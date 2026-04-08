@@ -172,6 +172,26 @@ function enrichMatchMetadata(match, prediction) {
     };
 }
 
+function inferSectionType(prediction) {
+    const explicit = String(prediction?.section_type || prediction?.type || '').trim().toLowerCase();
+    if (explicit) return explicit;
+
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    const uniqueMatchIds = new Set(
+        matches.map((match) => String(match?.match_id || '').trim()).filter(Boolean)
+    );
+    const firstMarket = String(matches[0]?.market || '').trim().toLowerCase();
+
+    if (matches.length >= 12) return 'mega_acca_12';
+    if (matches.length >= 6) return 'acca_6match';
+    if (matches.length > 1 && uniqueMatchIds.size === 1) return 'same_match';
+    if (matches.length >= 2) return 'multi';
+    if (matches.length === 1 && firstMarket && firstMarket !== '1x2' && firstMarket !== 'match_result') {
+        return 'secondary';
+    }
+    return 'direct';
+}
+
 function enrichPredictionDetails(prediction) {
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
     const firstMatch = matches[0] || {};
@@ -196,7 +216,7 @@ function enrichPredictionDetails(prediction) {
 
     return {
         ...prediction,
-        section_type: prediction?.section_type || getPredictionCategory(prediction),
+        section_type: inferSectionType(prediction),
         prediction_details: {
             ...(prediction?.prediction_details || {}),
             outcome: String(fallbackOutcome).trim(),
