@@ -223,18 +223,23 @@ router.get('/', requireRole('user'), async (req, res) => {
         }
 
         const weekStart = startOfWeekUtc(new Date());
-        let queryStr = `
-            SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at
-            FROM predictions_final pf
-            WHERE tier IN (${planCapabilities.tiers.map(t => `'${t}'`).join(',')})
-              AND pf.created_at >= $1
-        `;
-        const queryParams = [weekStart.toISOString()];
+        let predictions = [];
+        try {
+            let queryStr = `
+                SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at
+                FROM predictions_final pf
+                WHERE tier IN (${planCapabilities.tiers.map(t => `'${t}'`).join(',')})
+                  AND pf.created_at >= $1
+            `;
+            const queryParams = [weekStart.toISOString()];
 
-        queryStr += ` ORDER BY created_at DESC LIMIT 800;`;
+            queryStr += ` ORDER BY created_at DESC LIMIT 800;`;
 
-        const dbRes = await query(queryStr, queryParams);
-        let predictions = dbRes.rows || [];
+            const dbRes = await query(queryStr, queryParams);
+            predictions = dbRes.rows || [];
+        } catch (dbErr) {
+            console.error('[predictions] primary DB query failed, falling back to Supabase:', dbErr.message);
+        }
 
         // If DB returned no predictions, attempt Supabase fallback (useful when Supabase is the source)
         try {
