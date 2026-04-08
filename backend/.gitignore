@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.local
+*.sqlite
+access-log.json
+rate-limit.json
+form-submissions.txt
+submissions.json
+backend.local-backup/

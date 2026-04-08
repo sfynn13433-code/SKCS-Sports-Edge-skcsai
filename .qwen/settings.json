@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(node *)",
+      "Bash(dir *)",
+      "Bash(\"c:\\program files\\git\\cmd\\git.exe\" *)",
+      "Bash(npx *)",
+      "Bash(where.exe *)",
+      "Bash(powershell *)",
+      "Bash(set *)",
+      "Bash(c:\\program *)",
+      "Bash(\"c:\\progra~1\\git\\cmd\\git.exe\" *)",
+      "Bash(fix *)",
+      "Bash(eof)",
+      "Bash(del *)",
+      "Bash(curl *)",
+      "Bash(-h *)",
+      "Bash(findstr *)",
+      "Bash(fix: *)",
+      "Bash(- *)",
+      "Bash(msg)",
+      "Bash(type *)"
+    ]
+  },
+  "$version": 3
+}

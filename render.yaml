@@ -1,0 +1,66 @@
+services:
+  - type: web
+    name: skcsai
+    env: node
+    region: frankfurt
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: RAPIDAPI_KEY
+        sync: false
+      - key: X_APISPORTS_KEY
+        sync: false
+      - key: ODDS_API_KEY
+        sync: false
+      - key: X_RAPIDAPI_KEY
+        sync: false
+      - key: CRICKETDATA_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ENCRYPTION_KEY
+        sync: false
+      - key: USER_API_KEY
+        sync: false
+      - key: ADMIN_API_KEY
+        sync: false
+      - key: OPENAI_KEY
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: GROQ_KEY
+        sync: false
+      - key: COHERE_API_KEY
+        sync: false
+      - key: HUGGINGFACE_KEY
+        sync: false
+      - key: HUGGINGFACE_API_KEY
+        sync: false
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: OPENROUTER_KEY
+        sync: false
+      - key: LONG_CAT_KEY
+        sync: false
+      - key: CONSOLEAPI_KEY
+        sync: false
+      - key: DATA_MODE
+        value: live

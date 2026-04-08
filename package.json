@@ -1,0 +1,39 @@
+{
+  "name": "skcsai",
+  "version": "1.0.0",
+  "description": "SKCS AI - Multi-Sport Prediction Platform",
+  "main": "backend/server-express.js",
+  "scripts": {
+    "start": "node backend/server-express.js",
+    "dev": "nodemon backend/server-express.js",
+    "test": "node scripts/smoke-test.js",
+    "test:smoke": "node scripts/smoke-test.js",
+    "refresh:trigger": "node scripts/trigger-refresh.js",
+    "refresh:football": "node scripts/trigger-refresh.js --sport=football",
+    "grade:trigger": "node scripts/trigger-grade.js",
+    "grade:football": "node scripts/trigger-grade.js --sport=football",
+    "accuracy:track": "node scripts/track-prediction-accuracy.js",
+    "accuracy:april5": "node scripts/track-prediction-accuracy.js --date=2026-04-05 --sport=football",
+    "context:backfill": "node scripts/backfill-football-context.js",
+    "context:april5": "node scripts/backfill-football-context.js --date=2026-04-05 --sport=football"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.101.1",
+    "axios": "^1.14.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "moment-timezone": "^0.5.48",
+    "morgan": "^1.10.0",
+    "node-cron": "^3.0.3",
+    "path": "^0.12.7",
+    "pg": "^8.13.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

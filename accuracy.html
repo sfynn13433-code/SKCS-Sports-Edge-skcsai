@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKCS Accuracy Center</title>
+    <link rel="icon" href="data:,">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #08111f;
+            --panel: rgba(255,255,255,0.05);
+            --panel-strong: rgba(13,110,253,0.12);
+            --line: rgba(255,255,255,0.12);
+            --text: #f4f7fb;
+            --muted: #9eb3d1;
+            --blue: #0d6efd;
+            --blue-soft: #63a2ff;
+            --green: #2ecc71;
+            --red: #ff6b6b;
+            --amber: #ffbe55;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(13,110,253,0.22), transparent 35%),
+                radial-gradient(circle at top right, rgba(99,162,255,0.18), transparent 28%),
+                linear-gradient(180deg, #08111f 0%, #091727 100%);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .navbar {
+            background: rgba(8,17,31,0.88);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(14px);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-container {
+            max-width: 1260px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .logo {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 0.04em;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        .nav-links a:hover { color: #cfe2ff; }
+
+        .accuracy-hero {
+            position: relative;
+            min-height: 520px;
+            background: url('windrawwin.jpg') center/cover no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            margin-top: 70px;
+        }
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(8,17,31,0.88) 12%, rgba(13,110,253,0.24) 100%);
+            backdrop-filter: blur(2px);
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            padding: 2rem;
+        }
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 0.9rem;
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 999px;
+            background: rgba(255,255,255,0.08);
+            margin-bottom: 1.2rem;
+            color: #d7e7ff;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .hero-content h1 {
+            font-size: clamp(2.6rem, 5vw, 4.2rem);
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 18px rgba(0,0,0,0.45);
+        }
+        .hero-content p {
+            font-size: 1.15rem;
+            max-width: 780px;
+            margin: 0 auto;
+            color: #e5eefc;
+        }
+
+        .section {
+            max-width: 1260px;
+            margin: 4rem auto;
+            padding: 0 1.2rem;
+        }
+        .section h2 {
+            font-size: 2rem;
+            color: var(--blue-soft);
+            margin-bottom: 0.7rem;
+            border-left: 4px solid var(--blue);
+            padding-left: 1rem;
+        }
+        .section-intro {
+            color: var(--muted);
+            margin-bottom: 1.6rem;
+            max-width: 900px;
+        }
+        .controls-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 14px 40px rgba(0,0,0,0.18);
+            padding: 1.3rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+        .control-group label {
+            display: block;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            color: var(--muted);
+            margin-bottom: 0.45rem;
+        }
+        .control-group select,
+        .control-group input,
+        .control-btn {
+            width: 100%;
+            min-height: 46px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.06);
+            color: white;
+            padding: 0.8rem 0.95rem;
+            font-size: 0.98rem;
+        }
+        .control-btn {
+            cursor: pointer;
+            font-weight: 700;
+        }
+        .control-btn.primary {
+            background: linear-gradient(90deg, #0d6efd 0%, #63a2ff 100%);
+            border-color: rgba(99,162,255,0.45);
+        }
+        .control-btn:hover { opacity: 0.92; }
+
+        .stats-grid,
+        .tier-grid,
+        .type-grid,
+        .reasons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .stat-card,
+        .tier-card,
+        .type-card,
+        .reason-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 14px 40px rgba(0,0,0,0.18);
+        }
+
+        .stat-card,
+        .tier-card,
+        .type-card {
+            padding: 1.6rem;
+        }
+
+        .stat-card h3,
+        .tier-card h3,
+        .type-card h3 {
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--muted);
+            margin-bottom: 0.7rem;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--blue-soft);
+            margin: 0.4rem 0;
+        }
+        .stat-card small,
+        .tier-card small,
+        .type-card small {
+            color: var(--muted);
+            display: block;
+        }
+
+        .tier-card.core {
+            background: linear-gradient(180deg, rgba(17,68,140,0.22), rgba(255,255,255,0.04));
+        }
+        .tier-card.elite {
+            background: linear-gradient(180deg, rgba(13,110,253,0.26), rgba(255,255,255,0.05));
+        }
+
+        .tier-record,
+        .type-record {
+            margin-top: 1rem;
+            color: #dbe8fb;
+            font-size: 0.95rem;
+        }
+
+        .type-card.highlight {
+            border-color: rgba(13,110,253,0.45);
+            box-shadow: 0 18px 45px rgba(13,110,253,0.14);
+        }
+
+        .matrix-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            overflow: hidden;
+            backdrop-filter: blur(14px);
+        }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            background: rgba(13,110,253,0.2);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--line);
+        }
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            vertical-align: top;
+        }
+        tr:hover { background: rgba(255,255,255,0.03); }
+        .matrix-cell strong {
+            color: #f6fbff;
+            display: block;
+        }
+        .matrix-cell span {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .weekly-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            overflow: hidden;
+            backdrop-filter: blur(14px);
+        }
+
+        .reasons-grid {
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+        }
+        .reason-card {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            border-left: 4px solid var(--red);
+        }
+        .reason-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        .reason-head .match {
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: #dceaff;
+        }
+        .reason-head .score {
+            color: var(--amber);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .pill-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 0.28rem 0.7rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            border: 1px solid rgba(255,255,255,0.14);
+            background: rgba(255,255,255,0.05);
+            color: #eaf2ff;
+        }
+        .pill.core { background: rgba(17,68,140,0.24); }
+        .pill.elite { background: rgba(13,110,253,0.28); }
+        .pill.same_match,
+        .pill.acca { border-color: rgba(255,190,85,0.35); color: #ffe2a8; }
+        .reason-summary {
+            color: #edf4ff;
+            font-size: 1rem;
+        }
+        .evidence-stack {
+            display: grid;
+            gap: 0.8rem;
+        }
+        .evidence-item {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+            padding: 0.85rem 0.95rem;
+        }
+        .evidence-item strong {
+            display: block;
+            margin-bottom: 0.22rem;
+            color: #cfe2ff;
+        }
+        .evidence-item span,
+        .reason-meta-line {
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .sport-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .sport-item span:first-child {
+            width: 120px;
+            font-weight: 700;
+        }
+        .bar-container {
+            flex: 1;
+            height: 30px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .bar {
+            height: 100%;
+            background: linear-gradient(90deg, #0d6efd 0%, #63a2ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        .note {
+            margin-top: 1.4rem;
+            font-size: 0.92rem;
+            color: var(--muted);
+            text-align: center;
+        }
+        .empty-state {
+            background: rgba(255,255,255,0.04);
+            border: 1px dashed rgba(255,255,255,0.18);
+            border-radius: 18px;
+            padding: 1.3rem;
+            color: var(--muted);
+        }
+
+        .footer {
+            background: rgba(13,110,253,0.12);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding: 2rem;
+            text-align: center;
+            color: white;
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 1rem; }
+            .nav-container { align-items: flex-start; flex-direction: column; }
+            .hero-content { padding: 1.5rem; }
+            .reason-head { flex-direction: column; }
+            .sport-item { flex-direction: column; align-items: flex-start; }
+            .sport-item span:first-child { width: auto; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">SKCS AI</a>
+            <div class="nav-links">
+                <a href="index.html">← Back</a>
+                <a href="#weekly">Weekly View</a>
+                <a href="#loss-intel">Loss Intel</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="accuracy-hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-eyebrow">Accuracy Intelligence</div>
+            <h1>SKCS Accuracy Center</h1>
+            <p id="heroCopy">Football is the first live code in this intelligence view. Core, Elite, Same Match, and ACCA performance are broken out separately, and the same model is ready to expand to the remaining sport codes as their result pipelines come online.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Window Controls</h2>
+        <p class="section-intro">Soccer is live first, but the controls are already shaped for the other sport codes. Use them to inspect each dated prediction pull instead of relying on one static view.</p>
+        <div class="controls-card">
+            <div class="control-group">
+                <label for="sportSelect">Sport Code</label>
+                <select id="sportSelect"></select>
+            </div>
+            <div class="control-group">
+                <label for="dateInput">Fixture Date</label>
+                <input id="dateInput" type="date">
+            </div>
+            <div class="control-group">
+                <label for="runSelect">Publish Run</label>
+                <select id="runSelect"></select>
+            </div>
+            <div class="control-group">
+                <label>&nbsp;</label>
+                <button id="prevDateBtn" class="control-btn" type="button">Previous Window</button>
+            </div>
+            <div class="control-group">
+                <label>&nbsp;</label>
+                <button id="nextDateBtn" class="control-btn" type="button">Next Window</button>
+            </div>
+            <div class="control-group">
+                <label>&nbsp;</label>
+                <button id="applyFiltersBtn" class="control-btn primary" type="button">Load Window</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Window Snapshot</h2>
+        <p class="section-intro">This is the live grading window for the selected sport and date, including pending and voided legs so the published picture stays honest.</p>
+        <div class="stats-grid" id="statsGrid"></div>
+    </section>
+
+    <section class="section">
+        <h2>Tier Accuracy</h2>
+        <p class="section-intro">Core and Elite are shown separately at published product level. If one lane has no rows for the selected window, it still stays visible so future sports and future dates slot into the same reporting shape.</p>
+        <div class="tier-grid" id="tierGrid"></div>
+    </section>
+
+    <section class="section">
+        <h2>Bet Type Accuracy</h2>
+        <p class="section-intro">Same Match and ACCA are called out explicitly alongside the standard direct, secondary, and multi products, all graded as product slips rather than loose legs.</p>
+        <div class="type-grid" id="typeGrid"></div>
+    </section>
+
+    <section class="section">
+        <h2>Tier x Product Matrix</h2>
+        <p class="section-intro">This matrix shows exactly where the edge is landing by tier and product family, which matters as we expand to the other 12 sport codes.</p>
+        <div class="matrix-card table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tier</th>
+                        <th>Direct</th>
+                        <th>Secondary</th>
+                        <th>Multi</th>
+                        <th>Same Match</th>
+                        <th>ACCA</th>
+                    </tr>
+                </thead>
+                <tbody id="matrixBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="weekly" class="section">
+        <h2>Weekly Performance</h2>
+        <p class="section-intro">Weekly rollups stay available so one hot or cold day does not distort the bigger operating picture.</p>
+        <div class="weekly-card table-container">
+            <table id="weeklyTable">
+                <thead>
+                    <tr>
+                        <th>Week</th>
+                        <th>Wins</th>
+                        <th>Losses</th>
+                        <th>Accuracy</th>
+                        <th>Cumulative Record</th>
+                        <th>Loss Drivers</th>
+                    </tr>
+                </thead>
+                <tbody id="weeklyBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="loss-intel" class="section">
+        <h2>Why It Lost</h2>
+        <p class="section-intro">Each losing card shows the evidence stack we actually captured for that pick: tier, product, scoreline, and the incident chain behind the miss.</p>
+        <div class="reasons-grid" id="reasonsGrid"></div>
+        <p class="note" id="reasonNote">Reasons are evidence-backed from stored match events and context snapshots. Missing evidence stays explicitly unavailable instead of being guessed.</p>
+    </section>
+
+    <section class="section">
+        <h2>Accuracy by Sport</h2>
+        <p class="section-intro">The current endpoint is filtered per sport, but the display stays sport-aware so more codes can be added without changing the reporting surface.</p>
+        <div id="sportBars"></div>
+    </section>
+
+    <footer class="footer">
+        <p>SKCS AI Sports Predictions - transparency you can audit</p>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script>
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function formatTierClass(value) {
+            return String(value || '').toLowerCase() === 'elite' ? 'elite' : 'core';
+        }
+
+        function formatTypeClass(value) {
+            const normalized = String(value || '').toLowerCase().replace(/\s+/g, '_');
+            return normalized === 'same_match' || normalized === 'acca' ? normalized : 'standard';
+        }
+
+        function renderMatrixCell(item) {
+            if (!item) {
+                return '<div class="matrix-cell"><strong>0%</strong><span>0/0 graded</span></div>';
+            }
+            return `
+                <div class="matrix-cell">
+                    <strong>${item.winRate || 0}%</strong>
+                    <span>${item.wins || 0}-${item.losses || 0} graded, ${item.pending || 0} pending</span>
+                </div>
+            `;
+        }
+
+        function prettySportName(value) {
+            const map = {
+                football: 'Soccer',
+                basketball: 'Basketball',
+                baseball: 'Baseball',
+                hockey: 'Hockey',
+                rugby: 'Rugby',
+                cricket: 'Cricket',
+                volleyball: 'Volleyball',
+                mma: 'MMA',
+                formula1: 'Formula 1',
+                afl: 'AFL',
+                handball: 'Handball',
+                nfl: 'NFL',
+                american_football: 'American Football'
+            };
+            return map[value] || String(value || 'Unknown').replace(/_/g, ' ');
+        }
+
+        function shiftIsoDate(dateString, dayOffset) {
+            const date = new Date(`${dateString}T00:00:00Z`);
+            if (Number.isNaN(date.getTime())) return dateString;
+            date.setUTCDate(date.getUTCDate() + dayOffset);
+            return date.toISOString().slice(0, 10);
+        }
+
+        function updateQueryString(date, sport) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('date', date);
+            url.searchParams.set('sport', sport);
+            const runId = document.getElementById('runSelect')?.value || '';
+            if (runId) url.searchParams.set('run_id', runId);
+            else url.searchParams.delete('run_id');
+            window.history.replaceState({}, '', url.toString());
+        }
+
+        function formatRunLabel(run) {
+            const stamp = run.completedAt || run.startedAt || '';
+            const shortStamp = stamp ? String(stamp).replace('T', ' ').slice(0, 16) : 'pending';
+            return `Run #${run.runId} - ${run.triggerSource || 'unknown'} - ${shortStamp}`;
+        }
+
+        async function loadAccuracyStats() {
+            const params = new URLSearchParams(window.location.search);
+            const date = params.get('date') || '2026-04-05';
+            const sport = params.get('sport') || 'football';
+            const runId = params.get('run_id') || '';
+
+            let data = {
+                overall: { winRate: 0, wins: 0, total: 0, graded: 0, pending: 0, void: 0, unsupported: 0 },
+                byTier: [],
+                byType: [],
+                tierTypeBreakdown: [],
+                bySport: [],
+                weekly: [],
+                losses: [],
+                availability: { availableSports: [], availableDates: [], availableRuns: [] },
+                window: { date, sport, runId, publishSummary: { products: 0, legs: 0 }, reasonCapabilities: { verified: [], unavailable: [] }, contextCoverage: {} }
+            };
+
+            try {
+                const query = new URLSearchParams({ date, sport });
+                if (runId) query.set('run_id', runId);
+                const res = await fetch(`${window.API_BASE_URL}/api/accuracy?${query.toString()}`);
+                if (!res.ok) throw new Error('Failed to fetch');
+                data = await res.json();
+            } catch (error) {
+                console.warn('Accuracy API unavailable', error);
+            }
+
+            const winRate = data.overall?.winRate || 0;
+            const wins = data.overall?.wins || 0;
+            const total = data.overall?.total || 0;
+            const graded = data.overall?.graded || 0;
+            const pending = data.overall?.pending || 0;
+            const voided = data.overall?.void || 0;
+            const unsupported = data.overall?.unsupported || 0;
+            const missingEvent = data.overall?.missingEvent || data.window?.missingEvent || 0;
+            const publishedProducts = data.window?.publishSummary?.products || 0;
+            const publishedLegs = data.window?.publishSummary?.legs || 0;
+            const publishedHeadline = publishedProducts || total;
+            const publishedDetail = total === 0 && publishedProducts > 0
+                ? `${publishedLegs} legs in this publish run; results have not settled yet`
+                : `${pending} pending, ${voided} void, ${unsupported} unsupported`;
+            const availableSports = (data.availability?.availableSports || []).length
+                ? data.availability.availableSports
+                : [sport];
+            const availableDates = (data.availability?.availableDates || []).length
+                ? data.availability.availableDates
+                : [data.window?.date || date];
+            const availableRuns = Array.isArray(data.availability?.availableRuns) ? data.availability.availableRuns : [];
+
+            const sportSelect = document.getElementById('sportSelect');
+            const dateInput = document.getElementById('dateInput');
+            const runSelect = document.getElementById('runSelect');
+            sportSelect.innerHTML = availableSports.map((sportCode) => `
+                <option value="${escapeHtml(sportCode)}" ${sportCode === (data.window?.sport || sport) ? 'selected' : ''}>
+                    ${escapeHtml(prettySportName(sportCode))}
+                </option>
+            `).join('');
+            dateInput.value = data.window?.date || date;
+            dateInput.min = availableDates.length ? availableDates[availableDates.length - 1] : '';
+            dateInput.max = availableDates.length ? availableDates[0] : '';
+            runSelect.innerHTML = availableRuns.length
+                ? availableRuns.map((run) => `
+                    <option value="${run.runId}" ${String(run.runId) === String(data.window?.runId || runId || '') ? 'selected' : ''}>
+                        ${escapeHtml(formatRunLabel(run))}
+                    </option>
+                `).join('')
+                : '<option value="">Latest available run</option>';
+
+            document.getElementById('heroCopy').textContent = `${(data.window?.sport || sport).toUpperCase()} for ${data.window?.date || date} is live in the accuracy engine. Football is the first fully enriched code, with the same reporting model ready for the remaining 12 sport codes as their context pipelines are upgraded.`;
+
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card">
+                    <h3>${escapeHtml((data.window?.sport || sport).toUpperCase())} Window</h3>
+                    <div class="stat-number">${winRate}%</div>
+                    <small>${wins} correct from ${graded} graded legs</small>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Published</h3>
+                    <div class="stat-number">${publishedHeadline}</div>
+                    <small>${escapeHtml(publishedDetail)}</small>
+                </div>
+                <div class="stat-card">
+                    <h3>Missed Legs</h3>
+                    <div class="stat-number">${Math.max(graded - wins, 0)}</div>
+                    <small>Evidence stack shown below for every graded loss</small>
+                </div>
+                <div class="stat-card">
+                    <h3>Data Integrity</h3>
+                    <div class="stat-number">${missingEvent}</div>
+                    <small>legs missing canonical event linkage in this window</small>
+                </div>
+            `;
+
+            document.getElementById('tierGrid').innerHTML = (data.byTier || []).map((tier) => `
+                <div class="tier-card ${formatTierClass(tier.tier)}">
+                    <h3>${escapeHtml(tier.tier)} Tier</h3>
+                    <div class="stat-number">${tier.winRate || 0}%</div>
+                    <small>${tier.wins || 0} winning products from ${tier.graded || 0} graded products</small>
+                    <div class="tier-record">${tier.losses || 0} losses, ${tier.pending || 0} pending, ${tier.void || 0} void</div>
+                </div>
+            `).join('') || '<div class="empty-state">No tier data has been graded for this window yet.</div>';
+
+            document.getElementById('typeGrid').innerHTML = (data.byType || []).map((type) => `
+                <div class="type-card ${['Same Match', 'ACCA'].includes(type.type) ? 'highlight' : ''}">
+                    <h3>${escapeHtml(type.type)}</h3>
+                    <div class="stat-number">${type.winRate || 0}%</div>
+                    <small>${type.wins || 0} winning products from ${type.graded || 0} graded products</small>
+                    <div class="type-record">${type.losses || 0} losses, ${type.pending || 0} pending, ${type.void || 0} void</div>
+                </div>
+            `).join('') || '<div class="empty-state">No product-level accuracy data is available for this window yet.</div>';
+
+            const typeOrder = ['direct', 'secondary', 'multi', 'same_match', 'acca'];
+            document.getElementById('matrixBody').innerHTML = (data.tierTypeBreakdown || []).map((tier) => {
+                const typeMap = new Map((tier.types || []).map((type) => [type.typeKey, type]));
+                return `
+                    <tr>
+                        <td><strong>${escapeHtml(tier.tier)}</strong><br><span class="reason-meta-line">${tier.wins || 0}-${tier.losses || 0}, ${tier.pending || 0} pending</span></td>
+                        ${typeOrder.map((key) => `<td>${renderMatrixCell(typeMap.get(key))}</td>`).join('')}
+                    </tr>
+                `;
+            }).join('');
+
+            const weeklyBody = document.getElementById('weeklyBody');
+            let cumulativeWins = 0;
+            let cumulativeLosses = 0;
+            weeklyBody.innerHTML = (data.weekly || []).map((row) => {
+                cumulativeWins += row.wins || 0;
+                cumulativeLosses += row.losses || 0;
+                return `
+                    <tr>
+                        <td>${escapeHtml(row.weekStart || '-')}</td>
+                        <td>${row.wins || 0}</td>
+                        <td>${row.losses || 0}</td>
+                        <td>${row.accuracy || 0}%</td>
+                        <td>${cumulativeWins}-${cumulativeLosses}</td>
+                        <td>${escapeHtml((row.reasons || []).join(', ') || 'No verified reasons yet')}</td>
+                    </tr>
+                `;
+            }).join('') || '<tr><td colspan="6">No weekly data available yet.</td></tr>';
+
+            document.getElementById('reasonsGrid').innerHTML = (data.losses || []).length
+                ? (data.losses || []).map((item) => `
+                    <div class="reason-card">
+                        <div class="reason-head">
+                            <div>
+                                <div class="match">${escapeHtml(item.match)} (${escapeHtml(item.sport)})</div>
+                                <div class="pill-row">
+                                    <span class="pill ${formatTierClass(item.tier)}">${escapeHtml(item.tier || 'Tier')}</span>
+                                    <span class="pill ${formatTypeClass(item.predictionTypeKey || item.predictionType)}">${escapeHtml(item.predictionType || 'Type')}</span>
+                                    <span class="pill">${escapeHtml(item.market || 'market')}</span>
+                                    ${item.confidence ? `<span class="pill">${escapeHtml(item.confidence)}% confidence</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="score">${escapeHtml(item.scoreline ? `FT ${item.scoreline}` : (item.actualResult || 'LOSS'))}${item.halftimeScoreline ? `<br>HT ${escapeHtml(item.halftimeScoreline)}` : ''}</div>
+                        </div>
+                        <div class="reason-summary">${escapeHtml(item.reasonSummary || 'No verified reason captured.')}</div>
+                        <div class="reason-meta-line">Predicted: ${escapeHtml(item.predictedOutcome || '-')} | Actual: ${escapeHtml(item.actualResult || item.eventStatus || 'unresolved')}</div>
+                        <div class="evidence-stack">
+                            ${(item.factors || []).length
+                                ? item.factors.map((factor) => `
+                                    <div class="evidence-item">
+                                        <strong>${escapeHtml(factor.label || factor.type || 'Evidence')}</strong>
+                                        <span>${escapeHtml(factor.detail || '')}</span>
+                                    </div>
+                                `).join('')
+                                : '<div class="evidence-item"><strong>No evidence stack</strong><span>This loss has no structured factors stored yet.</span></div>'
+                            }
+                        </div>
+                    </div>
+                `).join('')
+                : '<div class="empty-state">No graded losses are available for this window yet.</div>';
+
+            const sportBars = document.getElementById('sportBars');
+            sportBars.innerHTML = (data.bySport || []).map((entry) => `
+                <div class="sport-item">
+                    <span>${escapeHtml((entry.sport || 'Unknown').charAt(0).toUpperCase() + (entry.sport || 'Unknown').slice(1))}</span>
+                    <div class="bar-container">
+                        <div class="bar" style="width: ${entry.winRate || 0}%">${entry.winRate || 0}%</div>
+                    </div>
+                    <span>${entry.wins || 0}/${entry.graded || 0}</span>
+                </div>
+            `).join('') || '<div class="empty-state">No sport-level breakdown is available yet.</div>';
+
+            const unavailable = (data.window?.reasonCapabilities?.unavailable || []).join(', ');
+            const coverage = data.window?.contextCoverage || {};
+            const coverageText = [];
+            if (coverage.injuryRows) coverageText.push(`${coverage.injuryRows} injury reports`);
+            if (coverage.weatherRows) coverageText.push(`${coverage.weatherRows} weather snapshots`);
+            if (coverage.newsRows) coverageText.push(`${coverage.newsRows} news signals`);
+
+            document.getElementById('reasonNote').textContent = unavailable
+                ? `Evidence is live from stored events and context snapshots${coverageText.length ? ` with ${coverageText.join(', ')}` : ''}. Still unavailable for this window: ${unavailable}.`
+                : `Evidence is live from stored events and context snapshots${coverageText.length ? ` with ${coverageText.join(', ')}` : ''}.`;
+        }
+
+        document.getElementById('applyFiltersBtn').addEventListener('click', () => {
+            const sport = document.getElementById('sportSelect').value || 'football';
+            const date = document.getElementById('dateInput').value || '2026-04-05';
+            updateQueryString(date, sport);
+            loadAccuracyStats();
+        });
+
+        document.getElementById('prevDateBtn').addEventListener('click', () => {
+            const dateInput = document.getElementById('dateInput');
+            dateInput.value = shiftIsoDate(dateInput.value || '2026-04-05', -1);
+            document.getElementById('runSelect').value = '';
+            document.getElementById('applyFiltersBtn').click();
+        });
+
+        document.getElementById('nextDateBtn').addEventListener('click', () => {
+            const dateInput = document.getElementById('dateInput');
+            dateInput.value = shiftIsoDate(dateInput.value || '2026-04-05', 1);
+            document.getElementById('runSelect').value = '';
+            document.getElementById('applyFiltersBtn').click();
+        });
+
+        loadAccuracyStats();
+    </script>
+</body>
+</html>
