@@ -433,7 +433,7 @@ function showElite(){
 async function loadBillingStatus() {
   const banner = document.getElementById('billingBanner');
   try {
-    const backend = window.API_BASE_URL || "https://skcsai-z8cd.onrender.com";
+    const backend = window.API_BASE_URL || "https://skcs-sports-edge-skcsai.onrender.com";
     const res = await fetch(backend + "/api/billing-status");
     billingStatus = await res.json();
 
@@ -466,7 +466,7 @@ async function selectPlan(tierId) {
     return;
   }
 
-  const SKCS_BACKEND = window.API_BASE_URL || "https://skcsai-z8cd.onrender.com";
+  const SKCS_BACKEND = window.API_BASE_URL || "https://skcs-sports-edge-skcsai.onrender.com";
   const token = session.access_token;
 
   try {

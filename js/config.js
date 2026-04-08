@@ -1,5 +1,5 @@
 // Default to the live Render API, but allow an earlier override for migration tests.
-window.API_BASE_URL = window.API_BASE_URL || "https://skcsai-z8cd.onrender.com";
+window.API_BASE_URL = window.API_BASE_URL || "https://skcs-sports-edge-skcsai.onrender.com";
 
 // Safety check: ensure no trailing slash
 if (window.API_BASE_URL.endsWith('/')) {
