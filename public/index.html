@@ -983,78 +983,12 @@
         return shaped;
     }
 
-    async function fetchPredictions(sport, userPlanId = 'elite_30day_deep_vip') {
-        const loadingMessage = `Loading ${sport} insights...`;
-        const errorMessage = `Failed to load ${sport} predictions. Please try again later.`;
-        
-        try {
-            console.log(`[predictions] Fetching ${sport} predictions for plan: ${userPlanId}`);
-            
-            const response = await fetch(`${window.API_BASE_URL}/api/predictions?sport=${sport}&plan_id=${userPlanId}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-            const data = await response.json();
-            console.log(`[predictions] Received ${data.count || 0} predictions for ${sport}`);
-            
-            if (!data.predictions || data.predictions.length === 0) {
-                console.warn(`[predictions] No predictions available for ${sport}`);
-                console.warn(`[predictions] This could mean:`);
-                console.warn(`  - No matches scheduled in the next few days`);
-                console.warn(`  - Pipeline sync hasn pending or failed`);
-                console.warn(`  - API keys not configured properly`);
-                
-                // Show user-friendly message
-                const container = document.getElementById(`${sport}-matches`);
-                if (container) {
-                    container.innerHTML = `
-                        <div style="text-align: center; padding: 2rem; color: #666;">
-                            <p style="font-size: 1.1rem; margin-bottom: 1rem;">
-                                🔍 No ${sport} insights available right now
-                            </p>
-                            <p style="font-size: 0.9rem;">
-                                This usually means no matches are scheduled in the next few days,<br>
-                                or our AI pipeline is currently processing new data.
-                            </p>
-                            <p style="font-size: 0.85rem; margin-top: 1rem; color: #999;">
-                                Try checking back later, or contact support if this persists.
-                            </p>
-                        </div>
-                    `;
-                }
-                return;
-            }
-            
-            // Process and display predictions
-            displayPredictions(sport, data.predictions);
-            
-        } catch (error) {
-            console.error(`[predictions] Error fetching ${sport} predictions:`, error);
-            console.error(`[predictions] Stack trace:`, error.stack);
-            
-            // Show error message to user
-            const container = document.getElementById(`${sport}-matches`);
-            if (container) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 2rem; color: #ff6b6b;">
-                        <p style="font-size: 1.1rem; margin-bottom: 1rem;">
-                            ⚠️ Unable to load ${sport} insights
-                        </p>
-                        <p style="font-size: 0.9rem; color: #666;">
-                            Error: ${error.message}
-                        </p>
-                        <button onclick="fetchPredictions('${sport}')" 
-                                style="margin-top: 1rem; padding: 0.5rem 1rem; background: #0d6efd; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                            🔄 Retry
-                        </button>
-                    </div>
-                `;
-            }
-        }
+    function resolveUserPlanId(userPlanId) {
+        return String(userPlanId || window.userPlanId || window.currentUserPlanId || 'elite_30day_deep_vip');
     }
-    async function fetchPredictions(sport) {
+
+    async function fetchPredictions(sport, userPlanId = 'elite_30day_deep_vip') {
+        const activePlanId = resolveUserPlanId(userPlanId);
         const container = document.getElementById(sport + '-matches');
         const requestSport = sport === 'accumulators' ? '' : sport;
         if (container) {
@@ -1077,11 +1011,11 @@
                 });
                 if (!res.ok) return [];
                 const rows = await res.json();
-                const allowedTiers = getPredictionTiersForPlan(userPlanId);
+                const allowedTiers = getPredictionTiersForPlan(activePlanId);
                 const filtered = (rows || []).filter(r => {
                     const rowTier = String(r.tier || 'normal').toLowerCase();
                     if (!allowedTiers.includes(rowTier)) return false;
-                    if (!predictionAllowsPlanAccess(r, userPlanId)) return false;
+                    if (!predictionAllowsPlanAccess(r, activePlanId)) return false;
                     const matches = Array.isArray(r.matches) ? r.matches : [];
                     if (sport === 'accumulators') {
                         const type = getSectionType(r);
@@ -1098,7 +1032,7 @@
 
         try {
             const cacheBust = Date.now();
-            let url = `${SKCS_BACKEND}/api/predictions?plan_id=${userPlanId}&_ts=${cacheBust}`;
+            let url = `${SKCS_BACKEND}/api/predictions?plan_id=${activePlanId}&_ts=${cacheBust}`;
             if (requestSport) {
                 url += `&sport=${requestSport}`;
             }
@@ -1116,7 +1050,7 @@
 
             let preds = (response.ok && data && Array.isArray(data.predictions)) ? applyUniqueAssetRule(data.predictions) : [];
 
-            if (preds.length === 0 && userPlanId.includes('elite')) {
+            if (preds.length === 0 && activePlanId.includes('elite')) {
                 let urlN = `${SKCS_BACKEND}/api/predictions?plan_id=core_30day_limitless&_ts=${cacheBust}`;
                 if (requestSport) {
                     urlN += `&sport=${requestSport}`;
