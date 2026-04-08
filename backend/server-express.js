@@ -75,9 +75,11 @@ const configuredOrigins = String(process.env.FRONTEND_ORIGINS || '')
 const allowedOrigins = new Set([
   "https://skcsaiedge.onrender.com",
   "https://skcsai-z8cd.onrender.com",
+  "https://skcs-sports-edge-skcsai.onrender.com",
   "https://skcs-sports-edge.github.io",
   "https://skcsaisports.vercel.app",
   "https://skcsai.vercel.app",
+  "https://skcs-sports-edge-skcsai.vercel.app",
   "https://skcs.co.za",
   "https://www.skcs.co.za",
   "https://skcsaisports-5ltic8509-stephens-projects-e3dd898a.vercel.app",
@@ -107,8 +109,10 @@ function isAllowedVercelPreview(origin) {
     return (
       hostname === 'skcsaisports.vercel.app' ||
       hostname === 'skcsai.vercel.app' ||
+      hostname === 'skcs-sports-edge-skcsai.vercel.app' ||
       /^skcsaisports-[a-z0-9-]+\.vercel\.app$/i.test(hostname) ||
-      /^skcsai-[a-z0-9-]+\.vercel\.app$/i.test(hostname)
+      /^skcsai-[a-z0-9-]+\.vercel\.app$/i.test(hostname) ||
+      /^skcs-sports-edge-skcsai(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(hostname)
     );
   } catch {
     return false;

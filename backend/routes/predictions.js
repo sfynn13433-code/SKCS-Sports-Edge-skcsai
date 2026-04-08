@@ -172,6 +172,39 @@ function enrichMatchMetadata(match, prediction) {
     };
 }
 
+function enrichPredictionDetails(prediction) {
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    const firstMatch = matches[0] || {};
+    const firstMetadata = firstMatch?.metadata || {};
+    const matchDetails = firstMatch?.prediction_details || {};
+
+    const fallbackOutcome =
+        matchDetails.outcome ||
+        firstMatch?.prediction ||
+        prediction?.prediction ||
+        prediction?.section_type ||
+        prediction?.type ||
+        'PREDICTION';
+
+    const fallbackReasoning =
+        matchDetails.reasoning ||
+        firstMetadata.reasoning ||
+        firstMetadata.model_reasoning ||
+        prediction?.reasoning ||
+        prediction?.model_reasoning ||
+        '';
+
+    return {
+        ...prediction,
+        section_type: prediction?.section_type || getPredictionCategory(prediction),
+        prediction_details: {
+            ...(prediction?.prediction_details || {}),
+            outcome: String(fallbackOutcome).trim(),
+            reasoning: String(fallbackReasoning).trim()
+        }
+    };
+}
+
 // GET /api/predictions
 // Default tier = deep (elite pool); subscription limits use /api/user/predictions
 router.get('/', requireRole('user'), async (req, res) => {
