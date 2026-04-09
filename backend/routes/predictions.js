@@ -149,6 +149,155 @@ function humanizePredictionLabel(prediction, market) {
     return String(prediction || '').toUpperCase();
 }
 
+function getPredictionPrimaryMatchId(prediction) {
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    const firstMatch = matches[0] || {};
+    return String(firstMatch?.match_id || prediction?.match_id || '').trim();
+}
+
+function buildSecondaryMarketSummaryItem(prediction) {
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    const firstMatch = matches[0] || {};
+    return {
+        market: firstMatch?.market || '',
+        prediction: firstMatch?.prediction || '',
+        confidence: normalizeConfidence(firstMatch?.confidence ?? prediction?.total_confidence ?? 0),
+        description: firstMatch?.metadata?.market_description || '',
+        label: humanizePredictionLabel(firstMatch?.prediction, firstMatch?.market)
+    };
+}
+
+function buildSameMatchBuilder(prediction) {
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    return matches.slice(0, 6).map((match, index) => ({
+        index: index + 1,
+        market: humanizeToken(match?.market || ''),
+        prediction: humanizePredictionLabel(match?.prediction, match?.market),
+        confidence: normalizeConfidence(match?.confidence || 0)
+    }));
+}
+
+function buildFallbackReasoning(prediction, relatedSecondaryMarkets = []) {
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    const firstMatch = matches[0] || {};
+    const metadata = firstMatch?.metadata || {};
+    const homeTeam = firstMatch?.home_team || metadata?.home_team || 'Home Team';
+    const awayTeam = firstMatch?.away_team || metadata?.away_team || 'Away Team';
+    const league = metadata?.league || humanizeToken(firstMatch?.sport || '');
+    const outcome = humanizePredictionLabel(firstMatch?.prediction, firstMatch?.market);
+    const confidence = normalizeConfidence(firstMatch?.confidence ?? prediction?.total_confidence ?? 0);
+    const backupSummary = relatedSecondaryMarkets
+        .slice(0, 3)
+        .map((market) => `${market.label} (${market.confidence}%)`)
+        .join(', ');
+
+    if (backupSummary) {
+        return `${homeTeam} vs ${awayTeam} leans ${outcome} at ${confidence}% confidence in ${league}. Secondary coverage currently favours ${backupSummary}.`;
+    }
+
+    return `${homeTeam} vs ${awayTeam} leans ${outcome} at ${confidence}% confidence in ${league}.`;
+}
+
+function buildFallbackPipelineData(prediction, relatedSecondaryMarkets = []) {
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    const firstMatch = matches[0] || {};
+    const metadata = firstMatch?.metadata || {};
+    const homeTeam = firstMatch?.home_team || metadata?.home_team || 'Home Team';
+    const awayTeam = firstMatch?.away_team || metadata?.away_team || 'Away Team';
+    const competition = metadata?.league || humanizeToken(firstMatch?.sport || '');
+    const outcome = humanizePredictionLabel(firstMatch?.prediction, firstMatch?.market);
+    const confidence = normalizeConfidence(firstMatch?.confidence ?? prediction?.total_confidence ?? 0);
+    const volatility = humanizeToken(firstMatch?.volatility || prediction?.risk_level || 'medium');
+    const backupSummary = relatedSecondaryMarkets
+        .slice(0, 3)
+        .map((market) => market.label)
+        .join(', ');
+
+    return {
+        elite_6_stage: {
+            stage_1_collection: `${competition} market inputs collected for ${homeTeam} vs ${awayTeam}.`,
+            stage_2_baseline: `${outcome} is the leading baseline edge at ${confidence}% confidence.`,
+            stage_3_context: backupSummary
+                ? `Related secondary coverage is available: ${backupSummary}.`
+                : 'No linked secondary coverage is currently attached to this fixture.',
+            stage_4_reality: `${volatility} volatility profile on the published market set.`,
+            stage_5_decision: `Primary market retained as ${outcome}.`,
+            stage_6_final: `Final published edge remains ${outcome}.`
+        },
+        core_4_stage: {
+            stage_1_baseline: `${outcome} is the leading baseline edge at ${confidence}% confidence.`,
+            stage_2_context: backupSummary
+                ? `Secondary coverage is available: ${backupSummary}.`
+                : 'No linked secondary coverage is currently attached to this fixture.',
+            stage_3_reality: `${volatility} volatility profile on the published market set.`,
+            stage_4_final: `Final published edge remains ${outcome}.`
+        }
+    };
+}
+
+function attachRelatedPredictionArtifacts(predictions) {
+    const secondaryByMatchId = new Map();
+    const sameMatchByMatchId = new Map();
+
+    for (const prediction of predictions) {
+        const primaryMatchId = getPredictionPrimaryMatchId(prediction);
+        if (!primaryMatchId) continue;
+
+        const sectionType = inferSectionType(prediction);
+        if (sectionType === 'secondary') {
+            if (!secondaryByMatchId.has(primaryMatchId)) {
+                secondaryByMatchId.set(primaryMatchId, []);
+            }
+            secondaryByMatchId.get(primaryMatchId).push(buildSecondaryMarketSummaryItem(prediction));
+        } else if (sectionType === 'same_match') {
+            sameMatchByMatchId.set(primaryMatchId, buildSameMatchBuilder(prediction));
+        }
+    }
+
+    return predictions.map((prediction) => {
+        const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+        if (!matches.length) return prediction;
+
+        const sectionType = inferSectionType(prediction);
+        const primaryMatchId = getPredictionPrimaryMatchId(prediction);
+        const firstMatch = matches[0] || {};
+        const remainingMatches = matches.slice(1);
+        const relatedSecondaryMarkets = secondaryByMatchId.get(primaryMatchId) || [];
+        const relatedSameMatchBuilder = sameMatchByMatchId.get(primaryMatchId) || [];
+        const metadata = {
+            ...(firstMatch?.metadata || {})
+        };
+
+        if (sectionType === 'direct') {
+            if (!Array.isArray(metadata.secondary_markets) || metadata.secondary_markets.length === 0) {
+                metadata.secondary_markets = relatedSecondaryMarkets;
+            }
+            if (!Array.isArray(metadata.same_match_builder) || metadata.same_match_builder.length === 0) {
+                metadata.same_match_builder = relatedSameMatchBuilder;
+            }
+        }
+
+        if (!String(metadata.reasoning || '').trim()) {
+            metadata.reasoning = buildFallbackReasoning(prediction, relatedSecondaryMarkets);
+        }
+
+        if (!metadata.pipeline_data || typeof metadata.pipeline_data !== 'object') {
+            metadata.pipeline_data = buildFallbackPipelineData(prediction, relatedSecondaryMarkets);
+        }
+
+        return {
+            ...prediction,
+            matches: [
+                {
+                    ...firstMatch,
+                    metadata
+                },
+                ...remainingMatches
+            ]
+        };
+    });
+}
+
 function normalizeConfidence(confidence) {
     if (typeof confidence !== 'number' || Number.isNaN(confidence)) return 0;
     return Math.max(0, Math.min(100, Math.round(confidence)));
@@ -292,7 +441,7 @@ router.get('/', requireRole('user'), async (req, res) => {
         const sport = req.query.sport;
         const sportFilterValues = getSportFilterValues(sport);
         const futureWindowDays = Math.max(1, Math.min(14, Number(req.query.window_days) || 7));
-        const historyWindowDays = Math.max(0, Math.min(14, Number(req.query.history_days) || 7));
+        const historyWindowDays = Math.max(0, Math.min(14, Number(req.query.history_days) || 0));
 
         console.log(`[PREDICTIONS] Request for Plan: ${planId}, Sport: ${sport || 'all'}`);
 
@@ -441,11 +590,12 @@ router.get('/', requireRole('user'), async (req, res) => {
                 matches: enrichedMatches
             };
         }).map(enrichPredictionDetails);
+        const hydratedPredictions = attachRelatedPredictionArtifacts(enrichedPredictions);
 
         const windowStart = new Date(now.getTime() - historyWindowDays * 24 * 60 * 60 * 1000);
         const windowEnd = new Date(now.getTime() + futureWindowDays * 24 * 60 * 60 * 1000);
 
-        const scopedPredictions = enrichedPredictions
+        const scopedPredictions = hydratedPredictions
             .filter((prediction) => predictionMatchesWindow(prediction, windowStart, windowEnd))
             .filter((prediction) => predictionMatchesSport(prediction, sportFilterValues))
             .sort((a, b) => comparePredictionsForDisplay(a, b, now));

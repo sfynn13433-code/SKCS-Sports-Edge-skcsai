@@ -358,10 +358,11 @@ function isPublishablePrediction(prediction, tier, now = new Date()) {
         return typeof prediction.confidence === 'number' && prediction.confidence > 0;
     }
 
-    // Keep a reviewable audit window so recent settled fixtures remain visible for testing.
-    const staleCutoff = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    // Do not republish old fixtures onto the live predictions surface.
+    // A small grace period allows fixtures that just started to remain visible.
+    const staleCutoff = new Date(now.getTime() - 2 * 60 * 60 * 1000);
     if (kickoff < staleCutoff) {
-        console.log(`[accaBuilder] Rejecting prediction for match ${prediction.match_id}: kickoff ${kickoff.toISOString()} is older than the 7-day review window`);
+        console.log(`[accaBuilder] Rejecting prediction for match ${prediction.match_id}: kickoff ${kickoff.toISOString()} is older than the live publish window`);
         return false;
     }
 
@@ -371,12 +372,20 @@ function isPublishablePrediction(prediction, tier, now = new Date()) {
     return kickoff <= maxFuture;
 }
 
-function compareCandidates(a, b) {
+function compareCandidates(a, b, now = new Date()) {
     const kickoffA = parseKickoff(a);
     const kickoffB = parseKickoff(b);
+    const upcomingA = kickoffA ? kickoffA >= now : false;
+    const upcomingB = kickoffB ? kickoffB >= now : false;
+
+    if (upcomingA !== upcomingB) {
+        return upcomingA ? -1 : 1;
+    }
 
     if (kickoffA && kickoffB) {
-        const timeDiff = kickoffA.getTime() - kickoffB.getTime();
+        const timeDiff = upcomingA && upcomingB
+            ? kickoffA.getTime() - kickoffB.getTime()
+            : kickoffB.getTime() - kickoffA.getTime();
         if (timeDiff !== 0) return timeDiff;
     } else if (kickoffA) {
         return -1;
@@ -535,7 +544,7 @@ function buildMegaAcca12Candidates(predictions, options = {}) {
     const expiryCutoff = options.expiryCutoff instanceof Date ? options.expiryCutoff : null;
     
     // Try multiple confidence thresholds to ensure we can build mega ACCAs
-    const confidenceThresholds = [MEGA_ACCA_MIN_CONFIDENCE, 85, 80];
+    const confidenceThresholds = [MEGA_ACCA_MIN_CONFIDENCE, 85, 80, 75, 70];
     let eligible = [];
     let usedThreshold = MEGA_ACCA_MIN_CONFIDENCE;
     
@@ -576,7 +585,7 @@ function buildMegaAcca12Candidates(predictions, options = {}) {
             match_id: ids.join('|'),
             matches: legs,
             total_confidence: computeTotalConfidence(legs),
-            risk_level: usedThreshold >= 90 ? 'safe' : usedThreshold >= 85 ? 'medium' : 'medium'
+            risk_level: usedThreshold >= 90 ? 'safe' : 'medium'
         });
     }
 
@@ -623,6 +632,7 @@ function getCategoryBuildCaps(requestedSports = []) {
 async function loadValidFilteredPredictions(tier, client, options = {}) {
     const t = normalizeTier(tier);
     const requestedSports = normalizeRequestedSports(options.requestedSports);
+    const now = options.now instanceof Date ? options.now : new Date();
 
     const res = await client.query(
         `
@@ -648,8 +658,8 @@ async function loadValidFilteredPredictions(tier, client, options = {}) {
 
     return res.rows
         .filter((row) => requestedSports.length === 0 || requestedSports.includes(normalizeSportKey(row.sport)))
-        .filter((row) => isPublishablePrediction(row, t))
-        .sort(compareCandidates);
+        .filter((row) => isPublishablePrediction(row, t, now))
+        .sort((a, b) => compareCandidates(a, b, now));
 }
 
 async function loadWeekLockedFixtureIds(client, now = new Date()) {
@@ -711,7 +721,8 @@ async function buildFinalForTier(tier, options = {}) {
         const accaRules = await getAccaRules(client);
 
         const valid = await loadValidFilteredPredictions(t, client, {
-            requestedSports: options.requestedSports
+            requestedSports: options.requestedSports,
+            now
         });
         const perMatchLimited = enforcePerMatchLimit(valid, accaRules.max_per_match);
         const perSportLimited = enforcePerSportLimit(

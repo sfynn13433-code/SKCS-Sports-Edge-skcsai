@@ -957,6 +957,44 @@
         return String(pred && (pred.section_type || pred.type) || '').toLowerCase();
     }
 
+    function buildSecondaryMarketDisplayItem(pred) {
+        const firstMatch = (pred && Array.isArray(pred.matches) && pred.matches[0]) ? pred.matches[0] : {};
+        const metadata = firstMatch.metadata || {};
+        return {
+            market: firstMatch.market || '',
+            prediction: firstMatch.prediction || '',
+            confidence: Math.max(0, Math.min(100, Math.round(Number(firstMatch.confidence || pred.total_confidence || 0)))),
+            label: formatPrediction(firstMatch),
+            description: metadata.market_description || ''
+        };
+    }
+
+    function attachSecondaryMarkets(pred, secondaryByMatchId) {
+        const firstMatch = (pred && Array.isArray(pred.matches) && pred.matches[0]) ? pred.matches[0] : {};
+        const matchId = String(firstMatch.match_id || '').trim();
+        if (!matchId) return pred;
+
+        const existing = Array.isArray(firstMatch?.metadata?.secondary_markets) ? firstMatch.metadata.secondary_markets : [];
+        if (existing.length > 0) return pred;
+
+        const linked = secondaryByMatchId.get(matchId) || [];
+        if (!linked.length) return pred;
+
+        return {
+            ...pred,
+            matches: [
+                {
+                    ...firstMatch,
+                    metadata: {
+                        ...(firstMatch.metadata || {}),
+                        secondary_markets: linked
+                    }
+                },
+                ...(Array.isArray(pred.matches) ? pred.matches.slice(1) : [])
+            ]
+        };
+    }
+
     function applyUniqueAssetRule(predictions) {
         const categoryOrder = ['direct', 'secondary', 'same_match', 'multi', 'acca_6match', 'mega_acca_12'];
         const buckets = new Map(categoryOrder.map((key) => [key, []]));
@@ -1048,7 +1086,7 @@
             let data = null;
             try { data = await response.json(); } catch (e) { data = null; }
 
-            let preds = (response.ok && data && Array.isArray(data.predictions)) ? applyUniqueAssetRule(data.predictions) : [];
+            let preds = (response.ok && data && Array.isArray(data.predictions)) ? data.predictions : [];
 
             if (preds.length === 0 && activePlanId.includes('elite')) {
                 let urlN = `${SKCS_BACKEND}/api/predictions?plan_id=core_30day_limitless&_ts=${cacheBust}`;
@@ -1065,7 +1103,7 @@
                 let d2 = null;
                 try { d2 = await r2.json(); } catch (e) { d2 = null; }
                 if (r2.ok && d2 && Array.isArray(d2.predictions) && d2.predictions.length > 0) {
-                    preds = applyUniqueAssetRule(d2.predictions);
+                    preds = d2.predictions;
                 }
             }
 
@@ -1087,11 +1125,11 @@
             const supaPreds = await fetchFromSupabase();
             if (supaPreds && supaPreds.length > 0) {
                 if (sport === 'football') {
-                    renderFootballInsights(applyUniqueAssetRule(supaPreds));
+                    renderFootballInsights(supaPreds);
                     return;
                 }
                 if (sport === 'accumulators') {
-                    renderAccumulatorInsights(applyUniqueAssetRule(supaPreds), null);
+                    renderAccumulatorInsights(supaPreds, null);
                     return;
                 }
                 renderSport(sport, sport + '-matches', supaPreds);
@@ -1117,11 +1155,11 @@
             const supaPreds = await fetchFromSupabase();
             if (supaPreds && supaPreds.length > 0) {
                 if (sport === 'football') {
-                    renderFootballInsights(applyUniqueAssetRule(supaPreds));
+                    renderFootballInsights(supaPreds);
                     return;
                 }
                 if (sport === 'accumulators') {
-                    renderAccumulatorInsights(applyUniqueAssetRule(supaPreds), null);
+                    renderAccumulatorInsights(supaPreds, null);
                     return;
                 }
                 renderSport(sport, sport + '-matches', supaPreds);
@@ -1160,13 +1198,22 @@
         const singles = predictions.filter(p => p.type === 'single' || !p.type || ['direct', 'secondary'].includes(getSectionType(p)));
         const directSingles = singles.filter(p => getSectionType(p) === 'direct' || (!getSectionType(p) && Array.isArray(p.matches) && p.matches.length === 1));
         const secondarySingles = singles.filter(p => getSectionType(p) === 'secondary');
+        const secondaryByMatchId = new Map();
+        secondarySingles.forEach((pred) => {
+            const firstMatch = (pred && Array.isArray(pred.matches) && pred.matches[0]) ? pred.matches[0] : {};
+            const matchId = String(firstMatch.match_id || '').trim();
+            if (!matchId) return;
+            if (!secondaryByMatchId.has(matchId)) secondaryByMatchId.set(matchId, []);
+            secondaryByMatchId.get(matchId).push(buildSecondaryMarketDisplayItem(pred));
+        });
+        const directWithLinkedSecondary = directSingles.map((pred) => attachSecondaryMarkets(pred, secondaryByMatchId));
         const multiPreds = predictions.filter(p => getSectionType(p) === 'multi' || (Array.isArray(p.matches) && p.matches.length >= 2 && p.matches.length <= 3));
         const sameMatchPreds = predictions.filter(p => getSectionType(p) === 'same_match' || (Array.isArray(p.matches) && p.matches.length > 1 && new Set((p.matches || []).map(m => m.match_id)).size === 1));
 
         const tierSummary = document.getElementById('football-tier-summary');
         if (tierSummary) tierSummary.style.display = 'block';
 
-        setFootballSection('football-direct-matches', directSingles, createPredictionCard, 'No direct football insights available.');
+        setFootballSection('football-direct-matches', directWithLinkedSecondary, createPredictionCard, 'No direct football insights available.');
         setFootballSection('football-secondary-matches', secondarySingles, createPredictionCard, 'No football analytical insights available.');
         setFootballSection('football-multi-matches', multiPreds, createMultiCard, 'No football multi insights available.');
         setFootballSection('football-same-matches', sameMatchPreds, createMultiCard, 'No same-match football bet builders available.');
@@ -1411,12 +1458,18 @@
         const legacyStagesHtml = pipelineHtml ? '' : `${baselineHtml}${contextHtml}${realityHtml}${decisionHtml}`;
 
         const secondaryHtml = secondaryMarkets.length
-            ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid #e2e8f0;">
+            ? `<button class="secondary-toggle" data-card-id="${cardId}" style="margin-top:10px;width:100%;padding:8px;background:#e7f1ff;color:#0d6efd;border:1px solid #93c5fd;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:700;">View Secondary Insights</button>
+               <div class="secondary-markets" id="secondary-${cardId}" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid #e2e8f0;">
                     <div style="font-size:0.8rem;font-weight:700;color:#b45309;margin-bottom:8px;">Secondary Backup Markets</div>
                     ${secondaryMarkets.map((market) => {
-                        const label = typeof market === 'string' ? market : (market.prediction || market.market || 'Secondary Market');
+                        const label = typeof market === 'string'
+                            ? market
+                            : (market.label || market.prediction || market.market || 'Secondary Market');
                         const confidence = typeof market === 'object' && market !== null && market.confidence ? ` <span style="color:#64748b;">(${market.confidence}%)</span>` : '';
-                        return `<div style="font-size:0.85rem;color:#1f2937;margin-bottom:4px;">• ${label}${confidence}</div>`;
+                        const description = typeof market === 'object' && market !== null && market.description
+                            ? `<div style="font-size:0.75rem;color:#64748b;margin-top:2px;">${market.description}</div>`
+                            : '';
+                        return `<div style="font-size:0.85rem;color:#1f2937;margin-bottom:8px;">• ${label}${confidence}${description}</div>`;
                     }).join('')}
                </div>`
             : '';
@@ -1436,6 +1489,17 @@
             ${secondaryHtml}
             ${pipelineHtml}
         `;
+
+        const toggleBtn = card.querySelector('.secondary-toggle');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function() {
+                const secondaryDiv = document.getElementById(`secondary-${cardId}`);
+                if (!secondaryDiv) return;
+                const isHidden = secondaryDiv.style.display === 'none';
+                secondaryDiv.style.display = isHidden ? 'block' : 'none';
+                toggleBtn.textContent = isHidden ? 'Hide Secondary Insights' : 'View Secondary Insights';
+            });
+        }
 
         return card;
     }
