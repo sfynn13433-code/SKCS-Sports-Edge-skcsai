@@ -874,28 +874,73 @@ async function buildFinalForTier(tier, options = {}) {
         }
 
         // -------------------------------------------------------------------------
-        // 2. DAILY INSIGHTS LAYER (Executes only on remaining fixtures)
+        // 2. 6-LEG ACCA LAYER (Second Priority)
         // -------------------------------------------------------------------------
-        const directRows = [];
-        const directSelections = takeAvailablePredictions(
-            limitedCandidates,
+        const accaRows = [];
+        const accaSelections = takeAvailablePredictions(
+            buildAcca6Candidates(
+                filterAvailablePredictions(limitedCandidates, usedFixtureIds).filter((p) => p.volatility === 'low')
+            ),
             usedFixtureIds,
-            categoryBuildCaps.direct
+            categoryBuildCaps.acca_6match
         );
-        for (const prediction of directSelections) {
-            const matches = [toFinalMatchPayload(prediction)];
-            const total = computeTotalConfidence(matches);
-            const row = await insertFinalRow({
+        for (const row of accaSelections) {
+            const inserted = await insertFinalRow({
                 publish_run_id: publishRunId,
                 tier: t,
-                type: 'direct',
-                matches,
-                total_confidence: total,
-                risk_level: riskLevelFromConfidence(total)
+                type: 'acca_6match',
+                matches: row.matches,
+                total_confidence: row.total_confidence,
+                risk_level: row.risk_level
             }, client);
-            directRows.push(row);
+            accaRows.push(inserted);
         }
 
+        // -------------------------------------------------------------------------
+        // 3. MULTI LAYER (Third Priority)
+        // -------------------------------------------------------------------------
+        const multiRows = [];
+        const multiSelections = takeAvailablePredictions(
+            buildMultiCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds)),
+            usedFixtureIds,
+            categoryBuildCaps.multi
+        );
+        for (const row of multiSelections) {
+            const inserted = await insertFinalRow({
+                publish_run_id: publishRunId,
+                tier: t,
+                type: 'multi',
+                matches: row.matches,
+                total_confidence: row.total_confidence,
+                risk_level: row.risk_level
+            }, client);
+            multiRows.push(inserted);
+        }
+
+        // -------------------------------------------------------------------------
+        // 4. SAME MATCH LAYER (Fourth Priority)
+        // -------------------------------------------------------------------------
+        const sameMatchRows = [];
+        const sameMatchSelections = takeAvailablePredictions(
+            buildSameMatchCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds)),
+            usedFixtureIds,
+            categoryBuildCaps.same_match
+        );
+        for (const row of sameMatchSelections) {
+            const inserted = await insertFinalRow({
+                publish_run_id: publishRunId,
+                tier: t,
+                type: 'same_match',
+                matches: row.matches,
+                total_confidence: row.total_confidence,
+                risk_level: row.risk_level
+            }, client);
+            sameMatchRows.push(inserted);
+        }
+
+        // -------------------------------------------------------------------------
+        // 5. SECONDARY LAYER (Fifth Priority)
+        // -------------------------------------------------------------------------
         const secondaryRows = [];
         const secondarySelections = takeAvailablePredictions(
             buildSecondaryCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds)),
@@ -916,60 +961,27 @@ async function buildFinalForTier(tier, options = {}) {
             secondaryRows.push(row);
         }
 
-        const sameMatchRows = [];
-        const sameMatchSelections = takeAvailablePredictions(
-            buildSameMatchCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds)),
+        // -------------------------------------------------------------------------
+        // 6. DIRECT LAYER (Last Priority - sweeps leftovers)
+        // -------------------------------------------------------------------------
+        const directRows = [];
+        const directSelections = takeAvailablePredictions(
+            limitedCandidates,
             usedFixtureIds,
-            categoryBuildCaps.same_match
+            categoryBuildCaps.direct
         );
-        for (const row of sameMatchSelections) {
-            const inserted = await insertFinalRow({
+        for (const prediction of directSelections) {
+            const matches = [toFinalMatchPayload(prediction)];
+            const total = computeTotalConfidence(matches);
+            const row = await insertFinalRow({
                 publish_run_id: publishRunId,
                 tier: t,
-                type: 'same_match',
-                matches: row.matches,
-                total_confidence: row.total_confidence,
-                risk_level: row.risk_level
+                type: 'direct',
+                matches,
+                total_confidence: total,
+                risk_level: riskLevelFromConfidence(total)
             }, client);
-            sameMatchRows.push(inserted);
-        }
-
-        const multiRows = [];
-        const multiSelections = takeAvailablePredictions(
-            buildMultiCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds)),
-            usedFixtureIds,
-            categoryBuildCaps.multi
-        );
-        for (const row of multiSelections) {
-            const inserted = await insertFinalRow({
-                publish_run_id: publishRunId,
-                tier: t,
-                type: 'multi',
-                matches: row.matches,
-                total_confidence: row.total_confidence,
-                risk_level: row.risk_level
-            }, client);
-            multiRows.push(inserted);
-        }
-
-        const accaRows = [];
-        const accaSelections = takeAvailablePredictions(
-            buildAcca6Candidates(
-                filterAvailablePredictions(limitedCandidates, usedFixtureIds).filter((p) => p.volatility === 'low')
-            ),
-            usedFixtureIds,
-            categoryBuildCaps.acca_6match
-        );
-        for (const row of accaSelections) {
-            const inserted = await insertFinalRow({
-                publish_run_id: publishRunId,
-                tier: t,
-                type: 'acca_6match',
-                matches: row.matches,
-                total_confidence: row.total_confidence,
-                risk_level: row.risk_level
-            }, client);
-            accaRows.push(inserted);
+            directRows.push(row);
         }
 
         console.log('[accaBuilder] tier=%s week_locked=%s direct=%s secondary=%s same_match=%s multi=%s acca_6match=%s mega_acca_12=%s',
