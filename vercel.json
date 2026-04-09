@@ -24,6 +24,12 @@
       ]
     }
   ],
+  "crons": [
+    {
+      "path": "/api/pipeline/run-full",
+      "schedule": "0 2 * * 1"
+    }
+  ],
   "rewrites": [
     {
       "source": "/terms",

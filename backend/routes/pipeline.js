@@ -12,24 +12,23 @@ const { requireRole } = require('../utils/auth');
 
 const router = express.Router();
 
-/**
- * TRIGGER REAL DATA SYNC
- * URL: POST https://skcsai.onrender.com/api/pipeline/sync
- * This is the main button to pull real matches from APIs into Supabase.
- */
-router.post('/sync', requireRole('admin'), async (req, res) => {
-    const requestedSport = req.body?.sport ? String(req.body.sport).toLowerCase() : null;
-    const waitForCompletion = req.body?.wait === true;
-    
-    console.log(`[pipeline] Starting manual sync of REAL sports data${requestedSport ? ` for ${requestedSport}` : ''}...`);
+async function handleSyncRequest(res, options = {}) {
+    const requestedSport = options.requestedSport ? String(options.requestedSport).toLowerCase() : null;
+    const waitForCompletion = options.waitForCompletion === true;
+    const triggerLabel = options.triggerLabel || 'manual sync';
+
+    console.log(`[pipeline] Starting ${triggerLabel}${requestedSport ? ` for ${requestedSport}` : ''}...`);
+
+    const execute = () => (
+        requestedSport
+            ? syncSports({ sports: requestedSport })
+            : syncAllSports()
+    );
 
     if (waitForCompletion) {
-        // Wait for sync to complete and return full results
         try {
-            const result = requestedSport
-                ? await syncSports({ sports: requestedSport })
-                : await syncAllSports();
-            
+            const result = await execute();
+
             res.status(200).json({
                 ok: true,
                 message: 'Sync completed successfully',
@@ -42,7 +41,7 @@ router.post('/sync', requireRole('admin'), async (req, res) => {
                 rebuiltFinalOutputs: result?.rebuiltFinalOutputs || false
             });
         } catch (err) {
-            console.error('[pipeline] Sync failed:', err.message);
+            console.error(`[pipeline] ${triggerLabel} failed:`, err.message);
             res.status(500).json({
                 ok: false,
                 error: 'Sync failed',
@@ -50,33 +49,62 @@ router.post('/sync', requireRole('admin'), async (req, res) => {
                 stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
             });
         }
-    } else {
-        // Return immediately to avoid Render's 30-second timeout
-        res.status(202).json({
-            ok: true,
-            message: 'Sync started in background. Check /api/pipeline/status for results.',
-            requestedSport,
-            note: 'Use wait=true in request body to wait for completion'
-        });
-
-        // Run sync in background
-        try {
-            const result = requestedSport
-                ? await syncSports({ sports: requestedSport })
-                : await syncAllSports();
-            console.log('[pipeline] Background sync complete:', JSON.stringify({
-                sync: result ? 'ok' : 'no result',
-                requestedSport,
-                publishRun: result?.publishRun || null,
-                totalMatchesProcessed: result?.totalMatchesProcessed || 0,
-                errors: result?.errors || []
-            }));
-        } catch (err) {
-            console.error('[pipeline] Background sync failed:', err.message);
-            console.error('[pipeline] Stack trace:', err.stack);
-        }
+        return;
     }
+
+    res.status(202).json({
+        ok: true,
+        message: 'Sync started in background. Check /api/pipeline/status for results.',
+        requestedSport,
+        note: 'Use wait=true to wait for completion'
+    });
+
+    try {
+        const result = await execute();
+        console.log('[pipeline] Background sync complete:', JSON.stringify({
+            trigger: triggerLabel,
+            sync: result ? 'ok' : 'no result',
+            requestedSport,
+            publishRun: result?.publishRun || null,
+            totalMatchesProcessed: result?.totalMatchesProcessed || 0,
+            errors: result?.errors || []
+        }));
+    } catch (err) {
+        console.error(`[pipeline] Background ${triggerLabel} failed:`, err.message);
+        console.error('[pipeline] Stack trace:', err.stack);
+    }
+}
+
+/**
+ * TRIGGER REAL DATA SYNC
+ * URL: POST https://skcsai.onrender.com/api/pipeline/sync
+ * This is the main button to pull real matches from APIs into Supabase.
+ */
+router.post('/sync', requireRole('admin'), async (req, res) => {
+    const requestedSport = req.body?.sport ? String(req.body.sport).toLowerCase() : null;
+    const waitForCompletion = req.body?.wait === true;
+
+    await handleSyncRequest(res, {
+        requestedSport,
+        waitForCompletion,
+        triggerLabel: 'manual sync of REAL sports data'
+    });
 });
+
+// Run the full multi-sport weekly scrape pipeline.
+// URL: POST|GET /api/pipeline/run-full
+const runFullHandler = async (req, res) => {
+    const waitFromBody = req.body?.wait === true;
+    const waitFromQuery = String(req.query?.wait || '').toLowerCase() === 'true';
+
+    await handleSyncRequest(res, {
+        waitForCompletion: waitFromBody || waitFromQuery,
+        triggerLabel: 'run-full global sync'
+    });
+};
+
+router.post('/run-full', requireRole('admin'), runFullHandler);
+router.get('/run-full', requireRole('admin'), runFullHandler);
 
 /**
  * SYNC WITH DETAILED PROGRESS

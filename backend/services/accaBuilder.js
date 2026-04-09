@@ -828,10 +828,15 @@ async function buildFinalForTier(tier, options = {}) {
         // Limit candidates to prevent combinatorial explosion and timeouts
         const MAX_ACCA_CANDIDATES = 120;
         const limitedCandidates = perSportLimited.slice(0, MAX_ACCA_CANDIDATES);
+
+        // -------------------------------------------------------------------------
+        // 1. THE MEGA ACCA RESERVATION LAYER (Highest Priority)
+        // -------------------------------------------------------------------------
         const megaAccaRows = [];
         const megaSelections = takeAvailablePredictions(
             buildMegaAcca12Candidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds), {
                 maxRows: categoryBuildCaps.mega_acca_12,
+                // Subscription temporal gate
                 expiryCutoff: new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000))
             }),
             usedFixtureIds,
@@ -849,6 +854,9 @@ async function buildFinalForTier(tier, options = {}) {
             megaAccaRows.push(inserted);
         }
 
+        // -------------------------------------------------------------------------
+        // 2. DAILY INSIGHTS LAYER (Executes only on remaining fixtures)
+        // -------------------------------------------------------------------------
         const directRows = [];
         const directSelections = takeAvailablePredictions(
             limitedCandidates,

@@ -33,18 +33,12 @@ const { normalizeFixtureDate, getPredictionWindow, isFixtureEligibleForPredictio
 
 void bootstrap().catch(err => console.error('[startup] bootstrap failed:', err.message));
 
-const CRON_SLOTS_UTC = [
-    { label: 'morning_cleanup', expr: '0 6 * * *' },
-    { label: 'midday_setup', expr: '0 14 * * *' },
-    { label: 'pregame_finalization', expr: '0 18 * * *' }
-];
+const WEEKLY_ROLLING_SCRAPE_CRON = '0 2 * * 1'; // Monday 02:00 UTC = 04:00 SAST
 
-for (const slot of CRON_SLOTS_UTC) {
-    cron.schedule(slot.expr, () => {
-        console.log(`[cron] Triggering master sports sync: ${slot.label}`);
-        void syncAllSports().catch(err => console.error(`[cron] Sync failed (${slot.label}):`, err));
-    }, { timezone: 'UTC' });
-}
+cron.schedule(WEEKLY_ROLLING_SCRAPE_CRON, () => {
+    console.log('[cron] Triggering weekly global 7-day rolling scrape (04:00 SAST / 02:00 UTC)');
+    void syncAllSports().catch(err => console.error('[cron] Weekly rolling scrape failed:', err));
+}, { timezone: 'UTC' });
 
 function warnEnv(name) {
     if (!process.env[name] || String(process.env[name]).trim().length === 0) {

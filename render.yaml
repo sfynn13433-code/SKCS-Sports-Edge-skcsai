@@ -64,3 +64,17 @@ services:
         sync: false
       - key: DATA_MODE
         value: live
+  - type: cron
+    name: skcs-weekly-global-scrape
+    env: node
+    region: frankfurt
+    plan: free
+    rootDir: backend
+    schedule: "0 2 * * 1"
+    buildCommand: npm install
+    startCommand: node deploy-trigger.js
+    envVars:
+      - key: SKCS_TRIGGER_HOST
+        sync: false
+      - key: ADMIN_API_KEY
+        sync: false
