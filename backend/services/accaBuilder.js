@@ -5,7 +5,7 @@ const { validateRawPredictionInput } = require('../utils/validation');
 const { filterRawPrediction } = require('./filterEngine');
 const { getPredictionInputs } = require('./dataProvider');
 const { scoreMatch } = require('./aiScoring');
-const { validatePredictionSet } = require('../utils/marketConsistency');
+const { validatePredictionSet, areLegsCompatible } = require('../utils/marketConsistency');
 const { detectConflicts } = require('../utils/conflictResolver');
 const { isValidCombination } = require('./conflictEngine');
 const { scoreMarkets } = require('./marketScoringEngine');
@@ -428,6 +428,74 @@ function uniqueBy(rows, keyFn) {
     return out;
 }
 
+function isSupplementaryDisplayMarket(market) {
+    const normalized = String(market || '').trim().toLowerCase();
+    if (!normalized) return false;
+    return normalized !== 'corners_under' && normalized !== 'corners_over';
+}
+
+function isCompatibleWithPrimaryPrediction(prediction, candidate) {
+    return areLegsCompatible(
+        {
+            market: prediction?.market,
+            prediction: prediction?.prediction
+        },
+        {
+            market: candidate?.market,
+            prediction: candidate?.prediction
+        }
+    );
+}
+
+function toConflictCheckLeg(leg) {
+    const marketKey = String(leg?.market || '').trim().toLowerCase();
+    const predictionKey = String(leg?.prediction || leg?.pick || '').trim().toLowerCase();
+    if (!marketKey || !predictionKey) return null;
+
+    if (marketKey === '1x2') {
+        return { market: '1X2', prediction: predictionKey };
+    }
+    if (marketKey.startsWith('double_chance_')) {
+        const mappedPrediction = predictionKey === '1x'
+            ? 'home_or_draw'
+            : predictionKey === 'x2'
+                ? 'draw_or_away'
+                : predictionKey === '12'
+                    ? 'home_or_away'
+                    : predictionKey;
+        return { market: 'DOUBLE_CHANCE', prediction: mappedPrediction };
+    }
+    if (marketKey === 'under_1_5' || marketKey === 'over_1_5') {
+        return { market: 'OVER_UNDER_1_5', prediction: predictionKey };
+    }
+    if (marketKey === 'under_2_5' || marketKey === 'over_2_5') {
+        return { market: 'OVER_UNDER_2_5', prediction: predictionKey };
+    }
+    if (marketKey === 'btts_yes' || marketKey === 'btts_no') {
+        return { market: 'BTTS', prediction: predictionKey === 'yes' ? 'yes' : 'no' };
+    }
+
+    return { market: marketKey.toUpperCase(), prediction: predictionKey };
+}
+
+function sanitizeSameMatchLegGroup(legs) {
+    const out = [];
+
+    for (const leg of legs) {
+        const prospective = [...out, leg]
+            .map(toConflictCheckLeg)
+            .filter(Boolean);
+
+        if (prospective.length > 0 && !isValidCombination(prospective)) {
+            continue;
+        }
+
+        out.push(leg);
+    }
+
+    return out;
+}
+
 function buildDerivedMarkets(prediction, options = {}) {
     const includeTypes = new Set(
         Array.isArray(options.includeTypes) && options.includeTypes.length
@@ -439,13 +507,16 @@ function buildDerivedMarkets(prediction, options = {}) {
             .map((market) => String(market || '').toUpperCase())
     );
     const maxRows = Number.isFinite(options.maxRows) ? options.maxRows : 1;
+    const requireDisplayFriendlyMarkets = options.requireDisplayFriendlyMarkets === true;
 
     return uniqueBy(
         scoreMarkets(toScoringMatchPayload(prediction))
             .filter((market) => includeTypes.has(market.type))
             .filter((market) => !excludeMarkets.has(String(market.market || '').toUpperCase()))
             .sort((a, b) => (Number(b.confidence) || 0) - (Number(a.confidence) || 0))
-            .map((market) => toSecondaryPayload(prediction, market)),
+            .map((market) => toSecondaryPayload(prediction, market))
+            .filter((candidate) => isCompatibleWithPrimaryPrediction(prediction, candidate))
+            .filter((candidate) => !requireDisplayFriendlyMarkets || isSupplementaryDisplayMarket(candidate.market)),
         (row) => `${row.match_id}:${row.market}`
     ).slice(0, maxRows);
 }
@@ -456,6 +527,7 @@ function buildSecondaryCandidates(predictions) {
     for (const prediction of predictions) {
         secondary.push(...buildDerivedMarkets(prediction, {
             includeTypes: ['secondary', 'advanced'],
+            requireDisplayFriendlyMarkets: true,
             maxRows: 2
         }));
     }
@@ -473,7 +545,12 @@ function buildSameMatchCandidates(predictions) {
         });
         if (derived.length === 0) continue;
 
-        const legs = [toFinalMatchPayload(prediction), ...derived.map(toFinalMatchPayload)];
+        const legs = sanitizeSameMatchLegGroup([
+            toFinalMatchPayload(prediction),
+            ...derived.map(toFinalMatchPayload)
+        ]).slice(0, SAME_MATCH_INSIGHT_TARGET);
+        if (legs.length < 2) continue;
+
         out.push({
             match_id: prediction.match_id,
             matches: legs,

@@ -7,10 +7,11 @@ const { requireRole } = require('../utils/auth');
 const config = require('../config');
 const { createClient } = require('@supabase/supabase-js');
 const moment = require('moment-timezone');
+const { isValidCombination } = require('../services/conflictEngine');
 
 const { getPlanCapabilities, filterPredictionsForPlan, calculateDailyAllocations } = require('../config/subscriptionMatrix');
 const { getPredictionWindow } = require('../utils/dateNormalization');
-const { doubleChanceFromBaseline } = require('../utils/marketConsistency');
+const { areLegsCompatible } = require('../utils/marketConsistency');
 
 const router = express.Router();
 
@@ -128,9 +129,13 @@ function humanizeToken(value) {
         .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
+function normalizeMarketKey(value) {
+    return String(value || '').trim().toLowerCase();
+}
+
 function humanizePredictionLabel(prediction, market) {
     const normalized = String(prediction || '').trim().toLowerCase();
-    const marketKey = String(market || '').trim().toLowerCase();
+    const marketKey = normalizeMarketKey(market);
     const explicit = {
         home_win: 'HOME WIN',
         away_win: 'AWAY WIN',
@@ -144,9 +149,63 @@ function humanizePredictionLabel(prediction, market) {
         '12': 'DOUBLE CHANCE - 12'
     };
 
+    const goalLineMatch = marketKey.match(/^(over|under)_(\d+)_(\d+)$/);
+    if (goalLineMatch) {
+        return `${goalLineMatch[1].toUpperCase()} ${goalLineMatch[2]}.${goalLineMatch[3]} GOALS`;
+    }
+    if (marketKey === 'btts_yes') return 'BTTS - YES';
+    if (marketKey === 'btts_no') return 'BTTS - NO';
+    if (marketKey === 'corners_under') return 'TOTAL CORNERS UNDER';
+    if (marketKey === 'corners_over') return 'TOTAL CORNERS OVER';
+    if (marketKey.startsWith('double_chance_')) {
+        return `DOUBLE CHANCE - ${marketKey.replace('double_chance_', '').toUpperCase()}`;
+    }
     if (explicit[normalized]) return explicit[normalized];
     if (marketKey.includes('double_chance')) return `DOUBLE CHANCE - ${String(prediction || '').toUpperCase()}`;
     return String(prediction || '').toUpperCase();
+}
+
+function buildSecondaryMarketDescription(market, fallbackDescription = '') {
+    const marketKey = normalizeMarketKey(market);
+    const description = String(fallbackDescription || '').trim();
+    if (marketKey === 'corners_under' || marketKey === 'corners_over') {
+        return description || 'Total corners line unavailable from source';
+    }
+    return description;
+}
+
+function isDisplayFriendlySecondaryMarket(market) {
+    const marketKey = normalizeMarketKey(market);
+    return marketKey !== 'corners_under' && marketKey !== 'corners_over';
+}
+
+function isCompatibleSecondaryMarket(primaryMatch, secondaryMarket) {
+    return areLegsCompatible(
+        {
+            market: primaryMatch?.market,
+            prediction: primaryMatch?.prediction
+        },
+        {
+            market: secondaryMarket?.market,
+            prediction: secondaryMarket?.prediction
+        }
+    );
+}
+
+function dedupeSecondaryMarkets(items) {
+    const seen = new Set();
+    const out = [];
+
+    for (const item of items) {
+        const marketKey = normalizeMarketKey(item?.market);
+        const predictionKey = String(item?.prediction || '').trim().toLowerCase();
+        const key = `${marketKey}:${predictionKey}`;
+        if (!marketKey || seen.has(key)) continue;
+        seen.add(key);
+        out.push(item);
+    }
+
+    return out;
 }
 
 function getPredictionPrimaryMatchId(prediction) {
@@ -162,7 +221,7 @@ function buildSecondaryMarketSummaryItem(prediction) {
         market: firstMatch?.market || '',
         prediction: firstMatch?.prediction || '',
         confidence: normalizeConfidence(firstMatch?.confidence ?? prediction?.total_confidence ?? 0),
-        description: firstMatch?.metadata?.market_description || '',
+        description: buildSecondaryMarketDescription(firstMatch?.market, firstMatch?.metadata?.market_description || ''),
         label: humanizePredictionLabel(firstMatch?.prediction, firstMatch?.market)
     };
 }
@@ -262,16 +321,18 @@ function attachRelatedPredictionArtifacts(predictions) {
         const primaryMatchId = getPredictionPrimaryMatchId(prediction);
         const firstMatch = matches[0] || {};
         const remainingMatches = matches.slice(1);
-        const relatedSecondaryMarkets = secondaryByMatchId.get(primaryMatchId) || [];
+        const relatedSecondaryMarkets = dedupeSecondaryMarkets(
+            (secondaryByMatchId.get(primaryMatchId) || [])
+                .filter((market) => isCompatibleSecondaryMarket(firstMatch, market))
+                .filter((market) => isDisplayFriendlySecondaryMarket(market.market))
+        ).slice(0, 3);
         const relatedSameMatchBuilder = sameMatchByMatchId.get(primaryMatchId) || [];
         const metadata = {
             ...(firstMatch?.metadata || {})
         };
 
         if (sectionType === 'direct') {
-            if (!Array.isArray(metadata.secondary_markets) || metadata.secondary_markets.length === 0) {
-                metadata.secondary_markets = relatedSecondaryMarkets;
-            }
+            metadata.secondary_markets = relatedSecondaryMarkets;
             if (!Array.isArray(metadata.same_match_builder) || metadata.same_match_builder.length === 0) {
                 metadata.same_match_builder = relatedSameMatchBuilder;
             }
@@ -432,6 +493,164 @@ function enrichPredictionDetails(prediction) {
     };
 }
 
+function buildPredictionSignature(prediction) {
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    const legs = matches.map((match) => [
+        String(match?.match_id || '').trim(),
+        normalizeMarketKey(match?.market),
+        String(match?.prediction || '').trim().toLowerCase()
+    ].join(':')).join('|');
+
+    return [
+        String(prediction?.tier || '').trim().toLowerCase(),
+        inferSectionType(prediction),
+        legs
+    ].join('::');
+}
+
+function dedupePredictions(predictions) {
+    const seen = new Set();
+    const out = [];
+
+    for (const prediction of predictions) {
+        const signature = buildPredictionSignature(prediction);
+        if (!signature || seen.has(signature)) continue;
+        seen.add(signature);
+        out.push(prediction);
+    }
+
+    return out;
+}
+
+function filterConflictingSecondaryPredictions(predictions) {
+    const directByMatchId = new Map();
+
+    for (const prediction of predictions) {
+        if (inferSectionType(prediction) !== 'direct') continue;
+        const matchId = getPredictionPrimaryMatchId(prediction);
+        const firstMatch = Array.isArray(prediction?.matches) ? prediction.matches[0] : null;
+        if (!matchId || !firstMatch) continue;
+        directByMatchId.set(matchId, firstMatch);
+    }
+
+    return predictions.filter((prediction) => {
+        if (inferSectionType(prediction) !== 'secondary') return true;
+        const matchId = getPredictionPrimaryMatchId(prediction);
+        const firstMatch = Array.isArray(prediction?.matches) ? prediction.matches[0] : null;
+        const directMatch = directByMatchId.get(matchId);
+        if (!matchId || !firstMatch || !directMatch) return true;
+        return isCompatibleSecondaryMarket(directMatch, firstMatch);
+    });
+}
+
+function toConflictCheckLeg(match) {
+    const marketKey = normalizeMarketKey(match?.market);
+    const predictionKey = String(match?.prediction || '').trim().toLowerCase();
+    if (!marketKey || !predictionKey) return null;
+
+    if (marketKey === '1x2') {
+        return { market: '1X2', prediction: predictionKey };
+    }
+    if (marketKey.startsWith('double_chance_')) {
+        const mappedPrediction = predictionKey === '1x'
+            ? 'home_or_draw'
+            : predictionKey === 'x2'
+                ? 'draw_or_away'
+                : predictionKey === '12'
+                    ? 'home_or_away'
+                    : predictionKey;
+        return { market: 'DOUBLE_CHANCE', prediction: mappedPrediction };
+    }
+    if (marketKey === 'under_1_5' || marketKey === 'over_1_5') {
+        return { market: 'OVER_UNDER_1_5', prediction: predictionKey };
+    }
+    if (marketKey === 'under_2_5' || marketKey === 'over_2_5') {
+        return { market: 'OVER_UNDER_2_5', prediction: predictionKey };
+    }
+    if (marketKey === 'btts_yes' || marketKey === 'btts_no') {
+        return { market: 'BTTS', prediction: predictionKey === 'yes' ? 'yes' : 'no' };
+    }
+
+    return { market: marketKey.toUpperCase(), prediction: predictionKey };
+}
+
+function sanitizeSameMatchMatchesForDisplay(matches) {
+    const out = [];
+
+    for (const match of matches) {
+        const prospective = [...out, match]
+            .map(toConflictCheckLeg)
+            .filter(Boolean);
+
+        if (prospective.length > 0 && !isValidCombination(prospective)) {
+            continue;
+        }
+
+        out.push(match);
+    }
+
+    return out;
+}
+
+function sanitizePredictionForDisplay(prediction) {
+    if (inferSectionType(prediction) !== 'same_match') return prediction;
+
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    const sanitizedMatches = sanitizeSameMatchMatchesForDisplay(matches);
+    if (!sanitizedMatches.length) return prediction;
+
+    return {
+        ...prediction,
+        matches: sanitizedMatches
+    };
+}
+
+async function getLatestRelevantPublishRunId(requestedSport) {
+    const sportKey = normalizePredictionSportKey(requestedSport || '');
+
+    if (!sportKey) {
+        const latestRunRes = await query(
+            `
+            SELECT id
+            FROM prediction_publish_runs
+            WHERE status = 'completed'
+              AND (
+                requested_sports IS NULL
+                OR cardinality(requested_sports) = 0
+                OR 'all' = ANY(requested_sports)
+              )
+            ORDER BY id DESC
+            LIMIT 1
+            `
+        );
+        return latestRunRes.rows[0]?.id || null;
+    }
+
+    const latestRunRes = await query(
+        `
+        SELECT id
+        FROM prediction_publish_runs
+        WHERE status = 'completed'
+          AND (
+            requested_sports IS NULL
+            OR cardinality(requested_sports) = 0
+            OR 'all' = ANY(requested_sports)
+            OR $1 = ANY(requested_sports)
+          )
+        ORDER BY
+          CASE
+            WHEN requested_sports IS NOT NULL AND $1 = ANY(requested_sports) THEN 0
+            WHEN requested_sports IS NULL OR cardinality(requested_sports) = 0 OR 'all' = ANY(requested_sports) THEN 1
+            ELSE 2
+          END,
+          id DESC
+        LIMIT 1
+        `,
+        [sportKey]
+    );
+    return latestRunRes.rows[0]?.id || null;
+}
+
 // GET /api/predictions
 // Default tier = deep (elite pool); subscription limits use /api/user/predictions
 router.get('/', requireRole('user'), async (req, res) => {
@@ -452,16 +671,20 @@ router.get('/', requireRole('user'), async (req, res) => {
         }
 
         const now = new Date();
-        const queryStart = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+        const latestPublishRunId = await getLatestRelevantPublishRunId(sport);
         let predictions = [];
         try {
+            if (!latestPublishRunId) {
+                throw new Error(`No completed publish run found for sport=${sport || 'all'}`);
+            }
+
             let queryStr = `
                 SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at
                 FROM predictions_final pf
                 WHERE tier IN (${planCapabilities.tiers.map(t => `'${t}'`).join(',')})
-                  AND pf.created_at >= $1
+                  AND pf.publish_run_id = $1
             `;
-            const queryParams = [queryStart.toISOString()];
+            const queryParams = [latestPublishRunId];
 
             queryStr += ` ORDER BY created_at DESC LIMIT 2000;`;
 
@@ -476,10 +699,32 @@ router.get('/', requireRole('user'), async (req, res) => {
             if ((!predictions || predictions.length === 0) && config.supabase && config.supabase.url && config.supabase.anonKey) {
                 console.log('[predictions] DB empty - attempting Supabase fallback');
                 const sb = createClient(config.supabase.url, config.supabase.anonKey);
-                const { data, error } = await sb.from('predictions_final').select('*').order('created_at', { ascending: false }).limit(100);
+                const { data: runs, error: runsError } = await sb
+                    .from('prediction_publish_runs')
+                    .select('id, requested_sports')
+                    .eq('status', 'completed')
+                    .order('id', { ascending: false })
+                    .limit(50);
+
+                const latestSupabaseRun = !runsError && Array.isArray(runs)
+                    ? runs.find((row) => {
+                        const requested = Array.isArray(row.requested_sports) ? row.requested_sports.map(normalizePredictionSportKey) : [];
+                        if (!sport) return requested.length === 0 || requested.includes('all');
+                        return requested.length === 0 || requested.includes('all') || requested.includes(normalizePredictionSportKey(sport));
+                    })
+                    : null;
+
+                const { data, error } = latestSupabaseRun
+                    ? await sb
+                        .from('predictions_final')
+                        .select('*')
+                        .eq('publish_run_id', latestSupabaseRun.id)
+                        .order('created_at', { ascending: false })
+                        .limit(2000)
+                    : { data: null, error: runsError };
+
                 if (!error && Array.isArray(data) && data.length > 0) {
                     // Filter Supabase rows by plan capabilities and sport
-                    const sportVals = (sportFilterValues || []).map(s => String(s).toLowerCase());
                     const filtered = data.filter(r => {
                         try {
                             // Check if prediction tier is in plan's allowed tiers
@@ -590,7 +835,10 @@ router.get('/', requireRole('user'), async (req, res) => {
                 matches: enrichedMatches
             };
         }).map(enrichPredictionDetails);
-        const hydratedPredictions = attachRelatedPredictionArtifacts(enrichedPredictions);
+        const hydratedPredictions = attachRelatedPredictionArtifacts(
+            filterConflictingSecondaryPredictions(dedupePredictions(enrichedPredictions))
+                .map(sanitizePredictionForDisplay)
+        );
 
         const windowStart = new Date(now.getTime() - historyWindowDays * 24 * 60 * 60 * 1000);
         const windowEnd = new Date(now.getTime() + futureWindowDays * 24 * 60 * 60 * 1000);
@@ -598,6 +846,11 @@ router.get('/', requireRole('user'), async (req, res) => {
         const scopedPredictions = hydratedPredictions
             .filter((prediction) => predictionMatchesWindow(prediction, windowStart, windowEnd))
             .filter((prediction) => predictionMatchesSport(prediction, sportFilterValues))
+            .filter((prediction) => {
+                if (inferSectionType(prediction) !== 'secondary') return true;
+                const firstMatch = Array.isArray(prediction?.matches) ? prediction.matches[0] : null;
+                return isDisplayFriendlySecondaryMarket(firstMatch?.market);
+            })
             .sort((a, b) => comparePredictionsForDisplay(a, b, now));
 
         const planFilteredPredictions = filterPredictionsForPlan(

@@ -957,6 +957,117 @@
         return String(pred && (pred.section_type || pred.type) || '').toLowerCase();
     }
 
+    function normalizeMarketKey(value) {
+        return String(value || '').trim().toLowerCase();
+    }
+
+    function formatMarketSelectionLabel(market, prediction) {
+        const marketKey = normalizeMarketKey(market);
+        const predictionKey = String(prediction || '').trim().toLowerCase();
+        const explicit = {
+            home_win: 'HOME WIN',
+            away_win: 'AWAY WIN',
+            draw: 'DRAW',
+            yes: 'YES',
+            no: 'NO',
+            '1x': 'DOUBLE CHANCE - 1X',
+            x2: 'DOUBLE CHANCE - X2',
+            '12': 'DOUBLE CHANCE - 12'
+        };
+
+        const goalLineMatch = marketKey.match(/^(over|under)_(\d+)_(\d+)$/);
+        if (goalLineMatch) {
+            return `${goalLineMatch[1].toUpperCase()} ${goalLineMatch[2]}.${goalLineMatch[3]} GOALS`;
+        }
+        if (marketKey === 'btts_yes') return 'BTTS - YES';
+        if (marketKey === 'btts_no') return 'BTTS - NO';
+        if (marketKey === 'corners_under') return 'TOTAL CORNERS UNDER';
+        if (marketKey === 'corners_over') return 'TOTAL CORNERS OVER';
+        if (marketKey.startsWith('double_chance_')) {
+            return `DOUBLE CHANCE - ${marketKey.replace('double_chance_', '').toUpperCase()}`;
+        }
+        if (explicit[predictionKey]) return explicit[predictionKey];
+        if (marketKey.includes('double_chance')) return `DOUBLE CHANCE - ${String(prediction || '').toUpperCase()}`;
+        return String(prediction || 'N/A').replace(/_/g, ' ').toUpperCase();
+    }
+
+    function buildSecondaryMarketDescription(market, fallbackDescription) {
+        const marketKey = normalizeMarketKey(market);
+        const description = String(fallbackDescription || '').trim();
+        if ((marketKey === 'corners_under' || marketKey === 'corners_over') && !description) {
+            return 'Total corners line unavailable from source';
+        }
+        return description;
+    }
+
+    function buildPredictionDisplayKey(pred) {
+        const matches = Array.isArray(pred && pred.matches) ? pred.matches : [];
+        const legs = matches.map((match) => [
+            String(match && match.match_id || '').trim(),
+            normalizeMarketKey(match && match.market),
+            String(match && match.prediction || '').trim().toLowerCase()
+        ].join(':')).join('|');
+        return `${String(pred && pred.tier || '').toLowerCase()}::${getSectionType(pred)}::${legs}`;
+    }
+
+    function dedupePredictionFeed(predictions) {
+        const seen = new Set();
+        const out = [];
+        (predictions || []).forEach((pred) => {
+            const key = buildPredictionDisplayKey(pred);
+            if (!key || seen.has(key)) return;
+            seen.add(key);
+            out.push(pred);
+        });
+        return out;
+    }
+
+    function outcomeSetForSelection(market, prediction) {
+        const marketKey = normalizeMarketKey(market);
+        const predictionKey = String(prediction || '').trim().toLowerCase();
+
+        if (marketKey === '1x2' || marketKey === 'match_result') {
+            if (predictionKey === 'home_win' || predictionKey === 'home') return new Set(['h']);
+            if (predictionKey === 'away_win' || predictionKey === 'away') return new Set(['a']);
+            if (predictionKey === 'draw' || predictionKey === 'x') return new Set(['d']);
+        }
+
+        if (marketKey.includes('double_chance')) {
+            if (predictionKey === '1x') return new Set(['h', 'd']);
+            if (predictionKey === 'x2') return new Set(['d', 'a']);
+            if (predictionKey === '12') return new Set(['h', 'a']);
+        }
+
+        return null;
+    }
+
+    function areSelectionsCompatible(primaryMatch, secondaryItem) {
+        const primarySet = outcomeSetForSelection(primaryMatch && primaryMatch.market, primaryMatch && primaryMatch.prediction);
+        const secondarySet = outcomeSetForSelection(secondaryItem && secondaryItem.market, secondaryItem && secondaryItem.prediction);
+        if (!primarySet || !secondarySet) return true;
+        for (const outcome of primarySet) {
+            if (secondarySet.has(outcome)) return true;
+        }
+        return false;
+    }
+
+    function isDisplayFriendlySecondaryMarket(market) {
+        const marketKey = normalizeMarketKey(market);
+        return marketKey !== 'corners_under' && marketKey !== 'corners_over';
+    }
+
+    function dedupeSecondaryDisplayItems(items) {
+        const seen = new Set();
+        const out = [];
+        (items || []).forEach((item) => {
+            const key = `${normalizeMarketKey(item && item.market)}:${String(item && item.prediction || '').trim().toLowerCase()}`;
+            if (!key || seen.has(key)) return;
+            seen.add(key);
+            out.push(item);
+        });
+        return out;
+    }
+
     function buildSecondaryMarketDisplayItem(pred) {
         const firstMatch = (pred && Array.isArray(pred.matches) && pred.matches[0]) ? pred.matches[0] : {};
         const metadata = firstMatch.metadata || {};
@@ -964,8 +1075,8 @@
             market: firstMatch.market || '',
             prediction: firstMatch.prediction || '',
             confidence: Math.max(0, Math.min(100, Math.round(Number(firstMatch.confidence || pred.total_confidence || 0)))),
-            label: formatPrediction(firstMatch),
-            description: metadata.market_description || ''
+            label: formatMarketSelectionLabel(firstMatch.market, firstMatch.prediction),
+            description: buildSecondaryMarketDescription(firstMatch.market, metadata.market_description || '')
         };
     }
 
@@ -975,9 +1086,9 @@
         if (!matchId) return pred;
 
         const existing = Array.isArray(firstMatch?.metadata?.secondary_markets) ? firstMatch.metadata.secondary_markets : [];
-        if (existing.length > 0) return pred;
-
-        const linked = secondaryByMatchId.get(matchId) || [];
+        const linked = dedupeSecondaryDisplayItems((existing.length ? existing : (secondaryByMatchId.get(matchId) || []))
+            .filter((item) => isDisplayFriendlySecondaryMarket(item && item.market))
+            .filter((item) => areSelectionsCompatible(firstMatch, item))).slice(0, 3);
         if (!linked.length) return pred;
 
         return {
@@ -1195,9 +1306,26 @@
     }
 
     function renderFootballInsights(predictions) {
-        const singles = predictions.filter(p => p.type === 'single' || !p.type || ['direct', 'secondary'].includes(getSectionType(p)));
+        const normalizedPredictions = dedupePredictionFeed(predictions);
+        const singles = normalizedPredictions.filter(p => p.type === 'single' || !p.type || ['direct', 'secondary'].includes(getSectionType(p)));
         const directSingles = singles.filter(p => getSectionType(p) === 'direct' || (!getSectionType(p) && Array.isArray(p.matches) && p.matches.length === 1));
-        const secondarySingles = singles.filter(p => getSectionType(p) === 'secondary');
+        const directByMatchId = new Map();
+        directSingles.forEach((pred) => {
+            const firstMatch = (pred && Array.isArray(pred.matches) && pred.matches[0]) ? pred.matches[0] : {};
+            const matchId = String(firstMatch.match_id || '').trim();
+            if (!matchId) return;
+            directByMatchId.set(matchId, firstMatch);
+        });
+        const secondarySingles = singles.filter((p) => {
+            if (getSectionType(p) !== 'secondary') return false;
+            const firstMatch = (p && Array.isArray(p.matches) && p.matches[0]) ? p.matches[0] : {};
+            const directMatch = directByMatchId.get(String(firstMatch.match_id || '').trim());
+            if (!isDisplayFriendlySecondaryMarket(firstMatch.market)) return false;
+            return !directMatch || areSelectionsCompatible(directMatch, {
+                market: firstMatch.market,
+                prediction: firstMatch.prediction
+            });
+        });
         const secondaryByMatchId = new Map();
         secondarySingles.forEach((pred) => {
             const firstMatch = (pred && Array.isArray(pred.matches) && pred.matches[0]) ? pred.matches[0] : {};
@@ -1207,8 +1335,8 @@
             secondaryByMatchId.get(matchId).push(buildSecondaryMarketDisplayItem(pred));
         });
         const directWithLinkedSecondary = directSingles.map((pred) => attachSecondaryMarkets(pred, secondaryByMatchId));
-        const multiPreds = predictions.filter(p => getSectionType(p) === 'multi' || (Array.isArray(p.matches) && p.matches.length >= 2 && p.matches.length <= 3));
-        const sameMatchPreds = predictions.filter(p => getSectionType(p) === 'same_match' || (Array.isArray(p.matches) && p.matches.length > 1 && new Set((p.matches || []).map(m => m.match_id)).size === 1));
+        const multiPreds = normalizedPredictions.filter(p => getSectionType(p) === 'multi' || (Array.isArray(p.matches) && p.matches.length >= 2 && p.matches.length <= 3));
+        const sameMatchPreds = normalizedPredictions.filter(p => getSectionType(p) === 'same_match' || (Array.isArray(p.matches) && p.matches.length > 1 && new Set((p.matches || []).map(m => m.match_id)).size === 1));
 
         const tierSummary = document.getElementById('football-tier-summary');
         if (tierSummary) tierSummary.style.display = 'block';
@@ -1238,16 +1366,17 @@
     function renderSport(sport, containerId, predictions) {
         const container = document.getElementById(containerId);
         if (!container) return;
-        
-        if (predictions.length === 0) {
+
+        const normalizedPredictions = dedupePredictionFeed(predictions);
+        if (normalizedPredictions.length === 0) {
             container.innerHTML = `<p style="text-align:center;color:#4a5568;padding:20px;">No new ${sport} predictions available.</p>`;
             return;
         }
 
         // Categorize by type: 'single' = Direct/1X2, 'acca' = Accumulators
         const sectionType = (pred) => String(pred.section_type || pred.type || '').toLowerCase();
-        const singles = predictions.filter(p => p.type === 'single' || !p.type || ['direct', 'secondary'].includes(sectionType(p)));
-        const accas = predictions.filter(p => p.type === 'acca' || sectionType(p) === 'acca_6match');
+        const singles = normalizedPredictions.filter(p => p.type === 'single' || !p.type || ['direct', 'secondary'].includes(sectionType(p)));
+        const accas = normalizedPredictions.filter(p => p.type === 'acca' || sectionType(p) === 'acca_6match');
 
         container.innerHTML = '';
 
@@ -1272,7 +1401,7 @@
         }
 
         // Section 2: Multi Bets (2-3 legs combined)
-        const multiPreds = predictions.filter(p => sectionType(p) === 'multi' || (p.matches && p.matches.length >= 2 && p.matches.length <= 3));
+        const multiPreds = normalizedPredictions.filter(p => sectionType(p) === 'multi' || (p.matches && p.matches.length >= 2 && p.matches.length <= 3));
         if (multiPreds.length > 0) {
             const multiSection = document.createElement('div');
             multiSection.style.marginBottom = '2rem';
@@ -1290,7 +1419,7 @@
             container.appendChild(multiSection);
         }
 
-        const sameMatchPreds = predictions.filter(p => sectionType(p) === 'same_match' || (p.matches && p.matches.length > 1 && new Set((p.matches || []).map(m => m.match_id)).size === 1));
+        const sameMatchPreds = normalizedPredictions.filter(p => sectionType(p) === 'same_match' || (p.matches && p.matches.length > 1 && new Set((p.matches || []).map(m => m.match_id)).size === 1));
         if (sameMatchPreds.length > 0) {
             const sameMatchSection = document.createElement('div');
             sameMatchSection.style.marginBottom = '2rem';
@@ -1335,11 +1464,12 @@
     }
 
     function renderAccumulatorInsights(predictions, planMeta) {
-        const accas = predictions.filter((pred) => {
+        const normalizedPredictions = dedupePredictionFeed(predictions);
+        const accas = normalizedPredictions.filter((pred) => {
             const type = getSectionType(pred);
             return pred.type === 'acca' || type === 'acca_6match';
         });
-        const megaAccas = predictions.filter((pred) => getSectionType(pred) === 'mega_acca_12');
+        const megaAccas = normalizedPredictions.filter((pred) => getSectionType(pred) === 'mega_acca_12');
 
         const tierSummary = document.getElementById('accumulator-tier-summary');
         if (tierSummary) tierSummary.style.display = 'block';
@@ -1700,8 +1830,7 @@
      * Format prediction text
      */
     function formatPrediction(match) {
-        const rawTip = match.prediction || 'N/A';
-        return rawTip.replace(/_/g, ' ').toUpperCase();
+        return formatMarketSelectionLabel(match && match.market, match && match.prediction);
     }
 
     // --- CHAT AND UI HELPERS ---
