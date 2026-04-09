@@ -29,17 +29,20 @@ function computeTotalConfidence(predictions) {
     return Math.round((sum / predictions.length) * 100) / 100;
 }
 
-function startOfWeekUtc(now = new Date()) {
-    const current = new Date(now);
+// The weekly single-use insight policy follows the South African business week.
+const SAST_OFFSET_MS = 2 * 60 * 60 * 1000;
+
+function startOfWeekSast(now = new Date()) {
+    const current = new Date(now.getTime() + SAST_OFFSET_MS);
     const day = current.getUTCDay();
     const diffToMonday = day === 0 ? -6 : 1 - day;
     current.setUTCDate(current.getUTCDate() + diffToMonday);
     current.setUTCHours(0, 0, 0, 0);
-    return current;
+    return new Date(current.getTime() - SAST_OFFSET_MS);
 }
 
-function endOfWeekUtc(now = new Date()) {
-    const start = startOfWeekUtc(now);
+function endOfWeekSast(now = new Date()) {
+    const start = startOfWeekSast(now);
     const end = new Date(start);
     end.setUTCDate(end.getUTCDate() + 7);
     return end;
@@ -678,9 +681,9 @@ function normalizeRequestedSports(requestedSports = []) {
 
 function getPerSportCandidateLimit(requestedSports = []) {
     const sports = normalizeRequestedSports(requestedSports);
-    if (sports.length === 1) return 24;
-    if (sports.length > 1) return 8;
-    return 8;
+    if (sports.length === 1) return 80;
+    if (sports.length > 1) return 24;
+    return 24;
 }
 
 function getCategoryBuildCaps(requestedSports = []) {
@@ -740,8 +743,8 @@ async function loadValidFilteredPredictions(tier, client, options = {}) {
 }
 
 async function loadWeekLockedFixtureIds(client, now = new Date()) {
-    const weekStart = startOfWeekUtc(now);
-    const weekEnd = endOfWeekUtc(now);
+    const weekStart = startOfWeekSast(now);
+    const weekEnd = endOfWeekSast(now);
     const res = await client.query(
         `
         SELECT DISTINCT NULLIF(TRIM(match_leg->>'match_id'), '') AS match_id
@@ -775,6 +778,26 @@ function filterAvailablePredictions(predictions, usedFixtureIds) {
     });
 }
 
+function reservePredictionFixtures(prediction, usedFixtureIds) {
+    for (const id of new Set(predictionFixtureIds(prediction))) {
+        usedFixtureIds.add(id);
+    }
+}
+
+function takeAvailablePredictions(predictions, usedFixtureIds, limit = Infinity) {
+    const out = [];
+
+    for (const prediction of predictions) {
+        if (out.length >= limit) break;
+        const ids = predictionFixtureIds(prediction);
+        if (!ids.length || ids.some((id) => usedFixtureIds.has(id))) continue;
+        out.push(prediction);
+        reservePredictionFixtures(prediction, usedFixtureIds);
+    }
+
+    return out;
+}
+
 async function insertFinalRow({ publish_run_id, tier, type, matches, total_confidence, risk_level }, client) {
     const res = await client.query(
         `
@@ -801,6 +824,8 @@ async function buildFinalForTier(tier, options = {}) {
             requestedSports: options.requestedSports,
             now
         });
+        const weekLockedFixtureIds = await loadWeekLockedFixtureIds(client, now);
+        const usedFixtureIds = new Set(weekLockedFixtureIds);
         const perMatchLimited = enforcePerMatchLimit(valid, accaRules.max_per_match);
         const perSportLimited = enforcePerSportLimit(
             perMatchLimited,
@@ -811,27 +836,33 @@ async function buildFinalForTier(tier, options = {}) {
         // Limit candidates to prevent combinatorial explosion and timeouts
         const MAX_ACCA_CANDIDATES = 120;
         const limitedCandidates = perSportLimited.slice(0, MAX_ACCA_CANDIDATES);
-        const secondaryCandidates = buildSecondaryCandidates(limitedCandidates);
-
-        const megaAccaRows = [];
-        const megaCandidates = buildMegaAcca12Candidates(limitedCandidates, {
-            maxRows: categoryBuildCaps.mega_acca_12,
-            expiryCutoff: new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000))
-        });
-        for (const row of megaCandidates) {
-            const inserted = await insertFinalRow({
+        const directRows = [];
+        const directSelections = takeAvailablePredictions(
+            limitedCandidates,
+            usedFixtureIds,
+            categoryBuildCaps.direct
+        );
+        for (const prediction of directSelections) {
+            const matches = [toFinalMatchPayload(prediction)];
+            const total = computeTotalConfidence(matches);
+            const row = await insertFinalRow({
                 publish_run_id: publishRunId,
                 tier: t,
-                type: 'mega_acca_12',
-                matches: row.matches,
-                total_confidence: row.total_confidence,
-                risk_level: row.risk_level
+                type: 'direct',
+                matches,
+                total_confidence: total,
+                risk_level: riskLevelFromConfidence(total)
             }, client);
-            megaAccaRows.push(inserted);
+            directRows.push(row);
         }
 
         const secondaryRows = [];
-        for (const prediction of secondaryCandidates.slice(0, categoryBuildCaps.secondary)) {
+        const secondarySelections = takeAvailablePredictions(
+            buildSecondaryCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds)),
+            usedFixtureIds,
+            categoryBuildCaps.secondary
+        );
+        for (const prediction of secondarySelections) {
             const matches = [toFinalMatchPayload(prediction)];
             const total = computeTotalConfidence(matches);
             const row = await insertFinalRow({
@@ -845,23 +876,13 @@ async function buildFinalForTier(tier, options = {}) {
             secondaryRows.push(row);
         }
 
-        const directRows = [];
-        for (const p of limitedCandidates.slice(0, categoryBuildCaps.direct)) {
-            const matches = [toFinalMatchPayload(p)];
-            const total = computeTotalConfidence(matches);
-            const row = await insertFinalRow({
-                publish_run_id: publishRunId,
-                tier: t,
-                type: 'direct',
-                matches,
-                total_confidence: total,
-                risk_level: riskLevelFromConfidence(total)
-            }, client);
-            directRows.push(row);
-        }
-
         const sameMatchRows = [];
-        for (const row of buildSameMatchCandidates(limitedCandidates).slice(0, categoryBuildCaps.same_match)) {
+        const sameMatchSelections = takeAvailablePredictions(
+            buildSameMatchCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds)),
+            usedFixtureIds,
+            categoryBuildCaps.same_match
+        );
+        for (const row of sameMatchSelections) {
             const inserted = await insertFinalRow({
                 publish_run_id: publishRunId,
                 tier: t,
@@ -873,23 +894,13 @@ async function buildFinalForTier(tier, options = {}) {
             sameMatchRows.push(inserted);
         }
 
-        const accaRows = [];
-        for (const row of buildAcca6Candidates(
-            limitedCandidates.filter((p) => p.volatility === 'low')
-        ).slice(0, categoryBuildCaps.acca_6match)) {
-            const inserted = await insertFinalRow({
-                publish_run_id: publishRunId,
-                tier: t,
-                type: 'acca_6match',
-                matches: row.matches,
-                total_confidence: row.total_confidence,
-                risk_level: row.risk_level
-            }, client);
-            accaRows.push(inserted);
-        }
-
         const multiRows = [];
-        for (const row of buildMultiCandidates(limitedCandidates).slice(0, categoryBuildCaps.multi)) {
+        const multiSelections = takeAvailablePredictions(
+            buildMultiCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds)),
+            usedFixtureIds,
+            categoryBuildCaps.multi
+        );
+        for (const row of multiSelections) {
             const inserted = await insertFinalRow({
                 publish_run_id: publishRunId,
                 tier: t,
@@ -901,8 +912,50 @@ async function buildFinalForTier(tier, options = {}) {
             multiRows.push(inserted);
         }
 
-        console.log('[accaBuilder] tier=%s direct=%s secondary=%s same_match=%s multi=%s acca_6match=%s mega_acca_12=%s',
+        const accaRows = [];
+        const accaSelections = takeAvailablePredictions(
+            buildAcca6Candidates(
+                filterAvailablePredictions(limitedCandidates, usedFixtureIds).filter((p) => p.volatility === 'low')
+            ),
+            usedFixtureIds,
+            categoryBuildCaps.acca_6match
+        );
+        for (const row of accaSelections) {
+            const inserted = await insertFinalRow({
+                publish_run_id: publishRunId,
+                tier: t,
+                type: 'acca_6match',
+                matches: row.matches,
+                total_confidence: row.total_confidence,
+                risk_level: row.risk_level
+            }, client);
+            accaRows.push(inserted);
+        }
+
+        const megaAccaRows = [];
+        const megaSelections = takeAvailablePredictions(
+            buildMegaAcca12Candidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds), {
+                maxRows: categoryBuildCaps.mega_acca_12,
+                expiryCutoff: new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000))
+            }),
+            usedFixtureIds,
+            categoryBuildCaps.mega_acca_12
+        );
+        for (const row of megaSelections) {
+            const inserted = await insertFinalRow({
+                publish_run_id: publishRunId,
+                tier: t,
+                type: 'mega_acca_12',
+                matches: row.matches,
+                total_confidence: row.total_confidence,
+                risk_level: row.risk_level
+            }, client);
+            megaAccaRows.push(inserted);
+        }
+
+        console.log('[accaBuilder] tier=%s week_locked=%s direct=%s secondary=%s same_match=%s multi=%s acca_6match=%s mega_acca_12=%s',
             t,
+            weekLockedFixtureIds.size,
             directRows.length,
             secondaryRows.length,
             sameMatchRows.length,

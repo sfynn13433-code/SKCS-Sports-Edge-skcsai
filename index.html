@@ -143,6 +143,8 @@
         .footer-company { line-height: 1.7; }
         .footer-links { margin-top: 0.75rem; }
         .footer a { color: #cfe2ff; text-decoration: underline; }
+        .policy-badge { display: inline-block; background: #e7f1ff; color: #0d6efd; border: 1px solid #bfd7ff; border-radius: 999px; padding: 0.55rem 1rem; font-weight: 700; margin: 0 auto 1rem; }
+        .policy-note { max-width: 900px; margin: 0 auto 1.75rem auto; text-align: center; color: #495057; }
         .copyright { margin-top: 1rem; color: #adb5bd; font-size: 0.9rem; }
         @media (max-width: 768px) { .pipeline-timeline::before { left: 25px; } .stage-number { width: 50px; height: 50px; margin-right: 1.5rem; font-size: 1.3rem; } .stage-content h3 { font-size: 1.2rem; } .stage-icon { font-size: 1.5rem; } }
         @media (max-width: 480px) { .pipeline-stage { flex-direction: column; } .stage-number { margin-bottom: 1rem; margin-right: 0; } .pipeline-timeline::before { left: 25px; } .summary-grid { grid-template-columns: 1fr; } }
@@ -615,6 +617,7 @@
                     <div class="summary-item"><h4>Multi Bets</h4><p>Built from <strong>low-correlation</strong> matches passing Stages 1-4</p></div>
                     <div class="summary-item"><h4>Same-Match Bets</h4><p>Created after Stage 2, adjusted by Stage 3 volatility</p></div>
                     <div class="summary-item"><h4>Accumulators</h4><p>Only matches passing <strong>all stages</strong> + kill-switch for volatility</p></div>
+                    <div class="summary-item"><h4>Single-Use Policy</h4><p>Once a match is published in one insight format, it is blocked from the other formats for the rest of the week</p></div>
                 </div>
                 <div class="disclaimer-note"><p>💡 <strong>Transparency First:</strong> We show our process so you understand our confidence scores. No black boxes, no hidden logic.</p></div>
             </div>
@@ -633,6 +636,8 @@
     <!-- INSIGHTS SECTION -->
     <section id="insights" class="predictions-section">
         <h2 class="section-title">Latest Insights</h2>
+        <p style="text-align:center;"><span class="policy-badge">SKCS Rule: Single-use per team per week</span></p>
+        <p class="policy-note">Once a team or athlete is used in an insight, the same match is blocked from other insight formats for the rest of that calendar week unless they appear in a different event.</p>
         <p class="section-description" id="planDescription"></p>
         <div class="tabs-container">
             <div class="tabs-header">
@@ -885,6 +890,7 @@
             <ul class="feature-list">
                 <li><strong>Multi-sport intelligence</strong> – One unified system across 13 sports</li>
                 <li><strong>Layered analysis</strong> – Data is filtered, validated, and refined before insights are generated</li>
+                <li><strong>Single-use insight policy</strong> – Once a fixture is published in one insight format, it is blocked from the other formats for that calendar week</li>
                 <li><strong>Responsible design</strong> – No promises, no manipulation, no false certainty</li>
                 <li><strong>Automation-first</strong> – Built to scale with minimal manual intervention</li>
                 <li><strong>Developer-friendly</strong> – Modular architecture designed for expansion</li>
