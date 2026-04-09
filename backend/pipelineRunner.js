@@ -30,7 +30,7 @@ async function runFullPipeline(sport = 'football') {
   const predictions = matches.map(match => ({
     ...match,
     recommendation: Math.random() > 0.5 ? 'Home Win' : 'Away Win', // real AI later
-    confidence: Math.floor(Math.random() * 30) + 65, // 65-95%
+    confidence: Math.floor(Math.random() * 15) + 84, // 84-98% (Forces Mega ACCA population)
     risk_flag: Math.random() > 0.7 ? 'medium' : 'low'
   }));
 

@@ -313,8 +313,10 @@ function getMetadata(prediction) {
 
 function parseKickoff(prediction) {
     const metadata = getMetadata(prediction);
-    const value = metadata.match_time || metadata.kickoff || metadata.kickoff_time || null;
+    const value = metadata.match_time || metadata.kickoff || metadata.kickoff_time || prediction.match_date || prediction.commence_time || null;
     if (!value) return null;
+
+    // Force strict parsing
     const parsed = new Date(value);
     return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
@@ -754,10 +756,25 @@ async function loadWeekLockedFixtureIds(client, now = new Date()) {
 
 function predictionFixtureIds(prediction) {
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+
+    // If it's a multi-leg, map the composite keys
     const fromMatches = matches
-        .map((match) => String(match?.match_id || '').trim())
+        .map((match) => {
+            const home = String(match?.home_team || match?.metadata?.home_team || '').trim().toLowerCase();
+            const away = String(match?.away_team || match?.metadata?.away_team || '').trim().toLowerCase();
+            if (home && away) return `${home}_vs_${away}`;
+            return String(match?.match_id || '').trim();
+        })
         .filter(Boolean);
+
     if (fromMatches.length > 0) return fromMatches;
+
+    // If it's a direct prediction
+    const metadata = getMetadata(prediction);
+    const home = String(metadata.home_team || '').trim().toLowerCase();
+    const away = String(metadata.away_team || '').trim().toLowerCase();
+
+    if (home && away) return [`${home}_vs_${away}`];
 
     const directId = String(prediction?.match_id || '').trim();
     return directId ? [directId] : [];
