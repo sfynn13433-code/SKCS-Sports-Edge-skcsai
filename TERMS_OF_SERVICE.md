@@ -29,6 +29,14 @@ Accumulator (ACCA) suggestions
 
 Analytical content and educational materials
 
+3.1 Single-Use Insight Policy
+
+To maintain independence and reduce correlation risk, SKCS AI Sports Edge operates a single-use insight policy. Once a team or individual is used within an insight, that same match or event will not be reused in any other insight format for the remainder of that calendar week.
+
+The only exception applies if the same team or individual appears in a completely different match or event. For publication controls, SKCS treats a calendar week as Monday 00:00 to Sunday 23:59 SAST.
+
+This approach ensures diversified coverage, improved stability, and stronger insight integrity across all supported sports.
+
 Each output is accompanied by a confidence score and risk guidance. Because sports outcomes depend on real-world events beyond our control, the Service is provided on an informational basis with no assurance of accuracy or future performance.
 
 4. Subscription Plans and Billing
