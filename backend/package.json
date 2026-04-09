@@ -2,10 +2,11 @@
   "name": "skcs-backend",
   "private": true,
   "scripts": {
-  "start": "node server-express.js",
-  "dev": "nodemon server-express.js"
-},
+    "start": "node server-express.js",
+    "dev": "nodemon server-express.js"
+  },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.56.0",
     "axios": "^1.13.5",
     "bcrypt": "^6.0.0",

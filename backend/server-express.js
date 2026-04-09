@@ -54,7 +54,7 @@ function warnEnv(name) {
 warnEnv('DATABASE_URL');
 warnEnv('ADMIN_API_KEY');
 warnEnv('USER_API_KEY');
-warnEnv('OPENAI_KEY');
+warnEnv('GEMINI_API_KEY');
 
 const predictionsRouter = require('./routes/predictions');
 const pipelineRouter    = require('./routes/pipeline');
@@ -204,6 +204,7 @@ app.use('/api/pipeline', pipelineRouter);
 app.use('/api/debug', debugRouter);
 app.use('/api/user', userRouter);
 app.use('/api/chat', chatRouter);
+app.use('/api/edgemind', chatRouter);
 app.use('/api/accuracy', accuracyRouter);
 
 app.use((err, _req, res, _next) => {
