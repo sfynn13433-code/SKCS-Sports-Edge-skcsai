@@ -28,9 +28,9 @@ function outcomeSetForLeg(market, pick) {
 
     // double chance
     if (m.includes('double_chance') || m === 'double chance') {
-        if (p === '1X') return new Set([OUTCOMES.H, OUTCOMES.D]);
-        if (p === 'X2') return new Set([OUTCOMES.D, OUTCOMES.A]);
-        if (p === '12') return new Set([OUTCOMES.H, OUTCOMES.A]);
+        if (p === '1X' || p === 'HOME_OR_DRAW' || p === 'HOME OR DRAW') return new Set([OUTCOMES.H, OUTCOMES.D]);
+        if (p === 'X2' || p === 'DRAW_OR_AWAY' || p === 'DRAW OR AWAY') return new Set([OUTCOMES.D, OUTCOMES.A]);
+        if (p === '12' || p === 'HOME_OR_AWAY' || p === 'HOME OR AWAY') return new Set([OUTCOMES.H, OUTCOMES.A]);
     }
 
     // Unknown/non-result market: cannot infer, treat as compatible by default
