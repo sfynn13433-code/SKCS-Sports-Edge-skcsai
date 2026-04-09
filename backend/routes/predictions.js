@@ -182,14 +182,72 @@ function inferSectionType(prediction) {
     );
     const firstMarket = String(matches[0]?.market || '').trim().toLowerCase();
 
+    if (matches.length > 1 && uniqueMatchIds.size === 1) return 'same_match';
     if (matches.length >= 12) return 'mega_acca_12';
     if (matches.length >= 6) return 'acca_6match';
-    if (matches.length > 1 && uniqueMatchIds.size === 1) return 'same_match';
     if (matches.length >= 2) return 'multi';
     if (matches.length === 1 && firstMarket && firstMarket !== '1x2' && firstMarket !== 'match_result') {
         return 'secondary';
     }
     return 'direct';
+}
+
+function parseMatchKickoff(match) {
+    const value =
+        match?.commence_time ||
+        match?.match_date ||
+        match?.metadata?.match_time ||
+        match?.metadata?.kickoff ||
+        match?.metadata?.kickoff_time ||
+        null;
+
+    if (!value) return null;
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function predictionMatchesWindow(prediction, windowStart, windowEnd) {
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    if (matches.length === 0) return false;
+
+    const kickoffs = matches
+        .map((match) => parseMatchKickoff(match))
+        .filter(Boolean);
+
+    if (kickoffs.length === 0) return true;
+    return kickoffs.every((kickoff) => kickoff >= windowStart && kickoff <= windowEnd);
+}
+
+function getPredictionPrimaryKickoff(prediction) {
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    const kickoffs = matches
+        .map((match) => parseMatchKickoff(match))
+        .filter(Boolean)
+        .sort((a, b) => a.getTime() - b.getTime());
+
+    return kickoffs[0] || null;
+}
+
+function comparePredictionsForDisplay(a, b, now = new Date()) {
+    const kickoffA = getPredictionPrimaryKickoff(a);
+    const kickoffB = getPredictionPrimaryKickoff(b);
+    const upcomingA = kickoffA ? kickoffA >= now : false;
+    const upcomingB = kickoffB ? kickoffB >= now : false;
+
+    if (upcomingA !== upcomingB) {
+        return upcomingA ? -1 : 1;
+    }
+
+    if (kickoffA && kickoffB) {
+        if (upcomingA && upcomingB) {
+            return kickoffA.getTime() - kickoffB.getTime();
+        }
+        return kickoffB.getTime() - kickoffA.getTime();
+    }
+
+    const createdA = new Date(a.created_at || 0).getTime();
+    const createdB = new Date(b.created_at || 0).getTime();
+    return createdB - createdA;
 }
 
 function enrichPredictionDetails(prediction) {
@@ -233,6 +291,8 @@ router.get('/', requireRole('user'), async (req, res) => {
         const planId = req.query.plan_id || 'elite_30day_deep_vip';
         const sport = req.query.sport;
         const sportFilterValues = getSportFilterValues(sport);
+        const futureWindowDays = Math.max(1, Math.min(14, Number(req.query.window_days) || 7));
+        const historyWindowDays = Math.max(0, Math.min(14, Number(req.query.history_days) || 7));
 
         console.log(`[PREDICTIONS] Request for Plan: ${planId}, Sport: ${sport || 'all'}`);
 
@@ -242,7 +302,8 @@ router.get('/', requireRole('user'), async (req, res) => {
             return res.status(400).json({ error: 'Invalid plan ID' });
         }
 
-        const weekStart = startOfWeekUtc(new Date());
+        const now = new Date();
+        const queryStart = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
         let predictions = [];
         try {
             let queryStr = `
@@ -251,9 +312,9 @@ router.get('/', requireRole('user'), async (req, res) => {
                 WHERE tier IN (${planCapabilities.tiers.map(t => `'${t}'`).join(',')})
                   AND pf.created_at >= $1
             `;
-            const queryParams = [weekStart.toISOString()];
+            const queryParams = [queryStart.toISOString()];
 
-            queryStr += ` ORDER BY created_at DESC LIMIT 800;`;
+            queryStr += ` ORDER BY created_at DESC LIMIT 2000;`;
 
             const dbRes = await query(queryStr, queryParams);
             predictions = dbRes.rows || [];
@@ -381,8 +442,20 @@ router.get('/', requireRole('user'), async (req, res) => {
             };
         }).map(enrichPredictionDetails);
 
-        const planFilteredPredictions = filterPredictionsForPlan(enrichedPredictions, planId)
-            .filter((prediction) => predictionMatchesSport(prediction, sportFilterValues));
+        const windowStart = new Date(now.getTime() - historyWindowDays * 24 * 60 * 60 * 1000);
+        const windowEnd = new Date(now.getTime() + futureWindowDays * 24 * 60 * 60 * 1000);
+
+        const scopedPredictions = enrichedPredictions
+            .filter((prediction) => predictionMatchesWindow(prediction, windowStart, windowEnd))
+            .filter((prediction) => predictionMatchesSport(prediction, sportFilterValues))
+            .sort((a, b) => comparePredictionsForDisplay(a, b, now));
+
+        const planFilteredPredictions = filterPredictionsForPlan(
+            scopedPredictions,
+            planId,
+            now,
+            { enforceUniqueAssetWindow: false }
+        );
         const todayName = moment.tz('Africa/Johannesburg').format('dddd').toLowerCase();
         const dailyLimits = calculateDailyAllocations(planId, todayName);
 
@@ -390,6 +463,8 @@ router.get('/', requireRole('user'), async (req, res) => {
             plan_id: planId,
             sport: sport || 'all',
             day: todayName,
+            history_days: historyWindowDays,
+            window_days: futureWindowDays,
             daily_limits: dailyLimits,
             plan_meta: {
                 id: planCapabilities.plan_id,

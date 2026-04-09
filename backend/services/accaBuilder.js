@@ -12,6 +12,7 @@ const { scoreMarkets } = require('./marketScoringEngine');
 
 const MEGA_ACCA_SIZE = 12;
 const MEGA_ACCA_MIN_CONFIDENCE = 80; // Lowered from 90 to be more achievable
+const SAME_MATCH_INSIGHT_TARGET = 6;
 
 function normalizeTier(tier) {
     if (tier === 'normal' || tier === 'deep') return tier;
@@ -253,11 +254,27 @@ function toScoringMatchPayload(prediction) {
 }
 
 function toSecondaryPayload(prediction, marketScore) {
+    const normalizedMarket = String(marketScore.market || '').toUpperCase();
+    const normalizedPick = String(marketScore.pick || '').toUpperCase();
+    let market = marketScore.legacyMarketHint || marketScore.market;
+
+    if (normalizedMarket === 'DOUBLE_CHANCE') {
+        market = `double_chance_${normalizedPick.toLowerCase()}`;
+    } else if (normalizedMarket === 'OVER_UNDER_2_5') {
+        market = normalizedPick === 'UNDER' ? 'under_2_5' : 'over_2_5';
+    } else if (normalizedMarket === 'OVER_UNDER_1_5') {
+        market = normalizedPick === 'UNDER' ? 'under_1_5' : 'over_1_5';
+    } else if (normalizedMarket === 'BTTS') {
+        market = normalizedPick === 'NO' ? 'btts_no' : 'btts_yes';
+    } else if (normalizedMarket === 'CORNERS_OVER_UNDER') {
+        market = normalizedPick === 'UNDER' ? 'corners_under' : 'corners_over';
+    }
+
     return {
         raw_id: prediction.raw_id,
         match_id: prediction.match_id,
         sport: prediction.sport,
-        market: marketScore.legacyMarketHint || marketScore.market,
+        market,
         prediction: marketScore.pick,
         confidence: marketScore.confidence,
         volatility: prediction.volatility,
@@ -341,10 +358,10 @@ function isPublishablePrediction(prediction, tier, now = new Date()) {
         return typeof prediction.confidence === 'number' && prediction.confidence > 0;
     }
 
-    // STRICT: Reject predictions older than 12 hours to ensure we only show current/upcoming matches
-    const staleCutoff = new Date(now.getTime() - 12 * 60 * 60 * 1000);
+    // Keep a reviewable audit window so recent settled fixtures remain visible for testing.
+    const staleCutoff = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     if (kickoff < staleCutoff) {
-        console.log(`[accaBuilder] Rejecting prediction for match ${prediction.match_id}: kickoff ${kickoff.toISOString()} is older than 12 hours`);
+        console.log(`[accaBuilder] Rejecting prediction for match ${prediction.match_id}: kickoff ${kickoff.toISOString()} is older than the 7-day review window`);
         return false;
     }
 
@@ -402,35 +419,52 @@ function uniqueBy(rows, keyFn) {
     return out;
 }
 
+function buildDerivedMarkets(prediction, options = {}) {
+    const includeTypes = new Set(
+        Array.isArray(options.includeTypes) && options.includeTypes.length
+            ? options.includeTypes
+            : ['secondary', 'advanced']
+    );
+    const excludeMarkets = new Set(
+        (Array.isArray(options.excludeMarkets) ? options.excludeMarkets : [])
+            .map((market) => String(market || '').toUpperCase())
+    );
+    const maxRows = Number.isFinite(options.maxRows) ? options.maxRows : 1;
+
+    return uniqueBy(
+        scoreMarkets(toScoringMatchPayload(prediction))
+            .filter((market) => includeTypes.has(market.type))
+            .filter((market) => !excludeMarkets.has(String(market.market || '').toUpperCase()))
+            .sort((a, b) => (Number(b.confidence) || 0) - (Number(a.confidence) || 0))
+            .map((market) => toSecondaryPayload(prediction, market)),
+        (row) => `${row.match_id}:${row.market}`
+    ).slice(0, maxRows);
+}
+
 function buildSecondaryCandidates(predictions) {
     const secondary = [];
 
     for (const prediction of predictions) {
-        const scoredMarkets = scoreMarkets(toScoringMatchPayload(prediction));
-        const derived = scoredMarkets
-            .filter((market) => market.type === 'secondary' || market.type === 'advanced')
-            .slice(0, 1)
-            .map((market) => toSecondaryPayload(prediction, market));
-
-        secondary.push(...derived);
+        secondary.push(...buildDerivedMarkets(prediction, {
+            includeTypes: ['secondary', 'advanced'],
+            maxRows: 2
+        }));
     }
 
-    return uniqueBy(secondary, (row) => row.match_id);
+    return uniqueBy(secondary, (row) => `${row.match_id}:${row.market}`);
 }
 
-function buildSameMatchCandidates(predictions, secondaryCandidates) {
-    const groupedSecondary = new Map();
-    for (const row of secondaryCandidates) {
-        if (!groupedSecondary.has(row.match_id)) groupedSecondary.set(row.match_id, []);
-        groupedSecondary.get(row.match_id).push(row);
-    }
-
+function buildSameMatchCandidates(predictions) {
     const out = [];
     for (const prediction of predictions) {
-        const secondary = (groupedSecondary.get(prediction.match_id) || []).slice(0, 2);
-        if (secondary.length === 0) continue;
+        const derived = buildDerivedMarkets(prediction, {
+            includeTypes: ['primary', 'secondary', 'advanced'],
+            excludeMarkets: ['MATCH_RESULT', 'MATCH_WINNER', 'WINNER', 'RACE_WINNER'],
+            maxRows: SAME_MATCH_INSIGHT_TARGET - 1
+        });
+        if (derived.length === 0) continue;
 
-        const legs = [toFinalMatchPayload(prediction), ...secondary.map(toFinalMatchPayload)];
+        const legs = [toFinalMatchPayload(prediction), ...derived.map(toFinalMatchPayload)];
         out.push({
             match_id: prediction.match_id,
             matches: legs,
@@ -560,7 +594,7 @@ function getPerSportCandidateLimit(requestedSports = []) {
     const sports = normalizeRequestedSports(requestedSports);
     if (sports.length === 1) return 24;
     if (sports.length > 1) return 8;
-    return 4;
+    return 8;
 }
 
 function getCategoryBuildCaps(requestedSports = []) {
@@ -577,12 +611,12 @@ function getCategoryBuildCaps(requestedSports = []) {
     }
 
     return {
-        direct: 60,
-        secondary: 30,
-        same_match: 16,
-        multi: 18,
-        acca_6match: 12,
-        mega_acca_12: 6
+        direct: 80,
+        secondary: 64,
+        same_match: 48,
+        multi: 24,
+        acca_6match: 16,
+        mega_acca_12: 8
     };
 }
 
@@ -673,10 +707,8 @@ async function buildFinalForTier(tier, options = {}) {
     const now = options.now instanceof Date ? options.now : new Date();
 
     return withTransaction(async (client) => {
-        const tierRules = await getTierRules(t, client);
+        await getTierRules(t, client);
         const accaRules = await getAccaRules(client);
-        const weeklyUsedFixtureIds = await loadWeekLockedFixtureIds(client, now);
-        const currentRunUsedFixtureIds = new Set(weeklyUsedFixtureIds);
 
         const valid = await loadValidFilteredPredictions(t, client, {
             requestedSports: options.requestedSports
@@ -691,27 +723,14 @@ async function buildFinalForTier(tier, options = {}) {
         // Limit candidates to prevent combinatorial explosion and timeouts
         const MAX_ACCA_CANDIDATES = 120;
         const limitedCandidates = perSportLimited.slice(0, MAX_ACCA_CANDIDATES);
-
-        const reserveFixtures = (predictionRows) => {
-            for (const row of predictionRows) {
-                for (const id of predictionFixtureIds(row)) currentRunUsedFixtureIds.add(id);
-            }
-        };
-
-        const secondaryCandidates = buildSecondaryCandidates(
-            filterAvailablePredictions(limitedCandidates, currentRunUsedFixtureIds)
-        );
+        const secondaryCandidates = buildSecondaryCandidates(limitedCandidates);
 
         const megaAccaRows = [];
-        const megaCandidates = buildMegaAcca12Candidates(
-            filterAvailablePredictions(limitedCandidates, currentRunUsedFixtureIds),
-            {
-                maxRows: categoryBuildCaps.mega_acca_12,
-                expiryCutoff: new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000))
-            }
-        );
+        const megaCandidates = buildMegaAcca12Candidates(limitedCandidates, {
+            maxRows: categoryBuildCaps.mega_acca_12,
+            expiryCutoff: new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000))
+        });
         for (const row of megaCandidates) {
-            if (!predictionFixtureIds(row).every((id) => !currentRunUsedFixtureIds.has(id))) continue;
             const inserted = await insertFinalRow({
                 publish_run_id: publishRunId,
                 tier: t,
@@ -722,65 +741,9 @@ async function buildFinalForTier(tier, options = {}) {
             }, client);
             megaAccaRows.push(inserted);
         }
-        reserveFixtures(megaAccaRows);
-
-        const sameMatchRows = [];
-        for (const row of buildSameMatchCandidates(
-            filterAvailablePredictions(limitedCandidates, currentRunUsedFixtureIds),
-            filterAvailablePredictions(secondaryCandidates, currentRunUsedFixtureIds)
-        ).slice(0, categoryBuildCaps.same_match)) {
-            if (!predictionFixtureIds(row).every((id) => !currentRunUsedFixtureIds.has(id))) continue;
-            const inserted = await insertFinalRow({
-                publish_run_id: publishRunId,
-                tier: t,
-                type: 'same_match',
-                matches: row.matches,
-                total_confidence: row.total_confidence,
-                risk_level: row.risk_level
-            }, client);
-            sameMatchRows.push(inserted);
-        }
-        reserveFixtures(sameMatchRows);
-
-        const accaRows = [];
-        for (const row of buildAcca6Candidates(
-            filterAvailablePredictions(
-                limitedCandidates.filter((p) => p.volatility === 'low'),
-                currentRunUsedFixtureIds
-            )
-        ).slice(0, categoryBuildCaps.acca_6match)) {
-            if (!predictionFixtureIds(row).every((id) => !currentRunUsedFixtureIds.has(id))) continue;
-            const inserted = await insertFinalRow({
-                publish_run_id: publishRunId,
-                tier: t,
-                type: 'acca_6match',
-                matches: row.matches,
-                total_confidence: row.total_confidence,
-                risk_level: row.risk_level
-            }, client);
-            accaRows.push(inserted);
-        }
-        reserveFixtures(accaRows);
-
-        const multiRows = [];
-        for (const row of buildMultiCandidates(
-            filterAvailablePredictions(limitedCandidates, currentRunUsedFixtureIds)
-        ).slice(0, categoryBuildCaps.multi)) {
-            if (!predictionFixtureIds(row).every((id) => !currentRunUsedFixtureIds.has(id))) continue;
-            const inserted = await insertFinalRow({
-                publish_run_id: publishRunId,
-                tier: t,
-                type: 'multi',
-                matches: row.matches,
-                total_confidence: row.total_confidence,
-                risk_level: row.risk_level
-            }, client);
-            multiRows.push(inserted);
-        }
-        reserveFixtures(multiRows);
 
         const secondaryRows = [];
-        for (const prediction of filterAvailablePredictions(secondaryCandidates, currentRunUsedFixtureIds).slice(0, categoryBuildCaps.secondary)) {
+        for (const prediction of secondaryCandidates.slice(0, categoryBuildCaps.secondary)) {
             const matches = [toFinalMatchPayload(prediction)];
             const total = computeTotalConfidence(matches);
             const row = await insertFinalRow({
@@ -793,10 +756,9 @@ async function buildFinalForTier(tier, options = {}) {
             }, client);
             secondaryRows.push(row);
         }
-        reserveFixtures(secondaryRows);
 
         const directRows = [];
-        for (const p of filterAvailablePredictions(limitedCandidates, currentRunUsedFixtureIds).slice(0, categoryBuildCaps.direct)) {
+        for (const p of limitedCandidates.slice(0, categoryBuildCaps.direct)) {
             const matches = [toFinalMatchPayload(p)];
             const total = computeTotalConfidence(matches);
             const row = await insertFinalRow({
@@ -809,7 +771,47 @@ async function buildFinalForTier(tier, options = {}) {
             }, client);
             directRows.push(row);
         }
-        reserveFixtures(directRows);
+
+        const sameMatchRows = [];
+        for (const row of buildSameMatchCandidates(limitedCandidates).slice(0, categoryBuildCaps.same_match)) {
+            const inserted = await insertFinalRow({
+                publish_run_id: publishRunId,
+                tier: t,
+                type: 'same_match',
+                matches: row.matches,
+                total_confidence: row.total_confidence,
+                risk_level: row.risk_level
+            }, client);
+            sameMatchRows.push(inserted);
+        }
+
+        const accaRows = [];
+        for (const row of buildAcca6Candidates(
+            limitedCandidates.filter((p) => p.volatility === 'low')
+        ).slice(0, categoryBuildCaps.acca_6match)) {
+            const inserted = await insertFinalRow({
+                publish_run_id: publishRunId,
+                tier: t,
+                type: 'acca_6match',
+                matches: row.matches,
+                total_confidence: row.total_confidence,
+                risk_level: row.risk_level
+            }, client);
+            accaRows.push(inserted);
+        }
+
+        const multiRows = [];
+        for (const row of buildMultiCandidates(limitedCandidates).slice(0, categoryBuildCaps.multi)) {
+            const inserted = await insertFinalRow({
+                publish_run_id: publishRunId,
+                tier: t,
+                type: 'multi',
+                matches: row.matches,
+                total_confidence: row.total_confidence,
+                risk_level: row.risk_level
+            }, client);
+            multiRows.push(inserted);
+        }
 
         console.log('[accaBuilder] tier=%s direct=%s secondary=%s same_match=%s multi=%s acca_6match=%s mega_acca_12=%s',
             t,

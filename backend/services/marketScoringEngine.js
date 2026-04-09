@@ -18,6 +18,13 @@ function normalizeSport(sport) {
     if (key === 'mma') return 'combat_sports';
     if (key === 'formula1') return 'motorsport';
     if (key === 'nfl') return 'american_football';
+    if (key.startsWith('soccer_')) return 'football';
+    if (key.startsWith('icehockey_')) return 'hockey';
+    if (key.startsWith('basketball_')) return 'basketball';
+    if (key.startsWith('americanfootball_')) return 'american_football';
+    if (key.startsWith('baseball_')) return 'baseball';
+    if (key.startsWith('rugbyunion_')) return 'rugby';
+    if (key.startsWith('aussierules_')) return 'afl';
     return key;
 }
 

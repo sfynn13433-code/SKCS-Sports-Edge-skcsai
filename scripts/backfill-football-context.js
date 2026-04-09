@@ -385,7 +385,11 @@ async function ensureTables(client) {
 async function fetchEventsForDate(client, date) {
     const res = await client.query(
         `WITH prediction_events AS (
-            SELECT DISTINCT COALESCE(m->>'match_id', m->'metadata'->>'event_id') AS event_id
+            SELECT DISTINCT
+                COALESCE(m->>'match_id', m->'metadata'->>'event_id') AS event_id,
+                LEFT(COALESCE(m->>'match_date', m->>'commence_time', ''), 10) AS fixture_date,
+                LOWER(TRIM(COALESCE(m->>'home_team', m->'metadata'->>'home_team', ''))) AS home_team_name_norm,
+                LOWER(TRIM(COALESCE(m->>'away_team', m->'metadata'->>'away_team', ''))) AS away_team_name_norm
             FROM predictions_final pf
             CROSS JOIN LATERAL jsonb_array_elements(pf.matches) AS m
             WHERE LEFT(COALESCE(m->>'match_date', m->>'commence_time', ''), 10) = $1::text
@@ -404,7 +408,21 @@ async function fetchEventsForDate(client, date) {
             ce.raw_provider_data->'teams'->'home'->>'name' AS home_team_name,
             ce.raw_provider_data->'teams'->'away'->>'name' AS away_team_name
          FROM canonical_events ce
-         JOIN prediction_events pe ON pe.event_id = ce.id::text
+         JOIN prediction_events pe
+           ON (
+                pe.event_id = COALESCE(
+                    ce.raw_provider_data->'fixture'->>'id',
+                    ce.raw_provider_data->>'id',
+                    ce.raw_provider_data->'game'->>'id',
+                    ce.raw_provider_data->'fight'->>'id',
+                    ce.raw_provider_data->'race'->>'id'
+                )
+                OR (
+                    pe.fixture_date = ce.start_time_utc::date::text
+                    AND pe.home_team_name_norm = LOWER(TRIM(COALESCE(ce.raw_provider_data->'teams'->'home'->>'name', '')))
+                    AND pe.away_team_name_norm = LOWER(TRIM(COALESCE(ce.raw_provider_data->'teams'->'away'->>'name', '')))
+                )
+           )
          WHERE ce.sport = 'football'
            AND ce.start_time_utc::date = $1::date
          ORDER BY ce.start_time_utc ASC`,
@@ -716,7 +734,12 @@ async function main() {
             return;
         }
 
-        const injuries = await fetchInjuriesByDate(date);
+        let injuries = [];
+        try {
+            injuries = await fetchInjuriesByDate(date);
+        } catch (error) {
+            console.warn(`[context] injuries fetch failed for ${date}: ${error.message}`);
+        }
         const eventByFixtureId = new Map(
             events
                 .filter((event) => event.fixture_provider_id)

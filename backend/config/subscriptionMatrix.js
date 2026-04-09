@@ -279,9 +279,9 @@ function getPredictionCategory(prediction) {
     const uniqueMatchIds = new Set(matches.map((match) => String(match?.match_id || '').trim()).filter(Boolean));
     const firstMarket = normalizeMarketName(matches[0]?.market);
 
+    if (matches.length > 1 && uniqueMatchIds.size === 1) return 'same_match';
     if (matches.length >= 12 || explicit === 'mega_acca_12') return 'mega_acca_12';
     if (matches.length >= 6 || explicit === 'acca') return 'acca_6match';
-    if (matches.length > 1 && uniqueMatchIds.size === 1) return 'same_match';
     if (matches.length >= 2) return 'multi';
     if (matches.length === 1 && firstMarket && firstMarket !== '1x2' && firstMarket !== 'match_result') return 'secondary';
     return 'direct';
@@ -369,7 +369,7 @@ function enforceUniqueAssetWindow(predictions, plan, now) {
     return shaped;
 }
 
-function filterPredictionsForPlan(predictions, planId, now = new Date()) {
+function filterPredictionsForPlan(predictions, planId, now = new Date(), options = {}) {
     const plan = getPlanCapabilities(planId);
     if (!plan) return [];
 
@@ -416,6 +416,10 @@ function filterPredictionsForPlan(predictions, planId, now = new Date()) {
             : 0;
         if (limit <= 0) continue;
         shaped.push(...buckets.get(category).slice(0, limit));
+    }
+
+    if (options.enforceUniqueAssetWindow === false) {
+        return shaped;
     }
 
     return enforceUniqueAssetWindow(shaped, plan, now);

@@ -2,6 +2,7 @@
 
 const { runPipelineForMatches, rebuildFinalOutputs } = require('./aiPipeline');
 const { buildLiveData } = require('./dataProvider');
+const { upsertCanonicalEvents } = require('./canonicalEvents');
 const config = require('../config');
 
 function getSeasonStartYear() {
@@ -159,6 +160,7 @@ async function syncSports(options = {}) {
                 const matches = await buildLiveData(item);
 
                 if (matches && matches.length > 0) {
+                    await upsertCanonicalEvents(matches);
                     console.log(`[syncService] Found ${matches.length} REAL matches for ${item.sport}. Running AI Analysis...`);
                     await runPipelineForMatches({ matches });
                     totalMatchesProcessed += matches.length;

@@ -140,8 +140,11 @@ async function fetchOddsData(sportKey) {
         volatility: marketView?.volatility || null,
         odds: null,
         provider: 'odds-api',
+        provider_name: 'odds-api',
         league: event.sport_title || humanizeCompetitionLabel(sportKey),
         bookmaker: marketView?.bookmaker || null
+        ,
+        raw_provider_data: event
     };
     });
 }
@@ -170,13 +173,15 @@ function normalizeFixture(f, sport) {
             prediction: null,
             confidence: null,
             volatility: null,
-            odds: null,
-            provider: 'api-sports',
-            league: f.league?.name || null,
-            country: f.league?.country || null,
-            round: f.league?.round || null,
-            venue: f.fixture?.venue?.name || null
-        };
+        odds: null,
+        provider: 'api-sports',
+        provider_name: 'api-sports',
+        league: f.league?.name || null,
+        country: f.league?.country || null,
+        round: f.league?.round || null,
+        venue: f.fixture?.venue?.name || null,
+        raw_provider_data: f
+    };
     }
     // Other sports v1/v2 format (games, races, fights)
     const id = f.id || f.game?.id || f.fight?.id || f.race?.id;
@@ -200,9 +205,11 @@ function normalizeFixture(f, sport) {
         volatility: null,
         odds: null,
         provider: 'api-sports',
+        provider_name: 'api-sports',
         league,
         venue,
-        stage: f.stage || f.competition?.stage || f.tournament?.stage || null
+        stage: f.stage || f.competition?.stage || f.tournament?.stage || null,
+        raw_provider_data: f
     };
 }
 
@@ -211,7 +218,8 @@ async function buildLiveData(options = {}) {
     const leagueId = options.leagueId || null;
     const season = options.season || null;
     const today = todayStr();
-    const windowEnd = futureStr(5);
+    const windowEnd = futureStr(7);
+    const maxFixturesPerSource = 80;
 
     const client = new APISportsClient();
 
@@ -250,7 +258,7 @@ async function buildLiveData(options = {}) {
             return [];
         }
 
-        const out = fixtures.slice(0, 30).map(f => normalizeFixture(f, sport));
+        const out = fixtures.slice(0, maxFixturesPerSource).map(f => normalizeFixture(f, sport));
         console.log(`[dataProvider] ${sport}: fetched=${fixtures.length} returned=${out.length}`);
         return out;
     } catch (error) {

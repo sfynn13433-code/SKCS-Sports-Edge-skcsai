@@ -53,15 +53,17 @@ function scoreMatch(match) {
 
     const winner = homeStrength >= awayStrength ? 'home' : 'away';
 
-    console.log('[aiScoring] match_id=%s home=%s away=%s diff=%.2f winner=%s confidence=%.2f volatility=%s',
-        match.match_id,
-        home || 'N/A',
-        away || 'N/A',
-        diff,
-        winner,
-        confidence,
-        volatility
-    );
+    if (String(process.env.DEBUG_AI_SCORING || '').trim().toLowerCase() === 'true') {
+        console.log('[aiScoring] match_id=%s home=%s away=%s diff=%.2f winner=%s confidence=%.2f volatility=%s',
+            match.match_id,
+            home || 'N/A',
+            away || 'N/A',
+            diff,
+            winner,
+            confidence,
+            volatility
+        );
+    }
 
     return {
         confidence,

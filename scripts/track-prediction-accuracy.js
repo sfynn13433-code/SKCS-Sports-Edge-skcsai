@@ -868,8 +868,26 @@ async function fetchPredictionRows(client, date, sport, publishRunId) {
             ce.provider_name AS result_source
         FROM predictions_final pf
         CROSS JOIN LATERAL jsonb_array_elements(pf.matches) WITH ORDINALITY AS leg(match_item, ordinality)
-        LEFT JOIN canonical_events ce
-            ON ce.id::text = COALESCE(leg.match_item->>'match_id', leg.match_item->'metadata'->>'event_id')
+        LEFT JOIN LATERAL (
+            SELECT ce.*
+            FROM canonical_events ce
+            WHERE (
+                COALESCE(
+                    ce.raw_provider_data->'fixture'->>'id',
+                    ce.raw_provider_data->>'id',
+                    ce.raw_provider_data->'game'->>'id',
+                    ce.raw_provider_data->'fight'->>'id',
+                    ce.raw_provider_data->'race'->>'id'
+                ) = COALESCE(leg.match_item->>'match_id', leg.match_item->'metadata'->>'event_id')
+                OR (
+                    LEFT(ce.start_time_utc::text, 10) = LEFT(COALESCE(leg.match_item->>'match_date', leg.match_item->>'commence_time', ''), 10)
+                    AND LOWER(TRIM(COALESCE(ce.raw_provider_data->'teams'->'home'->>'name', ''))) = LOWER(TRIM(COALESCE(leg.match_item->>'home_team', leg.match_item->'metadata'->>'home_team', '')))
+                    AND LOWER(TRIM(COALESCE(ce.raw_provider_data->'teams'->'away'->>'name', ''))) = LOWER(TRIM(COALESCE(leg.match_item->>'away_team', leg.match_item->'metadata'->>'away_team', '')))
+                )
+            )
+            ORDER BY ce.updated_at DESC NULLS LAST, ce.created_at DESC NULLS LAST
+            LIMIT 1
+        ) ce ON true
         WHERE LEFT(COALESCE(leg.match_item->>'match_date', leg.match_item->>'commence_time', ''), 10) = $1
           AND COALESCE(leg.match_item->>'sport', '') = $2
           AND ($3::bigint IS NULL OR pf.publish_run_id = $3::bigint)
