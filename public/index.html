@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SKCS AI Sports Insights</title>
+    <title>SKCS AI Sports Edge</title>
+    <meta name="description" content="SKCS AI Sports Edge delivers smart, confidence-based sports insights across multiple sports with fast performance, daily analysis, and high-probability selections.">
     <link rel="icon" href="data:,">
+    <link rel="preconnect" href="https://skcs-sports-edge-skcsai.onrender.com" crossorigin>
+    <link rel="preload" as="image" href="hero-page.webp">
     <style>
         /* ========== ALL YOUR EXISTING STYLES (kept exactly as before) ========== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -15,7 +18,8 @@
         .nav-links { display: flex; gap: 2rem; }
         .nav-links a { color: white; text-decoration: none; font-weight: 500; transition: color 0.3s; }
         .nav-links a:hover { color: #cfe2ff; }
-        .hero-section { position: relative; height: 500px; background-image: url('hero-page.jpg'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; text-align: center; color: white; padding: 2rem; }
+        .hero-section { position: relative; height: 500px; overflow: hidden; display: flex; align-items: center; justify-content: center; text-align: center; color: white; padding: 2rem; }
+        .hero-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
         .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); }
         .hero-content { position: relative; z-index: 2; max-width: 800px; }
         .hero-content h1 { font-size: 3rem; margin-bottom: 1rem; color: white; text-shadow: 2px 2px 8px rgba(0,0,0,0.7); }
@@ -109,7 +113,7 @@
         .principle h4 { color: #0d6efd; margin: 0; font-size: 1.1rem; }
         .philosophy-statement { font-size: 1.2rem; color: #fff; line-height: 1.8; margin-top: 2rem; text-align: center; font-style: italic; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 2rem; }
         .philosophy-statement strong { color: #0d6efd; }
-        .about-section { position: relative; padding: 4rem 2rem; margin: 3rem 0; border-radius: 10px; overflow: hidden; background-image: url('about-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed; }
+        .about-section { position: relative; padding: 4rem 2rem; margin: 3rem 0; border-radius: 10px; overflow: hidden; background-image: url('about-bg.webp'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed; }
         .about-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.7); z-index: 1; }
         .about-container { position: relative; max-width: 1000px; margin: 0 auto; z-index: 2; }
         .about-title { color: #0d6efd; font-size: 2.5rem; margin-bottom: 1.5rem; text-align: center; text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.8); }
@@ -136,6 +140,9 @@
         .contact-note { color: #6c757d; font-size: 0.9rem; margin-top: 2rem; font-style: italic; }
         .footer { background-color: #212529; color: white; padding: 2rem; text-align: center; }
         .footer-content { max-width: 1200px; margin: 0 auto; }
+        .footer-company { line-height: 1.7; }
+        .footer-links { margin-top: 0.75rem; }
+        .footer a { color: #cfe2ff; text-decoration: underline; }
         .copyright { margin-top: 1rem; color: #adb5bd; font-size: 0.9rem; }
         @media (max-width: 768px) { .pipeline-timeline::before { left: 25px; } .stage-number { width: 50px; height: 50px; margin-right: 1.5rem; font-size: 1.3rem; } .stage-content h3 { font-size: 1.2rem; } .stage-icon { font-size: 1.5rem; } }
         @media (max-width: 480px) { .pipeline-stage { flex-direction: column; } .stage-number { margin-bottom: 1rem; margin-right: 0; } .pipeline-timeline::before { left: 25px; } .summary-grid { grid-template-columns: 1fr; } }
@@ -429,10 +436,10 @@
     <!-- Navigation Bar (updated with auth link) -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="#" class="logo">SKCS AI</a>
+            <a href="#" class="logo">SKCS AI Sports Edge</a>
             <div class="nav-links">
                 <a href="#pipeline">🤖 AI Pipeline</a>
-                <a href="#predictions">📊 Predictions</a>
+                <a href="#insights">📊 Insights</a>
                 <a href="#framework">⚙️ Framework</a>
                 <a href="#about">📋 About</a>
                 <a href="#contact">📧 Contact</a>
@@ -444,12 +451,22 @@
             </div>
         </div>
     </nav>
+    <main id="main-content">
     <!-- Hero Section -->
     <section class="hero-section">
+        <img
+            class="hero-media"
+            src="hero-page.webp"
+            alt="SKCS AI Sports Edge"
+            width="1600"
+            height="900"
+            fetchpriority="high"
+            decoding="async"
+        >
         <div class="hero-overlay"></div>
         <div class="hero-content">
-                <h1>Welcome to SKCS AI Sports Insights</h1>
-            <p>Smart, confidence-based predictions for informed decisions</p>
+                <h1>SKCS AI Sports Edge</h1>
+            <p>Smart, confidence-based sports insights across multiple sports</p>
             <p>⚽ 🏉 🏐 ⚾ 🏀 🏎️ 🏏 13 Sports Coverage</p>
         </div>
     </section>
@@ -461,16 +478,16 @@
             intelligent probability analysis for better decision making.
         </p>
         <div class="features">
-            <div class="feature"><h3>🎯 Confidence-Based</h3><p>Every prediction comes with a confidence score, not just guesses. We show you how sure we are about each recommendation.</p></div>
+            <div class="feature"><h3>🎯 Confidence-Based</h3><p>Every insight comes with a confidence score, not just guesses. We show you how sure we are about each recommendation.</p></div>
             <div class="feature"><h3>🛡️ Responsible Analytics</h3><p>We provide safer alternatives for volatile matches. When confidence is low, we suggest more conservative options.</p></div>
-            <div class="feature"><h3>📊 Multi-Sport Coverage</h3><p>14 sports covered: Football, Rugby, AFL, Baseball, Basketball, Formula 1, Cricket, NFL, Hockey, MMA, Handball, Volleyball, Tennis.</p></div>
+            <div class="feature"><h3>📊 Multi-Sport Coverage</h3><p>13 sports covered: Football, Rugby, AFL, Baseball, Basketball, Formula 1, Cricket, NFL, Hockey, MMA, Handball, Volleyball, and Tennis.</p></div>
         </div>
     </div>
     <!-- Pipeline Section -->
     <section id="pipeline" class="pipeline-section">
         <div class="pipeline-container">
             <h2 class="section-title">The SKCS AI Analysis Pipeline</h2>
-            <p class="section-description">6-stage AI process transforming raw API data into intelligent predictions</p>
+            <p class="section-description">6-stage AI process transforming raw API data into confidence-based sports insights</p>
             <div class="pipeline-timeline">
                 <!-- Stage 1 -->
                 <div class="pipeline-stage">
@@ -574,7 +591,7 @@
                     <div class="stage-content">
                         <h3><span class="stage-icon">🎯</span> AI Stage 4: Decision Engine</h3>
                         <div class="stage-card">
-                            <h4>Final SKCS Predictions</h4>
+                            <h4>Final SKCS Insights</h4>
                             <pre><code>{
   "final_prediction": {
     "recommended": ["Home Win", "Over 1.5"],
@@ -613,9 +630,9 @@
       </div> 
     </div> 
 
-    <!-- PREDICTIONS SECTION -->
-    <section id="predictions" class="predictions-section">
-        <h2 class="section-title">SKCS Sports Insights</h2>
+    <!-- INSIGHTS SECTION -->
+    <section id="insights" class="predictions-section">
+        <h2 class="section-title">Latest Insights</h2>
         <p class="section-description" id="planDescription"></p>
         <div class="tabs-container">
             <div class="tabs-header">
@@ -741,49 +758,49 @@
                 </div>
             </div>
             <div id="nfl" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">🏈</span> NFL Predictions</h3>
+                <h3 class="tab-title"><span class="sport-icon">🏈</span> NFL Insights</h3>
                 <div class="prediction-sample">
                     <h4>🏈 Upcoming Games</h4>
                     <div id="nfl-matches" class="prediction-grid"><p>Loading insights...</p></div>
                 </div>
             </div>
             <div id="hockey" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">🏒</span> Hockey Predictions</h3>
+                <h3 class="tab-title"><span class="sport-icon">🏒</span> Hockey Insights</h3>
                 <div class="prediction-sample">
                     <h4>🏒 Upcoming Matches</h4>
                     <div id="hockey-matches" class="prediction-grid"><p>Loading insights...</p></div>
                 </div>
             </div>
             <div id="mma" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">🤼</span> MMA Predictions</h3>
+                <h3 class="tab-title"><span class="sport-icon">🤼</span> MMA Insights</h3>
                 <div class="prediction-sample">
                     <h4>🤼 Upcoming Fights</h4>
                     <div id="mma-matches" class="prediction-grid"><p>Loading insights...</p></div>
                 </div>
             </div>
             <div id="handball" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">🤾</span> Handball Predictions</h3>
+                <h3 class="tab-title"><span class="sport-icon">🤾</span> Handball Insights</h3>
                 <div class="prediction-sample">
                     <h4>🤾 Upcoming Matches</h4>
                     <div id="handball-matches" class="prediction-grid"><p>Loading insights...</p></div>
                 </div>
             </div>
             <div id="volleyball" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">🏐</span> Volleyball Predictions</h3>
+                <h3 class="tab-title"><span class="sport-icon">🏐</span> Volleyball Insights</h3>
                 <div class="prediction-sample">
                     <h4>🏐 Upcoming Matches</h4>
                     <div id="volleyball-matches" class="prediction-grid"><p>Loading insights...</p></div>
                 </div>
             </div>
             <div id="tennis" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">🎾</span> Tennis Predictions</h3>
+                <h3 class="tab-title"><span class="sport-icon">🎾</span> Tennis Insights</h3>
                 <div class="prediction-sample">
                     <h4>🎾 Upcoming Matches</h4>
                     <div id="tennis-matches" class="prediction-grid"><p>Loading insights...</p></div>
                 </div>
             </div>
         </div>
-        <p class="disclaimer">All predictions are for informational purposes only. No guarantees are provided.</p>
+        <p class="disclaimer">All insights are for informational purposes only. No guarantees are provided.</p>
     </section>
     <!-- Framework Section -->
     <section id="framework" class="framework-section">
@@ -857,7 +874,7 @@
     <section id="about" class="about-section">
         <div class="about-overlay"></div>
         <div class="about-container">
-            <h2 class="about-title">About SKCS AI</h2>
+            <h2 class="about-title">About SKCS AI Sports Edge</h2>
             <div class="mission-statement">
                 <h3>Our Mission</h3>
                 <p><strong>SKCS (Smart Knowledge & Control Systems)</strong> is a data-driven analytics platform focused on transforming raw sports data into structured, responsible insights.</p>
@@ -873,7 +890,7 @@
                 <li><strong>Developer-friendly</strong> – Modular architecture designed for expansion</li>
             </ul>
             <h3 class="section-subtitle">Our Vision</h3>
-            <p>SKCS is designed to grow beyond predictions alone. The long-term vision includes:</p>
+            <p>SKCS is designed to grow beyond daily sports insights alone. The long-term vision includes:</p>
             <ul class="vision-list">
                 <li><strong>Advanced Performance Analytics</strong><p class="core-principle">Deep insights into team and player performance</p></li>
                 <li><strong>Risk-Aware Modeling</strong><p class="core-principle">Volatility controls and risk management tools</p></li>
@@ -903,12 +920,21 @@
             </div>
         </div>
     </section>
+    </main>
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
-            <p>SKCS AI Sports Edge</p>
-            <p>AI-powered multi-sport prediction platform covering 13 sports</p>
-            <p style="margin-top:0.6rem;"><a href="terms.html" style="color:#cfe2ff;text-decoration:underline;">Terms of Service</a></p>
+            <div class="footer-company">
+                <strong>SKCS AI SPORTS EDGE (PTY) LTD</strong><br>
+                Company Reg: 2025/918368/07<br>
+                20 Lotus Road, Northdale<br>
+                Pietermaritzburg, KwaZulu-Natal, 3201<br>
+                South Africa
+            </div>
+            <p style="margin-top:0.75rem;">AI-powered multi-sport insights platform covering 13 sports</p>
+            <div class="footer-links">
+                <a href="/terms">Terms of Service</a>
+            </div>
             <p class="copyright">© 2026 SKCS AI Sports Edge. Informational analytics only; no gambling services offered.</p>
         </div>
     </footer>
