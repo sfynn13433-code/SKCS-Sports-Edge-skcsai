@@ -227,7 +227,7 @@ async function initializeTables() {
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`);
 
-        // Predictions Raw
+        // Insights Raw
         await client.query(`CREATE TABLE IF NOT EXISTS prediction_publish_runs (
             id BIGSERIAL PRIMARY KEY,
             trigger_source TEXT NOT NULL DEFAULT 'manual',
@@ -242,7 +242,7 @@ async function initializeTables() {
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )`);
 
-        // Predictions Raw
+        // Insights Raw
         await client.query(`CREATE TABLE IF NOT EXISTS predictions_raw (
             id BIGSERIAL PRIMARY KEY,
             match_id TEXT NOT NULL,
@@ -256,7 +256,7 @@ async function initializeTables() {
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )`);
 
-        // Predictions Filtered
+        // Insights Filtered
         await client.query(`CREATE TABLE IF NOT EXISTS predictions_filtered (
             id BIGSERIAL PRIMARY KEY,
             raw_id BIGINT NOT NULL REFERENCES predictions_raw(id) ON DELETE CASCADE,
@@ -267,7 +267,7 @@ async function initializeTables() {
             UNIQUE (raw_id, tier)
         )`);
 
-        // Predictions Final
+        // Insights Final
         await client.query(`CREATE TABLE IF NOT EXISTS predictions_final (
             id BIGSERIAL PRIMARY KEY,
             publish_run_id BIGINT REFERENCES prediction_publish_runs(id) ON DELETE CASCADE,

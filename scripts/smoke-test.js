@@ -116,7 +116,7 @@ async function run() {
         });
 
         if (predictions.res.status !== 200 || !Array.isArray(predictions.body?.predictions)) {
-            throw new Error('Predictions endpoint did not return a predictions array');
+            throw new Error('Insights endpoint did not return a predictions array');
         }
 
         const unauthPredictions = await fetch(`${baseUrl}/api/predictions?sport=football&plan_id=elite_30day_deep_vip`);

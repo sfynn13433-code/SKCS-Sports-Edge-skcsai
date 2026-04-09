@@ -11,7 +11,6 @@ const { isValidCombination } = require('./conflictEngine');
 const { scoreMarkets } = require('./marketScoringEngine');
 
 const MEGA_ACCA_SIZE = 12;
-const MEGA_ACCA_MIN_CONFIDENCE = 80; // Lowered from 90 to be more achievable
 const SAME_MATCH_INSIGHT_TARGET = 6;
 
 function normalizeTier(tier) {
@@ -622,37 +621,30 @@ function isCricketFixtureWithinWindow(prediction, expiryCutoff) {
 function buildMegaAcca12Candidates(predictions, options = {}) {
     const maxRows = Number.isFinite(options.maxRows) ? options.maxRows : 6;
     const expiryCutoff = options.expiryCutoff instanceof Date ? options.expiryCutoff : null;
-    
-    // Try multiple confidence thresholds to ensure we can build mega ACCAs
-    const confidenceThresholds = [MEGA_ACCA_MIN_CONFIDENCE, 85, 80, 75, 70];
-    let eligible = [];
-    let usedThreshold = MEGA_ACCA_MIN_CONFIDENCE;
-    
-    for (const threshold of confidenceThresholds) {
-        eligible = predictions
-            .filter((prediction) => Number(prediction.confidence) >= threshold)
-            .filter((prediction) => !expiryCutoff || isCricketFixtureWithinWindow(prediction, expiryCutoff))
-            .slice();
-        
-        if (eligible.length >= MEGA_ACCA_SIZE) {
-            usedThreshold = threshold;
-            break;
-        }
-    }
-    
-    // If still not enough, return empty
+
+    // STRICT MULTI-SPORT FLOOR: Enforce 90% confidence threshold across Football, Rugby, Cricket, etc.
+    const usedThreshold = 90;
+
+    const eligible = predictions
+        .filter((prediction) => Number(prediction.confidence) >= usedThreshold)
+        .filter((prediction) => !expiryCutoff || isCricketFixtureWithinWindow(prediction, expiryCutoff))
+        .slice();
+
+    // If not enough assets meet the strict 90% floor, abort the Mega ACCA build for this run
     if (eligible.length < MEGA_ACCA_SIZE) {
-        console.log(`[accaBuilder] Mega ACCA: Only ${eligible.length} predictions available (need ${MEGA_ACCA_SIZE}), threshold was ${usedThreshold}%`);
+        console.log(`[accaBuilder] Mega ACCA: Only ${eligible.length} insights available (need ${MEGA_ACCA_SIZE}). The 90% floor was not met.`);
         return [];
     }
-    
-    console.log(`[accaBuilder] Mega ACCA: Building with ${eligible.length} eligible predictions at ${usedThreshold}% threshold`);
+
+    console.log(`[accaBuilder] Mega ACCA: Building Moonshot series with ${eligible.length} eligible insights at strict ${usedThreshold}% threshold.`);
 
     const rows = [];
     for (let start = 0; start <= eligible.length - MEGA_ACCA_SIZE && rows.length < maxRows; start++) {
         const combo = eligible.slice(start, start + MEGA_ACCA_SIZE);
         const ids = combo.map((row) => row.match_id);
+
         if (new Set(ids).size !== ids.length) continue;
+
         const legs = combo.map((row) => ({
             ...toFinalMatchPayload(row),
             metadata: {
@@ -665,7 +657,7 @@ function buildMegaAcca12Candidates(predictions, options = {}) {
             match_id: ids.join('|'),
             matches: legs,
             total_confidence: computeTotalConfidence(legs),
-            risk_level: usedThreshold >= 90 ? 'safe' : 'medium'
+            risk_level: 'safe' // Floor is 90%, naturally qualifying as high-conviction
         });
     }
 
@@ -836,6 +828,27 @@ async function buildFinalForTier(tier, options = {}) {
         // Limit candidates to prevent combinatorial explosion and timeouts
         const MAX_ACCA_CANDIDATES = 120;
         const limitedCandidates = perSportLimited.slice(0, MAX_ACCA_CANDIDATES);
+        const megaAccaRows = [];
+        const megaSelections = takeAvailablePredictions(
+            buildMegaAcca12Candidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds), {
+                maxRows: categoryBuildCaps.mega_acca_12,
+                expiryCutoff: new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000))
+            }),
+            usedFixtureIds,
+            categoryBuildCaps.mega_acca_12
+        );
+        for (const row of megaSelections) {
+            const inserted = await insertFinalRow({
+                publish_run_id: publishRunId,
+                tier: t,
+                type: 'mega_acca_12',
+                matches: row.matches,
+                total_confidence: row.total_confidence,
+                risk_level: row.risk_level
+            }, client);
+            megaAccaRows.push(inserted);
+        }
+
         const directRows = [];
         const directSelections = takeAvailablePredictions(
             limitedCandidates,
@@ -930,27 +943,6 @@ async function buildFinalForTier(tier, options = {}) {
                 risk_level: row.risk_level
             }, client);
             accaRows.push(inserted);
-        }
-
-        const megaAccaRows = [];
-        const megaSelections = takeAvailablePredictions(
-            buildMegaAcca12Candidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds), {
-                maxRows: categoryBuildCaps.mega_acca_12,
-                expiryCutoff: new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000))
-            }),
-            usedFixtureIds,
-            categoryBuildCaps.mega_acca_12
-        );
-        for (const row of megaSelections) {
-            const inserted = await insertFinalRow({
-                publish_run_id: publishRunId,
-                tier: t,
-                type: 'mega_acca_12',
-                matches: row.matches,
-                total_confidence: row.total_confidence,
-                risk_level: row.risk_level
-            }, client);
-            megaAccaRows.push(inserted);
         }
 
         console.log('[accaBuilder] tier=%s week_locked=%s direct=%s secondary=%s same_match=%s multi=%s acca_6match=%s mega_acca_12=%s',
