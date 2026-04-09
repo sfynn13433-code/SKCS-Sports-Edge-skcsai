@@ -1197,12 +1197,41 @@ def generate_vip_master_set():
     if EVENT_LIMIT > 0:
         print(f"Event limit override active: {EVENT_LIMIT}")
 
-    direct_events = events[: min(direct_quotas["vip"], len(events))]
+    used_match_ids = set()
+    used_team_names = set()
+
+    def get_unused_events(count, needed_per_item=1):
+        selected = []
+        for e in events:
+            if len(selected) == count * needed_per_item:
+                break
+            match = extract_match(e)
+            match_id = match["match_id"]
+            home = match["home_team"].lower().strip()
+            away = match["away_team"].lower().strip()
+            
+            if match_id not in used_match_ids and home not in used_team_names and away not in used_team_names:
+                selected.append(e)
+                used_match_ids.add(match_id)
+                used_team_names.add(home)
+                used_team_names.add(away)
+        return selected
+
+    print("SKCS Master Insight Policy Active: Allocating unique fixtures...")
+
+    same_match_events = get_unused_events(same_match_quotas["vip"], 1)
+    direct_events = get_unused_events(direct_quotas["vip"], 1)
+    secondary_events = get_unused_events(secondary_quotas["vip"], 1)
+    multi_pool = get_unused_events(multi_quotas["vip"], 2)
+    acca_pool = get_unused_events(acca_quotas["vip"], 6)
+
+    all_allocated_events = same_match_events + direct_events + secondary_events + multi_pool + acca_pool
+
     if PROVIDERS:
         provider_names = ", ".join(provider["name"] for provider in PROVIDERS)
         print(f"Requesting live SKCS intelligence with provider chain: {provider_names}")
-        intelligence_map = asyncio.run(build_intelligence_map(direct_events))
-        for event in direct_events:
+        intelligence_map = asyncio.run(build_intelligence_map(all_allocated_events))
+        for event in all_allocated_events:
             match = extract_match(event)
             event["_skcs_intelligence"] = intelligence_map.get(match["match_id"])
         provider_counts = {}
@@ -1223,40 +1252,27 @@ def generate_vip_master_set():
     print(f"Deleted {deleted} existing rows from predictions_final.")
 
     payloads = []
-    processed_safe_matches = []
 
-    print("Generating VIP quotas: Direct, Secondary, Multi, Same Match, ACCA...")
+    print("Generating VIP quotas (Master Hierarchy): Same Match -> Direct -> Secondary -> Multi -> ACCA...")
+
+    for index, event in enumerate(same_match_events):
+        payloads.append(build_same_match_payload(event, index, same_match_quotas))
 
     for index, event in enumerate(direct_events):
-        payload = build_direct_payload(event, index, direct_quotas)
-        payloads.append(payload)
-        decision = (
-            ((payload.get("matches") or [{}])[0].get("metadata") or {})
-            .get("pipeline_data", {})
-            .get("stage_4_decision", {})
-        )
-        if decision.get("acca_safe"):
-            processed_safe_matches.append(event)
+        payloads.append(build_direct_payload(event, index, direct_quotas))
 
-    secondary_events = list(reversed(events[: min(secondary_quotas["vip"], len(events))]))
     for index, event in enumerate(secondary_events):
         payloads.append(build_secondary_payload(event, index, secondary_quotas))
 
-    multi_count = min(multi_quotas["vip"], len(events) // 2)
-    for index in range(multi_count):
-        payloads.append(build_multi_payload(events, index, multi_quotas))
+    for index in range(len(multi_pool) // 2):
+        chunk = multi_pool[index * 2 : (index + 1) * 2]
+        if len(chunk) == 2:
+            payloads.append(build_multi_payload(chunk, index, multi_quotas))
 
-    same_match_count = min(same_match_quotas["vip"], len(events))
-    for index in range(same_match_count):
-        payloads.append(build_same_match_payload(events[index], index, same_match_quotas))
-
-    acca_source = processed_safe_matches if len(processed_safe_matches) >= 6 else events
-    acca_count = min(acca_quotas["vip"], len(events))
-    for index in range(acca_count):
-        source_pool = acca_source if len(acca_source) >= 6 else events
-        if len(source_pool) < 6:
-            break
-        payloads.append(build_acca_payload(source_pool, index, acca_quotas))
+    for index in range(len(acca_pool) // 6):
+        chunk = acca_pool[index * 6 : (index + 1) * 6]
+        if len(chunk) == 6:
+            payloads.append(build_acca_payload(chunk, index, acca_quotas))
 
     print(f"Blasting {len(payloads)} waterfall-tagged predictions to the live database...")
     inserted = 0
