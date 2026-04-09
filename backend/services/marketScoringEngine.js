@@ -53,6 +53,7 @@ function pickFromOutcomes(outcomes, matchData, market, scoring) {
         case 'TOTAL_RUNS':
         case 'TOTAL_GAMES':
         case 'CORNERS_OVER_UNDER':
+        case 'YELLOW_CARDS_OVER_UNDER':
             return balanceSeed >= 0.45 ? 'OVER' : 'UNDER';
         case 'HANDICAP':
         case 'SPREAD':
@@ -93,6 +94,7 @@ function outcomeUniverseToLegacyMarket(sport, market) {
     if (s === 'football' && m === 'BTTS') return 'btts_yes/btts_no';
     if (s === 'football' && m === 'OVER_UNDER_2_5') return 'over_2_5/under_2_5';
     if (s === 'football' && m === 'OVER_UNDER_1_5') return 'over_1_5/under_1_5';
+    if (s === 'football' && m === 'YELLOW_CARDS_OVER_UNDER') return 'over_3_5_yellows/under_3_5_yellows';
 
     return null;
 }

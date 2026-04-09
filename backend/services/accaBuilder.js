@@ -270,6 +270,8 @@ function toSecondaryPayload(prediction, marketScore) {
         market = normalizedPick === 'NO' ? 'btts_no' : 'btts_yes';
     } else if (normalizedMarket === 'CORNERS_OVER_UNDER') {
         market = normalizedPick === 'UNDER' ? 'corners_under' : 'corners_over';
+    } else if (normalizedMarket === 'YELLOW_CARDS_OVER_UNDER') {
+        market = normalizedPick === 'UNDER' ? 'under_3_5_yellows' : 'over_3_5_yellows';
     }
 
     return {

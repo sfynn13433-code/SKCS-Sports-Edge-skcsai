@@ -90,6 +90,12 @@ const predictionOutcomes = {
                 type: 'advanced',
                 outcomes: ['OVER', 'UNDER'],
                 description: 'Total corners'
+            },
+            {
+                market: 'YELLOW_CARDS_OVER_UNDER',
+                type: 'advanced',
+                outcomes: ['OVER', 'UNDER'],
+                description: 'Total yellow cards over/under 3.5'
             }
         ]
     },
