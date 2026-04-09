@@ -1,22 +1,24 @@
 #!/bin/bash
 
 # SKCS AI Sports Edge - Cloud Scheduler Deployment Script
-# This script sets up reliable scheduling with SAST timezone and idempotency
+# This script sets up reliable scheduling with SAST timezone and idempotency.
+# It targets the live backend pipeline endpoint: /api/pipeline/run-full
 
-set -e
+set -euo pipefail
 
 # Configuration - Update these values for your environment
 PROJECT_ID="${SKCS_GCP_PROJECT:-YOUR_GCP_PROJECT}"
 REGION="${SKCS_SCHEDULER_REGION:-europe-west1}"
 BACKEND_HOST="${SKCS_BACKEND_HOST:-https://YOUR_BACKEND_HOST}"
-REFRESH_KEY="${SKCS_REFRESH_KEY:-YOUR_SECRET_REFRESH_KEY}"
+API_KEY="${SKCS_REFRESH_KEY:-${SKCS_ADMIN_API_KEY:-YOUR_SECRET_REFRESH_KEY}}"
+PIPELINE_PATH="${SKCS_PIPELINE_PATH:-/api/pipeline/run-full}"
 
 # Validate required variables
-if [[ "$PROJECT_ID" == "YOUR_GCP_PROJECT" || "$BACKEND_HOST" == "https://YOUR_BACKEND_HOST" || "$REFRESH_KEY" == "YOUR_SECRET_REFRESH_KEY" ]]; then
+if [[ "$PROJECT_ID" == "YOUR_GCP_PROJECT" || "$BACKEND_HOST" == "https://YOUR_BACKEND_HOST" || "$API_KEY" == "YOUR_SECRET_REFRESH_KEY" ]]; then
     echo "❌ ERROR: Please set environment variables before running this script:"
     echo "   - SKCS_GCP_PROJECT: Your Google Cloud project ID"
     echo "   - SKCS_BACKEND_HOST: Your backend URL (e.g., https://your-app.onrender.com)"
-    echo "   - SKCS_REFRESH_KEY: Your secret refresh API key"
+    echo "   - SKCS_REFRESH_KEY or SKCS_ADMIN_API_KEY: Your secret API key"
     echo ""
     echo "Example:"
     echo "export SKCS_GCP_PROJECT=my-skcs-project"
@@ -29,32 +31,48 @@ echo "🚀 Deploying SKCS Cloud Scheduler jobs..."
 echo "Project: $PROJECT_ID"
 echo "Region: $REGION"
 echo "Backend: $BACKEND_HOST"
+echo "Endpoint: $PIPELINE_PATH"
 echo ""
 
 # Set gcloud project
 gcloud config set project "$PROJECT_ID"
 
-# Create scheduler jobs with SAST timezone and proper retry settings
-create_scheduler_job() {
+# Create or update scheduler jobs with SAST timezone and proper retry settings
+apply_scheduler_job() {
     local job_name="$1"
     local schedule="$2"
     local description="$3"
+    local uri="${BACKEND_HOST%/}${PIPELINE_PATH}"
     
-    echo "Creating scheduler job: $job_name"
-    
-    gcloud scheduler jobs create http "$job_name" \
-        --location="$REGION" \
-        --schedule="$schedule" \
-        --time-zone="Africa/Johannesburg" \
-        --uri="$BACKEND_HOST/api/refresh-predictions" \
-        --http-method=POST \
-        --headers="x-api-key=$REFRESH_KEY,content-type=application/json" \
-        --attempt-deadline="1800s" \
-        --max-retry-attempts=1 \
-        --description="$description" \
-        --quiet || true
-    
-    echo "✅ Created: $job_name"
+    if gcloud scheduler jobs describe "$job_name" --location="$REGION" >/dev/null 2>&1; then
+        echo "Updating scheduler job: $job_name"
+        gcloud scheduler jobs update http "$job_name" \
+            --location="$REGION" \
+            --schedule="$schedule" \
+            --time-zone="Africa/Johannesburg" \
+            --uri="$uri" \
+            --http-method=POST \
+            --update-headers="x-api-key=$API_KEY,content-type=application/json" \
+            --attempt-deadline="1800s" \
+            --max-retry-attempts=1 \
+            --description="$description" \
+            --quiet
+        echo "✅ Updated: $job_name"
+    else
+        echo "Creating scheduler job: $job_name"
+        gcloud scheduler jobs create http "$job_name" \
+            --location="$REGION" \
+            --schedule="$schedule" \
+            --time-zone="Africa/Johannesburg" \
+            --uri="$uri" \
+            --http-method=POST \
+            --headers="x-api-key=$API_KEY,content-type=application/json" \
+            --attempt-deadline="1800s" \
+            --max-retry-attempts=1 \
+            --description="$description" \
+            --quiet
+        echo "✅ Created: $job_name"
+    fi
 }
 
 # Production schedule based on SAST
@@ -62,28 +80,28 @@ echo "📅 Creating production schedule (SAST timezone)..."
 echo ""
 
 # Morning refresh: 08:00 SAST
-create_scheduler_job \
+apply_scheduler_job \
     "skcs-refresh-0800" \
     "0 8 * * *" \
-    "Morning predictions refresh - 08:00 SAST"
+    "Morning full pipeline run - 08:00 SAST"
 
 # Midday refresh: 16:00 SAST  
-create_scheduler_job \
+apply_scheduler_job \
     "skcs-refresh-1600" \
     "0 16 * * *" \
-    "Midday predictions refresh - 16:00 SAST"
+    "Midday full pipeline run - 16:00 SAST"
 
 # Evening refresh: 20:00 SAST
-create_scheduler_job \
+apply_scheduler_job \
     "skcs-refresh-2000" \
     "0 20 * * *" \
-    "Evening predictions refresh - 20:00 SAST"
+    "Evening full pipeline run - 20:00 SAST"
 
-# Grading run: 04:00 SAST (grades yesterday's predictions)
-create_scheduler_job \
-    "skcs-grade-0400" \
+# Overnight run: 04:00 SAST
+apply_scheduler_job \
+    "skcs-refresh-0400" \
     "0 4 * * *" \
-    "Grade yesterday's predictions - 04:00 SAST"
+    "Overnight full pipeline run - 04:00 SAST"
 
 echo ""
 echo "🎯 Optional: Create OIDC-authenticated jobs (recommended for Cloud Run)"
@@ -97,7 +115,7 @@ echo ""
 #     --location="$REGION" \
 #     --schedule="0 8 * * *" \
 #     --time-zone="Africa/Johannesburg" \
-#     --uri="$BACKEND_HOST/api/refresh-predictions" \
+#     --uri="${BACKEND_HOST%/}${PIPELINE_PATH}" \
 #     --http-method=POST \
 #     --oidc-service-account-email="$SERVICE_ACCOUNT" \
 #     --attempt-deadline="1800s" \
