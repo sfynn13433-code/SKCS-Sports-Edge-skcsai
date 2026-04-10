@@ -251,6 +251,60 @@ app.post('/api/refresh-predictions', requireRefreshKey, (req, res) => {
     })();
 });
 
+// Debug endpoint to check API-Sports connectivity and trigger sync with detailed output
+app.get('/api/debug/sync-test', requireRefreshKey, async (req, res) => {
+    try {
+        const { APISportsClient } = require('./apiClients');
+        const client = new APISportsClient();
+        const today = new Date().toISOString().slice(0, 10);
+        const windowEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+        // Compute season year inline (same logic as syncService)
+        const now = new Date();
+        const month = now.getUTCMonth() + 1;
+        const year = now.getUTCFullYear();
+        const seasonYear = month >= 8 ? year : year - 1;
+
+        const debug = {
+            timestamp: new Date().toISOString(),
+            config: {
+                hasApiSportsKey: !!process.env.X_APISPORTS_KEY,
+                hasOddsApiKey: !!process.env.ODDS_API_KEY,
+                dataMode: config.DATA_MODE || 'test (default)',
+                seasonYear: String(seasonYear),
+                dateRange: `${today} to ${windowEnd}`,
+            },
+            apiTest: {}
+        };
+
+        // Test football API
+        try {
+            const footballKeys = client.getKeysForSport('football');
+            debug.apiTest.football = {
+                keysFound: footballKeys.length,
+                test: `EPL league 39, season ${seasonYear}`,
+            };
+
+            if (footballKeys.length > 0) {
+                const data = await client.getFixtures('39', String(seasonYear), { from: today, to: windowEnd }, 'football');
+                debug.apiTest.football.result = data ? {
+                    results: data.results || 0,
+                    errors: data.errors || null,
+                    fixtureCount: data.response ? data.response.length : 0,
+                } : 'request_failed';
+            } else {
+                debug.apiTest.football.result = 'no_keys_configured';
+            }
+        } catch (err) {
+            debug.apiTest.football = { error: err.message };
+        }
+
+        res.json({ ok: true, debug });
+    } catch (err) {
+        res.status(500).json({ ok: false, error: err.message });
+    }
+});
+
 app.post('/api/grade-predictions', requireRefreshKey, async (req, res) => {
     const sport     = req.query.sport || req.body?.sport || 'football';
     const dateParam = req.query.date  || req.body?.date  || null;
