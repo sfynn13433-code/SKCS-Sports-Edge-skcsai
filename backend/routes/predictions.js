@@ -777,14 +777,14 @@ router.get('/', requireRole('user'), async (req, res) => {
                 throw new Error(`No completed publish run found for sport=${sport || 'all'}`);
             }
 
-            // Include both Node.js pipeline rows (with publish_run_id) AND Python-generated rows (publish_run_id IS NULL)
+            // Query ALL predictions with matching tier (don't restrict by publish_run_id).
+            // The date windowing and subscription filtering below handles what the user sees.
             let queryStr = `
                 SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at
                 FROM predictions_final pf
-                WHERE LOWER(COALESCE(pf.tier, 'normal')) = ANY($2::text[])
-                  AND (pf.publish_run_id = $1 OR pf.publish_run_id IS NULL)
+                WHERE LOWER(COALESCE(pf.tier, 'normal')) = ANY($1::text[])
             `;
-            const queryParams = [latestPublishRunId, planCapabilities.tiers.map((tier) => String(tier).toLowerCase())];
+            const queryParams = [planCapabilities.tiers.map((tier) => String(tier).toLowerCase())];
 
             queryStr += ` ORDER BY created_at DESC LIMIT 2000;`;
 
