@@ -219,28 +219,36 @@ function requireRefreshKey(req, res, next) {
     return res.status(403).json({ error: 'Invalid API key' });
 }
 
-app.post('/api/refresh-predictions', requireRefreshKey, async (req, res) => {
+app.post('/api/refresh-predictions', requireRefreshKey, (req, res) => {
     const sport = req.query.sport || req.body?.sport || null;
     const label = `scheduler refresh${sport ? ` (${sport})` : ''}`;
-    console.log(`[scheduler] ${label} triggered`);
+    console.log(`[scheduler] ${label} triggered — starting in background`);
 
-    try {
-        const result = sport
-            ? await syncSports({ sports: sport })
-            : await syncAllSports();
+    // Respond immediately so the caller doesn't timeout
+    res.status(202).json({
+        ok: true,
+        message: `${label} started in background`,
+        note: 'Sync is running asynchronously. Check /api/predictions in a few minutes for fresh data.'
+    });
 
-        res.status(200).json({
-            ok: true,
-            message: `${label} completed`,
-            totalMatchesProcessed: result?.totalMatchesProcessed || 0,
-            perSport:              result?.perSport || [],
-            errors:                result?.errors || [],
-            rebuiltFinalOutputs:   result?.rebuiltFinalOutputs || false
-        });
-    } catch (err) {
-        console.error(`[scheduler] ${label} failed:`, err.message);
-        res.status(500).json({ ok: false, error: err.message });
-    }
+    // Run the sync in the background — unhandled errors are logged but won't crash the server
+    (async () => {
+        try {
+            const result = sport
+                ? await syncSports({ sports: sport })
+                : await syncAllSports();
+
+            console.log(`[scheduler] ${label} completed:`, JSON.stringify({
+                totalMatchesProcessed: result?.totalMatchesProcessed || 0,
+                perSport: result?.perSport || [],
+                errors: result?.errors || [],
+                rebuiltFinalOutputs: result?.rebuiltFinalOutputs || false
+            }));
+        } catch (err) {
+            console.error(`[scheduler] ${label} failed:`, err.message);
+            console.error(`[scheduler] ${label} stack:`, err.stack);
+        }
+    })();
 });
 
 app.post('/api/grade-predictions', requireRefreshKey, async (req, res) => {
