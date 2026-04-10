@@ -490,23 +490,26 @@ def build_header_info(match):
 
 def enforce_market_consistency(payload):
     """
-    Final check to prevent the 'Home Win vs X2' contradiction.
+    Final check to prevent 1X2 vs Double Chance contradictions.
     """
     outcome = payload.get("predicted_outcome")
     secondary = payload.get("secondary_markets", [])
     
-    # 1. Fix 1X2 vs Double Chance Contradictions
     if outcome == "HOME WIN":
-        # Remove X2 if it exists, replace with 1X
+        # Remove X2 (Draw or Away) - incompatible with Home Win
         payload["secondary_markets"] = [m for m in secondary if "X2" not in m]
         if "DOUBLE CHANCE - 1X" not in payload["secondary_markets"]:
             payload["secondary_markets"].append("DOUBLE CHANCE - 1X")
             
     elif outcome == "AWAY WIN":
-        # Remove 1X if it exists, replace with X2
+        # Remove 1X (Home or Draw) - incompatible with Away Win
         payload["secondary_markets"] = [m for m in secondary if "1X" not in m]
         if "DOUBLE CHANCE - X2" not in payload["secondary_markets"]:
             payload["secondary_markets"].append("DOUBLE CHANCE - X2")
+
+    elif outcome == "DRAW":
+        # Remove 12 (Home or Away) - incompatible with Draw
+        payload["secondary_markets"] = [m for m in secondary if "- 12" not in m and m != "12"]
 
     return payload
 
@@ -880,8 +883,17 @@ def build_direct_payload(event, index, quotas):
         volatility = "High" if weather in {"Rain", "Windy"} or missing_players > 1 else "Low"
         acca_safe = volatility == "Low" and max(home_probability, away_probability) > 50
 
+        # Filter secondary pool to remove Double Chance markets that conflict with the primary prediction
+        filtered_pool = list(DIRECT_SECONDARY_POOL)
+        if prediction == "HOME_WIN":
+            filtered_pool = [m for m in filtered_pool if m[0] != "double_chance_x2"]
+        elif prediction == "AWAY_WIN":
+            filtered_pool = [m for m in filtered_pool if m[0] != "double_chance_1x"]
+        elif prediction == "DRAW":
+            filtered_pool = [m for m in filtered_pool if m[0] != "double_chance_12"]
+
         nested_secondary = []
-        for market, outcome, market_probability in rng.sample(DIRECT_SECONDARY_POOL, 3):
+        for market, outcome, market_probability in rng.sample(filtered_pool, min(3, len(filtered_pool))):
             nested_secondary.append(
                 {
                     "market": market,

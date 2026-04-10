@@ -173,6 +173,29 @@ class PredictionPipeline {
             const idx2 = rec.indexOf('Over 2.5'); if (idx2 !== -1) rec.splice(idx2, 1);
         }
 
+        // Double Chance conflict pruning:
+        // Away Win is incompatible with 1X (Home or Draw) and Home Win
+        if (rec.includes('Away Win')) {
+            const idx1X = rec.indexOf('1X');
+            if (idx1X !== -1) { console.warn(`Conflict pruned for match ${this.matchId}: Away Win + 1X`); rec.splice(idx1X, 1); }
+            const idxHome = rec.indexOf('Home Win');
+            if (idxHome !== -1) { console.warn(`Conflict pruned for match ${this.matchId}: Away Win + Home Win`); rec.splice(idxHome, 1); }
+        }
+
+        // Home Win is incompatible with X2 (Draw or Away) and Away Win
+        if (rec.includes('Home Win')) {
+            const idxX2 = rec.indexOf('X2');
+            if (idxX2 !== -1) { console.warn(`Conflict pruned for match ${this.matchId}: Home Win + X2`); rec.splice(idxX2, 1); }
+            const idxAway = rec.indexOf('Away Win');
+            if (idxAway !== -1) { console.warn(`Conflict pruned for match ${this.matchId}: Home Win + Away Win`); rec.splice(idxAway, 1); }
+        }
+
+        // Draw is incompatible with 12 (Home or Away)
+        if (rec.includes('Draw')) {
+            const idx12 = rec.indexOf('12');
+            if (idx12 !== -1) { console.warn(`Conflict pruned for match ${this.matchId}: Draw + 12`); rec.splice(idx12, 1); }
+        }
+
         return true;
     }
 
