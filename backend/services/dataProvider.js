@@ -86,8 +86,8 @@ function derivePredictionFromH2HOutcomes(event) {
 
         if (!prediction) continue;
 
-        const gap = second ? Math.max(0, second.price - best.price) : 0.15;
-        const confidence = Math.max(56, Math.min(78, 58 + gap * 35));
+        const gap = second ? Math.max(0, second.price - best.price) : 0.2;
+        const confidence = Math.max(55, Math.min(92, 57 + gap * 40));
         const volatility = confidence >= 72 ? 'low' : confidence >= 64 ? 'medium' : 'high';
 
         return {

@@ -40,7 +40,11 @@ function buildRawPredictionFromProviderItem(item) {
         match_id,
         sport,
         home_team: item.home_team || null,
-        away_team: item.away_team || null
+        away_team: item.away_team || null,
+        prediction: item.prediction || null,
+        confidence: item.confidence,
+        raw_provider_data: item.raw_provider_data || null,
+        metadata: item.metadata || null
     });
 
     const providerPrediction = normalizePrediction(item.prediction);

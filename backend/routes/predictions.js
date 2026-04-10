@@ -158,8 +158,16 @@ function humanizePredictionLabel(prediction, market) {
     };
 
     const goalLineMatch = marketKey.match(/^(over|under)_(\d+)_(\d+)$/);
+    const cornersLineMatch = marketKey.match(/^corners_(over|under)_(\d+)_(\d+)$/);
+    const yellowsLineMatch = marketKey.match(/^(over|under)_(\d+)_(\d+)_yellows$/);
     if (goalLineMatch) {
         return `${goalLineMatch[1].toUpperCase()} ${goalLineMatch[2]}.${goalLineMatch[3]} GOALS`;
+    }
+    if (cornersLineMatch) {
+        return `TOTAL CORNERS ${cornersLineMatch[1].toUpperCase()} ${cornersLineMatch[2]}.${cornersLineMatch[3]}`;
+    }
+    if (yellowsLineMatch) {
+        return `YELLOW CARDS ${yellowsLineMatch[1].toUpperCase()} ${yellowsLineMatch[2]}.${yellowsLineMatch[3]}`;
     }
     if (marketKey === 'btts_yes') return 'BTTS - YES';
     if (marketKey === 'btts_no') return 'BTTS - NO';

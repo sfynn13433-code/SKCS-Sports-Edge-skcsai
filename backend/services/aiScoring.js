@@ -1,22 +1,65 @@
 'use strict';
 
-const crypto = require('crypto');
-
-function stableHashToUnitInterval(input) {
-    const h = crypto.createHash('sha256').update(String(input)).digest('hex');
-    const slice = h.slice(0, 12);
-    const n = parseInt(slice, 16);
-    return n / 0xFFFFFFFFFFFF;
-}
-
 function clamp(n, min, max) {
     return Math.max(min, Math.min(max, n));
 }
 
-function computeTeamStrength(teamName) {
-    const u = stableHashToUnitInterval(`team:${teamName || 'unknown'}`);
-    // Deterministic pseudo-strength 0..100
-    return Math.round(u * 10000) / 100;
+function normalizeWinnerFromPrediction(prediction) {
+    const key = String(prediction || '').trim().toLowerCase();
+    if (!key) return null;
+    if (key === 'home' || key === 'home_win' || key === 'home win') return 'home';
+    if (key === 'away' || key === 'away_win' || key === 'away win') return 'away';
+    return null;
+}
+
+function deriveVolatilityFromConfidence(confidence) {
+    if (confidence >= 78) return 'low';
+    if (confidence >= 66) return 'medium';
+    return 'high';
+}
+
+function extractImpliedSignalFromOddsEvent(match, homeTeam, awayTeam) {
+    const raw = match?.raw_provider_data || match?.metadata?.raw_provider_data || null;
+    const bookmakers = Array.isArray(raw?.bookmakers) ? raw.bookmakers : [];
+    if (!bookmakers.length || !homeTeam || !awayTeam) return null;
+
+    for (const bookmaker of bookmakers) {
+        const markets = Array.isArray(bookmaker?.markets) ? bookmaker.markets : [];
+        const h2h = markets.find((market) => String(market?.key || '').toLowerCase() === 'h2h');
+        const outcomes = Array.isArray(h2h?.outcomes) ? h2h.outcomes : [];
+        if (!outcomes.length) continue;
+
+        let homeProb = null;
+        let awayProb = null;
+
+        for (const outcome of outcomes) {
+            const price = Number(outcome?.price);
+            if (!Number.isFinite(price) || price <= 1) continue;
+            const implied = 1 / price;
+            const name = String(outcome?.name || '').trim();
+            if (name === homeTeam) homeProb = implied;
+            if (name === awayTeam) awayProb = implied;
+        }
+
+        if (!Number.isFinite(homeProb) || !Number.isFinite(awayProb)) continue;
+
+        const total = homeProb + awayProb;
+        if (!Number.isFinite(total) || total <= 0) continue;
+
+        const normHome = homeProb / total;
+        const normAway = awayProb / total;
+        const edge = Math.abs(normHome - normAway); // 0..1
+        const winner = normHome >= normAway ? 'home' : 'away';
+        const confidence = clamp(Math.round((56 + edge * 44) * 100) / 100, 50, 96);
+
+        return {
+            winner,
+            confidence,
+            volatility: deriveVolatilityFromConfidence(confidence)
+        };
+    }
+
+    return null;
 }
 
 function scoreMatch(match) {
@@ -26,39 +69,51 @@ function scoreMatch(match) {
 
     const home = String(match.home_team || match.homeTeam || '').trim();
     const away = String(match.away_team || match.awayTeam || '').trim();
+    const modelWinner = normalizeWinnerFromPrediction(
+        match.model_prediction || match.model_pick || match?.metadata?.model_prediction || null
+    );
+    const modelConfidence = Number(match.model_confidence ?? match?.metadata?.model_confidence);
 
-    const homeStrength = computeTeamStrength(home);
-    const awayStrength = computeTeamStrength(away);
-
-    const diff = Math.abs(homeStrength - awayStrength);
-
-    // Deterministic confidence bands
-    // strong favorite -> 75-85
-    // balanced -> 60-70
-    let confidence;
-    let volatility;
-
-    if (diff >= 30) {
-        confidence = 75 + (diff - 30) * 0.2; // ramps up
-        volatility = 'low';
-    } else if (diff >= 15) {
-        confidence = 68 + (diff - 15) * 0.3;
-        volatility = 'medium';
-    } else {
-        confidence = 60 + diff * 0.5;
-        volatility = 'high';
+    if (modelWinner && Number.isFinite(modelConfidence) && modelConfidence > 0) {
+        const confidence = clamp(Math.round(modelConfidence * 100) / 100, 0, 100);
+        const volatility = deriveVolatilityFromConfidence(confidence);
+        return {
+            confidence,
+            volatility,
+            winner: modelWinner
+        };
     }
 
-    confidence = clamp(Math.round(confidence * 100) / 100, 0, 100);
+    const baseWinner = normalizeWinnerFromPrediction(
+        match.base_prediction || match.prediction || match.pick || null
+    );
+    const baseConfidence = Number(match.base_confidence ?? match.confidence);
 
-    const winner = homeStrength >= awayStrength ? 'home' : 'away';
+    if (baseWinner && Number.isFinite(baseConfidence) && baseConfidence > 0) {
+        const confidence = clamp(Math.round(baseConfidence * 100) / 100, 0, 100);
+        const volatility = deriveVolatilityFromConfidence(confidence);
+        return {
+            confidence,
+            volatility,
+            winner: baseWinner
+        };
+    }
+
+    const impliedSignal = extractImpliedSignalFromOddsEvent(match, home, away);
+    if (impliedSignal) {
+        return impliedSignal;
+    }
+
+    // Conservative fallback: use home advantage when no structured evidence is available.
+    const winner = 'home';
+    const confidence = 58;
+    const volatility = 'high';
 
     if (String(process.env.DEBUG_AI_SCORING || '').trim().toLowerCase() === 'true') {
-        console.log('[aiScoring] match_id=%s home=%s away=%s diff=%.2f winner=%s confidence=%.2f volatility=%s',
+        console.log('[aiScoring] match_id=%s home=%s away=%s winner=%s confidence=%.2f volatility=%s',
             match.match_id,
             home || 'N/A',
             away || 'N/A',
-            diff,
             winner,
             confidence,
             volatility

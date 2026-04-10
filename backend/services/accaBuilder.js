@@ -251,13 +251,24 @@ function toScoringMatchPayload(prediction) {
         match_id: prediction.match_id,
         sport: prediction.sport,
         home_team: metadata.home_team || null,
-        away_team: metadata.away_team || null
+        away_team: metadata.away_team || null,
+        base_prediction: prediction.prediction || null,
+        base_confidence: prediction.confidence,
+        raw_provider_data: metadata.raw_provider_data || null
     };
+}
+
+function lineToToken(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return null;
+    return String(n).replace('.', '_');
 }
 
 function toSecondaryPayload(prediction, marketScore) {
     const normalizedMarket = String(marketScore.market || '').toUpperCase();
     const normalizedPick = String(marketScore.pick || '').toUpperCase();
+    const line = Number(marketScore.line);
+    const lineToken = lineToToken(line);
     let market = marketScore.legacyMarketHint || marketScore.market;
 
     if (normalizedMarket === 'DOUBLE_CHANCE') {
@@ -269,9 +280,11 @@ function toSecondaryPayload(prediction, marketScore) {
     } else if (normalizedMarket === 'BTTS') {
         market = normalizedPick === 'NO' ? 'btts_no' : 'btts_yes';
     } else if (normalizedMarket === 'CORNERS_OVER_UNDER') {
-        market = normalizedPick === 'UNDER' ? 'corners_under' : 'corners_over';
+        const side = normalizedPick === 'UNDER' ? 'under' : 'over';
+        market = lineToken ? `corners_${side}_${lineToken}` : `corners_${side}`;
     } else if (normalizedMarket === 'YELLOW_CARDS_OVER_UNDER') {
-        market = normalizedPick === 'UNDER' ? 'under_3_5_yellows' : 'over_3_5_yellows';
+        const side = normalizedPick === 'UNDER' ? 'under' : 'over';
+        market = lineToken ? `${side}_${lineToken}_yellows` : (side === 'under' ? 'under_3_5_yellows' : 'over_3_5_yellows');
     }
 
     return {
@@ -287,7 +300,9 @@ function toSecondaryPayload(prediction, marketScore) {
             ...(prediction.metadata || {}),
             market_type: marketScore.type,
             market_key: marketScore.market,
-            market_description: marketScore.description
+            market_description: marketScore.description,
+            market_line: Number.isFinite(line) ? line : null,
+            market_line_token: lineToken
         }
     };
 }
@@ -622,25 +637,43 @@ function isCricketFixtureWithinWindow(prediction, expiryCutoff) {
     return estimatedCompletion <= expiryCutoff;
 }
 
+function resolveMegaAccaThreshold(predictions, options = {}) {
+    const configured = Number(options.minLegConfidence ?? process.env.MEGA_ACCA_MIN_LEG_CONFIDENCE ?? 90);
+    const configuredThreshold = Number.isFinite(configured) ? clamp(configured, 60, 99) : 90;
+    const confidenceValues = (Array.isArray(predictions) ? predictions : [])
+        .map((prediction) => Number(prediction?.confidence))
+        .filter((value) => Number.isFinite(value))
+        .sort((a, b) => b - a);
+
+    if (confidenceValues.length < MEGA_ACCA_SIZE) {
+        return configuredThreshold;
+    }
+
+    const dynamicFloor = confidenceValues[MEGA_ACCA_SIZE - 1];
+    if (!Number.isFinite(dynamicFloor) || dynamicFloor >= configuredThreshold) {
+        return configuredThreshold;
+    }
+
+    return clamp(Math.round(dynamicFloor * 100) / 100, 70, configuredThreshold);
+}
+
 function buildMegaAcca12Candidates(predictions, options = {}) {
     const maxRows = Number.isFinite(options.maxRows) ? options.maxRows : 6;
     const expiryCutoff = options.expiryCutoff instanceof Date ? options.expiryCutoff : null;
-
-    // STRICT MULTI-SPORT FLOOR: Enforce 90% confidence threshold across Football, Rugby, Cricket, etc.
-    const usedThreshold = 90;
+    const usedThreshold = resolveMegaAccaThreshold(predictions, options);
 
     const eligible = predictions
         .filter((prediction) => Number(prediction.confidence) >= usedThreshold)
         .filter((prediction) => !expiryCutoff || isCricketFixtureWithinWindow(prediction, expiryCutoff))
         .slice();
 
-    // If not enough assets meet the strict 90% floor, abort the Mega ACCA build for this run
+    // If not enough assets meet the effective floor, abort the Mega ACCA build for this run.
     if (eligible.length < MEGA_ACCA_SIZE) {
-        console.log(`[accaBuilder] Mega ACCA: Only ${eligible.length} insights available (need ${MEGA_ACCA_SIZE}). The 90% floor was not met.`);
+        console.log(`[accaBuilder] Mega ACCA: Only ${eligible.length} insights available (need ${MEGA_ACCA_SIZE}). Effective floor ${usedThreshold}% not met.`);
         return [];
     }
 
-    console.log(`[accaBuilder] Mega ACCA: Building Moonshot series with ${eligible.length} eligible insights at strict ${usedThreshold}% threshold.`);
+    console.log(`[accaBuilder] Mega ACCA: Building Moonshot series with ${eligible.length} eligible insights at ${usedThreshold}% threshold.`);
 
     const rows = [];
     for (let start = 0; start <= eligible.length - MEGA_ACCA_SIZE && rows.length < maxRows; start++) {

@@ -44,7 +44,8 @@ const CONFLICT_MATRIX = {
     'OVER_UNDER_2_5': {
         'over': [
             { market: 'OVER_UNDER_2_5', pick: 'under' },
-            { market: 'OVER_UNDER_1_5', pick: 'under' }
+            { market: 'OVER_UNDER_1_5', pick: 'under' },
+            { market: 'BTTS', pick: 'no' }
         ],
         'under': [
             { market: 'OVER_UNDER_2_5', pick: 'over' },
@@ -67,7 +68,8 @@ const CONFLICT_MATRIX = {
             { market: 'OVER_UNDER_1_5', pick: 'under' }
         ],
         'no': [
-            { market: 'BTTS', pick: 'yes' }
+            { market: 'BTTS', pick: 'yes' },
+            { market: 'OVER_UNDER_2_5', pick: 'over' }
         ]
     }
 };

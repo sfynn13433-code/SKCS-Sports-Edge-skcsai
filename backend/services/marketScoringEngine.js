@@ -83,17 +83,44 @@ function marketTypePenalty(type) {
     return 6; // advanced
 }
 
-function outcomeUniverseToLegacyMarket(sport, market) {
+function lineToToken(line) {
+    const n = Number(line);
+    if (!Number.isFinite(n)) return null;
+    return String(n).replace('.', '_');
+}
+
+function resolveMarketLine(sport, market) {
+    const s = String(sport || '').toLowerCase();
+    const m = String(market || '').toUpperCase();
+
+    if (m === 'OVER_UNDER_2_5') return 2.5;
+    if (m === 'OVER_UNDER_1_5') return 1.5;
+    if (m === 'YELLOW_CARDS_OVER_UNDER') return 3.5;
+    if (m === 'CORNERS_OVER_UNDER' && s === 'football') return 9.5;
+    return null;
+}
+
+function withLineDescription(description, line) {
+    const n = Number(line);
+    if (!Number.isFinite(n)) return description;
+    return `${description} (${n})`;
+}
+
+function outcomeUniverseToLegacyMarket(sport, market, line = null) {
     // We keep outcome universe identifiers as primary source of truth,
     // but provide a pragmatic alias to the current pipeline naming where obvious.
     const s = String(sport || '').toLowerCase();
     const m = String(market || '').toUpperCase();
+    const token = lineToToken(line);
 
     if (s === 'football' && m === 'MATCH_RESULT') return '1X2';
     if (s === 'football' && m === 'DOUBLE_CHANCE') return 'double_chance';
     if (s === 'football' && m === 'BTTS') return 'btts_yes/btts_no';
     if (s === 'football' && m === 'OVER_UNDER_2_5') return 'over_2_5/under_2_5';
     if (s === 'football' && m === 'OVER_UNDER_1_5') return 'over_1_5/under_1_5';
+    if (s === 'football' && m === 'CORNERS_OVER_UNDER') {
+        return token ? `corners_over_${token}/corners_under_${token}` : 'corners_over/corners_under';
+    }
     if (s === 'football' && m === 'YELLOW_CARDS_OVER_UNDER') return 'over_3_5_yellows/under_3_5_yellows';
 
     return null;
@@ -108,7 +135,10 @@ function scoreMarkets(matchData) {
         match_id: matchData?.match_id || matchData?.matchId || null,
         sport,
         home_team: matchData?.home_team || matchData?.homeTeam || null,
-        away_team: matchData?.away_team || matchData?.awayTeam || null
+        away_team: matchData?.away_team || matchData?.awayTeam || null,
+        base_prediction: matchData?.base_prediction || matchData?.prediction || null,
+        base_confidence: matchData?.base_confidence ?? matchData?.confidence ?? null,
+        raw_provider_data: matchData?.raw_provider_data || matchData?.metadata?.raw_provider_data || null
     });
 
     const baseConfidence = typeof scoring?.confidence === 'number' ? scoring.confidence : 50;
@@ -118,14 +148,16 @@ function scoreMarkets(matchData) {
         const penalty = marketTypePenalty(m.type);
         const marketBias = hashToUnit(`${matchData?.match_id || matchData?.home_team || 'match'}:${m.market}`);
         const confidence = clamp(Math.round((baseConfidence - penalty - (marketBias * 4 - 2)) * 100) / 100, 0, 100);
+        const line = resolveMarketLine(sport, m.market);
 
         return {
             market: m.market,
             pick,
             confidence,
             type: m.type,
-            description: m.description,
-            legacyMarketHint: outcomeUniverseToLegacyMarket(sport, m.market)
+            description: withLineDescription(m.description, line),
+            line,
+            legacyMarketHint: outcomeUniverseToLegacyMarket(sport, m.market, line)
         };
     });
 }

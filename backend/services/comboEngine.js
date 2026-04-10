@@ -47,8 +47,7 @@ function generateSmartCombos(markets) {
         ['MATCH_RESULT', 'OVER_UNDER_2_5'],
         ['DOUBLE_CHANCE', 'OVER_UNDER_2_5'],
         ['MATCH_RESULT', 'BTTS'],
-        ['DOUBLE_CHANCE', 'BTTS'],
-        ['BTTS', 'OVER_UNDER_2_5']
+        ['DOUBLE_CHANCE', 'BTTS']
     ];
 
     const out = [];
@@ -121,4 +120,3 @@ module.exports = {
     generateSmartCombos,
     generateSameMatchBets
 };
-
