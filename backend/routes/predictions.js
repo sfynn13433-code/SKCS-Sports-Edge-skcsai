@@ -478,6 +478,25 @@ function predictionMatchesWindow(prediction, windowStart, windowEnd) {
     return kickoffs.every((kickoff) => kickoff >= windowStart && kickoff <= windowEnd);
 }
 
+// Hard cutoff: reject any prediction whose earliest kickoff is more than 24 hours in the past
+function predictionIsNotStale(prediction, now = new Date()) {
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    if (matches.length === 0) return false;
+
+    const kickoffs = matches.map(parseMatchKickoff).filter(Boolean);
+    if (kickoffs.length === 0) {
+        // No parseable kickoff dates — use created_at as a safety net
+        const created = new Date(prediction.created_at);
+        if (isNaN(created.getTime())) return false;
+        const hoursSinceCreation = (now.getTime() - created.getTime()) / (1000 * 60 * 60);
+        return hoursSinceCreation <= 48; // allow up to 48 hours since creation
+    }
+
+    const earliestKickoff = new Date(Math.min(...kickoffs.map(k => k.getTime())));
+    const hoursInPast = (now.getTime() - earliestKickoff.getTime()) / (1000 * 60 * 60);
+    return hoursInPast <= 24; // reject fixtures that kicked off more than 24 hours ago
+}
+
 function getPredictionPrimaryKickoff(prediction) {
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
     const kickoffs = matches
@@ -932,6 +951,7 @@ router.get('/', requireRole('user'), async (req, res) => {
         const windowEnd = new Date(now.getTime() + futureWindowDays * 24 * 60 * 60 * 1000);
 
         const scopedPredictions = hydratedPredictions
+            .filter((prediction) => predictionIsNotStale(prediction, now))
             .filter((prediction) => predictionMatchesWindow(prediction, windowStart, windowEnd))
             .filter((prediction) => predictionMatchesSport(prediction, sportFilterValues))
             .filter((prediction) => {

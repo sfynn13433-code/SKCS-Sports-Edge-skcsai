@@ -33,6 +33,24 @@ function outcomeSetForLeg(market, pick) {
         if (p === '12' || p === 'HOME_OR_AWAY' || p === 'HOME OR AWAY') return new Set([OUTCOMES.H, OUTCOMES.A]);
     }
 
+    // BTTS — encode as goal-event tokens so we can cross-check with goal predictions
+    if (m === 'btts_yes' || m === 'btts') {
+        if (p === 'YES') return new Set(['BTTS_YES']);
+        if (p === 'NO') return new Set(['BTTS_NO']);
+    }
+
+    // Over/Under goals — encode threshold so we can detect contradictions
+    const goalsOverMatch = m.match(/^over_(\d+)_(\d)$/);
+    const goalsUnderMatch = m.match(/^under_(\d+)_(\d)$/);
+    if (goalsOverMatch) {
+        const line = parseFloat(`${goalsOverMatch[1]}.${goalsOverMatch[2]}`);
+        return new Set([`OVER_GOALS_${line}`]);
+    }
+    if (goalsUnderMatch) {
+        const line = parseFloat(`${goalsUnderMatch[1]}.${goalsUnderMatch[2]}`);
+        return new Set([`UNDER_GOALS_${line}`]);
+    }
+
     // Unknown/non-result market: cannot infer, treat as compatible by default
     return null;
 }
@@ -44,7 +62,37 @@ function areLegsCompatible(legA, legB) {
     // If one is non-result, we don't block here.
     if (!setA || !setB) return true;
 
+    // Check for direct outcome overlap (1X2, double chance)
     for (const x of setA) if (setB.has(x)) return true;
+
+    // Check BTTS vs BTTS conflicts
+    if (setA.has('BTTS_YES') && setB.has('BTTS_NO')) return false;
+    if (setA.has('BTTS_NO') && setB.has('BTTS_YES')) return false;
+
+    // Check Over/Under goal-line contradictions
+    for (const a of setA) {
+        if (a.startsWith('OVER_GOALS_')) {
+            const lineA = parseFloat(a.split('_')[2]);
+            for (const b of setB) {
+                if (b.startsWith('UNDER_GOALS_')) {
+                    const lineB = parseFloat(b.split('_')[2]);
+                    // OVER 2.5 vs UNDER 1.5 = conflict (no score satisfies both)
+                    // OVER 1.5 vs UNDER 2.5 = compatible (score of 2 satisfies both)
+                    if (lineA > lineB) return false;
+                }
+            }
+        }
+        if (a.startsWith('UNDER_GOALS_')) {
+            const lineA = parseFloat(a.split('_')[2]);
+            for (const b of setB) {
+                if (b.startsWith('OVER_GOALS_')) {
+                    const lineB = parseFloat(b.split('_')[2]);
+                    if (lineB > lineA) return false;
+                }
+            }
+        }
+    }
+
     return false;
 }
 
