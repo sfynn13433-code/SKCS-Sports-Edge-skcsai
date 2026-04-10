@@ -611,10 +611,19 @@ function buildAcca6Candidates(predictions, maxRows = 6) {
     if (direct.length < 6) return [];
 
     const rows = [];
-    for (let start = 0; start <= direct.length - 6 && rows.length < maxRows; start++) {
+    const usedMatchIds = new Set();
+
+    // Use non-overlapping windows so each ACCA has completely different fixtures.
+    for (let start = 0; start <= direct.length - 6 && rows.length < maxRows; start += 6) {
         const combo = direct.slice(start, start + 6);
         const ids = combo.map((row) => row.match_id);
+
+        // Skip if any match_id is already used in a previous ACCA
+        if (ids.some((id) => usedMatchIds.has(id))) continue;
         if (new Set(ids).size !== ids.length) continue;
+
+        ids.forEach((id) => usedMatchIds.add(id));
+
         const legs = combo.map(toFinalMatchPayload);
         rows.push({
             match_id: ids.join('|'),
@@ -676,11 +685,18 @@ function buildMegaAcca12Candidates(predictions, options = {}) {
     console.log(`[accaBuilder] Mega ACCA: Building Moonshot series with ${eligible.length} eligible insights at ${usedThreshold}% threshold.`);
 
     const rows = [];
-    for (let start = 0; start <= eligible.length - MEGA_ACCA_SIZE && rows.length < maxRows; start++) {
+    const usedMatchIds = new Set();
+
+    // Use non-overlapping windows so each Mega ACCA has completely different fixtures.
+    for (let start = 0; start <= eligible.length - MEGA_ACCA_SIZE && rows.length < maxRows; start += MEGA_ACCA_SIZE) {
         const combo = eligible.slice(start, start + MEGA_ACCA_SIZE);
         const ids = combo.map((row) => row.match_id);
 
+        // Skip if any match_id is already used in a previous ACCA
+        if (ids.some((id) => usedMatchIds.has(id))) continue;
         if (new Set(ids).size !== ids.length) continue;
+
+        ids.forEach((id) => usedMatchIds.add(id));
 
         const legs = combo.map((row) => ({
             ...toFinalMatchPayload(row),
