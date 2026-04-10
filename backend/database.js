@@ -522,29 +522,11 @@ async function getAllUpcomingMatches(days = 7, sport = null) {
 }
 
 // Save a generated prediction (now includes safer_pick)
+// NOTE: This function is deprecated — the active pipeline uses aiPipeline.js + accaBuilder.js
+// which write to predictions_raw → predictions_filtered → predictions_final.
 async function savePrediction(prediction) {
-    const ok = await ensureDbInitialized();
-    if (!ok) return { id: null };
-    const {
-        matchId, probHome, probDraw, probAway, bttsProb, over25Prob, under25Prob,
-        recommended, avoid, accaSafe, confidence, volatility, riskFlags,
-        saferPick, normalTier, deepTier, validUntil
-    } = prediction;
-
-    const res = await pool.query(
-        `INSERT INTO predictions (
-            match_id, prob_home, prob_draw, prob_away, btts_prob, over25_prob, under25_prob,
-            recommended, avoid, acca_safe, confidence, volatility, risk_flags, safer_pick,
-            normal_tier, deep_tier, valid_until
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING id`,
-        [
-            matchId, probHome, probDraw, probAway, bttsProb, over25Prob, under25Prob,
-            JSON.stringify(recommended), JSON.stringify(avoid), accaSafe ? 1 : 0,
-            confidence, volatility, JSON.stringify(riskFlags), saferPick,
-            normalTier ? 1 : 0, deepTier ? 1 : 0, validUntil
-        ]
-    );
-    return { id: res.rows[0].id };
+    console.warn('[database] savePrediction is deprecated — use aiPipeline instead');
+    return { id: null };
 }
 
 // Get predictions filtered by subscription tier and date (now includes safer_pick)
@@ -592,6 +574,7 @@ async function getPredictionsByTier(tier, date) {
     return res.rows;
 }
 
+// NOTE: Deprecated — use aiPipeline.js + accaBuilder.js instead
 async function insertFinalPredictionRow({
     match_id,
     prediction,
@@ -601,44 +584,14 @@ async function insertFinalPredictionRow({
     home_team,
     away_team
 }) {
-    const ok = await ensureDbInitialized();
-    if (!ok) return { id: null };
-
-    const res = await pool.query(
-        `INSERT INTO predictions (
-            match_id,
-            prediction,
-            confidence,
-            stage,
-            is_final,
-            home_team,
-            away_team
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-        RETURNING id, created_at`,
-        [
-            match_id,
-            prediction,
-            confidence,
-            stage,
-            is_final,
-            home_team,
-            away_team
-        ]
-    );
-
-    return res.rows[0];
+    console.warn('[database] insertFinalPredictionRow is deprecated — use aiPipeline instead');
+    return { id: null };
 }
 
+// NOTE: Deprecated — use GET /api/predictions endpoint instead
 async function getLatestPredictions(limit = 50) {
-    const ok = await ensureDbInitialized();
-    if (!ok) return [];
-
-    const safeLimit = Number.isFinite(limit) ? Math.max(1, Math.min(200, limit)) : 50;
-    const res = await pool.query(
-        'SELECT * FROM predictions ORDER BY created_at DESC LIMIT $1',
-        [safeLimit]
-    );
-    return res.rows;
+    console.warn('[database] getLatestPredictions is deprecated — use GET /api/predictions instead');
+    return [];
 }
 
 // ========== USER HELPERS ==========

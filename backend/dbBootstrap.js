@@ -138,6 +138,98 @@ async function bootstrap() {
                 rule_value = EXCLUDED.rule_value;
         `);
 
+        // Predictions accuracy (graded results)
+        await query(`
+            CREATE TABLE IF NOT EXISTS predictions_accuracy (
+                id bigserial PRIMARY KEY,
+                prediction_final_id bigint NOT NULL,
+                publish_run_id bigint,
+                prediction_match_index integer NOT NULL,
+                event_id text,
+                sport text NOT NULL,
+                prediction_tier text,
+                prediction_type text,
+                confidence numeric,
+                market text NOT NULL,
+                predicted_outcome text NOT NULL,
+                prediction_source text,
+                result_source text,
+                home_team text,
+                away_team text,
+                fixture_date date,
+                actual_result text,
+                event_status text,
+                resolution_status text,
+                is_correct boolean,
+                actual_home_score numeric,
+                actual_away_score numeric,
+                actual_home_score_ht numeric,
+                actual_away_score_ht numeric,
+                loss_reason_summary text,
+                loss_factors jsonb NOT NULL DEFAULT '[]'::jsonb,
+                evaluation_notes text,
+                diagnostic_context jsonb,
+                raw_result jsonb,
+                evaluated_at timestamptz,
+                UNIQUE (prediction_final_id, prediction_match_index)
+            );
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_predictions_accuracy_fixture_date
+            ON predictions_accuracy(fixture_date)
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_predictions_accuracy_sport_date
+            ON predictions_accuracy(sport, fixture_date)
+        `);
+
+        // Event context snapshot tables (used by grading script for loss diagnostics)
+        await query(`
+            CREATE TABLE IF NOT EXISTS event_injury_snapshots (
+                id bigserial PRIMARY KEY,
+                event_id text NOT NULL,
+                team_name text NOT NULL,
+                status_type text,
+                status_reason text,
+                player_name text,
+                created_at timestamptz NOT NULL DEFAULT now()
+            );
+        `);
+
+        await query(`
+            CREATE TABLE IF NOT EXISTS event_weather_snapshots (
+                id bigserial PRIMARY KEY,
+                event_id text NOT NULL,
+                temperature_c numeric,
+                precipitation_mm numeric,
+                wind_speed_kmh numeric,
+                weather_code integer,
+                weather_summary text,
+                created_at timestamptz NOT NULL DEFAULT now(),
+                UNIQUE (event_id)
+            );
+        `);
+
+        await query(`
+            CREATE TABLE IF NOT EXISTS event_news_snapshots (
+                id bigserial PRIMARY KEY,
+                event_id text NOT NULL,
+                team_name text NOT NULL,
+                signal_type text,
+                signal_label text,
+                signal_strength text,
+                relevance_score numeric,
+                sentiment_score numeric,
+                evidence_keywords jsonb,
+                article_title text,
+                article_url text,
+                published_at timestamptz,
+                created_at timestamptz NOT NULL DEFAULT now()
+            );
+        `);
+
         console.log('[dbBootstrap] All tables and seed data verified.');
     } catch (err) {
         console.error('[dbBootstrap] Error:', err.message);

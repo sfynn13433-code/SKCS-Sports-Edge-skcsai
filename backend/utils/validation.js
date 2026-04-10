@@ -3,10 +3,35 @@
 const KNOWN_MARKETS = new Set([
     '1X2',
     'double_chance',
+    'double_chance_1x',
+    'double_chance_x2',
+    'double_chance_12',
+    'match_result',
+    'over_1_5',
     'over_2_5',
+    'over_3_5',
+    'over_4_5',
+    'under_1_5',
     'under_2_5',
+    'under_3_5',
+    'under_4_5',
     'btts_yes',
-    'btts_no'
+    'btts_no',
+    'ht_draw',
+    'ht_ft',
+    'corners_over_7_5',
+    'corners_over_8_5',
+    'corners_over_9_5',
+    'corners_over_10_5',
+    'corners_under_10_5',
+    'corners_under_11_5',
+    'red_cards_under_0_5',
+    'red_cards_under_1_5',
+    'yellow_cards_over_2_5',
+    'yellow_cards_over_3_5',
+    'yellow_cards_over_4_5',
+    'penalty_yes',
+    'penalty_no'
 ]);
 
 const KNOWN_VOLATILITY = new Set(['low', 'medium', 'high']);
