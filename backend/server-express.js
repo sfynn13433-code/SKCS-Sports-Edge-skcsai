@@ -201,6 +201,112 @@ app.use('/api/chat', chatRouter);
 app.use('/api/edgemind', chatRouter);
 app.use('/api/accuracy', accuracyRouter);
 
+// --- Cloud Scheduler endpoints -------------------------------------------------
+// These match the URLs documented in docs/google-cloud-soccer-refresh.md
+// and expected by the skcs-football-refresh / skcs-football-grade scheduler jobs.
+
+function requireRefreshKey(req, res, next) {
+    const key = req.headers['x-api-key'];
+    const refreshKey = process.env.SKCS_REFRESH_KEY;
+    const adminKey   = process.env.ADMIN_API_KEY;
+
+    if (!key) {
+        return res.status(401).json({ error: 'Missing API key' });
+    }
+    if ((refreshKey && key === refreshKey) || (adminKey && key === adminKey)) {
+        return next();
+    }
+    return res.status(403).json({ error: 'Invalid API key' });
+}
+
+app.post('/api/refresh-predictions', requireRefreshKey, async (req, res) => {
+    const sport = req.query.sport || req.body?.sport || null;
+    const label = `scheduler refresh${sport ? ` (${sport})` : ''}`;
+    console.log(`[scheduler] ${label} triggered`);
+
+    try {
+        const result = sport
+            ? await syncSports({ sports: sport })
+            : await syncAllSports();
+
+        res.status(200).json({
+            ok: true,
+            message: `${label} completed`,
+            totalMatchesProcessed: result?.totalMatchesProcessed || 0,
+            perSport:              result?.perSport || [],
+            errors:                result?.errors || [],
+            rebuiltFinalOutputs:   result?.rebuiltFinalOutputs || false
+        });
+    } catch (err) {
+        console.error(`[scheduler] ${label} failed:`, err.message);
+        res.status(500).json({ ok: false, error: err.message });
+    }
+});
+
+app.post('/api/grade-predictions', requireRefreshKey, async (req, res) => {
+    const sport     = req.query.sport || req.body?.sport || 'football';
+    const dateParam = req.query.date  || req.body?.date  || null;
+
+    // Default to yesterday in Africa/Johannesburg
+    const gradeDate = dateParam
+        || moment().tz('Africa/Johannesburg').subtract(1, 'day').format('YYYY-MM-DD');
+
+    console.log(`[scheduler] grading ${sport} for ${gradeDate}`);
+
+    const scriptPath = path.join(__dirname, '..', 'scripts', 'track-prediction-accuracy.js');
+    const args = [`--sport=${sport}`, `--date=${gradeDate}`];
+
+    try {
+        const result = await new Promise((resolve, reject) => {
+            const child = spawn(process.execPath, [scriptPath, ...args], {
+                env:   { ...process.env },
+                stdio: ['ignore', 'pipe', 'pipe'],
+                timeout: 25 * 60 * 1000   // 25 minutes
+            });
+
+            let stdout = '';
+            let stderr = '';
+            child.stdout.on('data', (chunk) => { stdout += chunk; });
+            child.stderr.on('data', (chunk) => { stderr += chunk; });
+
+            child.on('close', (code) => {
+                if (code === 0) {
+                    resolve({ stdout, stderr });
+                } else {
+                    reject(new Error(`Grading script exited with code ${code}: ${stderr || stdout}`));
+                }
+            });
+
+            child.on('error', reject);
+        });
+
+        // Try to parse the JSON summary the script prints on success
+        let summary = null;
+        try {
+            const lines = result.stdout.trim().split('\n');
+            for (let i = lines.length - 1; i >= 0; i--) {
+                if (lines[i].trim().startsWith('{')) {
+                    summary = JSON.parse(lines.slice(i).join('\n'));
+                    break;
+                }
+            }
+        } catch { /* ignore parse errors */ }
+
+        res.status(200).json({
+            ok: true,
+            message: `Grading completed for ${sport} on ${gradeDate}`,
+            gradeDate,
+            sport,
+            summary,
+            raw: result.stdout.slice(-2000)
+        });
+    } catch (err) {
+        console.error(`[scheduler] grading failed:`, err.message);
+        res.status(500).json({ ok: false, error: err.message, gradeDate, sport });
+    }
+});
+
+// --- Error handler -------------------------------------------------------------
 app.use((err, _req, res, _next) => {
   console.error('[error]', err);
   res.status(err.status || 500).json({
