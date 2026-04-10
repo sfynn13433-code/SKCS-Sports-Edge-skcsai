@@ -1,5 +1,27 @@
 'use strict';
 
+const LEGACY_PUBLIC_USER_KEY = 'skcs_user_12345';
+
+function parseKeyList(value) {
+    return String(value || '')
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean);
+}
+
+function getAllowedUserKeys() {
+    const keys = new Set();
+    parseKeyList(process.env.USER_API_KEY).forEach((key) => keys.add(key));
+    parseKeyList(process.env.USER_API_KEYS).forEach((key) => keys.add(key));
+
+    const allowLegacy = String(process.env.ALLOW_LEGACY_USER_KEY || 'true').toLowerCase() !== 'false';
+    if (allowLegacy) {
+        keys.add(LEGACY_PUBLIC_USER_KEY);
+    }
+
+    return keys;
+}
+
 // We pull from process.env INSIDE the function to ensure we get the latest Render values
 function requireRole(role) {
     return (req, res, next) => {
@@ -7,7 +29,7 @@ function requireRole(role) {
 
         // Get fresh values from environment
         const adminKey = process.env.ADMIN_API_KEY;
-        const userKey = process.env.USER_API_KEY;
+        const allowedUserKeys = getAllowedUserKeys();
 
         if (!key) {
             console.error(`[AUTH] Blocked: No x-api-key header provided.`);
@@ -24,7 +46,7 @@ function requireRole(role) {
 
         if (role === 'user') {
             // Users can be validated by user key OR admin key
-            const isValidUser = (key === userKey) || (key === adminKey);
+            const isValidUser = allowedUserKeys.has(key) || (key === adminKey);
             if (!isValidUser) {
                 console.error(`[AUTH] User Denied.`);
                 return res.status(403).json({ error: 'User access required' });

@@ -8,12 +8,16 @@ if (window.API_BASE_URL.endsWith('/')) {
 
 console.log(`[SKCS] API routing ACTIVE: ${window.API_BASE_URL}`);
 
+// Public user key for authenticated read endpoints; can be overridden per environment.
+window.USER_API_KEY = window.USER_API_KEY || 'skcs_user_12345';
+
 // This ensures all your fetch calls across the site use this base
 window.SKCS_CONFIG = {
     predictions: `${window.API_BASE_URL}/api/predictions`,
     matches: `${window.API_BASE_URL}/api/matches`,
     chat: `${window.API_BASE_URL}/api/chat`,
-    subscribe: `${window.API_BASE_URL}/api/subscribe`
+    subscribe: `${window.API_BASE_URL}/api/subscribe`,
+    userApiKey: window.USER_API_KEY
 };
 
 window.SUPABASE_URL = window.SUPABASE_URL || 'https://ghzjntdvaptuxfpvhybb.supabase.co';

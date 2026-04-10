@@ -63,6 +63,14 @@ function normalizePredictionSportKey(value) {
     return key;
 }
 
+function normalizeTierLabel(value) {
+    const tier = String(value || '').trim().toLowerCase();
+    if (!tier) return 'normal';
+    if (tier === 'elite') return 'deep';
+    if (tier === 'core') return 'normal';
+    return tier;
+}
+
 function getSportFilterValues(sport) {
     const key = String(sport || '').trim().toLowerCase();
     if (!key) return [];
@@ -651,6 +659,20 @@ async function getLatestRelevantPublishRunId(requestedSport) {
     return latestRunRes.rows[0]?.id || null;
 }
 
+async function getLatestPublishRunIdFromFinalTable() {
+    const fallbackRunRes = await query(
+        `
+        SELECT publish_run_id
+        FROM predictions_final
+        WHERE publish_run_id IS NOT NULL
+        ORDER BY publish_run_id DESC, created_at DESC
+        LIMIT 1
+        `
+    );
+
+    return fallbackRunRes.rows[0]?.publish_run_id || null;
+}
+
 // GET /api/predictions
 // Default tier = deep (elite pool); subscription limits use /api/user/predictions
 router.get('/', requireRole('user'), async (req, res) => {
@@ -671,7 +693,15 @@ router.get('/', requireRole('user'), async (req, res) => {
         }
 
         const now = new Date();
-        const latestPublishRunId = await getLatestRelevantPublishRunId(sport);
+        let latestPublishRunId = await getLatestRelevantPublishRunId(sport);
+        let publishRunSource = 'completed_publish_run';
+        if (!latestPublishRunId) {
+            latestPublishRunId = await getLatestPublishRunIdFromFinalTable();
+            if (latestPublishRunId) {
+                publishRunSource = 'predictions_final_fallback';
+                console.warn('[predictions] No completed publish run found; using latest predictions_final publish_run_id:', latestPublishRunId);
+            }
+        }
         let predictions = [];
         try {
             if (!latestPublishRunId) {
@@ -681,10 +711,10 @@ router.get('/', requireRole('user'), async (req, res) => {
             let queryStr = `
                 SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at
                 FROM predictions_final pf
-                WHERE tier IN (${planCapabilities.tiers.map(t => `'${t}'`).join(',')})
+                WHERE LOWER(COALESCE(pf.tier, 'normal')) = ANY($2::text[])
                   AND pf.publish_run_id = $1
             `;
-            const queryParams = [latestPublishRunId];
+            const queryParams = [latestPublishRunId, planCapabilities.tiers.map((tier) => String(tier).toLowerCase())];
 
             queryStr += ` ORDER BY created_at DESC LIMIT 2000;`;
 
@@ -721,17 +751,25 @@ router.get('/', requireRole('user'), async (req, res) => {
                         .eq('publish_run_id', latestSupabaseRun.id)
                         .order('created_at', { ascending: false })
                         .limit(2000)
-                    : { data: null, error: runsError };
+                    : await sb
+                        .from('predictions_final')
+                        .select('*')
+                        .order('created_at', { ascending: false })
+                        .limit(2000);
+
+                if (!latestSupabaseRun) {
+                    console.warn('[predictions] Supabase has no completed publish run; using latest predictions_final rows');
+                }
 
                 if (!error && Array.isArray(data) && data.length > 0) {
-                    // Filter Supabase rows by plan capabilities and sport
-                    const filtered = data.filter(r => {
+                    // Filter Supabase rows by plan capabilities.
+                    const allowedTiers = new Set(planCapabilities.tiers.map((tier) => normalizeTierLabel(tier)));
+                    const filtered = data.filter((r) => {
                         try {
-                            // Check if prediction tier is in plan's allowed tiers
-                            const rowTier = String(r.tier || 'normal');
-                            if (!planCapabilities.tiers.includes(rowTier)) return false;
+                            const rowTier = normalizeTierLabel(r.tier);
+                            if (!allowedTiers.has(rowTier)) return false;
                             return true;
-                        } catch (e) {
+                        } catch (_e) {
                             return false;
                         }
                     });
@@ -865,6 +903,7 @@ router.get('/', requireRole('user'), async (req, res) => {
         res.status(200).json({
             plan_id: planId,
             sport: sport || 'all',
+            publish_run_source: publishRunSource,
             day: todayName,
             history_days: historyWindowDays,
             window_days: futureWindowDays,

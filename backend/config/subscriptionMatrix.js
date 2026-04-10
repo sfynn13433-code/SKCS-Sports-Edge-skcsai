@@ -205,11 +205,16 @@ function calculateDailyAllocations(planId, dayOfWeek) {
 function getPlanCapabilities(planId) {
     const plan = SUBSCRIPTION_MATRIX[planId];
     if (!plan) return null;
+    const canonicalTier = plan.tier === 'elite' ? 'deep' : 'normal';
+    const tierAliases = canonicalTier === 'deep'
+        ? ['deep', 'elite']
+        : ['normal', 'core'];
 
     return {
         ...plan,
         baseline_plan_id: FAMILY_BASELINES[plan.tier],
-        tiers: [plan.tier === 'elite' ? 'deep' : 'normal'],
+        canonical_tier: canonicalTier,
+        tiers: tierAliases,
         capabilities: {
             chatbot_daily_limit: plan.chatbot_daily_limit,
             sports_coverage: plan.sports_coverage,

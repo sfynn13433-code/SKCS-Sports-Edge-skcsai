@@ -1052,8 +1052,14 @@
     const SKCS_BACKEND = window.API_BASE_URL || "https://skcs-sports-edge-skcsai.onrender.com";
     let activeSport = 'football';
 
+    function getUserApiKey() {
+        const direct = String(window.USER_API_KEY || '').trim();
+        const fromConfig = String(window.SKCS_CONFIG?.userApiKey || '').trim();
+        return direct || fromConfig || 'skcs_user_12345';
+    }
+
     function getPredictionTiersForPlan(planId) {
-        return String(planId || '').includes('elite') ? ['deep'] : ['normal'];
+        return String(planId || '').includes('elite') ? ['deep', 'elite'] : ['normal', 'core'];
     }
 
     function getPlanAccessLevel(planId) {
@@ -1270,6 +1276,8 @@
         const activePlanId = resolveUserPlanId(userPlanId);
         const container = document.getElementById(sport + '-matches');
         const requestSport = sport === 'accumulators' ? '' : sport;
+        const userApiKey = getUserApiKey();
+        let supabaseFallbackStatus = 'not_attempted';
         if (container) {
             container.innerHTML = '<p style="text-align:center;color:#4a5568;padding:20px;">Updating SKCS Insights...</p>';
         }
@@ -1278,7 +1286,10 @@
             try {
                 const supabaseUrl = (window.SUPABASE_URL || '').replace(/\/+$/,'');
                 const anon = window.SUPABASE_ANON_KEY || '';
-                if (!supabaseUrl || !anon) return [];
+                if (!supabaseUrl || !anon) {
+                    supabaseFallbackStatus = 'missing_supabase_config';
+                    return [];
+                }
 
                 const res = await fetch(`${supabaseUrl}/rest/v1/predictions_final?select=*&order=created_at.desc`, {
                     method: 'GET',
@@ -1288,7 +1299,13 @@
                         'Authorization': `Bearer ${anon}`
                     }
                 });
-                if (!res.ok) return [];
+                if (!res.ok) {
+                    supabaseFallbackStatus = (res.status === 401 || res.status === 403)
+                        ? 'rls_or_auth_denied'
+                        : `http_${res.status}`;
+                    console.warn(`[Supabase fallback] blocked with status ${res.status}.`);
+                    return [];
+                }
                 const rows = await res.json();
                 const allowedTiers = getPredictionTiersForPlan(activePlanId);
                 const filtered = (rows || []).filter(r => {
@@ -1302,8 +1319,10 @@
                     }
                     return matches.some(m => String((m.sport || '')).toLowerCase().includes(String(requestSport).toLowerCase()));
                 });
+                supabaseFallbackStatus = 'ok';
                 return filtered;
             } catch (e) {
+                supabaseFallbackStatus = 'error';
                 console.warn('[Supabase fallback] error:', e.message || e);
                 return [];
             }
@@ -1320,7 +1339,7 @@
                 method: 'GET',
                 cache: 'no-store',
                 headers: {
-                    'x-api-key': 'skcs_user_12345'
+                    'x-api-key': userApiKey
                 }
             });
 
@@ -1338,7 +1357,7 @@
                     method: 'GET',
                     cache: 'no-store',
                     headers: {
-                        'x-api-key': 'skcs_user_12345'
+                        'x-api-key': userApiKey
                     }
                 });
                 let d2 = null;
@@ -1376,6 +1395,9 @@
                 renderSport(sport, sport + '-matches', supaPreds);
                 return;
             }
+            if (supabaseFallbackStatus === 'rls_or_auth_denied') {
+                console.warn('[Insights] Backend returned no data and Supabase fallback was denied by RLS/auth policy.');
+            }
 
             // Nothing found - show friendly message
             if (sport === 'football') {
@@ -1405,6 +1427,9 @@
                 }
                 renderSport(sport, sport + '-matches', supaPreds);
                 return;
+            }
+            if (supabaseFallbackStatus === 'rls_or_auth_denied') {
+                console.warn('[Insights] Supabase fallback denied by RLS/auth policy after backend error.');
             }
             if (sport === 'football') {
                 renderFootballInsights([]);
@@ -1973,7 +1998,7 @@
         try {
             const response = await fetch(`${SKCS_BACKEND}/api/chat`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-api-key': 'skcs_user_12345' },
+                headers: { 'Content-Type': 'application/json', 'x-api-key': getUserApiKey() },
                 body: JSON.stringify({ message: msg })
             });
             const data = await response.json();
