@@ -777,11 +777,12 @@ router.get('/', requireRole('user'), async (req, res) => {
                 throw new Error(`No completed publish run found for sport=${sport || 'all'}`);
             }
 
+            // Include both Node.js pipeline rows (with publish_run_id) AND Python-generated rows (publish_run_id IS NULL)
             let queryStr = `
                 SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at
                 FROM predictions_final pf
                 WHERE LOWER(COALESCE(pf.tier, 'normal')) = ANY($2::text[])
-                  AND pf.publish_run_id = $1
+                  AND (pf.publish_run_id = $1 OR pf.publish_run_id IS NULL)
             `;
             const queryParams = [latestPublishRunId, planCapabilities.tiers.map((tier) => String(tier).toLowerCase())];
 
