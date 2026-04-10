@@ -77,11 +77,37 @@ function getSportFilterValues(sport) {
     return SPORT_FILTER_MAP[key] || [key];
 }
 
+function inferSectionType(prediction) {
+    const explicit = String(prediction?.section_type || prediction?.type || '').trim().toLowerCase();
+    if (explicit) return explicit;
+
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    const uniqueMatchIds = new Set(
+        matches.map((match) => String(match?.match_id || '').trim()).filter(Boolean)
+    );
+    const firstMarket = String(matches[0]?.market || '').trim().toLowerCase();
+
+    if (matches.length > 1 && uniqueMatchIds.size === 1) return 'same_match';
+    if (matches.length >= 12) return 'mega_acca_12';
+    if (matches.length >= 6) return 'acca_6match';
+    if (matches.length >= 2) return 'multi';
+    if (matches.length === 1 && firstMarket && firstMarket !== '1x2' && firstMarket !== 'match_result') {
+        return 'secondary';
+    }
+    return 'direct';
+}
+
 function predictionMatchesSport(prediction, sportFilterValues) {
     if (!Array.isArray(sportFilterValues) || sportFilterValues.length === 0) return true;
     const allowed = new Set(sportFilterValues.map(normalizePredictionSportKey));
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
     if (matches.length === 0) return false;
+
+    const sectionType = inferSectionType(prediction);
+    if (sectionType.includes('acca') || sectionType === 'multi') {
+        return matches.some((match) => allowed.has(normalizePredictionSportKey(match?.sport || '')));
+    }
+
     return matches.every((match) => allowed.has(normalizePredictionSportKey(match?.sport || '')));
 }
 
@@ -224,10 +250,14 @@ function dedupeSecondaryMarkets(items) {
     return out;
 }
 
-function getPredictionPrimaryMatchId(prediction) {
+function getFixtureSignature(prediction) {
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
     const firstMatch = matches[0] || {};
-    return String(firstMatch?.match_id || prediction?.match_id || '').trim();
+    const matchId = String(firstMatch?.match_id || prediction?.match_id || '').trim();
+    const home = String(firstMatch?.home_team || firstMatch?.metadata?.home_team || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    const away = String(firstMatch?.away_team || firstMatch?.metadata?.away_team || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    
+    return `${matchId}_${home}_${away}`;
 }
 
 function buildSecondaryMarketSummaryItem(prediction) {
@@ -311,21 +341,21 @@ function buildFallbackPipelineData(prediction, relatedSecondaryMarkets = []) {
 }
 
 function attachRelatedPredictionArtifacts(predictions) {
-    const secondaryByMatchId = new Map();
-    const sameMatchByMatchId = new Map();
+    const secondaryBySig = new Map();
+    const sameMatchBySig = new Map();
 
     for (const prediction of predictions) {
-        const primaryMatchId = getPredictionPrimaryMatchId(prediction);
-        if (!primaryMatchId) continue;
+        const sig = getFixtureSignature(prediction);
+        if (!sig || sig.endsWith('__')) continue; 
 
         const sectionType = inferSectionType(prediction);
         if (sectionType === 'secondary') {
-            if (!secondaryByMatchId.has(primaryMatchId)) {
-                secondaryByMatchId.set(primaryMatchId, []);
+            if (!secondaryBySig.has(sig)) {
+                secondaryBySig.set(sig, []);
             }
-            secondaryByMatchId.get(primaryMatchId).push(buildSecondaryMarketSummaryItem(prediction));
+            secondaryBySig.get(sig).push(buildSecondaryMarketSummaryItem(prediction));
         } else if (sectionType === 'same_match') {
-            sameMatchByMatchId.set(primaryMatchId, buildSameMatchBuilder(prediction));
+            sameMatchBySig.set(sig, buildSameMatchBuilder(prediction));
         }
     }
 
@@ -334,15 +364,17 @@ function attachRelatedPredictionArtifacts(predictions) {
         if (!matches.length) return prediction;
 
         const sectionType = inferSectionType(prediction);
-        const primaryMatchId = getPredictionPrimaryMatchId(prediction);
+        const sig = getFixtureSignature(prediction);
         const firstMatch = matches[0] || {};
         const remainingMatches = matches.slice(1);
+        
         const relatedSecondaryMarkets = dedupeSecondaryMarkets(
-            (secondaryByMatchId.get(primaryMatchId) || [])
+            (secondaryBySig.get(sig) || [])
                 .filter((market) => isCompatibleSecondaryMarket(firstMatch, market))
                 .filter((market) => isDisplayFriendlySecondaryMarket(market.market))
-        ).slice(0, 3);
-        const relatedSameMatchBuilder = sameMatchByMatchId.get(primaryMatchId) || [];
+        ).slice(0, 4);
+        
+        const relatedSameMatchBuilder = sameMatchBySig.get(sig) || [];
         const metadata = {
             ...(firstMatch?.metadata || {})
         };
@@ -398,26 +430,6 @@ function enrichMatchMetadata(match, prediction) {
     };
 }
 
-function inferSectionType(prediction) {
-    const explicit = String(prediction?.section_type || prediction?.type || '').trim().toLowerCase();
-    if (explicit) return explicit;
-
-    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
-    const uniqueMatchIds = new Set(
-        matches.map((match) => String(match?.match_id || '').trim()).filter(Boolean)
-    );
-    const firstMarket = String(matches[0]?.market || '').trim().toLowerCase();
-
-    if (matches.length > 1 && uniqueMatchIds.size === 1) return 'same_match';
-    if (matches.length >= 12) return 'mega_acca_12';
-    if (matches.length >= 6) return 'acca_6match';
-    if (matches.length >= 2) return 'multi';
-    if (matches.length === 1 && firstMarket && firstMarket !== '1x2' && firstMarket !== 'match_result') {
-        return 'secondary';
-    }
-    return 'direct';
-}
-
 function parseMatchKickoff(match) {
     const value =
         match?.commence_time ||
@@ -441,6 +453,12 @@ function predictionMatchesWindow(prediction, windowStart, windowEnd) {
         .filter(Boolean);
 
     if (kickoffs.length === 0) return true;
+
+    const sectionType = inferSectionType(prediction);
+    if (sectionType.includes('acca') || sectionType === 'multi') {
+        return kickoffs.some((kickoff) => kickoff >= windowStart && kickoff <= windowEnd);
+    }
+
     return kickoffs.every((kickoff) => kickoff >= windowStart && kickoff <= windowEnd);
 }
 
@@ -539,22 +557,22 @@ function dedupePredictions(predictions) {
 }
 
 function filterConflictingSecondaryPredictions(predictions) {
-    const directByMatchId = new Map();
+    const directBySig = new Map();
 
     for (const prediction of predictions) {
         if (inferSectionType(prediction) !== 'direct') continue;
-        const matchId = getPredictionPrimaryMatchId(prediction);
+        const sig = getFixtureSignature(prediction);
         const firstMatch = Array.isArray(prediction?.matches) ? prediction.matches[0] : null;
-        if (!matchId || !firstMatch) continue;
-        directByMatchId.set(matchId, firstMatch);
+        if (!sig || !firstMatch) continue;
+        directBySig.set(sig, firstMatch);
     }
 
     return predictions.filter((prediction) => {
         if (inferSectionType(prediction) !== 'secondary') return true;
-        const matchId = getPredictionPrimaryMatchId(prediction);
+        const sig = getFixtureSignature(prediction);
         const firstMatch = Array.isArray(prediction?.matches) ? prediction.matches[0] : null;
-        const directMatch = directByMatchId.get(matchId);
-        if (!matchId || !firstMatch || !directMatch) return true;
+        const directMatch = directBySig.get(sig);
+        if (!sig || !firstMatch || !directMatch) return true;
         return isCompatibleSecondaryMarket(directMatch, firstMatch);
     });
 }
