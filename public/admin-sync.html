@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKCS Admin - Trigger Data Sync</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: #12121a;
+            border: 1px solid #2a2a3a;
+            border-radius: 12px;
+            padding: 32px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        .subtitle {
+            color: #888;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #aaa;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            background: #1a1a28;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4a9eff;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #4a9eff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover { background: #3a8eef; }
+        button:disabled {
+            background: #444;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+        .status.success {
+            display: block;
+            background: #0a2a0a;
+            border: 1px solid #2a5a2a;
+            color: #4ade80;
+        }
+        .status.error {
+            display: block;
+            background: #2a0a0a;
+            border: 1px solid #5a2a2a;
+            color: #f87171;
+        }
+        .status.info {
+            display: block;
+            background: #0a1a2a;
+            border: 1px solid #2a4a6a;
+            color: #60a5fa;
+        }
+        .hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: -12px;
+            margin-bottom: 16px;
+        }
+        pre {
+            background: #0a0a0f;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            overflow-x: auto;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SKCS Data Sync</h1>
+        <p class="subtitle">Trigger a fresh data pull from API-Sports</p>
+
+        <label for="apiKey">API Key</label>
+        <input type="password" id="apiKey" placeholder="Enter your SKCS_REFRESH_KEY or ADMIN_API_KEY">
+        <p class="hint">Find this in Render Dashboard → Your Service → Environment</p>
+
+        <label for="sport">Sport to Sync</label>
+        <select id="sport">
+            <option value="all">All Sports (recommended)</option>
+            <option value="football">Football Only</option>
+            <option value="basketball">Basketball Only</option>
+            <option value="baseball">Baseball Only</option>
+            <option value="mma">MMA Only</option>
+            <option value="rugby">Rugby Only</option>
+            <option value="hockey">Hockey Only</option>
+            <option value="afl">AFL Only</option>
+        </select>
+
+        <button id="syncBtn" onclick="triggerSync()">Trigger Sync</button>
+
+        <div id="status" class="status"></div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'https://skcs-sports-edge-skcsai.onrender.com';
+
+        function showStatus(message, type) {
+            const el = document.getElementById('status');
+            el.className = 'status ' + type;
+            el.innerHTML = message;
+        }
+
+        async function triggerSync() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const sport = document.getElementById('sport').value;
+            const btn = document.getElementById('syncBtn');
+
+            if (!apiKey) {
+                showStatus('Please enter your API key', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Syncing...';
+            showStatus('<strong>Starting sync...</strong><br>This will take a few minutes. The API is fetching fixtures and running AI analysis.', 'info');
+
+            try {
+                const url = sport === 'all' 
+                    ? `${BACKEND_URL}/api/refresh-predictions`
+                    : `${BACKEND_URL}/api/refresh-predictions?sport=${sport}`;
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'x-api-key': apiKey,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showStatus(
+                        `<strong>Sync started successfully!</strong><br><br>` +
+                        `<strong>Message:</strong> ${data.message || 'OK'}<br>` +
+                        `<strong>Note:</strong> ${data.note || 'Check predictions in a few minutes'}<br><br>` +
+                        `<em>The sync runs in the background. Refresh your main website in 3-5 minutes to see new predictions.</em>`,
+                        'success'
+                    );
+                } else {
+                    showStatus(
+                        `<strong>Error:</strong> ${data.error || 'Unknown error'}<br>` +
+                        `<strong>Status:</strong> ${response.status}`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showStatus(
+                    `<strong>Connection Error:</strong> ${error.message}<br><br>` +
+                    `Make sure your API key is correct and the backend is running.`,
+                    'error'
+                );
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Trigger Sync';
+            }
+        }
+    </script>
+</body>
+</html>
