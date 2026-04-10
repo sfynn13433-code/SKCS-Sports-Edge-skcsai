@@ -250,14 +250,19 @@ function dedupeSecondaryMarkets(items) {
     return out;
 }
 
+// FIX 1: CROSSOVER BUG - Hard bind signatures to team names so generic API IDs never collide
 function getFixtureSignature(prediction) {
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
     const firstMatch = matches[0] || {};
-    const matchId = String(firstMatch?.match_id || prediction?.match_id || '').trim();
-    const home = String(firstMatch?.home_team || firstMatch?.metadata?.home_team || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-    const away = String(firstMatch?.away_team || firstMatch?.metadata?.away_team || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
     
-    return `${matchId}_${home}_${away}`;
+    const matchId = String(firstMatch?.match_id || prediction?.match_id || '').trim();
+    const home = String(firstMatch?.home_team || firstMatch?.metadata?.home_team || prediction?.home_team || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    const away = String(firstMatch?.away_team || firstMatch?.metadata?.away_team || prediction?.away_team || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    
+    if (home && away && matchId) return `${matchId}_${home}_${away}`;
+    if (home && away) return `no_id_${home}_${away}`;
+    
+    return matchId ? `id_only_${matchId}` : `unknown_${Math.random()}`;
 }
 
 function buildSecondaryMarketSummaryItem(prediction) {
@@ -346,7 +351,7 @@ function attachRelatedPredictionArtifacts(predictions) {
 
     for (const prediction of predictions) {
         const sig = getFixtureSignature(prediction);
-        if (!sig || sig.endsWith('__')) continue; 
+        if (!sig || sig.startsWith('unknown_')) continue; 
 
         const sectionType = inferSectionType(prediction);
         if (sectionType === 'secondary') {
@@ -444,15 +449,19 @@ function parseMatchKickoff(match) {
     return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+// FIX 2: OLD DATES BUG - Eject unparseable dates instead of blindly allowing them
 function predictionMatchesWindow(prediction, windowStart, windowEnd) {
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
     if (matches.length === 0) return false;
 
-    const kickoffs = matches
-        .map((match) => parseMatchKickoff(match))
-        .filter(Boolean);
+    let kickoffs = matches.map(parseMatchKickoff).filter(Boolean);
 
-    if (kickoffs.length === 0) return true;
+    if (kickoffs.length === 0) {
+        // Fallback to record creation time if match date is completely missing
+        const fallbackDate = new Date(prediction.created_at);
+        if (isNaN(fallbackDate.getTime())) return false; // Strictly drop records with no valid timeframe
+        kickoffs = [fallbackDate];
+    }
 
     const sectionType = inferSectionType(prediction);
     if (sectionType.includes('acca') || sectionType === 'multi') {
@@ -527,13 +536,14 @@ function enrichPredictionDetails(prediction) {
     };
 }
 
+// FIX 3: ACCA WIPE BUG - Include team names so dedupe doesn't destroy un-ID'd accumulators
 function buildPredictionSignature(prediction) {
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
-    const legs = matches.map((match) => [
-        String(match?.match_id || '').trim(),
-        normalizeMarketKey(match?.market),
-        String(match?.prediction || '').trim().toLowerCase()
-    ].join(':')).join('|');
+    const legs = matches.map((match) => {
+        const h = String(match?.home_team || match?.metadata?.home_team || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+        const a = String(match?.away_team || match?.metadata?.away_team || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+        return `${h}_${a}_${normalizeMarketKey(match?.market)}_${String(match?.prediction || '').trim().toLowerCase()}`;
+    }).join('|');
 
     return [
         String(prediction?.tier || '').trim().toLowerCase(),
@@ -703,12 +713,19 @@ async function getLatestPublishRunIdFromFinalTable() {
 // Default tier = deep (elite pool); subscription limits use /api/user/predictions
 router.get('/', requireRole('user'), async (req, res) => {
     try {
-        // NEW: Use subscription matrix instead of tier
         const planId = req.query.plan_id || 'elite_30day_deep_vip';
         const sport = req.query.sport;
         const sportFilterValues = getSportFilterValues(sport);
+        
+        let historyWindowDays = Number(req.query.history_days);
+        if (isNaN(historyWindowDays)) {
+            // Default: strict 24 hour history window to block old matches (e.g. 5 days old)
+            historyWindowDays = 1; 
+        } else {
+            historyWindowDays = Math.max(0, Math.min(14, historyWindowDays));
+        }
+        
         const futureWindowDays = Math.max(1, Math.min(14, Number(req.query.window_days) || 7));
-        const historyWindowDays = Math.max(0, Math.min(14, Number(req.query.history_days) || 0));
 
         console.log(`[PREDICTIONS] Request for Plan: ${planId}, Sport: ${sport || 'all'}`);
 
