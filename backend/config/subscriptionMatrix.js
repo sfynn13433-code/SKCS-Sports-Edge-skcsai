@@ -13,7 +13,7 @@ const MEGA_ACCA_SIZE = 12;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 const DEFAULT_MEGA_ACCA_CONSTRAINTS = {
-    min_leg_confidence: 90,
+    min_leg_confidence: 80,
     sports_coverage: 'all',
     cricket_must_finish_before_expiry: true
 };
@@ -58,7 +58,7 @@ const SUBSCRIPTION_MATRIX = {
         market_access: ['1X2', 'double_chance', 'over_2_5', 'under_2_5', 'btts_yes'],
         mega_acca_allocation: 1,
         mega_acca_constraints: {
-            min_leg_confidence: 90,
+            min_leg_confidence: 80,
             sports_coverage: 'all',
             cricket_must_finish_before_expiry: true
         },
@@ -83,7 +83,7 @@ const SUBSCRIPTION_MATRIX = {
         market_access: ['1X2', 'double_chance', 'over_2_5', 'under_2_5', 'btts_yes', 'over_1_5'],
         mega_acca_allocation: 3,
         mega_acca_constraints: {
-            min_leg_confidence: 90,
+            min_leg_confidence: 80,
             sports_coverage: 'all',
             cricket_must_finish_before_expiry: true
         },
@@ -108,7 +108,7 @@ const SUBSCRIPTION_MATRIX = {
         market_access: ['1X2', 'double_chance', 'over_2_5', 'under_2_5', 'btts_yes', 'over_1_5'],
         mega_acca_allocation: 6,
         mega_acca_constraints: {
-            min_leg_confidence: 90,
+            min_leg_confidence: 80,
             sports_coverage: 'all',
             cricket_must_finish_before_expiry: true
         },
@@ -133,7 +133,7 @@ const SUBSCRIPTION_MATRIX = {
         market_access: 'all',
         mega_acca_allocation: 12,
         mega_acca_constraints: {
-            min_leg_confidence: 90,
+            min_leg_confidence: 80,
             sports_coverage: 'all',
             cricket_must_finish_before_expiry: true
         },
@@ -158,7 +158,7 @@ const SUBSCRIPTION_MATRIX = {
         market_access: 'all',
         mega_acca_allocation: 1,
         mega_acca_constraints: {
-            min_leg_confidence: 90,
+            min_leg_confidence: 80,
             sports_coverage: 'all',
             cricket_must_finish_before_expiry: true
         },
@@ -183,7 +183,7 @@ const SUBSCRIPTION_MATRIX = {
         market_access: 'all',
         mega_acca_allocation: 3,
         mega_acca_constraints: {
-            min_leg_confidence: 90,
+            min_leg_confidence: 80,
             sports_coverage: 'all',
             cricket_must_finish_before_expiry: true
         },
@@ -208,7 +208,7 @@ const SUBSCRIPTION_MATRIX = {
         market_access: 'all',
         mega_acca_allocation: 6,
         mega_acca_constraints: {
-            min_leg_confidence: 90,
+            min_leg_confidence: 80,
             sports_coverage: 'all',
             cricket_must_finish_before_expiry: true
         },
@@ -233,7 +233,7 @@ const SUBSCRIPTION_MATRIX = {
         market_access: 'all',
         mega_acca_allocation: 12,
         mega_acca_constraints: {
-            min_leg_confidence: 90,
+            min_leg_confidence: 80,
             sports_coverage: 'all',
             cricket_must_finish_before_expiry: true
         },

@@ -12,7 +12,11 @@ const { scoreMarkets } = require('./marketScoringEngine');
 const { validateInsightLegGroup } = require('../utils/insightValidationMatrix');
 
 const MEGA_ACCA_SIZE = 12;
+const ACCA_SIZE = 6;
 const SAME_MATCH_INSIGHT_TARGET = 6;
+const ACCA_MIN_LEG_CONFIDENCE = 80;
+const REQUIRED_FOOTBALL_ONLY_ACCAS = 2;
+const MIXED_SPORT_TARGETS = new Set(['football', 'hockey', 'mma', 'afl', 'cricket', 'basketball']);
 
 function normalizeTier(tier) {
     if (tier === 'normal' || tier === 'deep') return tier;
@@ -229,10 +233,13 @@ async function getAccaRules(client) {
 function toFinalMatchPayload(p) {
     const metadata = getMetadata(p);
     const kickoff = metadata.match_time || metadata.kickoff || metadata.kickoff_time || null;
+    const normalizedSport = normalizeSportKey(p.sport || metadata.sport || metadata.sport_key || '');
+    const sportType = getSportTypeLabel(normalizedSport);
     return {
         raw_id: p.raw_id,
         match_id: p.match_id,
-        sport: normalizeSportKey(p.sport),
+        sport: normalizedSport,
+        sport_type: sportType,
         home_team: metadata.home_team || null,
         away_team: metadata.away_team || null,
         match_date: kickoff,
@@ -244,6 +251,7 @@ function toFinalMatchPayload(p) {
         odds: p.odds,
         metadata: {
             ...metadata,
+            sport_type: sportType,
             weekly_team_lock_applied: true
         }
     };
@@ -251,9 +259,10 @@ function toFinalMatchPayload(p) {
 
 function toScoringMatchPayload(prediction) {
     const metadata = prediction.metadata || {};
+    const normalizedSport = normalizeSportKey(prediction.sport || metadata.sport || '');
     return {
         match_id: prediction.match_id,
-        sport: prediction.sport,
+        sport: normalizedSport,
         home_team: metadata.home_team || null,
         away_team: metadata.away_team || null,
         base_prediction: prediction.prediction || null,
@@ -351,9 +360,34 @@ function normalizeSportKey(value) {
     if (!sport) return 'unknown';
     if (sport.startsWith('soccer_')) return 'football';
     if (sport.startsWith('icehockey_')) return 'hockey';
+    if (sport === 'nhl') return 'hockey';
     if (sport.startsWith('basketball_')) return 'basketball';
+    if (sport === 'nba') return 'basketball';
     if (sport.startsWith('americanfootball_')) return 'american_football';
+    if (sport === 'nfl') return 'american_football';
+    if (sport.startsWith('mma_')) return 'mma';
+    if (sport.startsWith('aussierules_')) return 'afl';
+    if (sport.startsWith('baseball_')) return 'baseball';
+    if (sport.startsWith('rugbyunion_')) return 'rugby';
     return sport;
+}
+
+function getSportTypeLabel(sportKey) {
+    const key = normalizeSportKey(sportKey);
+    if (key === 'football') return 'Football';
+    if (key === 'hockey') return 'Ice Hockey';
+    if (key === 'mma') return 'Mixed Martial Arts';
+    if (key === 'afl') return 'Aussie Rules';
+    if (key === 'basketball') return 'Basketball';
+    if (key === 'cricket') return 'Cricket';
+    if (key === 'american_football') return 'American Football';
+    if (key === 'baseball') return 'Baseball';
+    if (key === 'rugby') return 'Rugby';
+    return key
+        .split('_')
+        .filter(Boolean)
+        .map((part) => part.length <= 3 ? part.toUpperCase() : part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
 }
 
 function isPublishablePrediction(prediction, tier, now = new Date()) {
@@ -636,31 +670,495 @@ function buildMultiCandidates(predictions, maxRows = 16) {
         .slice(0, maxRows);
 }
 
-function buildAcca6Candidates(predictions, maxRows = 6) {
-    const direct = predictions.slice(0, 18);
-    if (direct.length < 6) return [];
+function normalizeMarketForAcca(value) {
+    return String(value || '').trim().toLowerCase().replace(/\s+/g, '_');
+}
+
+function normalizePickForAcca(value) {
+    return String(value || '').trim().toLowerCase();
+}
+
+function pickToWinnerToken(pick) {
+    const token = normalizePickForAcca(pick);
+    if (token === 'home' || token === 'team_1' || token === 'player_1' || token === 'fighter_1') return 'home_win';
+    if (token === 'away' || token === 'team_2' || token === 'player_2' || token === 'fighter_2') return 'away_win';
+    if (token === 'draw') return 'draw';
+    return token;
+}
+
+function parseGoalLineFromMarketScore(marketScore) {
+    const normalized = String(marketScore?.market || '').toUpperCase();
+    if (normalized === 'OVER_UNDER_1_5') return 1.5;
+    if (normalized === 'OVER_UNDER_2_5') return 2.5;
+    if (normalized === 'OVER_UNDER_3_5') return 3.5;
+    if (normalized === 'OVER_UNDER_4_5') return 4.5;
+    if (normalized === 'OVER_UNDER_5_5') return 5.5;
+    const line = Number(marketScore?.line);
+    return Number.isFinite(line) ? line : null;
+}
+
+function buildAccaCandidateFromMarketScore(prediction, marketScore) {
+    const metadata = getMetadata(prediction);
+    const sport = normalizeSportKey(prediction.sport || metadata.sport || '');
+    const sportType = getSportTypeLabel(sport);
+    const normalizedMarket = String(marketScore?.market || '').toUpperCase();
+    const pick = String(marketScore?.pick || '').toUpperCase();
+    const pickLower = normalizePickForAcca(pick);
+    const confidence = Number(marketScore?.confidence);
+    if (!Number.isFinite(confidence)) return null;
+
+    let market = normalizeMarketForAcca(marketScore?.market || prediction.market);
+    let predictionValue = pickLower;
+
+    if (normalizedMarket === 'MATCH_RESULT') {
+        market = '1x2';
+        predictionValue = pick === 'DRAW' ? 'draw' : (pick === 'AWAY' ? 'away_win' : 'home_win');
+    } else if (normalizedMarket === 'DOUBLE_CHANCE') {
+        market = `double_chance_${pickLower}`;
+        predictionValue = pickLower;
+    } else if (normalizedMarket === 'BTTS') {
+        market = pick === 'NO' ? 'btts_no' : 'btts_yes';
+        predictionValue = pick === 'NO' ? 'no' : 'yes';
+    } else if (normalizedMarket.startsWith('OVER_UNDER_')) {
+        const line = parseGoalLineFromMarketScore(marketScore);
+        const lineToken = lineToToken(line);
+        if (lineToken) {
+            market = `${pickLower}_${lineToken}`;
+        } else if (normalizedMarket === 'OVER_UNDER_2_5') {
+            market = pick === 'UNDER' ? 'under_2_5' : 'over_2_5';
+        } else if (normalizedMarket === 'OVER_UNDER_1_5') {
+            market = pick === 'UNDER' ? 'under_1_5' : 'over_1_5';
+        }
+        predictionValue = market;
+    } else if (normalizedMarket === 'MATCH_WINNER' || normalizedMarket === 'WINNER' || normalizedMarket === 'RACE_WINNER') {
+        market = normalizedMarket === 'RACE_WINNER' ? 'race_winner' : 'match_winner';
+        predictionValue = pickToWinnerToken(pick);
+    } else if (normalizedMarket === 'TOTAL_POINTS') {
+        market = `total_points_${pickLower}`;
+        predictionValue = pickLower;
+    } else if (normalizedMarket === 'TOTAL_GOALS') {
+        market = `total_goals_${pickLower}`;
+        predictionValue = pickLower;
+    } else if (normalizedMarket === 'TOTAL_RUNS') {
+        market = `total_runs_${pickLower}`;
+        predictionValue = pickLower;
+    } else if (normalizedMarket === 'TOTAL_GAMES') {
+        market = `total_games_${pickLower}`;
+        predictionValue = pickLower;
+    } else if (normalizedMarket === 'HANDICAP' || normalizedMarket === 'SPREAD' || normalizedMarket === 'SET_HANDICAP') {
+        market = normalizeMarketForAcca(marketScore.market);
+        predictionValue = pickLower;
+    } else if (normalizedMarket === 'METHOD') {
+        market = 'method_of_victory';
+        predictionValue = pickLower;
+    } else if (normalizedMarket === 'SET_BETTING' || normalizedMarket === 'MAP_SCORE') {
+        market = normalizeMarketForAcca(marketScore.market);
+        predictionValue = pickLower;
+    } else if (normalizedMarket === 'PODIUM') {
+        market = 'podium_finish';
+        predictionValue = pickLower;
+    } else if (normalizedMarket === 'TOP_10') {
+        market = 'top_10_finish';
+        predictionValue = pickLower;
+    }
+
+    return {
+        raw_id: prediction.raw_id,
+        match_id: prediction.match_id,
+        sport,
+        market,
+        prediction: predictionValue,
+        confidence,
+        volatility: prediction.volatility,
+        odds: prediction.odds,
+        metadata: {
+            ...metadata,
+            sport_type: sportType,
+            market_key: normalizedMarket,
+            market_type: marketScore?.type || null,
+            market_description: marketScore?.description || null,
+            market_line: Number.isFinite(Number(marketScore?.line)) ? Number(marketScore.line) : null,
+            source_market_confidence: confidence
+        }
+    };
+}
+
+function buildExpandedFootballGoalLineCandidates(prediction, scoredMarkets = [], minConfidence = ACCA_MIN_LEG_CONFIDENCE) {
+    const sport = normalizeSportKey(prediction?.sport);
+    if (sport !== 'football') return [];
+
+    const base = scoredMarkets
+        .filter((row) => String(row?.market || '').toUpperCase() === 'OVER_UNDER_2_5')
+        .sort((a, b) => Number(b?.confidence || 0) - Number(a?.confidence || 0))[0];
+    if (!base || !Number.isFinite(Number(base.confidence))) return [];
+
+    const pick = String(base.pick || '').toUpperCase();
+    if (pick !== 'OVER' && pick !== 'UNDER') return [];
+
+    const adjustments = pick === 'OVER'
+        ? [[3.5, 4], [4.5, 8], [5.5, 12]]
+        : [[3.5, 3], [4.5, 5], [5.5, 7]];
+    const out = [];
+
+    for (const [line, penalty] of adjustments) {
+        const confidence = Math.round((Number(base.confidence) - penalty) * 100) / 100;
+        if (confidence < minConfidence) continue;
+        const lineToken = lineToToken(line);
+        if (!lineToken) continue;
+        const market = `${pick.toLowerCase()}_${lineToken}`;
+        out.push({
+            raw_id: prediction.raw_id,
+            match_id: prediction.match_id,
+            sport: 'football',
+            market,
+            prediction: market,
+            confidence,
+            volatility: prediction.volatility,
+            odds: prediction.odds,
+            metadata: {
+                ...getMetadata(prediction),
+                sport_type: getSportTypeLabel('football'),
+                market_key: `OVER_UNDER_${lineToken}`,
+                market_type: 'secondary',
+                market_line: line,
+                market_description: `Total goals ${pick.toLowerCase()} ${line}`,
+                synthetic_market: true
+            }
+        });
+    }
+
+    return out;
+}
+
+function buildFootballComboCandidates(prediction, scoredMarkets = [], minConfidence = ACCA_MIN_LEG_CONFIDENCE) {
+    const sport = normalizeSportKey(prediction?.sport);
+    if (sport !== 'football') return [];
+
+    const byMarket = new Map();
+    for (const market of scoredMarkets) {
+        const key = String(market?.market || '').toUpperCase();
+        if (!byMarket.has(key)) byMarket.set(key, []);
+        byMarket.get(key).push(market);
+    }
+
+    for (const rows of byMarket.values()) {
+        rows.sort((a, b) => Number(b?.confidence || 0) - Number(a?.confidence || 0));
+    }
+
+    const dc = (byMarket.get('DOUBLE_CHANCE') || [])[0] || null;
+    const btts = (byMarket.get('BTTS') || [])[0] || null;
+    const result = (byMarket.get('MATCH_RESULT') || [])[0] || null;
+    const ou25 = (byMarket.get('OVER_UNDER_2_5') || [])[0] || null;
+
+    const out = [];
+    if (dc && btts) {
+        const comboConfidence = Math.round((Math.min(Number(dc.confidence), Number(btts.confidence)) - 1.5) * 100) / 100;
+        if (comboConfidence >= minConfidence) {
+            const dcPick = normalizePickForAcca(dc.pick);
+            const bttsPick = normalizePickForAcca(btts.pick);
+            out.push({
+                raw_id: prediction.raw_id,
+                match_id: prediction.match_id,
+                sport: 'football',
+                market: `combo_dc_${dcPick}_btts_${bttsPick}`,
+                prediction: `${dcPick}+${bttsPick}`,
+                confidence: comboConfidence,
+                volatility: prediction.volatility,
+                odds: prediction.odds,
+                metadata: {
+                    ...getMetadata(prediction),
+                    sport_type: getSportTypeLabel('football'),
+                    market_key: 'COMBO_DOUBLE_CHANCE_BTTS',
+                    market_type: 'advanced',
+                    market_description: `Double Chance ${dcPick.toUpperCase()} + BTTS ${bttsPick.toUpperCase()}`,
+                    synthetic_market: true
+                }
+            });
+        }
+    }
+
+    if (result && ou25) {
+        const winnerToken = normalizePickForAcca(result.pick);
+        const ouPick = normalizePickForAcca(ou25.pick);
+        const comboConfidence = Math.round((Math.min(Number(result.confidence), Number(ou25.confidence)) - 2) * 100) / 100;
+        if (comboConfidence >= minConfidence) {
+            out.push({
+                raw_id: prediction.raw_id,
+                match_id: prediction.match_id,
+                sport: 'football',
+                market: `combo_${winnerToken}_and_${ouPick}_2_5`,
+                prediction: `${winnerToken}+${ouPick}_2_5`,
+                confidence: comboConfidence,
+                volatility: prediction.volatility,
+                odds: prediction.odds,
+                metadata: {
+                    ...getMetadata(prediction),
+                    sport_type: getSportTypeLabel('football'),
+                    market_key: 'COMBO_MATCH_RESULT_OU_2_5',
+                    market_type: 'advanced',
+                    market_description: `Match Result ${winnerToken.toUpperCase()} + ${ouPick.toUpperCase()} 2.5 Goals`,
+                    synthetic_market: true
+                }
+            });
+        }
+    }
+
+    return out;
+}
+
+function compareAccaCandidates(a, b) {
+    const confidenceDiff = Number(b?.confidence || 0) - Number(a?.confidence || 0);
+    if (confidenceDiff !== 0) return confidenceDiff;
+    const kickoffA = parseKickoff(a);
+    const kickoffB = parseKickoff(b);
+    if (kickoffA && kickoffB) return kickoffA.getTime() - kickoffB.getTime();
+    if (kickoffA) return -1;
+    if (kickoffB) return 1;
+    return 0;
+}
+
+function getAccaCandidateFixtureIds(candidate) {
+    return predictionFixtureIds(candidate);
+}
+
+function canReserveCandidate(candidate, globallyUsedFixtureIds, locallyUsedFixtureIds) {
+    const ids = getAccaCandidateFixtureIds(candidate);
+    if (!ids.length) return false;
+    return !ids.some((id) => globallyUsedFixtureIds.has(id) || locallyUsedFixtureIds.has(id));
+}
+
+function reserveCandidate(candidate, usedFixtureIds) {
+    for (const id of new Set(getAccaCandidateFixtureIds(candidate))) {
+        usedFixtureIds.add(id);
+    }
+}
+
+function finalizeAccumulatorRow(legs, options = {}) {
+    const profile = String(options.profile || 'mixed_sport');
+    const minLegConfidenceFloor = Number(options.minLegConfidenceFloor || ACCA_MIN_LEG_CONFIDENCE);
+    const isMega = options.isMega === true;
+    const payloadLegs = legs.map((leg) => {
+        const finalLeg = toFinalMatchPayload(leg);
+        finalLeg.metadata = {
+            ...(finalLeg.metadata || {}),
+            sport_type: getSportTypeLabel(finalLeg.sport),
+            acca_profile: profile,
+            acca_profile_label: profile === 'football_only' ? 'Football ACCA' : 'Mixed Sport ACCA',
+            min_leg_confidence_floor: minLegConfidenceFloor
+        };
+        if (isMega) {
+            finalLeg.metadata.mega_acca_leg = true;
+        }
+        return finalLeg;
+    });
+    const totalConfidence = computeTotalConfidence(payloadLegs);
+    return {
+        match_id: payloadLegs.map((leg) => leg.match_id).filter(Boolean).join('|'),
+        matches: payloadLegs,
+        total_confidence: totalConfidence,
+        risk_level: isMega ? 'safe' : riskLevelFromConfidence(totalConfidence)
+    };
+}
+
+function hasMixedSportCoverage(candidates) {
+    const sports = new Set(candidates.map((candidate) => normalizeSportKey(candidate?.sport)));
+    const hasNonFootball = Array.from(sports).some((sport) => sport !== 'football');
+    const hasTargetSport = Array.from(sports).some((sport) => MIXED_SPORT_TARGETS.has(sport));
+    return sports.size >= 2 && hasNonFootball && hasTargetSport;
+}
+
+function buildFootballOnlyAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor) {
+    const footballPool = pool
+        .filter((candidate) => normalizeSportKey(candidate?.sport) === 'football')
+        .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
+        .sort(compareAccaCandidates);
+    if (footballPool.length < size) return null;
+
+    const selected = [];
+    const localUsed = new Set();
+    for (const candidate of footballPool) {
+        if (selected.length >= size) break;
+        if (!canReserveCandidate(candidate, usedFixtureIds, localUsed)) continue;
+        selected.push(candidate);
+        reserveCandidate(candidate, localUsed);
+    }
+
+    if (selected.length < size) return null;
+    for (const id of localUsed) usedFixtureIds.add(id);
+    return finalizeAccumulatorRow(selected, {
+        profile: 'football_only',
+        minLegConfidenceFloor
+    });
+}
+
+function buildMixedAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor, options = {}) {
+    const sorted = pool
+        .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
+        .sort(compareAccaCandidates);
+    if (sorted.length < size) return null;
+
+    const football = sorted.filter((candidate) => normalizeSportKey(candidate?.sport) === 'football');
+    const nonFootball = sorted.filter((candidate) => normalizeSportKey(candidate?.sport) !== 'football');
+
+    const anchorPairs = [];
+    if (football.length && nonFootball.length) {
+        for (const f of football.slice(0, 12)) {
+            for (const n of nonFootball.slice(0, 24)) {
+                const fIds = new Set(getAccaCandidateFixtureIds(f));
+                const nIds = getAccaCandidateFixtureIds(n);
+                if (nIds.some((id) => fIds.has(id))) continue;
+                anchorPairs.push([f, n]);
+                break;
+            }
+            if (anchorPairs.length >= 12) break;
+        }
+    }
+
+    if (!anchorPairs.length) {
+        for (let i = 0; i < sorted.length; i++) {
+            for (let j = i + 1; j < sorted.length; j++) {
+                const a = sorted[i];
+                const b = sorted[j];
+                if (normalizeSportKey(a?.sport) === normalizeSportKey(b?.sport)) continue;
+                anchorPairs.push([a, b]);
+                if (anchorPairs.length >= 12) break;
+            }
+            if (anchorPairs.length >= 12) break;
+        }
+    }
+
+    for (const pair of anchorPairs) {
+        const selected = [];
+        const localUsed = new Set();
+
+        for (const candidate of pair) {
+            if (!canReserveCandidate(candidate, usedFixtureIds, localUsed)) {
+                selected.length = 0;
+                break;
+            }
+            selected.push(candidate);
+            reserveCandidate(candidate, localUsed);
+        }
+        if (!selected.length) continue;
+
+        for (const candidate of sorted) {
+            if (selected.length >= size) break;
+            if (!canReserveCandidate(candidate, usedFixtureIds, localUsed)) continue;
+            selected.push(candidate);
+            reserveCandidate(candidate, localUsed);
+        }
+
+        if (selected.length < size) continue;
+        if (!hasMixedSportCoverage(selected)) continue;
+
+        for (const id of localUsed) usedFixtureIds.add(id);
+        return finalizeAccumulatorRow(selected, {
+            profile: 'mixed_sport',
+            minLegConfidenceFloor,
+            isMega: options.isMega === true
+        });
+    }
+
+    return null;
+}
+
+async function buildAccaLegCandidatePool(predictions, options = {}) {
+    const minConfidenceFloor = Number.isFinite(Number(options.minLegConfidence))
+        ? Number(options.minLegConfidence)
+        : ACCA_MIN_LEG_CONFIDENCE;
+    const byFixture = new Map();
+
+    for (const prediction of Array.isArray(predictions) ? predictions : []) {
+        const baseMetadata = getMetadata(prediction);
+        const normalizedSport = normalizeSportKey(prediction?.sport || baseMetadata?.sport || '');
+        const sportType = getSportTypeLabel(normalizedSport);
+
+        const fixtureIds = getAccaCandidateFixtureIds(prediction);
+        const fallbackFixtureId = String(prediction?.match_id || '').trim();
+        const fixtureKey = fixtureIds[0] || fallbackFixtureId;
+        if (!fixtureKey) continue;
+
+        let scoredMarkets = [];
+        try {
+            scoredMarkets = await scoreMarkets(toScoringMatchPayload({
+                ...prediction,
+                sport: normalizedSport
+            }));
+        } catch (error) {
+            console.warn(`[accaBuilder] market scoring skipped for match ${prediction?.match_id || 'unknown'}: ${error.message}`);
+            scoredMarkets = [];
+        }
+
+        const candidates = [];
+        if (Number(prediction?.confidence) >= minConfidenceFloor) {
+            candidates.push({
+                ...prediction,
+                sport: normalizedSport,
+                metadata: {
+                    ...baseMetadata,
+                    sport_type: sportType
+                }
+            });
+        }
+
+        for (const marketScore of scoredMarkets) {
+            const mapped = buildAccaCandidateFromMarketScore(
+                {
+                    ...prediction,
+                    sport: normalizedSport
+                },
+                marketScore
+            );
+            if (!mapped) continue;
+            if (Number(mapped.confidence) < minConfidenceFloor) continue;
+            candidates.push(mapped);
+        }
+
+        candidates.push(...buildExpandedFootballGoalLineCandidates(prediction, scoredMarkets, minConfidenceFloor));
+        candidates.push(...buildFootballComboCandidates(prediction, scoredMarkets, minConfidenceFloor));
+
+        if (!candidates.length) continue;
+        candidates.sort(compareAccaCandidates);
+        const best = candidates[0];
+        if (!best) continue;
+
+        const existing = byFixture.get(fixtureKey);
+        if (!existing || Number(best.confidence) > Number(existing.confidence)) {
+            byFixture.set(fixtureKey, best);
+        }
+    }
+
+    return Array.from(byFixture.values())
+        .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
+        .sort(compareAccaCandidates);
+}
+
+function buildAcca6Candidates(predictions, maxRows = 6, options = {}) {
+    const minConfidenceFloor = Number.isFinite(Number(options.minLegConfidence))
+        ? Number(options.minLegConfidence)
+        : ACCA_MIN_LEG_CONFIDENCE;
+    const sorted = (Array.isArray(predictions) ? predictions : [])
+        .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
+        .sort(compareAccaCandidates);
+    if (sorted.length < ACCA_SIZE) return [];
 
     const rows = [];
-    const usedMatchIds = new Set();
+    const usedFixtureIds = new Set();
+    const footballTarget = Math.min(REQUIRED_FOOTBALL_ONLY_ACCAS, Math.max(0, Number(maxRows) || 0));
 
-    // Use non-overlapping windows so each ACCA has completely different fixtures.
-    for (let start = 0; start <= direct.length - 6 && rows.length < maxRows; start += 6) {
-        const combo = direct.slice(start, start + 6);
-        const ids = combo.map((row) => row.match_id);
+    for (let i = 0; i < footballTarget; i++) {
+        const row = buildFootballOnlyAccumulatorRow(sorted, usedFixtureIds, ACCA_SIZE, minConfidenceFloor);
+        if (!row) {
+            console.warn(`[accaBuilder] ACCA football split warning: requested ${footballTarget} pure football ACCAs but only built ${i}.`);
+            break;
+        }
+        rows.push(row);
+    }
 
-        // Skip if any match_id is already used in a previous ACCA
-        if (ids.some((id) => usedMatchIds.has(id))) continue;
-        if (new Set(ids).size !== ids.length) continue;
-
-        ids.forEach((id) => usedMatchIds.add(id));
-
-        const legs = combo.map(toFinalMatchPayload);
-        rows.push({
-            match_id: ids.join('|'),
-            matches: legs,
-            total_confidence: computeTotalConfidence(legs),
-            risk_level: riskLevelFromConfidence(computeTotalConfidence(legs))
-        });
+    while (rows.length < maxRows) {
+        const row = buildMixedAccumulatorRow(sorted, usedFixtureIds, ACCA_SIZE, minConfidenceFloor);
+        if (!row) break;
+        rows.push(row);
     }
 
     return rows;
@@ -677,8 +1175,8 @@ function isCricketFixtureWithinWindow(prediction, expiryCutoff) {
 }
 
 function resolveMegaAccaThreshold(predictions, options = {}) {
-    const configured = Number(options.minLegConfidence ?? process.env.MEGA_ACCA_MIN_LEG_CONFIDENCE ?? 90);
-    const configuredThreshold = Number.isFinite(configured) ? clamp(configured, 60, 99) : 90;
+    const configured = Number(options.minLegConfidence ?? process.env.MEGA_ACCA_MIN_LEG_CONFIDENCE ?? ACCA_MIN_LEG_CONFIDENCE);
+    const configuredThreshold = Number.isFinite(configured) ? clamp(configured, 60, 99) : ACCA_MIN_LEG_CONFIDENCE;
     const confidenceValues = (Array.isArray(predictions) ? predictions : [])
         .map((prediction) => Number(prediction?.confidence))
         .filter((value) => Number.isFinite(value))
@@ -693,7 +1191,7 @@ function resolveMegaAccaThreshold(predictions, options = {}) {
         return configuredThreshold;
     }
 
-    return clamp(Math.round(dynamicFloor * 100) / 100, 70, configuredThreshold);
+    return clamp(Math.round(dynamicFloor * 100) / 100, ACCA_MIN_LEG_CONFIDENCE, configuredThreshold);
 }
 
 function buildMegaAcca12Candidates(predictions, options = {}) {
@@ -715,33 +1213,18 @@ function buildMegaAcca12Candidates(predictions, options = {}) {
     console.log(`[accaBuilder] Mega ACCA: Building Moonshot series with ${eligible.length} eligible insights at ${usedThreshold}% threshold.`);
 
     const rows = [];
-    const usedMatchIds = new Set();
-
-    // Use non-overlapping windows so each Mega ACCA has completely different fixtures.
-    for (let start = 0; start <= eligible.length - MEGA_ACCA_SIZE && rows.length < maxRows; start += MEGA_ACCA_SIZE) {
-        const combo = eligible.slice(start, start + MEGA_ACCA_SIZE);
-        const ids = combo.map((row) => row.match_id);
-
-        // Skip if any match_id is already used in a previous ACCA
-        if (ids.some((id) => usedMatchIds.has(id))) continue;
-        if (new Set(ids).size !== ids.length) continue;
-
-        ids.forEach((id) => usedMatchIds.add(id));
-
-        const legs = combo.map((row) => ({
-            ...toFinalMatchPayload(row),
-            metadata: {
-                ...getMetadata(row),
-                mega_acca_leg: true,
-                min_leg_confidence_floor: usedThreshold
-            }
-        }));
-        rows.push({
-            match_id: ids.join('|'),
-            matches: legs,
-            total_confidence: computeTotalConfidence(legs),
-            risk_level: 'safe' // Floor is 90%, naturally qualifying as high-conviction
-        });
+    const usedFixtureIds = new Set();
+    while (rows.length < maxRows) {
+        const row = buildMixedAccumulatorRow(
+            eligible,
+            usedFixtureIds,
+            MEGA_ACCA_SIZE,
+            usedThreshold,
+            { isMega: true }
+        );
+        if (!row) break;
+        row.risk_level = 'safe';
+        rows.push(row);
     }
 
     return rows;
@@ -1029,14 +1512,19 @@ async function buildFinalForTier(tier, options = {}) {
         // Limit candidates to prevent combinatorial explosion and timeouts
         const MAX_ACCA_CANDIDATES = 120;
         const limitedCandidates = perSportLimited.slice(0, MAX_ACCA_CANDIDATES);
+        const accaMarketCandidates = await buildAccaLegCandidatePool(
+            filterAvailablePredictions(limitedCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap),
+            { minLegConfidence: ACCA_MIN_LEG_CONFIDENCE }
+        );
 
         // -------------------------------------------------------------------------
         // 1. THE MEGA ACCA RESERVATION LAYER (Highest Priority)
         // -------------------------------------------------------------------------
         const megaAccaRows = [];
         const megaSelections = takeAvailablePredictions(
-            buildMegaAcca12Candidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap), {
+            buildMegaAcca12Candidates(filterAvailablePredictions(accaMarketCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap), {
                 maxRows: categoryBuildCaps.mega_acca_12,
+                minLegConfidence: ACCA_MIN_LEG_CONFIDENCE,
                 // Subscription temporal gate
                 expiryCutoff: new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000))
             }),
@@ -1063,7 +1551,9 @@ async function buildFinalForTier(tier, options = {}) {
         const accaRows = [];
         const accaSelections = takeAvailablePredictions(
             buildAcca6Candidates(
-                filterAvailablePredictions(limitedCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap).filter((p) => p.volatility === 'low')
+                filterAvailablePredictions(accaMarketCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap),
+                categoryBuildCaps.acca_6match,
+                { minLegConfidence: ACCA_MIN_LEG_CONFIDENCE }
             ),
             usedFixtureIds,
             weekLockedTeamCompetitionMap,

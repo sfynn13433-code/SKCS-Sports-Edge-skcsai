@@ -813,7 +813,7 @@
                             <strong style="color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">High-Risk Structural Asset</strong>
                         </div>
                         <p style="margin: 0; line-height: 1.5;">
-                            <strong>Capital Allocation Warning:</strong> Mega ACCAs (12-Leg Series) are engineered as high-variance, low-probability structural plays. While the SKCS intelligence engine enforces a strict &ge; 90% confidence floor on every individual leg across all sporting codes, the compounded mathematical variance of a 12-event sequence carries extreme risk. Never allocate your primary capital to these insights. Treat them strictly as high-yield, speculative positions.
+                            <strong>Capital Allocation Warning:</strong> Mega ACCAs (12-Leg Series) are engineered as high-variance, low-probability structural plays. While the SKCS intelligence engine enforces a strict &ge; 80% confidence floor on every individual leg across all sporting codes, the compounded mathematical variance of a 12-event sequence carries extreme risk. Never allocate your primary capital to these insights. Treat them strictly as high-yield, speculative positions.
                         </p>
                     </div>
                 </div>
@@ -1114,6 +1114,8 @@
         const goalLineMatch = marketKey.match(/^(over|under)_(\d+)_(\d+)$/);
         const cornersLineMatch = marketKey.match(/^corners_(over|under)_(\d+)_(\d+)$/);
         const yellowsLineMatch = marketKey.match(/^(over|under)_(\d+)_(\d+)_yellows$/);
+        const comboDcBttsMatch = marketKey.match(/^combo_dc_(1x|x2|12)_btts_(yes|no)$/);
+        const comboWinnerOuMatch = marketKey.match(/^combo_(home|away|draw)_and_(over|under)_2_5$/);
         if (goalLineMatch) {
             return `${goalLineMatch[1].toUpperCase()} ${goalLineMatch[2]}.${goalLineMatch[3]} GOALS`;
         }
@@ -1122,6 +1124,12 @@
         }
         if (yellowsLineMatch) {
             return `YELLOW CARDS ${yellowsLineMatch[1].toUpperCase()} ${yellowsLineMatch[2]}.${yellowsLineMatch[3]}`;
+        }
+        if (comboDcBttsMatch) {
+            return `DOUBLE CHANCE ${comboDcBttsMatch[1].toUpperCase()} + BTTS ${comboDcBttsMatch[2].toUpperCase()}`;
+        }
+        if (comboWinnerOuMatch) {
+            return `${comboWinnerOuMatch[1].toUpperCase()} WIN + ${comboWinnerOuMatch[2].toUpperCase()} 2.5 GOALS`;
         }
         if (marketKey === 'btts_yes') return 'BTTS - YES';
         if (marketKey === 'btts_no') return 'BTTS - NO';
@@ -1867,8 +1875,32 @@
         const badgesHtml = renderCardBadges(pred);
         const pipelineHtml = renderPipelinePanel(pred, firstMeta);
 
+        const normalizeSportForAccaBadge = (value) => {
+            const key = String(value || '').trim().toLowerCase();
+            if (!key) return '';
+            if (key.includes('football') && !key.includes('american')) return 'football';
+            if (key.includes('soccer')) return 'football';
+            if (key.includes('ice hockey') || key.startsWith('icehockey_') || key === 'nhl' || key === 'hockey') return 'hockey';
+            if (key.includes('mixed martial arts') || key.startsWith('mma_') || key === 'mma') return 'mma';
+            if (key.includes('aussie') || key.startsWith('aussierules_') || key === 'afl') return 'afl';
+            if (key.startsWith('basketball_') || key === 'basketball' || key === 'nba') return 'basketball';
+            if (key.includes('cricket') || key === 'cricket') return 'cricket';
+            return key;
+        };
+
+        const sportsUsed = new Set(
+            (pred.matches || [])
+                .map((m) => normalizeSportForAccaBadge(m?.sport_type || m?.sport || m?.metadata?.sport_type || m?.metadata?.sport || ''))
+                .filter(Boolean)
+        );
+        const isFootballOnly = sportsUsed.size === 1 && sportsUsed.has('football');
+        const isMixedSports = sportsUsed.size > 1;
+        const accaCompositionLabel = isFootballOnly
+            ? '⚽ Football ACCA'
+            : (isMixedSports ? '🌐 Mixed Sport ACCA' : '🌐 Mixed Sport ACCA');
+
         const legsHtml = (pred.matches || []).map((m, idx) => {
-            const info = formatMatchInfo(m, sport);
+            const info = formatMatchInfo(m, m?.sport_type || m?.sport || m?.metadata?.sport_type || m?.metadata?.sport || sport);
             const pred_text = formatPrediction(m);
             return `<div style="margin-bottom:6px; padding:6px; background:#f8f9fa; border-radius:4px; font-size:0.9rem;">
                 <div style="font-weight:600; color:#1a202c;">${info.teams}</div>
@@ -1879,6 +1911,9 @@
 
         card.innerHTML = `
             ${badgesHtml}
+            <div style="margin-bottom:8px;">
+                <span style="display:inline-block; background:${isFootballOnly ? '#1d4ed8' : '#0f766e'}; color:white; padding:4px 10px; border-radius:999px; font-size:0.75rem; font-weight:bold;">${accaCompositionLabel}</span>
+            </div>
             <div style="margin-bottom:8px;">
                 <span style="display:inline-block; background:${isMegaAcca ? '#7c3aed' : '#f87171'}; color:white; padding:4px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">${isMegaAcca ? 'MEGA ACCA' : 'ACCA'} (${pred.matches.length} LEGS)</span>
             </div>
@@ -1912,14 +1947,22 @@
                 soccer_epl: 'Premier League',
                 soccer_england_efl_cup: 'EFL Cup',
                 icehockey_nhl: 'NHL',
+                hockey: 'Ice Hockey',
+                ice_hockey: 'Ice Hockey',
                 baseball_mlb: 'MLB',
                 basketball_nba: 'NBA',
+                basketball: 'Basketball',
                 basketball_euroleague: 'EuroLeague',
                 americanfootball_nfl: 'NFL',
+                american_football: 'American Football',
                 rugbyunion_six_nations: 'Six Nations',
                 rugbyunion_international: 'International Rugby',
                 aussierules_afl: 'AFL',
-                mma_mixed_martial_arts: 'MMA'
+                afl: 'Aussie Rules',
+                mma_mixed_martial_arts: 'MMA',
+                mma: 'Mixed Martial Arts',
+                football: 'Football',
+                cricket: 'Cricket'
             };
 
             if (aliases[key]) return aliases[key];
@@ -1993,11 +2036,12 @@
             }
         }
 
+        const sportLabel = humanizeSportKey(sport || match.sport || meta.sport_type || meta.sport || '');
         return {
             teams: `${homeLogo}${h} <span style="color:#718096;font-size:0.8rem;">vs</span> ${a}${awayLogo}`,
             context: meta.header_info
                 ? contextLabel
-                : `${sport.toUpperCase()}${dateTimeStr ? ' • ' + dateTimeStr : ''}${contextLabel ? ' • ' + contextLabel : ''}`
+                : `${sportLabel || 'Sport'}${dateTimeStr ? ' • ' + dateTimeStr : ''}${contextLabel ? ' • ' + contextLabel : ''}`
         };
     }
 

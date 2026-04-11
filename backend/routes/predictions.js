@@ -193,6 +193,8 @@ function humanizePredictionLabel(prediction, market) {
     const goalLineMatch = marketKey.match(/^(over|under)_(\d+)_(\d+)$/);
     const cornersLineMatch = marketKey.match(/^corners_(over|under)_(\d+)_(\d+)$/);
     const yellowsLineMatch = marketKey.match(/^(over|under)_(\d+)_(\d+)_yellows$/);
+    const comboDcBttsMatch = marketKey.match(/^combo_dc_(1x|x2|12)_btts_(yes|no)$/);
+    const comboWinnerOuMatch = marketKey.match(/^combo_(home|away|draw)_and_(over|under)_2_5$/);
     if (goalLineMatch) {
         return `${goalLineMatch[1].toUpperCase()} ${goalLineMatch[2]}.${goalLineMatch[3]} GOALS`;
     }
@@ -201,6 +203,12 @@ function humanizePredictionLabel(prediction, market) {
     }
     if (yellowsLineMatch) {
         return `YELLOW CARDS ${yellowsLineMatch[1].toUpperCase()} ${yellowsLineMatch[2]}.${yellowsLineMatch[3]}`;
+    }
+    if (comboDcBttsMatch) {
+        return `DOUBLE CHANCE ${comboDcBttsMatch[1].toUpperCase()} + BTTS ${comboDcBttsMatch[2].toUpperCase()}`;
+    }
+    if (comboWinnerOuMatch) {
+        return `${comboWinnerOuMatch[1].toUpperCase()} WIN + ${comboWinnerOuMatch[2].toUpperCase()} 2.5 GOALS`;
     }
     if (marketKey === 'btts_yes') return 'BTTS - YES';
     if (marketKey === 'btts_no') return 'BTTS - NO';
