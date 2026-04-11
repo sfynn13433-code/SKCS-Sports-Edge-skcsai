@@ -1,7 +1,7 @@
 'use strict';
 
 const config = require('../config');
-const { APISportsClient, OddsAPIClient } = require('../apiClients');
+const { APISportsClient, OddsAPIClient, SportsDataOrgClient, SportsDataIOClient, RapidAPIClient, CricketDataClient } = require('../apiClients');
 
 const SPORT_KEY_MAP = {
     'soccer_epl': 'football',
@@ -149,6 +149,38 @@ async function fetchOddsData(sportKey) {
     });
 }
 
+async function fetchSportsDataOrg(sport) {
+    const client = new SportsDataOrgClient();
+    const data = await client.getFixtures(sport);
+    if (!data || data.length === 0) return [];
+
+    return data.map(game => client.normalizeFixture(game, sport));
+}
+
+async function fetchSportsDataIO(sport) {
+    const client = new SportsDataIOClient();
+    const data = await client.getFixtures(sport);
+    if (!data || data.length === 0) return [];
+
+    return data.map(game => client.normalizeFixture(game, sport));
+}
+
+async function fetchRapidAPI(sport, leagueId, season) {
+    const client = new RapidAPIClient();
+    const data = await client.getFixtures(sport, leagueId, season);
+    if (!data || data.length === 0) return [];
+
+    return data.map(f => client.normalizeFixture(f, sport));
+}
+
+async function fetchCricketData() {
+    const client = new CricketDataClient();
+    const data = await client.getFixtures();
+    if (!data || data.length === 0) return [];
+
+    return data.map(match => client.normalizeFixture(match));
+}
+
 function todayStr() {
     return new Date().toISOString().slice(0, 10);
 }
@@ -223,8 +255,8 @@ async function buildLiveData(options = {}) {
 
     const client = new APISportsClient();
 
+    // --- Source 1: API-Sports (primary) ---
     try {
-        // Build query options based on sport
         const queryOpts = { from: today, to: windowEnd };
 
         console.log(`[dataProvider] ${sport}: Fetching fixtures for league=${leagueId}, season=${season}, dateRange=${today} to ${windowEnd}`);
@@ -232,55 +264,90 @@ async function buildLiveData(options = {}) {
         let data = await client.getFixtures(leagueId, season, queryOpts, sport);
         let fixtures = data?.response || [];
 
-        // Some sports only support single-day queries. Retry with `date` if needed.
         if (fixtures.length === 0 && sport !== 'football') {
             console.log(`[dataProvider] ${sport}: No fixtures found with date range, trying single-day query`);
             data = await client.getFixtures(leagueId, season, { date: today }, sport);
             fixtures = data?.response || [];
         }
 
-        if (fixtures.length === 0) {
-            console.warn(`[dataProvider] ${sport}: 0 fixtures from API-Sports`);
-            console.warn(`[dataProvider] ${sport}: League=${leagueId}, Season=${season}, DateRange=${today} to ${windowEnd}`);
-            
-            // Fallback to Odds API for this sport
-            const oddsKey = options.oddsKey;
-            if (oddsKey) {
-                console.log(`[dataProvider] ${sport}: trying Odds API fallback (${oddsKey})`);
-                try {
-                    const oddsData = await fetchOddsData(oddsKey);
-                    console.log(`[dataProvider] ${sport}: Odds API returned ${oddsData.length} events`);
-                    return oddsData;
-                } catch (oddsErr) {
-                    console.error(`[dataProvider] ${sport}: Odds API fallback failed:`, oddsErr.message);
-                }
-            }
-            return [];
+        if (fixtures.length > 0) {
+            const out = fixtures.slice(0, maxFixturesPerSource).map(f => normalizeFixture(f, sport));
+            console.log(`[dataProvider] ${sport}: API-Sports fetched=${fixtures.length} returned=${out.length}`);
+            return out;
         }
 
-        const out = fixtures.slice(0, maxFixturesPerSource).map(f => normalizeFixture(f, sport));
-        console.log(`[dataProvider] ${sport}: fetched=${fixtures.length} returned=${out.length}`);
-        return out;
+        console.warn(`[dataProvider] ${sport}: 0 fixtures from API-Sports`);
     } catch (error) {
-        console.error(`[dataProvider] ${sport}: ERROR fetching data:`, error.message);
-        console.error(`[dataProvider] ${sport}: Stack trace:`, error.stack);
-        
-        // Try fallback on error
-        const oddsKey = options.oddsKey;
-        if (oddsKey) {
-            console.log(`[dataProvider] ${sport}: Attempting Odds API fallback after error`);
-            try {
-                const oddsData = await fetchOddsData(oddsKey);
+        console.error(`[dataProvider] ${sport}: API-Sports ERROR:`, error.message);
+    }
+
+    // --- Source 2: Odds API (fallback) ---
+    const oddsKey = options.oddsKey;
+    if (oddsKey) {
+        try {
+            console.log(`[dataProvider] ${sport}: trying Odds API fallback (${oddsKey})`);
+            const oddsData = await fetchOddsData(oddsKey);
+            if (oddsData.length > 0) {
                 console.log(`[dataProvider] ${sport}: Odds API returned ${oddsData.length} events`);
                 return oddsData;
-            } catch (oddsErr) {
-                console.error(`[dataProvider] ${sport}: Odds API fallback also failed:`, oddsErr.message);
             }
+        } catch (oddsErr) {
+            console.error(`[dataProvider] ${sport}: Odds API fallback failed:`, oddsErr.message);
         }
-        
-        // Return empty array instead of throwing
-        return [];
     }
+
+    // --- Source 3: SportsData.org (fallback) ---
+    try {
+        console.log(`[dataProvider] ${sport}: trying SportsData.org fallback`);
+        const sdoData = await fetchSportsDataOrg(sport);
+        if (sdoData.length > 0) {
+            console.log(`[dataProvider] ${sport}: SportsData.org returned ${sdoData.length} events`);
+            return sdoData;
+        }
+    } catch (sdoErr) {
+        console.error(`[dataProvider] ${sport}: SportsData.org fallback failed:`, sdoErr.message);
+    }
+
+    // --- Source 4: SportsData.io (fallback) ---
+    try {
+        console.log(`[dataProvider] ${sport}: trying SportsData.io fallback`);
+        const sdiData = await fetchSportsDataIO(sport);
+        if (sdiData.length > 0) {
+            console.log(`[dataProvider] ${sport}: SportsData.io returned ${sdiData.length} events`);
+            return sdiData;
+        }
+    } catch (sdiErr) {
+        console.error(`[dataProvider] ${sport}: SportsData.io fallback failed:`, sdiErr.message);
+    }
+
+    // --- Source 5: RapidAPI (fallback) ---
+    try {
+        console.log(`[dataProvider] ${sport}: trying RapidAPI fallback`);
+        const rapidData = await fetchRapidAPI(sport, leagueId, season);
+        if (rapidData.length > 0) {
+            console.log(`[dataProvider] ${sport}: RapidAPI returned ${rapidData.length} events`);
+            return rapidData;
+        }
+    } catch (rapidErr) {
+        console.error(`[dataProvider] ${sport}: RapidAPI fallback failed:`, rapidErr.message);
+    }
+
+    // --- Source 6: CricketData (cricket-specific fallback) ---
+    if (sport === 'cricket') {
+        try {
+            console.log(`[dataProvider] cricket: trying CricketData API fallback`);
+            const cricketData = await fetchCricketData();
+            if (cricketData.length > 0) {
+                console.log(`[dataProvider] cricket: CricketData API returned ${cricketData.length} events`);
+                return cricketData;
+            }
+        } catch (cricketErr) {
+            console.error(`[dataProvider] cricket: CricketData API fallback failed:`, cricketErr.message);
+        }
+    }
+
+    console.warn(`[dataProvider] ${sport}: All data sources exhausted, returning empty`);
+    return [];
 }
 
 async function getPredictionInputs(options = {}) {

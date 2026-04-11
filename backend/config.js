@@ -1,5 +1,5 @@
 // config.js
-require('dotenv').config();
+require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });
 
 module.exports = {
     DATA_MODE: process.env.DATA_MODE || 'test',
@@ -17,6 +17,10 @@ module.exports = {
     apiSportsKey: process.env.X_APISPORTS_KEY,
     
     oddsApiKey: process.env.ODDS_API_KEY,
+    sportsOddsApiKey: process.env.SPORTS_ODDS_API_KEY,
+    sportsDbKey: process.env.SPORTS_DB_KEY,
+    sportsDataOrgToken: process.env.X_AUTH_TOKEN,
+    cricketDataApiKey: process.env.CRICKETDATA_API_KEY,
     maxPredictionsPerDay: 500,
     deepTierConfidenceThreshold: 75,
     jwtSecret: process.env.JWT_SECRET,

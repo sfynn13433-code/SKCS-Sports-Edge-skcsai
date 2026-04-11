@@ -227,4 +227,347 @@ class OddsAPIClient {
     }
 }
 
-module.exports = { APISportsClient, OddsAPIClient };
+class SportsDataOrgClient {
+    constructor() {
+        this.token = config.sportsDataOrgToken;
+        this.baseUrl = 'https://api.sportsdata.io/v3';
+    }
+
+    getEndpointForSport(sport) {
+        const endpoints = {
+            football: 'soccer',
+            nba: 'nba',
+            basketball: 'basketball',
+            nfl: 'nfl',
+            american_football: 'nfl',
+            mlb: 'mlb',
+            baseball: 'mlb',
+            nhl: 'hockey',
+            hockey: 'hockey',
+            nfl: 'nfl',
+        };
+        return endpoints[sport] || 'soccer';
+    }
+
+    async getFixtures(sport, leagueCode) {
+        if (!this.token) {
+            throw new Error('SportsData.org: X-Auth-Token not configured');
+        }
+
+        const sportEndpoint = this.getEndpointForSport(sport);
+        const url = `${this.baseUrl}/${sportEndpoint}/scores/json/SchedulesByDate`;
+        const today = new Date().toISOString().slice(0, 10);
+
+        try {
+            const response = await axios.get(url, {
+                headers: {
+                    'Ocp-Apim-Subscription-Key': this.token,
+                },
+                params: {
+                    date: today,
+                },
+                timeout: 10000,
+            });
+
+            console.log(`[SportsData.org] ${sport}: returned ${Array.isArray(response.data) ? response.data.length : 0} games`);
+            return response.data || [];
+        } catch (error) {
+            console.error(`[SportsData.org] ${sport} error:`, error.message);
+            if (error.response) {
+                console.error(`[SportsData.org] Response:`, error.response.status, error.response.data);
+            }
+            return [];
+        }
+    }
+
+    normalizeFixture(game, sport) {
+        if (!game) return null;
+
+        const homeTeam = game.HomeTeamName || game.AwayTeam || null;
+        const awayTeam = game.AwayTeamName || game.HomeTeam || null;
+        const date = game.DateTime || game.Date || game.GameDate || null;
+        const status = game.Status || game.Quarter || game.Inning || null;
+        const league = game.League || game.SeasonType || null;
+        const venue = game.StadiumDetails?.Name || game.Venue || null;
+        const id = game.GameID || game.Id || null;
+
+        return {
+            match_id: id ? String(id) : `sdo-${sport}-${homeTeam}-${awayTeam}`,
+            sport,
+            home_team: homeTeam,
+            away_team: awayTeam,
+            date,
+            status,
+            market: '1X2',
+            prediction: null,
+            confidence: null,
+            volatility: null,
+            odds: null,
+            provider: 'sportsdata-org',
+            provider_name: 'SportsData.org',
+            league,
+            venue,
+            raw_provider_data: game,
+        };
+    }
+}
+
+class SportsDataIOClient {
+    constructor() {
+        this.apiKey = config.sportsDbKey;
+        this.baseUrl = 'https://api.sportsdata.io/v3';
+    }
+
+    async getFixtures(sport) {
+        if (!this.apiKey) {
+            throw new Error('SportsData.io: SPORTS_DB_KEY not configured');
+        }
+
+        const sportMap = {
+            football: 'soccer',
+            nba: 'nba',
+            basketball: 'basketball',
+            nfl: 'nfl',
+            american_football: 'nfl',
+            mlb: 'mlb',
+            baseball: 'mlb',
+            nhl: 'hockey',
+            hockey: 'hockey',
+        };
+
+        const sportEndpoint = sportMap[sport] || 'soccer';
+        const today = new Date().toISOString().slice(0, 10);
+        const url = `${this.baseUrl}/${sportEndpoint}/scores/json/SchedulesByDate`;
+
+        try {
+            const response = await axios.get(url, {
+                headers: {
+                    'Ocp-Apim-Subscription-Key': this.apiKey,
+                },
+                params: {
+                    date: today,
+                },
+                timeout: 10000,
+            });
+
+            console.log(`[SportsData.io] ${sport}: returned ${Array.isArray(response.data) ? response.data.length : 0} games`);
+            return response.data || [];
+        } catch (error) {
+            console.error(`[SportsData.io] ${sport} error:`, error.message);
+            if (error.response) {
+                console.error(`[SportsData.io] Response:`, error.response.status, error.response.data);
+            }
+            return [];
+        }
+    }
+
+    normalizeFixture(game, sport) {
+        if (!game) return null;
+
+        const homeTeam = game.HomeTeamName || null;
+        const awayTeam = game.AwayTeamName || null;
+        const date = game.DateTime || game.Date || null;
+        const status = game.Status || null;
+        const league = game.League || null;
+        const venue = game.StadiumDetails?.Name || null;
+        const id = game.GameID || null;
+
+        return {
+            match_id: id ? String(id) : `sdi-${sport}-${homeTeam}-${awayTeam}`,
+            sport,
+            home_team: homeTeam,
+            away_team: awayTeam,
+            date,
+            status,
+            market: '1X2',
+            prediction: null,
+            confidence: null,
+            volatility: null,
+            odds: null,
+            provider: 'sportsdata-io',
+            provider_name: 'SportsData.io',
+            league,
+            venue,
+            raw_provider_data: game,
+        };
+    }
+}
+
+class RapidAPIClient {
+    constructor() {
+        this.apiKey = config.rapidApiKey;
+        this.baseUrl = 'https://v3.football.api-sports.io';
+        this.host = 'v3.football.api-sports.io';
+    }
+
+    getBaseUrlForSport(sport) {
+        const urls = {
+            football: 'https://v3.football.api-sports.io',
+            basketball: 'https://v1.basketball.api-sports.io',
+            baseball: 'https://v1.baseball.api-sports.io',
+            hockey: 'https://v1.hockey.api-sports.io',
+            rugby: 'https://v1.rugby.api-sports.io',
+            american_football: 'https://v1.american-football.api-sports.io',
+            volleyball: 'https://v1.volleyball.api-sports.io',
+            handball: 'https://v1.handball.api-sports.io',
+            afl: 'https://v1.afl.api-sports.io',
+            nba: 'https://v2.nba.api-sports.io',
+            mma: 'https://v1.mma.api-sports.io',
+            formula1: 'https://v1.formula-1.api-sports.io',
+            cricket: 'https://v1.cricket.api-sports.io',
+        };
+        return urls[sport] || urls.football;
+    }
+
+    getHostForSport(sport) {
+        return this.getBaseUrlForSport(sport).replace(/^https?:\/\//, '');
+    }
+
+    getEndpointForSport(sport) {
+        const endpoints = {
+            football: 'fixtures',
+            basketball: 'games',
+            baseball: 'games',
+            hockey: 'games',
+            rugby: 'games',
+            american_football: 'games',
+            volleyball: 'games',
+            handball: 'games',
+            afl: 'games',
+            nba: 'games',
+            mma: 'fights',
+            formula1: 'races',
+            cricket: 'fixtures',
+        };
+        return endpoints[sport] || 'fixtures';
+    }
+
+    async getFixtures(sport, leagueId, season) {
+        if (!this.apiKey) {
+            throw new Error('RapidAPI: RAPIDAPI_KEY not configured');
+        }
+
+        const baseUrl = this.getBaseUrlForSport(sport);
+        const host = this.getHostForSport(sport);
+        const endpoint = this.getEndpointForSport(sport);
+        const params = { league: leagueId, season };
+
+        try {
+            const response = await axios.get(`${baseUrl}/${endpoint}`, {
+                headers: {
+                    'x-rapidapi-key': this.apiKey,
+                    'x-rapidapi-host': host,
+                },
+                params,
+                timeout: 10000,
+            });
+
+            console.log(`[RapidAPI] ${sport}: returned ${Array.isArray(response.data?.response) ? response.data.response.length : 0} fixtures`);
+            return response.data?.response || [];
+        } catch (error) {
+            console.error(`[RapidAPI] ${sport} error:`, error.message);
+            if (error.response) {
+                console.error(`[RapidAPI] Response:`, error.response.status, error.response.data);
+            }
+            return [];
+        }
+    }
+
+    normalizeFixture(f, sport) {
+        if (!f) return null;
+
+        const id = f.fixture?.id || f.id || null;
+        const homeTeam = f.teams?.home?.name || f.home_team || null;
+        const awayTeam = f.teams?.away?.name || f.away_team || null;
+        const date = f.fixture?.date || f.date || null;
+        const status = f.fixture?.status?.short || f.status || null;
+        const league = f.league?.name || f.league || null;
+        const venue = f.fixture?.venue?.name || null;
+
+        return {
+            match_id: id ? String(id) : `rapidapi-${sport}-${homeTeam}-${awayTeam}`,
+            sport,
+            home_team: homeTeam,
+            away_team: awayTeam,
+            date,
+            status,
+            market: '1X2',
+            prediction: null,
+            confidence: null,
+            volatility: null,
+            odds: null,
+            provider: 'rapidapi',
+            provider_name: 'RapidAPI',
+            league,
+            venue,
+            raw_provider_data: f,
+        };
+    }
+}
+
+class CricketDataClient {
+    constructor() {
+        this.apiKey = config.cricketDataApiKey;
+        this.baseUrl = 'https://api.cricapi.com/v1';
+    }
+
+    async getFixtures() {
+        if (!this.apiKey) {
+            throw new Error('CricketData: CRICKETDATA_API_KEY not configured');
+        }
+
+        try {
+            const response = await axios.get(`${this.baseUrl}/matches`, {
+                params: {
+                    apikey: this.apiKey,
+                    offset: 0,
+                },
+                timeout: 10000,
+            });
+
+            const data = response.data?.data || [];
+            console.log(`[CricketData] returned ${Array.isArray(data) ? data.length : 0} matches`);
+            return data;
+        } catch (error) {
+            console.error(`[CricketData] error:`, error.message);
+            if (error.response) {
+                console.error(`[CricketData] Response:`, error.response.status, error.response.data);
+            }
+            return [];
+        }
+    }
+
+    normalizeFixture(match) {
+        if (!match) return null;
+
+        const id = match.id || match.match_id || null;
+        const teams = match.teams || [];
+        const homeTeam = teams[0] || match.team1 || null;
+        const awayTeam = teams[1] || match.team2 || null;
+        const date = match.dateTimeGMT || match.date || null;
+        const status = match.matchStarted ? (match.matchEnded ? 'finished' : 'live') : 'scheduled';
+        const league = match.name || match.tournament || null;
+        const venue = match.venue || null;
+
+        return {
+            match_id: id ? String(id) : `cricket-${homeTeam}-${awayTeam}`,
+            sport: 'cricket',
+            home_team: homeTeam,
+            away_team: awayTeam,
+            date,
+            status,
+            market: 'match_winner',
+            prediction: null,
+            confidence: null,
+            volatility: null,
+            odds: null,
+            provider: 'cricketdata',
+            provider_name: 'CricketData API',
+            league,
+            venue,
+            raw_provider_data: match,
+        };
+    }
+}
+
+module.exports = { APISportsClient, OddsAPIClient, SportsDataOrgClient, SportsDataIOClient, RapidAPIClient, CricketDataClient };
