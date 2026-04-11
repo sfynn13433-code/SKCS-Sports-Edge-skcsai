@@ -997,11 +997,21 @@ function finalizeAccumulatorRow(legs, options = {}) {
         }
         return finalLeg;
     });
+    const averageLegConfidence = computeTotalConfidence(payloadLegs);
     const totalConfidence = computeCompoundConfidence(payloadLegs);
+    const payloadLegsWithConfidenceMeta = payloadLegs.map((leg) => ({
+        ...leg,
+        metadata: {
+            ...(leg.metadata || {}),
+            average_leg_confidence: averageLegConfidence,
+            compound_ticket_confidence: totalConfidence
+        }
+    }));
     return {
-        match_id: payloadLegs.map((leg) => leg.match_id).filter(Boolean).join('|'),
-        matches: payloadLegs,
+        match_id: payloadLegsWithConfidenceMeta.map((leg) => leg.match_id).filter(Boolean).join('|'),
+        matches: payloadLegsWithConfidenceMeta,
         total_confidence: totalConfidence,
+        average_leg_confidence: averageLegConfidence,
         risk_level: isMega ? 'safe' : riskLevelFromConfidence(totalConfidence)
     };
 }
@@ -1033,7 +1043,7 @@ function buildFootballOnlyAccumulatorRow(pool, usedFixtureIds, size, minConfiden
     for (const id of localUsed) usedFixtureIds.add(id);
     return finalizeAccumulatorRow(selected, {
         profile: 'football_only',
-        minLegConfidenceFloor
+        minLegConfidenceFloor: minConfidenceFloor
     });
 }
 
@@ -1305,8 +1315,8 @@ function normalizeRequestedSports(requestedSports = []) {
 function getPerSportCandidateLimit(requestedSports = []) {
     const sports = normalizeRequestedSports(requestedSports);
     if (sports.length === 1) return 80;
-    if (sports.length > 1) return 24;
-    return 24;
+    if (sports.length > 1) return 48;
+    return 48;
 }
 
 function getCategoryBuildCaps(requestedSports = []) {
@@ -1414,10 +1424,22 @@ async function loadWeekLockedTeamCompetitionMap(client, now = new Date()) {
     const weekEnd = endOfWeekSast(now);
     const res = await client.query(
         `
+        WITH latest_week_run AS (
+            SELECT MAX(publish_run_id) AS publish_run_id
+            FROM predictions_final
+            WHERE created_at >= $1
+              AND created_at < $2
+              AND publish_run_id IS NOT NULL
+        )
         SELECT pf.matches
         FROM predictions_final pf
+        LEFT JOIN latest_week_run lwr ON TRUE
         WHERE pf.created_at >= $1
           AND pf.created_at < $2
+          AND (
+              lwr.publish_run_id IS NULL
+              OR pf.publish_run_id = lwr.publish_run_id
+          )
         `,
         [weekStart.toISOString(), weekEnd.toISOString()]
     );
@@ -1606,44 +1628,36 @@ async function buildFinalForTier(tier, options = {}) {
         const categoryBuildCaps = getCategoryBuildCaps(options.requestedSports);
 
         // Limit candidates to prevent combinatorial explosion and timeouts
-        const MAX_ACCA_CANDIDATES = 120;
+        const MAX_ACCA_CANDIDATES = 320;
         const limitedCandidates = perSportLimited.slice(0, MAX_ACCA_CANDIDATES);
-        const accaMarketCandidates = await buildAccaLegCandidatePool(
-            filterAvailablePredictions(limitedCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap),
+        const baseAccaInput = filterAvailablePredictions(
+            limitedCandidates,
+            usedFixtureIds,
+            weekLockedTeamCompetitionMap,
+            runTeamCompetitionMap
+        );
+        let accaMarketCandidates = await buildAccaLegCandidatePool(
+            baseAccaInput,
             { minLegConfidence: ACCA_MIN_LEG_CONFIDENCE }
         );
 
-        // -------------------------------------------------------------------------
-        // 1. THE MEGA ACCA RESERVATION LAYER (Highest Priority)
-        // -------------------------------------------------------------------------
-        const megaAccaRows = [];
-        const megaSelections = takeAvailablePredictions(
-            buildMegaAcca12Candidates(filterAvailablePredictions(accaMarketCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap), {
-                maxRows: categoryBuildCaps.mega_acca_12,
-                minLegConfidence: ACCA_MIN_LEG_CONFIDENCE,
-                blockedFixtureIds: usedFixtureIds,
-                // Subscription temporal gate
-                expiryCutoff: new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000))
-            }),
-            usedFixtureIds,
-            weekLockedTeamCompetitionMap,
-            runTeamCompetitionMap,
-            categoryBuildCaps.mega_acca_12
-        );
-        for (const row of megaSelections) {
-            const inserted = await insertFinalRow({
-                publish_run_id: publishRunId,
-                tier: t,
-                type: 'mega_acca_12',
-                matches: row.matches,
-                total_confidence: row.total_confidence,
-                risk_level: row.risk_level
-            }, client);
-            megaAccaRows.push(inserted);
+        const minimumFootballFixturePool = REQUIRED_FOOTBALL_ONLY_ACCAS * ACCA_SIZE;
+        const footballCandidateCount = accaMarketCandidates
+            .filter((candidate) => normalizeSportKey(candidate?.sport) === 'football')
+            .length;
+
+        if (footballCandidateCount < minimumFootballFixturePool) {
+            console.warn(
+                `[accaBuilder] ACCA pool warning: only ${footballCandidateCount} football fixtures after weekly locks (need ${minimumFootballFixturePool}). Falling back to run-only lock scope for ACCA generation.`
+            );
+            accaMarketCandidates = await buildAccaLegCandidatePool(
+                filterAvailablePredictions(limitedCandidates, usedFixtureIds, new Map(), runTeamCompetitionMap),
+                { minLegConfidence: ACCA_MIN_LEG_CONFIDENCE }
+            );
         }
 
         // -------------------------------------------------------------------------
-        // 2. 6-LEG ACCA LAYER (Second Priority)
+        // 1. 6-LEG ACCA LAYER (Pure Football first, then Mixed)
         // -------------------------------------------------------------------------
         const accaRows = [];
         const accaSelections = takeAvailablePredictions(
@@ -1670,6 +1684,35 @@ async function buildFinalForTier(tier, options = {}) {
                 risk_level: row.risk_level
             }, client);
             accaRows.push(inserted);
+        }
+
+        // -------------------------------------------------------------------------
+        // 2. THE MEGA ACCA RESERVATION LAYER
+        // -------------------------------------------------------------------------
+        const megaAccaRows = [];
+        const megaSelections = takeAvailablePredictions(
+            buildMegaAcca12Candidates(filterAvailablePredictions(accaMarketCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap), {
+                maxRows: categoryBuildCaps.mega_acca_12,
+                minLegConfidence: ACCA_MIN_LEG_CONFIDENCE,
+                blockedFixtureIds: usedFixtureIds,
+                // Subscription temporal gate
+                expiryCutoff: new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000))
+            }),
+            usedFixtureIds,
+            weekLockedTeamCompetitionMap,
+            runTeamCompetitionMap,
+            categoryBuildCaps.mega_acca_12
+        );
+        for (const row of megaSelections) {
+            const inserted = await insertFinalRow({
+                publish_run_id: publishRunId,
+                tier: t,
+                type: 'mega_acca_12',
+                matches: row.matches,
+                total_confidence: row.total_confidence,
+                risk_level: row.risk_level
+            }, client);
+            megaAccaRows.push(inserted);
         }
 
         // -------------------------------------------------------------------------

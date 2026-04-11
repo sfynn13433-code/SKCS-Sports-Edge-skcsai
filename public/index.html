@@ -1671,6 +1671,29 @@
         return 'Insight';
     }
 
+    function getAverageLegConfidence(pred) {
+        const explicit = Number(pred && pred.average_leg_confidence);
+        if (Number.isFinite(explicit)) {
+            return Math.max(0, Math.min(100, Math.round(explicit)));
+        }
+
+        const matches = Array.isArray(pred && pred.matches) ? pred.matches : [];
+        if (matches.length > 0) {
+            const fromMetadata = Number(matches[0] && matches[0].metadata && matches[0].metadata.average_leg_confidence);
+            if (Number.isFinite(fromMetadata)) {
+                return Math.max(0, Math.min(100, Math.round(fromMetadata)));
+            }
+        }
+
+        const confidenceValues = matches
+            .map((match) => Number(match && match.confidence))
+            .filter((value) => Number.isFinite(value));
+        if (!confidenceValues.length) return 0;
+
+        const avg = confidenceValues.reduce((sum, value) => sum + value, 0) / confidenceValues.length;
+        return Math.max(0, Math.min(100, Math.round(avg)));
+    }
+
     function renderCardBadges(pred) {
         const firstMatch = (pred.matches && pred.matches[0]) ? pred.matches[0] : {};
         const meta = firstMatch.metadata || {};
@@ -1898,6 +1921,10 @@
         const accaCompositionLabel = isFootballOnly
             ? '⚽ Football ACCA'
             : (isMixedSports ? '🌐 Mixed Sport ACCA' : '🌐 Mixed Sport ACCA');
+        const averageLegConfidence = getAverageLegConfidence(pred);
+        const ticketConfidenceLabel = averageLegConfidence > 0
+            ? `${averageLegConfidence}% Average Leg Confidence`
+            : `${pred.total_confidence || 0}% Confidence`;
 
         const legsHtml = (pred.matches || []).map((m, idx) => {
             const info = formatMatchInfo(m, m?.sport_type || m?.sport || m?.metadata?.sport_type || m?.metadata?.sport || sport);
@@ -1920,7 +1947,7 @@
             <div style="margin-bottom:12px; max-height:200px; overflow-y:auto;">${legsHtml}</div>
             <div style="border-top:1px solid #e2e8f0; padding-top:12px; display:flex; justify-content:space-between; align-items:center;">
                 <div style="color:${isMegaAcca ? '#7c3aed' : '#f87171'}; font-weight:bold;">${outcome}</div>
-                <div style="color:#4a5568; font-size:0.85rem;">${pred.total_confidence || 0}% Confidence</div>
+                <div style="color:#4a5568; font-size:0.85rem;">${ticketConfidenceLabel}</div>
             </div>
             ${reasoning ? `<div style="margin-top:10px;padding:10px;border-radius:6px;background:#f8fafc;color:#334155;font-size:0.85rem;line-height:1.5;"><strong>AI Insight:</strong> ${reasoning}</div>` : ''}
             ${pipelineHtml}

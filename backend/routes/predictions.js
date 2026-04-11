@@ -432,6 +432,37 @@ function normalizeConfidence(confidence) {
     return Math.max(0, Math.min(100, Math.round(confidence)));
 }
 
+function roundConfidence(value) {
+    if (!Number.isFinite(Number(value))) return 0;
+    return Math.round(Number(value) * 100) / 100;
+}
+
+function computeAverageLegConfidence(matches = []) {
+    const values = (Array.isArray(matches) ? matches : [])
+        .map((match) => Number(match?.confidence))
+        .filter((value) => Number.isFinite(value));
+    if (!values.length) return 0;
+    const avg = values.reduce((sum, value) => sum + value, 0) / values.length;
+    return roundConfidence(Math.max(0, Math.min(100, avg)));
+}
+
+function resolveAverageLegConfidence(prediction) {
+    const explicit = Number(prediction?.average_leg_confidence);
+    if (Number.isFinite(explicit)) {
+        return roundConfidence(Math.max(0, Math.min(100, explicit)));
+    }
+
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    if (matches.length > 0) {
+        const fromMetadata = Number(matches[0]?.metadata?.average_leg_confidence);
+        if (Number.isFinite(fromMetadata)) {
+            return roundConfidence(Math.max(0, Math.min(100, fromMetadata)));
+        }
+    }
+
+    return computeAverageLegConfidence(matches);
+}
+
 function normalizeOdds(odds) {
     if (typeof odds !== 'number' || Number.isNaN(odds)) return null;
     return Math.max(1.01, Math.round(odds * 100) / 100);
@@ -562,6 +593,7 @@ function enrichPredictionDetails(prediction) {
     return {
         ...prediction,
         section_type: inferSectionType(prediction),
+        average_leg_confidence: resolveAverageLegConfidence(prediction),
         prediction_details: {
             ...(prediction?.prediction_details || {}),
             outcome: String(fallbackOutcome).trim(),

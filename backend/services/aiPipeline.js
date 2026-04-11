@@ -275,8 +275,8 @@ async function rebuildFinalOutputs(options = {}) {
             publishRunId: publishRun.id,
             requestedSports
         };
-        const normal = await buildFinalForTier('normal', buildOptions);
         const deep = await buildFinalForTier('deep', buildOptions);
+        const normal = await buildFinalForTier('normal', buildOptions);
         const summary = {
             normal: {
                 direct: normal?.direct?.length || 0,

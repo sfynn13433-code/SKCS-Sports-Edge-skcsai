@@ -102,6 +102,27 @@ function compareRows(a, b) {
     return new Date(b?.created_at || 0).getTime() - new Date(a?.created_at || 0).getTime();
 }
 
+function roundConfidence(value) {
+    if (!Number.isFinite(Number(value))) return 0;
+    return Math.round(Number(value) * 100) / 100;
+}
+
+function computeAverageLegConfidence(matches = []) {
+    const values = (Array.isArray(matches) ? matches : [])
+        .map((match) => Number(match?.confidence))
+        .filter((value) => Number.isFinite(value));
+    if (!values.length) return 0;
+    return roundConfidence(Math.max(0, Math.min(100, values.reduce((sum, value) => sum + value, 0) / values.length)));
+}
+
+function resolveAverageLegConfidence(row, matches = []) {
+    const explicit = Number(row?.average_leg_confidence);
+    if (Number.isFinite(explicit)) return roundConfidence(Math.max(0, Math.min(100, explicit)));
+    const fromMetadata = Number(matches?.[0]?.metadata?.average_leg_confidence);
+    if (Number.isFinite(fromMetadata)) return roundConfidence(Math.max(0, Math.min(100, fromMetadata)));
+    return computeAverageLegConfidence(matches);
+}
+
 function megaIsValid(row, plan, now = new Date()) {
     const constraints = plan?.capabilities?.mega_acca_constraints;
     if (!constraints) return true;
@@ -140,6 +161,7 @@ function shapePrediction(row) {
         type: row.type,
         section_type: category,
         total_confidence: Number(row.total_confidence || 0),
+        average_leg_confidence: resolveAverageLegConfidence(row, matches),
         risk_level: row.risk_level,
         created_at: row.created_at,
         validation_matrix: validation,
