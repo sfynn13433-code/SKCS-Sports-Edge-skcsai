@@ -230,69 +230,79 @@ class OddsAPIClient {
 class SportsDataOrgClient {
     constructor() {
         this.token = config.sportsDataOrgToken;
-        this.baseUrl = 'https://api.sportsdata.io/v3';
+        this.baseUrl = 'https://api.football-data.org/v4';
     }
 
-    getEndpointForSport(sport) {
-        const endpoints = {
-            football: 'soccer',
-            nba: 'nba',
-            basketball: 'basketball',
-            nfl: 'nfl',
-            american_football: 'nfl',
-            mlb: 'mlb',
-            baseball: 'mlb',
-            nhl: 'hockey',
-            hockey: 'hockey',
-            nfl: 'nfl',
+    getCompetitionCode(sport, leagueCode) {
+        const codes = {
+            '39': 'PL',
+            '40': 'ELC',
+            '140': 'PD',
+            '141': 'PD',
+            '78': 'BL1',
+            '79': 'BL1',
+            '135': 'SA',
+            '136': 'SA',
+            '61': 'FL1',
+            '62': 'FL1',
+            '2': 'CL',
+            '3': 'EC',
+            '82': 'DED',
+            '83': 'DED',
+            '71': 'PPL',
+            '848': 'BSA',
+            '1': 'WC',
         };
-        return endpoints[sport] || 'soccer';
+        return codes[leagueCode] || 'PL';
     }
 
     async getFixtures(sport, leagueCode) {
         if (!this.token) {
-            throw new Error('SportsData.org: X-Auth-Token not configured');
+            throw new Error('FootballData.org: X-Auth-Token not configured');
         }
 
-        const sportEndpoint = this.getEndpointForSport(sport);
-        const url = `${this.baseUrl}/${sportEndpoint}/scores/json/SchedulesByDate`;
+        const code = this.getCompetitionCode(sport, leagueCode);
+        const url = `${this.baseUrl}/competitions/${code}/matches`;
         const today = new Date().toISOString().slice(0, 10);
+        const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
         try {
             const response = await axios.get(url, {
                 headers: {
-                    'Ocp-Apim-Subscription-Key': this.token,
+                    'X-Auth-Token': this.token,
                 },
                 params: {
-                    date: today,
+                    dateFrom: today,
+                    dateTo: futureDate,
                 },
                 timeout: 10000,
             });
 
-            console.log(`[SportsData.org] ${sport}: returned ${Array.isArray(response.data) ? response.data.length : 0} games`);
-            return response.data || [];
+            const matches = response.data?.matches || [];
+            console.log(`[FootballData.org] ${sport} (${code}): returned ${matches.length} matches`);
+            return matches;
         } catch (error) {
-            console.error(`[SportsData.org] ${sport} error:`, error.message);
+            console.error(`[FootballData.org] ${sport} error:`, error.message);
             if (error.response) {
-                console.error(`[SportsData.org] Response:`, error.response.status, error.response.data);
+                console.error(`[FootballData.org] Response:`, error.response.status, error.response.data);
             }
             return [];
         }
     }
 
-    normalizeFixture(game, sport) {
-        if (!game) return null;
+    normalizeFixture(match, sport) {
+        if (!match) return null;
 
-        const homeTeam = game.HomeTeamName || game.AwayTeam || null;
-        const awayTeam = game.AwayTeamName || game.HomeTeam || null;
-        const date = game.DateTime || game.Date || game.GameDate || null;
-        const status = game.Status || game.Quarter || game.Inning || null;
-        const league = game.League || game.SeasonType || null;
-        const venue = game.StadiumDetails?.Name || game.Venue || null;
-        const id = game.GameID || game.Id || null;
+        const homeTeam = match.homeTeam?.name || null;
+        const awayTeam = match.awayTeam?.name || null;
+        const date = match.utcDate || null;
+        const status = match.status || null;
+        const competition = match.competition?.name || match.competition?.code || null;
+        const venue = null;
+        const id = match.id || null;
 
         return {
-            match_id: id ? String(id) : `sdo-${sport}-${homeTeam}-${awayTeam}`,
+            match_id: id ? String(id) : `fdo-${sport}-${homeTeam}-${awayTeam}`,
             sport,
             home_team: homeTeam,
             away_team: awayTeam,
@@ -303,11 +313,11 @@ class SportsDataOrgClient {
             confidence: null,
             volatility: null,
             odds: null,
-            provider: 'sportsdata-org',
-            provider_name: 'SportsData.org',
-            league,
+            provider: 'football-data-org',
+            provider_name: 'FootballData.org',
+            league: competition,
             venue,
-            raw_provider_data: game,
+            raw_provider_data: match,
         };
     }
 }

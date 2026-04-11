@@ -149,12 +149,12 @@ async function fetchOddsData(sportKey) {
     });
 }
 
-async function fetchSportsDataOrg(sport) {
+async function fetchSportsDataOrg(sport, leagueCode) {
     const client = new SportsDataOrgClient();
-    const data = await client.getFixtures(sport);
+    const data = await client.getFixtures(sport, leagueCode);
     if (!data || data.length === 0) return [];
 
-    return data.map(game => client.normalizeFixture(game, sport));
+    return data.map(match => client.normalizeFixture(match, sport));
 }
 
 async function fetchSportsDataIO(sport) {
@@ -296,16 +296,16 @@ async function buildLiveData(options = {}) {
         }
     }
 
-    // --- Source 3: SportsData.org (fallback) ---
+    // --- Source 3: FootballData.org (fallback) ---
     try {
-        console.log(`[dataProvider] ${sport}: trying SportsData.org fallback`);
-        const sdoData = await fetchSportsDataOrg(sport);
+        console.log(`[dataProvider] ${sport}: trying FootballData.org fallback`);
+        const sdoData = await fetchSportsDataOrg(sport, leagueId);
         if (sdoData.length > 0) {
-            console.log(`[dataProvider] ${sport}: SportsData.org returned ${sdoData.length} events`);
+            console.log(`[dataProvider] ${sport}: FootballData.org returned ${sdoData.length} events`);
             return sdoData;
         }
     } catch (sdoErr) {
-        console.error(`[dataProvider] ${sport}: SportsData.org fallback failed:`, sdoErr.message);
+        console.error(`[dataProvider] ${sport}: FootballData.org fallback failed:`, sdoErr.message);
     }
 
     // --- Source 4: SportsData.io (fallback) ---
