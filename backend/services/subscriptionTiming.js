@@ -4,7 +4,7 @@ const moment = require('moment-timezone');
 const { getPlan } = require('../config/subscriptionPlans');
 
 const TIMEZONE = 'Africa/Johannesburg';
-const DAY_ZERO_CUTOFF_HOUR = 11;
+const DAY_ZERO_CUTOFF_MINUTE_OF_DAY = (11 * 60) + 59; // 11:59 AM SAST
 const DAY_ZERO_LITE_HOUR = 17;
 const SAFE_BETTING_LEAD_MINUTES = 60;
 
@@ -28,11 +28,14 @@ function requireSastMoment(input, label) {
 function calculateSubscriptionStart(paymentDate, hasUsedDayZero = false) {
     const paymentMoment = requireSastMoment(paymentDate, 'paymentDate');
     const hour = paymentMoment.hour();
+    const minute = paymentMoment.minute();
+    const minuteOfDay = (hour * 60) + minute;
+    const joinedAfterCutoff = minuteOfDay > DAY_ZERO_CUTOFF_MINUTE_OF_DAY;
 
     let status = 'active';
     let officialStartTime = paymentMoment.clone();
 
-    if (!hasUsedDayZero && hour >= DAY_ZERO_CUTOFF_HOUR) {
+    if (!hasUsedDayZero && joinedAfterCutoff) {
         officialStartTime = paymentMoment.clone().add(1, 'day').startOf('day');
         status = hour < DAY_ZERO_LITE_HOUR ? 'day_zero_bonus' : 'day_zero_lite';
     }
@@ -46,6 +49,9 @@ function calculateSubscriptionStart(paymentDate, hasUsedDayZero = false) {
         paymentTimestampIso: paymentMoment.toISOString(),
         paymentTimestampSast: paymentMoment.format(),
         currentHourSast: hour,
+        currentMinuteSast: minute,
+        joinedAfterCutoff,
+        proRataDirectFreePercent: joinedAfterCutoff ? 50 : 0,
         timezone: TIMEZONE
     };
 }
@@ -100,7 +106,8 @@ function buildSubscriptionContext({ profile = null, subscription = null, now = n
         payment_timestamp: null,
         official_start_time: null,
         subscription_record_status: null,
-        day_zero_access: 'none'
+        day_zero_access: 'none',
+        pro_rata_direct_free_percent: 0
     };
 
     if (!subscription) {
@@ -120,7 +127,8 @@ function buildSubscriptionContext({ profile = null, subscription = null, now = n
         payment_timestamp: resolved?.paymentTimestampIso || null,
         official_start_time: resolved?.officialStartTimeIso || null,
         subscription_record_status: resolved?.storedStatus || null,
-        day_zero_access: resolved?.dayZeroAccess || 'none'
+        day_zero_access: resolved?.dayZeroAccess || 'none',
+        pro_rata_direct_free_percent: Number(subscription?.pro_rata_direct_free_percent || 0)
     };
 }
 
@@ -169,6 +177,13 @@ function getPredictionSectionType(prediction) {
     return rawType;
 }
 
+function isDirect1x2Prediction(prediction) {
+    if (getPredictionSectionType(prediction) !== 'direct') return false;
+    const firstMatch = Array.isArray(prediction?.matches) ? prediction.matches[0] : null;
+    const market = String(firstMatch?.market || '').trim().toLowerCase();
+    return market === '1x2' || market === 'match_result';
+}
+
 function filterPredictionsForSubscriptionAccess(predictions, subscriptionContext) {
     const rows = Array.isArray(predictions) ? predictions : [];
     const status = String(subscriptionContext?.subscription_status || '').trim().toLowerCase();
@@ -177,11 +192,11 @@ function filterPredictionsForSubscriptionAccess(predictions, subscriptionContext
         return rows;
     }
 
-    const allowedSections = new Set(['direct', 'secondary']);
     const paymentTimestamp = subscriptionContext?.payment_timestamp;
+    const freeDirectPercent = Number(subscriptionContext?.pro_rata_direct_free_percent || 50);
 
-    return rows.filter((prediction) => {
-        if (!allowedSections.has(getPredictionSectionType(prediction))) {
+    const eligibleDirect = rows.filter((prediction) => {
+        if (!isDirect1x2Prediction(prediction)) {
             return false;
         }
 
@@ -191,11 +206,18 @@ function filterPredictionsForSubscriptionAccess(predictions, subscriptionContext
         const availableMatches = getAvailableFixturesForUser(paymentTimestamp, matches);
         return availableMatches.length === matches.length;
     });
+
+    const ratio = Math.max(0, Math.min(100, freeDirectPercent));
+    const freeCount = eligibleDirect.length > 0
+        ? Math.max(1, Math.floor((eligibleDirect.length * ratio) / 100))
+        : 0;
+    return eligibleDirect.slice(0, freeCount);
 }
 
 module.exports = {
     ACTIVE_SUBSCRIPTION_STATUSES,
     DAY_ZERO_STATUSES,
+    DAY_ZERO_CUTOFF_MINUTE_OF_DAY,
     SAFE_BETTING_LEAD_MINUTES,
     TIMEZONE,
     buildSubscriptionContext,

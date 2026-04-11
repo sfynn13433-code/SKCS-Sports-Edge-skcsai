@@ -430,6 +430,8 @@ async function initializeTables() {
                 payment_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                 official_start_time TIMESTAMPTZ NOT NULL,
                 expiration_time TIMESTAMPTZ NOT NULL,
+                join_after_cutoff BOOLEAN NOT NULL DEFAULT FALSE,
+                pro_rata_direct_free_percent INTEGER NOT NULL DEFAULT 0,
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             )
         `);
@@ -442,6 +444,16 @@ async function initializeTables() {
         await client.query(`
             CREATE INDEX IF NOT EXISTS idx_subscriptions_status
             ON subscriptions(status)
+        `);
+
+        await client.query(`
+            ALTER TABLE subscriptions
+            ADD COLUMN IF NOT EXISTS join_after_cutoff BOOLEAN NOT NULL DEFAULT FALSE
+        `);
+
+        await client.query(`
+            ALTER TABLE subscriptions
+            ADD COLUMN IF NOT EXISTS pro_rata_direct_free_percent INTEGER NOT NULL DEFAULT 0
         `);
 
         await client.query('COMMIT');
@@ -680,7 +692,9 @@ async function createSubscriptionRecord({
     status,
     payment_timestamp,
     official_start_time,
-    expiration_time
+    expiration_time,
+    join_after_cutoff = false,
+    pro_rata_direct_free_percent = 0
 }) {
     const ok = await ensureDbInitialized();
     if (!ok) throw new Error('DATABASE_URL not configured');
@@ -692,11 +706,22 @@ async function createSubscriptionRecord({
             status,
             payment_timestamp,
             official_start_time,
-            expiration_time
+            expiration_time,
+            join_after_cutoff,
+            pro_rata_direct_free_percent
         )
-        VALUES ($1, $2, $3, $4, $5, $6)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *`,
-        [user_id, tier_id, status, payment_timestamp, official_start_time, expiration_time]
+        [
+            user_id,
+            tier_id,
+            status,
+            payment_timestamp,
+            official_start_time,
+            expiration_time,
+            join_after_cutoff,
+            pro_rata_direct_free_percent
+        ]
     );
 
     const record = res.rows[0] || null;

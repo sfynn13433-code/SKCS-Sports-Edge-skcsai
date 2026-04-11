@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKCS VIP Stress Dashboard</title>
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --bg-0: #08131f;
+    --bg-1: #0e1e2c;
+    --bg-2: #14283a;
+    --panel: rgba(15, 30, 44, 0.8);
+    --panel-border: rgba(148, 163, 184, 0.28);
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --direct: #60a5fa;
+    --insight: #f59e0b;
+    --multi: #34d399;
+    --same: #22c55e;
+    --acca6: #f97316;
+    --mega12: #ef4444;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Trebuchet MS", "Verdana", sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(circle at 10% 0%, rgba(56, 189, 248, 0.2), transparent 35%),
+      radial-gradient(circle at 100% 0%, rgba(245, 158, 11, 0.18), transparent 45%),
+      linear-gradient(160deg, var(--bg-0), var(--bg-1) 45%, var(--bg-2));
+    padding: 24px;
+  }
+
+  .shell {
+    max-width: 1480px;
+    margin: 0 auto;
+  }
+
+  .hero {
+    border: 1px solid rgba(186, 230, 253, 0.28);
+    border-radius: 18px;
+    background: linear-gradient(120deg, rgba(14, 116, 144, 0.42), rgba(30, 41, 59, 0.68));
+    padding: 22px;
+    box-shadow: 0 18px 40px rgba(8, 18, 30, 0.5);
+    margin-bottom: 18px;
+  }
+
+  .hero h1 {
+    margin: 0 0 8px;
+    font-size: clamp(1.35rem, 2.7vw, 2rem);
+    font-family: "Georgia", "Times New Roman", serif;
+    letter-spacing: 0.04em;
+  }
+
+  .hero p {
+    margin: 0;
+    color: #cbd5e1;
+    line-height: 1.6;
+    font-size: 0.98rem;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+    align-items: center;
+  }
+
+  .controls select,
+  .controls button {
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(15, 23, 42, 0.78);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 0.92rem;
+  }
+
+  .controls button {
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  .controls button:hover {
+    border-color: rgba(125, 211, 252, 0.75);
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 10px;
+    margin: 16px 0 20px;
+  }
+
+  .stat {
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    background: var(--panel);
+    padding: 12px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .stat .label {
+    color: var(--muted);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+
+  .stat .value {
+    margin-top: 8px;
+    font-size: 1.28rem;
+    font-weight: 800;
+  }
+
+  .coverage {
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    background: var(--panel);
+    padding: 14px;
+    margin-bottom: 18px;
+    overflow: auto;
+  }
+
+  .coverage h2 {
+    margin: 0 0 10px;
+    font-size: 1rem;
+    font-family: "Georgia", "Times New Roman", serif;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 980px;
+    font-size: 0.85rem;
+  }
+
+  th, td {
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    padding: 8px 6px;
+    text-align: left;
+  }
+
+  th {
+    color: #cbd5e1;
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .ok {
+    color: #22c55e;
+    font-weight: 700;
+  }
+
+  .warn {
+    color: #f59e0b;
+    font-weight: 700;
+  }
+
+  .sections {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .section {
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    background: var(--panel);
+    padding: 14px;
+  }
+
+  .section h3 {
+    margin: 0 0 6px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .section .meta {
+    margin: 0 0 12px;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+  }
+
+  .card {
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    border-radius: 10px;
+    background: rgba(15, 23, 42, 0.7);
+    padding: 10px;
+  }
+
+  .teams {
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .line {
+    margin-top: 6px;
+    color: #cbd5e1;
+    font-size: 0.82rem;
+  }
+
+  .legs {
+    margin-top: 8px;
+    border-top: 1px dashed rgba(148, 163, 184, 0.25);
+    padding-top: 8px;
+    font-size: 0.78rem;
+    color: #cbd5e1;
+    line-height: 1.45;
+  }
+
+  .analytical {
+    border-color: rgba(251, 191, 36, 0.66);
+    background: linear-gradient(130deg, rgba(120, 53, 15, 0.45), rgba(30, 41, 59, 0.78));
+    box-shadow: 0 12px 26px rgba(120, 53, 15, 0.28);
+  }
+
+  .analytical h3 {
+    color: #fcd34d;
+  }
+
+  .pill {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .pill.direct { background: rgba(96, 165, 250, 0.18); color: var(--direct); }
+  .pill.insight { background: rgba(245, 158, 11, 0.22); color: #fcd34d; }
+  .pill.multi { background: rgba(52, 211, 153, 0.2); color: var(--multi); }
+  .pill.same { background: rgba(34, 197, 94, 0.2); color: var(--same); }
+  .pill.acca6 { background: rgba(249, 115, 22, 0.2); color: var(--acca6); }
+  .pill.mega12 { background: rgba(239, 68, 68, 0.18); color: var(--mega12); }
+
+  .error {
+    border: 1px solid rgba(248, 113, 113, 0.6);
+    border-radius: 10px;
+    background: rgba(127, 29, 29, 0.3);
+    color: #fecaca;
+    padding: 12px;
+    margin-top: 14px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <section class="hero">
+    <h1>Saturday VIP Absolute Max Validation</h1>
+    <p>Master source is <strong>30-Day Deep VIP</strong>. Every Core and Elite offer is validated as a slice from this same baseline pool, so lower tiers are covered from one consistent source of truth.</p>
+    <div class="controls">
+      <label for="daySelect">Day:</label>
+      <select id="daySelect">
+        <option value="monday">Monday</option>
+        <option value="tuesday">Tuesday</option>
+        <option value="wednesday">Wednesday</option>
+        <option value="thursday">Thursday</option>
+        <option value="friday">Friday</option>
+        <option value="saturday" selected>Saturday</option>
+        <option value="sunday">Sunday</option>
+      </select>
+      <button id="refreshBtn" type="button">Refresh Payload</button>
+      <button id="downloadBtn" type="button">Download JSON</button>
+      <a href="subscription.html" style="color:#bfdbfe; margin-left:auto;">Back to Subscriptions</a>
+    </div>
+    <div id="errorBox" class="error"></div>
+  </section>
+
+  <section id="statsGrid" class="stats"></section>
+
+  <section class="coverage">
+    <h2>Offer Coverage Matrix (Derived From 30-Day Deep VIP)</h2>
+    <div id="coverageTableWrap"></div>
+  </section>
+
+  <section id="sectionsWrap" class="sections"></section>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/vip-stress-dashboard.js"></script>
+</body>
+</html>

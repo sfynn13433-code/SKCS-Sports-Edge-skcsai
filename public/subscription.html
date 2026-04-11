@@ -152,6 +152,36 @@ button:hover { opacity: 0.9; }
   box-shadow: 0 0 10px rgba(96,165,250,0.3); 
 } 
 
+.terms-alert {
+  margin: 0 auto 22px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(250, 204, 21, 0.6);
+  background: linear-gradient(135deg, rgba(146, 64, 14, 0.34), rgba(120, 53, 15, 0.22));
+  color: #fef3c7;
+  box-shadow: 0 10px 28px rgba(146, 64, 14, 0.25);
+}
+
+.terms-alert h3 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  color: #fde68a;
+}
+
+.terms-alert p {
+  margin: 0 0 10px;
+  line-height: 1.5;
+  font-size: 0.94rem;
+}
+
+.terms-alert p:last-child {
+  margin-bottom: 0;
+}
+
+.terms-alert strong {
+  color: #fef9c3;
+}
+
 </style>
 </head>
 
@@ -179,6 +209,16 @@ button:hover { opacity: 0.9; }
 
 <div class="status-banner">
   <strong>Accumulators live:</strong> Daily 6-Leg ACCAs and 12-Leg Mega ACCAs now live under the new Accumulators tab. The Daily Allocation Matrix stays numerically unchanged; elite plans now add dedicated Mega ACCA entitlements.
+</div>
+
+<div class="terms-alert">
+  <h3>Important Terms & Conditions</h3>
+  <p><strong>Pro-Rata Access:</strong> Join after 11:59 AM SAST and receive 50% of today's Direct 1x2 matches absolutely FREE. Your official subscription cycle will not begin until 00:00 midnight, ensuring you get your full paid subscription run.</p>
+  <p><strong>No Refund Policy:</strong> All sales are final. Once a subscription has been paid for and activated, no refund requests will be accepted or processed.</p>
+</div>
+
+<div class="status-banner">
+  <strong>Live Validation Dashboard:</strong> <a href="vip-stress-dashboard.html" style="color:#bfdbfe;">Open the Saturday VIP stress-test payload viewer</a> to inspect how all lower tiers are derived from 30-Day Deep VIP.
 </div>
 
 <!-- CORE -->
@@ -482,7 +522,10 @@ async function selectPlan(tierId) {
     const data = await res.json();
 
     if (res.ok && data.success) {
-      alert(`✅ Plan activated: ${data.tier_name || tierId}\nExpires: ${new Date(data.expires_at || data.expiresAt).toLocaleDateString()}`);
+      const freeLabel = Number(data.pro_rata_direct_free_percent || 0) > 0
+        ? `\nFree Direct 1x2 Access Today: ${data.pro_rata_direct_free_percent}%`
+        : '';
+      alert(`✅ Plan activated: ${data.tier_name || tierId}\nOfficial Start: ${new Date(data.official_start_time).toLocaleString()}\nExpires: ${new Date(data.expires_at || data.expiresAt).toLocaleDateString()}${freeLabel}`);
       window.location.href = "index.html";
     } else if (data.requires_payment) {
       alert(data.message || "Billing is not live yet. Access is currently limited to approved accounts or staging mode.");

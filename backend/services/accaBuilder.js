@@ -9,6 +9,7 @@ const { validatePredictionSet, areLegsCompatible } = require('../utils/marketCon
 const { detectConflicts } = require('../utils/conflictResolver');
 const { isValidCombination } = require('./conflictEngine');
 const { scoreMarkets } = require('./marketScoringEngine');
+const { validateInsightLegGroup } = require('../utils/insightValidationMatrix');
 
 const MEGA_ACCA_SIZE = 12;
 const SAME_MATCH_INSIGHT_TARGET = 6;
@@ -241,7 +242,10 @@ function toFinalMatchPayload(p) {
         confidence: p.confidence,
         volatility: p.volatility,
         odds: p.odds,
-        metadata
+        metadata: {
+            ...metadata,
+            weekly_team_lock_applied: true
+        }
     };
 }
 
@@ -546,11 +550,26 @@ async function buildSecondaryCandidates(predictions) {
     const secondary = [];
 
     for (const prediction of predictions) {
-        secondary.push(...await buildDerivedMarkets(prediction, {
+        const primaryLeg = toFinalMatchPayload(prediction);
+        const candidates = await buildDerivedMarkets(prediction, {
             includeTypes: ['secondary', 'advanced'],
             requireDisplayFriendlyMarkets: true,
             maxRows: 2
-        }));
+        });
+
+        for (const candidate of candidates) {
+            const candidateLeg = toFinalMatchPayload(candidate);
+            const validation = validateInsightLegGroup([primaryLeg, candidateLeg]);
+            if (!validation.valid) continue;
+
+            secondary.push({
+                ...candidate,
+                metadata: {
+                    ...(candidate.metadata || {}),
+                    validation_matrix: validation
+                }
+            });
+        }
     }
 
     return uniqueBy(secondary, (row) => `${row.match_id}:${row.market}`);
@@ -572,11 +591,22 @@ async function buildSameMatchCandidates(predictions) {
         ]).slice(0, SAME_MATCH_INSIGHT_TARGET);
         if (legs.length < 2) continue;
 
+        const validation = validateInsightLegGroup(legs);
+        if (!validation.valid) continue;
+
+        const validatedLegs = legs.map((leg) => ({
+            ...leg,
+            metadata: {
+                ...(leg.metadata || {}),
+                validation_matrix: validation
+            }
+        }));
+
         out.push({
             match_id: prediction.match_id,
-            matches: legs,
-            total_confidence: computeTotalConfidence(legs),
-            risk_level: riskLevelFromConfidence(computeTotalConfidence(legs))
+            matches: validatedLegs,
+            total_confidence: computeTotalConfidence(validatedLegs),
+            risk_level: riskLevelFromConfidence(computeTotalConfidence(validatedLegs))
         });
     }
 
@@ -787,22 +817,76 @@ async function loadValidFilteredPredictions(tier, client, options = {}) {
         .sort((a, b) => compareCandidates(a, b, now));
 }
 
-async function loadWeekLockedFixtureIds(client, now = new Date()) {
+function normalizeTeamToken(value) {
+    return String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '');
+}
+
+function normalizeCompetitionToken(value, fallback = 'unknown_competition') {
+    const normalized = String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '');
+    return normalized || fallback;
+}
+
+function extractTeamCompetitionPairsFromMatch(match) {
+    const metadata = match?.metadata || {};
+    const competition = normalizeCompetitionToken(
+        metadata.competition ||
+        metadata.league ||
+        metadata.tournament ||
+        metadata.series ||
+        metadata.event ||
+        match?.league ||
+        match?.sport
+    );
+
+    const home = normalizeTeamToken(match?.home_team || metadata.home_team);
+    const away = normalizeTeamToken(match?.away_team || metadata.away_team);
+    const out = [];
+
+    if (home) out.push({ team: home, competition });
+    if (away) out.push({ team: away, competition });
+    return out;
+}
+
+function addTeamCompetitionPair(map, team, competition) {
+    if (!team || !competition) return;
+    if (!map.has(team)) map.set(team, new Set());
+    map.get(team).add(competition);
+}
+
+async function loadWeekLockedTeamCompetitionMap(client, now = new Date()) {
     const weekStart = startOfWeekSast(now);
     const weekEnd = endOfWeekSast(now);
     const res = await client.query(
         `
-        SELECT DISTINCT NULLIF(TRIM(match_leg->>'match_id'), '') AS match_id
+        SELECT pf.matches
         FROM predictions_final pf
-        CROSS JOIN LATERAL jsonb_array_elements(pf.matches) AS match_leg
         WHERE pf.created_at >= $1
           AND pf.created_at < $2
-          AND NULLIF(TRIM(match_leg->>'match_id'), '') IS NOT NULL
         `,
         [weekStart.toISOString(), weekEnd.toISOString()]
     );
 
-    return new Set(res.rows.map((row) => String(row.match_id).trim()).filter(Boolean));
+    const map = new Map();
+
+    for (const row of res.rows) {
+        const legs = Array.isArray(row.matches) ? row.matches : [];
+        for (const leg of legs) {
+            const pairs = extractTeamCompetitionPairsFromMatch(leg);
+            for (const pair of pairs) {
+                addTeamCompetitionPair(map, pair.team, pair.competition);
+            }
+        }
+    }
+
+    return map;
 }
 
 function predictionFixtureIds(prediction) {
@@ -831,10 +915,56 @@ function predictionFixtureIds(prediction) {
     return directId ? [directId] : [];
 }
 
-function filterAvailablePredictions(predictions, usedFixtureIds) {
+function predictionTeamCompetitionPairs(prediction) {
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    if (matches.length > 0) {
+        return matches.flatMap((match) => extractTeamCompetitionPairsFromMatch(match));
+    }
+
+    const metadata = getMetadata(prediction);
+    const competition = normalizeCompetitionToken(
+        metadata.competition || metadata.league || metadata.tournament || prediction?.sport
+    );
+    const home = normalizeTeamToken(metadata.home_team);
+    const away = normalizeTeamToken(metadata.away_team);
+
+    const out = [];
+    if (home) out.push({ team: home, competition });
+    if (away) out.push({ team: away, competition });
+    return out;
+}
+
+function isPredictionTeamAllowed(prediction, historicalTeamCompetitionMap, runTeamCompetitionMap) {
+    const pairs = predictionTeamCompetitionPairs(prediction);
+    if (!pairs.length) return true;
+
+    for (const pair of pairs) {
+        const historicalCompetitions = historicalTeamCompetitionMap.get(pair.team);
+        if (historicalCompetitions && historicalCompetitions.has(pair.competition)) {
+            return false;
+        }
+
+        const runCompetitions = runTeamCompetitionMap.get(pair.team);
+        if (runCompetitions && runCompetitions.has(pair.competition)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function reservePredictionTeams(prediction, runTeamCompetitionMap) {
+    const pairs = predictionTeamCompetitionPairs(prediction);
+    for (const pair of pairs) {
+        addTeamCompetitionPair(runTeamCompetitionMap, pair.team, pair.competition);
+    }
+}
+
+function filterAvailablePredictions(predictions, usedFixtureIds, historicalTeamCompetitionMap, runTeamCompetitionMap) {
     return predictions.filter((prediction) => {
         const ids = predictionFixtureIds(prediction);
-        return ids.length > 0 && ids.every((id) => !usedFixtureIds.has(id));
+        if (!ids.length || ids.some((id) => usedFixtureIds.has(id))) return false;
+        return isPredictionTeamAllowed(prediction, historicalTeamCompetitionMap, runTeamCompetitionMap);
     });
 }
 
@@ -844,15 +974,17 @@ function reservePredictionFixtures(prediction, usedFixtureIds) {
     }
 }
 
-function takeAvailablePredictions(predictions, usedFixtureIds, limit = Infinity) {
+function takeAvailablePredictions(predictions, usedFixtureIds, historicalTeamCompetitionMap, runTeamCompetitionMap, limit = Infinity) {
     const out = [];
 
     for (const prediction of predictions) {
         if (out.length >= limit) break;
         const ids = predictionFixtureIds(prediction);
         if (!ids.length || ids.some((id) => usedFixtureIds.has(id))) continue;
+        if (!isPredictionTeamAllowed(prediction, historicalTeamCompetitionMap, runTeamCompetitionMap)) continue;
         out.push(prediction);
         reservePredictionFixtures(prediction, usedFixtureIds);
+        reservePredictionTeams(prediction, runTeamCompetitionMap);
     }
 
     return out;
@@ -884,8 +1016,9 @@ async function buildFinalForTier(tier, options = {}) {
             requestedSports: options.requestedSports,
             now
         });
-        const weekLockedFixtureIds = await loadWeekLockedFixtureIds(client, now);
-        const usedFixtureIds = new Set(weekLockedFixtureIds);
+        const weekLockedTeamCompetitionMap = await loadWeekLockedTeamCompetitionMap(client, now);
+        const runTeamCompetitionMap = new Map();
+        const usedFixtureIds = new Set();
         const perMatchLimited = enforcePerMatchLimit(valid, accaRules.max_per_match);
         const perSportLimited = enforcePerSportLimit(
             perMatchLimited,
@@ -902,12 +1035,14 @@ async function buildFinalForTier(tier, options = {}) {
         // -------------------------------------------------------------------------
         const megaAccaRows = [];
         const megaSelections = takeAvailablePredictions(
-            buildMegaAcca12Candidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds), {
+            buildMegaAcca12Candidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap), {
                 maxRows: categoryBuildCaps.mega_acca_12,
                 // Subscription temporal gate
                 expiryCutoff: new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000))
             }),
             usedFixtureIds,
+            weekLockedTeamCompetitionMap,
+            runTeamCompetitionMap,
             categoryBuildCaps.mega_acca_12
         );
         for (const row of megaSelections) {
@@ -928,9 +1063,11 @@ async function buildFinalForTier(tier, options = {}) {
         const accaRows = [];
         const accaSelections = takeAvailablePredictions(
             buildAcca6Candidates(
-                filterAvailablePredictions(limitedCandidates, usedFixtureIds).filter((p) => p.volatility === 'low')
+                filterAvailablePredictions(limitedCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap).filter((p) => p.volatility === 'low')
             ),
             usedFixtureIds,
+            weekLockedTeamCompetitionMap,
+            runTeamCompetitionMap,
             categoryBuildCaps.acca_6match
         );
         for (const row of accaSelections) {
@@ -950,8 +1087,10 @@ async function buildFinalForTier(tier, options = {}) {
         // -------------------------------------------------------------------------
         const multiRows = [];
         const multiSelections = takeAvailablePredictions(
-            buildMultiCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds)),
+            buildMultiCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap)),
             usedFixtureIds,
+            weekLockedTeamCompetitionMap,
+            runTeamCompetitionMap,
             categoryBuildCaps.multi
         );
         for (const row of multiSelections) {
@@ -971,8 +1110,10 @@ async function buildFinalForTier(tier, options = {}) {
         // -------------------------------------------------------------------------
         const sameMatchRows = [];
         const sameMatchSelections = takeAvailablePredictions(
-            await buildSameMatchCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds)),
+            await buildSameMatchCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap)),
             usedFixtureIds,
+            weekLockedTeamCompetitionMap,
+            runTeamCompetitionMap,
             categoryBuildCaps.same_match
         );
         for (const row of sameMatchSelections) {
@@ -992,8 +1133,10 @@ async function buildFinalForTier(tier, options = {}) {
         // -------------------------------------------------------------------------
         const secondaryRows = [];
         const secondarySelections = takeAvailablePredictions(
-            await buildSecondaryCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds)),
+            await buildSecondaryCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap)),
             usedFixtureIds,
+            weekLockedTeamCompetitionMap,
+            runTeamCompetitionMap,
             categoryBuildCaps.secondary
         );
         for (const prediction of secondarySelections) {
@@ -1017,6 +1160,8 @@ async function buildFinalForTier(tier, options = {}) {
         const directSelections = takeAvailablePredictions(
             limitedCandidates,
             usedFixtureIds,
+            weekLockedTeamCompetitionMap,
+            runTeamCompetitionMap,
             categoryBuildCaps.direct
         );
         for (const prediction of directSelections) {
@@ -1035,7 +1180,7 @@ async function buildFinalForTier(tier, options = {}) {
 
         console.log('[accaBuilder] tier=%s week_locked=%s direct=%s secondary=%s same_match=%s multi=%s acca_6match=%s mega_acca_12=%s',
             t,
-            weekLockedFixtureIds.size,
+            weekLockedTeamCompetitionMap.size,
             directRows.length,
             secondaryRows.length,
             sameMatchRows.length,

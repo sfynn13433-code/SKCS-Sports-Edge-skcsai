@@ -10,6 +10,7 @@ const morgan       = require('morgan');
 const { spawn }    = require('child_process');
 const moment       = require('moment-timezone');
 const path         = require('path');
+const config       = require('./config');
 const { query }            = require('./db');
 const { requireRole }        = require('./utils/auth');
 const {
@@ -34,11 +35,55 @@ const { normalizeFixtureDate, getPredictionWindow, isFixtureEligibleForPredictio
 void bootstrap().catch(err => console.error('[startup] bootstrap failed:', err.message));
 
 const WEEKLY_ROLLING_SCRAPE_CRON = '0 2 * * 1'; // Monday 02:00 UTC = 04:00 SAST
+const ACCA_ROLLING_SYNC_CRON = '0 */4 * * *';
+const CORE_MARKET_ROLLING_SYNC_CRON = '0 */2 * * *';
+const ROLLING_SYNC_TIMEZONE = 'Africa/Johannesburg';
+const ROLLING_CUTOFF_HOUR = 11;
+const ROLLING_CUTOFF_MINUTE = 59;
+
+let rollingSyncInProgress = false;
 
 cron.schedule(WEEKLY_ROLLING_SCRAPE_CRON, () => {
     console.log('[cron] Triggering weekly global 7-day rolling scrape (04:00 SAST / 02:00 UTC)');
     void syncAllSports().catch(err => console.error('[cron] Weekly rolling scrape failed:', err));
 }, { timezone: 'UTC' });
+
+function isWithinRollingWindow(nowMoment = moment.tz(ROLLING_SYNC_TIMEZONE)) {
+    const hour = nowMoment.hour();
+    const minute = nowMoment.minute();
+    return hour < ROLLING_CUTOFF_HOUR || (hour === ROLLING_CUTOFF_HOUR && minute <= ROLLING_CUTOFF_MINUTE);
+}
+
+async function runRollingSync(label) {
+    const now = moment.tz(ROLLING_SYNC_TIMEZONE);
+    if (!isWithinRollingWindow(now)) {
+        console.log(`[cron] ${label}: skipped (${now.format()} outside 00:00-11:59 SAST rolling window)`);
+        return;
+    }
+    if (rollingSyncInProgress) {
+        console.log(`[cron] ${label}: skipped (another rolling sync is in progress)`);
+        return;
+    }
+
+    rollingSyncInProgress = true;
+    try {
+        console.log(`[cron] ${label}: starting rolling sync at ${now.format()} SAST`);
+        await syncAllSports();
+        console.log(`[cron] ${label}: rolling sync completed`);
+    } catch (err) {
+        console.error(`[cron] ${label}: rolling sync failed`, err.message);
+    } finally {
+        rollingSyncInProgress = false;
+    }
+}
+
+cron.schedule(ACCA_ROLLING_SYNC_CRON, () => {
+    void runRollingSync('ACCA-4h');
+}, { timezone: ROLLING_SYNC_TIMEZONE });
+
+cron.schedule(CORE_MARKET_ROLLING_SYNC_CRON, () => {
+    void runRollingSync('DIRECT-SAME-DOUBLECHANCE-2h');
+}, { timezone: ROLLING_SYNC_TIMEZONE });
 
 function warnEnv(name) {
     if (!process.env[name] || String(process.env[name]).trim().length === 0) {
@@ -56,6 +101,7 @@ const debugRouter       = require('./routes/debug');
 const userRouter        = require('./routes/user');
 const chatRouter        = require('./routes/chat');
 const accuracyRouter    = require('./routes/accuracy');
+const vipRouter         = require('./routes/vip');
 
 const app = express();
 
@@ -169,6 +215,95 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
+app.get('/api/billing-status', (_req, res) => {
+    const billing_enabled = String(process.env.BILLING_ENABLED || 'false').toLowerCase() === 'true';
+    const subscription_open = String(process.env.SUBSCRIPTION_OPEN || 'true').toLowerCase() !== 'false';
+
+    res.status(200).json({
+        billing_enabled,
+        subscription_open,
+        currency: 'GBP',
+        policy: {
+            pro_rata: 'Join after 11:59 AM SAST and receive 50% of today\'s Direct 1x2 matches free. Full paid cycle starts at 00:00 midnight.',
+            refunds: 'All sales are final. No refunds are processed after activation.'
+        }
+    });
+});
+
+app.post('/api/select-plan', requireSupabaseUser, async (req, res) => {
+    try {
+        const tierId = String(req.body?.tier_id || '').trim();
+        if (!tierId) {
+            return res.status(400).json({ error: 'tier_id is required' });
+        }
+
+        const plan = getPlan(tierId);
+        if (!plan) {
+            return res.status(400).json({ error: 'Invalid plan selected' });
+        }
+
+        const billingEnabled = String(process.env.BILLING_ENABLED || 'false').toLowerCase() === 'true';
+        const subscriptionOpen = String(process.env.SUBSCRIPTION_OPEN || 'true').toLowerCase() !== 'false';
+        if (!billingEnabled && !subscriptionOpen) {
+            return res.status(403).json({
+                requires_payment: true,
+                message: 'Billing is not live yet. Access is currently limited to approved accounts or staging mode.'
+            });
+        }
+
+        const userId = req.user?.id;
+        const email = req.user?.email || null;
+        if (!userId) {
+            return res.status(401).json({ error: 'User session is invalid' });
+        }
+
+        const hasUsedDayZero = await hasUsedDayZeroForUser(userId);
+        const start = calculateSubscriptionStart(new Date(), hasUsedDayZero);
+        const expirationTime = calculateExpirationTime(start.officialStartTime, plan.days);
+
+        const subscription = await createSubscriptionRecord({
+            user_id: userId,
+            tier_id: tierId,
+            status: start.status,
+            payment_timestamp: start.paymentTimestamp,
+            official_start_time: start.officialStartTime,
+            expiration_time: expirationTime,
+            join_after_cutoff: start.joinedAfterCutoff,
+            pro_rata_direct_free_percent: start.proRataDirectFreePercent
+        });
+
+        await upsertProfile({
+            id: userId,
+            email,
+            subscription_status: start.status,
+            is_test_user: false,
+            plan_id: tierId,
+            plan_tier: plan.tier,
+            plan_expires_at: expirationTime.toISOString()
+        });
+
+        return res.status(200).json({
+            success: true,
+            tier_id: tierId,
+            tier_name: tierId,
+            status: start.status,
+            official_start_time: start.officialStartTimeIso,
+            payment_timestamp: start.paymentTimestampIso,
+            expires_at: expirationTime.toISOString(),
+            join_after_cutoff: start.joinedAfterCutoff,
+            pro_rata_direct_free_percent: start.proRataDirectFreePercent,
+            policy: {
+                pro_rata: 'Join after 11:59 AM SAST and receive 50% of today\'s Direct 1x2 matches free. Full paid cycle starts at 00:00 midnight.',
+                refunds: 'All sales are final. Once paid and activated, no refund requests are processed.'
+            },
+            subscription
+        });
+    } catch (err) {
+        console.error('[select-plan] error:', err);
+        return res.status(500).json({ error: 'Failed to activate plan', details: err.message });
+    }
+});
+
 app.get('/', (_req, res) => {
   res.redirect('/index.html');
 });
@@ -200,6 +335,7 @@ app.use('/api/user', userRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/edgemind', chatRouter);
 app.use('/api/accuracy', accuracyRouter);
+app.use('/api/vip', vipRouter);
 
 // --- Cloud Scheduler endpoints -------------------------------------------------
 // These match the URLs documented in docs/google-cloud-soccer-refresh.md
