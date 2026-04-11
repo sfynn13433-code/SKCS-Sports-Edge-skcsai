@@ -6,7 +6,8 @@ const { requireRole } = require('../utils/auth');
 const {
     SUBSCRIPTION_MATRIX,
     calculateDailyAllocations,
-    getPlanCapabilities
+    getPlanCapabilities,
+    getMegaAccaDailyAllocation
 } = require('../config/subscriptionMatrix');
 const { validateInsightLegGroup } = require('../utils/insightValidationMatrix');
 
@@ -19,6 +20,28 @@ function normalizeDay(dayName) {
     const normalized = String(dayName || '').trim().toLowerCase();
     if (DAY_NAMES.includes(normalized)) return normalized;
     return 'saturday';
+}
+
+function getUtcWeekdayIndex(date) {
+    const day = String(date.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' }) || '').toLowerCase();
+    return DAY_NAMES.indexOf(day);
+}
+
+function resolveReferenceDateForDay(day, now = new Date()) {
+    const targetDay = normalizeDay(day);
+    const targetIndex = DAY_NAMES.indexOf(targetDay);
+    if (targetIndex < 0) return now;
+
+    const reference = new Date(now);
+    const currentIndex = getUtcWeekdayIndex(reference);
+    if (currentIndex < 0) return reference;
+
+    let delta = targetIndex - currentIndex;
+    if (delta < 0) delta += 7;
+
+    reference.setUTCDate(reference.getUTCDate() + delta);
+    reference.setUTCHours(12, 0, 0, 0);
+    return reference;
 }
 
 function normalizeSportName(value) {
@@ -124,7 +147,7 @@ function shapePrediction(row) {
     };
 }
 
-function buildCoverageMatrix(day, masterCounts) {
+function buildCoverageMatrix(day, masterCounts, referenceDate, sourceRows) {
     const coverage = {};
     for (const planId of Object.keys(SUBSCRIPTION_MATRIX)) {
         const limits = calculateDailyAllocations(planId, day) || {};
@@ -135,7 +158,7 @@ function buildCoverageMatrix(day, masterCounts) {
             multi: Number(limits.multi || 0),
             same_match: Number(limits.same_match || 0),
             acca_6match: Number(limits.acca_6match || 0),
-            mega_acca_12: Number(plan?.capabilities?.mega_acca_allocation || 0)
+            mega_acca_12: getMegaAccaDailyAllocation(planId, referenceDate, { predictions: sourceRows })
         };
 
         const shortages = {};
@@ -160,17 +183,9 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
     try {
         const day = normalizeDay(req.query.day || 'saturday');
         const now = new Date();
+        const referenceDate = resolveReferenceDateForDay(day, now);
         const masterPlan = getPlanCapabilities(MASTER_PLAN_ID);
         const dailyLimits = calculateDailyAllocations(MASTER_PLAN_ID, day) || {};
-
-        const required = {
-            direct: Number(dailyLimits.direct || 0),
-            analytical_insights: Number(dailyLimits.secondary || 0),
-            multi: Number(dailyLimits.multi || 0),
-            same_match: Number(dailyLimits.same_match || 0),
-            acca_6match: Number(dailyLimits.acca_6match || 0),
-            mega_acca_12: Number(masterPlan?.capabilities?.mega_acca_allocation || 0)
-        };
 
         const dbRes = await query(
             `
@@ -184,6 +199,14 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
         );
 
         const rows = (dbRes.rows || []).map(shapePrediction).sort(compareRows);
+        const required = {
+            direct: Number(dailyLimits.direct || 0),
+            analytical_insights: Number(dailyLimits.secondary || 0),
+            multi: Number(dailyLimits.multi || 0),
+            same_match: Number(dailyLimits.same_match || 0),
+            acca_6match: Number(dailyLimits.acca_6match || 0),
+            mega_acca_12: getMegaAccaDailyAllocation(MASTER_PLAN_ID, referenceDate, { predictions: rows })
+        };
         const buckets = {
             direct: [],
             analytical_insights: [],
@@ -234,7 +257,7 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
             ok: true,
             source_rows: rows.length,
             payload,
-            tier_coverage: buildCoverageMatrix(day, fulfilled)
+            tier_coverage: buildCoverageMatrix(day, fulfilled, referenceDate, rows)
         });
     } catch (err) {
         console.error('[vip/stress-payload] error:', err);

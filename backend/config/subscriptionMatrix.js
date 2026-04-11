@@ -9,6 +9,43 @@ const FAMILY_BASELINES = {
     elite: 'elite_30day_deep_vip'
 };
 
+const MEGA_ACCA_SIZE = 12;
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+const DEFAULT_MEGA_ACCA_CONSTRAINTS = {
+    min_leg_confidence: 90,
+    sports_coverage: 'all',
+    cricket_must_finish_before_expiry: true
+};
+
+const MEGA_ACCA_POLICY_BY_DURATION = {
+    4: {
+        cycle_days: 4,
+        cycle_total_accas: 1,
+        weekly_target_accas: 0,
+        distribution_mode: 'fixed_three_legs_per_day',
+        fixed_legs_per_day: 3
+    },
+    9: {
+        cycle_days: 9,
+        cycle_total_accas: 3,
+        weekly_target_accas: 0,
+        distribution_mode: 'fixture_volume_weighted'
+    },
+    14: {
+        cycle_days: 14,
+        cycle_total_accas: 6,
+        weekly_target_accas: 0,
+        distribution_mode: 'fixture_volume_weighted'
+    },
+    30: {
+        cycle_days: 28,
+        cycle_total_accas: 48,
+        weekly_target_accas: 12,
+        distribution_mode: 'weekly_fixture_volume_weighted'
+    }
+};
+
 const SUBSCRIPTION_MATRIX = {
     core_4day_sprint: {
         plan_id: 'core_4day_sprint',
@@ -19,6 +56,12 @@ const SUBSCRIPTION_MATRIX = {
         chatbot_daily_limit: 10,
         sports_coverage: ['football', 'basketball', 'cricket', 'rugby', 'baseball'],
         market_access: ['1X2', 'double_chance', 'over_2_5', 'under_2_5', 'btts_yes'],
+        mega_acca_allocation: 1,
+        mega_acca_constraints: {
+            min_leg_confidence: 90,
+            sports_coverage: 'all',
+            cricket_must_finish_before_expiry: true
+        },
         daily_limits: {
             monday: { direct: 6, secondary: 4, multi: 2, same_match: 2, acca_6match: 1 },
             tuesday: { direct: 6, secondary: 4, multi: 2, same_match: 2, acca_6match: 1 },
@@ -38,6 +81,12 @@ const SUBSCRIPTION_MATRIX = {
         chatbot_daily_limit: 15,
         sports_coverage: ['football', 'basketball', 'cricket', 'rugby', 'baseball', 'hockey'],
         market_access: ['1X2', 'double_chance', 'over_2_5', 'under_2_5', 'btts_yes', 'over_1_5'],
+        mega_acca_allocation: 3,
+        mega_acca_constraints: {
+            min_leg_confidence: 90,
+            sports_coverage: 'all',
+            cricket_must_finish_before_expiry: true
+        },
         daily_limits: {
             monday: { direct: 8, secondary: 5, multi: 3, same_match: 3, acca_6match: 1 },
             tuesday: { direct: 8, secondary: 5, multi: 3, same_match: 3, acca_6match: 1 },
@@ -57,6 +106,12 @@ const SUBSCRIPTION_MATRIX = {
         chatbot_daily_limit: 20,
         sports_coverage: ['football', 'basketball', 'cricket', 'rugby', 'baseball', 'hockey', 'volleyball'],
         market_access: ['1X2', 'double_chance', 'over_2_5', 'under_2_5', 'btts_yes', 'over_1_5'],
+        mega_acca_allocation: 6,
+        mega_acca_constraints: {
+            min_leg_confidence: 90,
+            sports_coverage: 'all',
+            cricket_must_finish_before_expiry: true
+        },
         daily_limits: {
             monday: { direct: 9, secondary: 6, multi: 4, same_match: 4, acca_6match: 2 },
             tuesday: { direct: 9, secondary: 6, multi: 4, same_match: 4, acca_6match: 2 },
@@ -76,6 +131,12 @@ const SUBSCRIPTION_MATRIX = {
         chatbot_daily_limit: 30,
         sports_coverage: ['football', 'basketball', 'cricket', 'rugby', 'baseball', 'hockey', 'volleyball', 'mma', 'formula1', 'afl', 'handball'],
         market_access: 'all',
+        mega_acca_allocation: 12,
+        mega_acca_constraints: {
+            min_leg_confidence: 90,
+            sports_coverage: 'all',
+            cricket_must_finish_before_expiry: true
+        },
         daily_limits: {
             monday: { direct: 10, secondary: 8, multi: 5, same_match: 5, acca_6match: 3 },
             tuesday: { direct: 10, secondary: 8, multi: 5, same_match: 5, acca_6match: 3 },
@@ -120,7 +181,7 @@ const SUBSCRIPTION_MATRIX = {
         chatbot_daily_limit: 35,
         sports_coverage: 'all',
         market_access: 'all',
-        mega_acca_allocation: 2,
+        mega_acca_allocation: 3,
         mega_acca_constraints: {
             min_leg_confidence: 90,
             sports_coverage: 'all',
@@ -145,7 +206,7 @@ const SUBSCRIPTION_MATRIX = {
         chatbot_daily_limit: 50,
         sports_coverage: 'all',
         market_access: 'all',
-        mega_acca_allocation: 4,
+        mega_acca_allocation: 6,
         mega_acca_constraints: {
             min_leg_confidence: 90,
             sports_coverage: 'all',
@@ -170,7 +231,7 @@ const SUBSCRIPTION_MATRIX = {
         chatbot_daily_limit: 150,
         sports_coverage: 'all',
         market_access: 'all',
-        mega_acca_allocation: 6,
+        mega_acca_allocation: 12,
         mega_acca_constraints: {
             min_leg_confidence: 90,
             sports_coverage: 'all',
@@ -196,6 +257,185 @@ function getTodayName(now = new Date()) {
     return now.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' }).toLowerCase();
 }
 
+function startOfUtcDay(input) {
+    const source = input instanceof Date ? input : new Date(input);
+    const date = Number.isNaN(source.getTime()) ? new Date() : source;
+    return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+}
+
+function resolveMegaPolicy(plan) {
+    const duration = Number(plan?.duration_days || 0);
+    const policy = MEGA_ACCA_POLICY_BY_DURATION[duration];
+    if (!policy) {
+        return {
+            cycle_days: 0,
+            cycle_total_accas: 0,
+            weekly_target_accas: 0,
+            distribution_mode: 'none'
+        };
+    }
+    return {
+        ...policy,
+        legs_per_acca: MEGA_ACCA_SIZE
+    };
+}
+
+function resolveMegaConstraints(plan) {
+    return {
+        ...DEFAULT_MEGA_ACCA_CONSTRAINTS,
+        ...(plan?.mega_acca_constraints || {})
+    };
+}
+
+function normalizeVolumeVector(rawVolumes, size) {
+    const out = [];
+    const source = Array.isArray(rawVolumes) ? rawVolumes : [];
+    for (let i = 0; i < size; i++) {
+        const n = Number(source[i]);
+        out.push(Number.isFinite(n) && n > 0 ? n : 0);
+    }
+    return out;
+}
+
+function distributeUnitsByWeight(totalUnits, weights) {
+    const units = Math.max(0, Math.floor(Number(totalUnits) || 0));
+    if (units === 0) return weights.map(() => 0);
+
+    const safeWeights = weights.map((weight) => {
+        const n = Number(weight);
+        return Number.isFinite(n) && n > 0 ? n : 0;
+    });
+    const sum = safeWeights.reduce((acc, value) => acc + value, 0);
+    const effective = sum > 0 ? safeWeights : safeWeights.map(() => 1);
+    const effectiveSum = effective.reduce((acc, value) => acc + value, 0) || 1;
+
+    const seeded = effective.map((weight, index) => {
+        const raw = (units * weight) / effectiveSum;
+        const base = Math.floor(raw);
+        return {
+            index,
+            base,
+            remainder: raw - base,
+            weight
+        };
+    });
+
+    let remaining = units - seeded.reduce((acc, entry) => acc + entry.base, 0);
+    seeded.sort((a, b) => {
+        if (b.remainder !== a.remainder) return b.remainder - a.remainder;
+        if (b.weight !== a.weight) return b.weight - a.weight;
+        return a.index - b.index;
+    });
+
+    for (let i = 0; i < seeded.length && remaining > 0; i++) {
+        seeded[i].base += 1;
+        remaining -= 1;
+    }
+
+    seeded.sort((a, b) => a.index - b.index);
+    return seeded.map((entry) => entry.base);
+}
+
+function legsToAccaTargets(legTargets) {
+    const out = [];
+    let cumulativeLegs = 0;
+    let distributedAccas = 0;
+
+    for (const legTarget of legTargets) {
+        cumulativeLegs += Number(legTarget) || 0;
+        const accasByNow = Math.floor(cumulativeLegs / MEGA_ACCA_SIZE);
+        const todayAccas = Math.max(0, accasByNow - distributedAccas);
+        out.push(todayAccas);
+        distributedAccas = accasByNow;
+    }
+
+    return out;
+}
+
+function buildMegaDistribution(policy, fixtureVolumeByCycleDay = []) {
+    const cycleDays = Number(policy?.cycle_days || 0);
+    if (cycleDays <= 0) {
+        return {
+            cycle_days: 0,
+            cycle_total_accas: 0,
+            weekly_target_accas: 0,
+            legs_per_acca: MEGA_ACCA_SIZE,
+            daily_leg_targets: [],
+            daily_acca_targets: []
+        };
+    }
+
+    const volumes = normalizeVolumeVector(fixtureVolumeByCycleDay, cycleDays);
+    let dailyLegTargets = Array(cycleDays).fill(0);
+
+    if (policy.distribution_mode === 'fixed_three_legs_per_day') {
+        dailyLegTargets = Array(cycleDays).fill(Number(policy.fixed_legs_per_day || 3));
+    } else if (policy.distribution_mode === 'weekly_fixture_volume_weighted') {
+        const weekSize = 7;
+        const weeks = Math.floor(cycleDays / weekSize);
+        const weeklyLegTarget = Number(policy.weekly_target_accas || 0) * MEGA_ACCA_SIZE;
+        const weekBase = volumes.slice(0, weekSize);
+        for (let week = 0; week < weeks; week++) {
+            const start = week * weekSize;
+            const windowWeights = volumes.slice(start, start + weekSize);
+            const hasWindowSignal = windowWeights.some((value) => value > 0);
+            const weights = hasWindowSignal ? windowWeights : weekBase;
+            const allocated = distributeUnitsByWeight(weeklyLegTarget, weights);
+            for (let i = 0; i < allocated.length; i++) {
+                dailyLegTargets[start + i] = allocated[i];
+            }
+        }
+    } else {
+        const totalLegs = Number(policy.cycle_total_accas || 0) * MEGA_ACCA_SIZE;
+        dailyLegTargets = distributeUnitsByWeight(totalLegs, volumes);
+    }
+
+    const dailyAccaTargets = legsToAccaTargets(dailyLegTargets);
+    return {
+        cycle_days: cycleDays,
+        cycle_total_accas: Number(policy.cycle_total_accas || 0),
+        weekly_target_accas: Number(policy.weekly_target_accas || 0),
+        legs_per_acca: MEGA_ACCA_SIZE,
+        daily_leg_targets: dailyLegTargets,
+        daily_acca_targets: dailyAccaTargets
+    };
+}
+
+function daySerialUtc(now = new Date()) {
+    return Math.floor(startOfUtcDay(now).getTime() / MS_PER_DAY);
+}
+
+function fallbackCycleIndex(policy, now = new Date()) {
+    const cycleDays = Number(policy?.cycle_days || 0);
+    if (cycleDays <= 0) return 0;
+
+    if (policy.distribution_mode === 'weekly_fixture_volume_weighted' && cycleDays % 7 === 0) {
+        const today = startOfUtcDay(now);
+        const dayOfWeek = today.getUTCDay();
+        const mondayBasedDay = (dayOfWeek + 6) % 7;
+        const weekSerial = Math.floor(daySerialUtc(today) / 7);
+        const weekInCycle = ((weekSerial % 4) + 4) % 4;
+        return (weekInCycle * 7) + mondayBasedDay;
+    }
+
+    const serial = daySerialUtc(now);
+    return ((serial % cycleDays) + cycleDays) % cycleDays;
+}
+
+function resolveCycleIndex(policy, now = new Date(), subscriptionStart = null) {
+    const cycleDays = Number(policy?.cycle_days || 0);
+    if (cycleDays <= 0) return 0;
+
+    const startCandidate = subscriptionStart ? startOfUtcDay(subscriptionStart) : null;
+    if (!startCandidate || Number.isNaN(startCandidate.getTime())) {
+        return fallbackCycleIndex(policy, now);
+    }
+
+    const deltaDays = Math.floor((startOfUtcDay(now).getTime() - startCandidate.getTime()) / MS_PER_DAY);
+    const normalized = ((deltaDays % cycleDays) + cycleDays) % cycleDays;
+    return normalized;
+}
+
 function calculateDailyAllocations(planId, dayOfWeek) {
     const plan = SUBSCRIPTION_MATRIX[planId];
     if (!plan) return null;
@@ -209,19 +449,26 @@ function getPlanCapabilities(planId) {
     const tierAliases = canonicalTier === 'deep'
         ? ['deep', 'elite']
         : ['normal', 'core'];
+    const megaPolicy = resolveMegaPolicy(plan);
+    const megaConstraints = resolveMegaConstraints(plan);
+    const displayMegaAllocation = megaPolicy.weekly_target_accas > 0
+        ? megaPolicy.weekly_target_accas
+        : (megaPolicy.cycle_total_accas || Number(plan.mega_acca_allocation || 0));
 
     return {
         ...plan,
         baseline_plan_id: FAMILY_BASELINES[plan.tier],
         canonical_tier: canonicalTier,
         tiers: tierAliases,
+        mega_acca_policy: megaPolicy,
         capabilities: {
             chatbot_daily_limit: plan.chatbot_daily_limit,
             sports_coverage: plan.sports_coverage,
             market_access: plan.market_access,
             plan_tier: plan.tier,
-            mega_acca_allocation: plan.mega_acca_allocation || 0,
-            mega_acca_constraints: plan.mega_acca_constraints || null
+            mega_acca_allocation: displayMegaAllocation,
+            mega_acca_constraints: megaConstraints,
+            mega_acca_policy: megaPolicy
         }
     };
 }
@@ -329,6 +576,75 @@ function parsePredictionKickoff(match) {
     return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+function buildFixtureVolumeByCycleDay(predictions, policy, now = new Date(), options = {}) {
+    const cycleDays = Number(policy?.cycle_days || 0);
+    if (cycleDays <= 0) return [];
+
+    const volumes = Array(cycleDays).fill(0);
+    const hasSubscriptionStart = Boolean(options.subscriptionStart);
+    const cycleStart = hasSubscriptionStart ? startOfUtcDay(options.subscriptionStart) : startOfUtcDay(now);
+
+    const rows = Array.isArray(predictions) ? predictions : [];
+    for (const prediction of rows) {
+        const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+        for (const match of matches) {
+            const kickoff = parsePredictionKickoff(match);
+            if (!kickoff) continue;
+
+            let index;
+            if (hasSubscriptionStart) {
+                index = Math.floor((startOfUtcDay(kickoff).getTime() - cycleStart.getTime()) / MS_PER_DAY);
+            } else {
+                index = fallbackCycleIndex(policy, kickoff);
+            }
+
+            if (index >= 0 && index < cycleDays) {
+                volumes[index] += 1;
+            }
+        }
+    }
+
+    if (volumes.some((value) => value > 0)) {
+        return volumes;
+    }
+
+    return Array(cycleDays).fill(1);
+}
+
+function getMegaAccaDistributionForPlan(planId, now = new Date(), options = {}) {
+    const plan = SUBSCRIPTION_MATRIX[planId];
+    if (!plan) return null;
+    const policy = resolveMegaPolicy(plan);
+    if (!policy.cycle_total_accas) {
+        return {
+            policy,
+            day_index: 0,
+            daily_allocation: 0,
+            daily_leg_targets: [],
+            daily_acca_targets: []
+        };
+    }
+
+    const fixtureVolumes = Array.isArray(options.fixtureVolumeByCycleDay)
+        ? options.fixtureVolumeByCycleDay
+        : buildFixtureVolumeByCycleDay(options.predictions, policy, now, options);
+
+    const distribution = buildMegaDistribution(policy, fixtureVolumes);
+    const dayIndex = resolveCycleIndex(policy, now, options.subscriptionStart);
+    return {
+        policy,
+        day_index: dayIndex,
+        daily_allocation: Number(distribution.daily_acca_targets[dayIndex] || 0),
+        daily_leg_targets: distribution.daily_leg_targets,
+        daily_acca_targets: distribution.daily_acca_targets
+    };
+}
+
+function getMegaAccaDailyAllocation(planId, now = new Date(), options = {}) {
+    const distribution = getMegaAccaDistributionForPlan(planId, now, options);
+    return Number(distribution?.daily_allocation || 0);
+}
+
 function predictionSatisfiesMegaConstraints(prediction, plan, now) {
     const constraints = plan?.capabilities?.mega_acca_constraints;
     if (!constraints) return true;
@@ -408,6 +724,12 @@ function filterPredictionsForPlan(predictions, planId, now = new Date(), options
         buckets.get(category).push(cloneWithSectionType(prediction, category));
     }
 
+    const megaDailyAllocation = getMegaAccaDailyAllocation(planId, now, {
+        subscriptionStart: options.subscriptionStart || options.officialStartTime || null,
+        fixtureVolumeByCycleDay: options.fixtureVolumeByCycleDay,
+        predictions: filtered
+    });
+
     const shaped = [];
     for (const category of PLAN_CATEGORIES) {
         const limit = dailyLimits[category] || 0;
@@ -417,7 +739,7 @@ function filterPredictionsForPlan(predictions, planId, now = new Date(), options
 
     for (const category of EXTRA_PLAN_CATEGORIES) {
         const limit = category === 'mega_acca_12'
-            ? (plan.capabilities.mega_acca_allocation || 0)
+            ? megaDailyAllocation
             : 0;
         if (limit <= 0) continue;
         shaped.push(...buckets.get(category).slice(0, limit));
@@ -438,6 +760,8 @@ module.exports = {
     calculateDailyAllocations,
     getPlanCapabilities,
     filterPredictionsForPlan,
+    getMegaAccaDailyAllocation,
+    getMegaAccaDistributionForPlan,
     getPlanAccessLevel,
     getPlansByFamily,
     getBaselinePlan

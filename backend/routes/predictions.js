@@ -9,7 +9,7 @@ const { createClient } = require('@supabase/supabase-js');
 const moment = require('moment-timezone');
 const { isValidCombination } = require('../services/conflictEngine');
 
-const { getPlanCapabilities, filterPredictionsForPlan, calculateDailyAllocations } = require('../config/subscriptionMatrix');
+const { getPlanCapabilities, filterPredictionsForPlan, calculateDailyAllocations, getMegaAccaDailyAllocation } = require('../config/subscriptionMatrix');
 const { getPredictionWindow } = require('../utils/dateNormalization');
 const { areLegsCompatible } = require('../utils/marketConsistency');
 
@@ -966,8 +966,15 @@ router.get('/', requireRole('user'), async (req, res) => {
             scopedPredictions,
             planId,
             now,
-            { enforceUniqueAssetWindow: false }
+            {
+                enforceUniqueAssetWindow: false,
+                subscriptionStart: req.user?.official_start_time || null
+            }
         );
+        const megaAccaDailyAllocation = getMegaAccaDailyAllocation(planId, now, {
+            subscriptionStart: req.user?.official_start_time || null,
+            predictions: scopedPredictions
+        });
         const todayName = moment.tz('Africa/Johannesburg').format('dddd').toLowerCase();
         const dailyLimits = calculateDailyAllocations(planId, todayName);
 
@@ -985,7 +992,9 @@ router.get('/', requireRole('user'), async (req, res) => {
                 tier: planCapabilities.tier,
                 duration_days: planCapabilities.duration_days,
                 mega_acca_allocation: planCapabilities.capabilities?.mega_acca_allocation || 0,
-                mega_acca_constraints: planCapabilities.capabilities?.mega_acca_constraints || null
+                mega_acca_daily_allocation: megaAccaDailyAllocation,
+                mega_acca_constraints: planCapabilities.capabilities?.mega_acca_constraints || null,
+                mega_acca_policy: planCapabilities.capabilities?.mega_acca_policy || null
             },
             count: planFilteredPredictions.length,
             predictions: planFilteredPredictions

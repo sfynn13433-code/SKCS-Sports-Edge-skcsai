@@ -17,12 +17,31 @@ body { font-family: Arial, sans-serif; background:#0f172a; color:white; margin:0
   border: 1px solid rgba(96,165,250,0.45);
   color: #dbeafe;
   line-height: 1.5;
+  text-align: center;
 }
 .status-banner strong {
   color: #ffffff;
 }
 
 h1 { text-align:center; color:#fff; margin-bottom:30px; font-weight: bold; }
+
+.global-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.global-header .back-btn {
+  position: absolute;
+  left: 0;
+  width: auto;
+  padding: 8px 16px;
+  background: #64748b;
+  margin-top: 0;
+}
 
 .tabs {
   display:flex;
@@ -160,6 +179,7 @@ button:hover { opacity: 0.9; }
   background: linear-gradient(135deg, rgba(146, 64, 14, 0.34), rgba(120, 53, 15, 0.22));
   color: #fef3c7;
   box-shadow: 0 10px 28px rgba(146, 64, 14, 0.25);
+  text-align: center;
 }
 
 .terms-alert h3 {
@@ -189,8 +209,8 @@ button:hover { opacity: 0.9; }
 
 <div class="container">
 
-<div style="display: flex; align-items: center; margin-bottom: 20px;">
-  <button onclick="goBack()" style="width: auto; padding: 8px 16px; background: #64748b; margin-right: 10px; margin-top: 0;">← Back</button>
+<div class="global-header">
+  <button class="back-btn" onclick="goBack()">← Back</button>
   <h1 style="margin: 0; flex-grow: 1;">Choose Your SKCS AI Sports Edge Plan</h1>
 </div>
 
@@ -208,7 +228,7 @@ button:hover { opacity: 0.9; }
 </div> 
 
 <div class="status-banner">
-  <strong>Accumulators live:</strong> Daily 6-Leg ACCAs and 12-Leg Mega ACCAs now live under the new Accumulators tab. The Daily Allocation Matrix stays numerically unchanged; elite plans now add dedicated Mega ACCA entitlements.
+  <strong>Accumulators live:</strong> 12-Leg Mega ACCAs now live under the new Accumulators tab. The Daily Allocation Matrix stays numerically unchanged; elite plans now add dedicated Mega ACCA entitlements.
 </div>
 
 <div class="terms-alert">
@@ -254,6 +274,7 @@ button:hover { opacity: 0.9; }
       <li><strong>Sun (Balanced Coverage):</strong>
         <span class="skcs-direct">⚽ 12 Direct</span> | <span class="skcs-secondary">📊 7 Secondary</span> | <span class="skcs-multi">🔀 4 Multi</span> | <span class="skcs-same">🎯 4 Same Match</span> | <span class="skcs-acca">🔥 2 x 6-Match ACCA</span>
       </li>
+      <li><strong>Mega ACCA Allocation:</strong> 🌐 1 x 12-Leg Mega ACCA | 90% leg floor | Cricket legs must finish before expiry</li>
     </ul>
     <div class="skcs-chatbot">Chatbot Access: 2 Requests / Day</div>
     <button class="core-btn" onclick="selectPlan('core_4day_sprint')">Select Plan</button>
@@ -279,6 +300,7 @@ button:hover { opacity: 0.9; }
       <li><strong>Sun (Elite Balanced):</strong>
         <span class="skcs-direct">⚽ 14 Direct</span> | <span class="skcs-secondary">📊 9 Secondary</span> | <span class="skcs-multi">🔀 5 Multi</span> | <span class="skcs-same">🎯 5 Same Match</span> | <span class="skcs-acca">🔥 3 x 6-Match ACCA</span>
       </li>
+      <li><strong>Mega ACCA Allocation:</strong> 🌐 3 x 12-Leg Mega ACCAs | 90% leg floor | Cricket legs must finish before expiry</li>
     </ul>
     <div class="skcs-chatbot">Chatbot Access: 5 Requests / Day</div>
     <button class="core-btn" onclick="selectPlan('core_9day_run')">Select Plan</button>
@@ -304,6 +326,7 @@ button:hover { opacity: 0.9; }
       <li><strong>Sun (Pro Finish):</strong>
         <span class="skcs-direct">⚽ 18 Direct</span> | <span class="skcs-secondary">📊 11 Secondary</span> | <span class="skcs-multi">🔀 6 Multi</span> | <span class="skcs-same">🎯 6 Same Match</span> | <span class="skcs-acca">🔥 3 x 6-Match ACCA</span>
       </li>
+      <li><strong>Mega ACCA Allocation:</strong> 🌐 6 x 12-Leg Mega ACCAs | 90% leg floor | Cricket legs must finish before expiry</li>
     </ul>
     <div class="skcs-chatbot">Chatbot Access: 10 Requests / Day</div>
     <button class="core-btn" onclick="selectPlan('core_14day_pro')">Select Plan</button>
@@ -329,6 +352,7 @@ button:hover { opacity: 0.9; }
       <li><strong>Sun (Full Coverage):</strong>
         <span class="skcs-direct">⚽ 25 Direct</span> | <span class="skcs-secondary">📊 14 Secondary</span> | <span class="skcs-multi">🔀 9 Multi</span> | <span class="skcs-same">🎯 9 Same Match</span> | <span class="skcs-acca">🔥 6 x 6-Match ACCA</span>
       </li>
+      <li><strong>Mega ACCA Allocation:</strong> 🌐 12 x 12-Leg Mega ACCAs per week | 90% leg floor | Cricket legs must finish before expiry</li>
     </ul>
     <div class="skcs-chatbot">Chatbot Access: 20 Requests / Day</div>
     <button class="core-btn" onclick="selectPlan('core_30day_limitless')">Select Plan</button>
@@ -361,7 +385,7 @@ button:hover { opacity: 0.9; }
       </li>
       <li><strong>Mega ACCA Allocation:</strong> 🌐 1 x 12-Leg Mega ACCA | 90% leg floor | Cricket legs must finish before expiry</li>
     </ul>
-    <div class="skcs-chatbot">Chatbot: 10 Requests / Day</div>
+    <div class="skcs-chatbot">Chatbot Access: 10 Requests / Day</div>
     <button class="elite-btn" onclick="selectPlan('elite_4day_deep_dive')">Select Plan</button>
   </div>
 
@@ -385,9 +409,9 @@ button:hover { opacity: 0.9; }
       <li><strong>Sun (Elite Finish):</strong>
         <span class="skcs-direct">⚽ 22 Direct</span> | <span class="skcs-secondary">📊 13 Secondary</span> | <span class="skcs-multi">🔀 8 Multi</span> | <span class="skcs-same">🎯 8 Same Match</span> | <span class="skcs-acca">🔥 5 x 6-Match ACCA</span>
       </li>
-      <li><strong>Mega ACCA Allocation:</strong> 🌐 2 x 12-Leg Mega ACCAs | 90% leg floor | Cricket legs must finish before expiry</li>
+      <li><strong>Mega ACCA Allocation:</strong> 🌐 3 x 12-Leg Mega ACCAs | 90% leg floor | Cricket legs must finish before expiry</li>
     </ul>
-    <div class="skcs-chatbot">Chatbot: 25 Requests / Day</div>
+    <div class="skcs-chatbot">Chatbot Access: 25 Requests / Day</div>
     <button class="elite-btn" onclick="selectPlan('elite_9day_deep_strike')">Select Plan</button>
   </div>
 
@@ -411,9 +435,9 @@ button:hover { opacity: 0.9; }
       <li><strong>Sun (Ultimate Finish):</strong>
         <span class="skcs-direct">⚽ 28 Direct</span> | <span class="skcs-secondary">📊 18 Secondary</span> | <span class="skcs-multi">🔀 12 Multi</span> | <span class="skcs-same">🎯 12 Same Match</span> | <span class="skcs-acca">🔥 8 x 6-Match ACCA</span>
       </li>
-      <li><strong>Mega ACCA Allocation:</strong> 🌐 4 x 12-Leg Mega ACCAs | 90% leg floor | Cricket legs must finish before expiry</li>
+      <li><strong>Mega ACCA Allocation:</strong> 🌐 6 x 12-Leg Mega ACCAs | 90% leg floor | Cricket legs must finish before expiry</li>
     </ul>
-    <div class="skcs-chatbot">Chatbot: 50 Requests / Day</div>
+    <div class="skcs-chatbot">Chatbot Access: 50 Requests / Day</div>
     <button class="elite-btn" onclick="selectPlan('elite_14day_deep_pro')">Select Plan</button>
   </div>
 
@@ -437,9 +461,9 @@ button:hover { opacity: 0.9; }
       <li><strong>Sun (VIP Full Coverage):</strong>
         <span class="skcs-direct">⚽ 35 Direct</span> | <span class="skcs-secondary">📊 22 Secondary</span> | <span class="skcs-multi">🔀 15 Multi</span> | <span class="skcs-same">🎯 15 Same Match</span> | <span class="skcs-acca">🔥 12 x 6-Match ACCA</span>
       </li>
-      <li><strong>Mega ACCA Allocation:</strong> 🌐 6 x 12-Leg Mega ACCAs | 90% leg floor | Cricket legs must finish before expiry</li>
+      <li><strong>Mega ACCA Allocation:</strong> 🌐 12 x 12-Leg Mega ACCAs per week | 90% leg floor | Cricket legs must finish before expiry</li>
     </ul>
-    <div class="skcs-chatbot">Chatbot: 150 Requests / Day</div>
+    <div class="skcs-chatbot">Chatbot Access: 150 Requests / Day</div>
     <button class="elite-btn" onclick="selectPlan('elite_30day_deep_vip')">Select Plan</button>
   </div>
 
