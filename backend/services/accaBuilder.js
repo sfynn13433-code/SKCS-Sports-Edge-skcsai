@@ -33,6 +33,16 @@ function computeTotalConfidence(predictions) {
     return Math.round((sum / predictions.length) * 100) / 100;
 }
 
+function computeCompoundConfidence(predictions) {
+    if (!Array.isArray(predictions) || predictions.length === 0) return 0;
+    const combined = predictions.reduce((acc, prediction) => {
+        const confidence = Number(prediction?.confidence);
+        const probability = Number.isFinite(confidence) ? clamp(confidence, 0, 100) / 100 : 0;
+        return acc * probability;
+    }, 1);
+    return Math.round(clamp(combined * 100, 0, 100) * 100) / 100;
+}
+
 // The weekly single-use insight policy follows the South African business week.
 const SAST_OFFSET_MS = 2 * 60 * 60 * 1000;
 
@@ -906,6 +916,42 @@ function buildFootballComboCandidates(prediction, scoredMarkets = [], minConfide
     return out;
 }
 
+function normalizedAccaMarketKey(candidate) {
+    return normalizeMarketForAcca(candidate?.market || candidate?.metadata?.market_key || '');
+}
+
+function isSaferAccumulatorMarket(candidate) {
+    const market = normalizedAccaMarketKey(candidate);
+    if (!market) return false;
+    if (market.startsWith('double_chance_')) return true;
+    if (market.startsWith('combo_') || market.startsWith('combo_dc_')) return true;
+    if (market.startsWith('over_') || market.startsWith('under_')) return true;
+    if (market.startsWith('btts_')) return true;
+    return false;
+}
+
+function accumulatorMarketPriorityScore(candidate) {
+    const market = normalizedAccaMarketKey(candidate);
+    if (!market) return 0;
+    if (market.startsWith('combo_dc_') || market.startsWith('combo_')) return 5;
+    if (market.startsWith('double_chance_')) return 4;
+    if (market.startsWith('under_') || market.startsWith('over_')) return 3;
+    if (market.startsWith('btts_')) return 2;
+    if (market === '1x2') return 1;
+    return 2;
+}
+
+function compareAccaCandidatePreference(a, b) {
+    const saferA = isSaferAccumulatorMarket(a);
+    const saferB = isSaferAccumulatorMarket(b);
+    if (saferA !== saferB) return saferB ? 1 : -1;
+
+    const marketPriorityDiff = accumulatorMarketPriorityScore(b) - accumulatorMarketPriorityScore(a);
+    if (marketPriorityDiff !== 0) return marketPriorityDiff;
+
+    return compareAccaCandidates(a, b);
+}
+
 function compareAccaCandidates(a, b) {
     const confidenceDiff = Number(b?.confidence || 0) - Number(a?.confidence || 0);
     if (confidenceDiff !== 0) return confidenceDiff;
@@ -951,7 +997,7 @@ function finalizeAccumulatorRow(legs, options = {}) {
         }
         return finalLeg;
     });
-    const totalConfidence = computeTotalConfidence(payloadLegs);
+    const totalConfidence = computeCompoundConfidence(payloadLegs);
     return {
         match_id: payloadLegs.map((leg) => leg.match_id).filter(Boolean).join('|'),
         matches: payloadLegs,
@@ -971,7 +1017,7 @@ function buildFootballOnlyAccumulatorRow(pool, usedFixtureIds, size, minConfiden
     const footballPool = pool
         .filter((candidate) => normalizeSportKey(candidate?.sport) === 'football')
         .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
-        .sort(compareAccaCandidates);
+        .sort(compareAccaCandidatePreference);
     if (footballPool.length < size) return null;
 
     const selected = [];
@@ -994,7 +1040,7 @@ function buildFootballOnlyAccumulatorRow(pool, usedFixtureIds, size, minConfiden
 function buildMixedAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor, options = {}) {
     const sorted = pool
         .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
-        .sort(compareAccaCandidates);
+        .sort(compareAccaCandidatePreference);
     if (sorted.length < size) return null;
 
     const football = sorted.filter((candidate) => normalizeSportKey(candidate?.sport) === 'football');
@@ -1054,7 +1100,7 @@ function buildMixedAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor
         for (const id of localUsed) usedFixtureIds.add(id);
         return finalizeAccumulatorRow(selected, {
             profile: 'mixed_sport',
-            minLegConfidenceFloor,
+            minLegConfidenceFloor: minConfidenceFloor,
             isMega: options.isMega === true
         });
     }
@@ -1118,12 +1164,18 @@ async function buildAccaLegCandidatePool(predictions, options = {}) {
         candidates.push(...buildFootballComboCandidates(prediction, scoredMarkets, minConfidenceFloor));
 
         if (!candidates.length) continue;
-        candidates.sort(compareAccaCandidates);
-        const best = candidates[0];
+        const eligibleCandidates = candidates
+            .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor);
+        if (!eligibleCandidates.length) continue;
+
+        const saferCandidates = eligibleCandidates.filter((candidate) => isSaferAccumulatorMarket(candidate));
+        const candidatePool = saferCandidates.length > 0 ? saferCandidates : eligibleCandidates;
+        candidatePool.sort(compareAccaCandidatePreference);
+        const best = candidatePool[0];
         if (!best) continue;
 
         const existing = byFixture.get(fixtureKey);
-        if (!existing || Number(best.confidence) > Number(existing.confidence)) {
+        if (!existing || compareAccaCandidatePreference(best, existing) < 0) {
             byFixture.set(fixtureKey, best);
         }
     }
@@ -1137,9 +1189,15 @@ function buildAcca6Candidates(predictions, maxRows = 6, options = {}) {
     const minConfidenceFloor = Number.isFinite(Number(options.minLegConfidence))
         ? Number(options.minLegConfidence)
         : ACCA_MIN_LEG_CONFIDENCE;
+    const blockedFixtureIds = options.blockedFixtureIds instanceof Set ? options.blockedFixtureIds : null;
     const sorted = (Array.isArray(predictions) ? predictions : [])
         .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
-        .sort(compareAccaCandidates);
+        .filter((candidate) => {
+            if (!blockedFixtureIds) return true;
+            const ids = getAccaCandidateFixtureIds(candidate);
+            return ids.length > 0 && !ids.some((id) => blockedFixtureIds.has(id));
+        })
+        .sort(compareAccaCandidatePreference);
     if (sorted.length < ACCA_SIZE) return [];
 
     const rows = [];
@@ -1150,7 +1208,7 @@ function buildAcca6Candidates(predictions, maxRows = 6, options = {}) {
         const row = buildFootballOnlyAccumulatorRow(sorted, usedFixtureIds, ACCA_SIZE, minConfidenceFloor);
         if (!row) {
             console.warn(`[accaBuilder] ACCA football split warning: requested ${footballTarget} pure football ACCAs but only built ${i}.`);
-            break;
+            return rows;
         }
         rows.push(row);
     }
@@ -1198,10 +1256,17 @@ function buildMegaAcca12Candidates(predictions, options = {}) {
     const maxRows = Number.isFinite(options.maxRows) ? options.maxRows : 6;
     const expiryCutoff = options.expiryCutoff instanceof Date ? options.expiryCutoff : null;
     const usedThreshold = resolveMegaAccaThreshold(predictions, options);
+    const blockedFixtureIds = options.blockedFixtureIds instanceof Set ? options.blockedFixtureIds : null;
 
     const eligible = predictions
         .filter((prediction) => Number(prediction.confidence) >= usedThreshold)
+        .filter((prediction) => {
+            if (!blockedFixtureIds) return true;
+            const ids = getAccaCandidateFixtureIds(prediction);
+            return ids.length > 0 && !ids.some((id) => blockedFixtureIds.has(id));
+        })
         .filter((prediction) => !expiryCutoff || isCricketFixtureWithinWindow(prediction, expiryCutoff))
+        .sort(compareAccaCandidatePreference)
         .slice();
 
     // If not enough assets meet the effective floor, abort the Mega ACCA build for this run.
@@ -1372,30 +1437,61 @@ async function loadWeekLockedTeamCompetitionMap(client, now = new Date()) {
     return map;
 }
 
+function normalizeFixtureIdentityToken(value, fallback = null) {
+    const normalized = String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '');
+    return normalized || fallback;
+}
+
+function buildFixtureIdentityKeys(matchLike, fallbackMetadata = {}) {
+    const metadata = matchLike?.metadata || fallbackMetadata || {};
+    const home = normalizeTeamToken(matchLike?.home_team || metadata.home_team);
+    const away = normalizeTeamToken(matchLike?.away_team || metadata.away_team);
+    const kickoff = parseKickoff({
+        ...matchLike,
+        metadata
+    });
+    const kickoffDay = kickoff ? kickoff.toISOString().slice(0, 10) : null;
+    const competition = normalizeCompetitionToken(
+        matchLike?.competition ||
+        matchLike?.league ||
+        metadata.competition ||
+        metadata.league ||
+        metadata.tournament ||
+        metadata.series ||
+        metadata.event ||
+        matchLike?.sport ||
+        metadata.sport
+    );
+    const matchId = normalizeFixtureIdentityToken(matchLike?.match_id || metadata.match_id);
+    const out = [];
+
+    if (matchId) out.push(`id:${matchId}`);
+
+    if (home && away) {
+        if (kickoffDay) {
+            out.push(`fixture:${home}_vs_${away}|${kickoffDay}|${competition}`);
+        } else {
+            out.push(`fixture:${home}_vs_${away}|${competition}`);
+            out.push(`fixture:${home}_vs_${away}`);
+        }
+    }
+
+    return Array.from(new Set(out));
+}
+
 function predictionFixtureIds(prediction) {
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
 
-    // If it's a multi-leg, map the composite keys
-    const fromMatches = matches
-        .map((match) => {
-            const home = String(match?.home_team || match?.metadata?.home_team || '').trim().toLowerCase();
-            const away = String(match?.away_team || match?.metadata?.away_team || '').trim().toLowerCase();
-            if (home && away) return `${home}_vs_${away}`;
-            return String(match?.match_id || '').trim();
-        })
-        .filter(Boolean);
+    const fromMatches = matches.flatMap((match) => buildFixtureIdentityKeys(match));
 
     if (fromMatches.length > 0) return fromMatches;
 
-    // If it's a direct prediction
     const metadata = getMetadata(prediction);
-    const home = String(metadata.home_team || '').trim().toLowerCase();
-    const away = String(metadata.away_team || '').trim().toLowerCase();
-
-    if (home && away) return [`${home}_vs_${away}`];
-
-    const directId = String(prediction?.match_id || '').trim();
-    return directId ? [directId] : [];
+    return buildFixtureIdentityKeys(prediction, metadata);
 }
 
 function predictionTeamCompetitionPairs(prediction) {
@@ -1525,6 +1621,7 @@ async function buildFinalForTier(tier, options = {}) {
             buildMegaAcca12Candidates(filterAvailablePredictions(accaMarketCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap), {
                 maxRows: categoryBuildCaps.mega_acca_12,
                 minLegConfidence: ACCA_MIN_LEG_CONFIDENCE,
+                blockedFixtureIds: usedFixtureIds,
                 // Subscription temporal gate
                 expiryCutoff: new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000))
             }),
@@ -1553,7 +1650,10 @@ async function buildFinalForTier(tier, options = {}) {
             buildAcca6Candidates(
                 filterAvailablePredictions(accaMarketCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap),
                 categoryBuildCaps.acca_6match,
-                { minLegConfidence: ACCA_MIN_LEG_CONFIDENCE }
+                {
+                    minLegConfidence: ACCA_MIN_LEG_CONFIDENCE,
+                    blockedFixtureIds: usedFixtureIds
+                }
             ),
             usedFixtureIds,
             weekLockedTeamCompetitionMap,
