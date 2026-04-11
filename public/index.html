@@ -1664,10 +1664,22 @@
     }
 
     function renderCardBadges(pred) {
+        const firstMatch = (pred.matches && pred.matches[0]) ? pred.matches[0] : {};
+        const meta = firstMatch.metadata || {};
+        const aiSource = meta.ai_source || null;
+        let sourceBadge = '';
+        if (aiSource === 'dolphin') {
+            sourceBadge = '<span style="display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;padding:4px 8px;border-radius:999px;font-size:0.72rem;font-weight:700;">DOLPHIN AI</span>';
+        } else if (aiSource === 'odds') {
+            sourceBadge = '<span style="display:inline-block;background:#fef3c7;color:#92400e;padding:4px 8px;border-radius:999px;font-size:0.72rem;font-weight:700;">ODDS MODEL</span>';
+        } else if (aiSource === 'fallback') {
+            sourceBadge = '<span style="display:inline-block;background:#f1f5f9;color:#475569;padding:4px 8px;border-radius:999px;font-size:0.72rem;font-weight:700;">BASELINE</span>';
+        }
         return `
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
                 <span style="display:inline-block;background:#0f172a;color:#fff;padding:4px 8px;border-radius:999px;font-size:0.72rem;font-weight:700;">${getTierLabel(pred)}</span>
                 <span style="display:inline-block;background:#e2e8f0;color:#1e293b;padding:4px 8px;border-radius:999px;font-size:0.72rem;font-weight:700;">${getProductLabel(pred)}</span>
+                ${sourceBadge}
             </div>
         `;
     }

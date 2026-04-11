@@ -29,14 +29,14 @@ function normalizePrediction(prediction) {
     return aliases[value] || value;
 }
 
-function buildRawPredictionFromProviderItem(item) {
+async function buildRawPredictionFromProviderItem(item) {
     const match_id = String(item.match_id || item.id || '').trim();
     if (!match_id) throw new Error('match_id missing in provider item');
 
     const sport = normalizeSport(item.sport);
     const market = String(item.market || '1X2').trim();
 
-    const scoring = scoreMatch({
+    const scoring = await scoreMatch({
         match_id,
         sport,
         home_team: item.home_team || null,
@@ -49,11 +49,20 @@ function buildRawPredictionFromProviderItem(item) {
 
     const providerPrediction = normalizePrediction(item.prediction);
     const predictionSource = providerPrediction ? 'provider' : 'ai_fallback';
-    const prediction = providerPrediction || (scoring.winner === 'home' ? 'home_win' : 'away_win');
+    const fallbackPrediction = scoring.winner === 'home'
+        ? 'home_win'
+        : scoring.winner === 'away'
+            ? 'away_win'
+            : scoring.winner === 'draw'
+                ? 'draw'
+                : 'home_win';
+    const prediction = providerPrediction || fallbackPrediction;
     const confidence = typeof item.confidence === 'number' && Number.isFinite(item.confidence)
         ? item.confidence
         : scoring.confidence;
     const volatility = item.volatility || scoring.volatility;
+    const aiSource = scoring.source || null; // 'dolphin', 'fallback', 'odds', etc.
+    const aiReasoning = scoring.reasoning || null;
 
     const raw = {
         match_id,
@@ -67,6 +76,8 @@ function buildRawPredictionFromProviderItem(item) {
             source: 'aiPipeline:v2-provider+aiScoring',
             data_mode: item.data_mode || null,
             prediction_source: predictionSource,
+            ai_source: aiSource,
+            ai_reasoning: aiReasoning,
             provider: item.provider || null,
             bookmaker: item.bookmaker || null,
             home_team: item.home_team || null,
@@ -79,7 +90,9 @@ function buildRawPredictionFromProviderItem(item) {
             country: item.country || null,
             ai: predictionSource === 'ai_fallback'
                 ? {
-                    winner: scoring.winner
+                    winner: scoring.winner,
+                    source: aiSource,
+                    reasoning: aiReasoning
                 }
                 : null
         }
@@ -132,7 +145,7 @@ async function runPipelineForMatches({ matches }) {
         console.log('[aiPipeline] manual matches input count=%s', matches.length);
 
         for (const item of matches) {
-            const raw = buildRawPredictionFromProviderItem({
+            const raw = await buildRawPredictionFromProviderItem({
                 ...item,
                 data_mode: 'manual'
             });
@@ -187,7 +200,7 @@ async function runPipelineFromConfiguredDataMode() {
         console.log('[aiPipeline] DATA_MODE=%s provider_items=%s', mode, predictions.length);
 
         for (const item of predictions) {
-            const raw = buildRawPredictionFromProviderItem({
+            const raw = await buildRawPredictionFromProviderItem({
                 ...item,
                 data_mode: mode
             });

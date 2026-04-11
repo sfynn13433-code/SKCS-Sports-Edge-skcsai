@@ -1,3 +1,7 @@
+# Node artifacts
+node_modules
+npm-debug.log
+
 # Security: never copy local secrets
 .env
 *.env

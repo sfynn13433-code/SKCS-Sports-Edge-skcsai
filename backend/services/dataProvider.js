@@ -1,7 +1,29 @@
 'use strict';
 
+const axios = require('axios');
 const config = require('../config');
 const { APISportsClient, OddsAPIClient, SportsDataOrgClient, SportsDataIOClient, RapidAPIClient, CricketDataClient } = require('../apiClients');
+
+const SUPPORTED_LEAGUES = ['4328', '4332', '4331', '4335', '4334', '4387', '4424', '4380', '4391'];
+const LEAGUE_SPORT_MAP = {
+    '4328': 'football',          // EPL
+    '4332': 'football',          // Serie A
+    '4331': 'football',          // Bundesliga
+    '4335': 'football',          // La Liga
+    '4334': 'football',          // Ligue 1
+    '4387': 'basketball',        // NBA
+    '4424': 'baseball',          // MLB
+    '4380': 'hockey',            // NHL
+    '4391': 'american_football'  // NFL
+};
+
+const THESPORTSDB_BASE_URL = 'https://www.thesportsdb.com/api/v1/json';
+const THESPORTSDB_DELAY_MS = 500;
+
+const sportsClient = axios.create({
+    baseURL: THESPORTSDB_BASE_URL,
+    timeout: 15000
+});
 
 const SPORT_KEY_MAP = {
     'soccer_epl': 'football',
@@ -58,6 +80,130 @@ function humanizeCompetitionLabel(value) {
         .filter(Boolean)
         .map(part => part.length <= 3 ? part.toUpperCase() : part.charAt(0).toUpperCase() + part.slice(1))
         .join(' ');
+}
+
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function normalizeRequestedSport(sport) {
+    const key = String(sport || '').trim().toLowerCase();
+    if (!key) return null;
+    if (key === 'nba') return 'basketball';
+    if (key === 'mlb') return 'baseball';
+    if (key === 'nhl') return 'hockey';
+    if (key === 'nfl') return 'american_football';
+    return key;
+}
+
+function normalizeTheSportsDbStartTime(event) {
+    const timestamp = String(event?.strTimestamp || '').trim();
+    if (timestamp) {
+        const parsedTimestamp = new Date(timestamp);
+        if (!Number.isNaN(parsedTimestamp.getTime())) {
+            return parsedTimestamp.toISOString();
+        }
+    }
+
+    const dateValue = String(event?.dateEvent || '').trim();
+    const timeValue = String(event?.strTime || '').trim();
+    if (dateValue && timeValue) {
+        const composed = new Date(`${dateValue}T${timeValue}`);
+        if (!Number.isNaN(composed.getTime())) {
+            return composed.toISOString();
+        }
+    }
+
+    if (dateValue) {
+        const dateOnly = new Date(`${dateValue}T00:00:00Z`);
+        if (!Number.isNaN(dateOnly.getTime())) {
+            return dateOnly.toISOString();
+        }
+    }
+
+    return null;
+}
+
+function mapTheSportsDbFixture(event, fallbackLeagueId) {
+    const leagueId = String(event?.idLeague || fallbackLeagueId || '').trim();
+    const fixtureId = String(event?.idEvent || '').trim();
+
+    if (!leagueId || !fixtureId) return null;
+
+    return {
+        fixture_id: fixtureId,
+        league_id: leagueId,
+        home_team: event?.strHomeTeam || null,
+        away_team: event?.strAwayTeam || null,
+        start_time: normalizeTheSportsDbStartTime(event),
+        status: 'NS',
+        league_name: event?.strLeague || event?.strLeagueAlternate || null,
+        home_logo: event?.strHomeTeamBadge || event?.strHomeBadge || event?.strHomeLogo || null,
+        away_logo: event?.strAwayTeamBadge || event?.strAwayBadge || event?.strAwayLogo || null,
+        sport: LEAGUE_SPORT_MAP[leagueId] || 'football',
+        raw_provider_data: event
+    };
+}
+
+function toPredictionInputFromSportsDbFixture(fixture) {
+    return {
+        match_id: `tsdb-${fixture.fixture_id}`,
+        sport: fixture.sport || 'football',
+        home_team: fixture.home_team,
+        away_team: fixture.away_team,
+        date: fixture.start_time,
+        status: fixture.status,
+        market: '1X2',
+        prediction: null,
+        confidence: null,
+        volatility: null,
+        odds: null,
+        provider: 'the-sports-db',
+        provider_name: 'TheSportsDB',
+        league: fixture.league_name || null,
+        league_id: fixture.league_id,
+        home_logo: fixture.home_logo || null,
+        away_logo: fixture.away_logo || null,
+        raw_provider_data: fixture.raw_provider_data || null
+    };
+}
+
+async function fetchUpcomingFixtures(options = {}) {
+    const sportsDbKey = String(config.sportsDbKey || '').trim();
+    if (!sportsDbKey) {
+        throw new Error('TheSportsDB key is missing (SPORTS_DB_KEY)');
+    }
+
+    const requestedLeagueIds = Array.isArray(options.leagueIds) && options.leagueIds.length > 0
+        ? options.leagueIds.map((id) => String(id || '').trim()).filter(Boolean)
+        : SUPPORTED_LEAGUES;
+    const uniqueLeagueIds = [...new Set(requestedLeagueIds)];
+
+    const out = [];
+
+    for (let i = 0; i < uniqueLeagueIds.length; i++) {
+        const leagueId = uniqueLeagueIds[i];
+        try {
+            const response = await sportsClient.get(`/${sportsDbKey}/eventsnextleague.php`, {
+                params: { id: leagueId }
+            });
+            const events = Array.isArray(response.data?.events) ? response.data.events : [];
+            const mapped = events
+                .map((event) => mapTheSportsDbFixture(event, leagueId))
+                .filter(Boolean);
+
+            out.push(...mapped);
+            console.log(`[dataProvider] TheSportsDB league=${leagueId} fixtures=${mapped.length}`);
+        } catch (error) {
+            console.error(`[dataProvider] TheSportsDB league=${leagueId} failed:`, error.message);
+        }
+
+        if (i < uniqueLeagueIds.length - 1) {
+            await sleep(THESPORTSDB_DELAY_MS);
+        }
+    }
+
+    return out;
 }
 
 function derivePredictionFromH2HOutcomes(event) {
@@ -252,8 +398,39 @@ async function buildLiveData(options = {}) {
     const today = todayStr();
     const windowEnd = futureStr(7);
     const maxFixturesPerSource = 80;
+    const requestedLeagueId = leagueId ? String(leagueId).trim() : null;
+    const isSupportedLeagueId = requestedLeagueId ? SUPPORTED_LEAGUES.includes(requestedLeagueId) : false;
+    const shouldFetchAllLeagues = !requestedLeagueId || String(sport || '').toLowerCase() === 'all';
+    const leagueIdsForSportsDb = shouldFetchAllLeagues
+        ? SUPPORTED_LEAGUES
+        : (isSupportedLeagueId ? [requestedLeagueId] : []);
+    const requestedSport = normalizeRequestedSport(sport);
+    const includeAllSports = String(sport || '').toLowerCase() === 'all';
 
     const client = new APISportsClient();
+
+    // --- Source 0: TheSportsDB (primary for supported multi-league ingestion) ---
+    if (leagueIdsForSportsDb.length > 0) {
+        try {
+            console.log(`[dataProvider] ${sport}: fetching TheSportsDB leagues=${leagueIdsForSportsDb.join(',')}`);
+            const fixtures = await fetchUpcomingFixtures({ leagueIds: leagueIdsForSportsDb });
+            const filteredFixtures = fixtures.filter((fixture) => (
+                includeAllSports || !requestedSport || normalizeRequestedSport(fixture.sport) === requestedSport
+            ));
+
+            if (filteredFixtures.length > 0) {
+                const out = filteredFixtures
+                    .slice(0, maxFixturesPerSource)
+                    .map(toPredictionInputFromSportsDbFixture);
+                console.log(`[dataProvider] ${sport}: TheSportsDB fetched=${filteredFixtures.length} returned=${out.length}`);
+                return out;
+            }
+
+            console.warn(`[dataProvider] ${sport}: 0 fixtures from TheSportsDB`);
+        } catch (error) {
+            console.error(`[dataProvider] ${sport}: TheSportsDB error:`, error.message);
+        }
+    }
 
     // --- Source 1: API-Sports (primary) ---
     try {
@@ -364,6 +541,8 @@ async function getPredictionInputs(options = {}) {
 }
 
 module.exports = {
+    SUPPORTED_LEAGUES,
+    fetchUpcomingFixtures,
     getPredictionInputs,
     buildLiveData
 };

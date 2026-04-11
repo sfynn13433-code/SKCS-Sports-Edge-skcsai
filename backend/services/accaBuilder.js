@@ -517,7 +517,7 @@ function sanitizeSameMatchLegGroup(legs) {
     return out;
 }
 
-function buildDerivedMarkets(prediction, options = {}) {
+async function buildDerivedMarkets(prediction, options = {}) {
     const includeTypes = new Set(
         Array.isArray(options.includeTypes) && options.includeTypes.length
             ? options.includeTypes
@@ -531,7 +531,7 @@ function buildDerivedMarkets(prediction, options = {}) {
     const requireDisplayFriendlyMarkets = options.requireDisplayFriendlyMarkets === true;
 
     return uniqueBy(
-        scoreMarkets(toScoringMatchPayload(prediction))
+        (await scoreMarkets(toScoringMatchPayload(prediction)))
             .filter((market) => includeTypes.has(market.type))
             .filter((market) => !excludeMarkets.has(String(market.market || '').toUpperCase()))
             .sort((a, b) => (Number(b.confidence) || 0) - (Number(a.confidence) || 0))
@@ -542,11 +542,11 @@ function buildDerivedMarkets(prediction, options = {}) {
     ).slice(0, maxRows);
 }
 
-function buildSecondaryCandidates(predictions) {
+async function buildSecondaryCandidates(predictions) {
     const secondary = [];
 
     for (const prediction of predictions) {
-        secondary.push(...buildDerivedMarkets(prediction, {
+        secondary.push(...await buildDerivedMarkets(prediction, {
             includeTypes: ['secondary', 'advanced'],
             requireDisplayFriendlyMarkets: true,
             maxRows: 2
@@ -556,10 +556,10 @@ function buildSecondaryCandidates(predictions) {
     return uniqueBy(secondary, (row) => `${row.match_id}:${row.market}`);
 }
 
-function buildSameMatchCandidates(predictions) {
+async function buildSameMatchCandidates(predictions) {
     const out = [];
     for (const prediction of predictions) {
-        const derived = buildDerivedMarkets(prediction, {
+        const derived = await buildDerivedMarkets(prediction, {
             includeTypes: ['primary', 'secondary', 'advanced'],
             excludeMarkets: ['MATCH_RESULT', 'MATCH_WINNER', 'WINNER', 'RACE_WINNER'],
             maxRows: SAME_MATCH_INSIGHT_TARGET - 1
@@ -971,7 +971,7 @@ async function buildFinalForTier(tier, options = {}) {
         // -------------------------------------------------------------------------
         const sameMatchRows = [];
         const sameMatchSelections = takeAvailablePredictions(
-            buildSameMatchCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds)),
+            await buildSameMatchCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds)),
             usedFixtureIds,
             categoryBuildCaps.same_match
         );
@@ -992,7 +992,7 @@ async function buildFinalForTier(tier, options = {}) {
         // -------------------------------------------------------------------------
         const secondaryRows = [];
         const secondarySelections = takeAvailablePredictions(
-            buildSecondaryCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds)),
+            await buildSecondaryCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds)),
             usedFixtureIds,
             categoryBuildCaps.secondary
         );

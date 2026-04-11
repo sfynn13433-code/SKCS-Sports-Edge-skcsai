@@ -14,7 +14,7 @@ function hoursUntil(kickoff) {
     return (k.getTime() - Date.now()) / (1000 * 60 * 60);
 }
 
-function reEvaluatePredictions(predictions) {
+async function reEvaluatePredictions(predictions) {
     const input = Array.isArray(predictions) ? predictions : [];
     const out = [];
 
@@ -45,7 +45,7 @@ function reEvaluatePredictions(predictions) {
 
         // Re-score markets using the deterministic market engine, then decide whether to keep/switch/remove.
         const matchData = p?.matchData || p?.match || null;
-        const rescored = matchData ? scoreMarkets(matchData) : [];
+        const rescored = matchData ? await scoreMarkets(matchData) : [];
 
         const currentConfidence = typeof selection?.confidence === 'number'
             ? selection.confidence

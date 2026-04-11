@@ -126,12 +126,12 @@ function outcomeUniverseToLegacyMarket(sport, market, line = null) {
     return null;
 }
 
-function scoreMarkets(matchData) {
+async function scoreMarkets(matchData) {
     const sport = normalizeSport(matchData?.sport);
     const sportConfig = predictionOutcomes.getMarketsBySport(sport);
     if (!sportConfig) return [];
 
-    const scoring = scoreMatch({
+    const scoring = await scoreMatch({
         match_id: matchData?.match_id || matchData?.matchId || null,
         sport,
         home_team: matchData?.home_team || matchData?.homeTeam || null,
