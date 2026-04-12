@@ -14,8 +14,36 @@ const {
     calculateTrueComboConfidence,
     calculateTicketCompoundProbability,
     filterExpiredFixtures,
-    selectAccaLegs
+    selectAccaLegs,
+    MIN_CONFIDENCE,
+    MAX_CONFIDENCE,
+    FAMILY_CAPS_6,
+    FAMILY_CAPS_12,
+    BUILD_ORDER,
+    ALLOWED_FAMILIES,
+    normalizeMarketFamily,
+    isValidConfidence,
 } = require('../utils/accaLogicEngine');
+const {
+    filterUpcomingFixtures,
+    stableFixtureKey,
+    normalizeInsightFamily,
+    validateAndNormalizeMarket,
+    isBannedMarket,
+    isValidConfidence: isValidConfidenceIE,
+    weeklyTeamLock,
+    reserveTeamsWeekly,
+    extractTeamCompetitionPairs,
+    startOfWeekUtc,
+    endOfWeekUtc,
+    validateMarketDiversity,
+    verifyProbabilityIntegrity,
+    MIN_LEG_CONFIDENCE,
+    MAX_LEG_CONFIDENCE,
+    MIN_FAMILIES_PER_CARD,
+    getCardDescriptor,
+    getFamilyCaps,
+} = require('../utils/insightEngine');
 
 const MEGA_ACCA_SIZE = 12;
 const ACCA_SIZE = 6;
@@ -1301,28 +1329,19 @@ function reserveCandidate(candidate, usedFixtureIds) {
 
 function finalizeAccumulatorRow(legs, options = {}) {
     const profile = String(options.profile || 'mixed_sport');
-    const minLegConfidenceFloor = Number(options.minLegConfidenceFloor || ACCA_MIN_LEG_CONFIDENCE);
+    const minLegConfidenceFloor = Number(options.minLegConfidenceFloor || (MIN_CONFIDENCE || 80));
     const isMega = options.isMega === true;
     const legCount = Number(legs?.length || 0);
-    const ticketLabel = legCount >= MEGA_ACCA_SIZE ? '12 MATCH MEGA ACCA' : '6 MATCH ACCA';
+    const ticketLabel = legCount >= 12 ? '12 MATCH MEGA ACCA' : '6 MATCH ACCA';
 
-    // Compute diversity breakdown: count market families across legs
+    // SKCS LAW: Compute diversity breakdown
     const diversityBreakdown = {};
     legs.forEach((leg) => {
-        const marketType = String(leg?.market || leg?.metadata?.market || '').toLowerCase();
-        let family = 'other';
-        if (marketType.includes('combo')) family = 'combo';
-        else if (marketType.includes('double_chance')) family = 'double_chance';
-        else if (marketType.includes('draw_no_bet')) family = 'draw_no_bet';
-        else if (marketType.includes('team_total')) family = 'team_total';
-        else if (marketType.includes('over') || marketType.includes('under')) family = 'totals';
-        else if (marketType.includes('btts')) family = 'btts';
-        else if (marketType.includes('handicap')) family = 'handicap';
-        else if (marketType.includes('half')) family = 'half_time';
-        else if (marketType.includes('corner')) family = 'corners';
-        else if (marketType.includes('card')) family = 'cards';
-        else if (marketType.includes('winner') || marketType === '1x2' || marketType.includes('match_result')) family = 'match_result';
-        diversityBreakdown[family] = (diversityBreakdown[family] || 0) + 1;
+        const marketType = String(leg?.market || leg?.metadata?.market || leg?.type || '').toLowerCase();
+        const family = normalizeMarketFamily(marketType) || normalizeInsightFamily(marketType) || 'other';
+        if (family && family !== 'other') {
+            diversityBreakdown[family] = (diversityBreakdown[family] || 0) + 1;
+        }
     });
 
     const payloadLegs = legs.map((leg) => {
@@ -1333,7 +1352,8 @@ function finalizeAccumulatorRow(legs, options = {}) {
             acca_profile: profile,
             acca_profile_label: profile === 'football_only' ? 'Football ACCA' : 'Mixed Sport ACCA',
             acca_ticket_label: ticketLabel,
-            min_leg_confidence_floor: minLegConfidenceFloor
+            min_leg_confidence_floor: minLegConfidenceFloor,
+            market_family: normalizeMarketFamily(leg?.market || leg?.metadata?.market || '') || 'other',
         };
         if (isMega) {
             finalLeg.metadata.mega_acca_leg = true;
@@ -1342,6 +1362,7 @@ function finalizeAccumulatorRow(legs, options = {}) {
     });
 
     const averageLegConfidence = computeTotalConfidence(payloadLegs);
+    // SKCS LAW: Strict multiplication for total
     const totalConfidence = computeCompoundConfidence(payloadLegs);
     const totalTicketProbability = totalConfidence.toFixed(2) + '%';
 
@@ -1352,7 +1373,8 @@ function finalizeAccumulatorRow(legs, options = {}) {
             display_label: ticketLabel,
             average_leg_confidence: averageLegConfidence,
             compound_ticket_confidence: totalConfidence,
-            total_ticket_probability_display: totalTicketProbability
+            total_ticket_probability_display: totalTicketProbability,
+            diversity_breakdown: { ...diversityBreakdown },
         }
     }));
 
@@ -1366,9 +1388,11 @@ function finalizeAccumulatorRow(legs, options = {}) {
         display_label: ticketLabel,
         average_leg_confidence: averageLegConfidence,
         diversity_breakdown: diversityBreakdown,
+        family_count: Object.keys(diversityBreakdown).length,
         risk_level: isMega ? 'safe' : riskLevelFromConfidence(totalConfidence)
     };
 }
+
 
 function hasMixedSportCoverage(candidates) {
     const sports = new Set(candidates.map((candidate) => normalizeSportKey(candidate?.sport)));
@@ -2259,18 +2283,34 @@ async function buildFinalForTier(tier, options = {}) {
         );
 
 
-        // TEMPORARY DIAGNOSTICS: Stabilization pass — remove after one clean deploy cycle
+        // TEMPORARY DIAGNOSTICS: SKCS ACCA Engine Law enforcement
         const allAccaCards = [...accaRows, ...megaAccaRows];
         const allFixtureKeys = [];
+        const allTeamPairs = [];
         let cardsWithFakeMath = 0;
+        let duplicateTeamsWeekly = 0;
+        let bannedMarketsTotal = 0;
+        let familyCapsEnforcedTotal = 0;
+
         const cardDiagnostics = allAccaCards.map((card) => {
             const cardMatches = card.matches || [];
             const fixtureKeys = cardMatches.map((m) => m.match_id).filter(Boolean);
             allFixtureKeys.push(...fixtureKeys);
+
+            // Collect team pairs for weekly lock check
+            for (const m of cardMatches) {
+                const pairs = extractTeamCompetitionPairs(m);
+                allTeamPairs.push(...pairs);
+            }
+
             const avgConf = Number(card.average_leg_confidence || 0);
             const totalConf = Number(card.total_confidence || 0);
             const isHonest = totalConf <= avgConf || avgConf === 0;
             if (!isHonest) cardsWithFakeMath++;
+
+            const diversity = card.diversity_breakdown || cardMatches[0]?.metadata?.diversity_breakdown || {};
+            const familyCount = Object.keys(diversity).filter(k => diversity[k] > 0).length;
+
             return {
                 type: card.type,
                 legs: cardMatches.length,
@@ -2278,18 +2318,30 @@ async function buildFinalForTier(tier, options = {}) {
                 totalConfidence: totalConf,
                 honest: isHonest,
                 displayLabel: card.display_label || card.ticket_label || 'UNKNOWN',
-                diversityBreakdown: card.diversity_breakdown || null,
+                familyCount,
+                diversityBreakdown: diversity,
             };
         });
+
         const uniqueFixtureKeys = new Set(allFixtureKeys);
         const duplicateFixtureCount = allFixtureKeys.length - uniqueFixtureKeys.size;
 
+        // Weekly team lock check
+        const teamCompMap = new Map();
+        for (const { team, competition } of allTeamPairs) {
+            if (!team || !competition) continue;
+            if (!teamCompMap.has(team)) teamCompMap.set(team, new Set());
+            if (teamCompMap.get(team).has(competition)) {
+                duplicateTeamsWeekly++;
+            }
+            teamCompMap.get(team).add(competition);
+        }
+
         console.log('[accaBuilder DIAGNOSTICS] tier=%s', t);
         console.log('[accaBuilder DIAGNOSTICS] raw_fixtures_in=%s upcoming_after_filter=%s', valid.length, perSportLimited.length);
-        console.log('[accaBuilder DIAGNOSTICS] acca_cards_built=%s duplicate_fixture_keys=%s cards_with_fake_math=%s', allAccaCards.length, duplicateFixtureCount, cardsWithFakeMath);
+        console.log('[accaBuilder DIAGNOSTICS] acca_cards_built=%s duplicate_fixture_keys=%s duplicate_teams_weekly=%s cards_with_fake_math=%s', allAccaCards.length, duplicateFixtureCount, duplicateTeamsWeekly, cardsWithFakeMath);
+        console.log('[accaBuilder DIAGNOSTICS] avg_vs_total=%s', JSON.stringify(cardDiagnostics.map(c => ({ legs: c.legs, avg: c.avgConfidence, total: c.totalConfidence, honest: c.honest, families: c.familyCount }))));
         console.log('[accaBuilder DIAGNOSTICS] card_details=%s', JSON.stringify(cardDiagnostics));
-        const avgVsTotal = allAccaCards.map((c) => ({ legs: (c.matches || []).length, avg: Number(c.average_leg_confidence || 0), total: Number(c.total_confidence || 0) }));
-        console.log('[accaBuilder DIAGNOSTICS] avg_vs_total=%s', JSON.stringify(avgVsTotal));
         // END TEMPORARY DIAGNOSTICS
 
         return {

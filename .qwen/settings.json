@@ -20,7 +20,9 @@
       "Bash(fix: *)",
       "Bash(- *)",
       "Bash(msg)",
-      "Bash(type *)"
+      "Bash(type *)",
+      "Bash(cd *)",
+      "Bash(find *)"
     ]
   },
   "$version": 3
