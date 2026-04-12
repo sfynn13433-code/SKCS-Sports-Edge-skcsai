@@ -504,10 +504,25 @@ function enrichMatchMetadata(match, prediction) {
         : rawOutcome.toUpperCase();
     const fallbackReasoning = String(prediction?.reasoning || prediction?.model_reasoning || '').trim();
     const contextInsights = buildContextInsightsFromMetadata(match?.metadata?.context_intelligence || null);
+    const routerMeta = match?.metadata?.market_router || {};
+    const engineLog = Array.isArray(routerMeta.engine_log) ? routerMeta.engine_log : [];
+    const matchConfidence = normalizeConfidence(match?.confidence ?? prediction?.total_confidence ?? 0);
+    const finalRecommendation = routerMeta?.final_recommendation || {
+        market: humanizePredictionLabel(match?.prediction, match?.market),
+        confidence: matchConfidence
+    };
+    const insights = routerMeta?.insights || {
+        weather: contextInsights?.chips?.weather || 'Unavailable',
+        availability: contextInsights?.chips?.injuries_bans || 'No major absences',
+        stability: contextInsights?.chips?.stability || 'Unknown'
+    };
 
     return {
         ...match,
         context_insights: contextInsights,
+        final_recommendation: finalRecommendation,
+        engine_log: engineLog,
+        insights,
         prediction_details: {
             outcome: fallbackOutcome,
             reasoning: fallbackReasoning,
@@ -635,6 +650,18 @@ function enrichPredictionDetails(prediction) {
         prediction?.model_reasoning ||
         '';
     const contextInsights = firstMatch?.context_insights || buildContextInsightsFromMetadata(firstMetadata?.context_intelligence || null);
+    const engineLog = Array.isArray(firstMatch?.engine_log)
+        ? firstMatch.engine_log
+        : (Array.isArray(firstMetadata?.market_router?.engine_log) ? firstMetadata.market_router.engine_log : []);
+    const finalRecommendation = firstMatch?.final_recommendation || firstMetadata?.market_router?.final_recommendation || {
+        market: humanizePredictionLabel(firstMatch?.prediction, firstMatch?.market),
+        confidence: normalizeConfidence(firstMatch?.confidence ?? prediction?.total_confidence ?? 0)
+    };
+    const insights = firstMatch?.insights || firstMetadata?.market_router?.insights || {
+        weather: contextInsights?.chips?.weather || 'Unavailable',
+        availability: contextInsights?.chips?.injuries_bans || 'No major absences',
+        stability: contextInsights?.chips?.stability || 'Unknown'
+    };
 
     return {
         ...prediction,
@@ -642,6 +669,9 @@ function enrichPredictionDetails(prediction) {
         ticket_label: defaultTicketLabel,
         average_leg_confidence: resolveAverageLegConfidence(prediction),
         context_insights: contextInsights,
+        final_recommendation: finalRecommendation,
+        engine_log: engineLog,
+        insights,
         prediction_details: {
             ...(prediction?.prediction_details || {}),
             outcome: finalOutcome,

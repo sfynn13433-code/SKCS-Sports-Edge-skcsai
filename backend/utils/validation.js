@@ -17,6 +17,8 @@ const KNOWN_MARKETS = new Set([
     'under_4_5',
     'btts_yes',
     'btts_no',
+    'draw_no_bet_home',
+    'draw_no_bet_away',
     'ht_draw',
     'ht_ft',
     'corners_over_7_5',

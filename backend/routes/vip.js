@@ -151,10 +151,24 @@ function megaIsValid(row, plan, now = new Date()) {
 function shapePrediction(row) {
     const category = inferCategory(row);
     const matches = Array.isArray(row?.matches) ? row.matches : [];
-    const matchesWithContext = matches.map((match) => ({
-        ...match,
-        context_insights: buildContextInsightsFromMetadata(match?.metadata?.context_intelligence || null)
-    }));
+    const matchesWithContext = matches.map((match) => {
+        const contextInsights = buildContextInsightsFromMetadata(match?.metadata?.context_intelligence || null);
+        const routerMeta = match?.metadata?.market_router || {};
+        return {
+            ...match,
+            context_insights: contextInsights,
+            final_recommendation: routerMeta?.final_recommendation || {
+                market: String(match?.market || '').toUpperCase(),
+                confidence: Number(match?.confidence || row?.total_confidence || 0)
+            },
+            engine_log: Array.isArray(routerMeta.engine_log) ? routerMeta.engine_log : [],
+            insights: routerMeta?.insights || {
+                weather: contextInsights?.chips?.weather || 'Unavailable',
+                availability: contextInsights?.chips?.injuries_bans || 'No major absences',
+                stability: contextInsights?.chips?.stability || 'Unknown'
+            }
+        };
+    });
     const validation = category === 'same_match'
         ? validateInsightLegGroup(matchesWithContext)
         : null;
@@ -192,6 +206,9 @@ function shapePrediction(row) {
         created_at: row.created_at,
         validation_matrix: validation,
         context_insights: firstMatch?.context_insights || buildContextInsightsFromMetadata(firstMatch?.metadata?.context_intelligence || null),
+        final_recommendation: firstMatch?.final_recommendation || null,
+        engine_log: Array.isArray(firstMatch?.engine_log) ? firstMatch.engine_log : [],
+        insights: firstMatch?.insights || null,
         matches: matchesWithContext
     };
 }

@@ -8,6 +8,7 @@ const { getPredictionInputs } = require('./dataProvider');
 const { scoreMatch } = require('./aiScoring');
 const enrichFixtureWithContext = require('../src/services/contextIntelligence/aiPipeline');
 const adjustProbability = require('../src/services/contextIntelligence/adjustProbability');
+const { resolveDecision } = require('../src/services/marketRouter/waterfall');
 
 let isRunning = false;
 
@@ -29,6 +30,10 @@ function normalizePrediction(prediction) {
     };
 
     return aliases[value] || value;
+}
+
+function ensureArray(value) {
+    return Array.isArray(value) ? value : [];
 }
 
 function clamp(value, min, max) {
@@ -60,6 +65,113 @@ function normalizeContextSignals(value) {
         discipline_risk: read('discipline_risk'),
         stability_risk: read('stability_risk')
     };
+}
+
+function toTitleCase(text) {
+    return String(text || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[_-]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function safeTeamData(teamData) {
+    const payload = teamData && typeof teamData === 'object' ? teamData : {};
+    return {
+        injuries: ensureArray(payload.injuries),
+        suspensions: ensureArray(payload.suspensions),
+        expectedXI: {
+            reliability: Number.isFinite(Number(payload.expectedXI?.reliability))
+                ? Number(payload.expectedXI.reliability)
+                : 1
+        }
+    };
+}
+
+function deriveWaterfallProbabilities(predictionKey, pAdj) {
+    const pFav = clamp(toProb(pAdj), 0.10, 0.95);
+
+    let home = 0.33;
+    let away = 0.33;
+    let draw = 0.34;
+
+    if (predictionKey === 'home_win') {
+        home = pFav;
+        const rem = 1 - home;
+        away = rem * 0.58;
+        draw = rem * 0.42;
+    } else if (predictionKey === 'away_win') {
+        away = pFav;
+        const rem = 1 - away;
+        home = rem * 0.58;
+        draw = rem * 0.42;
+    } else {
+        draw = pFav;
+        const rem = 1 - draw;
+        home = rem * 0.5;
+        away = rem * 0.5;
+    }
+
+    const doubleChance1X = clamp(home + draw, 0, 1);
+    const doubleChanceX2 = clamp(away + draw, 0, 1);
+
+    const dnbDenom = Math.max(home + away, 0.0001);
+    const dnbHome = clamp(home / dnbDenom, 0, 1);
+    const dnbAway = clamp(away / dnbDenom, 0, 1);
+
+    const over15 = clamp(Math.max(home, away) + 0.18, 0.55, 0.98);
+    const under45 = clamp(0.92 - Math.abs(home - away) * 0.12 + draw * 0.06, 0.55, 0.98);
+
+    return {
+        home_win: home,
+        away_win: away,
+        draw,
+        double_chance_1x: doubleChance1X,
+        double_chance_x2: doubleChanceX2,
+        draw_no_bet_home: dnbHome,
+        draw_no_bet_away: dnbAway,
+        over_1_5: over15,
+        under_4_5: under45
+    };
+}
+
+function toProb(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return 0;
+    return clamp(n, 0, 1);
+}
+
+function countKeyAbsences(teamData) {
+    const safe = safeTeamData(teamData);
+    const keyInjuries = safe.injuries.filter((p) => Boolean(p?.isKeyPlayer)).length;
+    const keySuspensions = safe.suspensions.filter((p) => Boolean(p?.isKeyPlayer)).length;
+    return keyInjuries + keySuspensions;
+}
+
+function riskBand(value) {
+    const risk = clamp(Number(value) || 0, 0, 1);
+    if (risk >= 0.7) return 'High Risk';
+    if (risk >= 0.4) return 'Medium Risk';
+    return 'Low Risk';
+}
+
+function buildUiInsights(contextFixture, contextSignals) {
+    const weatherRisk = clamp(Number(contextSignals.weather_risk) || 0, 0, 1);
+    const availabilityRisk = clamp(Number(contextSignals.availability_risk) || 0, 0, 1);
+    const stabilityRisk = clamp(Number(contextSignals.stability_risk) || 0, 0, 1);
+    const teamName = String(contextFixture.home_team || 'Team').trim() || 'Team';
+    const keyAbsences = countKeyAbsences(contextFixture.teamData);
+
+    const weather = weatherRisk > 0.3
+        ? `Adverse weather risk (${Math.round(weatherRisk * 100)}%)`
+        : 'Weather conditions stable';
+    const availability = keyAbsences > 0
+        ? `${teamName} missing ${keyAbsences} key player${keyAbsences === 1 ? '' : 's'}`
+        : `Squad availability stable (${Math.round((1 - availabilityRisk) * 100)}%)`;
+    const stability = `${teamName}: ${riskBand(stabilityRisk)}`;
+
+    return { weather, availability, stability };
 }
 
 function buildContextFixture(item, matchId, sport) {
@@ -126,7 +238,7 @@ async function buildRawPredictionFromProviderItem(item) {
     if (!match_id) throw new Error('match_id missing in provider item');
 
     const sport = normalizeSport(item.sport);
-    const market = String(item.market || '1X2').trim();
+    const requestedMarket = String(item.market || '1X2').trim();
 
     const scoring = await scoreMatch({
         match_id,
@@ -153,26 +265,37 @@ async function buildRawPredictionFromProviderItem(item) {
         ? item.confidence
         : scoring.confidence;
     const p_base = toProbability(baselineConfidence);
+    const contextFixture = buildContextFixture(item, match_id, sport);
     let contextEnriched = null;
 
     try {
-        contextEnriched = await enrichFixtureWithContext(buildContextFixture(item, match_id, sport));
+        contextEnriched = await enrichFixtureWithContext(contextFixture);
     } catch (contextErr) {
         console.warn('[aiPipeline] context enrichment failed for match_id=%s: %s', match_id, contextErr.message);
     }
 
     const contextSignals = normalizeContextSignals(contextEnriched?.contextSignals);
     const p_adj = adjustProbability(p_base, contextSignals);
-    const confidence = toConfidencePercent(p_adj);
+    const waterfallProbabilities = deriveWaterfallProbabilities(prediction, p_adj);
+    const waterfallDecision = resolveDecision(waterfallProbabilities);
+    if (waterfallDecision.status === 'no_bet') {
+        console.log('[aiPipeline] no-bet fixture skipped match_id=%s phase=%s', match_id, waterfallDecision.phase);
+        return null;
+    }
+
+    const market = waterfallDecision.market || requestedMarket;
+    const routedPrediction = waterfallDecision.prediction || prediction;
+    const confidence = toConfidencePercent(waterfallDecision.confidence_probability || p_adj);
     const volatility = item.volatility || scoring.volatility;
     const aiSource = scoring.source || null; // 'dolphin', 'fallback', 'odds', etc.
     const aiReasoning = scoring.reasoning || null;
+    const uiInsights = buildUiInsights(contextFixture, contextSignals);
 
     const raw = {
         match_id,
         sport,
         market,
-        prediction,
+        prediction: routedPrediction,
         confidence,
         volatility,
         odds: item.odds !== undefined ? item.odds : null,
@@ -192,16 +315,33 @@ async function buildRawPredictionFromProviderItem(item) {
             stage: item.stage || item.round || null,
             venue: item.venue || null,
             country: item.country || null,
+            base_market: requestedMarket,
+            base_prediction: prediction,
             context_intelligence: {
                 status: contextEnriched?.context_status || 'unavailable',
-                cache_key: contextEnriched?.context_cache_key || null,
-                last_verified: contextEnriched?.context_last_verified || null,
+                last_verified: new Date().toISOString(),
                 signals: contextSignals,
-                insights: contextEnriched?.contextInsights || null,
+                insights: {
+                    weather: { summary: uiInsights.weather },
+                    availability: { summary: uiInsights.availability },
+                    stability: { summary: uiInsights.stability },
+                    discipline: {}
+                },
                 p_base,
                 p_adj,
                 confidence_base_pct: Math.round(toProbability(baselineConfidence) * 10000) / 100,
                 confidence_adj_pct: confidence
+            },
+            market_router: {
+                phase: waterfallDecision.phase,
+                status: waterfallDecision.status,
+                final_recommendation: {
+                    market: waterfallDecision.display_market || toTitleCase(market),
+                    confidence
+                },
+                engine_log: ensureArray(waterfallDecision.engine_log),
+                probabilities: waterfallDecision.probabilities || {},
+                insights: uiInsights
             },
             ai: predictionSource === 'ai_fallback'
                 ? {
@@ -264,6 +404,7 @@ async function runPipelineForMatches({ matches }) {
                 ...item,
                 data_mode: 'manual'
             });
+            if (!raw) continue;
             const row = await insertRawPrediction(raw, client);
             inserted.push(row);
         }
@@ -319,6 +460,7 @@ async function runPipelineFromConfiguredDataMode() {
                 ...item,
                 data_mode: mode
             });
+            if (!raw) continue;
 
             const row = await insertRawPrediction(raw, client);
             inserted.push(row);

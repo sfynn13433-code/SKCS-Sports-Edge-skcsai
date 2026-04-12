@@ -17,6 +17,9 @@ function toRiskLabel(riskValue) {
 }
 
 function buildWeatherLabel(weatherMeta = {}) {
+    if (typeof weatherMeta.summary === 'string' && weatherMeta.summary.trim().length > 0) {
+        return weatherMeta.summary.trim();
+    }
     const status = String(weatherMeta.status || '').trim().toLowerCase();
     if (!status || status === 'failed' || status === 'unavailable') return 'Unavailable';
 
@@ -29,6 +32,9 @@ function buildWeatherLabel(weatherMeta = {}) {
 }
 
 function buildInjuryBanLabel(availabilityMeta = {}, disciplineMeta = {}) {
+    if (typeof availabilityMeta.summary === 'string' && availabilityMeta.summary.trim().length > 0) {
+        return availabilityMeta.summary.trim();
+    }
     const keyAbsences = toNumber(availabilityMeta.keyAbsences, 0);
     const squadAbsences = toNumber(availabilityMeta.squadAbsences, 0);
     const bans = Array.isArray(disciplineMeta.bans) ? disciplineMeta.bans.length : 0;
@@ -54,6 +60,10 @@ function buildContextInsightsFromMetadata(contextIntelligence) {
     const stabilityMeta = insights.stability && typeof insights.stability === 'object' ? insights.stability : {};
     const lastVerified = payload.last_verified || null;
 
+    const stabilityLabelFromSummary = typeof stabilityMeta.summary === 'string' && stabilityMeta.summary.trim().length > 0
+        ? stabilityMeta.summary.trim()
+        : toRiskLabel(signals.stability_risk);
+
     return {
         status: payload.status || 'unavailable',
         weather: {
@@ -69,7 +79,7 @@ function buildContextInsightsFromMetadata(contextIntelligence) {
             bans: Array.isArray(disciplineMeta.bans) ? disciplineMeta.bans.length : 0
         },
         stability: {
-            label: toRiskLabel(signals.stability_risk),
+            label: stabilityLabelFromSummary,
             risk: toNumber(signals.stability_risk, 0),
             flags: {
                 coach_conflict: Boolean(stabilityMeta.coachConflict),
@@ -82,7 +92,7 @@ function buildContextInsightsFromMetadata(contextIntelligence) {
         chips: {
             weather: buildWeatherLabel(weatherMeta),
             injuries_bans: buildInjuryBanLabel(availabilityMeta, disciplineMeta),
-            stability: toRiskLabel(signals.stability_risk),
+            stability: stabilityLabelFromSummary,
             last_verified: lastVerified
         }
     };
