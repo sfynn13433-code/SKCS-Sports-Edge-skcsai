@@ -48,6 +48,8 @@ function computeTotalConfidence(predictions) {
 
 function computeCompoundConfidence(predictions) {
     if (!Array.isArray(predictions) || predictions.length === 0) return 0;
+    // True compound probability: multiply per-leg decimal probabilities.
+    // Example: 90% * 80% => 0.9 * 0.8 = 0.72 => 72%
     const combined = predictions.reduce((acc, prediction) => {
         const confidence = Number(prediction?.confidence);
         const probability = Number.isFinite(confidence) ? clamp(confidence, 0, 100) / 100 : 0;
@@ -1145,9 +1147,10 @@ function isComboConditionAccumulatorMarket(candidate) {
 }
 
 function resolveComboConditionCap(size, options = {}) {
-    if (Number(size) !== ACCA_SIZE) return Infinity;
-    if (options.isMega === true) return Infinity;
-    return 2;
+    if (Number(size) === ACCA_SIZE) return 2;
+    if (Number(size) === MEGA_ACCA_SIZE) return 4;
+    if (options.isMega === true) return 4;
+    return Infinity;
 }
 
 function selectBestAccaCandidateFromPool(candidatePool, minConfidenceFloor) {
@@ -1195,6 +1198,12 @@ function getAccaCandidateFixtureIds(candidate) {
     return predictionFixtureIds(candidate);
 }
 
+function isCandidateUsedGlobally(candidate, globalUsedFixtures) {
+    const ids = getAccaCandidateFixtureIds(candidate);
+    if (!ids.length) return true;
+    return ids.some((fixtureId) => globalUsedFixtures.has(fixtureId));
+}
+
 function canReserveCandidate(candidate, globallyUsedFixtureIds, locallyUsedFixtureIds) {
     const ids = getAccaCandidateFixtureIds(candidate);
     if (!ids.length) return false;
@@ -1227,18 +1236,22 @@ function finalizeAccumulatorRow(legs, options = {}) {
     });
     const averageLegConfidence = computeTotalConfidence(payloadLegs);
     const totalConfidence = computeCompoundConfidence(payloadLegs);
+    const totalTicketProbability = `${totalConfidence.toFixed(2)}%`;
     const payloadLegsWithConfidenceMeta = payloadLegs.map((leg) => ({
         ...leg,
         metadata: {
             ...(leg.metadata || {}),
             average_leg_confidence: averageLegConfidence,
-            compound_ticket_confidence: totalConfidence
+            compound_ticket_confidence: totalConfidence,
+            total_ticket_probability_display: totalTicketProbability
         }
     }));
     return {
         match_id: payloadLegsWithConfidenceMeta.map((leg) => leg.match_id).filter(Boolean).join('|'),
         matches: payloadLegsWithConfidenceMeta,
         total_confidence: totalConfidence,
+        total_ticket_probability: totalConfidence,
+        totalTicketProbability: totalTicketProbability,
         average_leg_confidence: averageLegConfidence,
         risk_level: isMega ? 'safe' : riskLevelFromConfidence(totalConfidence)
     };
@@ -1265,6 +1278,7 @@ function buildFootballOnlyAccumulatorRow(pool, usedFixtureIds, size, minConfiden
     for (const candidate of footballPool) {
         if (selected.length >= size) break;
         if (comboConditionCount >= comboConditionCap && isComboConditionAccumulatorMarket(candidate)) continue;
+        if (isCandidateUsedGlobally(candidate, usedFixtureIds)) continue;
         if (!canReserveCandidate(candidate, usedFixtureIds, localUsed)) continue;
         selected.push(candidate);
         reserveCandidate(candidate, localUsed);
@@ -1326,6 +1340,10 @@ function buildMixedAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor
                 selected.length = 0;
                 break;
             }
+            if (isCandidateUsedGlobally(candidate, usedFixtureIds)) {
+                selected.length = 0;
+                break;
+            }
             if (!canReserveCandidate(candidate, usedFixtureIds, localUsed)) {
                 selected.length = 0;
                 break;
@@ -1339,6 +1357,7 @@ function buildMixedAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor
         for (const candidate of sorted) {
             if (selected.length >= size) break;
             if (comboConditionCount >= comboConditionCap && isComboConditionAccumulatorMarket(candidate)) continue;
+            if (isCandidateUsedGlobally(candidate, usedFixtureIds)) continue;
             if (!canReserveCandidate(candidate, usedFixtureIds, localUsed)) continue;
             selected.push(candidate);
             reserveCandidate(candidate, localUsed);
@@ -1438,25 +1457,23 @@ function buildAcca6Candidates(predictions, maxRows = 6, options = {}) {
     const minConfidenceFloor = Number.isFinite(Number(options.minLegConfidence))
         ? Number(options.minLegConfidence)
         : ACCA_MIN_LEG_CONFIDENCE;
-    const blockedFixtureIds = options.blockedFixtureIds instanceof Set ? options.blockedFixtureIds : null;
+    const globalUsedFixtures = options.globalUsedFixtures instanceof Set ? options.globalUsedFixtures : new Set();
     const sorted = (Array.isArray(predictions) ? predictions : [])
         .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
         .filter((candidate) => {
-            if (!blockedFixtureIds) return true;
             const ids = getAccaCandidateFixtureIds(candidate);
-            return ids.length > 0 && !ids.some((id) => blockedFixtureIds.has(id));
+            return ids.length > 0 && !ids.some((id) => globalUsedFixtures.has(id));
         })
         .sort(compareAccaCandidatePreference);
     if (sorted.length < ACCA_SIZE) return [];
 
     const rows = [];
-    const usedFixtureIds = new Set();
     const footballTarget = Math.min(REQUIRED_FOOTBALL_ONLY_ACCAS, Math.max(0, Number(maxRows) || 0));
 
     for (let i = 0; i < footballTarget; i++) {
         const row = buildFootballOnlyAccumulatorRow(
             sorted,
-            usedFixtureIds,
+            globalUsedFixtures,
             ACCA_SIZE,
             minConfidenceFloor,
             { isMega: false }
@@ -1469,7 +1486,7 @@ function buildAcca6Candidates(predictions, maxRows = 6, options = {}) {
     }
 
     while (rows.length < maxRows) {
-        const row = buildMixedAccumulatorRow(sorted, usedFixtureIds, ACCA_SIZE, minConfidenceFloor);
+        const row = buildMixedAccumulatorRow(sorted, globalUsedFixtures, ACCA_SIZE, minConfidenceFloor, { isMega: false });
         if (!row) break;
         rows.push(row);
     }
@@ -1511,14 +1528,13 @@ function buildMegaAcca12Candidates(predictions, options = {}) {
     const maxRows = Number.isFinite(options.maxRows) ? options.maxRows : 6;
     const expiryCutoff = options.expiryCutoff instanceof Date ? options.expiryCutoff : null;
     const usedThreshold = resolveMegaAccaThreshold(predictions, options);
-    const blockedFixtureIds = options.blockedFixtureIds instanceof Set ? options.blockedFixtureIds : null;
+    const globalUsedFixtures = options.globalUsedFixtures instanceof Set ? options.globalUsedFixtures : new Set();
 
     const eligible = predictions
         .filter((prediction) => Number(prediction.confidence) >= usedThreshold)
         .filter((prediction) => {
-            if (!blockedFixtureIds) return true;
             const ids = getAccaCandidateFixtureIds(prediction);
-            return ids.length > 0 && !ids.some((id) => blockedFixtureIds.has(id));
+            return ids.length > 0 && !ids.some((id) => globalUsedFixtures.has(id));
         })
         .filter((prediction) => !expiryCutoff || isCricketFixtureWithinWindow(prediction, expiryCutoff))
         .sort(compareAccaCandidatePreference)
@@ -1533,11 +1549,10 @@ function buildMegaAcca12Candidates(predictions, options = {}) {
     console.log(`[accaBuilder] Mega ACCA: Building Moonshot series with ${eligible.length} eligible insights at ${usedThreshold}% threshold.`);
 
     const rows = [];
-    const usedFixtureIds = new Set();
     while (rows.length < maxRows) {
         const row = buildMixedAccumulatorRow(
             eligible,
-            usedFixtureIds,
+            globalUsedFixtures,
             MEGA_ACCA_SIZE,
             usedThreshold,
             { isMega: true }
@@ -1886,7 +1901,7 @@ async function buildFinalForTier(tier, options = {}) {
         });
         const weekLockedTeamCompetitionMap = await loadWeekLockedTeamCompetitionMap(client, now);
         const runTeamCompetitionMap = new Map();
-        const usedFixtureIds = new Set();
+        const globalUsedFixtures = new Set();
         const perMatchLimited = enforcePerMatchLimit(valid, accaRules.max_per_match);
         const perSportLimited = enforcePerSportLimit(
             perMatchLimited,
@@ -1899,7 +1914,7 @@ async function buildFinalForTier(tier, options = {}) {
         const limitedCandidates = perSportLimited.slice(0, MAX_ACCA_CANDIDATES);
         const baseAccaInput = filterAvailablePredictions(
             limitedCandidates,
-            usedFixtureIds,
+            globalUsedFixtures,
             weekLockedTeamCompetitionMap,
             runTeamCompetitionMap
         );
@@ -1918,7 +1933,7 @@ async function buildFinalForTier(tier, options = {}) {
                 `[accaBuilder] ACCA pool warning: only ${footballCandidateCount} football fixtures after weekly locks (need ${minimumFootballFixturePool}). Falling back to run-only lock scope for ACCA generation.`
             );
             accaMarketCandidates = await buildAccaLegCandidatePool(
-                filterAvailablePredictions(limitedCandidates, usedFixtureIds, new Map(), runTeamCompetitionMap),
+                filterAvailablePredictions(limitedCandidates, globalUsedFixtures, new Map(), runTeamCompetitionMap),
                 { minLegConfidence: ACCA_MIN_LEG_CONFIDENCE }
             );
         }
@@ -1927,21 +1942,17 @@ async function buildFinalForTier(tier, options = {}) {
         // 1. 6-LEG ACCA LAYER (Pure Football first, then Mixed)
         // -------------------------------------------------------------------------
         const accaRows = [];
-        const accaSelections = takeAvailablePredictions(
-            buildAcca6Candidates(
-                filterAvailablePredictions(accaMarketCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap),
-                categoryBuildCaps.acca_6match,
-                {
-                    minLegConfidence: ACCA_MIN_LEG_CONFIDENCE,
-                    blockedFixtureIds: usedFixtureIds
-                }
-            ),
-            usedFixtureIds,
-            weekLockedTeamCompetitionMap,
-            runTeamCompetitionMap,
-            categoryBuildCaps.acca_6match
+        const accaSelections = buildAcca6Candidates(
+            filterAvailablePredictions(accaMarketCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap),
+            categoryBuildCaps.acca_6match,
+            {
+                minLegConfidence: ACCA_MIN_LEG_CONFIDENCE,
+                globalUsedFixtures
+            }
         );
         for (const row of accaSelections) {
+            reservePredictionFixtures(row, globalUsedFixtures);
+            reservePredictionTeams(row, runTeamCompetitionMap);
             const inserted = await insertFinalRow({
                 publish_run_id: publishRunId,
                 tier: t,
@@ -1957,20 +1968,19 @@ async function buildFinalForTier(tier, options = {}) {
         // 2. THE MEGA ACCA RESERVATION LAYER
         // -------------------------------------------------------------------------
         const megaAccaRows = [];
-        const megaSelections = takeAvailablePredictions(
-            buildMegaAcca12Candidates(filterAvailablePredictions(accaMarketCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap), {
+        const megaSelections = buildMegaAcca12Candidates(
+            filterAvailablePredictions(accaMarketCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap),
+            {
                 maxRows: categoryBuildCaps.mega_acca_12,
                 minLegConfidence: ACCA_MIN_LEG_CONFIDENCE,
-                blockedFixtureIds: usedFixtureIds,
+                globalUsedFixtures,
                 // Subscription temporal gate
                 expiryCutoff: new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000))
-            }),
-            usedFixtureIds,
-            weekLockedTeamCompetitionMap,
-            runTeamCompetitionMap,
-            categoryBuildCaps.mega_acca_12
+            }
         );
         for (const row of megaSelections) {
+            reservePredictionFixtures(row, globalUsedFixtures);
+            reservePredictionTeams(row, runTeamCompetitionMap);
             const inserted = await insertFinalRow({
                 publish_run_id: publishRunId,
                 tier: t,
@@ -1987,8 +1997,8 @@ async function buildFinalForTier(tier, options = {}) {
         // -------------------------------------------------------------------------
         const multiRows = [];
         const multiSelections = takeAvailablePredictions(
-            buildMultiCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap)),
-            usedFixtureIds,
+            buildMultiCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap)),
+            globalUsedFixtures,
             weekLockedTeamCompetitionMap,
             runTeamCompetitionMap,
             categoryBuildCaps.multi
@@ -2010,8 +2020,8 @@ async function buildFinalForTier(tier, options = {}) {
         // -------------------------------------------------------------------------
         const sameMatchRows = [];
         const sameMatchSelections = takeAvailablePredictions(
-            await buildSameMatchCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap)),
-            usedFixtureIds,
+            await buildSameMatchCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap)),
+            globalUsedFixtures,
             weekLockedTeamCompetitionMap,
             runTeamCompetitionMap,
             categoryBuildCaps.same_match
@@ -2033,8 +2043,8 @@ async function buildFinalForTier(tier, options = {}) {
         // -------------------------------------------------------------------------
         const secondaryRows = [];
         const secondarySelections = takeAvailablePredictions(
-            await buildSecondaryCandidates(filterAvailablePredictions(limitedCandidates, usedFixtureIds, weekLockedTeamCompetitionMap, runTeamCompetitionMap)),
-            usedFixtureIds,
+            await buildSecondaryCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap)),
+            globalUsedFixtures,
             weekLockedTeamCompetitionMap,
             runTeamCompetitionMap,
             categoryBuildCaps.secondary
@@ -2059,7 +2069,7 @@ async function buildFinalForTier(tier, options = {}) {
         const directRows = [];
         const directSelections = takeAvailablePredictions(
             limitedCandidates,
-            usedFixtureIds,
+            globalUsedFixtures,
             weekLockedTeamCompetitionMap,
             runTeamCompetitionMap,
             categoryBuildCaps.direct

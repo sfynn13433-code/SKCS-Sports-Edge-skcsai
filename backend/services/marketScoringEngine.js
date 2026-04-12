@@ -14,10 +14,12 @@ function toProbability(confidence) {
     return clamp(n, 0, 100) / 100;
 }
 
-function intersectionConfidence(confidences = []) {
-    const product = (Array.isArray(confidences) ? confidences : [])
-        .reduce((acc, confidence) => acc * toProbability(confidence), 1);
-    return clamp(Math.round(product * 10000) / 100, 0, 100);
+function comboIntersectionConfidence(probEventA, probEventB) {
+    // True statistical intersection:
+    // (A / 100) * (B / 100) * 100
+    const a = toProbability(probEventA);
+    const b = toProbability(probEventB);
+    return clamp(Math.round((a * b * 100) * 100) / 100, 0, 100);
 }
 
 function hashToUnit(seed) {
@@ -250,7 +252,7 @@ function computeComboIntersectionConfidence(row, allRows) {
 
     const primaryConfidence = confidenceForRequiredOutcome(primaryRow, requirements.primaryPick);
     const secondaryConfidence = confidenceForRequiredOutcome(secondaryRow, requirements.secondaryPick);
-    return intersectionConfidence([primaryConfidence, secondaryConfidence]);
+    return comboIntersectionConfidence(primaryConfidence, secondaryConfidence);
 }
 
 function outcomeUniverseToLegacyMarket(sport, market, line = null) {
