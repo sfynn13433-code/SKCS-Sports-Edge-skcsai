@@ -397,20 +397,26 @@ function countSetOverlap(setA, setB) {
 }
 
 function exceedsCardOverlapLimit(candidateCard, publishedCards) {
-    const candidateSet = getCardFixtureKeySet(candidateCard);
-    const limit = candidateCard.legs.length === 12 ? 4 : 2;
+    const candidateLegs = Array.isArray(candidateCard?.legs) ? candidateCard.legs : [];
+    if (!candidateLegs.length) {
+        return { reject: false, overlap: 0 };
+    }
 
-    for (const existingCard of publishedCards) {
-        if (existingCard.legs.length !== candidateCard.legs.length) continue;
+    const candidateSet = getCardFixtureKeySet({ legs: candidateLegs });
+    const limit = candidateLegs.length === 12 ? 4 : 2;
 
-        const existingSet = getCardFixtureKeySet(existingCard);
+    for (const existingCard of Array.isArray(publishedCards) ? publishedCards : []) {
+        const existingLegs = Array.isArray(existingCard?.legs) ? existingCard.legs : [];
+        if (existingLegs.length !== candidateLegs.length) continue;
+
+        const existingSet = getCardFixtureKeySet({ legs: existingLegs });
         const overlap = countSetOverlap(candidateSet, existingSet);
 
         if (overlap > limit) {
             return {
                 reject: true,
                 overlap,
-                comparedAgainst: existingCard.display_label || `${existingCard.legs.length} card`,
+                comparedAgainst: existingCard?.display_label || `${existingLegs.length} card`,
             };
         }
     }
