@@ -3,23 +3,10 @@
 const crypto = require('crypto');
 const predictionOutcomes = require('../config/predictionOutcomes');
 const { scoreMatch } = require('./aiScoring');
+const { calculateTrueComboConfidence } = require('./accaMathUtils');
 
 function clamp(n, min, max) {
     return Math.max(min, Math.min(max, n));
-}
-
-function toProbability(confidence) {
-    const n = Number(confidence);
-    if (!Number.isFinite(n)) return 0;
-    return clamp(n, 0, 100) / 100;
-}
-
-function comboIntersectionConfidence(probEventA, probEventB) {
-    // True statistical intersection:
-    // (A / 100) * (B / 100) * 100
-    const a = toProbability(probEventA);
-    const b = toProbability(probEventB);
-    return clamp(Math.round((a * b * 100) * 100) / 100, 0, 100);
 }
 
 function hashToUnit(seed) {
@@ -252,7 +239,7 @@ function computeComboIntersectionConfidence(row, allRows) {
 
     const primaryConfidence = confidenceForRequiredOutcome(primaryRow, requirements.primaryPick);
     const secondaryConfidence = confidenceForRequiredOutcome(secondaryRow, requirements.secondaryPick);
-    return comboIntersectionConfidence(primaryConfidence, secondaryConfidence);
+    return calculateTrueComboConfidence(primaryConfidence, secondaryConfidence);
 }
 
 function outcomeUniverseToLegacyMarket(sport, market, line = null) {

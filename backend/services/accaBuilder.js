@@ -10,6 +10,11 @@ const { detectConflicts } = require('../utils/conflictResolver');
 const { isValidCombination } = require('./conflictEngine');
 const { scoreMarkets } = require('./marketScoringEngine');
 const { validateInsightLegGroup } = require('../utils/insightValidationMatrix');
+const {
+    calculateTrueComboConfidence,
+    calculateTicketCompoundProbability,
+    filterExpiredFixtures
+} = require('./accaMathUtils');
 
 const MEGA_ACCA_SIZE = 12;
 const ACCA_SIZE = 6;
@@ -27,19 +32,6 @@ function clamp(n, min, max) {
     return Math.max(min, Math.min(max, n));
 }
 
-function toProbability(confidence) {
-    const numeric = Number(confidence);
-    if (!Number.isFinite(numeric)) return 0;
-    return clamp(numeric, 0, 100) / 100;
-}
-
-function intersectionConfidence(confidences = []) {
-    const values = Array.isArray(confidences) ? confidences : [];
-    if (values.length === 0) return 0;
-    const product = values.reduce((acc, value) => acc * toProbability(value), 1);
-    return Math.round(clamp(product * 100, 0, 100) * 100) / 100;
-}
-
 function computeTotalConfidence(predictions) {
     if (!predictions.length) return 0;
     const sum = predictions.reduce((acc, p) => acc + (typeof p.confidence === 'number' ? p.confidence : 0), 0);
@@ -47,15 +39,7 @@ function computeTotalConfidence(predictions) {
 }
 
 function computeCompoundConfidence(predictions) {
-    if (!Array.isArray(predictions) || predictions.length === 0) return 0;
-    // True compound probability: multiply per-leg decimal probabilities.
-    // Example: 90% * 80% => 0.9 * 0.8 = 0.72 => 72%
-    const combined = predictions.reduce((acc, prediction) => {
-        const confidence = Number(prediction?.confidence);
-        const probability = Number.isFinite(confidence) ? clamp(confidence, 0, 100) / 100 : 0;
-        return acc * probability;
-    }, 1);
-    return Math.round(clamp(combined * 100, 0, 100) * 100) / 100;
+    return calculateTicketCompoundProbability(predictions);
 }
 
 // The weekly single-use insight policy follows the South African business week.
@@ -932,7 +916,7 @@ function buildFootballComboCandidates(prediction, scoredMarkets = [], minConfide
 
     const out = [];
     if (dc && btts) {
-        const comboConfidence = intersectionConfidence([dc.confidence, btts.confidence]);
+        const comboConfidence = calculateTrueComboConfidence(dc.confidence, btts.confidence);
         if (comboConfidence >= minConfidence) {
             const dcPick = normalizePickForAcca(dc.pick);
             const bttsPick = normalizePickForAcca(btts.pick);
@@ -961,7 +945,7 @@ function buildFootballComboCandidates(prediction, scoredMarkets = [], minConfide
         const dcPick = normalizePickForAcca(dc.pick);
         const ouPick = normalizePickForAcca(ouBest.pick);
         const lineToken = resolveLineTokenForMarketScore(ouBest, '2_5');
-        const comboConfidence = intersectionConfidence([dc.confidence, ouBest.confidence]);
+        const comboConfidence = calculateTrueComboConfidence(dc.confidence, ouBest.confidence);
         if (comboConfidence >= minConfidence) {
             out.push({
                 raw_id: prediction.raw_id,
@@ -988,7 +972,7 @@ function buildFootballComboCandidates(prediction, scoredMarkets = [], minConfide
         const bttsPick = normalizePickForAcca(btts.pick);
         const ouPick = normalizePickForAcca(ouBest.pick);
         const lineToken = resolveLineTokenForMarketScore(ouBest, '2_5');
-        const comboConfidence = intersectionConfidence([btts.confidence, ouBest.confidence]);
+        const comboConfidence = calculateTrueComboConfidence(btts.confidence, ouBest.confidence);
         if (comboConfidence >= minConfidence) {
             out.push({
                 raw_id: prediction.raw_id,
@@ -1014,7 +998,7 @@ function buildFootballComboCandidates(prediction, scoredMarkets = [], minConfide
     if (result && ou25) {
         const winnerToken = normalizePickForAcca(result.pick);
         const ouPick = normalizePickForAcca(ou25.pick);
-        const comboConfidence = intersectionConfidence([result.confidence, ou25.confidence]);
+        const comboConfidence = calculateTrueComboConfidence(result.confidence, ou25.confidence);
         if (comboConfidence >= minConfidence) {
             out.push({
                 raw_id: prediction.raw_id,
@@ -1651,7 +1635,14 @@ async function loadValidFilteredPredictions(tier, client, options = {}) {
         [t, now.toISOString()]
     );
 
-    return res.rows
+    const futureRows = filterExpiredFixtures(
+        res.rows.map((row) => ({
+            ...row,
+            date: row.kickoff_utc || row?.metadata?.match_time || row?.metadata?.kickoff || row?.metadata?.kickoff_time || null
+        }))
+    );
+
+    return futureRows
         .filter((row) => requestedSports.length === 0 || requestedSports.includes(normalizeSportKey(row.sport)))
         .filter((row) => isPublishablePrediction(row, t, now))
         .sort((a, b) => compareCandidates(a, b, now));
