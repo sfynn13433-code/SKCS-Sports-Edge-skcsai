@@ -1116,6 +1116,10 @@
         const yellowsLineMatch = marketKey.match(/^(over|under)_(\d+)_(\d+)_yellows$/);
         const comboDcBttsMatch = marketKey.match(/^combo_dc_(1x|x2|12)_btts_(yes|no)$/);
         const comboWinnerOuMatch = marketKey.match(/^combo_(home|away|draw)_and_(over|under)_2_5$/);
+        const comboDcOuMatch = marketKey.match(/^combo_dc_(1x|x2|12)_and_(over|under)_(\d+)_(\d+)$/);
+        const comboBttsOuMatch = marketKey.match(/^combo_btts_(yes|no)_and_(over|under)_(\d+)_(\d+)$/);
+        const teamTotalMatch = marketKey.match(/^team_total_(home|away)_(over|under)_(\d+)_(\d+)$/);
+        const htFtMatch = marketKey.match(/^ht_ft_(home|draw|away)_(home|draw|away)$/);
         if (goalLineMatch) {
             return `${goalLineMatch[1].toUpperCase()} ${goalLineMatch[2]}.${goalLineMatch[3]} GOALS`;
         }
@@ -1131,8 +1135,23 @@
         if (comboWinnerOuMatch) {
             return `${comboWinnerOuMatch[1].toUpperCase()} WIN + ${comboWinnerOuMatch[2].toUpperCase()} 2.5 GOALS`;
         }
+        if (comboDcOuMatch) {
+            return `DOUBLE CHANCE ${comboDcOuMatch[1].toUpperCase()} + ${comboDcOuMatch[2].toUpperCase()} ${comboDcOuMatch[3]}.${comboDcOuMatch[4]} GOALS`;
+        }
+        if (comboBttsOuMatch) {
+            return `BTTS ${comboBttsOuMatch[1].toUpperCase()} + ${comboBttsOuMatch[2].toUpperCase()} ${comboBttsOuMatch[3]}.${comboBttsOuMatch[4]} GOALS`;
+        }
+        if (teamTotalMatch) {
+            return `${teamTotalMatch[1].toUpperCase()} TEAM ${teamTotalMatch[2].toUpperCase()} ${teamTotalMatch[3]}.${teamTotalMatch[4]} GOALS`;
+        }
+        if (htFtMatch) {
+            return `HT/FT ${htFtMatch[1].toUpperCase()}-${htFtMatch[2].toUpperCase()}`;
+        }
         if (marketKey === 'btts_yes') return 'BTTS - YES';
         if (marketKey === 'btts_no') return 'BTTS - NO';
+        if (marketKey.startsWith('draw_no_bet_')) return `DRAW NO BET - ${marketKey.replace('draw_no_bet_', '').toUpperCase()}`;
+        if (marketKey === 'asian_handicap') return `ASIAN HANDICAP - ${String(prediction || '').toUpperCase()}`;
+        if (marketKey === 'european_handicap') return `EUROPEAN HANDICAP - ${String(prediction || '').toUpperCase()}`;
         if (marketKey === 'corners_under') return 'TOTAL CORNERS UNDER';
         if (marketKey === 'corners_over') return 'TOTAL CORNERS OVER';
         if (marketKey.startsWith('double_chance_')) {
@@ -1896,7 +1915,7 @@
         const isMegaAcca = getSectionType(pred) === 'mega_acca_12' || (Array.isArray(pred.matches) && pred.matches.length >= 12);
         const outcome = predictionDetails.outcome || (isMegaAcca ? '12-Leg Mega ACCA' : '6-Leg ACCA');
         const badgesHtml = renderCardBadges(pred);
-        const pipelineHtml = renderPipelinePanel(pred, firstMeta);
+        const compoundProbability = Math.max(0, Math.min(100, Math.round(Number(pred.total_confidence || 0) * 100) / 100));
 
         const normalizeSportForAccaBadge = (value) => {
             const key = String(value || '').trim().toLowerCase();
@@ -1921,18 +1940,15 @@
         const accaCompositionLabel = isFootballOnly
             ? '⚽ Football ACCA'
             : (isMixedSports ? '🌐 Mixed Sport ACCA' : '🌐 Mixed Sport ACCA');
-        const averageLegConfidence = getAverageLegConfidence(pred);
-        const ticketConfidenceLabel = averageLegConfidence > 0
-            ? `${averageLegConfidence}% Average Leg Confidence`
-            : `${pred.total_confidence || 0}% Confidence`;
 
         const legsHtml = (pred.matches || []).map((m, idx) => {
             const info = formatMatchInfo(m, m?.sport_type || m?.sport || m?.metadata?.sport_type || m?.metadata?.sport || sport);
             const pred_text = formatPrediction(m);
+            const legConfidence = Math.max(0, Math.min(100, Math.round(Number(m && m.confidence || 0))));
             return `<div style="margin-bottom:6px; padding:6px; background:#f8f9fa; border-radius:4px; font-size:0.9rem;">
                 <div style="font-weight:600; color:#1a202c;">${info.teams}</div>
                 <div style="color:#64748b; font-size:0.72rem; margin-top:4px; letter-spacing:0.03em;">${info.context}</div>
-                <div style="color:#059669; font-weight:600;">${pred_text}</div>
+                <div style="color:#059669; font-weight:600;">${pred_text} <span style="color:#475569; font-weight:700;">| ${legConfidence}%</span></div>
             </div>`;
         }).join('');
 
@@ -1947,10 +1963,10 @@
             <div style="margin-bottom:12px; max-height:200px; overflow-y:auto;">${legsHtml}</div>
             <div style="border-top:1px solid #e2e8f0; padding-top:12px; display:flex; justify-content:space-between; align-items:center;">
                 <div style="color:${isMegaAcca ? '#7c3aed' : '#f87171'}; font-weight:bold;">${outcome}</div>
-                <div style="color:#4a5568; font-size:0.85rem;">${ticketConfidenceLabel}</div>
+                <div style="color:#4a5568; font-size:0.85rem;">Total Ticket Probability: ${compoundProbability}%</div>
             </div>
             ${reasoning ? `<div style="margin-top:10px;padding:10px;border-radius:6px;background:#f8fafc;color:#334155;font-size:0.85rem;line-height:1.5;"><strong>AI Insight:</strong> ${reasoning}</div>` : ''}
-            ${pipelineHtml}
+            <div style="margin-top:10px;text-align:center;color:#334155;font-size:0.8rem;font-weight:600;">All insights have gone through the 6-stage process.</div>
         `;
 
         return card;

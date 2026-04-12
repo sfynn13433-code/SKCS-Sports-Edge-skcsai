@@ -99,20 +99,29 @@
 
     function renderCard(prediction) {
         const leg = firstLeg(prediction);
+        const sectionType = String(prediction.section_type || prediction.type || '').toLowerCase();
+        const isAcca = sectionType === 'acca_6match' || sectionType === 'mega_acca_12';
         const teams = `${safe(leg.home_team || leg.metadata?.home_team)} vs ${safe(leg.away_team || leg.metadata?.away_team)}`;
-        const line = `${safe(leg.market)} • ${safe(leg.prediction)} • ${Number(prediction.total_confidence || 0)}%`;
+        const compound = Math.max(0, Math.min(100, Math.round(Number(prediction.total_confidence || 0) * 100) / 100));
+        const line = isAcca
+            ? `Total Ticket Probability: ${compound}%`
+            : `${safe(leg.market)} • ${safe(leg.prediction)} • ${compound}%`;
         const kickoff = safe(leg.commence_time || leg.match_date || leg.metadata?.kickoff_time || leg.metadata?.match_time);
         const league = safe(leg.metadata?.league || leg.league || leg.sport || prediction.section_type);
         const validation = prediction.validation_matrix;
 
         const legsPreview = Array.isArray(prediction.matches) && prediction.matches.length > 1
-            ? `<div class="legs">${prediction.matches.slice(0, 3).map((m, idx) =>
-                `${idx + 1}. ${safe(m.home_team || m.metadata?.home_team)} vs ${safe(m.away_team || m.metadata?.away_team)} — ${safe(m.market)} ${safe(m.prediction)}`
-            ).join('<br>')}</div>`
+            ? `<div class="legs">${prediction.matches.map((m, idx) => {
+                const legConfidence = Math.max(0, Math.min(100, Math.round(Number(m.confidence || 0))));
+                return `${idx + 1}. ${safe(m.home_team || m.metadata?.home_team)} vs ${safe(m.away_team || m.metadata?.away_team)} — ${safe(m.market)} ${safe(m.prediction)} | ${legConfidence}%`;
+            }).join('<br>')}</div>`
             : '';
 
         const validationInfo = validation
             ? `<div class="line">Validation: ${validation.valid ? 'PASS' : 'FAIL'} • Min Goals: ${validation.min_total_goals_required}</div>`
+            : '';
+        const processFooter = isAcca
+            ? '<div class="line" style="text-align:center;font-weight:700;">All insights have gone through the 6-stage process.</div>'
             : '';
 
         return `
@@ -122,6 +131,7 @@
             <div class="line">${league} • ${kickoff}</div>
             ${validationInfo}
             ${legsPreview}
+            ${processFooter}
           </article>
         `;
     }

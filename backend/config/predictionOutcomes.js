@@ -68,10 +68,22 @@ const predictionOutcomes = {
                 description: 'Two possible outcomes'
             },
             {
+                market: 'DRAW_NO_BET',
+                type: 'secondary',
+                outcomes: ['HOME', 'AWAY'],
+                description: 'Draw no bet (stake returned on draw)'
+            },
+            {
                 market: 'OVER_UNDER_2_5',
                 type: 'primary',
                 outcomes: ['OVER', 'UNDER'],
                 description: 'Total goals over/under 2.5'
+            },
+            {
+                market: 'OVER_UNDER_3_5',
+                type: 'secondary',
+                outcomes: ['OVER', 'UNDER'],
+                description: 'Total goals over/under 3.5'
             },
             {
                 market: 'BTTS',
@@ -84,6 +96,48 @@ const predictionOutcomes = {
                 type: 'secondary',
                 outcomes: ['OVER', 'UNDER'],
                 description: 'Safer goals market'
+            },
+            {
+                market: 'TEAM_TOTAL_GOALS',
+                type: 'secondary',
+                outcomes: ['HOME_OVER', 'HOME_UNDER', 'AWAY_OVER', 'AWAY_UNDER'],
+                description: 'Team total goals over/under line'
+            },
+            {
+                market: 'COMBO_MATCH_RESULT_OVER_UNDER',
+                type: 'advanced',
+                outcomes: ['HOME_OVER_1_5', 'HOME_OVER_2_5', 'AWAY_OVER_1_5', 'AWAY_OVER_2_5', 'DRAW_UNDER_3_5'],
+                description: 'Match result + goals over/under combo'
+            },
+            {
+                market: 'COMBO_DC_OVER_UNDER',
+                type: 'advanced',
+                outcomes: ['1X_OVER_1_5', '1X_OVER_2_5', 'X2_OVER_1_5', 'X2_OVER_2_5', '12_OVER_1_5'],
+                description: 'Double chance + goals over/under combo'
+            },
+            {
+                market: 'COMBO_BTTS_OVER_UNDER',
+                type: 'advanced',
+                outcomes: ['YES_OVER_2_5', 'YES_OVER_3_5', 'NO_UNDER_2_5', 'NO_UNDER_3_5'],
+                description: 'BTTS + goals over/under combo'
+            },
+            {
+                market: 'EUROPEAN_HANDICAP',
+                type: 'advanced',
+                outcomes: ['HOME_COVER', 'AWAY_COVER'],
+                description: 'European handicap outcome'
+            },
+            {
+                market: 'ASIAN_HANDICAP',
+                type: 'advanced',
+                outcomes: ['HOME_COVER', 'AWAY_COVER'],
+                description: 'Asian handicap outcome'
+            },
+            {
+                market: 'HT_FT',
+                type: 'advanced',
+                outcomes: ['HOME_HOME', 'HOME_DRAW', 'DRAW_HOME', 'DRAW_DRAW', 'DRAW_AWAY', 'AWAY_AWAY', 'AWAY_DRAW'],
+                description: 'Half-time / full-time result'
             },
             {
                 market: 'CORNERS_OVER_UNDER',

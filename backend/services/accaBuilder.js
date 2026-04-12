@@ -698,6 +698,7 @@ function pickToWinnerToken(pick) {
 
 function parseGoalLineFromMarketScore(marketScore) {
     const normalized = String(marketScore?.market || '').toUpperCase();
+    if (normalized === 'OVER_UNDER_0_5') return 0.5;
     if (normalized === 'OVER_UNDER_1_5') return 1.5;
     if (normalized === 'OVER_UNDER_2_5') return 2.5;
     if (normalized === 'OVER_UNDER_3_5') return 3.5;
@@ -705,6 +706,21 @@ function parseGoalLineFromMarketScore(marketScore) {
     if (normalized === 'OVER_UNDER_5_5') return 5.5;
     const line = Number(marketScore?.line);
     return Number.isFinite(line) ? line : null;
+}
+
+function parseLineTokenFromPick(pick = '') {
+    const token = String(pick || '').trim().toLowerCase();
+    const match = token.match(/_(\d+)_(\d+)$/);
+    if (!match) return null;
+    return `${match[1]}_${match[2]}`;
+}
+
+function resolveLineTokenForMarketScore(marketScore, fallback = '2_5') {
+    const line = parseGoalLineFromMarketScore(marketScore);
+    const fromLine = lineToToken(line);
+    if (fromLine) return fromLine;
+    const fromPick = parseLineTokenFromPick(marketScore?.pick);
+    return fromPick || fallback;
 }
 
 function buildAccaCandidateFromMarketScore(prediction, marketScore) {
@@ -726,6 +742,9 @@ function buildAccaCandidateFromMarketScore(prediction, marketScore) {
     } else if (normalizedMarket === 'DOUBLE_CHANCE') {
         market = `double_chance_${pickLower}`;
         predictionValue = pickLower;
+    } else if (normalizedMarket === 'DRAW_NO_BET') {
+        market = pick === 'AWAY' ? 'draw_no_bet_away' : 'draw_no_bet_home';
+        predictionValue = pick === 'AWAY' ? 'away' : 'home';
     } else if (normalizedMarket === 'BTTS') {
         market = pick === 'NO' ? 'btts_no' : 'btts_yes';
         predictionValue = pick === 'NO' ? 'no' : 'yes';
@@ -749,14 +768,48 @@ function buildAccaCandidateFromMarketScore(prediction, marketScore) {
     } else if (normalizedMarket === 'TOTAL_GOALS') {
         market = `total_goals_${pickLower}`;
         predictionValue = pickLower;
+    } else if (normalizedMarket === 'TEAM_TOTAL_GOALS') {
+        const sideMatch = pickLower.match(/^(home|away)_(over|under)$/);
+        const lineToken = resolveLineTokenForMarketScore(marketScore, '1_5');
+        if (sideMatch) {
+            market = `team_total_${sideMatch[1]}_${sideMatch[2]}_${lineToken}`;
+            predictionValue = `${sideMatch[1]}_${sideMatch[2]}_${lineToken}`;
+        } else {
+            market = `team_total_${pickLower}`;
+            predictionValue = pickLower;
+        }
     } else if (normalizedMarket === 'TOTAL_RUNS') {
         market = `total_runs_${pickLower}`;
         predictionValue = pickLower;
     } else if (normalizedMarket === 'TOTAL_GAMES') {
         market = `total_games_${pickLower}`;
         predictionValue = pickLower;
+    } else if (normalizedMarket === 'COMBO_MATCH_RESULT_OVER_UNDER') {
+        const comboMatch = pickLower.match(/^(home|away|draw)_(over|under)_(\d+)_(\d+)$/);
+        if (comboMatch) {
+            market = `combo_${comboMatch[1]}_and_${comboMatch[2]}_${comboMatch[3]}_${comboMatch[4]}`;
+            predictionValue = `${comboMatch[1]}+${comboMatch[2]}_${comboMatch[3]}_${comboMatch[4]}`;
+        }
+    } else if (normalizedMarket === 'COMBO_DC_OVER_UNDER') {
+        const comboMatch = pickLower.match(/^(1x|x2|12)_(over|under)_(\d+)_(\d+)$/);
+        if (comboMatch) {
+            market = `combo_dc_${comboMatch[1]}_and_${comboMatch[2]}_${comboMatch[3]}_${comboMatch[4]}`;
+            predictionValue = `${comboMatch[1]}+${comboMatch[2]}_${comboMatch[3]}_${comboMatch[4]}`;
+        }
+    } else if (normalizedMarket === 'COMBO_BTTS_OVER_UNDER') {
+        const comboMatch = pickLower.match(/^(yes|no)_(over|under)_(\d+)_(\d+)$/);
+        if (comboMatch) {
+            market = `combo_btts_${comboMatch[1]}_and_${comboMatch[2]}_${comboMatch[3]}_${comboMatch[4]}`;
+            predictionValue = `${comboMatch[1]}+${comboMatch[2]}_${comboMatch[3]}_${comboMatch[4]}`;
+        }
     } else if (normalizedMarket === 'HANDICAP' || normalizedMarket === 'SPREAD' || normalizedMarket === 'SET_HANDICAP') {
         market = normalizeMarketForAcca(marketScore.market);
+        predictionValue = pickLower;
+    } else if (normalizedMarket === 'EUROPEAN_HANDICAP' || normalizedMarket === 'ASIAN_HANDICAP') {
+        market = normalizedMarket === 'EUROPEAN_HANDICAP' ? 'european_handicap' : 'asian_handicap';
+        predictionValue = pickLower;
+    } else if (normalizedMarket === 'HT_FT') {
+        market = `ht_ft_${pickLower}`;
         predictionValue = pickLower;
     } else if (normalizedMarket === 'METHOD') {
         market = 'method_of_victory';
@@ -859,6 +912,12 @@ function buildFootballComboCandidates(prediction, scoredMarkets = [], minConfide
     const btts = (byMarket.get('BTTS') || [])[0] || null;
     const result = (byMarket.get('MATCH_RESULT') || [])[0] || null;
     const ou25 = (byMarket.get('OVER_UNDER_2_5') || [])[0] || null;
+    const preferredGoalMarkets = [
+        ...(byMarket.get('OVER_UNDER_2_5') || []),
+        ...(byMarket.get('OVER_UNDER_3_5') || []),
+        ...(byMarket.get('OVER_UNDER_1_5') || [])
+    ].sort((a, b) => Number(b?.confidence || 0) - Number(a?.confidence || 0));
+    const ouBest = preferredGoalMarkets[0] || null;
 
     const out = [];
     if (dc && btts) {
@@ -881,6 +940,60 @@ function buildFootballComboCandidates(prediction, scoredMarkets = [], minConfide
                     market_key: 'COMBO_DOUBLE_CHANCE_BTTS',
                     market_type: 'advanced',
                     market_description: `Double Chance ${dcPick.toUpperCase()} + BTTS ${bttsPick.toUpperCase()}`,
+                    synthetic_market: true
+                }
+            });
+        }
+    }
+
+    if (dc && ouBest) {
+        const dcPick = normalizePickForAcca(dc.pick);
+        const ouPick = normalizePickForAcca(ouBest.pick);
+        const lineToken = resolveLineTokenForMarketScore(ouBest, '2_5');
+        const comboConfidence = Math.round((Math.min(Number(dc.confidence), Number(ouBest.confidence)) - 1.25) * 100) / 100;
+        if (comboConfidence >= minConfidence) {
+            out.push({
+                raw_id: prediction.raw_id,
+                match_id: prediction.match_id,
+                sport: 'football',
+                market: `combo_dc_${dcPick}_and_${ouPick}_${lineToken}`,
+                prediction: `${dcPick}+${ouPick}_${lineToken}`,
+                confidence: comboConfidence,
+                volatility: prediction.volatility,
+                odds: prediction.odds,
+                metadata: {
+                    ...getMetadata(prediction),
+                    sport_type: getSportTypeLabel('football'),
+                    market_key: 'COMBO_DC_OVER_UNDER',
+                    market_type: 'advanced',
+                    market_description: `Double Chance ${dcPick.toUpperCase()} + ${ouPick.toUpperCase()} ${lineToken.replace('_', '.')} Goals`,
+                    synthetic_market: true
+                }
+            });
+        }
+    }
+
+    if (btts && ouBest) {
+        const bttsPick = normalizePickForAcca(btts.pick);
+        const ouPick = normalizePickForAcca(ouBest.pick);
+        const lineToken = resolveLineTokenForMarketScore(ouBest, '2_5');
+        const comboConfidence = Math.round((Math.min(Number(btts.confidence), Number(ouBest.confidence)) - 1.25) * 100) / 100;
+        if (comboConfidence >= minConfidence) {
+            out.push({
+                raw_id: prediction.raw_id,
+                match_id: prediction.match_id,
+                sport: 'football',
+                market: `combo_btts_${bttsPick}_and_${ouPick}_${lineToken}`,
+                prediction: `${bttsPick}+${ouPick}_${lineToken}`,
+                confidence: comboConfidence,
+                volatility: prediction.volatility,
+                odds: prediction.odds,
+                metadata: {
+                    ...getMetadata(prediction),
+                    sport_type: getSportTypeLabel('football'),
+                    market_key: 'COMBO_BTTS_OVER_UNDER',
+                    market_type: 'advanced',
+                    market_description: `BTTS ${bttsPick.toUpperCase()} + ${ouPick.toUpperCase()} ${lineToken.replace('_', '.')} Goals`,
                     synthetic_market: true
                 }
             });
@@ -924,7 +1037,11 @@ function isSaferAccumulatorMarket(candidate) {
     const market = normalizedAccaMarketKey(candidate);
     if (!market) return false;
     if (market.startsWith('double_chance_')) return true;
+    if (market.startsWith('draw_no_bet_')) return true;
     if (market.startsWith('combo_') || market.startsWith('combo_dc_')) return true;
+    if (market.startsWith('team_total_')) return true;
+    if (market.includes('handicap')) return true;
+    if (market.startsWith('ht_ft_')) return true;
     if (market.startsWith('over_') || market.startsWith('under_')) return true;
     if (market.startsWith('btts_')) return true;
     return false;
@@ -934,20 +1051,94 @@ function accumulatorMarketPriorityScore(candidate) {
     const market = normalizedAccaMarketKey(candidate);
     if (!market) return 0;
     if (market.startsWith('combo_dc_') || market.startsWith('combo_')) return 5;
-    if (market.startsWith('double_chance_')) return 4;
-    if (market.startsWith('under_') || market.startsWith('over_')) return 3;
-    if (market.startsWith('btts_')) return 2;
+    if (market.startsWith('double_chance_') || market.startsWith('draw_no_bet_')) return 4;
+    if (market.startsWith('under_') || market.startsWith('over_') || market.startsWith('btts_') || market.startsWith('team_total_') || market.includes('handicap') || market.startsWith('ht_ft_')) return 3;
+    if (market === 'match_winner') return 2;
     if (market === '1x2') return 1;
     return 2;
 }
 
+function parseGoalLineFromAccumulatorMarket(market = '') {
+    const normalized = normalizeMarketForAcca(market);
+    const match = normalized.match(/(?:^|_)(\d+)_(\d+)$/);
+    if (!match) return null;
+    const whole = Number(match[1]);
+    const decimal = Number(match[2]);
+    if (!Number.isFinite(whole) || !Number.isFinite(decimal)) return null;
+    return Number(`${whole}.${decimal}`);
+}
+
+function isLowValueAccumulatorMarket(candidate) {
+    const market = normalizedAccaMarketKey(candidate);
+    if (!market) return false;
+
+    const directLowValue = market === 'over_0_5' || market.includes('_over_0_5');
+    if (directLowValue) return true;
+
+    if (market.startsWith('over_') || market.includes('_over_')) {
+        const line = parseGoalLineFromAccumulatorMarket(market);
+        if (Number.isFinite(line) && line <= 1.5) return true;
+    }
+
+    return false;
+}
+
+function isEscalatedValueAccumulatorMarket(candidate) {
+    const market = normalizedAccaMarketKey(candidate);
+    if (!market) return false;
+    if (market.startsWith('combo_') || market.startsWith('combo_dc_')) return true;
+    if (market.startsWith('double_chance_') || market.startsWith('draw_no_bet_')) return true;
+    if (market.startsWith('btts_')) return true;
+    if (market.startsWith('team_total_')) return true;
+    if (market.includes('handicap')) return true;
+    if (market.startsWith('ht_ft_')) return true;
+    if (market.startsWith('over_') || market.startsWith('under_')) {
+        const line = parseGoalLineFromAccumulatorMarket(market);
+        return Number.isFinite(line) ? line >= 2.5 : true;
+    }
+    return false;
+}
+
+function applyMinimumValueConstraint(candidatePool, minConfidenceFloor) {
+    if (!Array.isArray(candidatePool) || candidatePool.length === 0) return null;
+    const best = candidatePool[0];
+    if (!best) return null;
+
+    const bestConfidence = Number(best?.confidence || 0);
+    if (!isLowValueAccumulatorMarket(best) || bestConfidence < 95) {
+        return best;
+    }
+
+    const escalatedCandidates = candidatePool
+        .filter((candidate) => Number(candidate?.confidence || 0) >= minConfidenceFloor)
+        .filter(isEscalatedValueAccumulatorMarket)
+        .sort(compareAccaCandidatePreference);
+
+    if (!escalatedCandidates.length) {
+        return best;
+    }
+
+    const upgraded = escalatedCandidates[0];
+    return {
+        ...upgraded,
+        metadata: {
+            ...(upgraded.metadata || {}),
+            minimum_value_constraint_applied: true,
+            minimum_value_escalated_from: normalizedAccaMarketKey(best)
+        }
+    };
+}
+
 function compareAccaCandidatePreference(a, b) {
-    const saferA = isSaferAccumulatorMarket(a);
-    const saferB = isSaferAccumulatorMarket(b);
-    if (saferA !== saferB) return saferB ? 1 : -1;
+    const confidenceDiff = Number(b?.confidence || 0) - Number(a?.confidence || 0);
+    if (confidenceDiff !== 0) return confidenceDiff;
 
     const marketPriorityDiff = accumulatorMarketPriorityScore(b) - accumulatorMarketPriorityScore(a);
     if (marketPriorityDiff !== 0) return marketPriorityDiff;
+
+    const saferA = isSaferAccumulatorMarket(a);
+    const saferB = isSaferAccumulatorMarket(b);
+    if (saferA !== saferB) return saferB ? 1 : -1;
 
     return compareAccaCandidates(a, b);
 }
@@ -1178,10 +1369,8 @@ async function buildAccaLegCandidatePool(predictions, options = {}) {
             .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor);
         if (!eligibleCandidates.length) continue;
 
-        const saferCandidates = eligibleCandidates.filter((candidate) => isSaferAccumulatorMarket(candidate));
-        const candidatePool = saferCandidates.length > 0 ? saferCandidates : eligibleCandidates;
-        candidatePool.sort(compareAccaCandidatePreference);
-        const best = candidatePool[0];
+        const candidatePool = eligibleCandidates.slice().sort(compareAccaCandidatePreference);
+        const best = applyMinimumValueConstraint(candidatePool, minConfidenceFloor) || candidatePool[0];
         if (!best) continue;
 
         const existing = byFixture.get(fixtureKey);

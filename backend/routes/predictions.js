@@ -195,6 +195,10 @@ function humanizePredictionLabel(prediction, market) {
     const yellowsLineMatch = marketKey.match(/^(over|under)_(\d+)_(\d+)_yellows$/);
     const comboDcBttsMatch = marketKey.match(/^combo_dc_(1x|x2|12)_btts_(yes|no)$/);
     const comboWinnerOuMatch = marketKey.match(/^combo_(home|away|draw)_and_(over|under)_2_5$/);
+    const comboDcOuMatch = marketKey.match(/^combo_dc_(1x|x2|12)_and_(over|under)_(\d+)_(\d+)$/);
+    const comboBttsOuMatch = marketKey.match(/^combo_btts_(yes|no)_and_(over|under)_(\d+)_(\d+)$/);
+    const teamTotalMatch = marketKey.match(/^team_total_(home|away)_(over|under)_(\d+)_(\d+)$/);
+    const htFtMatch = marketKey.match(/^ht_ft_(home|draw|away)_(home|draw|away)$/);
     if (goalLineMatch) {
         return `${goalLineMatch[1].toUpperCase()} ${goalLineMatch[2]}.${goalLineMatch[3]} GOALS`;
     }
@@ -210,8 +214,23 @@ function humanizePredictionLabel(prediction, market) {
     if (comboWinnerOuMatch) {
         return `${comboWinnerOuMatch[1].toUpperCase()} WIN + ${comboWinnerOuMatch[2].toUpperCase()} 2.5 GOALS`;
     }
+    if (comboDcOuMatch) {
+        return `DOUBLE CHANCE ${comboDcOuMatch[1].toUpperCase()} + ${comboDcOuMatch[2].toUpperCase()} ${comboDcOuMatch[3]}.${comboDcOuMatch[4]} GOALS`;
+    }
+    if (comboBttsOuMatch) {
+        return `BTTS ${comboBttsOuMatch[1].toUpperCase()} + ${comboBttsOuMatch[2].toUpperCase()} ${comboBttsOuMatch[3]}.${comboBttsOuMatch[4]} GOALS`;
+    }
+    if (teamTotalMatch) {
+        return `${teamTotalMatch[1].toUpperCase()} TEAM ${teamTotalMatch[2].toUpperCase()} ${teamTotalMatch[3]}.${teamTotalMatch[4]} GOALS`;
+    }
+    if (htFtMatch) {
+        return `HT/FT ${htFtMatch[1].toUpperCase()}-${htFtMatch[2].toUpperCase()}`;
+    }
     if (marketKey === 'btts_yes') return 'BTTS - YES';
     if (marketKey === 'btts_no') return 'BTTS - NO';
+    if (marketKey.startsWith('draw_no_bet_')) return `DRAW NO BET - ${marketKey.replace('draw_no_bet_', '').toUpperCase()}`;
+    if (marketKey === 'asian_handicap') return `ASIAN HANDICAP - ${String(prediction || '').toUpperCase()}`;
+    if (marketKey === 'european_handicap') return `EUROPEAN HANDICAP - ${String(prediction || '').toUpperCase()}`;
     if (marketKey === 'corners_under') return 'TOTAL CORNERS UNDER';
     if (marketKey === 'corners_over') return 'TOTAL CORNERS OVER';
     if (marketKey.startsWith('double_chance_')) {

@@ -31,11 +31,16 @@ function normalizeSport(sport) {
 function pickFromOutcomes(outcomes, matchData, market, scoring) {
     if (!Array.isArray(outcomes) || outcomes.length === 0) return null;
 
+    const marketKey = String(market || '').toUpperCase();
     const winner = scoring?.winner === 'away' ? 'AWAY' : 'HOME';
     const diff = Number(scoring?.confidence || 50) - 60;
     const balanceSeed = hashToUnit(`${matchData?.match_id || matchData?.home_team || 'home'}:${market}`);
 
-    switch (String(market || '').toUpperCase()) {
+    if (marketKey.startsWith('OVER_UNDER_')) {
+        return balanceSeed >= 0.45 ? 'OVER' : 'UNDER';
+    }
+
+    switch (marketKey) {
         case 'MATCH_RESULT':
             if (diff < 6 && outcomes.includes('DRAW') && balanceSeed < 0.22) return 'DRAW';
             return outcomes.includes(winner) ? winner : outcomes[0];
@@ -44,10 +49,10 @@ function pickFromOutcomes(outcomes, matchData, market, scoring) {
             return outcomes.includes(winner) ? winner : outcomes[0];
         case 'DOUBLE_CHANCE':
             return winner === 'HOME' ? '1X' : 'X2';
+        case 'DRAW_NO_BET':
+            return winner === 'HOME' ? 'HOME' : 'AWAY';
         case 'BTTS':
             return diff < 10 ? 'YES' : 'NO';
-        case 'OVER_UNDER_2_5':
-        case 'OVER_UNDER_1_5':
         case 'TOTAL_POINTS':
         case 'TOTAL_GOALS':
         case 'TOTAL_RUNS':
@@ -55,9 +60,35 @@ function pickFromOutcomes(outcomes, matchData, market, scoring) {
         case 'CORNERS_OVER_UNDER':
         case 'YELLOW_CARDS_OVER_UNDER':
             return balanceSeed >= 0.45 ? 'OVER' : 'UNDER';
+        case 'TEAM_TOTAL_GOALS':
+            if (winner === 'HOME') return diff >= 10 ? 'HOME_OVER' : 'AWAY_UNDER';
+            return diff >= 10 ? 'AWAY_OVER' : 'HOME_UNDER';
+        case 'COMBO_MATCH_RESULT_OVER_UNDER':
+            if (diff < 6 && outcomes.includes('DRAW_UNDER_3_5')) return 'DRAW_UNDER_3_5';
+            if (winner === 'HOME') {
+                return diff >= 10 ? 'HOME_OVER_2_5' : 'HOME_OVER_1_5';
+            }
+            return diff >= 10 ? 'AWAY_OVER_2_5' : 'AWAY_OVER_1_5';
+        case 'COMBO_DC_OVER_UNDER':
+            if (winner === 'HOME') return diff >= 8 ? '1X_OVER_2_5' : '1X_OVER_1_5';
+            return diff >= 8 ? 'X2_OVER_2_5' : 'X2_OVER_1_5';
+        case 'COMBO_BTTS_OVER_UNDER':
+            if (diff < 8) return balanceSeed >= 0.5 ? 'YES_OVER_3_5' : 'YES_OVER_2_5';
+            return balanceSeed >= 0.5 ? 'NO_UNDER_2_5' : 'NO_UNDER_3_5';
+        case 'HT_FT':
+            if (winner === 'HOME') {
+                if (diff >= 12 && outcomes.includes('HOME_HOME')) return 'HOME_HOME';
+                if (outcomes.includes('DRAW_HOME')) return 'DRAW_HOME';
+                return outcomes.includes('HOME_DRAW') ? 'HOME_DRAW' : outcomes[0];
+            }
+            if (diff >= 12 && outcomes.includes('AWAY_AWAY')) return 'AWAY_AWAY';
+            if (outcomes.includes('DRAW_AWAY')) return 'DRAW_AWAY';
+            return outcomes.includes('AWAY_DRAW') ? 'AWAY_DRAW' : outcomes[0];
         case 'HANDICAP':
         case 'SPREAD':
         case 'SET_HANDICAP':
+        case 'EUROPEAN_HANDICAP':
+        case 'ASIAN_HANDICAP':
             return winner === 'HOME' ? outcomes[0] : (outcomes[1] || outcomes[0]);
         case 'METHOD':
             if (diff >= 18 && outcomes.includes('KO')) return 'KO';
@@ -93,8 +124,11 @@ function resolveMarketLine(sport, market) {
     const s = String(sport || '').toLowerCase();
     const m = String(market || '').toUpperCase();
 
-    if (m === 'OVER_UNDER_2_5') return 2.5;
+    if (m === 'OVER_UNDER_0_5') return 0.5;
     if (m === 'OVER_UNDER_1_5') return 1.5;
+    if (m === 'OVER_UNDER_2_5') return 2.5;
+    if (m === 'OVER_UNDER_3_5') return 3.5;
+    if (m === 'TEAM_TOTAL_GOALS') return 1.5;
     if (m === 'YELLOW_CARDS_OVER_UNDER') return 3.5;
     if (m === 'CORNERS_OVER_UNDER' && s === 'football') return 9.5;
     return null;
@@ -115,9 +149,18 @@ function outcomeUniverseToLegacyMarket(sport, market, line = null) {
 
     if (s === 'football' && m === 'MATCH_RESULT') return '1X2';
     if (s === 'football' && m === 'DOUBLE_CHANCE') return 'double_chance';
+    if (s === 'football' && m === 'DRAW_NO_BET') return 'draw_no_bet';
     if (s === 'football' && m === 'BTTS') return 'btts_yes/btts_no';
+    if (s === 'football' && m === 'TEAM_TOTAL_GOALS') return 'team_total_goals';
     if (s === 'football' && m === 'OVER_UNDER_2_5') return 'over_2_5/under_2_5';
     if (s === 'football' && m === 'OVER_UNDER_1_5') return 'over_1_5/under_1_5';
+    if (s === 'football' && m === 'OVER_UNDER_3_5') return 'over_3_5/under_3_5';
+    if (s === 'football' && m === 'COMBO_MATCH_RESULT_OVER_UNDER') return 'combo_match_result_ou';
+    if (s === 'football' && m === 'COMBO_DC_OVER_UNDER') return 'combo_dc_ou';
+    if (s === 'football' && m === 'COMBO_BTTS_OVER_UNDER') return 'combo_btts_ou';
+    if (s === 'football' && m === 'EUROPEAN_HANDICAP') return 'european_handicap';
+    if (s === 'football' && m === 'ASIAN_HANDICAP') return 'asian_handicap';
+    if (s === 'football' && m === 'HT_FT') return 'ht_ft';
     if (s === 'football' && m === 'CORNERS_OVER_UNDER') {
         return token ? `corners_over_${token}/corners_under_${token}` : 'corners_over/corners_under';
     }
@@ -144,7 +187,8 @@ async function scoreMarkets(matchData) {
     const baseConfidence = typeof scoring?.confidence === 'number' ? scoring.confidence : 50;
 
     return sportConfig.markets.map((m) => {
-        const pick = pickFromOutcomes(m.outcomes, matchData, m.market, scoring);
+        const rawPick = pickFromOutcomes(m.outcomes, matchData, m.market, scoring);
+        const pick = m.outcomes.includes(rawPick) ? rawPick : m.outcomes[0];
         const penalty = marketTypePenalty(m.type);
         const marketBias = hashToUnit(`${matchData?.match_id || matchData?.home_team || 'match'}:${m.market}`);
         const confidence = clamp(Math.round((baseConfidence - penalty - (marketBias * 4 - 2)) * 100) / 100, 0, 100);
