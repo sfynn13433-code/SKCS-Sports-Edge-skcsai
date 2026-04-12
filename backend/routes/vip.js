@@ -10,6 +10,7 @@ const {
     getMegaAccaDailyAllocation
 } = require('../config/subscriptionMatrix');
 const { validateInsightLegGroup } = require('../utils/insightValidationMatrix');
+const { buildContextInsightsFromMetadata } = require('../utils/contextInsights');
 
 const router = express.Router();
 
@@ -150,12 +151,16 @@ function megaIsValid(row, plan, now = new Date()) {
 function shapePrediction(row) {
     const category = inferCategory(row);
     const matches = Array.isArray(row?.matches) ? row.matches : [];
+    const matchesWithContext = matches.map((match) => ({
+        ...match,
+        context_insights: buildContextInsightsFromMetadata(match?.metadata?.context_intelligence || null)
+    }));
     const validation = category === 'same_match'
-        ? validateInsightLegGroup(matches)
+        ? validateInsightLegGroup(matchesWithContext)
         : null;
 
     // Extract new stabilized fields from row or first match metadata
-    const firstMatch = matches[0] || {};
+    const firstMatch = matchesWithContext[0] || {};
     const displayLabel = row.display_label ||
         firstMatch.metadata?.display_label ||
         row.ticket_label ||
@@ -186,7 +191,8 @@ function shapePrediction(row) {
         risk_level: row.risk_level,
         created_at: row.created_at,
         validation_matrix: validation,
-        matches
+        context_insights: firstMatch?.context_insights || buildContextInsightsFromMetadata(firstMatch?.metadata?.context_intelligence || null),
+        matches: matchesWithContext
     };
 }
 

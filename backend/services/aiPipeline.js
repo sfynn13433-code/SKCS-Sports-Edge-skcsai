@@ -6,6 +6,8 @@ const { filterRawPrediction } = require('./filterEngine');
 const { buildFinalForTier } = require('./accaBuilder');
 const { getPredictionInputs } = require('./dataProvider');
 const { scoreMatch } = require('./aiScoring');
+const enrichFixtureWithContext = require('../src/services/contextIntelligence/aiPipeline');
+const adjustProbability = require('../src/services/contextIntelligence/adjustProbability');
 
 let isRunning = false;
 
@@ -27,6 +29,96 @@ function normalizePrediction(prediction) {
     };
 
     return aliases[value] || value;
+}
+
+function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+}
+
+function toProbability(confidencePercent) {
+    const n = Number(confidencePercent);
+    if (!Number.isFinite(n)) return 0.5;
+    return clamp(n, 0, 100) / 100;
+}
+
+function toConfidencePercent(probability) {
+    const n = Number(probability);
+    if (!Number.isFinite(n)) return 50;
+    return Math.round(clamp(n, 0, 1) * 10000) / 100;
+}
+
+function normalizeContextSignals(value) {
+    const source = value && typeof value === 'object' ? value : {};
+    const read = (key) => {
+        const n = Number(source[key]);
+        if (!Number.isFinite(n)) return 0;
+        return clamp(n, 0, 1);
+    };
+    return {
+        weather_risk: read('weather_risk'),
+        availability_risk: read('availability_risk'),
+        discipline_risk: read('discipline_risk'),
+        stability_risk: read('stability_risk')
+    };
+}
+
+function buildContextFixture(item, matchId, sport) {
+    const metadata = item?.metadata && typeof item.metadata === 'object' ? item.metadata : {};
+    const rawProviderData = item?.raw_provider_data && typeof item.raw_provider_data === 'object'
+        ? item.raw_provider_data
+        : {};
+
+    return {
+        match_id: matchId,
+        sport,
+        home_team: item.home_team || metadata.home_team || null,
+        away_team: item.away_team || metadata.away_team || null,
+        competition: item.league || item.competition || metadata.league || metadata.competition || null,
+        location:
+            item.location ||
+            item.venue ||
+            metadata.venue ||
+            rawProviderData?.venue?.name ||
+            rawProviderData?.venue?.city ||
+            metadata.city ||
+            'London',
+        kickoffTime:
+            item.date ||
+            item.commence_time ||
+            item.kickoff ||
+            item.match_time ||
+            metadata.match_time ||
+            metadata.kickoff ||
+            new Date().toISOString(),
+        teamData:
+            item.teamData ||
+            metadata.teamData ||
+            rawProviderData.teamData ||
+            {
+                injuries: [],
+                suspensions: [],
+                expectedXI: { reliability: 1 }
+            },
+        teamDiscipline:
+            item.teamDiscipline ||
+            metadata.teamDiscipline ||
+            rawProviderData.teamDiscipline ||
+            {
+                redCards: { last5Games: 0 },
+                yellowCardThreats: [],
+                bans: []
+            },
+        teamContext:
+            item.teamContext ||
+            metadata.teamContext ||
+            rawProviderData.teamContext ||
+            {
+                coachConflict: false,
+                execInstability: false,
+                playerLegalIssues: [],
+                fanViolence: false
+            }
+    };
 }
 
 async function buildRawPredictionFromProviderItem(item) {
@@ -57,9 +149,21 @@ async function buildRawPredictionFromProviderItem(item) {
                 ? 'draw'
                 : 'home_win';
     const prediction = providerPrediction || fallbackPrediction;
-    const confidence = typeof item.confidence === 'number' && Number.isFinite(item.confidence)
+    const baselineConfidence = typeof item.confidence === 'number' && Number.isFinite(item.confidence)
         ? item.confidence
         : scoring.confidence;
+    const p_base = toProbability(baselineConfidence);
+    let contextEnriched = null;
+
+    try {
+        contextEnriched = await enrichFixtureWithContext(buildContextFixture(item, match_id, sport));
+    } catch (contextErr) {
+        console.warn('[aiPipeline] context enrichment failed for match_id=%s: %s', match_id, contextErr.message);
+    }
+
+    const contextSignals = normalizeContextSignals(contextEnriched?.contextSignals);
+    const p_adj = adjustProbability(p_base, contextSignals);
+    const confidence = toConfidencePercent(p_adj);
     const volatility = item.volatility || scoring.volatility;
     const aiSource = scoring.source || null; // 'dolphin', 'fallback', 'odds', etc.
     const aiReasoning = scoring.reasoning || null;
@@ -88,6 +192,17 @@ async function buildRawPredictionFromProviderItem(item) {
             stage: item.stage || item.round || null,
             venue: item.venue || null,
             country: item.country || null,
+            context_intelligence: {
+                status: contextEnriched?.context_status || 'unavailable',
+                cache_key: contextEnriched?.context_cache_key || null,
+                last_verified: contextEnriched?.context_last_verified || null,
+                signals: contextSignals,
+                insights: contextEnriched?.contextInsights || null,
+                p_base,
+                p_adj,
+                confidence_base_pct: Math.round(toProbability(baselineConfidence) * 10000) / 100,
+                confidence_adj_pct: confidence
+            },
             ai: predictionSource === 'ai_fallback'
                 ? {
                     winner: scoring.winner,

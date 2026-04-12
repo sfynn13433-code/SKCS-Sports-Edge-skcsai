@@ -13,6 +13,7 @@ const { getPlanCapabilities, filterPredictionsForPlan, calculateDailyAllocations
 const { getPredictionWindow } = require('../utils/dateNormalization');
 const { areLegsCompatible } = require('../utils/marketConsistency');
 const { getCardDescriptor } = require('../utils/insightEngine');
+const { buildContextInsightsFromMetadata } = require('../utils/contextInsights');
 
 const router = express.Router();
 
@@ -502,9 +503,11 @@ function enrichMatchMetadata(match, prediction) {
         ? defaultTicketLabel
         : rawOutcome.toUpperCase();
     const fallbackReasoning = String(prediction?.reasoning || prediction?.model_reasoning || '').trim();
+    const contextInsights = buildContextInsightsFromMetadata(match?.metadata?.context_intelligence || null);
 
     return {
         ...match,
+        context_insights: contextInsights,
         prediction_details: {
             outcome: fallbackOutcome,
             reasoning: fallbackReasoning,
@@ -631,16 +634,19 @@ function enrichPredictionDetails(prediction) {
         prediction?.reasoning ||
         prediction?.model_reasoning ||
         '';
+    const contextInsights = firstMatch?.context_insights || buildContextInsightsFromMetadata(firstMetadata?.context_intelligence || null);
 
     return {
         ...prediction,
         section_type: sectionType,
         ticket_label: defaultTicketLabel,
         average_leg_confidence: resolveAverageLegConfidence(prediction),
+        context_insights: contextInsights,
         prediction_details: {
             ...(prediction?.prediction_details || {}),
             outcome: finalOutcome,
-            reasoning: String(fallbackReasoning).trim()
+            reasoning: String(fallbackReasoning).trim(),
+            context_status: contextInsights?.status || 'unavailable'
         }
     };
 }

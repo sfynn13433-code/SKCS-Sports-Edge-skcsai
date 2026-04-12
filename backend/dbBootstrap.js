@@ -185,6 +185,24 @@ async function bootstrap() {
             ON predictions_accuracy(sport, fixture_date)
         `);
 
+        await query(`
+            CREATE TABLE IF NOT EXISTS context_intelligence_cache (
+                id bigserial PRIMARY KEY,
+                cache_key text NOT NULL UNIQUE,
+                fixture_id text,
+                payload jsonb NOT NULL DEFAULT '{}'::jsonb,
+                last_verified timestamptz NOT NULL DEFAULT now(),
+                expires_at timestamptz NOT NULL DEFAULT (now() + interval '3 hour'),
+                created_at timestamptz NOT NULL DEFAULT now(),
+                updated_at timestamptz NOT NULL DEFAULT now()
+            );
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_context_intelligence_cache_expires_at
+            ON context_intelligence_cache(expires_at)
+        `);
+
         // Event context snapshot tables (used by grading script for loss diagnostics)
         await query(`
             CREATE TABLE IF NOT EXISTS event_injury_snapshots (
