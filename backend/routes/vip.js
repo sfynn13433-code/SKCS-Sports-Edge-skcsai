@@ -224,24 +224,55 @@ function buildCoverageMatrix(day, masterCounts, referenceDate, sourceRows) {
 
 router.get('/stress-payload', requireRole('user'), async (req, res) => {
     try {
+        // Force fresh response — no caching
+        res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.set('Pragma', 'no-cache');
+        res.set('Expires', '0');
+
         const day = normalizeDay(req.query.day || 'saturday');
         const now = new Date();
+        const generatedAt = now.toISOString();
         const referenceDate = resolveReferenceDateForDay(day, now);
         const masterPlan = getPlanCapabilities(MASTER_PLAN_ID);
         const dailyLimits = calculateDailyAllocations(MASTER_PLAN_ID, day) || {};
 
-        const dbRes = await query(
-            `
-            SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
-            FROM predictions_final
-            WHERE LOWER(COALESCE(tier, 'normal')) = ANY($1::text[])
-            ORDER BY total_confidence DESC, created_at DESC
-            LIMIT 3000
-            `,
-            [masterPlan.tiers.map((tier) => String(tier).toLowerCase())]
+        // Fetch the latest publish_run_id to avoid stale rows
+        const latestRunRes = await query(
+            `SELECT id FROM prediction_publish_runs WHERE status = 'completed' ORDER BY created_at DESC LIMIT 1`
         );
+        const latestPublishRunId = latestRunRes.rows.length ? latestRunRes.rows[0].id : null;
+
+        console.log('[vip/stress-payload] latest_publish_run_id=%s', latestPublishRunId);
+
+        // Filter by latest publish_run_id if available, otherwise fall back to tier-only
+        const queryText = latestPublishRunId
+            ? `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
+               FROM predictions_final
+               WHERE publish_run_id = $1
+               ORDER BY total_confidence DESC, created_at DESC
+               LIMIT 3000`
+            : `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
+               FROM predictions_final
+               WHERE LOWER(COALESCE(tier, 'normal')) = ANY($1::text[])
+               ORDER BY total_confidence DESC, created_at DESC
+               LIMIT 3000`;
+        const queryParams = latestPublishRunId ? [latestPublishRunId] : [masterPlan.tiers.map((tier) => String(tier).toLowerCase())];
+
+        const dbRes = await query(queryText, queryParams);
+
+        console.log('[vip/stress-payload] db_rows=%d tier_filter=%s', dbRes.rows.length, latestPublishRunId ? `run_${latestPublishRunId}` : 'tier-only');
 
         const rows = (dbRes.rows || []).map(shapePrediction).sort(compareRows);
+
+        // Pre-response logging: log fixture key sets for ACCA cards to detect duplicates
+        const accaRows = rows.filter(r => r.section_type === 'acca_6match' || r.section_type === 'mega_acca_12');
+        const fixtureSets = accaRows.map(r => ({
+            label: r.display_label || r.type,
+            fixtureKeys: (r.matches || []).map(m => m.match_id).filter(Boolean),
+        }));
+        console.log('[vip response] acca_cards=%d', accaRows.length);
+        console.log('[vip response] labels=%o', accaRows.map(r => r.display_label));
+        console.log('[vip response] fixture_sets=%o', fixtureSets);
         const required = {
             direct: Number(dailyLimits.direct || 0),
             analytical_insights: Number(dailyLimits.secondary || 0),
@@ -299,6 +330,11 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
         return res.status(200).json({
             ok: true,
             source_rows: rows.length,
+            build_commit: '8e429fe',
+            build_timestamp: generatedAt,
+            builder_version: 'skcs-card-uniqueness-v3',
+            publish_run_id: latestPublishRunId,
+            generated_at: generatedAt,
             payload,
             tier_coverage: buildCoverageMatrix(day, fulfilled, referenceDate, rows)
         });
