@@ -27,6 +27,19 @@ function clamp(n, min, max) {
     return Math.max(min, Math.min(max, n));
 }
 
+function toProbability(confidence) {
+    const numeric = Number(confidence);
+    if (!Number.isFinite(numeric)) return 0;
+    return clamp(numeric, 0, 100) / 100;
+}
+
+function intersectionConfidence(confidences = []) {
+    const values = Array.isArray(confidences) ? confidences : [];
+    if (values.length === 0) return 0;
+    const product = values.reduce((acc, value) => acc * toProbability(value), 1);
+    return Math.round(clamp(product * 100, 0, 100) * 100) / 100;
+}
+
 function computeTotalConfidence(predictions) {
     if (!predictions.length) return 0;
     const sum = predictions.reduce((acc, p) => acc + (typeof p.confidence === 'number' ? p.confidence : 0), 0);
@@ -421,23 +434,19 @@ function isPublishablePrediction(prediction, tier, now = new Date()) {
     }
 
     const kickoff = parseKickoff(prediction);
-    
-    // If no kickoff time, still allow if we have confidence
     if (!kickoff) {
-        return typeof prediction.confidence === 'number' && prediction.confidence > 0;
-    }
-
-    // Do not republish old fixtures onto the live predictions surface.
-    // A small grace period allows fixtures that just started to remain visible.
-    const staleCutoff = new Date(now.getTime() - 2 * 60 * 60 * 1000);
-    if (kickoff < staleCutoff) {
-        console.log(`[accaBuilder] Rejecting prediction for match ${prediction.match_id}: kickoff ${kickoff.toISOString()} is older than the live publish window`);
+        console.log(`[accaBuilder] Rejecting prediction for match ${prediction.match_id}: kickoff time missing or invalid.`);
         return false;
     }
 
-    // Extend the publish window to be more generous - allow up to 9 days in future
+    // Strict pre-match rule: only fixtures strictly in the future are valid.
+    if (kickoff.getTime() <= now.getTime()) {
+        console.log(`[accaBuilder] Rejecting prediction for match ${prediction.match_id}: kickoff ${kickoff.toISOString()} is not strictly in the future.`);
+        return false;
+    }
+
     const maxWindowDays = getPublishWindowDays(tier);
-    const maxFuture = new Date(now.getTime() + (maxWindowDays + 4) * 24 * 60 * 60 * 1000);
+    const maxFuture = new Date(now.getTime() + maxWindowDays * 24 * 60 * 60 * 1000);
     return kickoff <= maxFuture;
 }
 
@@ -921,7 +930,7 @@ function buildFootballComboCandidates(prediction, scoredMarkets = [], minConfide
 
     const out = [];
     if (dc && btts) {
-        const comboConfidence = Math.round((Math.min(Number(dc.confidence), Number(btts.confidence)) - 1.5) * 100) / 100;
+        const comboConfidence = intersectionConfidence([dc.confidence, btts.confidence]);
         if (comboConfidence >= minConfidence) {
             const dcPick = normalizePickForAcca(dc.pick);
             const bttsPick = normalizePickForAcca(btts.pick);
@@ -950,7 +959,7 @@ function buildFootballComboCandidates(prediction, scoredMarkets = [], minConfide
         const dcPick = normalizePickForAcca(dc.pick);
         const ouPick = normalizePickForAcca(ouBest.pick);
         const lineToken = resolveLineTokenForMarketScore(ouBest, '2_5');
-        const comboConfidence = Math.round((Math.min(Number(dc.confidence), Number(ouBest.confidence)) - 1.25) * 100) / 100;
+        const comboConfidence = intersectionConfidence([dc.confidence, ouBest.confidence]);
         if (comboConfidence >= minConfidence) {
             out.push({
                 raw_id: prediction.raw_id,
@@ -977,7 +986,7 @@ function buildFootballComboCandidates(prediction, scoredMarkets = [], minConfide
         const bttsPick = normalizePickForAcca(btts.pick);
         const ouPick = normalizePickForAcca(ouBest.pick);
         const lineToken = resolveLineTokenForMarketScore(ouBest, '2_5');
-        const comboConfidence = Math.round((Math.min(Number(btts.confidence), Number(ouBest.confidence)) - 1.25) * 100) / 100;
+        const comboConfidence = intersectionConfidence([btts.confidence, ouBest.confidence]);
         if (comboConfidence >= minConfidence) {
             out.push({
                 raw_id: prediction.raw_id,
@@ -1003,7 +1012,7 @@ function buildFootballComboCandidates(prediction, scoredMarkets = [], minConfide
     if (result && ou25) {
         const winnerToken = normalizePickForAcca(result.pick);
         const ouPick = normalizePickForAcca(ou25.pick);
-        const comboConfidence = Math.round((Math.min(Number(result.confidence), Number(ou25.confidence)) - 2) * 100) / 100;
+        const comboConfidence = intersectionConfidence([result.confidence, ou25.confidence]);
         if (comboConfidence >= minConfidence) {
             out.push({
                 raw_id: prediction.raw_id,
@@ -1129,6 +1138,34 @@ function applyMinimumValueConstraint(candidatePool, minConfidenceFloor) {
     };
 }
 
+function isComboConditionAccumulatorMarket(candidate) {
+    const market = normalizedAccaMarketKey(candidate);
+    if (!market) return false;
+    return market.startsWith('combo_') || market.startsWith('combo_dc_');
+}
+
+function resolveComboConditionCap(size, options = {}) {
+    if (Number(size) !== ACCA_SIZE) return Infinity;
+    if (options.isMega === true) return Infinity;
+    return 2;
+}
+
+function selectBestAccaCandidateFromPool(candidatePool, minConfidenceFloor) {
+    if (!Array.isArray(candidatePool) || candidatePool.length === 0) return null;
+    const ranked = candidatePool.slice().sort(compareAccaCandidatePreference);
+    const constrained = applyMinimumValueConstraint(ranked, minConfidenceFloor);
+    const selected = constrained || ranked[0] || null;
+    if (!selected) return null;
+    return {
+        ...selected,
+        metadata: {
+            ...(selected.metadata || {}),
+            depth_first_full_scoring_applied: true,
+            evaluated_market_count: ranked.length
+        }
+    };
+}
+
 function compareAccaCandidatePreference(a, b) {
     const confidenceDiff = Number(b?.confidence || 0) - Number(a?.confidence || 0);
     if (confidenceDiff !== 0) return confidenceDiff;
@@ -1214,7 +1251,7 @@ function hasMixedSportCoverage(candidates) {
     return sports.size >= 2 && hasNonFootball && hasTargetSport;
 }
 
-function buildFootballOnlyAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor) {
+function buildFootballOnlyAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor, options = {}) {
     const footballPool = pool
         .filter((candidate) => normalizeSportKey(candidate?.sport) === 'football')
         .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
@@ -1223,11 +1260,15 @@ function buildFootballOnlyAccumulatorRow(pool, usedFixtureIds, size, minConfiden
 
     const selected = [];
     const localUsed = new Set();
+    const comboConditionCap = resolveComboConditionCap(size, options);
+    let comboConditionCount = 0;
     for (const candidate of footballPool) {
         if (selected.length >= size) break;
+        if (comboConditionCount >= comboConditionCap && isComboConditionAccumulatorMarket(candidate)) continue;
         if (!canReserveCandidate(candidate, usedFixtureIds, localUsed)) continue;
         selected.push(candidate);
         reserveCandidate(candidate, localUsed);
+        if (isComboConditionAccumulatorMarket(candidate)) comboConditionCount += 1;
     }
 
     if (selected.length < size) return null;
@@ -1243,6 +1284,7 @@ function buildMixedAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor
         .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
         .sort(compareAccaCandidatePreference);
     if (sorted.length < size) return null;
+    const comboConditionCap = resolveComboConditionCap(size, options);
 
     const football = sorted.filter((candidate) => normalizeSportKey(candidate?.sport) === 'football');
     const nonFootball = sorted.filter((candidate) => normalizeSportKey(candidate?.sport) !== 'football');
@@ -1277,22 +1319,30 @@ function buildMixedAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor
     for (const pair of anchorPairs) {
         const selected = [];
         const localUsed = new Set();
+        let comboConditionCount = 0;
 
         for (const candidate of pair) {
+            if (comboConditionCount >= comboConditionCap && isComboConditionAccumulatorMarket(candidate)) {
+                selected.length = 0;
+                break;
+            }
             if (!canReserveCandidate(candidate, usedFixtureIds, localUsed)) {
                 selected.length = 0;
                 break;
             }
             selected.push(candidate);
             reserveCandidate(candidate, localUsed);
+            if (isComboConditionAccumulatorMarket(candidate)) comboConditionCount += 1;
         }
         if (!selected.length) continue;
 
         for (const candidate of sorted) {
             if (selected.length >= size) break;
+            if (comboConditionCount >= comboConditionCap && isComboConditionAccumulatorMarket(candidate)) continue;
             if (!canReserveCandidate(candidate, usedFixtureIds, localUsed)) continue;
             selected.push(candidate);
             reserveCandidate(candidate, localUsed);
+            if (isComboConditionAccumulatorMarket(candidate)) comboConditionCount += 1;
         }
 
         if (selected.length < size) continue;
@@ -1369,8 +1419,8 @@ async function buildAccaLegCandidatePool(predictions, options = {}) {
             .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor);
         if (!eligibleCandidates.length) continue;
 
-        const candidatePool = eligibleCandidates.slice().sort(compareAccaCandidatePreference);
-        const best = applyMinimumValueConstraint(candidatePool, minConfidenceFloor) || candidatePool[0];
+        const candidatePool = eligibleCandidates.slice();
+        const best = selectBestAccaCandidateFromPool(candidatePool, minConfidenceFloor);
         if (!best) continue;
 
         const existing = byFixture.get(fixtureKey);
@@ -1404,7 +1454,13 @@ function buildAcca6Candidates(predictions, maxRows = 6, options = {}) {
     const footballTarget = Math.min(REQUIRED_FOOTBALL_ONLY_ACCAS, Math.max(0, Number(maxRows) || 0));
 
     for (let i = 0; i < footballTarget; i++) {
-        const row = buildFootballOnlyAccumulatorRow(sorted, usedFixtureIds, ACCA_SIZE, minConfidenceFloor);
+        const row = buildFootballOnlyAccumulatorRow(
+            sorted,
+            usedFixtureIds,
+            ACCA_SIZE,
+            minConfidenceFloor,
+            { isMega: false }
+        );
         if (!row) {
             console.warn(`[accaBuilder] ACCA football split warning: requested ${footballTarget} pure football ACCAs but only built ${i}.`);
             return rows;
@@ -1549,13 +1605,35 @@ async function loadValidFilteredPredictions(tier, client, options = {}) {
             r.volatility,
             r.odds,
             r.metadata,
-            r.created_at
+            r.created_at,
+            k.kickoff_utc
         from predictions_filtered f
         join predictions_raw r on r.id = f.raw_id
-        where f.tier = $1 and f.is_valid = true
+        cross join lateral (
+            select coalesce(
+                case
+                    when coalesce(r.metadata->>'match_time', '') ~ '^\\d{4}-\\d{2}-\\d{2}'
+                        then (r.metadata->>'match_time')::timestamptz
+                    else null
+                end,
+                case
+                    when coalesce(r.metadata->>'kickoff', '') ~ '^\\d{4}-\\d{2}-\\d{2}'
+                        then (r.metadata->>'kickoff')::timestamptz
+                    else null
+                end,
+                case
+                    when coalesce(r.metadata->>'kickoff_time', '') ~ '^\\d{4}-\\d{2}-\\d{2}'
+                        then (r.metadata->>'kickoff_time')::timestamptz
+                    else null
+                end
+            ) as kickoff_utc
+        ) k
+        where f.tier = $1
+          and f.is_valid = true
+          and k.kickoff_utc > $2::timestamptz
         order by r.confidence desc, r.created_at desc;
         `,
-        [t]
+        [t, now.toISOString()]
     );
 
     return res.rows

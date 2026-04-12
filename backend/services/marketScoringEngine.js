@@ -8,6 +8,18 @@ function clamp(n, min, max) {
     return Math.max(min, Math.min(max, n));
 }
 
+function toProbability(confidence) {
+    const n = Number(confidence);
+    if (!Number.isFinite(n)) return 0;
+    return clamp(n, 0, 100) / 100;
+}
+
+function intersectionConfidence(confidences = []) {
+    const product = (Array.isArray(confidences) ? confidences : [])
+        .reduce((acc, confidence) => acc * toProbability(confidence), 1);
+    return clamp(Math.round(product * 10000) / 100, 0, 100);
+}
+
 function hashToUnit(seed) {
     const hash = crypto.createHash('sha256').update(String(seed)).digest('hex').slice(0, 8);
     return parseInt(hash, 16) / 0xFFFFFFFF;
@@ -140,6 +152,107 @@ function withLineDescription(description, line) {
     return `${description} (${n})`;
 }
 
+function isComboMarket(market) {
+    const key = String(market || '').toUpperCase();
+    return key === 'COMBO_MATCH_RESULT_OVER_UNDER'
+        || key === 'COMBO_DC_OVER_UNDER'
+        || key === 'COMBO_BTTS_OVER_UNDER';
+}
+
+function findMarketRow(rows, market) {
+    const key = String(market || '').toUpperCase();
+    return (Array.isArray(rows) ? rows : []).find((row) => String(row?.market || '').toUpperCase() === key) || null;
+}
+
+function lineTokenFromComboPick(pick) {
+    const token = String(pick || '').toUpperCase();
+    const match = token.match(/_(\d+)_(\d+)$/);
+    if (!match) return null;
+    return `${match[1]}_${match[2]}`;
+}
+
+function overUnderMarketFromLineToken(token = '2_5') {
+    const normalized = String(token || '').trim();
+    if (normalized === '1_5') return 'OVER_UNDER_1_5';
+    if (normalized === '2_5') return 'OVER_UNDER_2_5';
+    if (normalized === '3_5') return 'OVER_UNDER_3_5';
+    return 'OVER_UNDER_2_5';
+}
+
+function confidenceForRequiredOutcome(row, requiredPick) {
+    const market = String(row?.market || '').toUpperCase();
+    const pick = String(row?.pick || '').toUpperCase();
+    const required = String(requiredPick || '').toUpperCase();
+    const confidence = clamp(Number(row?.confidence || 0), 0, 100);
+    if (!required) return confidence;
+    if (pick === required) return confidence;
+
+    if (market === 'DOUBLE_CHANCE' || market === 'BTTS' || market === 'DRAW_NO_BET' || market.startsWith('OVER_UNDER_')) {
+        return clamp(100 - confidence, 0, 100);
+    }
+
+    if (market === 'MATCH_RESULT') {
+        return clamp((100 - confidence) / 2, 0, 100);
+    }
+
+    return 0;
+}
+
+function parseComboRequirements(row) {
+    const market = String(row?.market || '').toUpperCase();
+    const pick = String(row?.pick || '').toUpperCase();
+    const lineToken = lineTokenFromComboPick(pick) || '2_5';
+    const ouMarket = overUnderMarketFromLineToken(lineToken);
+
+    if (market === 'COMBO_MATCH_RESULT_OVER_UNDER') {
+        const match = pick.match(/^(HOME|AWAY|DRAW)_(OVER|UNDER)_\d+_\d+$/);
+        if (!match) return null;
+        return {
+            primaryMarket: 'MATCH_RESULT',
+            primaryPick: match[1],
+            secondaryMarket: ouMarket,
+            secondaryPick: match[2]
+        };
+    }
+
+    if (market === 'COMBO_DC_OVER_UNDER') {
+        const match = pick.match(/^(1X|X2|12)_(OVER|UNDER)_\d+_\d+$/);
+        if (!match) return null;
+        return {
+            primaryMarket: 'DOUBLE_CHANCE',
+            primaryPick: match[1],
+            secondaryMarket: ouMarket,
+            secondaryPick: match[2]
+        };
+    }
+
+    if (market === 'COMBO_BTTS_OVER_UNDER') {
+        const match = pick.match(/^(YES|NO)_(OVER|UNDER)_\d+_\d+$/);
+        if (!match) return null;
+        return {
+            primaryMarket: 'BTTS',
+            primaryPick: match[1],
+            secondaryMarket: ouMarket,
+            secondaryPick: match[2]
+        };
+    }
+
+    return null;
+}
+
+function computeComboIntersectionConfidence(row, allRows) {
+    const requirements = parseComboRequirements(row);
+    if (!requirements) return Number(row?.confidence || 0);
+
+    const primaryRow = findMarketRow(allRows, requirements.primaryMarket);
+    const secondaryRow = findMarketRow(allRows, requirements.secondaryMarket);
+    if (!primaryRow || !secondaryRow) return 0;
+
+    const primaryConfidence = confidenceForRequiredOutcome(primaryRow, requirements.primaryPick);
+    const secondaryConfidence = confidenceForRequiredOutcome(secondaryRow, requirements.secondaryPick);
+    return intersectionConfidence([primaryConfidence, secondaryConfidence]);
+}
+
 function outcomeUniverseToLegacyMarket(sport, market, line = null) {
     // We keep outcome universe identifiers as primary source of truth,
     // but provide a pragmatic alias to the current pipeline naming where obvious.
@@ -186,7 +299,7 @@ async function scoreMarkets(matchData) {
 
     const baseConfidence = typeof scoring?.confidence === 'number' ? scoring.confidence : 50;
 
-    return sportConfig.markets.map((m) => {
+    const scoredRows = sportConfig.markets.map((m) => {
         const rawPick = pickFromOutcomes(m.outcomes, matchData, m.market, scoring);
         const pick = m.outcomes.includes(rawPick) ? rawPick : m.outcomes[0];
         const penalty = marketTypePenalty(m.type);
@@ -202,6 +315,16 @@ async function scoreMarkets(matchData) {
             description: withLineDescription(m.description, line),
             line,
             legacyMarketHint: outcomeUniverseToLegacyMarket(sport, m.market, line)
+        };
+    });
+
+    return scoredRows.map((row) => {
+        if (!isComboMarket(row.market)) return row;
+        const comboConfidence = computeComboIntersectionConfidence(row, scoredRows);
+        return {
+            ...row,
+            confidence: comboConfidence,
+            confidence_method: 'intersection_probability'
         };
     });
 }
