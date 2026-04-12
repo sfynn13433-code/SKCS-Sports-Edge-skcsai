@@ -1093,6 +1093,118 @@
         return String(pred && (pred.section_type || pred.type) || '').toLowerCase();
     }
 
+    function normalizeSportForFilter(value) {
+        const key = String(value || '').trim().toLowerCase();
+        if (!key) return '';
+        if (key.startsWith('soccer_')) return 'football';
+        if (key.startsWith('basketball_') || key === 'nba') return 'basketball';
+        if (key.startsWith('americanfootball_') || key === 'nfl') return 'nfl';
+        if (key.startsWith('icehockey_') || key === 'nhl') return 'hockey';
+        if (key.startsWith('baseball_') || key === 'mlb') return 'baseball';
+        if (key.startsWith('rugbyunion_')) return 'rugby';
+        if (key.startsWith('aussierules_')) return 'afl';
+        if (key.startsWith('mma_')) return 'mma';
+        return key;
+    }
+
+    function getPredictionLegCount(pred) {
+        return Array.isArray(pred && pred.matches) ? pred.matches.length : 0;
+    }
+
+    function getPrimaryMatch(pred) {
+        return (pred && Array.isArray(pred.matches) && pred.matches[0]) ? pred.matches[0] : {};
+    }
+
+    function getPredictionConfidenceScore(pred) {
+        const finalRec = pred && pred.final_recommendation && typeof pred.final_recommendation === 'object'
+            ? pred.final_recommendation
+            : null;
+        const fromFinal = Number(finalRec && finalRec.confidence);
+        if (Number.isFinite(fromFinal)) return fromFinal;
+        const fromTotal = Number(pred && pred.total_confidence);
+        if (Number.isFinite(fromTotal)) return fromTotal;
+        const firstMatch = getPrimaryMatch(pred);
+        const fromMatch = Number(firstMatch && firstMatch.confidence);
+        if (Number.isFinite(fromMatch)) return fromMatch;
+        return 0;
+    }
+
+    function hasFinalRecommendation(pred) {
+        if (pred && pred.final_recommendation && typeof pred.final_recommendation === 'object') return true;
+        const firstMatch = getPrimaryMatch(pred);
+        if (firstMatch && firstMatch.final_recommendation && typeof firstMatch.final_recommendation === 'object') return true;
+        const meta = firstMatch && firstMatch.metadata ? firstMatch.metadata : {};
+        return Boolean(meta && meta.market_router && meta.market_router.final_recommendation);
+    }
+
+    function isDirectInsightCandidate(pred) {
+        const type = getSectionType(pred);
+        const legCount = getPredictionLegCount(pred);
+        if (legCount !== 1) return false;
+        if (hasFinalRecommendation(pred)) return true;
+        if (type === 'direct' || type === 'single') return true;
+        return !type;
+    }
+
+    function selectDirectInsights(predictions) {
+        const byMatchId = new Map();
+        (predictions || []).forEach((pred) => {
+            if (!isDirectInsightCandidate(pred)) return;
+            const firstMatch = getPrimaryMatch(pred);
+            const matchId = String(firstMatch && firstMatch.match_id || '').trim();
+            const key = matchId || `no-match-${buildPredictionDisplayKey(pred)}`;
+            const existing = byMatchId.get(key);
+            if (!existing || getPredictionConfidenceScore(pred) > getPredictionConfidenceScore(existing)) {
+                byMatchId.set(key, pred);
+            }
+        });
+
+        return Array.from(byMatchId.values()).sort((a, b) => getPredictionConfidenceScore(b) - getPredictionConfidenceScore(a));
+    }
+
+    function getPredictionEngineLog(pred) {
+        if (Array.isArray(pred && pred.engine_log)) return pred.engine_log;
+        const firstMatch = getPrimaryMatch(pred);
+        if (Array.isArray(firstMatch && firstMatch.engine_log)) return firstMatch.engine_log;
+        const router = firstMatch && firstMatch.metadata && firstMatch.metadata.market_router
+            ? firstMatch.metadata.market_router
+            : null;
+        if (Array.isArray(router && router.engine_log)) return router.engine_log;
+        return [];
+    }
+
+    function getPredictionInsights(pred) {
+        if (pred && pred.insights && typeof pred.insights === 'object') return pred.insights;
+        const firstMatch = getPrimaryMatch(pred);
+        if (firstMatch && firstMatch.insights && typeof firstMatch.insights === 'object') return firstMatch.insights;
+        const router = firstMatch && firstMatch.metadata && firstMatch.metadata.market_router
+            ? firstMatch.metadata.market_router
+            : null;
+        if (router && router.insights && typeof router.insights === 'object') return router.insights;
+        const context = pred && pred.context_insights && pred.context_insights.chips ? pred.context_insights.chips : {};
+        return {
+            weather: context.weather || 'Unavailable',
+            availability: context.injuries_bans || 'No major absences',
+            stability: context.stability || 'Unknown'
+        };
+    }
+
+    function getFinalRecommendation(pred, fallbackMarket, fallbackConfidence) {
+        const firstMatch = getPrimaryMatch(pred);
+        const rec =
+            (pred && pred.final_recommendation) ||
+            (firstMatch && firstMatch.final_recommendation) ||
+            (firstMatch && firstMatch.metadata && firstMatch.metadata.market_router && firstMatch.metadata.market_router.final_recommendation) ||
+            null;
+        if (rec && typeof rec === 'object') {
+            return {
+                market: rec.market || fallbackMarket,
+                confidence: Number.isFinite(Number(rec.confidence)) ? Number(rec.confidence) : fallbackConfidence
+            };
+        }
+        return { market: fallbackMarket, confidence: fallbackConfidence };
+    }
+
     function normalizeMarketKey(value) {
         return String(value || '').trim().toLowerCase();
     }
@@ -1352,7 +1464,11 @@
                         const type = getSectionType(r);
                         return type === 'acca_6match' || type === 'mega_acca_12';
                     }
-                    return matches.some(m => String((m.sport || '')).toLowerCase().includes(String(requestSport).toLowerCase()));
+                    const requestSportKey = normalizeSportForFilter(requestSport);
+                    return matches.some(m => {
+                        const matchSport = normalizeSportForFilter((m && (m.sport || m.metadata && m.metadata.sport || m.metadata && m.metadata.sport_type || '')) || '');
+                        return requestSportKey ? matchSport === requestSportKey : true;
+                    });
                 });
                 supabaseFallbackStatus = 'ok';
                 return filtered;
@@ -1365,7 +1481,7 @@
 
         try {
             const cacheBust = Date.now();
-            let url = `${SKCS_BACKEND}/api/predictions?plan_id=${activePlanId}&_ts=${cacheBust}`;
+            let url = `${SKCS_BACKEND}/api/predictions?plan_id=${activePlanId}&history_days=14&window_days=14&_ts=${cacheBust}`;
             if (requestSport) {
                 url += `&sport=${requestSport}`;
             }
@@ -1384,7 +1500,7 @@
             let preds = (response.ok && data && Array.isArray(data.predictions)) ? data.predictions : [];
 
             if (preds.length === 0 && activePlanId.includes('elite')) {
-                let urlN = `${SKCS_BACKEND}/api/predictions?plan_id=core_30day_limitless&_ts=${cacheBust}`;
+                let urlN = `${SKCS_BACKEND}/api/predictions?plan_id=core_30day_limitless&history_days=14&window_days=14&_ts=${cacheBust}`;
                 if (requestSport) {
                     urlN += `&sport=${requestSport}`;
                 }
@@ -1497,11 +1613,15 @@
 
     function renderFootballInsights(predictions) {
         const normalizedPredictions = dedupePredictionFeed(predictions);
-        const singles = normalizedPredictions.filter(p => p.type === 'single' || !p.type || ['direct', 'secondary'].includes(getSectionType(p)));
-        const directSingles = singles.filter(p => getSectionType(p) === 'direct' || (!getSectionType(p) && Array.isArray(p.matches) && p.matches.length === 1));
+        const singles = normalizedPredictions.filter((p) => {
+            const type = getSectionType(p);
+            const legs = getPredictionLegCount(p);
+            return legs === 1 || type === 'direct' || type === 'secondary' || type === 'single';
+        });
+        const directSingles = selectDirectInsights(singles);
         const directByMatchId = new Map();
         directSingles.forEach((pred) => {
-            const firstMatch = (pred && Array.isArray(pred.matches) && pred.matches[0]) ? pred.matches[0] : {};
+            const firstMatch = getPrimaryMatch(pred);
             const matchId = String(firstMatch.match_id || '').trim();
             if (!matchId) return;
             directByMatchId.set(matchId, firstMatch);
@@ -1525,8 +1645,19 @@
             secondaryByMatchId.get(matchId).push(buildSecondaryMarketDisplayItem(pred));
         });
         const directWithLinkedSecondary = directSingles.map((pred) => attachSecondaryMarkets(pred, secondaryByMatchId));
-        const multiPreds = normalizedPredictions.filter(p => getSectionType(p) === 'multi' || (Array.isArray(p.matches) && p.matches.length >= 2 && p.matches.length <= 3));
-        const sameMatchPreds = normalizedPredictions.filter(p => getSectionType(p) === 'same_match' || (Array.isArray(p.matches) && p.matches.length > 1 && new Set((p.matches || []).map(m => m.match_id)).size === 1));
+        const multiPreds = normalizedPredictions.filter((p) => {
+            const legs = getPredictionLegCount(p);
+            const type = getSectionType(p);
+            if (legs < 2 || legs > 3) return false;
+            if (type === 'same_match') return false;
+            return type === 'multi' || legs >= 2;
+        });
+        const sameMatchPreds = normalizedPredictions.filter((p) => {
+            const legs = getPredictionLegCount(p);
+            if (legs <= 1) return false;
+            const type = getSectionType(p);
+            return type === 'same_match' || new Set((p.matches || []).map(m => m.match_id)).size === 1;
+        });
 
         const tierSummary = document.getElementById('football-tier-summary');
         if (tierSummary) tierSummary.style.display = 'block';
@@ -1565,12 +1696,16 @@
 
         // Categorize by type: 'single' = Direct/1X2, 'acca' = Accumulators
         const sectionType = (pred) => String(pred.section_type || pred.type || '').toLowerCase();
-        const singles = normalizedPredictions.filter(p => p.type === 'single' || !p.type || ['direct', 'secondary'].includes(sectionType(p)));
+        const singles = normalizedPredictions.filter((p) => {
+            const type = sectionType(p);
+            const legs = getPredictionLegCount(p);
+            return legs === 1 || type === 'direct' || type === 'secondary' || type === 'single';
+        });
         const accas = normalizedPredictions.filter(p => p.type === 'acca' || sectionType(p) === 'acca_6match');
 
         container.innerHTML = '';
 
-        const directSingles = singles.filter(p => sectionType(p) === 'direct' || (!sectionType(p) && Array.isArray(p.matches) && p.matches.length === 1));
+        const directSingles = selectDirectInsights(singles);
 
         // Section 1: Direct (1X2) — only true single-match rows (multi-leg lives under Multi)
         if (directSingles.length > 0) {
@@ -1591,7 +1726,13 @@
         }
 
         // Section 2: Multi Bets (2-3 legs combined)
-        const multiPreds = normalizedPredictions.filter(p => sectionType(p) === 'multi' || (p.matches && p.matches.length >= 2 && p.matches.length <= 3));
+        const multiPreds = normalizedPredictions.filter((p) => {
+            const legs = getPredictionLegCount(p);
+            const type = sectionType(p);
+            if (legs < 2 || legs > 3) return false;
+            if (type === 'same_match') return false;
+            return type === 'multi' || legs >= 2;
+        });
         if (multiPreds.length > 0) {
             const multiSection = document.createElement('div');
             multiSection.style.marginBottom = '2rem';
@@ -1609,7 +1750,11 @@
             container.appendChild(multiSection);
         }
 
-        const sameMatchPreds = normalizedPredictions.filter(p => sectionType(p) === 'same_match' || (p.matches && p.matches.length > 1 && new Set((p.matches || []).map(m => m.match_id)).size === 1));
+        const sameMatchPreds = normalizedPredictions.filter((p) => {
+            const legs = getPredictionLegCount(p);
+            if (legs <= 1) return false;
+            return sectionType(p) === 'same_match' || new Set((p.matches || []).map(m => m.match_id)).size === 1;
+        });
         if (sameMatchPreds.length > 0) {
             const sameMatchSection = document.createElement('div');
             sameMatchSection.style.marginBottom = '2rem';
@@ -1734,42 +1879,31 @@
         `;
     }
 
-    function renderPipelinePanel(pred, meta) {
-        const pipeline = meta && meta.pipeline_data ? meta.pipeline_data : {};
-        const isElite = String(pred && pred.tier || '').toLowerCase() === 'deep';
-        const stageSource = isElite
-            ? (pipeline.elite_6_stage || {})
-            : (pipeline.core_4_stage || {});
-
-        const stageEntries = isElite
-            ? [
-                ['Stage 1', stageSource.stage_1_collection],
-                ['Stage 2', stageSource.stage_2_baseline],
-                ['Stage 3', stageSource.stage_3_context],
-                ['Stage 4', stageSource.stage_4_reality],
-                ['Stage 5', stageSource.stage_5_decision],
-                ['Stage 6', stageSource.stage_6_final]
-            ]
-            : [
-                ['Stage 1', stageSource.stage_1_baseline],
-                ['Stage 2', stageSource.stage_2_context],
-                ['Stage 3', stageSource.stage_3_reality],
-                ['Stage 4', stageSource.stage_4_final]
-            ];
-
-        const filteredStages = stageEntries.filter(([, value]) => String(value || '').trim().length > 0);
-        if (!filteredStages.length) return '';
-
+    function renderEngineLogPanel(engineLog) {
+        const entries = Array.isArray(engineLog) ? engineLog.filter((x) => String(x || '').trim().length > 0) : [];
+        if (!entries.length) return '';
         return `
             <div style="margin-top:12px;padding:12px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0;">
                 <div style="font-size:0.78rem;font-weight:800;color:#0f172a;margin-bottom:8px;letter-spacing:0.06em;text-transform:uppercase;">
-                    ${isElite ? 'Elite 6-Stage Process' : 'Core 4-Stage Process'}
+                    Decision Waterfall Log
                 </div>
-                ${filteredStages.map(([label, value]) => `
-                    <div style="font-size:0.82rem;color:#334155;line-height:1.5;margin-bottom:6px;">
-                        <strong style="color:#0f172a;">${label}:</strong> ${value}
-                    </div>
-                `).join('')}
+                <ul style="margin:0;padding-left:18px;color:#334155;font-size:0.82rem;line-height:1.55;">
+                    ${entries.map((line) => `<li style="margin-bottom:4px;">${line}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+    }
+
+    function renderInsightsPanel(insights) {
+        const payload = insights && typeof insights === 'object' ? insights : {};
+        const weather = payload.weather || 'Unavailable';
+        const availability = payload.availability || 'No major absences';
+        const stability = payload.stability || 'Unknown';
+        return `
+            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+                <span style="display:inline-block;background:#e0f2fe;color:#075985;padding:5px 8px;border-radius:999px;font-size:0.74rem;font-weight:700;">Weather: ${weather}</span>
+                <span style="display:inline-block;background:#ecfdf3;color:#166534;padding:5px 8px;border-radius:999px;font-size:0.74rem;font-weight:700;">Availability: ${availability}</span>
+                <span style="display:inline-block;background:#fef3c7;color:#92400e;padding:5px 8px;border-radius:999px;font-size:0.74rem;font-weight:700;">Stability: ${stability}</span>
             </div>
         `;
     }
@@ -1779,38 +1913,19 @@
         card.className = 'prediction-card';
         card.id = cardId;
 
-        const firstMatch = (pred.matches && pred.matches[0]) ? pred.matches[0] : {};
+        const firstMatch = getPrimaryMatch(pred);
         const matchInfo = formatMatchInfo(firstMatch, sport);
-        const prediction = formatPrediction(firstMatch);
+        const fallbackLabel = formatPrediction(firstMatch);
+        const fallbackConfidence = Math.max(0, Math.min(100, Math.round(getPredictionConfidenceScore(pred))));
+        const finalRecommendation = getFinalRecommendation(pred, fallbackLabel, fallbackConfidence);
         const meta = firstMatch.metadata || {};
         const reasoning = meta.reasoning || '';
         const secondaryMarkets = Array.isArray(meta.secondary_markets) ? meta.secondary_markets : [];
-        const pipeline = meta.pipeline_data || {};
-        const baseline = pipeline.stage_1_baseline || null;
-        const contextNote = pipeline.stage_2_context || '';
-        const reality = pipeline.stage_3_reality || {};
-        const decision = pipeline.stage_4_decision || {};
-
-        const baselineHtml = baseline
-            ? `<div style="font-size:0.8rem;color:#475569;margin-top:8px;">
-                    <strong>Stage 1:</strong> H ${baseline.home ?? '-'}% | D ${baseline.draw ?? '-'}% | A ${baseline.away ?? '-'}%
-               </div>`
-            : '';
-
-        const contextHtml = contextNote
-            ? `<div style="font-size:0.8rem;color:#475569;margin-top:6px;"><strong>Stage 2:</strong> ${contextNote}</div>`
-            : '';
-
-        const realityHtml = (reality.weather || reality.volatility)
-            ? `<div style="font-size:0.8rem;color:#475569;margin-top:6px;"><strong>Stage 3:</strong> ${reality.weather || 'Unknown'} conditions • ${reality.volatility || 'Unknown'} volatility</div>`
-            : '';
-
-        const decisionHtml = Object.keys(decision).length
-            ? `<div style="font-size:0.8rem;color:#475569;margin-top:6px;"><strong>Stage 4:</strong> ACCA Safe = ${decision.acca_safe ? 'Yes' : 'No'}</div>`
-            : '';
+        const engineLog = getPredictionEngineLog(pred);
+        const insights = getPredictionInsights(pred);
         const badgesHtml = renderCardBadges(pred);
-        const pipelineHtml = renderPipelinePanel(pred, meta);
-        const legacyStagesHtml = pipelineHtml ? '' : `${baselineHtml}${contextHtml}${realityHtml}${decisionHtml}`;
+        const engineLogHtml = renderEngineLogPanel(engineLog);
+        const insightsHtml = renderInsightsPanel(insights);
 
         const secondaryHtml = secondaryMarkets.length
             ? `<button class="secondary-toggle" data-card-id="${cardId}" style="margin-top:10px;width:100%;padding:8px;background:#e7f1ff;color:#0d6efd;border:1px solid #93c5fd;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:700;">View Secondary Insights</button>
@@ -1836,13 +1951,13 @@
                 <div class="match-date" style="color:#4a5568; font-size:0.75rem; margin-top:8px; letter-spacing:1px;">${matchInfo.context}</div>
             </div>
             <div class="prediction-details" style="margin-top:12px; border-top:1px solid #e2e8f0; padding-top:12px; display:flex; justify-content:space-between; align-items:center;">
-                <div class="prediction" style="color:#059669; font-weight:bold;">${prediction}</div>
-                <div class="confidence" style="color:#4a5568; font-size:0.85rem;">${pred.total_confidence || 0}% Confidence</div>
+                <div class="prediction" style="color:#059669; font-weight:bold;">${finalRecommendation.market || fallbackLabel}</div>
+                <div class="confidence" style="color:#4a5568; font-size:0.85rem;">${finalRecommendation.confidence}% Confidence</div>
             </div>
             ${reasoning ? `<div style="margin-top:10px;padding:10px;border-radius:6px;background:#f8fafc;color:#334155;font-size:0.85rem;line-height:1.5;"><strong>AI Insight:</strong> ${reasoning}</div>` : ''}
-            ${legacyStagesHtml}
+            ${insightsHtml}
+            ${engineLogHtml}
             ${secondaryHtml}
-            ${pipelineHtml}
         `;
 
         const toggleBtn = card.querySelector('.secondary-toggle');
@@ -1866,13 +1981,16 @@
         const card = document.createElement('div');
         card.className = 'prediction-card';
         card.id = cardId;
-        const firstMatch = (pred.matches && pred.matches[0]) ? pred.matches[0] : {};
+        const firstMatch = getPrimaryMatch(pred);
         const firstMeta = firstMatch.metadata || {};
         const predictionDetails = pred.prediction_details || firstMeta.prediction_details || {};
         const reasoning = predictionDetails.reasoning || firstMeta.reasoning || '';
-        const outcome = predictionDetails.outcome || 'Multi Bet';
+        const fallbackLabel = predictionDetails.outcome || 'Multi Bet';
+        const fallbackConfidence = Math.max(0, Math.min(100, Math.round(getPredictionConfidenceScore(pred))));
+        const finalRecommendation = getFinalRecommendation(pred, fallbackLabel, fallbackConfidence);
         const badgesHtml = renderCardBadges(pred);
-        const pipelineHtml = renderPipelinePanel(pred, firstMeta);
+        const engineLogHtml = renderEngineLogPanel(getPredictionEngineLog(pred));
+        const insightsHtml = renderInsightsPanel(getPredictionInsights(pred));
 
         const legsHtml = (pred.matches || []).map((m, idx) => {
             const info = formatMatchInfo(m, sport);
@@ -1891,11 +2009,12 @@
             </div>
             <div style="margin-bottom:12px;">${legsHtml}</div>
             <div style="border-top:1px solid #e2e8f0; padding-top:12px; display:flex; justify-content:space-between; align-items:center;">
-                <div style="color:#059669; font-weight:bold;">${outcome}</div>
-                <div style="color:#4a5568; font-size:0.85rem;">${pred.total_confidence || 0}% Confidence</div>
+                <div style="color:#059669; font-weight:bold;">${finalRecommendation.market || fallbackLabel}</div>
+                <div style="color:#4a5568; font-size:0.85rem;">${finalRecommendation.confidence}% Confidence</div>
             </div>
             ${reasoning ? `<div style="margin-top:10px;padding:10px;border-radius:6px;background:#f8fafc;color:#334155;font-size:0.85rem;line-height:1.5;"><strong>AI Insight:</strong> ${reasoning}</div>` : ''}
-            ${pipelineHtml}
+            ${insightsHtml}
+            ${engineLogHtml}
         `;
 
         return card;
@@ -1976,7 +2095,8 @@
                 <div style="color:#4a5568; font-size:0.85rem;">Total Ticket Probability: ${compoundProbability}%</div>
             </div>
             ${reasoning ? `<div style="margin-top:10px;padding:10px;border-radius:6px;background:#f8fafc;color:#334155;font-size:0.85rem;line-height:1.5;"><strong>AI Insight:</strong> ${reasoning}</div>` : ''}
-            <div style="margin-top:10px;text-align:center;color:#334155;font-size:0.8rem;font-weight:600;">All insights have gone through the 6 stage process: Elite Tier</div>
+            ${renderInsightsPanel(getPredictionInsights(pred))}
+            ${renderEngineLogPanel(getPredictionEngineLog(pred))}
         `;
 
         return card;

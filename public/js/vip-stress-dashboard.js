@@ -120,8 +120,13 @@
         const validationInfo = validation
             ? `<div class="line">Validation: ${validation.valid ? 'PASS' : 'FAIL'} • Min Goals: ${validation.min_total_goals_required}</div>`
             : '';
-        const processFooter = isAcca
-            ? '<div class="line" style="text-align:center;font-weight:700;">All insights have gone through the 6 stage process: Elite Tier</div>'
+        const insights = prediction.insights || {};
+        const insightsFooter = (insights.weather || insights.availability || insights.stability)
+            ? `<div class="line">Weather: ${safe(insights.weather)} • Availability: ${safe(insights.availability)} • Stability: ${safe(insights.stability)}</div>`
+            : '';
+        const engineLog = Array.isArray(prediction.engine_log) ? prediction.engine_log.slice(0, 2) : [];
+        const engineLogFooter = engineLog.length
+            ? `<div class="line">${engineLog.map((line) => safe(line)).join(' | ')}</div>`
             : '';
 
         return `
@@ -131,7 +136,8 @@
             <div class="line">${league} • ${kickoff}</div>
             ${validationInfo}
             ${legsPreview}
-            ${processFooter}
+            ${insightsFooter}
+            ${engineLogFooter}
           </article>
         `;
     }
