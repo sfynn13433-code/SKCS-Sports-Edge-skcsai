@@ -1924,6 +1924,7 @@ async function loadWeekLockedTeamCompetitionMap(client, now = new Date()) {
             FROM predictions_final
             WHERE created_at >= $1
               AND created_at < $2
+              AND type IN ('acca_6match', 'mega_acca_12', 'acca')
               AND publish_run_id IS NOT NULL
         )
         SELECT pf.matches
@@ -1931,6 +1932,7 @@ async function loadWeekLockedTeamCompetitionMap(client, now = new Date()) {
         LEFT JOIN latest_week_run lwr ON TRUE
         WHERE pf.created_at >= $1
           AND pf.created_at < $2
+          AND pf.type IN ('acca_6match', 'mega_acca_12', 'acca')
           AND (
               lwr.publish_run_id IS NULL
               OR pf.publish_run_id = lwr.publish_run_id
@@ -2339,11 +2341,13 @@ async function buildFinalForTier(tier, options = {}) {
             if (familyCapState.exceeded) {
                 if (step.legCount === 12) {
                     megaDiagnostics.mega_rejected_for_family_caps += Math.max(1, familyCapState.exceededFamilies.length);
+                    console.log('[accaBuilder] %s: card rejected for family caps %s', step.type, JSON.stringify(familyCapState.exceededFamilies));
+                    addCardFixtureKeysToSet(candidateRow, usedFixtureKeys);
+                    candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
+                    continue;
                 }
-                console.log('[accaBuilder] %s: card rejected for family caps %s', step.type, JSON.stringify(familyCapState.exceededFamilies));
-                addCardFixtureKeysToSet(candidateRow, usedFixtureKeys);
-                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
-                continue;
+                // For 6-leg cards, preserve existing builder behavior and track the condition for observability.
+                console.log('[accaBuilder] %s: family cap exceeded (diagnostic only) %s', step.type, JSON.stringify(familyCapState.exceededFamilies));
             }
 
             if (step.legCount === 12 && !hasMinimumMarketDiversity(candidateRow)) {
