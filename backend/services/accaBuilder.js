@@ -2283,6 +2283,13 @@ async function buildFinalForTier(tier, options = {}) {
             if (overlapResult.reject) {
                 if (step.legCount === 12) megaDiagnostics.mega_rejected_for_duplicate_overlap += 1;
                 console.log('[accaBuilder] %s: card rejected for fixture overlap=%s with %s', step.type, overlapResult.overlap, overlapResult.comparedAgainst);
+
+                // CRITICAL: Still rotate pool on rejection to prevent infinite loops
+                // The rejected card's fixtures must be removed so next iteration gets different candidates
+                for (const m of (candidateRow.matches || [])) {
+                    if (m.match_id) usedFixtureKeys.add(m.match_id);
+                }
+                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
                 continue;
             }
 
@@ -2309,12 +2316,22 @@ async function buildFinalForTier(tier, options = {}) {
             }
             if (teamLockViolation) {
                 console.log('[accaBuilder] %s: card rejected by weekly team lock', step.type);
+
+                // CRITICAL: Also rotate pool on team lock rejection
+                for (const m of (candidateRow.matches || [])) {
+                    if (m.match_id) usedFixtureKeys.add(m.match_id);
+                }
+                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
                 continue;
             }
 
             // Accept the card
             reservePredictionFixtures(candidateRow, globalUsedFixtures);
             reservePredictionTeams(candidateRow, runTeamCompetitionMap);
+
+            // Log published card fixture keys for verification
+            const pubKeys = (candidateRow.matches || []).map(m => m.match_id).filter(Boolean);
+            console.log('[accaBuilder] PUBLISHING CARD %s legs=%s fixtureKeys=[%s]', step.type, pubKeys.length, pubKeys.join(', '));
 
             // Lock teams for weekly reuse prevention
             for (const m of (candidateRow.matches || [])) {
