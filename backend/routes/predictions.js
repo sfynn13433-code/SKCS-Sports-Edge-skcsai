@@ -860,6 +860,7 @@ router.get('/', requireRole('user'), async (req, res) => {
     try {
         const planId = req.query.plan_id || 'elite_30day_deep_vip';
         const sport = req.query.sport;
+        const includeAll = ['1', 'true'].includes(String(req.query.include_all || '').trim().toLowerCase());
         const sportFilterValues = getSportFilterValues(sport);
         
         let historyWindowDays = Number(req.query.history_days);
@@ -872,7 +873,7 @@ router.get('/', requireRole('user'), async (req, res) => {
         
         const futureWindowDays = Math.max(1, Math.min(14, Number(req.query.window_days) || 7));
 
-        console.log(`[PREDICTIONS] Request for Plan: ${planId}, Sport: ${sport || 'all'}`);
+        console.log(`[PREDICTIONS] Request for Plan: ${planId}, Sport: ${sport || 'all'}, include_all=${includeAll ? '1' : '0'}`);
 
         // Get plan capabilities from subscription matrix
         const planCapabilities = getPlanCapabilities(planId);
@@ -881,31 +882,46 @@ router.get('/', requireRole('user'), async (req, res) => {
         }
 
         const now = new Date();
-        let latestPublishRunId = await getLatestRelevantPublishRunId(sport);
-        let publishRunSource = 'completed_publish_run';
-        if (!latestPublishRunId) {
-            latestPublishRunId = await getLatestPublishRunIdFromFinalTable();
-            if (latestPublishRunId) {
-                publishRunSource = 'predictions_final_fallback';
-                console.warn('[predictions] No completed publish run found; using latest predictions_final publish_run_id:', latestPublishRunId);
+        let latestPublishRunId = null;
+        let publishRunSource = includeAll ? 'include_all_bypass' : 'completed_publish_run';
+        if (!includeAll) {
+            latestPublishRunId = await getLatestRelevantPublishRunId(sport);
+            if (!latestPublishRunId) {
+                latestPublishRunId = await getLatestPublishRunIdFromFinalTable();
+                if (latestPublishRunId) {
+                    publishRunSource = 'predictions_final_fallback';
+                    console.warn('[predictions] No completed publish run found; using latest predictions_final publish_run_id:', latestPublishRunId);
+                }
             }
         }
         let predictions = [];
         try {
-            if (!latestPublishRunId) {
+            if (!includeAll && !latestPublishRunId) {
                 throw new Error(`No completed publish run found for sport=${sport || 'all'}`);
             }
 
-            // Query ALL predictions with matching tier (don't restrict by publish_run_id).
-            // The date windowing and subscription filtering below handles what the user sees.
-            let queryStr = `
-                SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at
-                FROM predictions_final pf
-                WHERE LOWER(COALESCE(pf.tier, 'normal')) = ANY($1::text[])
-            `;
-            const queryParams = [planCapabilities.tiers.map((tier) => String(tier).toLowerCase())];
-
-            queryStr += ` ORDER BY created_at DESC LIMIT 2000;`;
+            // include_all bypass: return wide historical set for UI stress testing.
+            let queryStr = '';
+            let queryParams = [];
+            if (includeAll) {
+                queryStr = `
+                    SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at
+                    FROM predictions_final pf
+                    ORDER BY created_at DESC
+                    LIMIT 2500;
+                `;
+            } else {
+                // Query ALL predictions with matching tier (don't restrict by publish_run_id).
+                // The date windowing and subscription filtering below handles what the user sees.
+                queryStr = `
+                    SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at
+                    FROM predictions_final pf
+                    WHERE LOWER(COALESCE(pf.tier, 'normal')) = ANY($1::text[])
+                    ORDER BY created_at DESC
+                    LIMIT 2000;
+                `;
+                queryParams = [planCapabilities.tiers.map((tier) => String(tier).toLowerCase())];
+            }
 
             const dbRes = await query(queryStr, queryParams);
             predictions = dbRes.rows || [];
@@ -918,53 +934,67 @@ router.get('/', requireRole('user'), async (req, res) => {
             if ((!predictions || predictions.length === 0) && config.supabase && config.supabase.url && config.supabase.anonKey) {
                 console.log('[predictions] DB empty - attempting Supabase fallback');
                 const sb = createClient(config.supabase.url, config.supabase.anonKey);
-                const { data: runs, error: runsError } = await sb
-                    .from('prediction_publish_runs')
-                    .select('id, requested_sports')
-                    .eq('status', 'completed')
-                    .order('id', { ascending: false })
-                    .limit(50);
-
-                const latestSupabaseRun = !runsError && Array.isArray(runs)
-                    ? runs.find((row) => {
-                        const requested = Array.isArray(row.requested_sports) ? row.requested_sports.map(normalizePredictionSportKey) : [];
-                        if (!sport) return requested.length === 0 || requested.includes('all');
-                        return requested.length === 0 || requested.includes('all') || requested.includes(normalizePredictionSportKey(sport));
-                    })
-                    : null;
-
-                const { data, error } = latestSupabaseRun
-                    ? await sb
-                        .from('predictions_final')
-                        .select('*')
-                        .eq('publish_run_id', latestSupabaseRun.id)
-                        .order('created_at', { ascending: false })
-                        .limit(2000)
-                    : await sb
+                if (includeAll) {
+                    const { data, error } = await sb
                         .from('predictions_final')
                         .select('*')
                         .order('created_at', { ascending: false })
-                        .limit(2000);
+                        .limit(2500);
 
-                if (!latestSupabaseRun) {
-                    console.warn('[predictions] Supabase has no completed publish run; using latest predictions_final rows');
-                }
+                    if (!error && Array.isArray(data) && data.length > 0) {
+                        predictions = data;
+                    } else if (error) {
+                        console.warn('[predictions] Supabase include_all fallback error:', error.message || error);
+                    }
+                } else {
+                    const { data: runs, error: runsError } = await sb
+                        .from('prediction_publish_runs')
+                        .select('id, requested_sports')
+                        .eq('status', 'completed')
+                        .order('id', { ascending: false })
+                        .limit(50);
 
-                if (!error && Array.isArray(data) && data.length > 0) {
-                    // Filter Supabase rows by plan capabilities.
-                    const allowedTiers = new Set(planCapabilities.tiers.map((tier) => normalizeTierLabel(tier)));
-                    const filtered = data.filter((r) => {
-                        try {
-                            const rowTier = normalizeTierLabel(r.tier);
-                            if (!allowedTiers.has(rowTier)) return false;
-                            return true;
-                        } catch (_e) {
-                            return false;
-                        }
-                    });
-                    predictions = filtered;
-                } else if (error) {
-                    console.warn('[predictions] Supabase fallback error:', error.message || error);
+                    const latestSupabaseRun = !runsError && Array.isArray(runs)
+                        ? runs.find((row) => {
+                            const requested = Array.isArray(row.requested_sports) ? row.requested_sports.map(normalizePredictionSportKey) : [];
+                            if (!sport) return requested.length === 0 || requested.includes('all');
+                            return requested.length === 0 || requested.includes('all') || requested.includes(normalizePredictionSportKey(sport));
+                        })
+                        : null;
+
+                    const { data, error } = latestSupabaseRun
+                        ? await sb
+                            .from('predictions_final')
+                            .select('*')
+                            .eq('publish_run_id', latestSupabaseRun.id)
+                            .order('created_at', { ascending: false })
+                            .limit(2000)
+                        : await sb
+                            .from('predictions_final')
+                            .select('*')
+                            .order('created_at', { ascending: false })
+                            .limit(2000);
+
+                    if (!latestSupabaseRun) {
+                        console.warn('[predictions] Supabase has no completed publish run; using latest predictions_final rows');
+                    }
+
+                    if (!error && Array.isArray(data) && data.length > 0) {
+                        // Filter Supabase rows by plan capabilities.
+                        const allowedTiers = new Set(planCapabilities.tiers.map((tier) => normalizeTierLabel(tier)));
+                        const filtered = data.filter((r) => {
+                            try {
+                                const rowTier = normalizeTierLabel(r.tier);
+                                if (!allowedTiers.has(rowTier)) return false;
+                                return true;
+                            } catch (_e) {
+                                return false;
+                            }
+                        });
+                        predictions = filtered;
+                    } else if (error) {
+                        console.warn('[predictions] Supabase fallback error:', error.message || error);
+                    }
                 }
             }
         } catch (fbErr) {
@@ -1070,26 +1100,34 @@ router.get('/', requireRole('user'), async (req, res) => {
         const windowStart = new Date(now.getTime() - historyWindowDays * 24 * 60 * 60 * 1000);
         const windowEnd = new Date(now.getTime() + futureWindowDays * 24 * 60 * 60 * 1000);
 
-        const scopedPredictions = hydratedPredictions
-            .filter((prediction) => predictionIsNotStale(prediction, now))
-            .filter((prediction) => predictionMatchesWindow(prediction, windowStart, windowEnd))
+        const scopeBase = hydratedPredictions
             .filter((prediction) => predictionMatchesSport(prediction, sportFilterValues))
             .filter((prediction) => {
                 if (inferSectionType(prediction) !== 'secondary') return true;
                 const firstMatch = Array.isArray(prediction?.matches) ? prediction.matches[0] : null;
                 return isDisplayFriendlySecondaryMarket(firstMatch?.market);
-            })
-            .sort((a, b) => comparePredictionsForDisplay(a, b, now));
+            });
 
-        const planFilteredPredictions = filterPredictionsForPlan(
-            scopedPredictions,
-            planId,
-            now,
-            {
-                enforceUniqueAssetWindow: false,
-                subscriptionStart: req.user?.official_start_time || null
-            }
-        );
+        const scopedPredictions = (includeAll
+            ? scopeBase
+            : scopeBase
+                .filter((prediction) => predictionIsNotStale(prediction, now))
+                .filter((prediction) => predictionMatchesWindow(prediction, windowStart, windowEnd))
+        ).sort((a, b) => includeAll
+            ? (new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+            : comparePredictionsForDisplay(a, b, now));
+
+        const planFilteredPredictions = includeAll
+            ? scopedPredictions.slice(0, 2500)
+            : filterPredictionsForPlan(
+                scopedPredictions,
+                planId,
+                now,
+                {
+                    enforceUniqueAssetWindow: false,
+                    subscriptionStart: req.user?.official_start_time || null
+                }
+            );
         const megaAccaDailyAllocation = getMegaAccaDailyAllocation(planId, now, {
             subscriptionStart: req.user?.official_start_time || null,
             predictions: scopedPredictions
@@ -1101,6 +1139,7 @@ router.get('/', requireRole('user'), async (req, res) => {
             plan_id: planId,
             sport: sport || 'all',
             publish_run_source: publishRunSource,
+            include_all: includeAll,
             day: todayName,
             history_days: historyWindowDays,
             window_days: futureWindowDays,
