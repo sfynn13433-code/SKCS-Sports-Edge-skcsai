@@ -307,13 +307,42 @@ function normalizeTeamName(name) {
 }
 
 function normalizeCompetitionKey(fixture) {
+    const metadata = fixture?.metadata || {};
     return String(
-        fixture.competition_key ||
-        fixture.competition ||
-        fixture.league ||
-        fixture.tournament ||
+        fixture?.competition_key ||
+        fixture?.competition ||
+        fixture?.league ||
+        fixture?.tournament ||
+        metadata.competition_key ||
+        metadata.competition ||
+        metadata.league ||
+        metadata.tournament ||
+        metadata.series ||
+        metadata.event ||
+        fixture?.sport ||
+        metadata.sport ||
         'unknown_competition'
     ).trim().toLowerCase().replace(/[^a-z0-9]+/g, '_');
+}
+
+function getFixtureWeekDateValue(fixture) {
+    const metadata = fixture?.metadata || {};
+    return (
+        fixture?.startTime ||
+        fixture?.kickoff ||
+        fixture?.date ||
+        fixture?.match_date ||
+        fixture?.commence_time ||
+        fixture?.match_time ||
+        fixture?.kickoff_utc ||
+        fixture?.start_time ||
+        metadata.match_time ||
+        metadata.kickoff ||
+        metadata.kickoff_time ||
+        metadata.commence_time ||
+        metadata.date ||
+        null
+    );
 }
 
 function getWeekKey(dateValue) {
@@ -330,11 +359,18 @@ function getWeekKey(dateValue) {
 }
 
 function isTeamLockedForWeek(fixture, usedTeamsWeekly) {
-    const weekKey = getWeekKey(fixture.startTime || fixture.kickoff || fixture.date);
+    const metadata = fixture?.metadata || {};
+    const weekKey = getWeekKey(getFixtureWeekDateValue(fixture));
     const competitionKey = normalizeCompetitionKey(fixture);
 
-    const home = normalizeTeamName(fixture.homeTeam || fixture.home_team || fixture.home);
-    const away = normalizeTeamName(fixture.awayTeam || fixture.away_team || fixture.away);
+    const home = normalizeTeamName(
+        fixture?.homeTeam || fixture?.home_team || fixture?.home || metadata.home_team || metadata.home || metadata.team_home
+    );
+    const away = normalizeTeamName(
+        fixture?.awayTeam || fixture?.away_team || fixture?.away || metadata.away_team || metadata.away || metadata.team_away
+    );
+
+    if (!home && !away) return false;
 
     if (!usedTeamsWeekly.has(weekKey)) return false;
 
@@ -346,11 +382,18 @@ function isTeamLockedForWeek(fixture, usedTeamsWeekly) {
 }
 
 function lockTeamsForWeek(fixture, usedTeamsWeekly) {
-    const weekKey = getWeekKey(fixture.startTime || fixture.kickoff || fixture.date);
+    const metadata = fixture?.metadata || {};
+    const weekKey = getWeekKey(getFixtureWeekDateValue(fixture));
     const competitionKey = normalizeCompetitionKey(fixture);
 
-    const home = normalizeTeamName(fixture.homeTeam || fixture.home_team || fixture.home);
-    const away = normalizeTeamName(fixture.awayTeam || fixture.away_team || fixture.away);
+    const home = normalizeTeamName(
+        fixture?.homeTeam || fixture?.home_team || fixture?.home || metadata.home_team || metadata.home || metadata.team_home
+    );
+    const away = normalizeTeamName(
+        fixture?.awayTeam || fixture?.away_team || fixture?.away || metadata.away_team || metadata.away || metadata.team_away
+    );
+
+    if (!home && !away) return;
 
     if (!usedTeamsWeekly.has(weekKey)) {
         usedTeamsWeekly.set(weekKey, new Map());
@@ -363,8 +406,8 @@ function lockTeamsForWeek(fixture, usedTeamsWeekly) {
     }
 
     const usedTeams = byCompetition.get(competitionKey);
-    usedTeams.add(home);
-    usedTeams.add(away);
+    if (home) usedTeams.add(home);
+    if (away) usedTeams.add(away);
 }
 
 /* ==========================================================================
@@ -385,7 +428,44 @@ function stableFixtureKeyForCard(fixture) {
    ========================================================================== */
 
 function getCardFixtureKeySet(card) {
-    return new Set((card.legs || []).map(leg => leg.fixtureKey));
+    const rows = Array.isArray(card?.legs)
+        ? card.legs
+        : (Array.isArray(card?.matches) ? card.matches : []);
+
+    const keys = rows.map((leg, index) => {
+        const explicitKey = String(leg?.fixtureKey || leg?.fixture_key || '').trim().toLowerCase();
+        if (explicitKey) return explicitKey;
+
+        const explicitId = String(
+            leg?.fixtureId ||
+            leg?.fixture_id ||
+            leg?.match_id ||
+            leg?.matchId ||
+            leg?.id ||
+            leg?.event_id ||
+            leg?.raw_id ||
+            leg?.metadata?.match_id ||
+            ''
+        ).trim().toLowerCase();
+        if (explicitId) return `id:${explicitId}`;
+
+        const home = normalizeTeamName(
+            leg?.homeTeam || leg?.home_team || leg?.home || leg?.metadata?.home_team || leg?.metadata?.home
+        );
+        const away = normalizeTeamName(
+            leg?.awayTeam || leg?.away_team || leg?.away || leg?.metadata?.away_team || leg?.metadata?.away
+        );
+        const competition = normalizeCompetitionKey(leg || {});
+        const kickoff = String(getFixtureWeekDateValue(leg) || 'unknown_time');
+
+        if (home || away) {
+            return `${home || 'unknown_home'}__${away || 'unknown_away'}__${competition}__${kickoff}`;
+        }
+
+        return `unknown_fixture_${index}`;
+    }).filter(Boolean);
+
+    return new Set(keys);
 }
 
 function countSetOverlap(setA, setB) {
@@ -397,26 +477,30 @@ function countSetOverlap(setA, setB) {
 }
 
 function exceedsCardOverlapLimit(candidateCard, publishedCards) {
-    const candidateLegs = Array.isArray(candidateCard?.legs) ? candidateCard.legs : [];
+    const candidateLegs = Array.isArray(candidateCard?.legs)
+        ? candidateCard.legs
+        : (Array.isArray(candidateCard?.matches) ? candidateCard.matches : []);
     if (!candidateLegs.length) {
         return { reject: false, overlap: 0 };
     }
 
-    const candidateSet = getCardFixtureKeySet({ legs: candidateLegs });
+    const candidateSet = getCardFixtureKeySet(candidateCard);
     const limit = candidateLegs.length === 12 ? 4 : 2;
 
     for (const existingCard of Array.isArray(publishedCards) ? publishedCards : []) {
-        const existingLegs = Array.isArray(existingCard?.legs) ? existingCard.legs : [];
+        const existingLegs = Array.isArray(existingCard?.legs)
+            ? existingCard.legs
+            : (Array.isArray(existingCard?.matches) ? existingCard.matches : []);
         if (existingLegs.length !== candidateLegs.length) continue;
 
-        const existingSet = getCardFixtureKeySet({ legs: existingLegs });
+        const existingSet = getCardFixtureKeySet(existingCard);
         const overlap = countSetOverlap(candidateSet, existingSet);
 
         if (overlap > limit) {
             return {
                 reject: true,
                 overlap,
-                comparedAgainst: existingCard?.display_label || `${existingLegs.length} card`,
+                comparedAgainst: existingCard?.display_label || existingCard?.label || `${existingLegs.length} card`,
             };
         }
     }

@@ -1711,16 +1711,40 @@ function buildMegaAcca12Candidates(predictions, options = {}) {
     const expiryCutoff = options.expiryCutoff instanceof Date ? options.expiryCutoff : null;
     const usedThreshold = resolveMegaAccaThreshold(predictions, options);
     const globalUsedFixtures = options.globalUsedFixtures instanceof Set ? options.globalUsedFixtures : new Set();
+    const megaDiagnostics = options.megaDiagnostics || null;
+    const allPredictions = Array.isArray(predictions) ? predictions : [];
 
-    const eligible = predictions
-        .filter((prediction) => Number(prediction.confidence) >= usedThreshold)
-        .filter((prediction) => {
-            const ids = getAccaCandidateFixtureIds(prediction);
-            return ids.length > 0 && !ids.some((id) => globalUsedFixtures.has(id));
-        })
+    if (megaDiagnostics) {
+        megaDiagnostics.mega_candidate_fixtures_before_filter = allPredictions.length;
+    }
+
+    const confidenceEligible = [];
+    for (const prediction of allPredictions) {
+        if (isBannedMarket(prediction?.market, prediction?.prediction)) {
+            if (megaDiagnostics) megaDiagnostics.mega_rejected_for_banned_market += 1;
+            continue;
+        }
+        const confidence = Number(prediction?.confidence);
+        if (!Number.isFinite(confidence) || confidence < usedThreshold) {
+            if (megaDiagnostics) megaDiagnostics.mega_rejected_for_confidence_floor += 1;
+            continue;
+        }
+        confidenceEligible.push(prediction);
+    }
+
+    const fixtureEligible = confidenceEligible.filter((prediction) => {
+        const ids = getAccaCandidateFixtureIds(prediction);
+        return ids.length > 0 && !ids.some((id) => globalUsedFixtures.has(id));
+    });
+
+    const eligible = fixtureEligible
         .filter((prediction) => !expiryCutoff || isCricketFixtureWithinWindow(prediction, expiryCutoff))
         .sort(compareAccaCandidatePreference)
         .slice();
+
+    if (megaDiagnostics) {
+        megaDiagnostics.mega_candidate_fixtures_after_filter = eligible.length;
+    }
 
     // If not enough assets meet the effective floor, abort the Mega ACCA build for this run.
     if (eligible.length < MEGA_ACCA_SIZE) {
@@ -2076,103 +2100,115 @@ async function insertFinalRow({ publish_run_id, tier, type, matches, total_confi
 }
 
 
-/**
- * SKCS LAW: Card similarity rejection.
- * Two cards sharing more than N fixtures are duplicates and must be rejected.
- */
-function countFixtureOverlap(cardA, cardB) {
-    const keysA = new Set((cardA.matches || []).map(m => m.match_id || '').filter(Boolean));
-    const keysB = (cardB.matches || []).map(m => m.match_id || '').filter(Boolean);
-    let overlap = 0;
-    for (const key of keysB) {
-        if (keysA.has(key)) overlap++;
-    }
-    return overlap;
+function initAccaPublishDiagnostics() {
+    return {
+        weekly_team_lock_hits: 0,
+        duplicate_card_rejections: 0,
+        published_card_overlap_counts: [],
+        remaining_candidate_pool_after_each_publish: [],
+    };
 }
 
-function isDuplicateCard(newCard, publishedCards, legCount) {
-    // 6-leg: reject if overlap > 2 (need min 4 unique fixtures)
-    // 12-leg: reject if overlap > 4 (need min 8 unique fixtures)
-    const maxOverlap = legCount >= 12 ? 4 : 2;
-    for (const pub of publishedCards) {
-        if (countFixtureOverlap(newCard, pub) > maxOverlap) return true;
+function toPublishedFixtureLike(match) {
+    const metadata = match?.metadata || {};
+    const kickoffValue =
+        match?.commence_time ||
+        match?.match_date ||
+        metadata.match_time ||
+        metadata.kickoff ||
+        metadata.kickoff_time ||
+        metadata.commence_time ||
+        metadata.date ||
+        null;
+
+    return {
+        fixture_id: match?.fixture_id || match?.id || match?.match_id || metadata.match_id || null,
+        match_id: match?.match_id || metadata.match_id || match?.fixture_id || match?.id || null,
+        home_team: match?.home_team || metadata.home_team || match?.homeTeam || metadata.home || null,
+        away_team: match?.away_team || metadata.away_team || match?.awayTeam || metadata.away || null,
+        homeTeam: match?.home_team || metadata.home_team || match?.homeTeam || metadata.home || null,
+        awayTeam: match?.away_team || metadata.away_team || match?.awayTeam || metadata.away || null,
+        competition: metadata.competition || metadata.league || metadata.tournament || metadata.series || match?.competition || match?.league || null,
+        league: metadata.league || metadata.competition || match?.league || match?.competition || null,
+        tournament: metadata.tournament || metadata.series || null,
+        startTime: kickoffValue,
+        kickoff: kickoffValue,
+        date: kickoffValue,
+        match_date: kickoffValue,
+        commence_time: kickoffValue,
+        metadata,
+    };
+}
+
+function addCardFixtureKeysToSet(card, usedFixtureKeys) {
+    for (const match of (card?.matches || [])) {
+        const key = stableFixtureKey(toPublishedFixtureLike(match));
+        if (key) usedFixtureKeys.add(key);
+    }
+}
+
+function cardWeeklyLockViolation(card, usedTeamsWeekly) {
+    for (const match of (card?.matches || [])) {
+        const fixtureLike = toPublishedFixtureLike(match);
+        if (isTeamLockedForWeek(fixtureLike, usedTeamsWeekly)) {
+            return true;
+        }
     }
     return false;
 }
 
-/**
- * SKCS LAW: Extract all team names from a card.
- */
-function getTeamsFromCard(card) {
-    const teams = new Set();
-    for (const m of (card.matches || [])) {
-        const meta = m.metadata || {};
-        const home = String(m.home_team || meta.home_team || '').trim().toLowerCase();
-        const away = String(m.away_team || meta.away_team || '').trim().toLowerCase();
-        if (home) teams.add(home);
-        if (away) teams.add(away);
-    }
-    return teams;
-}
-
-/**
- * SKCS LAW: Get competition key from a card.
- */
-function getCompetitionFromCard(card) {
-    const comps = new Set();
-    for (const m of (card.matches || [])) {
-        const meta = m.metadata || {};
-        const comp = String(meta.competition || meta.league || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_');
-        if (comp) comps.add(comp);
-    }
-    return comps;
-}
-
-/**
- * SKCS LAW: Check if a candidate's teams conflict with weekly lock.
- * Returns true if the candidate has ANY team already used in the same competition this week.
- */
-function candidateViolatesWeeklyLock(candidate, usedTeamsWeekly) {
-    const meta = candidate.metadata || {};
-    const comp = String(meta.competition || meta.league || candidate.league || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_');
-    const home = String(candidate.home_team || meta.home_team || '').trim().toLowerCase();
-    const away = String(candidate.away_team || meta.away_team || '').trim().toLowerCase();
-
-    // Check home team
-    if (home) {
-        const compKey = `${comp}::${home}`;
-        if (usedTeamsWeekly.has(compKey)) return true;
-    }
-    // Check away team
-    if (away) {
-        const compKey = `${comp}::${away}`;
-        if (usedTeamsWeekly.has(compKey)) return true;
-    }
-    return false;
-}
-
-/**
- * SKCS LAW: Lock teams from a published card into weekly lock map.
- */
-function lockTeamsFromCard(card, usedTeamsWeekly) {
-    for (const m of (card.matches || [])) {
-        const meta = m.metadata || {};
-        const comp = String(meta.competition || meta.league || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_');
-        const home = String(m.home_team || meta.home_team || '').trim().toLowerCase();
-        const away = String(m.away_team || meta.away_team || '').trim().toLowerCase();
-        if (home) usedTeamsWeekly.add(`${comp}::${home}`);
-        if (away) usedTeamsWeekly.add(`${comp}::${away}`);
+function lockCardTeamsForWeek(card, usedTeamsWeekly) {
+    for (const match of (card?.matches || [])) {
+        lockTeamsForWeek(toPublishedFixtureLike(match), usedTeamsWeekly);
     }
 }
 
-/**
- * SKCS LAW: Remove used fixture keys from candidate pool.
- */
-function removeUsedFixturesFromPool(pool, usedKeys) {
-    return pool.filter(c => {
-        const ids = getAccaCandidateFixtureIds(c);
-        return ids.length > 0 && !ids.some(id => usedKeys.has(id));
-    });
+function normalizeFamilyForMatch(match) {
+    const metadata = match?.metadata || {};
+    const raw =
+        metadata.market_family ||
+        metadata.market_key ||
+        metadata.market ||
+        match?.market ||
+        match?.prediction ||
+        '';
+    return normalizeMarketFamily(raw) || normalizeInsightFamily(raw) || null;
+}
+
+function getCardFamilyCounts(card) {
+    const counts = {};
+    for (const match of (card?.matches || [])) {
+        const family = normalizeFamilyForMatch(match);
+        if (!family) continue;
+        counts[family] = (counts[family] || 0) + 1;
+    }
+    return counts;
+}
+
+function exceedsFamilyCaps(card, legCount) {
+    const familyCaps = getFamilyCaps(legCount);
+    const counts = getCardFamilyCounts(card);
+    const exceeded = [];
+
+    for (const [family, count] of Object.entries(counts)) {
+        const cap = familyCaps[family];
+        if (typeof cap === 'number' && count > cap) {
+            exceeded.push({ family, count, cap });
+        }
+    }
+
+    return {
+        exceeded: exceeded.length > 0,
+        exceededFamilies: exceeded,
+        counts,
+    };
+}
+
+function hasMinimumMarketDiversity(card) {
+    const legs = (card?.matches || []).map((match) => ({
+        family: normalizeFamilyForMatch(match),
+    }));
+    return validateMarketDiversity(legs);
 }
 
 
@@ -2220,11 +2256,7 @@ async function buildFinalForTier(tier, options = {}) {
 
         if (footballCandidateCount < minimumFootballFixturePool) {
             console.warn(
-                `[accaBuilder] ACCA pool warning: only ${footballCandidateCount} football fixtures after weekly locks (need ${minimumFootballFixturePool}). Falling back to run-only lock scope for ACCA generation.`
-            );
-            accaMarketCandidates = await buildAccaLegCandidatePool(
-                filterAvailablePredictions(limitedCandidates, globalUsedFixtures, new Map(), runTeamCompetitionMap),
-                { minLegConfidence: ACCA_MIN_LEG_CONFIDENCE }
+                `[accaBuilder] ACCA pool warning: only ${footballCandidateCount} football fixtures after weekly locks (need ${minimumFootballFixturePool}). Weekly team lock remains enforced; lock bypass fallback is disabled.`
             );
         }
 
@@ -2246,6 +2278,7 @@ async function buildFinalForTier(tier, options = {}) {
         const publishedCards = [];
         const usedFixtureKeys = new Set();
         const usedTeamsWeekly = new Map();
+        const accaPublishDiagnostics = initAccaPublishDiagnostics();
 
         // Start with filtered candidate pool
         let candidatePool = filterAvailablePredictions(accaMarketCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap);
@@ -2256,28 +2289,45 @@ async function buildFinalForTier(tier, options = {}) {
 
         // Build plan: 4 x 6-leg + 1 x 12-leg
         const buildPlan = [
-            { type: 'acca_6match', legCount: 6 },
-            { type: 'acca_6match', legCount: 6 },
-            { type: 'acca_6match', legCount: 6 },
-            { type: 'acca_6match', legCount: 6 },
-            { type: 'mega_acca_12', legCount: 12 },
+            { type: 'acca_6match', legCount: 6, profile: 'football_only' },
+            { type: 'acca_6match', legCount: 6, profile: 'football_only' },
+            { type: 'acca_6match', legCount: 6, profile: 'mixed_sport' },
+            { type: 'acca_6match', legCount: 6, profile: 'mixed_sport' },
+            { type: 'mega_acca_12', legCount: 12, profile: 'mixed_sport' },
         ];
 
         for (const step of buildPlan) {
-            // Build candidate card from current pool
-            const selections = step.legCount === 12
-                ? buildMegaAcca12Candidates(candidatePool, {
+            const stagedGlobalUsedFixtures = new Set(globalUsedFixtures);
+            let candidateRow = null;
+
+            if (step.legCount === 12) {
+                const selections = buildMegaAcca12Candidates(candidatePool, {
                     maxRows: 1,
                     minLegConfidence: ACCA_MIN_LEG_CONFIDENCE,
-                    globalUsedFixtures,
+                    globalUsedFixtures: stagedGlobalUsedFixtures,
                     expiryCutoff: new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000)),
-                })
-                : buildAcca6Candidates(candidatePool, step.legCount === 6 ? categoryBuildCaps.acca_6match : 1, {
-                    minLegConfidence: ACCA_MIN_LEG_CONFIDENCE,
-                    globalUsedFixtures,
+                    megaDiagnostics,
                 });
+                candidateRow = selections[0] || null;
+            } else if (step.profile === 'football_only') {
+                candidateRow = buildFootballOnlyAccumulatorRow(
+                    candidatePool,
+                    stagedGlobalUsedFixtures,
+                    ACCA_SIZE,
+                    ACCA_MIN_LEG_CONFIDENCE,
+                    { isMega: false }
+                );
+            } else {
+                candidateRow = buildMixedAccumulatorRow(
+                    candidatePool,
+                    stagedGlobalUsedFixtures,
+                    ACCA_SIZE,
+                    ACCA_MIN_LEG_CONFIDENCE,
+                    { isMega: false }
+                );
+            }
 
-            if (!selections || selections.length === 0) {
+            if (!candidateRow) {
                 if (step.legCount === 12) {
                     megaDiagnostics.mega_rejected_for_insufficient_legs += 1;
                     console.log('[accaBuilder] %s: no candidates from pool (pool_size=%s)', step.type, candidatePool.length);
@@ -2285,51 +2335,49 @@ async function buildFinalForTier(tier, options = {}) {
                 continue;
             }
 
-            const candidateRow = selections[0];
+            const familyCapState = exceedsFamilyCaps(candidateRow, step.legCount);
+            if (familyCapState.exceeded) {
+                if (step.legCount === 12) {
+                    megaDiagnostics.mega_rejected_for_family_caps += Math.max(1, familyCapState.exceededFamilies.length);
+                }
+                console.log('[accaBuilder] %s: card rejected for family caps %s', step.type, JSON.stringify(familyCapState.exceededFamilies));
+                addCardFixtureKeysToSet(candidateRow, usedFixtureKeys);
+                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
+                continue;
+            }
+
+            if (step.legCount === 12 && !hasMinimumMarketDiversity(candidateRow)) {
+                megaDiagnostics.mega_rejected_for_low_diversity += 1;
+                console.log('[accaBuilder] %s: card rejected for low market diversity (<%s families)', step.type, MIN_FAMILIES_PER_CARD);
+                addCardFixtureKeysToSet(candidateRow, usedFixtureKeys);
+                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
+                continue;
+            }
 
             // SKCS LAW: Card overlap rejection
             const overlapResult = exceedsCardOverlapLimit(candidateRow, publishedCards);
             if (overlapResult.reject) {
+                accaPublishDiagnostics.duplicate_card_rejections += 1;
+                accaPublishDiagnostics.published_card_overlap_counts.push({
+                    type: step.type,
+                    profile: step.profile,
+                    leg_count: step.legCount,
+                    overlap: overlapResult.overlap,
+                    compared_against: overlapResult.comparedAgainst,
+                });
                 if (step.legCount === 12) megaDiagnostics.mega_rejected_for_duplicate_overlap += 1;
                 console.log('[accaBuilder] %s: card rejected for fixture overlap=%s with %s', step.type, overlapResult.overlap, overlapResult.comparedAgainst);
-
-                // CRITICAL: Still rotate pool on rejection to prevent infinite loops
-                // The rejected card's fixtures must be removed so next iteration gets different candidates
-                for (const m of (candidateRow.matches || [])) {
-                    if (m.match_id) usedFixtureKeys.add(m.match_id);
-                }
+                addCardFixtureKeysToSet(candidateRow, usedFixtureKeys);
                 candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
                 continue;
             }
 
             // SKCS LAW: Weekly team lock check on this card
-            let teamLockViolation = false;
-            for (const m of (candidateRow.matches || [])) {
-                const fixtureLike = {
-                    home_team: m.home_team,
-                    away_team: m.away_team,
-                    homeTeam: m.home_team,
-                    awayTeam: m.away_team,
-                    competition: m.metadata?.competition || m.metadata?.league,
-                    league: m.metadata?.league,
-                    tournament: m.metadata?.tournament,
-                    startTime: m.commence_time || m.match_date || m.metadata?.match_time,
-                    kickoff: m.commence_time || m.match_date || m.metadata?.match_time,
-                    date: m.commence_time || m.match_date,
-                };
-                if (isTeamLockedForWeek(fixtureLike, usedTeamsWeekly)) {
-                    teamLockViolation = true;
-                    if (step.legCount === 12) megaDiagnostics.mega_rejected_for_weekly_team_lock += 1;
-                    break;
-                }
-            }
-            if (teamLockViolation) {
+            if (cardWeeklyLockViolation(candidateRow, usedTeamsWeekly)) {
+                accaPublishDiagnostics.weekly_team_lock_hits += 1;
+                if (step.legCount === 12) megaDiagnostics.mega_rejected_for_weekly_team_lock += 1;
                 console.log('[accaBuilder] %s: card rejected by weekly team lock', step.type);
-
-                // CRITICAL: Also rotate pool on team lock rejection
-                for (const m of (candidateRow.matches || [])) {
-                    if (m.match_id) usedFixtureKeys.add(m.match_id);
-                }
+                addCardFixtureKeysToSet(candidateRow, usedFixtureKeys);
                 candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
                 continue;
             }
@@ -2339,27 +2387,12 @@ async function buildFinalForTier(tier, options = {}) {
             reservePredictionTeams(candidateRow, runTeamCompetitionMap);
 
             // Log published card fixture keys for verification
-            const pubKeys = (candidateRow.matches || []).map(m => m.match_id).filter(Boolean);
+            const pubKeys = Array.from(getCardFixtureKeySet(candidateRow));
             console.log('[accaBuilder] PUBLISHING CARD %s legs=%s fixtureKeys=[%s]', step.type, pubKeys.length, pubKeys.join(', '));
 
             // Lock teams for weekly reuse prevention
-            for (const m of (candidateRow.matches || [])) {
-                const fixtureLike = {
-                    home_team: m.home_team,
-                    away_team: m.away_team,
-                    homeTeam: m.home_team,
-                    awayTeam: m.away_team,
-                    competition: m.metadata?.competition || m.metadata?.league,
-                    league: m.metadata?.league,
-                    tournament: m.metadata?.tournament,
-                    startTime: m.commence_time || m.match_date || m.metadata?.match_time,
-                    kickoff: m.commence_time || m.match_date || m.metadata?.match_time,
-                    date: m.commence_time || m.match_date,
-                };
-                lockTeamsForWeek(fixtureLike, usedTeamsWeekly);
-                const key = m.match_id;
-                if (key) usedFixtureKeys.add(key);
-            }
+            lockCardTeamsForWeek(candidateRow, usedTeamsWeekly);
+            addCardFixtureKeysToSet(candidateRow, usedFixtureKeys);
 
             publishedCards.push(candidateRow);
 
@@ -2381,16 +2414,34 @@ async function buildFinalForTier(tier, options = {}) {
 
             // SKCS LAW: Rotate candidate pool
             candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
+            accaPublishDiagnostics.remaining_candidate_pool_after_each_publish.push({
+                type: step.type,
+                profile: step.profile,
+                leg_count: step.legCount,
+                remaining: candidatePool.length,
+            });
             console.log('[accaBuilder] %s: card accepted, remaining_pool=%s', step.type, candidatePool.length);
         }
 
-        // Resolve mega zero reason
-        if (megaDiagnostics.mega_final_cards_built === 0) {
-            megaDiagnostics.mega_zero_reason = resolveMegaZeroReason(megaDiagnostics);
-        }
+        megaDiagnostics.mega_zero_reason = resolveMegaZeroReason(megaDiagnostics);
 
         console.log('[accaBuilder] 6-LEG: published=%s', accaRows.length);
         console.log('[accaBuilder] MEGA: published=%s zero_reason=%s', megaAccaRows.length, megaDiagnostics.mega_zero_reason || 'n/a');
+        console.log('[accaBuilder DIAGNOSTICS] weekly_team_lock_hits=%s', accaPublishDiagnostics.weekly_team_lock_hits);
+        console.log('[accaBuilder DIAGNOSTICS] duplicate_card_rejections=%s', accaPublishDiagnostics.duplicate_card_rejections);
+        console.log('[accaBuilder DIAGNOSTICS] published_card_overlap_counts=%s', JSON.stringify(accaPublishDiagnostics.published_card_overlap_counts));
+        console.log('[accaBuilder DIAGNOSTICS] remaining_candidate_pool_after_each_publish=%s', JSON.stringify(accaPublishDiagnostics.remaining_candidate_pool_after_each_publish));
+        console.log('[accaBuilder DIAGNOSTICS] mega_candidate_fixtures_before_filter=%s', megaDiagnostics.mega_candidate_fixtures_before_filter);
+        console.log('[accaBuilder DIAGNOSTICS] mega_candidate_fixtures_after_filter=%s', megaDiagnostics.mega_candidate_fixtures_after_filter);
+        console.log('[accaBuilder DIAGNOSTICS] mega_rejected_for_weekly_team_lock=%s', megaDiagnostics.mega_rejected_for_weekly_team_lock);
+        console.log('[accaBuilder DIAGNOSTICS] mega_rejected_for_family_caps=%s', megaDiagnostics.mega_rejected_for_family_caps);
+        console.log('[accaBuilder DIAGNOSTICS] mega_rejected_for_duplicate_overlap=%s', megaDiagnostics.mega_rejected_for_duplicate_overlap);
+        console.log('[accaBuilder DIAGNOSTICS] mega_rejected_for_confidence_floor=%s', megaDiagnostics.mega_rejected_for_confidence_floor);
+        console.log('[accaBuilder DIAGNOSTICS] mega_rejected_for_banned_market=%s', megaDiagnostics.mega_rejected_for_banned_market);
+        console.log('[accaBuilder DIAGNOSTICS] mega_rejected_for_low_diversity=%s', megaDiagnostics.mega_rejected_for_low_diversity);
+        console.log('[accaBuilder DIAGNOSTICS] mega_rejected_for_insufficient_legs=%s', megaDiagnostics.mega_rejected_for_insufficient_legs);
+        console.log('[accaBuilder DIAGNOSTICS] mega_final_cards_built=%s', megaDiagnostics.mega_final_cards_built);
+        console.log('[accaBuilder DIAGNOSTICS] mega_zero_reason=%s', megaDiagnostics.mega_zero_reason || 'n/a');
 
         // ---------------------------------------------------------------------
         // 3. MULTI LAYER (Third Priority)
@@ -2506,7 +2557,14 @@ async function buildFinalForTier(tier, options = {}) {
             same_match: sameMatchRows,
             multi: multiRows,
             acca_6match: accaRows,
-            mega_acca_12: megaAccaRows
+            mega_acca_12: megaAccaRows,
+            diagnostics: {
+                weekly_team_lock_hits: accaPublishDiagnostics.weekly_team_lock_hits,
+                duplicate_card_rejections: accaPublishDiagnostics.duplicate_card_rejections,
+                published_card_overlap_counts: accaPublishDiagnostics.published_card_overlap_counts,
+                remaining_candidate_pool_after_each_publish: accaPublishDiagnostics.remaining_candidate_pool_after_each_publish,
+                mega_zero_reason: megaDiagnostics.mega_zero_reason,
+            }
         };
     });
 }
