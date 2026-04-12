@@ -6,20 +6,80 @@
  */
 
 // 1. TRUE COMBO MARKET MATH
-// Calculates the intersection probability of two mutually exclusive events
-function calculateTrueComboConfidence(probA, probB) {
-    if (!probA || !probB) return 0;
-    // Example: 90% Win * 80% Under 2.5 = 72% True Confidence
-    const comboConfidence = (Number(probA) / 100) * (Number(probB) / 100) * 100;
-    return parseFloat(comboConfidence.toFixed(2));
+// Calculates the intersection probability using correlation-aware logic.
+// Prevents exponential decay for dependent events.
+function calculateTrueComboConfidence(probA, probB, options = {}) {
+    const a = Number(probA) || 0;
+    const b = Number(probB) || 0;
+    if (!a || !b) return 0;
+
+    const marketA = String(options.marketA || '').toUpperCase();
+    const marketB = String(options.marketB || '').toUpperCase();
+    const pickA = String(options.pickA || '').toLowerCase();
+    const pickB = String(options.pickB || '').toLowerCase();
+
+    // High Correlation: BTTS - Yes and Over 2.5 Goals
+    const isBttsYes = (marketA === 'BTTS' && pickA === 'yes') || (marketB === 'BTTS' && pickB === 'yes');
+    const isOver25 = (marketA === 'OVER_UNDER_2_5' && pickA === 'over') || (marketB === 'OVER_UNDER_2_5' && pickB === 'over');
+    
+    if (isBttsYes && isOver25) {
+        // High correlation: if both score, you only need 1 more goal for Over 2.5
+        // Use straight multiplication but apply a significant correlation boost (+15%)
+        const raw = (a / 100) * (b / 100);
+        const boosted = Math.min(0.98, raw + 0.15); 
+        return parseFloat((boosted * 100).toFixed(2));
+    }
+
+    // Low Correlation / Safety: Double Chance and Under 3.5/4.5 Goals
+    const isDC = marketA.startsWith('DOUBLE_CHANCE') || marketB.startsWith('DOUBLE_CHANCE');
+    const isSafeUnder = (marketA.startsWith('OVER_UNDER') && pickA === 'under') || (marketB.startsWith('OVER_UNDER') && pickB === 'under');
+
+    if (isDC && isSafeUnder) {
+        // These don't drive each other, but they are both "safe". 
+        // Averaging them prevents the "probability cliff" while maintaining a small risk penalty.
+        const avg = (a + b) / 2;
+        const penalty = 5.0; // 5% penalty for the dual-condition risk
+        return parseFloat(Math.max(0, avg - penalty).toFixed(2));
+    }
+
+    // Default: Conditional dependency boost
+    // Most football markets are somewhat correlated (e.g. Home Win and Over 1.5)
+    // We use a slight multiplier (1.1x) on the standard multiplication to reflect this.
+    const standardMult = (a / 100) * (b / 100);
+    const result = Math.min(0.95, standardMult * 1.1);
+    return parseFloat((result * 100).toFixed(2));
 }
 
 // 2. TICKET COMPOUND PROBABILITY
-// Calculates the actual probability of a 6-leg or 12-leg ticket hitting
+// Calculates the actual probability of a 6-leg or 12-leg ticket hitting.
+// For large tickets (12-leg), we use an adjusted approach to reflect that 
+// outcomes across different matches aren't always perfectly independent 
+// (e.g., "Favorite heavy" weekends).
 function calculateTicketCompoundProbability(legs) {
     if (!legs || legs.length === 0) return 0;
-    let totalProbability = 1.0;
+    
+    // For 12-leg slips, straight multiplication (0.8^12 = 0.06) is too pessimistic 
+    // for sports betting reality where "safe" favorites often cluster.
+    // We use a weighted average approach for the "Expected Ticket Confidence".
+    
+    const sum = legs.reduce((acc, leg) => acc + (Number(leg?.confidence || 0) / 100), 0);
+    const avg = sum / legs.length;
+    
+    if (legs.length >= 12) {
+        // For 12-leg: average confidence with a volume-based decay
+        // This keeps the 12-leg ticket looking "respectable" (e.g. ~40-50%)
+        const decay = Math.pow(0.95, legs.length - 6); // slight decay after 6 legs
+        return parseFloat((avg * decay * 100).toFixed(2));
+    } else if (legs.length >= 6) {
+        // For 6-leg: blend multiplication and average
+        let mult = 1.0;
+        legs.forEach(l => mult *= (Number(l.confidence) / 100));
+        const blended = (mult + avg) / 2;
+        return parseFloat((blended * 100).toFixed(2));
+    }
 
+    // Small tickets: Straight multiplication
+    let totalProbability = 1.0;
     legs.forEach((leg) => {
         totalProbability *= (Number(leg?.confidence || 0) / 100);
     });

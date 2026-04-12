@@ -917,7 +917,12 @@ function buildFootballComboCandidates(prediction, scoredMarkets = [], minConfide
 
     const out = [];
     if (dc && btts) {
-        const comboConfidence = calculateTrueComboConfidence(dc.confidence, btts.confidence);
+        const comboConfidence = calculateTrueComboConfidence(dc.confidence, btts.confidence, {
+            marketA: 'DOUBLE_CHANCE',
+            pickA: dc.pick,
+            marketB: 'BTTS',
+            pickB: btts.pick
+        });
         if (comboConfidence >= minConfidence) {
             const dcPick = normalizePickForAcca(dc.pick);
             const bttsPick = normalizePickForAcca(btts.pick);
@@ -946,7 +951,12 @@ function buildFootballComboCandidates(prediction, scoredMarkets = [], minConfide
         const dcPick = normalizePickForAcca(dc.pick);
         const ouPick = normalizePickForAcca(ouBest.pick);
         const lineToken = resolveLineTokenForMarketScore(ouBest, '2_5');
-        const comboConfidence = calculateTrueComboConfidence(dc.confidence, ouBest.confidence);
+        const comboConfidence = calculateTrueComboConfidence(dc.confidence, ouBest.confidence, {
+            marketA: 'DOUBLE_CHANCE',
+            pickA: dc.pick,
+            marketB: ouBest.market,
+            pickB: ouBest.pick
+        });
         if (comboConfidence >= minConfidence) {
             out.push({
                 raw_id: prediction.raw_id,
@@ -973,7 +983,12 @@ function buildFootballComboCandidates(prediction, scoredMarkets = [], minConfide
         const bttsPick = normalizePickForAcca(btts.pick);
         const ouPick = normalizePickForAcca(ouBest.pick);
         const lineToken = resolveLineTokenForMarketScore(ouBest, '2_5');
-        const comboConfidence = calculateTrueComboConfidence(btts.confidence, ouBest.confidence);
+        const comboConfidence = calculateTrueComboConfidence(btts.confidence, ouBest.confidence, {
+            marketA: 'BTTS',
+            pickA: btts.pick,
+            marketB: ouBest.market,
+            pickB: ouBest.pick
+        });
         if (comboConfidence >= minConfidence) {
             out.push({
                 raw_id: prediction.raw_id,
@@ -999,7 +1014,12 @@ function buildFootballComboCandidates(prediction, scoredMarkets = [], minConfide
     if (result && ou25) {
         const winnerToken = normalizePickForAcca(result.pick);
         const ouPick = normalizePickForAcca(ou25.pick);
-        const comboConfidence = calculateTrueComboConfidence(result.confidence, ou25.confidence);
+        const comboConfidence = calculateTrueComboConfidence(result.confidence, ou25.confidence, {
+            marketA: 'MATCH_RESULT',
+            pickA: result.pick,
+            marketB: 'OVER_UNDER_2_5',
+            pickB: ou25.pick
+        });
         if (comboConfidence >= minConfidence) {
             out.push({
                 raw_id: prediction.raw_id,
