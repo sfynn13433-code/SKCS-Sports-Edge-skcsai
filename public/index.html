@@ -1912,8 +1912,18 @@
         const firstMeta = firstMatch.metadata || {};
         const predictionDetails = pred.prediction_details || firstMeta.prediction_details || {};
         const reasoning = predictionDetails.reasoning || firstMeta.reasoning || '';
-        const isMegaAcca = getSectionType(pred) === 'mega_acca_12' || (Array.isArray(pred.matches) && pred.matches.length >= 12);
-        const outcome = predictionDetails.outcome || (isMegaAcca ? '12-Leg Mega ACCA' : '6-Leg ACCA');
+        const legCount = Array.isArray(pred.matches) ? pred.matches.length : 0;
+        const isMegaAcca = getSectionType(pred) === 'mega_acca_12' || legCount >= 12;
+        const dynamicTicketLabel = isMegaAcca ? '12 MATCH MEGA ACCA' : '6 MATCH ACCA';
+        const rawOutcome = String(
+            predictionDetails.outcome
+            || pred.ticket_label
+            || firstMeta.acca_ticket_label
+            || ''
+        ).trim();
+        const outcome = !rawOutcome || rawOutcome.toUpperCase() === 'UNKNOWN'
+            ? dynamicTicketLabel
+            : rawOutcome;
         const badgesHtml = renderCardBadges(pred);
         const compoundProbability = Math.max(0, Math.min(100, Math.round(Number(pred.total_confidence || 0) * 100) / 100));
 
@@ -1958,7 +1968,7 @@
                 <span style="display:inline-block; background:${isFootballOnly ? '#1d4ed8' : '#0f766e'}; color:white; padding:4px 10px; border-radius:999px; font-size:0.75rem; font-weight:bold;">${accaCompositionLabel}</span>
             </div>
             <div style="margin-bottom:8px;">
-                <span style="display:inline-block; background:${isMegaAcca ? '#7c3aed' : '#f87171'}; color:white; padding:4px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">${isMegaAcca ? 'MEGA ACCA' : 'ACCA'} (${pred.matches.length} LEGS)</span>
+                <span style="display:inline-block; background:${isMegaAcca ? '#7c3aed' : '#f87171'}; color:white; padding:4px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">${isMegaAcca ? 'MEGA ACCA' : 'ACCA'} (${legCount} LEGS)</span>
             </div>
             <div style="margin-bottom:12px; max-height:200px; overflow-y:auto;">${legsHtml}</div>
             <div style="border-top:1px solid #e2e8f0; padding-top:12px; display:flex; justify-content:space-between; align-items:center;">

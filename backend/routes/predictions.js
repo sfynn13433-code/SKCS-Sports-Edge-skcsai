@@ -488,7 +488,16 @@ function normalizeOdds(odds) {
 }
 
 function enrichMatchMetadata(match, prediction) {
-    const fallbackOutcome = String(prediction?.prediction || prediction?.label || 'unknown').toUpperCase();
+    const sectionType = inferSectionType(prediction);
+    const defaultTicketLabel = sectionType === 'mega_acca_12'
+        ? '12 MATCH MEGA ACCA'
+        : sectionType === 'acca_6match'
+            ? '6 MATCH ACCA'
+            : 'PREDICTION';
+    const rawOutcome = String(prediction?.prediction || prediction?.label || '').trim();
+    const fallbackOutcome = !rawOutcome || rawOutcome.toUpperCase() === 'UNKNOWN'
+        ? defaultTicketLabel
+        : rawOutcome.toUpperCase();
     const fallbackReasoning = String(prediction?.reasoning || prediction?.model_reasoning || '').trim();
 
     return {
@@ -592,14 +601,24 @@ function enrichPredictionDetails(prediction) {
     const firstMatch = matches[0] || {};
     const firstMetadata = firstMatch?.metadata || {};
     const matchDetails = firstMatch?.prediction_details || {};
+    const sectionType = inferSectionType(prediction);
 
     const fallbackOutcome =
         matchDetails.outcome ||
         firstMatch?.prediction ||
         prediction?.prediction ||
-        prediction?.section_type ||
+        sectionType ||
         prediction?.type ||
-        'PREDICTION';
+        '';
+    const defaultTicketLabel = sectionType === 'mega_acca_12'
+        ? '12 MATCH MEGA ACCA'
+        : sectionType === 'acca_6match'
+            ? '6 MATCH ACCA'
+            : 'PREDICTION';
+    const resolvedOutcome = String(fallbackOutcome || '').trim();
+    const finalOutcome = !resolvedOutcome || resolvedOutcome.toUpperCase() === 'UNKNOWN'
+        ? defaultTicketLabel
+        : resolvedOutcome;
 
     const fallbackReasoning =
         matchDetails.reasoning ||
@@ -611,11 +630,12 @@ function enrichPredictionDetails(prediction) {
 
     return {
         ...prediction,
-        section_type: inferSectionType(prediction),
+        section_type: sectionType,
+        ticket_label: defaultTicketLabel,
         average_leg_confidence: resolveAverageLegConfidence(prediction),
         prediction_details: {
             ...(prediction?.prediction_details || {}),
-            outcome: String(fallbackOutcome).trim(),
+            outcome: finalOutcome,
             reasoning: String(fallbackReasoning).trim()
         }
     };

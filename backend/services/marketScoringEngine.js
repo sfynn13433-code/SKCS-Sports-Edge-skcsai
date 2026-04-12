@@ -3,7 +3,7 @@
 const crypto = require('crypto');
 const predictionOutcomes = require('../config/predictionOutcomes');
 const { scoreMatch } = require('./aiScoring');
-const { calculateTrueComboConfidence } = require('./accaMathUtils');
+const { calculateTrueComboConfidence } = require('../utils/accaLogicEngine');
 
 function clamp(n, min, max) {
     return Math.max(min, Math.min(max, n));

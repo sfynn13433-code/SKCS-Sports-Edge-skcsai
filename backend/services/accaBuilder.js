@@ -13,8 +13,9 @@ const { validateInsightLegGroup } = require('../utils/insightValidationMatrix');
 const {
     calculateTrueComboConfidence,
     calculateTicketCompoundProbability,
-    filterExpiredFixtures
-} = require('./accaMathUtils');
+    filterExpiredFixtures,
+    selectAccaLegs
+} = require('../utils/accaLogicEngine');
 
 const MEGA_ACCA_SIZE = 12;
 const ACCA_SIZE = 6;
@@ -1182,6 +1183,84 @@ function getAccaCandidateFixtureIds(candidate) {
     return predictionFixtureIds(candidate);
 }
 
+function deriveAccaMarketType(candidate) {
+    const raw = String(candidate?.metadata?.market_key || candidate?.market || '').trim().toLowerCase();
+    if (!raw) return 'market';
+    if (raw.startsWith('combo_')) return raw;
+    if (raw.startsWith('draw_no_bet')) return 'draw_no_bet';
+    if (raw.startsWith('double_chance')) return 'double_chance';
+    if (raw.startsWith('asian_handicap')) return 'asian_handicap';
+    if (raw.startsWith('european_handicap')) return 'european_handicap';
+    if (raw.startsWith('team_total')) return 'team_total_goals';
+    if (raw.startsWith('btts')) return 'btts';
+    if (raw.startsWith('ht_ft')) return 'ht_ft';
+    if (raw.startsWith('over_') || raw.startsWith('under_') || raw.startsWith('over_under')) return 'over_under';
+    if (raw === '1x2' || raw === 'match_result' || raw === 'match_winner' || raw === 'winner') return '1x2';
+    return raw;
+}
+
+function buildSelectableFixturePool(candidates, minConfidenceFloor) {
+    const byFixture = new Map();
+
+    for (const candidate of Array.isArray(candidates) ? candidates : []) {
+        const confidence = Number(candidate?.confidence);
+        if (!Number.isFinite(confidence) || confidence < minConfidenceFloor) continue;
+        const fixtureIds = getAccaCandidateFixtureIds(candidate);
+        const fixtureId = fixtureIds[0];
+        if (!fixtureId) continue;
+
+        const metadata = getMetadata(candidate);
+        const home = String(metadata?.home_team || candidate?.home_team || '').trim();
+        const away = String(metadata?.away_team || candidate?.away_team || '').trim();
+        const fixtureName = home && away ? `${home} vs ${away}` : String(candidate?.match_id || fixtureId);
+
+        if (!byFixture.has(fixtureId)) {
+            byFixture.set(fixtureId, {
+                id: fixtureId,
+                name: fixtureName || 'Unknown Match',
+                sport: normalizeSportKey(candidate?.sport),
+                scoredMarkets: []
+            });
+        }
+
+        byFixture.get(fixtureId).scoredMarkets.push({
+            name: candidate?.market || 'unknown_market',
+            prediction: candidate?.prediction || 'unknown',
+            confidence,
+            type: deriveAccaMarketType(candidate),
+            _candidate: candidate
+        });
+    }
+
+    const fixtures = Array.from(byFixture.values());
+    for (const fixture of fixtures) {
+        fixture.scoredMarkets.sort((a, b) => Number(b?.confidence || 0) - Number(a?.confidence || 0));
+    }
+
+    return fixtures;
+}
+
+function resolveSelectedLegCandidate(selectedLeg, fixtures) {
+    const fixtureId = String(selectedLeg?.fixture_id || '').trim();
+    if (!fixtureId) return null;
+
+    const fixture = (Array.isArray(fixtures) ? fixtures : []).find((entry) => String(entry?.id || '').trim() === fixtureId);
+    if (!fixture) return null;
+
+    const marketKey = normalizeMarketForAcca(selectedLeg?.market || '');
+    const predictionKey = normalizePickForAcca(selectedLeg?.prediction || '');
+    const direct = fixture.scoredMarkets.find((market) =>
+        normalizeMarketForAcca(market?.name || '') === marketKey
+        && normalizePickForAcca(market?.prediction || '') === predictionKey
+    );
+    if (direct && direct._candidate) return direct._candidate;
+
+    const fallback = fixture.scoredMarkets.find((market) =>
+        normalizeMarketForAcca(market?.name || '') === marketKey
+    ) || fixture.scoredMarkets[0];
+    return fallback?._candidate || null;
+}
+
 function isCandidateUsedGlobally(candidate, globalUsedFixtures) {
     const ids = getAccaCandidateFixtureIds(candidate);
     if (!ids.length) return true;
@@ -1204,6 +1283,7 @@ function finalizeAccumulatorRow(legs, options = {}) {
     const profile = String(options.profile || 'mixed_sport');
     const minLegConfidenceFloor = Number(options.minLegConfidenceFloor || ACCA_MIN_LEG_CONFIDENCE);
     const isMega = options.isMega === true;
+    const ticketLabel = Number(legs?.length || 0) >= MEGA_ACCA_SIZE ? '12 MATCH MEGA ACCA' : '6 MATCH ACCA';
     const payloadLegs = legs.map((leg) => {
         const finalLeg = toFinalMatchPayload(leg);
         finalLeg.metadata = {
@@ -1211,6 +1291,7 @@ function finalizeAccumulatorRow(legs, options = {}) {
             sport_type: getSportTypeLabel(finalLeg.sport),
             acca_profile: profile,
             acca_profile_label: profile === 'football_only' ? 'Football ACCA' : 'Mixed Sport ACCA',
+            acca_ticket_label: ticketLabel,
             min_leg_confidence_floor: minLegConfidenceFloor
         };
         if (isMega) {
@@ -1236,6 +1317,7 @@ function finalizeAccumulatorRow(legs, options = {}) {
         total_confidence: totalConfidence,
         total_ticket_probability: totalConfidence,
         totalTicketProbability: totalTicketProbability,
+        ticket_label: ticketLabel,
         average_leg_confidence: averageLegConfidence,
         risk_level: isMega ? 'safe' : riskLevelFromConfidence(totalConfidence)
     };
@@ -1255,18 +1337,22 @@ function buildFootballOnlyAccumulatorRow(pool, usedFixtureIds, size, minConfiden
         .sort(compareAccaCandidatePreference);
     if (footballPool.length < size) return null;
 
+    const fixtures = buildSelectableFixturePool(footballPool, minConfidenceFloor);
+    if (fixtures.length < size) return null;
+
     const selected = [];
     const localUsed = new Set();
-    const comboConditionCap = resolveComboConditionCap(size, options);
-    let comboConditionCount = 0;
-    for (const candidate of footballPool) {
+    const stagedGlobalUsed = new Set([...usedFixtureIds]);
+    const selectedLegs = selectAccaLegs(fixtures, stagedGlobalUsed, size);
+
+    for (const leg of selectedLegs) {
         if (selected.length >= size) break;
-        if (comboConditionCount >= comboConditionCap && isComboConditionAccumulatorMarket(candidate)) continue;
+        const candidate = resolveSelectedLegCandidate(leg, fixtures);
+        if (!candidate) continue;
         if (isCandidateUsedGlobally(candidate, usedFixtureIds)) continue;
         if (!canReserveCandidate(candidate, usedFixtureIds, localUsed)) continue;
         selected.push(candidate);
         reserveCandidate(candidate, localUsed);
-        if (isComboConditionAccumulatorMarket(candidate)) comboConditionCount += 1;
     }
 
     if (selected.length < size) return null;
@@ -1282,7 +1368,6 @@ function buildMixedAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor
         .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
         .sort(compareAccaCandidatePreference);
     if (sorted.length < size) return null;
-    const comboConditionCap = resolveComboConditionCap(size, options);
 
     const football = sorted.filter((candidate) => normalizeSportKey(candidate?.sport) === 'football');
     const nonFootball = sorted.filter((candidate) => normalizeSportKey(candidate?.sport) !== 'football');
@@ -1317,13 +1402,8 @@ function buildMixedAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor
     for (const pair of anchorPairs) {
         const selected = [];
         const localUsed = new Set();
-        let comboConditionCount = 0;
 
         for (const candidate of pair) {
-            if (comboConditionCount >= comboConditionCap && isComboConditionAccumulatorMarket(candidate)) {
-                selected.length = 0;
-                break;
-            }
             if (isCandidateUsedGlobally(candidate, usedFixtureIds)) {
                 selected.length = 0;
                 break;
@@ -1334,18 +1414,23 @@ function buildMixedAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor
             }
             selected.push(candidate);
             reserveCandidate(candidate, localUsed);
-            if (isComboConditionAccumulatorMarket(candidate)) comboConditionCount += 1;
         }
         if (!selected.length) continue;
 
-        for (const candidate of sorted) {
+        const remainingPool = sorted.filter((candidate) => canReserveCandidate(candidate, usedFixtureIds, localUsed));
+        const fixtures = buildSelectableFixturePool(remainingPool, minConfidenceFloor);
+        const stagedGlobalUsed = new Set([...usedFixtureIds, ...localUsed]);
+        const legsNeeded = Math.max(0, size - selected.length);
+        const selectedLegs = selectAccaLegs(fixtures, stagedGlobalUsed, legsNeeded);
+
+        for (const leg of selectedLegs) {
             if (selected.length >= size) break;
-            if (comboConditionCount >= comboConditionCap && isComboConditionAccumulatorMarket(candidate)) continue;
+            const candidate = resolveSelectedLegCandidate(leg, fixtures);
+            if (!candidate) continue;
             if (isCandidateUsedGlobally(candidate, usedFixtureIds)) continue;
             if (!canReserveCandidate(candidate, usedFixtureIds, localUsed)) continue;
             selected.push(candidate);
             reserveCandidate(candidate, localUsed);
-            if (isComboConditionAccumulatorMarket(candidate)) comboConditionCount += 1;
         }
 
         if (selected.length < size) continue;
@@ -1422,17 +1507,53 @@ async function buildAccaLegCandidatePool(predictions, options = {}) {
             .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor);
         if (!eligibleCandidates.length) continue;
 
-        const candidatePool = eligibleCandidates.slice();
-        const best = selectBestAccaCandidateFromPool(candidatePool, minConfidenceFloor);
-        if (!best) continue;
+        const rankedCandidates = eligibleCandidates.slice().sort(compareAccaCandidatePreference);
+        const preferred = selectBestAccaCandidateFromPool(rankedCandidates, minConfidenceFloor);
+        const orderedCandidates = preferred
+            ? [preferred, ...rankedCandidates.filter((candidate) =>
+                normalizeMarketForAcca(candidate?.market) !== normalizeMarketForAcca(preferred?.market)
+                || normalizePickForAcca(candidate?.prediction) !== normalizePickForAcca(preferred?.prediction)
+            )]
+            : rankedCandidates;
 
-        const existing = byFixture.get(fixtureKey);
-        if (!existing || compareAccaCandidatePreference(best, existing) < 0) {
-            byFixture.set(fixtureKey, best);
+        const existingCandidates = byFixture.get(fixtureKey) || [];
+        const merged = existingCandidates.slice();
+
+        for (const candidate of orderedCandidates) {
+            const preparedCandidate = {
+                ...candidate,
+                metadata: {
+                    ...(candidate?.metadata || {}),
+                    depth_first_full_scoring_applied: true,
+                    evaluated_market_count: rankedCandidates.length
+                }
+            };
+            const signature = `${normalizeMarketForAcca(preparedCandidate?.market)}::${normalizePickForAcca(preparedCandidate?.prediction)}`;
+            const existingIndex = merged.findIndex((row) =>
+                `${normalizeMarketForAcca(row?.market)}::${normalizePickForAcca(row?.prediction)}` === signature
+            );
+
+            if (existingIndex < 0) {
+                merged.push(preparedCandidate);
+                continue;
+            }
+
+            if (compareAccaCandidatePreference(preparedCandidate, merged[existingIndex]) < 0) {
+                merged[existingIndex] = preparedCandidate;
+            }
         }
+
+        byFixture.set(
+            fixtureKey,
+            merged
+                .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
+                .sort(compareAccaCandidatePreference)
+                .slice(0, 18)
+        );
     }
 
     return Array.from(byFixture.values())
+        .flat()
         .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
         .sort(compareAccaCandidates);
 }
