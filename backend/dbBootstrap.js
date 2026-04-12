@@ -203,6 +203,14 @@ async function bootstrap() {
             ON context_intelligence_cache(expires_at)
         `);
 
+        await query(`
+            CREATE TABLE IF NOT EXISTS fixture_context_cache (
+                fixture_id TEXT PRIMARY KEY,
+                context_payload JSONB NOT NULL,
+                updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+        `);
+
         // Event context snapshot tables (used by grading script for loss diagnostics)
         await query(`
             CREATE TABLE IF NOT EXISTS event_injury_snapshots (

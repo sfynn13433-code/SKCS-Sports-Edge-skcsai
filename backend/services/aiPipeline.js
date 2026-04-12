@@ -181,6 +181,7 @@ function buildContextFixture(item, matchId, sport) {
         : {};
 
     return {
+        id: matchId,
         match_id: matchId,
         sport,
         home_team: item.home_team || metadata.home_team || null,
