@@ -121,7 +121,7 @@
             ? `<div class="line">Validation: ${validation.valid ? 'PASS' : 'FAIL'} • Min Goals: ${validation.min_total_goals_required}</div>`
             : '';
         const processFooter = isAcca
-            ? '<div class="line" style="text-align:center;font-weight:700;">All insights have gone through the 6-stage process.</div>'
+            ? '<div class="line" style="text-align:center;font-weight:700;">All insights have gone through the 6 stage process: Elite Tier</div>'
             : '';
 
         return `

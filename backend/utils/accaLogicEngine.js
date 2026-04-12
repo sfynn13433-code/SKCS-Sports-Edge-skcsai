@@ -1,308 +1,340 @@
 'use strict';
 
 /**
- * SKCS ACCA ENGINE — ACCA LOGIC LAYER
+ * ACCA math + leg selection utilities.
  *
- * Enforces:
- * - Strict multiplication probability
- * - 6-hour grace window
- * - New family caps per SKCS law
- * - Banned market filtering
- * - Confidence guardrails (72%-97%)
- * - Build order enforcement
+ * Design goals:
+ * - True combo math (intersection probability only).
+ * - True ticket math (strict compound multiplication).
+ * - Enforce 80% floor for leg selection.
+ * - Preserve market variety and cap condition bloat.
+ * - Avoid "junk value" auto-picks like obvious Over 0.5 / Over 1.5 traps.
  */
 
-/* ==========================================================================
-   1. TRUE COMBO MARKET MATH
-   ========================================================================== */
+const MIN_CONFIDENCE = 80;
+const MAX_CONFIDENCE = 99;
 
-function calculateTrueComboConfidence(probA, probB, options = {}) {
-    const a = Number(probA) || 0;
-    const b = Number(probB) || 0;
-    if (!a || !b) return 0;
+const BANNED_PATTERNS = [
+    'exact_score',
+    'correct_score',
+    'player',
+    'clean_sheet',
+    'win_to_nil',
+    'red_card',
+    'penalty',
+    'var',
+    'winning_margin',
+    'method_of_victory',
+    'first_scorer',
+    'last_scorer',
+    'shots'
+];
 
-    const marketA = String(options.marketA || '').toUpperCase();
-    const marketB = String(options.marketB || '').toUpperCase();
-    const pickA = String(options.pickA || '').toLowerCase();
-    const pickB = String(options.pickB || '').toLowerCase();
+const ALLOWED_FAMILIES = new Set([
+    'result',
+    'double_chance',
+    'draw_no_bet',
+    'totals',
+    'btts',
+    'team_goals',
+    'handicap',
+    'ht_ft',
+    'corners',
+    'cards',
+    'combo'
+]);
 
-    // High Correlation: BTTS - Yes and Over 2.5 Goals
-    const isBttsYes = (marketA === 'BTTS' && pickA === 'yes') || (marketB === 'BTTS' && pickB === 'yes');
-    const isOver25 = (marketA === 'OVER_UNDER_2_5' && pickA === 'over') || (marketB === 'OVER_UNDER_2_5' && pickB === 'over');
+const FAMILY_CAPS_6 = {
+    result: 2,
+    double_chance: 2,
+    draw_no_bet: 2,
+    totals: 2,
+    btts: 2,
+    team_goals: 2,
+    handicap: 2,
+    ht_ft: 1,
+    corners: 1,
+    cards: 1,
+    combo: 2
+};
 
-    if (isBttsYes && isOver25) {
-        const raw = (a / 100) * (b / 100);
-        const boosted = Math.min(0.98, raw + 0.15);
-        return parseFloat((boosted * 100).toFixed(2));
-    }
+const FAMILY_CAPS_12 = {
+    result: 3,
+    double_chance: 3,
+    draw_no_bet: 3,
+    totals: 3,
+    btts: 3,
+    team_goals: 3,
+    handicap: 3,
+    ht_ft: 2,
+    corners: 2,
+    cards: 2,
+    combo: 4
+};
 
-    // Low Correlation: Double Chance and Under
-    const isDC = marketA.startsWith('DOUBLE_CHANCE') || marketB.startsWith('DOUBLE_CHANCE');
-    const isSafeUnder = (marketA.startsWith('OVER_UNDER') && pickA === 'under') || (marketB.startsWith('OVER_UNDER') && pickB === 'under');
-
-    if (isDC && isSafeUnder) {
-        const avg = (a + b) / 2;
-        const penalty = 5.0;
-        return parseFloat(Math.max(0, avg - penalty).toFixed(2));
-    }
-
-    // Default: multiplication with slight correlation factor
-    const standardMult = (a / 100) * (b / 100);
-    const result = Math.min(0.95, standardMult * 1.1);
-    return parseFloat((result * 100).toFixed(2));
-}
-
-/* ==========================================================================
-   2. TICKET COMPOUND PROBABILITY — STRICT MULTIPLICATION (SKCS LAW SECTION 6)
-   ========================================================================== */
-
-function calculateTicketCompoundProbability(legs) {
-    if (!legs || legs.length === 0) return 0;
-
-    const validLegs = (Array.isArray(legs) ? legs : [])
-        .filter((leg) => Number(leg?.confidence) > 0);
-
-    if (!validLegs.length) return 0;
-
-    // STRICT MULTIPLICATION only — no averaging, no boosting, no smoothing
-    let product = 1.0;
-    for (const leg of validLegs) {
-        const confidence = clamp(Number(leg.confidence), 0, 100);
-        product *= (confidence / 100);
-    }
-
-    return parseFloat((product * 100).toFixed(2));
-}
+const BUILD_ORDER = [
+    'combo',
+    'double_chance',
+    'draw_no_bet',
+    'handicap',
+    'team_goals',
+    'btts',
+    'totals',
+    'result',
+    'ht_ft',
+    'corners',
+    'cards'
+];
 
 function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
 }
 
-/* ==========================================================================
-   3. STRICT CHRONOLOGICAL FILTER (6-HOUR GRACE)
-   ========================================================================== */
-
-function filterExpiredFixtures(fixtures) {
-    const currentUTC = new Date().getTime();
-    const gracePeriod = 6 * 60 * 60 * 1000;
-    let malformedDateCount = 0;
-
-    return (Array.isArray(fixtures) ? fixtures : []).filter((fixture) => {
-        if (!fixture) return false;
-
-        const dateStr = fixture.date || fixture.kickoff || fixture.match_time ||
-            fixture.startTime || fixture.kickoff_utc || fixture.commence_time ||
-            fixture.metadata?.kickoff || fixture.metadata?.match_time;
-
-        if (!dateStr) return true;
-
-        const matchTime = new Date(dateStr).getTime();
-
-        if (Number.isNaN(matchTime)) {
-            malformedDateCount++;
-            return true;
-        }
-
-        return matchTime > (currentUTC - gracePeriod);
-    });
+function toNumber(value, fallback = 0) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : fallback;
 }
 
-/* ==========================================================================
-   4. MARKET NORMALIZATION (SKCS LAW — 7 ALLOWED FAMILIES ONLY)
-   ========================================================================== */
+function isComboMarket(market = {}) {
+    const joined = `${market?.type || ''} ${market?.name || ''} ${market?.market || ''}`.toLowerCase();
+    return joined.includes('combo') || joined.includes('+');
+}
 
-const ALLOWED_FAMILIES = new Set([
-    'result', 'double_chance', 'totals', 'btts',
-    'team_goals', 'corners', 'cards',
-]);
+function parseGoalLineFromMarket(market = {}) {
+    const raw = `${market?.name || market?.market || ''}`.toLowerCase();
+    const prediction = `${market?.prediction || market?.pick || ''}`.toLowerCase();
+    const joined = `${raw} ${prediction}`;
+    const match = joined.match(/(\d+)[._](\d+)/);
+    if (!match) return null;
+    const line = Number(`${match[1]}.${match[2]}`);
+    return Number.isFinite(line) ? line : null;
+}
 
-const BANNED_PATTERNS = [
-    'exact_score', 'correct_score', 'player', 'clean_sheet',
-    'win_to_nil', 'red_card', 'penalty', 'var', 'winning_margin',
-    'method_of_victory', 'scorer', 'shots',
-];
+function normalizeMarketFamily(value) {
+    const raw = String(value || '').toLowerCase();
+    if (!raw) return null;
 
-function normalizeMarketFamily(type) {
-    const value = String(type || '').toLowerCase();
-
-    // Banned check
     for (const pattern of BANNED_PATTERNS) {
-        if (value.includes(pattern)) return null;
+        if (raw.includes(pattern)) return null;
     }
 
-    if (value.includes('draw_no_bet') || value.includes('dnb')) return 'result';
-    if (value.includes('double_chance')) return 'double_chance';
-    if (value.includes('team_total') || value.includes('team_goals')) return 'team_goals';
-    if (value.includes('over') || value.includes('under') || value.includes('totals')) return 'totals';
-    if (value.includes('btts')) return 'btts';
-    if (value.includes('corner')) return 'corners';
-    if (value.includes('card') || value.includes('yellow')) return 'cards';
-    if (value.includes('1x2') || value.includes('match_result') || value.includes('winner')) return 'result';
-    if (value.includes('combo')) return null; // Combos banned under SKCS law
-    if (value.includes('handicap') || value.includes('asian')) return null; // Not in allowed list
+    if (raw.includes('combo') || raw.includes('+')) return 'combo';
+    if (raw.includes('draw_no_bet') || raw.includes('dnb')) return 'draw_no_bet';
+    if (raw.includes('double_chance') || raw.startsWith('dc_')) return 'double_chance';
+    if (raw.includes('team_total') || raw.includes('team_goals')) return 'team_goals';
+    if (raw.includes('asian_handicap') || raw.includes('european_handicap') || raw.includes('handicap')) return 'handicap';
+    if (raw.includes('btts')) return 'btts';
+    if (raw.includes('ht_ft') || raw.includes('half-time/full-time')) return 'ht_ft';
+    if (raw.includes('corner')) return 'corners';
+    if (raw.includes('card') || raw.includes('yellow')) return 'cards';
+    if (
+        raw.includes('over_under')
+        || raw.includes('over_')
+        || raw.includes('under_')
+        || raw.includes('total_goals')
+        || raw.includes('total_points')
+        || raw.includes('total_runs')
+    ) {
+        return 'totals';
+    }
+    if (raw.includes('1x2') || raw.includes('match_result') || raw.includes('match_winner') || raw.includes('winner')) {
+        return 'result';
+    }
 
     return null;
 }
 
-/* ==========================================================================
-   5. FAMILY CAPS (SKCS LAW — SECTION 3)
-   ========================================================================== */
+function normalizeMarketTypeForVariety(market = {}) {
+    const raw = `${market?.type || ''} ${market?.name || ''} ${market?.market || ''}`.toLowerCase();
 
-const FAMILY_CAPS_6 = {
-    result: 1,
-    double_chance: 1,
-    totals: 2,
-    btts: 1,
-    team_goals: 1,
-    corners: 1,
-    cards: 0,  // corners OR cards combined max 1
-};
+    if (raw.includes('combo') || raw.includes('+')) return 'combo';
+    if (raw.includes('double_chance') || raw.includes('dc_')) return 'double_chance';
+    if (raw.includes('draw_no_bet') || raw.includes('dnb')) return 'draw_no_bet';
+    if (raw.includes('asian_handicap') || raw.includes('european_handicap') || raw.includes('handicap')) return 'handicap';
+    if (raw.includes('team_total') || raw.includes('team_goals')) return 'team_goals';
+    if (raw.includes('btts')) return 'btts';
+    if (raw.includes('ht_ft')) return 'ht_ft';
+    if (
+        raw.includes('over_under')
+        || raw.includes('over_')
+        || raw.includes('under_')
+        || raw.includes('total_goals')
+        || raw.includes('total_points')
+        || raw.includes('total_runs')
+    ) {
+        return 'totals';
+    }
+    if (raw.includes('corner')) return 'corners';
+    if (raw.includes('card') || raw.includes('yellow')) return 'cards';
+    if (raw.includes('1x2') || raw.includes('match_result') || raw.includes('match_winner') || raw.includes('winner')) return 'result';
 
-const FAMILY_CAPS_12 = {
-    result: 2,
-    double_chance: 2,
-    totals: 3,
-    btts: 2,
-    team_goals: 1,
-    corners: 2,
-    cards: 1,
-};
+    return 'market';
+}
 
-/* ==========================================================================
-   6. CONFIDENCE GUARDRAILS (72%-97%)
-   ========================================================================== */
+function isLowValueTrapMarket(market = {}) {
+    const raw = `${market?.name || market?.market || ''}`.toLowerCase();
+    const prediction = `${market?.prediction || market?.pick || ''}`.toLowerCase();
+    const line = parseGoalLineFromMarket(market);
 
-const MIN_CONFIDENCE = 72;
-const MAX_CONFIDENCE = 97;
+    if (raw.includes('over_0_5') || prediction.includes('over_0_5')) return true;
+    if ((raw.includes('over_1_5') || prediction.includes('over_1_5')) && line !== null && line <= 1.5) return true;
+
+    return false;
+}
+
+function isEscalatedValueMarket(market = {}) {
+    const raw = `${market?.type || ''} ${market?.name || ''} ${market?.market || ''}`.toLowerCase();
+    const line = parseGoalLineFromMarket(market);
+
+    if (raw.includes('combo') || raw.includes('+')) return true;
+    if (raw.includes('double_chance') || raw.includes('draw_no_bet')) return true;
+    if (raw.includes('btts')) return true;
+    if (raw.includes('team_total')) return true;
+    if (raw.includes('handicap')) return true;
+
+    if (raw.includes('over_') || raw.includes('under_') || raw.includes('over_under')) {
+        return Number.isFinite(line) ? line >= 2.5 : false;
+    }
+
+    return false;
+}
 
 function isValidConfidence(confidence) {
     const c = Number(confidence);
     return Number.isFinite(c) && c >= MIN_CONFIDENCE && c <= MAX_CONFIDENCE;
 }
 
-/* ==========================================================================
-   7. BUILD ORDER (SKCS LAW — SECTION 9)
-   ========================================================================== */
+/**
+ * True intersection probability for combo events.
+ * Example: 90% * 80% = 72%.
+ */
+function calculateTrueComboConfidence(probA, probB) {
+    const a = clamp(toNumber(probA), 0, 100);
+    const b = clamp(toNumber(probB), 0, 100);
+    if (!a || !b) return 0;
+    const comboConfidence = (a / 100) * (b / 100) * 100;
+    return Number(comboConfidence.toFixed(2));
+}
 
-const BUILD_ORDER = ['result', 'double_chance', 'totals', 'btts', 'team_goals', 'corners', 'cards'];
+/**
+ * True compound ticket probability for all legs.
+ */
+function calculateTicketCompoundProbability(legs) {
+    const rows = Array.isArray(legs) ? legs : [];
+    if (!rows.length) return 0;
 
-/* ==========================================================================
-   8. LEG SELECTION WITH SKCS LAW ENFORCEMENT
-   ========================================================================== */
+    let totalProbability = 1.0;
+    for (const leg of rows) {
+        const confidence = clamp(toNumber(leg?.confidence), 0, 100);
+        totalProbability *= (confidence / 100);
+    }
 
-function selectAccaLegs(availableFixtures, globalUsedFixtures, targetLegCount, options = {}) {
-    const familyCaps = targetLegCount >= 12 ? { ...FAMILY_CAPS_12 } : { ...FAMILY_CAPS_6 };
-    const familyCounts = {};
+    return Number((totalProbability * 100).toFixed(2));
+}
+
+/**
+ * Chronological filter with resilient parsing.
+ * - Uses 24h grace for timezone mismatch protection.
+ * - Keeps fixtures with missing/unparseable date to avoid accidental full wipe.
+ */
+function filterExpiredFixtures(fixtures) {
+    const currentUTC = Date.now();
+    const gracePeriod = 24 * 60 * 60 * 1000;
+
+    return (Array.isArray(fixtures) ? fixtures : []).filter((fixture) => {
+        if (!fixture) return false;
+
+        const dateStr = fixture.date
+            || fixture.kickoff
+            || fixture.kickoff_utc
+            || fixture.match_time
+            || fixture.startTime
+            || fixture.commence_time
+            || fixture?.metadata?.match_time
+            || fixture?.metadata?.kickoff
+            || fixture?.metadata?.kickoff_time
+            || null;
+
+        if (!dateStr) return true;
+
+        const matchTime = new Date(dateStr).getTime();
+        if (Number.isNaN(matchTime)) return true;
+
+        return matchTime > (currentUTC - gracePeriod);
+    });
+}
+
+/**
+ * ACCA leg selection:
+ * - Global fixture dedupe across the entire run.
+ * - Max combo conditions (2 for 6-leg, 4 for 12-leg).
+ * - Market-type repetition cap to enforce variance.
+ * - Reject low-value trap markets when stronger alternatives exist.
+ */
+function selectAccaLegs(availableFixtures, globalUsedFixtures, targetLegCount) {
     const selectedLegs = [];
     const usedSet = globalUsedFixtures instanceof Set ? globalUsedFixtures : new Set();
 
-    let stats = {
-        bannedMarketsRemoved: 0,
-        confidenceOutOfRange: 0,
-        familyCapEnforced: 0,
-        dedupeSkipped: 0,
-    };
+    const maxCombos = Number(targetLegCount) === 12 ? 4 : 2;
+    const maxSameMarketType = Number(targetLegCount) === 12 ? 3 : 2;
+    let comboCount = 0;
+    const marketTypeCounts = {};
 
     for (const fixture of Array.isArray(availableFixtures) ? availableFixtures : []) {
-        if (selectedLegs.length >= targetLegCount) break;
+        if (selectedLegs.length >= Number(targetLegCount || 0)) break;
         if (!fixture || !fixture.id) continue;
-        if (usedSet.has(fixture.id)) {
-            stats.dedupeSkipped++;
-            continue;
-        }
+        if (usedSet.has(fixture.id)) continue;
 
-        const markets = Array.isArray(fixture.scoredMarkets) ? fixture.scoredMarkets : [];
-        markets.sort((a, b) => Number(b?.confidence || 0) - Number(a?.confidence || 0));
+        const markets = Array.isArray(fixture.scoredMarkets) ? fixture.scoredMarkets.slice() : [];
+        markets.sort((a, b) => toNumber(b?.confidence) - toNumber(a?.confidence));
 
-        // Try markets in build order preference
-        for (const preferredFamily of BUILD_ORDER) {
-            let found = false;
+        const hasEscalatedAlternative = markets.some((market) =>
+            isEscalatedValueMarket(market) && isValidConfidence(market?.confidence)
+        );
+
+        let bestLeg = null;
+        for (const family of BUILD_ORDER) {
             for (const market of markets) {
-                if (!market || !market.confidence || !market.type) continue;
+                const confidence = toNumber(market?.confidence);
+                if (!isValidConfidence(confidence)) continue;
 
-                // Banned market check
-                const family = normalizeMarketFamily(market.type);
-                if (!family || !ALLOWED_FAMILIES.has(family)) {
-                    stats.bannedMarketsRemoved++;
+                const familyKey = normalizeMarketFamily(`${market?.type || ''} ${market?.name || ''} ${market?.market || ''}`);
+                if (!familyKey || !ALLOWED_FAMILIES.has(familyKey)) continue;
+                if (familyKey !== family) continue;
+
+                if (isLowValueTrapMarket(market) && confidence >= 95 && hasEscalatedAlternative) {
                     continue;
                 }
 
-                // Must match preferred family in this pass
-                if (family !== preferredFamily) continue;
+                const marketType = normalizeMarketTypeForVariety(market);
+                const isCombo = isComboMarket(market);
 
-                // Confidence guardrails
-                if (!isValidConfidence(market.confidence)) {
-                    stats.confidenceOutOfRange++;
-                    continue;
-                }
+                if (isCombo && comboCount >= maxCombos) continue;
+                if ((marketTypeCounts[marketType] || 0) >= maxSameMarketType) continue;
 
-                // Family cap
-                if ((familyCounts[family] || 0) >= (familyCaps[family] ?? Infinity)) {
-                    stats.familyCapEnforced++;
-                    continue;
-                }
-
-                // Corners/cards combined cap for 6-leg
-                if (targetLegCount < 12) {
-                    const ccTotal = (familyCounts.corners || 0) + (familyCounts.cards || 0);
-                    if ((family === 'corners' || family === 'cards') && ccTotal >= 1) continue;
-                }
-
-                selectedLegs.push({
+                bestLeg = {
                     fixture_id: fixture.id,
                     match_name: fixture.name || 'Unknown Match',
                     sport: fixture.sport || 'Unknown Sport',
                     market: market.name || market.market || 'Unknown Market',
                     prediction: market.prediction || market.pick || 'Unknown',
-                    confidence: Number(market.confidence),
-                    market_type: market.type,
-                    market_family: family,
-                });
+                    confidence: Number(confidence.toFixed(2)),
+                    market_type: marketType,
+                    market_family: familyKey
+                };
 
-                familyCounts[family] = (familyCounts[family] || 0) + 1;
-                usedSet.add(fixture.id);
-                found = true;
+                if (isCombo) comboCount += 1;
+                marketTypeCounts[marketType] = (marketTypeCounts[marketType] || 0) + 1;
                 break;
             }
-            if (found) break;
+
+            if (bestLeg) break;
         }
 
-        // If build order pass didn't find anything, do a general pass
-        if (selectedLegs.length < targetLegCount && !usedSet.has(fixture.id)) {
-            for (const market of markets) {
-                if (!market || !market.confidence || !market.type) continue;
-                if (usedSet.has(fixture.id)) break;
-
-                const family = normalizeMarketFamily(market.type);
-                if (!family || !ALLOWED_FAMILIES.has(family)) continue;
-                if (!isValidConfidence(market.confidence)) continue;
-                if ((familyCounts[family] || 0) >= (familyCaps[family] ?? Infinity)) continue;
-
-                if (targetLegCount < 12) {
-                    const ccTotal = (familyCounts.corners || 0) + (familyCounts.cards || 0);
-                    if ((family === 'corners' || family === 'cards') && ccTotal >= 1) continue;
-                }
-
-                selectedLegs.push({
-                    fixture_id: fixture.id,
-                    match_name: fixture.name || 'Unknown Match',
-                    sport: fixture.sport || 'Unknown Sport',
-                    market: market.name || market.market || 'Unknown Market',
-                    prediction: market.prediction || market.pick || 'Unknown',
-                    confidence: Number(market.confidence),
-                    market_type: market.type,
-                    market_family: family,
-                });
-
-                familyCounts[family] = (familyCounts[family] || 0) + 1;
-                usedSet.add(fixture.id);
-                break;
-            }
-        }
+        if (!bestLeg) continue;
+        selectedLegs.push(bestLeg);
+        usedSet.add(fixture.id);
     }
-
-    selectedLegs.stats = stats;
-    selectedLegs.familyBreakdown = { ...familyCounts };
 
     return selectedLegs;
 }
@@ -320,5 +352,5 @@ module.exports = {
     FAMILY_CAPS_12,
     BUILD_ORDER,
     ALLOWED_FAMILIES,
-    BANNED_PATTERNS,
+    BANNED_PATTERNS
 };
