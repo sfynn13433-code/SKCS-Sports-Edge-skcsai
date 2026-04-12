@@ -154,6 +154,23 @@ function shapePrediction(row) {
         ? validateInsightLegGroup(matches)
         : null;
 
+    // Extract new stabilized fields from row or first match metadata
+    const firstMatch = matches[0] || {};
+    const displayLabel = row.display_label ||
+        firstMatch.metadata?.display_label ||
+        row.ticket_label ||
+        firstMatch.metadata?.acca_ticket_label ||
+        null;
+    const totalTicketProbability = row.total_ticket_probability_display ||
+        firstMatch.metadata?.total_ticket_probability_display ||
+        null;
+    const compoundConfidence = row.compound_ticket_confidence ||
+        firstMatch.metadata?.compound_ticket_confidence ||
+        null;
+    const diversityBreakdown = row.diversity_breakdown ||
+        firstMatch.metadata?.diversity_breakdown ||
+        null;
+
     return {
         id: row.id,
         publish_run_id: row.publish_run_id,
@@ -162,6 +179,10 @@ function shapePrediction(row) {
         section_type: category,
         total_confidence: Number(row.total_confidence || 0),
         average_leg_confidence: resolveAverageLegConfidence(row, matches),
+        display_label: displayLabel,
+        total_ticket_probability: totalTicketProbability,
+        compound_ticket_confidence: compoundConfidence,
+        diversity_breakdown: diversityBreakdown,
         risk_level: row.risk_level,
         created_at: row.created_at,
         validation_matrix: validation,

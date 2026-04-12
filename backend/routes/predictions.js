@@ -12,6 +12,7 @@ const { isValidCombination } = require('../services/conflictEngine');
 const { getPlanCapabilities, filterPredictionsForPlan, calculateDailyAllocations, getMegaAccaDailyAllocation } = require('../config/subscriptionMatrix');
 const { getPredictionWindow } = require('../utils/dateNormalization');
 const { areLegsCompatible } = require('../utils/marketConsistency');
+const { getCardDescriptor } = require('../utils/insightEngine');
 
 const router = express.Router();
 
@@ -489,13 +490,15 @@ function normalizeOdds(odds) {
 
 function enrichMatchMetadata(match, prediction) {
     const sectionType = inferSectionType(prediction);
-    const defaultTicketLabel = sectionType === 'mega_acca_12'
-        ? '12 MATCH MEGA ACCA'
-        : sectionType === 'acca_6match'
-            ? '6 MATCH ACCA'
-            : 'PREDICTION';
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    const legCount = matches.length;
+
+    // Use the standardized card descriptor for proper labeling
+    const defaultTicketLabel = getCardDescriptor(legCount);
     const rawOutcome = String(prediction?.prediction || prediction?.label || '').trim();
-    const fallbackOutcome = !rawOutcome || rawOutcome.toUpperCase() === 'UNKNOWN'
+
+    // Replace UNKNOWN or empty labels with the proper card descriptor
+    const fallbackOutcome = !rawOutcome || rawOutcome.toUpperCase() === 'UNKNOWN' || rawOutcome.toUpperCase() === 'UNKNOWN PREDICTION'
         ? defaultTicketLabel
         : rawOutcome.toUpperCase();
     const fallbackReasoning = String(prediction?.reasoning || prediction?.model_reasoning || '').trim();
@@ -504,7 +507,8 @@ function enrichMatchMetadata(match, prediction) {
         ...match,
         prediction_details: {
             outcome: fallbackOutcome,
-            reasoning: fallbackReasoning
+            reasoning: fallbackReasoning,
+            card_label: defaultTicketLabel,
         }
     };
 }

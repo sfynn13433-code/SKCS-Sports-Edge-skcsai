@@ -1303,7 +1303,28 @@ function finalizeAccumulatorRow(legs, options = {}) {
     const profile = String(options.profile || 'mixed_sport');
     const minLegConfidenceFloor = Number(options.minLegConfidenceFloor || ACCA_MIN_LEG_CONFIDENCE);
     const isMega = options.isMega === true;
-    const ticketLabel = Number(legs?.length || 0) >= MEGA_ACCA_SIZE ? '12 MATCH MEGA ACCA' : '6 MATCH ACCA';
+    const legCount = Number(legs?.length || 0);
+    const ticketLabel = legCount >= MEGA_ACCA_SIZE ? '12 MATCH MEGA ACCA' : '6 MATCH ACCA';
+
+    // Compute diversity breakdown: count market families across legs
+    const diversityBreakdown = {};
+    legs.forEach((leg) => {
+        const marketType = String(leg?.market || leg?.metadata?.market || '').toLowerCase();
+        let family = 'other';
+        if (marketType.includes('combo')) family = 'combo';
+        else if (marketType.includes('double_chance')) family = 'double_chance';
+        else if (marketType.includes('draw_no_bet')) family = 'draw_no_bet';
+        else if (marketType.includes('team_total')) family = 'team_total';
+        else if (marketType.includes('over') || marketType.includes('under')) family = 'totals';
+        else if (marketType.includes('btts')) family = 'btts';
+        else if (marketType.includes('handicap')) family = 'handicap';
+        else if (marketType.includes('half')) family = 'half_time';
+        else if (marketType.includes('corner')) family = 'corners';
+        else if (marketType.includes('card')) family = 'cards';
+        else if (marketType.includes('winner') || marketType === '1x2' || marketType.includes('match_result')) family = 'match_result';
+        diversityBreakdown[family] = (diversityBreakdown[family] || 0) + 1;
+    });
+
     const payloadLegs = legs.map((leg) => {
         const finalLeg = toFinalMatchPayload(leg);
         finalLeg.metadata = {
@@ -1319,18 +1340,22 @@ function finalizeAccumulatorRow(legs, options = {}) {
         }
         return finalLeg;
     });
+
     const averageLegConfidence = computeTotalConfidence(payloadLegs);
     const totalConfidence = computeCompoundConfidence(payloadLegs);
-    const totalTicketProbability = `${totalConfidence.toFixed(2)}%`;
+    const totalTicketProbability = totalConfidence.toFixed(2) + '%';
+
     const payloadLegsWithConfidenceMeta = payloadLegs.map((leg) => ({
         ...leg,
         metadata: {
             ...(leg.metadata || {}),
+            display_label: ticketLabel,
             average_leg_confidence: averageLegConfidence,
             compound_ticket_confidence: totalConfidence,
             total_ticket_probability_display: totalTicketProbability
         }
     }));
+
     return {
         match_id: payloadLegsWithConfidenceMeta.map((leg) => leg.match_id).filter(Boolean).join('|'),
         matches: payloadLegsWithConfidenceMeta,
@@ -1338,7 +1363,9 @@ function finalizeAccumulatorRow(legs, options = {}) {
         total_ticket_probability: totalConfidence,
         totalTicketProbability: totalTicketProbability,
         ticket_label: ticketLabel,
+        display_label: ticketLabel,
         average_leg_confidence: averageLegConfidence,
+        diversity_breakdown: diversityBreakdown,
         risk_level: isMega ? 'safe' : riskLevelFromConfidence(totalConfidence)
     };
 }
@@ -2230,6 +2257,40 @@ async function buildFinalForTier(tier, options = {}) {
             accaRows.length,
             megaAccaRows.length
         );
+
+
+        // TEMPORARY DIAGNOSTICS: Stabilization pass — remove after one clean deploy cycle
+        const allAccaCards = [...accaRows, ...megaAccaRows];
+        const allFixtureKeys = [];
+        let cardsWithFakeMath = 0;
+        const cardDiagnostics = allAccaCards.map((card) => {
+            const cardMatches = card.matches || [];
+            const fixtureKeys = cardMatches.map((m) => m.match_id).filter(Boolean);
+            allFixtureKeys.push(...fixtureKeys);
+            const avgConf = Number(card.average_leg_confidence || 0);
+            const totalConf = Number(card.total_confidence || 0);
+            const isHonest = totalConf <= avgConf || avgConf === 0;
+            if (!isHonest) cardsWithFakeMath++;
+            return {
+                type: card.type,
+                legs: cardMatches.length,
+                avgConfidence: avgConf,
+                totalConfidence: totalConf,
+                honest: isHonest,
+                displayLabel: card.display_label || card.ticket_label || 'UNKNOWN',
+                diversityBreakdown: card.diversity_breakdown || null,
+            };
+        });
+        const uniqueFixtureKeys = new Set(allFixtureKeys);
+        const duplicateFixtureCount = allFixtureKeys.length - uniqueFixtureKeys.size;
+
+        console.log('[accaBuilder DIAGNOSTICS] tier=%s', t);
+        console.log('[accaBuilder DIAGNOSTICS] raw_fixtures_in=%s upcoming_after_filter=%s', valid.length, perSportLimited.length);
+        console.log('[accaBuilder DIAGNOSTICS] acca_cards_built=%s duplicate_fixture_keys=%s cards_with_fake_math=%s', allAccaCards.length, duplicateFixtureCount, cardsWithFakeMath);
+        console.log('[accaBuilder DIAGNOSTICS] card_details=%s', JSON.stringify(cardDiagnostics));
+        const avgVsTotal = allAccaCards.map((c) => ({ legs: (c.matches || []).length, avg: Number(c.average_leg_confidence || 0), total: Number(c.total_confidence || 0) }));
+        console.log('[accaBuilder DIAGNOSTICS] avg_vs_total=%s', JSON.stringify(avgVsTotal));
+        // END TEMPORARY DIAGNOSTICS
 
         return {
             tier: t,
