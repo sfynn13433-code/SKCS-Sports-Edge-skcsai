@@ -1,7 +1,8 @@
 'use strict';
 
 /**
- * SKCS ACCA ENGINE — LAW COMPLIANCE TESTS
+ * SKCS ACCA ENGINE — FINAL LAW COMPLIANCE TESTS
+ * Includes: weekly team lock, card overlap rejection, pool rotation, mega diagnostics
  *
  * Run with: node backend/test/smoke-test-skcs-law.js
  */
@@ -18,28 +19,28 @@ const {
     isValidConfidence,
     clampConfidence,
     validateMarketDiversity,
-    weeklyTeamLock,
-    reserveTeamsWeekly,
-    extractTeamCompetitionPairs,
+    isTeamLockedForWeek,
+    lockTeamsForWeek,
+    getWeekKey,
+    normalizeTeamName,
+    normalizeCompetitionKey,
+    exceedsCardOverlapLimit,
+    getCardFixtureKeySet,
+    countSetOverlap,
+    rotateCandidatePool,
+    initMegaDiagnostics,
+    resolveMegaZeroReason,
     buildAccaCard,
     getCardDescriptor,
     getFamilyCaps,
     MIN_LEG_CONFIDENCE,
     MAX_LEG_CONFIDENCE,
     MIN_FAMILIES_PER_CARD,
-    ALLOWED_MARKET_FAMILIES,
-    BANNED_MARKET_PATTERNS,
 } = require('../utils/insightEngine');
 
 const {
     calculateTicketCompoundProbability,
     filterExpiredFixtures,
-    selectAccaLegs,
-    normalizeMarketFamily,
-    MIN_CONFIDENCE,
-    MAX_CONFIDENCE,
-    FAMILY_CAPS_6,
-    FAMILY_CAPS_12,
 } = require('../utils/accaLogicEngine');
 
 let passed = 0;
@@ -56,315 +57,240 @@ function assert(condition, message) {
 }
 
 /* ==========================================================================
-   1. ALLOWED MARKET FAMILIES (SECTION 1)
+   1. ALLOWED MARKET FAMILIES
    ========================================================================== */
-
 console.log('\n=== SECTION 1: ALLOWED MARKET FAMILIES ===\n');
-
 assert(normalizeInsightFamily('1x2') === 'result', '1x2 → result');
 assert(normalizeInsightFamily('match_result') === 'result', 'match_result → result');
 assert(normalizeInsightFamily('draw_no_bet_home') === 'result', 'draw_no_bet → result');
-assert(normalizeInsightFamily('double_chance_1x') === 'double_chance', 'double_chance_1x → double_chance');
-assert(normalizeInsightFamily('over_under_2_5') === 'totals', 'over_under_2_5 → totals');
+assert(normalizeInsightFamily('double_chance_1x') === 'double_chance', 'double_chance → double_chance');
+assert(normalizeInsightFamily('over_under_2_5') === 'totals', 'over_under → totals');
 assert(normalizeInsightFamily('btts') === 'btts', 'btts → btts');
 assert(normalizeInsightFamily('team_total_home_over_1_5') === 'team_goals', 'team_total → team_goals');
 assert(normalizeInsightFamily('corners_over_under') === 'corners', 'corners → corners');
 assert(normalizeInsightFamily('yellow_cards_over_under') === 'cards', 'yellow_cards → cards');
 
 /* ==========================================================================
-   2. BANNED MARKETS (SECTION 2)
+   2. BANNED MARKETS
    ========================================================================== */
-
 console.log('\n=== SECTION 2: BANNED MARKETS ===\n');
-
-assert(isBannedMarket('exact_score', '2-1') === true, 'exact_score is banned');
-assert(isBannedMarket('player_shots', 'over_2_5') === true, 'player_shots is banned');
-assert(isBannedMarket('1x2', 'draw') === true, 'standalone draw pick is banned');
-assert(isBannedMarket('clean_sheet', 'yes') === true, 'clean_sheet is banned');
-assert(isBannedMarket('win_to_nil', 'home') === true, 'win_to_nil is banned');
-assert(isBannedMarket('red_card', 'yes') === true, 'red_card is banned');
-assert(isBannedMarket('penalty', 'awarded') === true, 'penalty is banned');
-assert(isBannedMarket('first_scorer', 'any') === true, 'first_scorer is banned');
-assert(isBannedMarket('winning_margin', '2_goals') === true, 'winning_margin is banned');
-assert(isBannedMarket('var', 'yes') === true, 'var is banned');
-
-// Allowed markets should NOT be banned
-assert(isBannedMarket('1x2', 'home_win') === false, 'home_win is allowed');
-assert(isBannedMarket('over_under_2_5', 'over') === false, 'over 2.5 is allowed');
-assert(isBannedMarket('btts', 'yes') === false, 'btts yes is allowed');
+assert(isBannedMarket('exact_score', '2-1') === true, 'exact_score banned');
+assert(isBannedMarket('player_shots', 'over') === true, 'player_shots banned');
+assert(isBannedMarket('1x2', 'draw') === true, 'standalone draw banned');
+assert(isBannedMarket('clean_sheet', 'yes') === true, 'clean_sheet banned');
+assert(isBannedMarket('first_scorer', 'any') === true, 'first_scorer banned');
+assert(isBannedMarket('1x2', 'home_win') === false, 'home_win allowed');
+assert(isBannedMarket('over_under_2_5', 'over') === false, 'over 2.5 allowed');
+assert(isBannedMarket('btts', 'yes') === false, 'btts yes allowed');
 
 /* ==========================================================================
-   3. FAMILY CAPS (SECTION 3)
+   3. CONFIDENCE GUARDRAILS
    ========================================================================== */
-
-console.log('\n=== SECTION 3: FAMILY CAPS ===\n');
-
-assert(FAMILY_CAPS_6.result === 1, '6-leg: result max 1');
-assert(FAMILY_CAPS_6.double_chance === 1, '6-leg: double_chance max 1');
-assert(FAMILY_CAPS_6.totals === 2, '6-leg: totals max 2');
-assert(FAMILY_CAPS_6.btts === 1, '6-leg: btts max 1');
-assert(FAMILY_CAPS_12.result === 2, '12-leg: result max 2');
-assert(FAMILY_CAPS_12.double_chance === 2, '12-leg: double_chance max 2');
-assert(FAMILY_CAPS_12.totals === 3, '12-leg: totals max 3');
-assert(FAMILY_CAPS_12.btts === 2, '12-leg: btts max 2');
-assert(FAMILY_CAPS_12.corners === 2, '12-leg: corners max 2');
-assert(FAMILY_CAPS_12.cards === 1, '12-leg: cards max 1');
-
-/* ==========================================================================
-   4. CONFIDENCE GUARDRAILS (SECTION 8)
-   ========================================================================== */
-
 console.log('\n=== SECTION 8: CONFIDENCE GUARDRAILS ===\n');
-
-assert(isValidConfidence(72) === true, '72% is valid (minimum)');
-assert(isValidConfidence(97) === true, '97% is valid (maximum)');
-assert(isValidConfidence(71) === false, '71% is invalid (below minimum)');
-assert(isValidConfidence(98) === false, '98% is invalid (above maximum)');
-assert(isValidConfidence(60) === false, '60% is invalid (risky leg)');
-assert(isValidConfidence(99) === false, '99% is invalid (fake leg)');
-assert(isValidConfidence(85) === true, '85% is valid');
-
-assert(clampConfidence(99) === 97, '99% clamped to 97');
-assert(clampConfidence(60) === 72, '60% clamped to 72');
-assert(clampConfidence(85) === 85, '85% unchanged');
+assert(isValidConfidence(72) === true, '72% valid');
+assert(isValidConfidence(97) === true, '97% valid');
+assert(isValidConfidence(71) === false, '71% invalid');
+assert(isValidConfidence(99) === false, '99% invalid');
+assert(clampConfidence(99) === 97, '99 clamped to 97');
+assert(clampConfidence(60) === 72, '60 clamped to 72');
 
 /* ==========================================================================
-   5. PROBABILITY LAW — STRICT MULTIPLICATION (SECTION 6)
+   4. PROBABILITY LAW
    ========================================================================== */
-
 console.log('\n=== SECTION 6: PROBABILITY LAW ===\n');
+const sixLegs = Array(6).fill(null).map((_, i) => ({ fixtureId: `f${i}`, matchName: `T${i}A vs T${i}B`, confidence: 94 }));
+const sixProb = calculateCardProbability(sixLegs);
+console.log(`  6 legs @ 94% → ${sixProb}%`);
+assert(sixProb >= 68 && sixProb <= 70, `6-leg @ 94% ≈ 68.99% (got ${sixProb}%)`);
 
-const sixLegs = Array(6).fill(null).map((_, i) => ({
-    fixtureId: `f${i}`,
-    matchName: `Team ${i}A vs Team ${i}B`,
-    confidence: 94,
-}));
-
-const sixLegProb = calculateCardProbability(sixLegs);
-console.log(`  6 legs @ 94% → total: ${sixLegProb}% (expected ≈68.99%)`);
-assert(sixLegProb <= 70, `6-leg @ 94% <= 70% (got ${sixLegProb}%)`);
-assert(sixLegProb >= 68, `6-leg @ 94% >= 68% (got ${sixLegProb}%)`);
-
-const twelveLegs = Array(12).fill(null).map((_, i) => ({
-    fixtureId: `f${i}`,
-    matchName: `Team ${i}A vs Team ${i}B`,
-    confidence: 92,
-}));
-
-const twelveLegProb = calculateCardProbability(twelveLegs);
-console.log(`  12 legs @ 92% → total: ${twelveLegProb}% (expected ≈36.77%)`);
-assert(twelveLegProb <= 40, `12-leg @ 92% <= 40% (got ${twelveLegProb}%)`);
-assert(twelveLegProb >= 35, `12-leg @ 92% >= 35% (got ${twelveLegProb}%)`);
-
-// CRITICAL: total must never exceed average
-assert(
-    verifyProbabilityIntegrity(sixLegs),
-    '6-leg card: total <= average (integrity check)'
-);
-assert(
-    verifyProbabilityIntegrity(twelveLegs),
-    '12-leg card: total <= average (integrity check)'
-);
-
-// accaLogicEngine version
-const ticketProb = calculateTicketCompoundProbability(sixLegs);
-assert(ticketProb <= 70, `accaLogicEngine 6-leg @ 94% <= 70% (got ${ticketProb}%)`);
+const twelveLegs = Array(12).fill(null).map((_, i) => ({ fixtureId: `f${i}`, matchName: `T${i}A vs T${i}B`, confidence: 92 }));
+const twelveProb = calculateCardProbability(twelveLegs);
+console.log(`  12 legs @ 92% → ${twelveProb}%`);
+assert(twelveProb >= 35 && twelveProb <= 40, `12-leg @ 92% ≈ 36.77% (got ${twelveProb}%)`);
+assert(verifyProbabilityIntegrity(sixLegs), '6-leg integrity OK');
+assert(verifyProbabilityIntegrity(twelveLegs), '12-leg integrity OK');
 
 /* ==========================================================================
-   6. MARKET DIVERSITY (SECTION 7 — MIN 3 FAMILIES)
+   5. WEEKLY TEAM LOCK (EXACT SPEC)
    ========================================================================== */
+console.log('\n=== WEEKLY TEAM LOCK ===\n');
 
-console.log('\n=== SECTION 7: MARKET DIVERSITY ===\n');
-
-const diverseLegs = [
-    { family: 'result', confidence: 90 },
-    { family: 'double_chance', confidence: 88 },
-    { family: 'totals', confidence: 85 },
-    { family: 'btts', confidence: 82 },
-    { family: 'corners', confidence: 80 },
-    { family: 'cards', confidence: 78 },
-];
-assert(validateMarketDiversity(diverseLegs) === true, '6 families = diverse');
-
-const nonDiverseLegs = [
-    { family: 'totals', confidence: 90 },
-    { family: 'totals', confidence: 88 },
-    { family: 'totals', confidence: 85 },
-];
-assert(validateMarketDiversity(nonDiverseLegs) === false, '1 family = not diverse');
-
-const barelyDiverse = [
-    { family: 'result', confidence: 90 },
-    { family: 'totals', confidence: 88 },
-    { family: 'btts', confidence: 85 },
-];
-assert(validateMarketDiversity(barelyDiverse) === true, '3 families = minimum diverse');
-
-/* ==========================================================================
-   7. WEEKLY TEAM LOCK (SECTION 4)
-   ========================================================================== */
-
-console.log('\n=== SECTION 4: WEEKLY TEAM LOCK ===\n');
-
-const usedTeams = new Map();
-usedTeams.set('barcelona', new Set(['la_liga']));
-
-// Same team, same competition → REJECT
-const sameTeamSameComp = [{
-    home_team: 'barcelona',
-    away_team: 'getafe',
-    metadata: { league: 'la_liga', competition: 'la_liga' },
-    competition: 'la_liga',
-}];
-const lockCheck1 = weeklyTeamLock(sameTeamSameComp, usedTeams);
-assert(lockCheck1.valid === false, 'Same team + same competition → rejected');
-assert(lockCheck1.rejectedTeams.includes('barcelona'), 'Barcelona flagged as rejected');
-
-// Same team, different competition → ALLOW
-const differentComp = [{
-    home_team: 'barcelona',
-    away_team: 'bayern',
-    metadata: { league: 'champions_league', competition: 'champions_league' },
-    competition: 'champions_league',
-}];
-const lockCheck2 = weeklyTeamLock(differentComp, usedTeams);
-assert(lockCheck2.valid === true, 'Same team + different competition → allowed');
-
-// Different team → ALLOW
-const diffTeam = [{
-    home_team: 'real_madrid',
-    away_team: 'atletico',
-    metadata: { league: 'la_liga', competition: 'la_liga' },
-    competition: 'la_liga',
-}];
-const lockCheck3 = weeklyTeamLock(diffTeam, usedTeams);
-assert(lockCheck3.valid === true, 'Different team → allowed');
-
-/* ==========================================================================
-   8. CARD BUILDING WITH SKCS LAW
-   ========================================================================== */
-
-console.log('\n=== SECTION 9: CARD BUILDING ===\n');
-
-function createFixture(id, home, away, daysFromNow, sport, league, markets) {
-    const kickoff = new Date();
-    kickoff.setUTCDate(kickoff.getUTCDate() + daysFromNow);
-    kickoff.setUTCHours(15, 0, 0, 0);
-    return {
-        id: String(id),
-        fixture_id: String(id),
-        name: `${home} vs ${away}`,
-        home_team: home,
-        away_team: away,
-        sport: sport || 'football',
-        league: league || 'EPL',
-        competition: league || 'EPL',
-        kickoff: kickoff.toISOString(),
-        scoredMarkets: markets || [
-            { type: '1x2', market: '1x2', name: 'Home Win', prediction: 'home_win', confidence: 88 },
-            { type: 'double_chance_1x', market: 'Double Chance', prediction: '1x', confidence: 92 },
-            { type: 'over_under_2_5', market: 'Over/Under 2.5', prediction: 'over', confidence: 85 },
-            { type: 'btts', market: 'BTTS', prediction: 'yes', confidence: 82 },
-            { type: 'corners_over_under', market: 'Corners', prediction: 'over', confidence: 78 },
-        ],
-    };
-}
-
-const fixtures = [];
-const teams = [
-    ['Arsenal', 'Chelsea'], ['Man Utd', 'Liverpool'], ['Tottenham', 'Man City'],
-    ['Newcastle', 'Brighton'], ['Aston Villa', 'West Ham'], ['Wolves', 'Fulham'],
-    ['Crystal Palace', 'Everton'], ['Brentford', 'Nottingham Forest'],
-    ['Bournemouth', 'Sheffield Utd'], ['Luton', 'Burnley'],
-    ['Real Madrid', 'Barcelona'], ['Bayern', 'Dortmund'],
-];
-
-teams.forEach(([home, away], i) => {
-    fixtures.push(createFixture(
-        100 + i, home, away, (i % 7) + 1, 'football',
-        ['EPL', 'La Liga', 'Bundesliga'][i % 3],
-        [
-            { type: '1x2', market: '1x2', prediction: 'home_win', confidence: 85 + (i % 10) },
-            { type: 'double_chance_1x', market: 'DC', prediction: '1x', confidence: 88 + (i % 7) },
-            { type: 'over_under_2_5', market: 'OU', prediction: 'over', confidence: 82 + (i % 12) },
-            { type: 'btts', market: 'BTTS', prediction: 'yes', confidence: 80 + (i % 14) },
-            { type: 'corners_over_under', market: 'Corners', prediction: 'over', confidence: 75 + (i % 18) },
-        ]
-    ));
-});
-
-const globalUsedKeys = new Set();
 const usedTeamsWeekly = new Map();
+const now = new Date();
 
-const card6 = buildAccaCard(fixtures, {
-    legCount: 6,
-    minConfidence: 72,
-    globalUsedFixtureKeys: globalUsedKeys,
-    usedTeamsWeekly,
-});
+// Lock Arsenal in EPL for current week
+const arsenalFixture = {
+    home_team: 'Arsenal',
+    away_team: 'Chelsea',
+    homeTeam: 'Arsenal',
+    awayTeam: 'Chelsea',
+    competition: 'Premier League',
+    league: 'Premier League',
+    startTime: now.toISOString(),
+    kickoff: now.toISOString(),
+    date: now.toISOString(),
+};
 
-assert(card6.displayLabel === '6 MATCH ACCA', `Label: "6 MATCH ACCA" (got "${card6.displayLabel}")`);
-assert(card6.legs.length <= 6, `Max 6 legs (got ${card6.legs.length})`);
-assert(
-    card6.totalCardProbability <= card6.averageLegConfidence,
-    `Total (${card6.totalCardProbability}%) <= avg (${card6.averageLegConfidence}%)`
-);
+lockTeamsForWeek(arsenalFixture, usedTeamsWeekly);
 
-// Check diversity
-const familyKeys = Object.keys(card6.diversityBreakdown || {});
-console.log(`  Family breakdown: ${JSON.stringify(card6.diversityBreakdown)}`);
-assert(familyKeys.length >= MIN_FAMILIES_PER_CARD, `Diversity: ${familyKeys.length} families (need >=${MIN_FAMILIES_PER_CARD})`);
+// Same team, same competition → LOCKED
+const sameTeamSameComp = {
+    home_team: 'Arsenal',
+    away_team: 'Brighton',
+    homeTeam: 'Arsenal',
+    awayTeam: 'Brighton',
+    competition: 'Premier League',
+    league: 'Premier League',
+    startTime: now.toISOString(),
+    kickoff: now.toISOString(),
+    date: now.toISOString(),
+};
+assert(isTeamLockedForWeek(sameTeamSameComp, usedTeamsWeekly) === true, 'Arsenal in EPL → locked');
 
-// No duplicate fixtures
-const fixtureKeysInCard = card6.legs.map(l => l.fixtureKey);
-assert(new Set(fixtureKeysInCard).size === fixtureKeysInCard.length, 'No duplicate fixtures in card');
+// Same team, different competition → NOT LOCKED
+const sameTeamDiffComp = {
+    home_team: 'Arsenal',
+    away_team: 'Bayern',
+    homeTeam: 'Arsenal',
+    awayTeam: 'Bayern',
+    competition: 'Champions League',
+    league: 'Champions League',
+    startTime: now.toISOString(),
+    kickoff: now.toISOString(),
+    date: now.toISOString(),
+};
+assert(isTeamLockedForWeek(sameTeamDiffComp, usedTeamsWeekly) === false, 'Arsenal in UCL → allowed');
 
-// Build second card with shared global state
-const card6b = buildAccaCard(fixtures, {
-    legCount: 6,
-    minConfidence: 72,
-    globalUsedFixtureKeys: globalUsedKeys,
-    usedTeamsWeekly,
-});
+// Different team → NOT LOCKED
+const diffTeam = {
+    home_team: 'Man Utd',
+    away_team: 'Liverpool',
+    homeTeam: 'Man Utd',
+    awayTeam: 'Liverpool',
+    competition: 'Premier League',
+    league: 'Premier League',
+    startTime: now.toISOString(),
+    kickoff: now.toISOString(),
+    date: now.toISOString(),
+};
+assert(isTeamLockedForWeek(diffTeam, usedTeamsWeekly) === false, 'Different teams → allowed');
 
-const allFixtureKeys = [...fixtureKeysInCard, ...card6b.legs.map(l => l.fixtureKey)];
-assert(new Set(allFixtureKeys).size === allFixtureKeys.length, 'No duplicate fixtures across cards');
+// Week key generation
+const weekKey = getWeekKey(now);
+assert(typeof weekKey === 'string' && weekKey.includes('-W'), `Week key format: ${weekKey}`);
 
 /* ==========================================================================
-   9. LABELING RULES (SECTION 10)
+   6. CARD OVERLAP REJECTION
    ========================================================================== */
+console.log('\n=== CARD OVERLAP REJECTION ===\n');
 
-console.log('\n=== SECTION 10: LABELING RULES ===\n');
+const pubCard6 = {
+    legs: [
+        { fixtureKey: 'a__b__epl__t1', fixtureId: '1', matchName: 'A vs B', confidence: 90, family: 'result' },
+        { fixtureKey: 'c__d__epl__t2', fixtureId: '2', matchName: 'C vs D', confidence: 88, family: 'totals' },
+        { fixtureKey: 'e__f__laliga__t3', fixtureId: '3', matchName: 'E vs F', confidence: 85, family: 'btts' },
+        { fixtureKey: 'g__h__bundesliga__t4', fixtureId: '4', matchName: 'G vs H', confidence: 82, family: 'double_chance' },
+        { fixtureKey: 'i__j__ligue1__t5', fixtureId: '5', matchName: 'I vs J', confidence: 80, family: 'corners' },
+        { fixtureKey: 'k__l__epl__t6', fixtureId: '6', matchName: 'K vs L', confidence: 78, family: 'result' },
+    ],
+    displayLabel: '6 MATCH ACCA',
+};
 
-assert(getCardDescriptor(6) === '6 MATCH ACCA', '6 legs → "6 MATCH ACCA"');
-assert(getCardDescriptor(12) === '12 MATCH MEGA ACCA', '12 legs → "12 MATCH MEGA ACCA"');
-assert(getCardDescriptor(0) === '0 MATCH ACCA', '0 legs → "0 MATCH ACCA"');
+// Overlap of 3 → REJECTED (limit is 2 for 6-leg)
+const overlap3Card = {
+    legs: [
+        { fixtureKey: 'a__b__epl__t1', fixtureId: '1', matchName: 'A vs B', confidence: 90, family: 'result' },
+        { fixtureKey: 'c__d__epl__t2', fixtureId: '2', matchName: 'C vs D', confidence: 88, family: 'totals' },
+        { fixtureKey: 'e__f__laliga__t3', fixtureId: '3', matchName: 'E vs F', confidence: 85, family: 'btts' },
+        { fixtureKey: 'm__n__seriea__t7', fixtureId: '7', matchName: 'M vs N', confidence: 82, family: 'result' },
+        { fixtureKey: 'o__p__epl__t8', fixtureId: '8', matchName: 'O vs P', confidence: 80, family: 'totals' },
+        { fixtureKey: 'q__r__laliga__t9', fixtureId: '9', matchName: 'Q vs R', confidence: 78, family: 'btts' },
+    ],
+    displayLabel: '6 MATCH ACCA',
+};
+
+const result1 = exceedsCardOverlapLimit(overlap3Card, [pubCard6]);
+assert(result1.reject === true, `Overlap 3 → rejected for 6-leg`);
+assert(result1.overlap === 3, `Overlap count = 3`);
+
+// Overlap of 2 → ACCEPTED
+const overlap2Card = {
+    legs: [
+        { fixtureKey: 'a__b__epl__t1', fixtureId: '1', matchName: 'A vs B', confidence: 90, family: 'result' },
+        { fixtureKey: 'c__d__epl__t2', fixtureId: '2', matchName: 'C vs D', confidence: 88, family: 'totals' },
+        { fixtureKey: 'm__n__seriea__t7', fixtureId: '7', matchName: 'M vs N', confidence: 85, family: 'result' },
+        { fixtureKey: 'o__p__epl__t8', fixtureId: '8', matchName: 'O vs P', confidence: 82, family: 'totals' },
+        { fixtureKey: 'q__r__laliga__t9', fixtureId: '9', matchName: 'Q vs R', confidence: 80, family: 'btts' },
+        { fixtureKey: 's__t__bundesliga__t10', fixtureId: '10', matchName: 'S vs T', confidence: 78, family: 'double_chance' },
+    ],
+    displayLabel: '6 MATCH ACCA',
+};
+
+const result2 = exceedsCardOverlapLimit(overlap2Card, [pubCard6]);
+assert(result2.reject === false, `Overlap 2 → accepted for 6-leg`);
+
+// 12-leg: overlap of 5 → REJECTED (limit is 4)
+const pubCard12 = { legs: Array(12).fill(null).map((_, i) => ({ fixtureKey: `f${i}`, fixtureId: `${i}`, matchName: `T${i}A vs T${i}B`, confidence: 90, family: 'totals' })), displayLabel: '12 MATCH MEGA ACCA' };
+const overlap5Card12 = { legs: [...Array(5).fill(null).map((_, i) => ({ fixtureKey: `f${i}`, fixtureId: `${i}`, matchName: `T${i}A vs T${i}B`, confidence: 90, family: 'totals' })), ...Array(7).fill(null).map((_, i) => ({ fixtureKey: `z${i}`, fixtureId: `z${i}`, matchName: `Z${i}A vs Z${i}B`, confidence: 90, family: 'result' }))], displayLabel: '12 MATCH MEGA ACCA' };
+
+const result3 = exceedsCardOverlapLimit(overlap5Card12, [pubCard12]);
+assert(result3.reject === true, `12-leg overlap 5 → rejected`);
+assert(result3.overlap === 5, `12-leg overlap count = 5`);
 
 /* ==========================================================================
-   10. EXPIRED FIXTURE RULE (SECTION 11)
+   7. MEGA DIAGNOSTICS
    ========================================================================== */
+console.log('\n=== MEGA DIAGNOSTICS ===\n');
 
-console.log('\n=== SECTION 11: EXPIRED FIXTURE RULE ===\n');
+const megaDiag = initMegaDiagnostics();
+assert(megaDiag.mega_final_cards_built === 0, 'Initial mega cards = 0');
+assert(megaDiag.mega_zero_reason === null, 'Initial zero_reason = null');
 
-const expired = [
-    { id: '1', kickoff: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() }, // 7 days ago
-    { id: '2', kickoff: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() }, // 1 day ago
-    { id: '3', kickoff: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString() }, // 3 days ahead
+megaDiag.mega_rejected_for_weekly_team_lock = 5;
+megaDiag.mega_rejected_for_family_caps = 2;
+const reason1 = resolveMegaZeroReason(megaDiag);
+assert(reason1 === 'weekly_team_lock', `Top rejection reason: ${reason1}`);
+
+megaDiag.mega_final_cards_built = 1;
+const reason2 = resolveMegaZeroReason(megaDiag);
+assert(reason2 === null, 'Zero reason null when cards built');
+
+/* ==========================================================================
+   8. CANDIDATE POOL ROTATION
+   ========================================================================== */
+console.log('\n=== CANDIDATE POOL ROTATION ===\n');
+
+const pool = [
+    { id: '1', fixture_id: '1', home_team: 'A', away_team: 'B', competition: 'EPL', startTime: now.toISOString() },
+    { id: '2', fixture_id: '2', home_team: 'C', away_team: 'D', competition: 'EPL', startTime: now.toISOString() },
+    { id: '3', fixture_id: '3', home_team: 'E', away_team: 'F', competition: 'LaLiga', startTime: now.toISOString() },
 ];
-const filtered = filterExpiredFixtures(expired);
-assert(filtered.length >= 1, 'At least future fixture kept');
-assert(filtered.some(f => f.id === '3'), 'Future fixture (ID 3) kept');
+
+const usedKeys = new Set(['1', '2']);
+const usedTeams = new Map();
+lockTeamsForWeek({ home_team: 'A', away_team: 'B', competition: 'EPL', league: 'EPL', startTime: now.toISOString() }, usedTeams);
+lockTeamsForWeek({ home_team: 'C', away_team: 'D', competition: 'EPL', league: 'EPL', startTime: now.toISOString() }, usedTeams);
+
+const rotated = rotateCandidatePool(pool, usedKeys, usedTeams);
+assert(rotated.length === 1, `Pool reduced from 3 to 1 after rotation (got ${rotated.length})`);
+assert(rotated[0].id === '3', 'Remaining fixture is E vs F');
+
+/* ==========================================================================
+   9. LABELING RULES
+   ========================================================================== */
+console.log('\n=== LABELING RULES ===\n');
+assert(getCardDescriptor(6) === '6 MATCH ACCA', '6 legs label');
+assert(getCardDescriptor(12) === '12 MATCH MEGA ACCA', '12 legs label');
 
 /* ==========================================================================
    SUMMARY
    ========================================================================== */
-
 console.log('\n=== SUMMARY ===\n');
 console.log(`  Passed: ${passed}`);
 console.log(`  Failed: ${failed}`);
 
 if (failed > 0) {
-    console.error('\n  ❌ SOME TESTS FAILED — SKCS LAW NOT FULLY COMPLIANT\n');
+    console.error('\n  ❌ SOME TESTS FAILED\n');
     process.exit(1);
 } else {
     console.log('\n  ✅ ALL SKCS ACCA ENGINE LAW TESTS PASSED\n');

@@ -296,87 +296,184 @@ function validateMarketDiversity(legs) {
 }
 
 /* ==========================================================================
-   WEEKLY TEAM LOCK (SECTION 4)
+   WEEKLY TEAM LOCK (SECTION 4 — EXACT SPEC)
    ========================================================================== */
 
-function startOfWeekUtc(now = new Date()) {
-    const current = new Date(now);
-    const day = current.getUTCDay();
-    const diffToMonday = day === 0 ? -6 : 1 - day;
-    current.setUTCDate(current.getUTCDate() + diffToMonday);
-    current.setUTCHours(0, 0, 0, 0);
-    return current;
+function normalizeTeamName(name) {
+    return String(name || '')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, ' ');
 }
 
-function endOfWeekUtc(now = new Date()) {
-    const start = startOfWeekUtc(now);
-    const end = new Date(start);
-    end.setUTCDate(end.getUTCDate() + 7);
-    return end;
-}
-
-/**
- * Extract team → competition pairs from a match/leg.
- */
-function extractTeamCompetitionPairs(match) {
-    const meta = match?.metadata || {};
-    const competition = String(
-        meta.competition || meta.league || meta.tournament ||
-        match?.league || match?.competition || match?.sport || ''
+function normalizeCompetitionKey(fixture) {
+    return String(
+        fixture.competition_key ||
+        fixture.competition ||
+        fixture.league ||
+        fixture.tournament ||
+        'unknown_competition'
     ).trim().toLowerCase().replace(/[^a-z0-9]+/g, '_');
-
-    const home = String(match?.home_team || meta.home_team || '').trim().toLowerCase();
-    const away = String(match?.away_team || meta.away_team || '').trim().toLowerCase();
-
-    const pairs = [];
-    if (home) pairs.push({ team: home, competition });
-    if (away) pairs.push({ team: away, competition });
-    return pairs;
 }
 
-/**
- * Check if adding a match would violate the weekly team lock.
- * A team can appear in different competitions but not the same competition twice in one week.
- *
- * @param {Array} matches - Array of match objects in the proposed card
- * @param {Map} usedTeamsWeekly - Map of team → Set of competitions already used this week
- * @returns {{ valid: boolean, rejectedTeams: string[] }}
- */
-function weeklyTeamLock(matches, usedTeamsWeekly) {
-    const rejectedTeams = [];
+function getWeekKey(dateValue) {
+    const d = new Date(dateValue);
+    if (Number.isNaN(d.getTime())) return 'unknown_week';
 
-    for (const match of asArray(matches)) {
-        const pairs = extractTeamCompetitionPairs(match);
-        for (const { team, competition } of pairs) {
-            if (!team || !competition) continue;
+    const tmp = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayNum = tmp.getUTCDay() || 7;
+    tmp.setUTCDate(tmp.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(), 0, 1));
+    const weekNo = Math.ceil((((tmp - yearStart) / 86400000) + 1) / 7);
 
-            const existingCompetitions = usedTeamsWeekly.get(team);
-            if (existingCompetitions && existingCompetitions.has(competition)) {
-                rejectedTeams.push(team);
-            }
+    return `${tmp.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+}
+
+function isTeamLockedForWeek(fixture, usedTeamsWeekly) {
+    const weekKey = getWeekKey(fixture.startTime || fixture.kickoff || fixture.date);
+    const competitionKey = normalizeCompetitionKey(fixture);
+
+    const home = normalizeTeamName(fixture.homeTeam || fixture.home_team || fixture.home);
+    const away = normalizeTeamName(fixture.awayTeam || fixture.away_team || fixture.away);
+
+    if (!usedTeamsWeekly.has(weekKey)) return false;
+
+    const byCompetition = usedTeamsWeekly.get(weekKey);
+    if (!byCompetition.has(competitionKey)) return false;
+
+    const usedTeams = byCompetition.get(competitionKey);
+    return usedTeams.has(home) || usedTeams.has(away);
+}
+
+function lockTeamsForWeek(fixture, usedTeamsWeekly) {
+    const weekKey = getWeekKey(fixture.startTime || fixture.kickoff || fixture.date);
+    const competitionKey = normalizeCompetitionKey(fixture);
+
+    const home = normalizeTeamName(fixture.homeTeam || fixture.home_team || fixture.home);
+    const away = normalizeTeamName(fixture.awayTeam || fixture.away_team || fixture.away);
+
+    if (!usedTeamsWeekly.has(weekKey)) {
+        usedTeamsWeekly.set(weekKey, new Map());
+    }
+
+    const byCompetition = usedTeamsWeekly.get(weekKey);
+
+    if (!byCompetition.has(competitionKey)) {
+        byCompetition.set(competitionKey, new Set());
+    }
+
+    const usedTeams = byCompetition.get(competitionKey);
+    usedTeams.add(home);
+    usedTeams.add(away);
+}
+
+/* ==========================================================================
+   STABLE FIXTURE IDENTITY (EXACT SPEC)
+   ========================================================================== */
+
+function stableFixtureKeyForCard(fixture) {
+    const home = normalizeTeamName(fixture.homeTeam || fixture.home_team || fixture.home);
+    const away = normalizeTeamName(fixture.awayTeam || fixture.away_team || fixture.away);
+    const competition = normalizeCompetitionKey(fixture);
+    const kickoff = String(fixture.startTime || fixture.kickoff || fixture.date || 'unknown_time');
+
+    return `${home}__${away}__${competition}__${kickoff}`;
+}
+
+/* ==========================================================================
+   CARD OVERLAP REJECTION (EXACT SPEC)
+   ========================================================================== */
+
+function getCardFixtureKeySet(card) {
+    return new Set((card.legs || []).map(leg => leg.fixtureKey));
+}
+
+function countSetOverlap(setA, setB) {
+    let count = 0;
+    for (const item of setA) {
+        if (setB.has(item)) count += 1;
+    }
+    return count;
+}
+
+function exceedsCardOverlapLimit(candidateCard, publishedCards) {
+    const candidateSet = getCardFixtureKeySet(candidateCard);
+    const limit = candidateCard.legs.length === 12 ? 4 : 2;
+
+    for (const existingCard of publishedCards) {
+        if (existingCard.legs.length !== candidateCard.legs.length) continue;
+
+        const existingSet = getCardFixtureKeySet(existingCard);
+        const overlap = countSetOverlap(candidateSet, existingSet);
+
+        if (overlap > limit) {
+            return {
+                reject: true,
+                overlap,
+                comparedAgainst: existingCard.display_label || `${existingCard.legs.length} card`,
+            };
         }
     }
 
+    return { reject: false, overlap: 0 };
+}
+
+/* ==========================================================================
+   CANDIDATE POOL ROTATION (EXACT SPEC)
+   ========================================================================== */
+
+function removeUsedFixturesFromPool(pool, usedFixtureKeys) {
+    return pool.filter(fixture => {
+        const key = stableFixtureKey(fixture);
+        return key && !usedFixtureKeys.has(key);
+    });
+}
+
+function removeLockedTeamFixturesFromPool(pool, usedTeamsWeekly) {
+    return pool.filter(fixture => !isTeamLockedForWeek(fixture, usedTeamsWeekly));
+}
+
+function rotateCandidatePool(pool, usedFixtureKeys, usedTeamsWeekly) {
+    let nextPool = removeUsedFixturesFromPool(pool, usedFixtureKeys);
+    nextPool = removeLockedTeamFixturesFromPool(nextPool, usedTeamsWeekly);
+    return nextPool;
+}
+
+/* ==========================================================================
+   MEGA DIAGNOSTICS (EXACT SPEC)
+   ========================================================================== */
+
+function initMegaDiagnostics() {
     return {
-        valid: rejectedTeams.length === 0,
-        rejectedTeams: [...new Set(rejectedTeams)],
+        mega_candidate_fixtures_before_filter: 0,
+        mega_candidate_fixtures_after_filter: 0,
+        mega_rejected_for_weekly_team_lock: 0,
+        mega_rejected_for_family_caps: 0,
+        mega_rejected_for_duplicate_overlap: 0,
+        mega_rejected_for_confidence_floor: 0,
+        mega_rejected_for_banned_market: 0,
+        mega_rejected_for_low_diversity: 0,
+        mega_rejected_for_insufficient_legs: 0,
+        mega_final_cards_built: 0,
+        mega_zero_reason: null,
     };
 }
 
-/**
- * Reserve teams from a completed card into the weekly lock map.
- */
-function reserveTeamsWeekly(matches, usedTeamsWeekly) {
-    for (const match of asArray(matches)) {
-        const pairs = extractTeamCompetitionPairs(match);
-        for (const { team, competition } of pairs) {
-            if (!team || !competition) continue;
-            if (!usedTeamsWeekly.has(team)) {
-                usedTeamsWeekly.set(team, new Set());
-            }
-            usedTeamsWeekly.get(team).add(competition);
-        }
-    }
+function resolveMegaZeroReason(diag) {
+    if (diag.mega_final_cards_built > 0) return null;
+
+    const reasons = [
+        ['weekly_team_lock', diag.mega_rejected_for_weekly_team_lock],
+        ['family_caps', diag.mega_rejected_for_family_caps],
+        ['duplicate_overlap', diag.mega_rejected_for_duplicate_overlap],
+        ['confidence_floor', diag.mega_rejected_for_confidence_floor],
+        ['banned_market', diag.mega_rejected_for_banned_market],
+        ['low_diversity', diag.mega_rejected_for_low_diversity],
+        ['insufficient_legs', diag.mega_rejected_for_insufficient_legs],
+    ];
+
+    reasons.sort((a, b) => b[1] - a[1]);
+    return reasons[0][1] > 0 ? reasons[0][0] : 'unknown';
 }
 
 /* ==========================================================================
@@ -628,11 +725,28 @@ module.exports = {
     validateMarketDiversity,
 
     // Weekly team lock (section 4)
-    startOfWeekUtc,
-    endOfWeekUtc,
-    extractTeamCompetitionPairs,
-    weeklyTeamLock,
-    reserveTeamsWeekly,
+    normalizeTeamName,
+    normalizeCompetitionKey,
+    getWeekKey,
+    isTeamLockedForWeek,
+    lockTeamsForWeek,
+
+    // Stable fixture identity
+    stableFixtureKeyForCard,
+
+    // Card overlap rejection
+    getCardFixtureKeySet,
+    countSetOverlap,
+    exceedsCardOverlapLimit,
+
+    // Candidate pool rotation
+    removeUsedFixturesFromPool,
+    removeLockedTeamFixturesFromPool,
+    rotateCandidatePool,
+
+    // Mega diagnostics
+    initMegaDiagnostics,
+    resolveMegaZeroReason,
 
     // Card builder (section 9)
     getCardDescriptor,
