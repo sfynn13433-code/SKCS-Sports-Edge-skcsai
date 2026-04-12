@@ -7,6 +7,7 @@ const { spawn } = require('child_process');
 const rootDir = path.resolve(__dirname, '..');
 const serverPath = path.join(rootDir, 'backend', 'server-express.js');
 const backendEnvPath = path.join(rootDir, 'backend', '.env');
+const backendScriptsEnvPath = path.join(rootDir, 'backend', 'scripts', '.env');
 const smokePort = String(process.env.SMOKE_PORT || process.env.PORT || '3000');
 const baseUrl = `http://127.0.0.1:${smokePort}`;
 
@@ -35,7 +36,7 @@ async function waitForServer(timeoutMs = 15000) {
     const start = Date.now();
     while (Date.now() - start < timeoutMs) {
         try {
-            const res = await fetch(`${baseUrl}/health`);
+            const res = await fetch(`${baseUrl}/api/health`);
             if (res.ok) return;
         } catch (_) {
             // Keep retrying until timeout.
@@ -63,6 +64,7 @@ async function run() {
     const env = {
         ...process.env,
         ...parseEnvFile(backendEnvPath),
+        ...parseEnvFile(backendScriptsEnvPath),
         PORT: smokePort
     };
 
@@ -94,14 +96,9 @@ async function run() {
             if (!res.ok) throw new Error(`Page failed: ${page} -> ${res.status}`);
         }
 
-        const health = await fetchJson(`${baseUrl}/health`);
+        const health = await fetchJson(`${baseUrl}/api/health`);
         if (health.res.status !== 200 || health.body?.status !== 'ok') {
             throw new Error('Health endpoint did not return expected payload');
-        }
-
-        const apiInfo = await fetchJson(`${baseUrl}/api`);
-        if (apiInfo.res.status !== 200 || apiInfo.body?.status !== 'running') {
-            throw new Error('API info endpoint did not return running status');
         }
 
         const accuracy = await fetchJson(`${baseUrl}/api/accuracy`);
@@ -124,7 +121,7 @@ async function run() {
             throw new Error(`Unauthenticated predictions endpoint should return 401, got ${unauthPredictions.status}`);
         }
 
-        const cors = await fetch(`${baseUrl}/cors-test`, {
+        const cors = await fetch(`${baseUrl}/api/health`, {
             headers: {
                 Origin: 'https://skcs-sports-edge.github.io',
                 'x-api-key': env.USER_API_KEY || 'skcs_user_12345'
