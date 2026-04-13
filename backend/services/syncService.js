@@ -8,17 +8,27 @@ const { buildMatchContext } = require('./normalizerService');
 const pipelineLogger = require('../utils/pipelineLogger');
 const config = require('../config');
 
-// IRON-CLAD DATE PATCH: matches kicked off more than this many minutes ago are dropped at sync time.
+// IRON-CLAD DATE PATCH: only drop matches that are CONFIRMED to be in the past
+// beyond the 15-minute grace period. The 7-day forward ingestion horizon is
+// preserved — future kickoffs (up to +7d) always pass this guard.
+// Matches with no parseable kickoff are passed through (not rejected) so that
+// freshly ingested fixtures without a kickoff field do not get silently dropped.
 const SYNC_GRACE_MINUTES = 15;
+// Maximum future window accepted at sync time — matches beyond 7 days are ignored.
+const SYNC_FUTURE_DAYS = 7;
 
 function isObject(value) {
     return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 
 /**
- * Returns true if the normalized match has a kickoff that is still within the
- * 15-minute grace window (i.e. future or kicked off less than 15 minutes ago).
- * Matches with no parseable kickoff are rejected to avoid polluting the pipeline.
+ * Returns true if the normalized match should enter the pipeline.
+ *
+ * Rules:
+ *  - No parseable kickoff → pass through (let downstream validation handle it).
+ *  - Kickoff is in the past beyond SYNC_GRACE_MINUTES → reject (stale).
+ *  - Kickoff is more than SYNC_FUTURE_DAYS in the future → reject (too far out).
+ *  - Anything else (upcoming, within grace window) → accept.
  */
 function isMatchWithinGraceWindow(normalizedMatch) {
     const mi = isObject(normalizedMatch?.match_info) ? normalizedMatch.match_info : {};
@@ -31,13 +41,18 @@ function isMatchWithinGraceWindow(normalizedMatch) {
         normalizedMatch?.match_time ||
         null;
 
-    if (!rawKickoff) return false; // no kickoff → reject
+    if (!rawKickoff) return true; // no kickoff → pass through, let downstream decide
 
     const kickoffMs = new Date(rawKickoff).getTime();
-    if (!Number.isFinite(kickoffMs)) return false; // unparseable → reject
+    if (!Number.isFinite(kickoffMs)) return true; // unparseable → pass through
 
-    const graceCutoffMs = Date.now() - SYNC_GRACE_MINUTES * 60 * 1000;
-    return kickoffMs >= graceCutoffMs;
+    const nowMs = Date.now();
+    const graceCutoffMs = nowMs - SYNC_GRACE_MINUTES * 60 * 1000;
+    const futureCapMs   = nowMs + SYNC_FUTURE_DAYS * 24 * 60 * 60 * 1000;
+
+    if (kickoffMs < graceCutoffMs) return false; // past the grace window → stale, reject
+    if (kickoffMs > futureCapMs)   return false; // beyond 7-day horizon → reject
+    return true; // within [grace cutoff … +7 days] → accept
 }
 
 function toNormalizationInput(rawMatch) {

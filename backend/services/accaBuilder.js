@@ -2241,7 +2241,17 @@ async function loadValidFilteredPredictions(tier, client, options = {}) {
         ) k
         where f.tier = $1
           and f.is_valid = true
-          and k.kickoff_utc > $2::timestamptz
+          and (
+            -- NULL kickoff: pass through so JS-side filterExpiredFixtures handles it
+            k.kickoff_utc is null
+            -- Within grace window (up to 15 min past kickoff) OR fully future
+            or k.kickoff_utc >= (now() - interval '15 minutes')
+          )
+          and (
+            -- 7-day forward cap: do not load inventory beyond the rolling window
+            k.kickoff_utc is null
+            or k.kickoff_utc <= (now() + interval '7 days')
+          )
         order by r.confidence desc, r.created_at desc;
         `,
         [t, now.toISOString()]
