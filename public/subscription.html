@@ -477,8 +477,31 @@ button:hover { opacity: 0.9; }
 const SUPABASE_URL = window.SUPABASE_URL || "";
 const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || "";
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+function createSupabaseClientSafe() {
+  if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+    return null;
+  }
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    return null;
+  }
+  try {
+    return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } catch (err) {
+    console.error('[subscription] failed to initialize supabase client:', err);
+    return null;
+  }
+}
+
+const supabaseClient = createSupabaseClientSafe();
 let billingStatus = null;
+
+function setPlanButtonsEnabled(enabled) {
+  document.querySelectorAll('.core-btn, .elite-btn').forEach((btn) => {
+    btn.disabled = !enabled;
+    btn.style.opacity = enabled ? '' : '0.55';
+    btn.style.cursor = enabled ? '' : 'not-allowed';
+  });
+}
 
 function showCore(){
   document.getElementById('corePlans').style.display='grid';
@@ -522,6 +545,11 @@ async function loadBillingStatus() {
 }
 
 async function selectPlan(tierId) {
+  if (!supabaseClient) {
+    alert("Authentication is currently unavailable. Please refresh, then sign in again.");
+    return;
+  }
+
   const { data: { session } } = await supabaseClient.auth.getSession();
   
   if (!session || !session.user) {
@@ -546,6 +574,8 @@ async function selectPlan(tierId) {
     const data = await res.json();
 
     if (res.ok && data.success) {
+      localStorage.setItem('skcs_plan_id', tierId);
+      localStorage.setItem('skcs_plan_selected_at', new Date().toISOString());
       const freeLabel = Number(data.pro_rata_direct_free_percent || 0) > 0
         ? `\nFree Direct 1x2 Access Today: ${data.pro_rata_direct_free_percent}%`
         : '';
@@ -572,9 +602,24 @@ if (typeof checkSession === 'function') {
 }
 loadBillingStatus();
 
+if (!supabaseClient) {
+  setPlanButtonsEnabled(false);
+  const banner = document.getElementById('billingBanner');
+  if (banner) {
+    banner.innerHTML = "<strong>Authentication unavailable:</strong> Plan selection is temporarily disabled. Refresh the page and sign in again.";
+  }
+} else {
+  setPlanButtonsEnabled(true);
+}
+
 document.querySelectorAll('.skcs-secondary').forEach((node) => {
   node.innerHTML = node.innerHTML.replace(/\bSecondary\b/g, 'Analytical Insights');
 });
+
+window.showCore = showCore;
+window.showElite = showElite;
+window.selectPlan = selectPlan;
+window.goBack = goBack;
 </script>
 
 </body>

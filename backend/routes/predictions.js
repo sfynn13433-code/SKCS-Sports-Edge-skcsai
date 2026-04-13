@@ -864,6 +864,19 @@ async function getLatestPublishRunIdFromFinalTable() {
     return fallbackRunRes.rows[0]?.publish_run_id || null;
 }
 
+function resolveQueryTiers(planCapabilities, includeAll = false) {
+    const tiers = (Array.isArray(planCapabilities?.tiers) ? planCapabilities.tiers : [])
+        .map((tier) => normalizeTierLabel(tier));
+
+    // Availability fallback: when elite/deep inventory is thin, allow normal/core
+    // inventory to prevent near-empty payloads for paid users.
+    if (!includeAll && String(planCapabilities?.tier || '').toLowerCase() === 'elite') {
+        tiers.push('normal', 'core');
+    }
+
+    return Array.from(new Set(tiers));
+}
+
 // GET /api/predictions
 // Default tier = deep (elite pool); subscription limits use /api/user/predictions
 router.get('/', requireRole('user'), async (req, res) => {
@@ -890,6 +903,7 @@ router.get('/', requireRole('user'), async (req, res) => {
         if (!planCapabilities) {
             return res.status(400).json({ error: 'Invalid plan ID' });
         }
+        const queryTiers = resolveQueryTiers(planCapabilities, includeAll);
 
         const now = new Date();
         let latestPublishRunId = null;
@@ -930,7 +944,7 @@ router.get('/', requireRole('user'), async (req, res) => {
                     ORDER BY created_at DESC
                     LIMIT 2000;
                 `;
-                queryParams = [planCapabilities.tiers.map((tier) => String(tier).toLowerCase())];
+                queryParams = [queryTiers];
             }
 
             const dbRes = await query(queryStr, queryParams);
@@ -991,7 +1005,7 @@ router.get('/', requireRole('user'), async (req, res) => {
 
                     if (!error && Array.isArray(data) && data.length > 0) {
                         // Filter Supabase rows by plan capabilities.
-                        const allowedTiers = new Set(planCapabilities.tiers.map((tier) => normalizeTierLabel(tier)));
+                        const allowedTiers = new Set(queryTiers);
                         const filtered = data.filter((r) => {
                             try {
                                 const rowTier = normalizeTierLabel(r.tier);

@@ -1061,7 +1061,9 @@
     }
 
     function getPredictionTiersForPlan(planId) {
-        return String(planId || '').includes('elite') ? ['deep', 'elite'] : ['normal', 'core'];
+        return String(planId || '').includes('elite')
+            ? ['deep', 'elite', 'normal', 'core']
+            : ['normal', 'core'];
     }
 
     function getPlanAccessLevel(planId) {
@@ -1448,7 +1450,13 @@
     }
 
     function resolveUserPlanId(userPlanId) {
-        return String(userPlanId || window.userPlanId || window.currentUserPlanId || 'elite_30day_deep_vip');
+        let storedPlan = '';
+        try {
+            storedPlan = String(localStorage.getItem('skcs_plan_id') || '').trim();
+        } catch (e) {
+            storedPlan = '';
+        }
+        return String(userPlanId || window.userPlanId || window.currentUserPlanId || storedPlan || 'elite_30day_deep_vip');
     }
 
     async function fetchPredictions(sport, userPlanId = 'elite_30day_deep_vip') {
