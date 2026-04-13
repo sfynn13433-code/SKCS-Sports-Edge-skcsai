@@ -3,6 +3,7 @@
 const { runPipelineForMatches, rebuildFinalOutputs } = require('./aiPipeline');
 const { buildLiveData } = require('./dataProvider');
 const { upsertCanonicalEvents } = require('./canonicalEvents');
+const { assertRapidApiCacheWallReady } = require('./dataProviders');
 const config = require('../config');
 
 function getSeasonStartYear() {
@@ -131,6 +132,11 @@ function getSportsConfigForRequest(input) {
  * from the providers into your Supabase database.
  */
 async function syncSports(options = {}) {
+    const cacheWallReady = assertRapidApiCacheWallReady();
+    if (!cacheWallReady) {
+        console.warn('[syncService] RapidAPI cache wall is not fully configured. RapidAPI fallbacks may be blocked.');
+    }
+
     const { configs, requestedSports } = getSportsConfigForRequest(options.sports);
     const scopeLabel = requestedSports.length ? requestedSports.join(', ') : 'all sports';
     console.log(`[syncService] Starting sports data sync for REAL matches (${scopeLabel})...`);

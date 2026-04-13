@@ -1,5 +1,6 @@
 const axios = require('axios');
 const config = require('./config');
+const { fetchRapidApiCustom, getRapidApiProviderForSport } = require('./services/dataProviders');
 
 class APISportsClient {
     constructor() {
@@ -453,32 +454,35 @@ class RapidAPIClient {
     }
 
     async getFixtures(sport, leagueId, season) {
-        if (!this.apiKey) {
-            throw new Error('RapidAPI: RAPIDAPI_KEY not configured');
-        }
-
         const baseUrl = this.getBaseUrlForSport(sport);
         const host = this.getHostForSport(sport);
         const endpoint = this.getEndpointForSport(sport);
-        const params = { league: leagueId, season };
+        const providerName = getRapidApiProviderForSport(sport);
+        const params = {};
+
+        if (leagueId) params.league = leagueId;
+        if (season) params.season = season;
 
         try {
-            const response = await axios.get(`${baseUrl}/${endpoint}`, {
-                headers: {
-                    'x-rapidapi-key': this.apiKey,
-                    'x-rapidapi-host': host,
-                },
-                params,
-                timeout: 10000,
+            const payload = await fetchRapidApiCustom({
+                providerName,
+                endpointUrl: `${baseUrl}/${endpoint}`,
+                host,
+                params
             });
 
-            console.log(`[RapidAPI] ${sport}: returned ${Array.isArray(response.data?.response) ? response.data.response.length : 0} fixtures`);
-            return response.data?.response || [];
+            const fixtures = Array.isArray(payload?.response)
+                ? payload.response
+                : Array.isArray(payload?.data)
+                    ? payload.data
+                    : Array.isArray(payload)
+                        ? payload
+                        : [];
+
+            console.log(`[RapidAPI] ${sport}: provider=${providerName}, returned ${fixtures.length} fixtures`);
+            return fixtures;
         } catch (error) {
             console.error(`[RapidAPI] ${sport} error:`, error.message);
-            if (error.response) {
-                console.error(`[RapidAPI] Response:`, error.response.status, error.response.data);
-            }
             return [];
         }
     }
