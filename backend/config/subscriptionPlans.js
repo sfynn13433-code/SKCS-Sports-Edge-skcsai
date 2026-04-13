@@ -37,9 +37,45 @@ const subscriptionPlans = {
     deep_30: { tier: 'elite', days: 30, tierKey: 'deep30' }
 };
 
-function getPlan(planId) {
+// External business-tier aliases used for Supabase test seeding and QA.
+// Values map to canonical plan IDs already supported by the subscription matrix.
+const PLAN_ALIASES = {
+    // Core aliases
+    core_free: 'core_4day_sprint',
+    core_daily: 'core_4day_sprint',
+    core_weekly: 'core_9day_run',
+    core_monthly: 'core_30day_limitless',
+
+    // Elite aliases
+    elite_daily: 'elite_4day_deep_dive',
+    elite_weekly: 'elite_9day_deep_strike',
+    elite_monthly: 'elite_14day_deep_pro',
+
+    // VIP alias
+    vip_30day: 'elite_30day_deep_vip'
+};
+
+function normalizePlanId(planId) {
     if (typeof planId !== 'string') return null;
-    return subscriptionPlans[planId] || null;
+    const raw = planId.trim();
+    if (!raw) return null;
+
+    if (subscriptionPlans[raw]) return raw;
+
+    const lower = raw.toLowerCase();
+    if (subscriptionPlans[lower]) return lower;
+
+    const aliasMatch = PLAN_ALIASES[lower];
+    if (aliasMatch && subscriptionPlans[aliasMatch]) {
+        return aliasMatch;
+    }
+
+    return null;
+}
+
+function getPlan(planId) {
+    const normalized = normalizePlanId(planId);
+    return normalized ? subscriptionPlans[normalized] : null;
 }
 
 function getTierKeyForPlan(planId) {
@@ -49,6 +85,7 @@ function getTierKeyForPlan(planId) {
 
 module.exports = {
     subscriptionPlans,
+    normalizePlanId,
     getPlan,
     getTierKeyForPlan
 };

@@ -223,6 +223,10 @@ button:hover { opacity: 0.9; }
   <strong>Plan access mode:</strong> Checking current billing status...
 </div>
 
+<div id="publicLockNotice" class="status-banner" style="display:none;">
+  <strong>Platform opening soon. Registration available.</strong>
+</div>
+
 <div class="skcs-focus-bar"> 
   🔥 TODAY'S FOCUS: Full Global Coverage — Maximum volume across all sports 
 </div> 
@@ -495,6 +499,34 @@ function createSupabaseClientSafe() {
 const supabaseClient = createSupabaseClientSafe();
 let billingStatus = null;
 
+function showPublicLockNotice() {
+  const notice = document.getElementById('publicLockNotice');
+  if (!notice) return;
+
+  let message = '';
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('locked') === '1') {
+      message = String(params.get('message') || '').trim();
+    }
+  } catch (e) {
+    message = '';
+  }
+
+  if (!message) {
+    try {
+      message = String(sessionStorage.getItem('skcs_public_lock_message') || '').trim();
+      sessionStorage.removeItem('skcs_public_lock_message');
+    } catch (e) {
+      message = '';
+    }
+  }
+
+  if (!message) return;
+  notice.innerHTML = `<strong>${message}</strong>`;
+  notice.style.display = 'block';
+}
+
 function setPlanButtonsEnabled(enabled) {
   document.querySelectorAll('.core-btn, .elite-btn').forEach((btn) => {
     btn.disabled = !enabled;
@@ -600,6 +632,7 @@ function goBack() {
 if (typeof checkSession === 'function') {
   checkSession();
 }
+showPublicLockNotice();
 loadBillingStatus();
 
 if (!supabaseClient) {

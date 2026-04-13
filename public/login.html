@@ -306,17 +306,18 @@
                     return;
                 }
 
+                // Keep registration + verification flow explicit for testing:
+                // do not auto-login immediately after signup, even if a session is returned.
                 if (data?.session) {
-                    messageDiv.className = 'message success';
-                    messageDiv.textContent = 'Account created. Redirecting…';
-                    const dest = sessionStorage.getItem('skcs_after_auth') || 'index.html';
-                    sessionStorage.removeItem('skcs_after_auth');
-                    window.location.href = dest;
-                    return;
+                    try {
+                        await supabaseClient.auth.signOut();
+                    } catch (signOutErr) {
+                        console.warn('[login] sign-out after signup failed:', signOutErr?.message || signOutErr);
+                    }
                 }
 
                 messageDiv.className = 'message success';
-                messageDiv.textContent = 'Check your email to confirm your account, then sign in.';
+                messageDiv.textContent = 'Registration submitted. Verify your email, then login to continue.';
             } catch (error) {
                 messageDiv.className = 'message error';
                 messageDiv.textContent = 'Connection error';

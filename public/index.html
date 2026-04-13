@@ -1045,11 +1045,19 @@
     <!-- Scroll to top button -->
     <button id="scrollTopBtn" title="Go to top">⬆️</button>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/config.js"></script>
     <!-- ========== REPLACED SCRIPT SECTION ========== -->
     <script>
     // Configuration: use shared frontend config first, with a safe fallback.
     const SKCS_BACKEND = window.API_BASE_URL || "https://skcs-sports-edge-skcsai.onrender.com";
+    const PUBLIC_LOCK_MESSAGE = "Platform opening soon. Registration available.";
+    const SUPABASE_URL = window.SUPABASE_URL || '';
+    const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
+    const supabaseClient = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY)
+        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        : null;
+    let authSession = null;
     let activeSport = 'football';
     const includeAllParam = new URLSearchParams(window.location.search).get('include_all');
     const INCLUDE_ALL_MODE = ['1', 'true'].includes(String(includeAllParam || '').trim().toLowerCase());
@@ -1058,6 +1066,64 @@
         const direct = String(window.USER_API_KEY || '').trim();
         const fromConfig = String(window.SKCS_CONFIG?.userApiKey || '').trim();
         return direct || fromConfig || 'skcs_user_12345';
+    }
+
+    function redirectToSubscribeLocked() {
+        try {
+            sessionStorage.setItem('skcs_public_lock_message', PUBLIC_LOCK_MESSAGE);
+        } catch (e) { /* ignore */ }
+        window.location.href = `subscription.html?locked=1&message=${encodeURIComponent(PUBLIC_LOCK_MESSAGE)}`;
+    }
+
+    async function getActiveSession(forceReload = false) {
+        if (!supabaseClient) return null;
+        if (authSession && !forceReload) return authSession;
+        try {
+            const { data, error } = await supabaseClient.auth.getSession();
+            if (error) {
+                console.warn('[auth] failed to get session:', error.message || error);
+                authSession = null;
+                return null;
+            }
+            authSession = data?.session || null;
+            return authSession;
+        } catch (_error) {
+            authSession = null;
+            return null;
+        }
+    }
+
+    async function getAccessTokenOrRedirect() {
+        const session = await getActiveSession();
+        if (session?.access_token) return session.access_token;
+        redirectToSubscribeLocked();
+        return null;
+    }
+
+    function updateAuthLink(session) {
+        const authLink = document.getElementById('authLink');
+        if (!authLink) return;
+
+        if (session?.user) {
+            authLink.textContent = 'Logout';
+            authLink.href = '#';
+            authLink.onclick = async (event) => {
+                event.preventDefault();
+                try {
+                    if (supabaseClient) {
+                        await supabaseClient.auth.signOut();
+                    }
+                } catch (e) {
+                    console.warn('[auth] sign-out failed:', e?.message || e);
+                }
+                redirectToSubscribeLocked();
+            };
+            return;
+        }
+
+        authLink.textContent = 'Login';
+        authLink.href = 'login.html?next=index.html';
+        authLink.onclick = null;
     }
 
     function getPredictionTiersForPlan(planId) {
@@ -1465,10 +1531,12 @@
     }
 
     async function fetchPredictions(sport, userPlanId = 'elite_30day_deep_vip') {
+        const accessToken = await getAccessTokenOrRedirect();
+        if (!accessToken) return;
+
         const activePlanId = resolveUserPlanId(userPlanId);
         const container = document.getElementById(sport + '-matches');
         const requestSport = sport === 'accumulators' ? '' : sport;
-        const userApiKey = getUserApiKey();
         let supabaseFallbackStatus = 'not_attempted';
         if (container) {
             container.innerHTML = '<p style="text-align:center;color:#4a5568;padding:20px;">Updating SKCS Insights...</p>';
@@ -1541,9 +1609,14 @@
                 method: 'GET',
                 cache: 'no-store',
                 headers: {
-                    'x-api-key': userApiKey
+                    'Authorization': `Bearer ${accessToken}`
                 }
             });
+
+            if (response.status === 401 || response.status === 403) {
+                redirectToSubscribeLocked();
+                return;
+            }
 
             let data = null;
             try { data = await response.json(); } catch (e) { data = null; }
@@ -1562,7 +1635,7 @@
                     method: 'GET',
                     cache: 'no-store',
                     headers: {
-                        'x-api-key': userApiKey
+                        'Authorization': `Bearer ${accessToken}`
                     }
                 });
                 let d2 = null;
@@ -2313,13 +2386,21 @@
         box.scrollTop = box.scrollHeight; 
     } 
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
         const sendBtn = document.getElementById('send-btn');
         if(sendBtn) sendBtn.addEventListener('click', sendMessage);
         const chatInput = document.getElementById('chat-input');
         if (chatInput) {
             chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
         }
+
+        const session = await getActiveSession(true);
+        if (!session?.user) {
+            updateAuthLink(null);
+            redirectToSubscribeLocked();
+            return;
+        }
+        updateAuthLink(session);
 
         document.querySelectorAll('.tab-button').forEach(btn => {
             btn.addEventListener('click', function() {

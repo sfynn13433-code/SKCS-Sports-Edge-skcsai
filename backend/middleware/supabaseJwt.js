@@ -53,9 +53,18 @@ async function requireSupabaseUser(req, res, next) {
             now: new Date()
         });
 
+        const profileRole = String(profile?.role || '').trim().toLowerCase();
+        const profileIsAdmin = profile?.is_admin === true || profileRole === 'admin';
+
         req.user = {
             id: supaUser.id,
             email: supaUser.email,
+            first_name: profile?.first_name || null,
+            last_name: profile?.last_name || null,
+            id_number: profile?.id_number || null,
+            country: profile?.country || null,
+            role: profileRole || 'user',
+            is_admin: profileIsAdmin,
             ...subscriptionContext
         };
 
@@ -74,7 +83,11 @@ function requireActiveSubscription(req, res, next) {
         return;
     }
 
-    if (!ACTIVE_SUBSCRIPTION_STATUSES.has(user.subscription_status) && user.is_test_user !== true) {
+    if (
+        !ACTIVE_SUBSCRIPTION_STATUSES.has(user.subscription_status) &&
+        user.is_test_user !== true &&
+        user.is_admin !== true
+    ) {
         res.status(403).json({ error: 'Subscription required' });
         return;
     }

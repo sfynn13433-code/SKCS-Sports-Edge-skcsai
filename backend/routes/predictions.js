@@ -4,10 +4,12 @@ const express = require('express');
 const { query } = require('../db');
 const { rebuildFinalOutputs } = require('../services/aiPipeline');
 const { requireRole } = require('../utils/auth');
+const { requireSupabaseUser, requireActiveSubscription } = require('../middleware/supabaseJwt');
 const config = require('../config');
 const { createClient } = require('@supabase/supabase-js');
 const moment = require('moment-timezone');
 const { isValidCombination } = require('../services/conflictEngine');
+const { getPlan, normalizePlanId } = require('../config/subscriptionPlans');
 
 const { getPlanCapabilities, filterPredictionsForPlan, calculateDailyAllocations, getMegaAccaDailyAllocation } = require('../config/subscriptionMatrix');
 const { getPredictionWindow } = require('../utils/dateNormalization');
@@ -1078,13 +1080,42 @@ function resolveQueryTiers(planCapabilities, includeAll = false) {
     return Array.from(new Set(tiers));
 }
 
+function resolveRequestedPlanId(req) {
+    const fromQuery = String(req.query?.plan_id || '').trim();
+    const fromProfile = String(req.user?.plan_id || '').trim();
+    return normalizePlanId(fromQuery || fromProfile || 'elite_30day_deep_vip');
+}
+
+function canUserAccessPlan(user, requestedPlanId) {
+    if (!user || !requestedPlanId) return false;
+    if (user.is_admin === true || user.is_test_user === true) return true;
+
+    const userPlanId = normalizePlanId(user.plan_id);
+    if (!userPlanId) return false;
+    if (userPlanId === requestedPlanId) return true;
+
+    // Keep current elite -> core fallback working for low inventory days.
+    const userPlan = getPlan(userPlanId);
+    const requestedPlan = getPlan(requestedPlanId);
+    if (!userPlan || !requestedPlan) return false;
+    return userPlan.tier === 'elite' && requestedPlan.tier === 'core';
+}
+
 // GET /api/predictions
 // Default tier = deep (elite pool); subscription limits use /api/user/predictions
-router.get('/', requireRole('user'), async (req, res) => {
+router.get('/', requireSupabaseUser, requireActiveSubscription, async (req, res) => {
     try {
-        const planId = req.query.plan_id || 'elite_30day_deep_vip';
+        const planId = resolveRequestedPlanId(req);
+        if (!planId) {
+            return res.status(400).json({ error: 'Invalid plan ID' });
+        }
+        if (!canUserAccessPlan(req.user, planId)) {
+            return res.status(403).json({ error: 'Plan access denied for user' });
+        }
+
         const sport = req.query.sport;
-        const includeAll = ['1', 'true'].includes(String(req.query.include_all || '').trim().toLowerCase());
+        const includeAllRequested = ['1', 'true'].includes(String(req.query.include_all || '').trim().toLowerCase());
+        const includeAll = includeAllRequested && (req.user?.is_admin === true || req.user?.is_test_user === true);
         const sportFilterValues = getSportFilterValues(sport);
         
         let historyWindowDays = Number(req.query.history_days);

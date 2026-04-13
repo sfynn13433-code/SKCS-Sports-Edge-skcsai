@@ -1,5 +1,7 @@
 'use strict';
 
+const { normalizePlanId } = require('./subscriptionPlans');
+
 const DAY_NAMES = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 const PLAN_CATEGORIES = ['direct', 'secondary', 'multi', 'same_match', 'acca_6match'];
 const EXTRA_PLAN_CATEGORIES = ['mega_acca_12'];
@@ -437,13 +439,15 @@ function resolveCycleIndex(policy, now = new Date(), subscriptionStart = null) {
 }
 
 function calculateDailyAllocations(planId, dayOfWeek) {
-    const plan = SUBSCRIPTION_MATRIX[planId];
+    const resolvedPlanId = normalizePlanId(planId) || planId;
+    const plan = SUBSCRIPTION_MATRIX[resolvedPlanId];
     if (!plan) return null;
     return plan.daily_limits[normalizeDay(dayOfWeek)] || null;
 }
 
 function getPlanCapabilities(planId) {
-    const plan = SUBSCRIPTION_MATRIX[planId];
+    const resolvedPlanId = normalizePlanId(planId) || planId;
+    const plan = SUBSCRIPTION_MATRIX[resolvedPlanId];
     if (!plan) return null;
     const canonicalTier = plan.tier === 'elite' ? 'deep' : 'normal';
     const tierAliases = canonicalTier === 'deep'
@@ -457,6 +461,7 @@ function getPlanCapabilities(planId) {
 
     return {
         ...plan,
+        plan_id: resolvedPlanId,
         baseline_plan_id: FAMILY_BASELINES[plan.tier],
         canonical_tier: canonicalTier,
         tiers: tierAliases,
@@ -501,7 +506,7 @@ function normalizeMarketName(value) {
 }
 
 function getPlanAccessLevel(planId) {
-    const key = String(planId || '').trim().toLowerCase();
+    const key = String(normalizePlanId(planId) || planId || '').trim().toLowerCase();
     if (!key.startsWith('elite_')) return null;
     if (key.includes('deep_vip')) return 'vip';
     if (key.includes('deep_pro')) return 'pro';
@@ -617,7 +622,8 @@ function buildFixtureVolumeByCycleDay(predictions, policy, now = new Date(), opt
 }
 
 function getMegaAccaDistributionForPlan(planId, now = new Date(), options = {}) {
-    const plan = SUBSCRIPTION_MATRIX[planId];
+    const resolvedPlanId = normalizePlanId(planId) || planId;
+    const plan = SUBSCRIPTION_MATRIX[resolvedPlanId];
     if (!plan) return null;
     const policy = resolveMegaPolicy(plan);
     if (!policy.cycle_total_accas) {
@@ -696,11 +702,12 @@ function enforceUniqueAssetWindow(predictions, plan, now) {
 }
 
 function filterPredictionsForPlan(predictions, planId, now = new Date(), options = {}) {
-    const plan = getPlanCapabilities(planId);
+    const resolvedPlanId = normalizePlanId(planId) || planId;
+    const plan = getPlanCapabilities(resolvedPlanId);
     if (!plan) return [];
 
     const dayName = getTodayName(now);
-    const dailyLimits = calculateDailyAllocations(planId, dayName);
+    const dailyLimits = calculateDailyAllocations(resolvedPlanId, dayName);
     if (!dailyLimits) return [];
 
     let filtered = Array.isArray(predictions) ? predictions.slice() : [];
@@ -719,7 +726,7 @@ function filterPredictionsForPlan(predictions, planId, now = new Date(), options
         });
     }
 
-    filtered = filtered.filter((prediction) => predictionAllowsPlanAccess(prediction, planId));
+    filtered = filtered.filter((prediction) => predictionAllowsPlanAccess(prediction, resolvedPlanId));
 
     const allCategories = [...PLAN_CATEGORIES, ...EXTRA_PLAN_CATEGORIES];
     const buckets = new Map(allCategories.map((category) => [category, []]));
@@ -729,7 +736,7 @@ function filterPredictionsForPlan(predictions, planId, now = new Date(), options
         buckets.get(category).push(cloneWithSectionType(prediction, category));
     }
 
-    const megaDailyAllocation = getMegaAccaDailyAllocation(planId, now, {
+    const megaDailyAllocation = getMegaAccaDailyAllocation(resolvedPlanId, now, {
         subscriptionStart: options.subscriptionStart || options.officialStartTime || null,
         fixtureVolumeByCycleDay: options.fixtureVolumeByCycleDay,
         predictions: filtered
