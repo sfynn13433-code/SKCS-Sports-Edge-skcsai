@@ -42,6 +42,37 @@ const SPORT_FILTER_MAP = {
     cricket: ['cricket']
 };
 
+const DEFAULT_UPCOMING_GRACE_MINUTES = 30;
+const DEFAULT_ACCA_STARTED_LOOKBACK_HOURS = 72;
+const DEFAULT_ACCA_WINDOW_LOOKBACK_HOURS = 168;
+
+function parseBoundedInt(value, fallback, min, max) {
+    const parsed = Number.parseInt(value, 10);
+    if (!Number.isFinite(parsed)) return fallback;
+    return Math.max(min, Math.min(max, parsed));
+}
+
+const UPCOMING_GRACE_MINUTES = parseBoundedInt(
+    process.env.PREDICTION_UPCOMING_GRACE_MINUTES,
+    DEFAULT_UPCOMING_GRACE_MINUTES,
+    0,
+    120
+);
+
+const ACCA_STARTED_LOOKBACK_HOURS = parseBoundedInt(
+    process.env.PREDICTION_ACCA_STARTED_LOOKBACK_HOURS,
+    DEFAULT_ACCA_STARTED_LOOKBACK_HOURS,
+    1,
+    168
+);
+
+const ACCA_WINDOW_LOOKBACK_HOURS = parseBoundedInt(
+    process.env.PREDICTION_ACCA_WINDOW_LOOKBACK_HOURS,
+    DEFAULT_ACCA_WINDOW_LOOKBACK_HOURS,
+    1,
+    336
+);
+
 function startOfWeekUtc(now = new Date()) {
     const current = new Date(now);
     const day = current.getUTCDay();
@@ -545,6 +576,101 @@ function parseMatchKickoff(match) {
     return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+function isAccumulatorLikePrediction(prediction) {
+    const sectionType = inferSectionType(prediction);
+    return sectionType.includes('acca') || sectionType === 'multi';
+}
+
+function computePredictionKickoffStats(prediction, now = new Date()) {
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    const kickoffs = matches.map(parseMatchKickoff).filter(Boolean);
+    const nowMs = now.getTime();
+    const graceCutoffMs = nowMs - (UPCOMING_GRACE_MINUTES * 60 * 1000);
+    const accaLookbackCutoffMs = nowMs - (ACCA_STARTED_LOOKBACK_HOURS * 60 * 60 * 1000);
+    const createdAt = new Date(prediction?.created_at || 0);
+    const createdAtMs = Number.isNaN(createdAt.getTime()) ? null : createdAt.getTime();
+    const isAccumulator = isAccumulatorLikePrediction(prediction);
+
+    const kickoffMs = kickoffs.map((kickoff) => kickoff.getTime());
+    const latestKickoffMs = kickoffMs.length ? Math.max(...kickoffMs) : null;
+    const earliestKickoffMs = kickoffMs.length ? Math.min(...kickoffMs) : null;
+    const hasUpcomingOrGrace = kickoffMs.some((value) => value >= graceCutoffMs);
+    const allUpcomingOrGrace = kickoffMs.length > 0 && kickoffMs.every((value) => value >= graceCutoffMs);
+    const recentlyPublished = createdAtMs !== null && createdAtMs >= accaLookbackCutoffMs;
+
+    return {
+        hasKickoffs: kickoffMs.length > 0,
+        isAccumulator,
+        latestKickoffMs,
+        earliestKickoffMs,
+        hasUpcomingOrGrace,
+        allUpcomingOrGrace,
+        recentlyPublished,
+        graceCutoffMs,
+        accaLookbackCutoffMs
+    };
+}
+
+function getMatchTimingState(kickoff, now = new Date()) {
+    if (!kickoff) return { state: 'unknown', label: 'Unknown' };
+    const nowMs = now.getTime();
+    const kickoffMs = kickoff.getTime();
+    const graceCutoffMs = nowMs - (UPCOMING_GRACE_MINUTES * 60 * 1000);
+    const accaLookbackCutoffMs = nowMs - (ACCA_STARTED_LOOKBACK_HOURS * 60 * 60 * 1000);
+
+    if (kickoffMs >= nowMs) return { state: 'upcoming', label: 'Upcoming' };
+    if (kickoffMs >= graceCutoffMs) return { state: 'live_locked', label: 'Live/Locked' };
+    if (kickoffMs >= accaLookbackCutoffMs) return { state: 'started_locked', label: 'Started/Locked' };
+    return { state: 'stale', label: 'Stale' };
+}
+
+function decoratePredictionWithTiming(prediction, now = new Date()) {
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    if (!matches.length) return prediction;
+
+    const enrichedMatches = matches.map((match) => {
+        const kickoff = parseMatchKickoff(match);
+        const timing = getMatchTimingState(kickoff, now);
+        const metadata = match?.metadata && typeof match.metadata === 'object' ? match.metadata : {};
+        return {
+            ...match,
+            match_state: timing.state,
+            match_state_label: timing.label,
+            metadata: {
+                ...metadata,
+                match_state: timing.state,
+                match_state_label: timing.label
+            }
+        };
+    });
+
+    const states = new Set(enrichedMatches.map((match) => String(match.match_state || '').toLowerCase()));
+    const predictionState = states.has('upcoming')
+        ? 'upcoming'
+        : (states.has('live_locked') || states.has('started_locked'))
+            ? 'live_locked'
+            : states.has('stale')
+                ? 'stale'
+                : 'unknown';
+
+    return {
+        ...prediction,
+        prediction_state: predictionState,
+        prediction_state_label: predictionState === 'live_locked'
+            ? 'Live/Locked'
+            : predictionState === 'upcoming'
+                ? 'Upcoming'
+                : predictionState === 'stale'
+                    ? 'Stale'
+                    : 'Unknown',
+        timing_policy: {
+            upcoming_grace_minutes: UPCOMING_GRACE_MINUTES,
+            acca_started_lookback_hours: ACCA_STARTED_LOOKBACK_HOURS
+        },
+        matches: enrichedMatches
+    };
+}
+
 // FIX 2: OLD DATES BUG - Eject unparseable dates instead of blindly allowing them
 function predictionMatchesWindow(prediction, windowStart, windowEnd) {
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
@@ -559,12 +685,19 @@ function predictionMatchesWindow(prediction, windowStart, windowEnd) {
         kickoffs = [fallbackDate];
     }
 
-    const sectionType = inferSectionType(prediction);
-    if (sectionType.includes('acca') || sectionType === 'multi') {
-        return kickoffs.some((kickoff) => kickoff >= windowStart && kickoff <= windowEnd);
+    if (isAccumulatorLikePrediction(prediction)) {
+        const accaWindowStart = new Date(windowStart.getTime() - (ACCA_WINDOW_LOOKBACK_HOURS * 60 * 60 * 1000));
+        const inKickoffRange = kickoffs.some((kickoff) => kickoff >= accaWindowStart && kickoff <= windowEnd);
+        if (inKickoffRange) return true;
+        const createdAt = new Date(prediction?.created_at || 0);
+        return !Number.isNaN(createdAt.getTime());
     }
 
-    return kickoffs.every((kickoff) => kickoff >= windowStart && kickoff <= windowEnd);
+    const strictWindowPass = kickoffs.every((kickoff) => kickoff >= windowStart && kickoff <= windowEnd);
+    if (strictWindowPass) return true;
+
+    const createdAt = new Date(prediction?.created_at || 0);
+    return !Number.isNaN(createdAt.getTime());
 }
 
 // Hard cutoff: reject any prediction whose earliest kickoff is more than 24 hours in the past
@@ -572,8 +705,8 @@ function predictionIsNotStale(prediction, now = new Date()) {
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
     if (matches.length === 0) return false;
 
-    const kickoffs = matches.map(parseMatchKickoff).filter(Boolean);
-    if (kickoffs.length === 0) {
+    const kickoffStats = computePredictionKickoffStats(prediction, now);
+    if (!kickoffStats.hasKickoffs) {
         // No parseable kickoff dates — use created_at as a safety net
         const created = new Date(prediction.created_at);
         if (isNaN(created.getTime())) return false;
@@ -581,19 +714,31 @@ function predictionIsNotStale(prediction, now = new Date()) {
         return hoursSinceCreation <= 48; // allow up to 48 hours since creation
     }
 
-    const earliestKickoff = new Date(Math.min(...kickoffs.map(k => k.getTime())));
+    if (kickoffStats.isAccumulator) {
+        return (
+            (kickoffStats.latestKickoffMs !== null && kickoffStats.latestKickoffMs >= kickoffStats.accaLookbackCutoffMs)
+            || kickoffStats.recentlyPublished
+        );
+    }
+
+    const earliestKickoff = new Date(kickoffStats.earliestKickoffMs);
     const hoursInPast = (now.getTime() - earliestKickoff.getTime()) / (1000 * 60 * 60);
-    return hoursInPast <= 24; // reject fixtures that kicked off more than 24 hours ago
+    return hoursInPast <= 24 || kickoffStats.recentlyPublished; // read-path resilience for freshly published cards
 }
 
 function predictionHasOnlyUpcomingKickoffs(prediction, now = new Date()) {
-    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
-    if (matches.length === 0) return false;
+    const kickoffStats = computePredictionKickoffStats(prediction, now);
+    if (!kickoffStats.hasKickoffs) return false;
 
-    const kickoffs = matches.map(parseMatchKickoff).filter(Boolean);
-    if (kickoffs.length === 0) return false;
+    if (kickoffStats.isAccumulator) {
+        return (
+            kickoffStats.hasUpcomingOrGrace
+            || (kickoffStats.latestKickoffMs !== null && kickoffStats.latestKickoffMs >= kickoffStats.accaLookbackCutoffMs)
+            || kickoffStats.recentlyPublished
+        );
+    }
 
-    return kickoffs.every((kickoff) => kickoff.getTime() >= now.getTime());
+    return kickoffStats.allUpcomingOrGrace || kickoffStats.recentlyPublished;
 }
 
 function getPredictionPrimaryKickoff(prediction) {
@@ -864,6 +1009,64 @@ async function getLatestPublishRunIdFromFinalTable() {
     return fallbackRunRes.rows[0]?.publish_run_id || null;
 }
 
+async function loadReadPathDbCounts(now = new Date()) {
+    try {
+        const res = await query(
+            `
+            WITH raw_kickoff AS (
+                SELECT
+                    r.id AS raw_id,
+                    COALESCE(
+                        CASE
+                            WHEN COALESCE(r.metadata->>'match_time', '') ~ '^\\d{4}-\\d{2}-\\d{2}'
+                                THEN (r.metadata->>'match_time')::timestamptz
+                            ELSE NULL
+                        END,
+                        CASE
+                            WHEN COALESCE(r.metadata->>'kickoff', '') ~ '^\\d{4}-\\d{2}-\\d{2}'
+                                THEN (r.metadata->>'kickoff')::timestamptz
+                            ELSE NULL
+                        END,
+                        CASE
+                            WHEN COALESCE(r.metadata->>'kickoff_time', '') ~ '^\\d{4}-\\d{2}-\\d{2}'
+                                THEN (r.metadata->>'kickoff_time')::timestamptz
+                            ELSE NULL
+                        END
+                    ) AS kickoff_utc
+                FROM predictions_raw r
+            )
+            SELECT
+                (SELECT COUNT(*)::int FROM predictions_raw) AS predictions_raw_count,
+                (SELECT COUNT(*)::int FROM predictions_filtered WHERE is_valid = true) AS predictions_filtered_valid_count,
+                (
+                    SELECT COUNT(*)::int
+                    FROM predictions_filtered f
+                    JOIN raw_kickoff rk ON rk.raw_id = f.raw_id
+                    WHERE f.is_valid = true
+                      AND rk.kickoff_utc > $1::timestamptz
+                ) AS predictions_filtered_future_count,
+                (SELECT COUNT(*)::int FROM predictions_final) AS predictions_final_count
+            `,
+            [now.toISOString()]
+        );
+
+        return res.rows[0] || {
+            predictions_raw_count: 0,
+            predictions_filtered_valid_count: 0,
+            predictions_filtered_future_count: 0,
+            predictions_final_count: 0
+        };
+    } catch (err) {
+        console.warn('[predictions] failed to load read-path DB counts:', err.message);
+        return {
+            predictions_raw_count: null,
+            predictions_filtered_valid_count: null,
+            predictions_filtered_future_count: null,
+            predictions_final_count: null
+        };
+    }
+}
+
 function resolveQueryTiers(planCapabilities, includeAll = false) {
     const tiers = (Array.isArray(planCapabilities?.tiers) ? planCapabilities.tiers : [])
         .map((tier) => normalizeTierLabel(tier));
@@ -906,6 +1109,7 @@ router.get('/', requireRole('user'), async (req, res) => {
         const queryTiers = resolveQueryTiers(planCapabilities, includeAll);
 
         const now = new Date();
+        const readPathDbCounts = await loadReadPathDbCounts(now);
         let latestPublishRunId = null;
         let publishRunSource = includeAll ? 'include_all_bypass' : 'completed_publish_run';
         if (!includeAll) {
@@ -1117,35 +1321,60 @@ router.get('/', requireRole('user'), async (req, res) => {
             };
         }).map(enrichPredictionDetails);
         const hydratedPredictions = attachRelatedPredictionArtifacts(
-            filterConflictingSecondaryPredictions(dedupePredictions(enrichedPredictions))
-                .map(sanitizePredictionForDisplay)
+            enrichedPredictions.map(sanitizePredictionForDisplay)
         );
 
         const windowStart = new Date(now.getTime() - historyWindowDays * 24 * 60 * 60 * 1000);
         const windowEnd = new Date(now.getTime() + futureWindowDays * 24 * 60 * 60 * 1000);
 
-        const scopeBase = hydratedPredictions
-            .filter((prediction) => predictionMatchesSport(prediction, sportFilterValues))
-            .filter((prediction) => {
-                if (inferSectionType(prediction) !== 'secondary') return true;
-                const firstMatch = Array.isArray(prediction?.matches) ? prediction.matches[0] : null;
-                return isDisplayFriendlySecondaryMarket(firstMatch?.market);
-            });
+        const stageCounts = {
+            source_rows: predictions.length,
+            enriched_rows: enrichedPredictions.length,
+            hydrated_rows: hydratedPredictions.length,
+            sport_filtered_rows: 0,
+            display_filtered_rows: 0,
+            upcoming_gate_rows: 0,
+            stale_gate_rows: 0,
+            window_gate_rows: 0,
+            scoped_rows: 0,
+            plan_filtered_rows: 0
+        };
 
-        const scopedPredictions = (includeAll
-            ? scopeBase
-            : scopeBase
-                .filter((prediction) => predictionHasOnlyUpcomingKickoffs(prediction, now))
-                .filter((prediction) => predictionIsNotStale(prediction, now))
-                .filter((prediction) => predictionMatchesWindow(prediction, windowStart, windowEnd))
-        ).sort((a, b) => includeAll
+        const sportFilteredPredictions = hydratedPredictions.filter((prediction) => predictionMatchesSport(prediction, sportFilterValues));
+        stageCounts.sport_filtered_rows = sportFilteredPredictions.length;
+
+        const displayFilteredPredictions = sportFilteredPredictions.filter((prediction) => {
+            if (inferSectionType(prediction) !== 'secondary') return true;
+            const firstMatch = Array.isArray(prediction?.matches) ? prediction.matches[0] : null;
+            return isDisplayFriendlySecondaryMarket(firstMatch?.market);
+        });
+        stageCounts.display_filtered_rows = displayFilteredPredictions.length;
+
+        let upcomingGatePredictions = displayFilteredPredictions;
+        let staleGatePredictions = displayFilteredPredictions;
+        let windowGatePredictions = displayFilteredPredictions;
+
+        if (!includeAll) {
+            upcomingGatePredictions = displayFilteredPredictions.filter((prediction) => predictionHasOnlyUpcomingKickoffs(prediction, now));
+            staleGatePredictions = upcomingGatePredictions.filter((prediction) => predictionIsNotStale(prediction, now));
+            windowGatePredictions = staleGatePredictions.filter((prediction) => predictionMatchesWindow(prediction, windowStart, windowEnd));
+        }
+
+        stageCounts.upcoming_gate_rows = upcomingGatePredictions.length;
+        stageCounts.stale_gate_rows = staleGatePredictions.length;
+        stageCounts.window_gate_rows = windowGatePredictions.length;
+
+        const scopedPredictions = (includeAll ? displayFilteredPredictions : windowGatePredictions).sort((a, b) => includeAll
             ? (new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
             : comparePredictionsForDisplay(a, b, now));
+        stageCounts.scoped_rows = scopedPredictions.length;
+
+        const scopedWithTiming = scopedPredictions.map((prediction) => decoratePredictionWithTiming(prediction, now));
 
         const planFilteredPredictions = includeAll
-            ? scopedPredictions.slice(0, 2500)
+            ? scopedWithTiming.slice(0, 2500)
             : filterPredictionsForPlan(
-                scopedPredictions,
+                scopedWithTiming,
                 planId,
                 now,
                 {
@@ -1153,12 +1382,23 @@ router.get('/', requireRole('user'), async (req, res) => {
                     subscriptionStart: req.user?.official_start_time || null
                 }
             );
+        stageCounts.plan_filtered_rows = planFilteredPredictions.length;
+
         const megaAccaDailyAllocation = getMegaAccaDailyAllocation(planId, now, {
             subscriptionStart: req.user?.official_start_time || null,
-            predictions: scopedPredictions
+            predictions: scopedWithTiming
         });
         const todayName = moment.tz('Africa/Johannesburg').format('dddd').toLowerCase();
         const dailyLimits = calculateDailyAllocations(planId, todayName);
+
+        const dropCounts = {
+            sport_filter_excluded: Math.max(0, stageCounts.hydrated_rows - stageCounts.sport_filtered_rows),
+            display_filter_excluded: Math.max(0, stageCounts.sport_filtered_rows - stageCounts.display_filtered_rows),
+            upcoming_gate_excluded: Math.max(0, stageCounts.display_filtered_rows - stageCounts.upcoming_gate_rows),
+            stale_gate_excluded: Math.max(0, stageCounts.upcoming_gate_rows - stageCounts.stale_gate_rows),
+            date_window_excluded: Math.max(0, stageCounts.stale_gate_rows - stageCounts.window_gate_rows),
+            plan_filter_excluded: Math.max(0, stageCounts.scoped_rows - stageCounts.plan_filtered_rows)
+        };
 
         res.status(200).json({
             plan_id: planId,
@@ -1178,6 +1418,19 @@ router.get('/', requireRole('user'), async (req, res) => {
                 mega_acca_daily_allocation: megaAccaDailyAllocation,
                 mega_acca_constraints: planCapabilities.capabilities?.mega_acca_constraints || null,
                 mega_acca_policy: planCapabilities.capabilities?.mega_acca_policy || null
+            },
+            read_path_diagnostics: {
+                server_now_utc: now.toISOString(),
+                server_now_sast: moment.tz(now, 'Africa/Johannesburg').format(),
+                include_all: includeAll,
+                gate_config: {
+                    upcoming_grace_minutes: UPCOMING_GRACE_MINUTES,
+                    acca_started_lookback_hours: ACCA_STARTED_LOOKBACK_HOURS,
+                    acca_window_lookback_hours: ACCA_WINDOW_LOOKBACK_HOURS
+                },
+                db_counts: readPathDbCounts,
+                stage_counts: stageCounts,
+                drop_counts: dropCounts
             },
             count: planFilteredPredictions.length,
             predictions: planFilteredPredictions
