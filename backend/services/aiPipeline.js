@@ -11,6 +11,7 @@ const {
     buildCandidateMarkets,
     selectDirectSecondarySameMatch
 } = require('./marketIntelligence');
+const pipelineLogger = require('../utils/pipelineLogger');
 const enrichFixtureWithContext = require('../src/services/contextIntelligence/aiPipeline');
 const adjustProbability = require('../src/services/contextIntelligence/adjustProbability');
 const { resolveDecision } = require('../src/services/marketRouter/waterfall');
@@ -322,9 +323,22 @@ function volatilityFromRiskProfile(riskProfile, fallbackVolatility) {
 }
 
 async function buildRawPredictionFromProviderItem(item) {
+    const telemetry = isObject(item?.telemetry) ? item.telemetry : {};
+    const telemetryRunId = telemetry.run_id || null;
     const normalizationInput = toNormalizationInput(item);
     const matchContext = buildMatchContext(normalizationInput);
-    if (!matchContext) return null;
+    if (!matchContext) {
+        pipelineLogger.rejectionAdd({
+            run_id: telemetryRunId,
+            sport: item?.sport || telemetry?.sport || 'unknown',
+            bucket: 'legacy_schema_reject',
+            metadata: {
+                reason: 'buildMatchContext_returned_null',
+                match_id: item?.match_id || null
+            }
+        });
+        return null;
+    }
     const matchInfo = matchContext?.match_info || {};
 
     const match_id = String(matchInfo.match_id || item.match_id || item.id || '').trim();
@@ -332,6 +346,12 @@ async function buildRawPredictionFromProviderItem(item) {
 
     const sport = normalizeSport(matchContext?.sport || item.sport || 'football');
     const requestedMarket = String(item.market || '1X2').trim();
+    pipelineLogger.stageAdd({
+        run_id: telemetryRunId,
+        sport,
+        stage: 'normalized_count',
+        count: 1
+    });
 
     const scoring = await scoreMatch({
         match_id,
@@ -366,6 +386,20 @@ async function buildRawPredictionFromProviderItem(item) {
     } catch (contextErr) {
         console.warn('[aiPipeline] context enrichment failed for match_id=%s: %s', match_id, contextErr.message);
     }
+    pipelineLogger.stageAdd({
+        run_id: telemetryRunId,
+        sport,
+        stage: 'enriched_count',
+        count: 1
+    });
+    if (!contextEnriched?.contextual_intelligence && !contextFixture?.contextual_intelligence) {
+        pipelineLogger.rejectionAdd({
+            run_id: telemetryRunId,
+            sport,
+            bucket: 'missing_context',
+            metadata: { match_id }
+        });
+    }
 
     const contextSignals = normalizeContextSignals(contextEnriched?.contextSignals);
     const p_adj = adjustProbability(p_base, contextSignals);
@@ -375,22 +409,80 @@ async function buildRawPredictionFromProviderItem(item) {
     const marketIntelligence = buildCandidateMarkets(
         waterfallProbabilities,
         effectiveMatchContext,
-        { contextSignals }
+        {
+            contextSignals,
+            telemetry: {
+                run_id: telemetryRunId,
+                sport
+            }
+        }
     );
+    pipelineLogger.stageAdd({
+        run_id: telemetryRunId,
+        sport,
+        stage: 'market_scored_count',
+        count: 1
+    });
     const marketSelections = selectDirectSecondarySameMatch(
         marketIntelligence.candidates,
         effectiveMatchContext,
-        { contextSignals, riskProfile: marketIntelligence.risk_profile }
+        {
+            contextSignals,
+            riskProfile: marketIntelligence.risk_profile,
+            telemetry: {
+                run_id: telemetryRunId,
+                sport
+            }
+        }
     );
+    if (marketSelections?.direct || marketSelections?.secondary) {
+        pipelineLogger.stageAdd({
+            run_id: telemetryRunId,
+            sport,
+            stage: 'post_conflict_count',
+            count: 1
+        });
+    } else {
+        pipelineLogger.rejectionAdd({
+            run_id: telemetryRunId,
+            sport,
+            bucket: 'conflict_reject',
+            metadata: { match_id }
+        });
+    }
     const waterfallDecision = resolveDecision(waterfallProbabilities);
 
     if (marketIntelligence.risk_profile?.reject) {
         console.log('[aiPipeline] risk-rejection fixture skipped match_id=%s aggregate_risk=%s', match_id, marketIntelligence.risk_profile.aggregate_risk);
+        pipelineLogger.rejectionAdd({
+            run_id: telemetryRunId,
+            sport,
+            bucket: 'validation_reject',
+            metadata: {
+                match_id,
+                reason: 'risk_profile_reject'
+            }
+        });
         return null;
     }
 
     if (waterfallDecision.status === 'no_bet' && !marketSelections.direct) {
         console.log('[aiPipeline] no-bet fixture skipped match_id=%s phase=%s', match_id, waterfallDecision.phase);
+        pipelineLogger.rejectionAdd({
+            run_id: telemetryRunId,
+            sport,
+            bucket: 'publish_skip',
+            metadata: {
+                match_id,
+                reason: 'waterfall_no_bet'
+            }
+        });
+        pipelineLogger.rejectionAdd({
+            run_id: telemetryRunId,
+            sport,
+            bucket: 'low_confidence',
+            metadata: { match_id }
+        });
         return null;
     }
 
@@ -486,7 +578,24 @@ async function buildRawPredictionFromProviderItem(item) {
         }
     };
 
-    validateRawPredictionInput(raw);
+    try {
+        validateRawPredictionInput(raw);
+    } catch (validationError) {
+        pipelineLogger.rejectionAdd({
+            run_id: telemetryRunId,
+            sport,
+            bucket: 'validation_reject',
+            reason: validationError.message,
+            metadata: { match_id }
+        });
+        throw validationError;
+    }
+    pipelineLogger.stageAdd({
+        run_id: telemetryRunId,
+        sport,
+        stage: 'post_validation_count',
+        count: 1
+    });
     return raw;
 }
 
@@ -514,7 +623,7 @@ async function insertRawPrediction(pred, client) {
     return res.rows[0];
 }
 
-async function runPipelineForMatches({ matches }) {
+async function runPipelineForMatches({ matches, telemetry = {} }) {
     if (!Array.isArray(matches) || matches.length === 0) {
         throw new Error('matches must be a non-empty array');
     }
@@ -529,13 +638,16 @@ async function runPipelineForMatches({ matches }) {
     try {
         return await withTransaction(async (client) => {
             const inserted = [];
+            let normalValid = 0;
+            let normalInvalid = 0;
 
         console.log('[aiPipeline] manual matches input count=%s', matches.length);
 
         for (const item of matches) {
             const raw = await buildRawPredictionFromProviderItem({
                 ...item,
-                data_mode: 'manual'
+                data_mode: 'manual',
+                telemetry
             });
             if (!raw) continue;
             const row = await insertRawPrediction(raw, client);
@@ -550,12 +662,34 @@ async function runPipelineForMatches({ matches }) {
             const n = await filterRawPrediction({ rawId: row.id, tier: 'normal' }, client);
             const d = await filterRawPrediction({ rawId: row.id, tier: 'deep' }, client);
             filtered.push(n, d);
+            if (n?.is_valid) {
+                normalValid += 1;
+            } else {
+                normalInvalid += 1;
+                pipelineLogger.rejectionAdd({
+                    run_id: telemetry?.run_id || null,
+                    sport: row?.sport || telemetry?.sport || 'unknown',
+                    bucket: 'validation_reject',
+                    reason: n?.reject_reason || null,
+                    metadata: {
+                        raw_id: row?.id || null,
+                        tier: 'normal'
+                    }
+                });
+            }
         }
 
         for (const f of filtered) {
             if (f.is_valid) filteredValid++;
             else filteredInvalid++;
         }
+
+        pipelineLogger.stageSet({
+            run_id: telemetry?.run_id || null,
+            sport: telemetry?.sport || 'unknown',
+            stage: 'post_validation_count',
+            count: normalValid
+        });
 
         console.log('[aiPipeline] inserted_raw=%s filtered_valid=%s filtered_invalid=%s', inserted.length, filteredValid, filteredInvalid);
 
@@ -564,7 +698,11 @@ async function runPipelineForMatches({ matches }) {
                 inserted,
                 filtered,
                 filtered_valid: filteredValid,
-                filtered_invalid: filteredInvalid
+                filtered_invalid: filteredInvalid,
+                telemetry: {
+                    normal_valid: normalValid,
+                    normal_invalid: normalInvalid
+                }
             };
         });
     } finally {
@@ -663,7 +801,8 @@ async function rebuildFinalOutputs(options = {}) {
     try {
         const buildOptions = {
             publishRunId: publishRun.id,
-            requestedSports
+            requestedSports,
+            telemetryRunId: options.telemetryRunId || null
         };
         const deep = await buildFinalForTier('deep', buildOptions);
         const normal = await buildFinalForTier('normal', buildOptions);

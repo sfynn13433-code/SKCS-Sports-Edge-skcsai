@@ -2,6 +2,7 @@
 
 const { query, withTransaction } = require('../db');
 const { validateRawPredictionInput } = require('../utils/validation');
+const pipelineLogger = require('../utils/pipelineLogger');
 const { filterRawPrediction } = require('./filterEngine');
 const { getPredictionInputs } = require('./dataProvider');
 const { scoreMatch } = require('./aiScoring');
@@ -447,6 +448,53 @@ function normalizeSportKey(value) {
     if (sport.startsWith('baseball_')) return 'baseball';
     if (sport.startsWith('rugbyunion_')) return 'rugby';
     return sport;
+}
+
+function resolveTelemetryRunId(options = {}) {
+    return options?.telemetryRunId || options?.telemetry_run_id || null;
+}
+
+function addStageBySport(runId, stage, sportCounts = new Map()) {
+    for (const [sport, count] of sportCounts.entries()) {
+        pipelineLogger.stageAdd({
+            run_id: runId,
+            sport,
+            stage,
+            count
+        });
+    }
+}
+
+function collectSportCountsFromPredictions(predictions = []) {
+    const counts = new Map();
+    for (const prediction of Array.isArray(predictions) ? predictions : []) {
+        const metadata = getMetadata(prediction);
+        const sport = normalizeSportKey(prediction?.sport || metadata?.sport || metadata?.sport_key || 'unknown');
+        counts.set(sport, (counts.get(sport) || 0) + 1);
+    }
+    return counts;
+}
+
+function collectSportCountsFromMatches(rows = []) {
+    const counts = new Map();
+    for (const row of Array.isArray(rows) ? rows : []) {
+        const matches = Array.isArray(row?.matches) ? row.matches : [];
+        const matchSports = new Set();
+        for (const match of matches) {
+            const metadata = match?.metadata || {};
+            const sport = normalizeSportKey(match?.sport || metadata?.sport || metadata?.sport_key || row?.sport || 'unknown');
+            matchSports.add(sport);
+        }
+        if (!matchSports.size) {
+            const fallbackSport = normalizeSportKey(row?.sport || 'unknown');
+            counts.set(fallbackSport, (counts.get(fallbackSport) || 0) + 1);
+            continue;
+        }
+        for (const sport of matchSports) {
+            counts.set(sport, (counts.get(sport) || 0) + 1);
+        }
+    }
+    return counts;
 }
 
 function getSportTypeLabel(sportKey) {
@@ -2151,6 +2199,7 @@ async function loadValidFilteredPredictions(tier, client, options = {}) {
     const t = normalizeTier(tier);
     const requestedSports = normalizeRequestedSports(options.requestedSports);
     const now = options.now instanceof Date ? options.now : new Date();
+    const telemetryRunId = resolveTelemetryRunId(options);
 
     const res = await client.query(
         `
@@ -2196,17 +2245,67 @@ async function loadValidFilteredPredictions(tier, client, options = {}) {
         [t, now.toISOString()]
     );
 
-    const futureRows = filterExpiredFixtures(
-        res.rows.map((row) => ({
+    const mappedRows = res.rows.map((row) => ({
             ...row,
             date: row.kickoff_utc || row?.metadata?.match_time || row?.metadata?.kickoff || row?.metadata?.kickoff_time || null
-        }))
-    );
+        }));
+    const futureRows = filterExpiredFixtures(mappedRows);
+    const dateExcluded = mappedRows.length - futureRows.length;
+    if (dateExcluded > 0) {
+        const perSportDateExcluded = new Map();
+        for (const row of mappedRows) {
+            if (futureRows.includes(row)) continue;
+            const sport = normalizeSportKey(row?.sport || 'unknown');
+            perSportDateExcluded.set(sport, (perSportDateExcluded.get(sport) || 0) + 1);
+        }
+        for (const [sport, count] of perSportDateExcluded.entries()) {
+            pipelineLogger.rejectionAdd({
+                run_id: telemetryRunId,
+                sport,
+                bucket: 'date_window_exclude',
+                count,
+                metadata: { stage: 'loadValidFilteredPredictions' }
+            });
+        }
+    }
 
-    return futureRows
-        .filter((row) => requestedSports.length === 0 || requestedSports.includes(normalizeSportKey(row.sport)))
-        .filter((row) => isPublishablePrediction(row, t, now))
-        .sort((a, b) => compareCandidates(a, b, now));
+    const sportFiltered = [];
+    for (const row of futureRows) {
+        const sport = normalizeSportKey(row?.sport || 'unknown');
+        const allowed = requestedSports.length === 0 || requestedSports.includes(sport);
+        if (!allowed) {
+            pipelineLogger.rejectionAdd({
+                run_id: telemetryRunId,
+                sport,
+                bucket: 'sport_key_mismatch',
+                metadata: { stage: 'loadValidFilteredPredictions' }
+            });
+            continue;
+        }
+        sportFiltered.push(row);
+    }
+
+    const publishable = [];
+    for (const row of sportFiltered) {
+        const sport = normalizeSportKey(row?.sport || 'unknown');
+        const allowed = isPublishablePrediction(row, t, now);
+        if (!allowed) {
+            pipelineLogger.rejectionAdd({
+                run_id: telemetryRunId,
+                sport,
+                bucket: 'validation_reject',
+                metadata: {
+                    stage: 'isPublishablePrediction',
+                    tier: t,
+                    raw_id: row?.raw_id || null
+                }
+            });
+            continue;
+        }
+        publishable.push(row);
+    }
+
+    return publishable.sort((a, b) => compareCandidates(a, b, now));
 }
 
 function normalizeTeamToken(value) {
@@ -2442,6 +2541,52 @@ async function insertFinalRow({ publish_run_id, tier, type, matches, total_confi
     return res.rows[0];
 }
 
+async function insertDebugPublishedRow({ publish_run_id, tier, sport, candidate, rejection_metadata }, client) {
+    const res = await client.query(
+        `
+        INSERT INTO debug_published (publish_run_id, tier, sport, candidate, rejection_metadata)
+        VALUES ($1, $2, $3, $4::jsonb, $5::jsonb)
+        RETURNING *;
+        `,
+        [
+            publish_run_id || null,
+            tier || null,
+            normalizeSportKey(sport || 'unknown'),
+            JSON.stringify(candidate || {}),
+            JSON.stringify(rejection_metadata || {})
+        ]
+    );
+
+    return res.rows[0];
+}
+
+function extractKickoffForDiagnostics(rows = []) {
+    const kickoffs = [];
+    for (const row of Array.isArray(rows) ? rows : []) {
+        const matches = Array.isArray(row?.matches) ? row.matches : [];
+        for (const match of matches) {
+            const metadata = match?.metadata || {};
+            const raw =
+                match?.commence_time
+                || match?.match_date
+                || metadata?.match_time
+                || metadata?.kickoff
+                || metadata?.kickoff_time
+                || null;
+            if (!raw) continue;
+            const parsed = new Date(raw);
+            if (Number.isNaN(parsed.getTime())) continue;
+            kickoffs.push(parsed);
+        }
+    }
+    if (!kickoffs.length) return null;
+    kickoffs.sort((a, b) => a.getTime() - b.getTime());
+    return {
+        earliest_kickoff_utc: kickoffs[0].toISOString(),
+        latest_kickoff_utc: kickoffs[kickoffs.length - 1].toISOString()
+    };
+}
+
 
 function initAccaPublishDiagnostics() {
     return {
@@ -2559,6 +2704,7 @@ async function buildFinalForTier(tier, options = {}) {
     const t = normalizeTier(tier);
     const publishRunId = options.publishRunId || null;
     const now = options.now instanceof Date ? options.now : new Date();
+    const telemetryRunId = resolveTelemetryRunId(options);
 
     return withTransaction(async (client) => {
         await getTierRules(t, client);
@@ -2566,7 +2712,8 @@ async function buildFinalForTier(tier, options = {}) {
 
         const valid = await loadValidFilteredPredictions(t, client, {
             requestedSports: options.requestedSports,
-            now
+            now,
+            telemetryRunId
         });
         const weekLockedTeamCompetitionMap = await loadWeekLockedTeamCompetitionMap(client, now);
         const runTeamCompetitionMap = new Map();
@@ -2581,6 +2728,11 @@ async function buildFinalForTier(tier, options = {}) {
         // Limit candidates to prevent combinatorial explosion and timeouts
         const MAX_ACCA_CANDIDATES = 320;
         const limitedCandidates = perSportLimited.slice(0, MAX_ACCA_CANDIDATES);
+        addStageBySport(
+            telemetryRunId,
+            'candidate_count',
+            collectSportCountsFromPredictions(limitedCandidates)
+        );
         const baseAccaInput = filterAvailablePredictions(
             limitedCandidates,
             globalUsedFixtures,
@@ -2668,6 +2820,19 @@ async function buildFinalForTier(tier, options = {}) {
             }
 
             if (!candidateRow) {
+                const fallbackSport = step.legCount === 12
+                    ? normalizeSportKey(candidatePool[0]?.sport || 'unknown')
+                    : normalizeSportKey(step.profile === 'football_only' ? 'football' : (candidatePool[0]?.sport || 'unknown'));
+                pipelineLogger.rejectionAdd({
+                    run_id: telemetryRunId,
+                    sport: fallbackSport,
+                    bucket: 'publish_skip',
+                    metadata: {
+                        tier: t,
+                        step_type: step.type,
+                        reason: 'candidate_row_not_built'
+                    }
+                });
                 if (step.legCount === 12) {
                     megaDiagnostics.mega_rejected_for_insufficient_legs += 1;
                     console.log('[accaBuilder] %s: no candidates from pool (pool_size=%s)', step.type, candidatePool.length);
@@ -2677,6 +2842,17 @@ async function buildFinalForTier(tier, options = {}) {
 
             const familyCapState = exceedsFamilyCaps(candidateRow, step.legCount);
             if (familyCapState.exceeded) {
+                pipelineLogger.rejectionAdd({
+                    run_id: telemetryRunId,
+                    sport: normalizeSportKey(candidateRow?.matches?.[0]?.sport || candidatePool[0]?.sport || 'unknown'),
+                    bucket: 'consistency_reject',
+                    metadata: {
+                        tier: t,
+                        step_type: step.type,
+                        reason: 'family_cap_exceeded',
+                        exceeded: familyCapState.exceededFamilies
+                    }
+                });
                 if (step.legCount === 12) {
                     megaDiagnostics.mega_rejected_for_family_caps += Math.max(1, familyCapState.exceededFamilies.length);
                     console.log('[accaBuilder] %s: card rejected for family caps %s', step.type, JSON.stringify(familyCapState.exceededFamilies));
@@ -2689,6 +2865,16 @@ async function buildFinalForTier(tier, options = {}) {
             }
 
             if (step.legCount === 12 && !hasMinimumMarketDiversity(candidateRow)) {
+                pipelineLogger.rejectionAdd({
+                    run_id: telemetryRunId,
+                    sport: normalizeSportKey(candidateRow?.matches?.[0]?.sport || candidatePool[0]?.sport || 'unknown'),
+                    bucket: 'consistency_reject',
+                    metadata: {
+                        tier: t,
+                        step_type: step.type,
+                        reason: 'low_market_diversity'
+                    }
+                });
                 megaDiagnostics.mega_rejected_for_low_diversity += 1;
                 console.log('[accaBuilder] %s: card rejected for low market diversity (<%s families)', step.type, MIN_FAMILIES_PER_CARD);
                 addCardFixtureKeysToSet(candidateRow, usedFixtureKeys);
@@ -2699,6 +2885,17 @@ async function buildFinalForTier(tier, options = {}) {
             // SKCS LAW: Card overlap rejection
             const overlapResult = exceedsCardOverlapLimit(candidateRow, publishedCards);
             if (overlapResult.reject) {
+                pipelineLogger.rejectionAdd({
+                    run_id: telemetryRunId,
+                    sport: normalizeSportKey(candidateRow?.matches?.[0]?.sport || candidatePool[0]?.sport || 'unknown'),
+                    bucket: 'conflict_reject',
+                    metadata: {
+                        tier: t,
+                        step_type: step.type,
+                        reason: 'card_overlap_limit',
+                        overlap: overlapResult.overlap
+                    }
+                });
                 accaPublishDiagnostics.duplicate_card_rejections += 1;
                 accaPublishDiagnostics.published_card_overlap_counts.push({
                     type: step.type,
@@ -2716,6 +2913,16 @@ async function buildFinalForTier(tier, options = {}) {
 
             // SKCS LAW: Weekly team lock check on this card
             if (cardWeeklyLockViolation(candidateRow, usedTeamsWeekly)) {
+                pipelineLogger.rejectionAdd({
+                    run_id: telemetryRunId,
+                    sport: normalizeSportKey(candidateRow?.matches?.[0]?.sport || candidatePool[0]?.sport || 'unknown'),
+                    bucket: 'weekly_lock_reject',
+                    metadata: {
+                        tier: t,
+                        step_type: step.type,
+                        reason: 'card_weekly_lock_violation'
+                    }
+                });
                 accaPublishDiagnostics.weekly_team_lock_hits += 1;
                 if (step.legCount === 12) megaDiagnostics.mega_rejected_for_weekly_team_lock += 1;
                 console.log('[accaBuilder] %s: card rejected by weekly team lock', step.type);
@@ -2734,6 +2941,16 @@ async function buildFinalForTier(tier, options = {}) {
                 );
 
                 if (!retryRow || cardWeeklyLockViolation(retryRow, usedTeamsWeekly)) {
+                    pipelineLogger.rejectionAdd({
+                        run_id: telemetryRunId,
+                        sport: normalizeSportKey(candidateRow?.matches?.[0]?.sport || candidatePool[0]?.sport || 'unknown'),
+                        bucket: 'publish_skip',
+                        metadata: {
+                            tier: t,
+                            step_type: step.type,
+                            reason: 'weekly_lock_retry_failed'
+                        }
+                    });
                     continue;
                 }
 
@@ -2813,6 +3030,17 @@ async function buildFinalForTier(tier, options = {}) {
                 accaRows.push(inserted);
                 candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, new Map());
                 console.log('[accaBuilder] fallback acca_6match published.');
+            } else {
+                pipelineLogger.rejectionAdd({
+                    run_id: telemetryRunId,
+                    sport: 'football',
+                    bucket: 'publish_skip',
+                    metadata: {
+                        tier: t,
+                        step_type: 'acca_6match',
+                        reason: 'fallback_card_not_publishable'
+                    }
+                });
             }
         }
 
@@ -2849,6 +3077,17 @@ async function buildFinalForTier(tier, options = {}) {
                 megaDiagnostics.mega_final_cards_built += 1;
                 candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, new Map());
                 console.log('[accaBuilder] fallback mega_acca_12 published.');
+            } else {
+                pipelineLogger.rejectionAdd({
+                    run_id: telemetryRunId,
+                    sport: normalizeSportKey(fallbackPool[0]?.sport || 'unknown'),
+                    bucket: 'publish_skip',
+                    metadata: {
+                        tier: t,
+                        step_type: 'mega_acca_12',
+                        reason: 'fallback_card_not_publishable'
+                    }
+                });
             }
         }
 
@@ -2966,6 +3205,89 @@ async function buildFinalForTier(tier, options = {}) {
                 risk_level: riskLevelFromConfidence(total)
             }, client);
             secondaryRows.push(row);
+        }
+
+        const insightRowsInserted = directRows.length + secondaryRows.length + sameMatchRows.length + multiRows.length;
+        const accaRowsInserted = accaRows.length + megaAccaRows.length;
+        const allPublishedRows = [
+            ...directRows,
+            ...secondaryRows,
+            ...sameMatchRows,
+            ...multiRows,
+            ...accaRows,
+            ...megaAccaRows
+        ];
+        addStageBySport(
+            telemetryRunId,
+            'published_count',
+            collectSportCountsFromMatches(allPublishedRows)
+        );
+
+        const kickoffDiagnostics = extractKickoffForDiagnostics(allPublishedRows);
+        const publishDates = allPublishedRows
+            .map((row) => new Date(row?.created_at || 0))
+            .filter((value) => !Number.isNaN(value.getTime()))
+            .sort((a, b) => a.getTime() - b.getTime());
+        const uiFilterStart = new Date(now.getTime() - (24 * 60 * 60 * 1000)).toISOString();
+        const uiFilterEnd = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000)).toISOString();
+        const publishDateStored = publishDates.length ? publishDates[publishDates.length - 1].toISOString() : null;
+
+        console.log(
+            '[accaBuilder][publish_counts] tier=%s insights_rows=%s acca_rows=%s total_rows=%s',
+            t,
+            insightRowsInserted,
+            accaRowsInserted,
+            allPublishedRows.length
+        );
+        console.log('[accaBuilder][timezone_diagnostics] %s', JSON.stringify({
+            tier: t,
+            server_now_utc: now.toISOString(),
+            extracted_kickoff_date_stored: kickoffDiagnostics,
+            publish_date_stored: publishDateStored,
+            ui_filter_bounds: {
+                start_utc: uiFilterStart,
+                end_utc: uiFilterEnd
+            }
+        }));
+
+        const candidateCountTotal = Array.isArray(limitedCandidates) ? limitedCandidates.length : 0;
+        if (candidateCountTotal > 0 && allPublishedRows.length === 0) {
+            const baseSafePool = Array.isArray(accaMarketCandidates) && accaMarketCandidates.length
+                ? accaMarketCandidates
+                : limitedCandidates;
+            const safeCandidates = baseSafePool
+                .filter((candidate) => !isPredictionHighRisk(candidate, { forMega: false }))
+                .sort(compareAccaCandidatePreference)
+                .slice(0, 3);
+            const forcedRows = safeCandidates.length ? safeCandidates : baseSafePool.slice(0, 3);
+
+            for (const candidate of forcedRows) {
+                const candidateSport = normalizeSportKey(candidate?.sport || candidate?.metadata?.sport || 'unknown');
+                await insertDebugPublishedRow({
+                    publish_run_id: publishRunId,
+                    tier: t,
+                    sport: candidateSport,
+                    candidate,
+                    rejection_metadata: {
+                        reason: 'candidate_count_gt_zero_but_published_zero',
+                        tier: t,
+                        candidate_count: candidateCountTotal,
+                        telemetry_run_id: telemetryRunId,
+                        captured_at: new Date().toISOString()
+                    }
+                }, client);
+                pipelineLogger.rejectionAdd({
+                    run_id: telemetryRunId,
+                    sport: candidateSport,
+                    bucket: 'publish_skip',
+                    metadata: {
+                        tier: t,
+                        reason: 'debug_published_forced_store'
+                    }
+                });
+            }
+
+            console.warn('[accaBuilder] forced debug publish mode activated: stored %s candidate(s) in debug_published.', forcedRows.length);
         }
 
         console.log('[accaBuilder] tier=%s week_locked=%s direct=%s secondary=%s same_match=%s multi=%s acca_6match=%s mega_acca_12=%s',

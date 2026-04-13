@@ -9,6 +9,7 @@ const {
     isTwelveLegRestrictedMarket,
     DIRECT_SAFE_MARKETS
 } = require('../services/marketIntelligence');
+const pipelineLogger = require('./pipelineLogger');
 
 /**
  * SKCS ACCA ENGINE — CORE LAW
@@ -839,6 +840,21 @@ function insightMatchesFallbackPass(insight, pass) {
     return true;
 }
 
+function resolveTelemetryForFixture(fixture, options = {}) {
+    const telemetry = options?.telemetry && typeof options.telemetry === 'object' ? options.telemetry : {};
+    const sport = String(
+        telemetry.sport
+        || fixture?.sport
+        || fixture?.metadata?.sport
+        || fixture?.metadata?.sport_key
+        || 'unknown'
+    ).trim().toLowerCase();
+    return {
+        run_id: telemetry.run_id || null,
+        sport: sport || 'unknown'
+    };
+}
+
 /**
  * Pick the best eligible insight for one fixture with:
  * - banned market filtering
@@ -847,6 +863,7 @@ function insightMatchesFallbackPass(insight, pass) {
  * - confidence guardrails
  */
 function pickBestInsightForFixture(fixture, options = {}) {
+    const telemetry = resolveTelemetryForFixture(fixture, options);
     const minConfidence = Math.max(80, Number(options.minConfidence ?? MIN_LEG_CONFIDENCE));
     const maxConfidence = MAX_LEG_CONFIDENCE;
     const familyCounts = options.familyCounts || {};
@@ -896,20 +913,43 @@ function pickBestInsightForFixture(fixture, options = {}) {
         .sort((a, b) => b.selectionScore - a.selectionScore);
 
     let scoped = [];
+    let selectedPass = 'none';
     for (const pass of FALLBACK_GENERATION_LADDER) {
         const passRows = scored.filter((insight) => insightMatchesFallbackPass(insight, pass));
         if (passRows.length) {
             scoped = passRows;
+            selectedPass = pass.pass;
             break;
         }
     }
 
     if (!scoped.length) {
         scoped = scored.filter((insight) => DIRECT_SAFE_MARKETS.has(normalizeMarketKey(insight?.market || insight?.type || '')));
+        if (scoped.length) selectedPass = 'forced_safe_pool';
     }
 
     if (!scoped.length) {
         scoped = scored;
+        if (scoped.length) selectedPass = 'forced_top';
+    }
+
+    pipelineLogger.recordFallback({
+        run_id: telemetry.run_id,
+        sport: telemetry.sport,
+        pre_fallback_count: scored.length,
+        post_fallback_count: scoped.length,
+        post_validation_after_fallback_count: scoped.length
+    });
+    if (scored.length > 0 && scoped.length === 0) {
+        pipelineLogger.rejectionAdd({
+            run_id: telemetry.run_id,
+            sport: telemetry.sport,
+            bucket: 'low_confidence',
+            metadata: {
+                reason: 'insight_fallback_empty',
+                selected_pass: selectedPass
+            }
+        });
     }
 
     // Apply build order preference: try families in construction order

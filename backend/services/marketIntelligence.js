@@ -1,5 +1,7 @@
 'use strict';
 
+const pipelineLogger = require('../utils/pipelineLogger');
+
 const SKCS_MARKET_CATEGORIES = Object.freeze({
     core_safe_markets: [
         'home_win',
@@ -207,6 +209,20 @@ function normalizeRisk(value, fallback = 0) {
     if (!Number.isFinite(n)) return fallback;
     if (n > 1 && n <= 100) return clamp(n / 100, 0, 1);
     return clamp(n, 0, 1);
+}
+
+function resolveTelemetry(options = {}, matchContext = {}) {
+    const telemetry = options?.telemetry && typeof options.telemetry === 'object' ? options.telemetry : {};
+    const sport = String(
+        telemetry.sport
+        || matchContext?.sport
+        || matchContext?.match_info?.sport
+        || 'unknown'
+    ).trim().toLowerCase();
+    return {
+        run_id: telemetry.run_id || null,
+        sport: sport || 'unknown'
+    };
 }
 
 function weatherRisk(context) {
@@ -622,8 +638,16 @@ function buildCandidateMarkets(probabilitiesInput = {}, matchContext = {}, optio
 function applyFallbackLadder(candidates, options = {}) {
     const requireCount = Number.isFinite(Number(options.requireCount)) ? Number(options.requireCount) : 1;
     const normalized = Array.isArray(candidates) ? candidates.slice() : [];
+    const telemetry = resolveTelemetry(options);
 
     if (!normalized.length) {
+        pipelineLogger.recordFallback({
+            run_id: telemetry.run_id,
+            sport: telemetry.sport,
+            pre_fallback_count: 0,
+            post_fallback_count: 0,
+            post_validation_after_fallback_count: 0
+        });
         return { pass: 'none', candidates: [] };
     }
 
@@ -640,6 +664,24 @@ function applyFallbackLadder(candidates, options = {}) {
         });
 
         if (subset.length >= requireCount) {
+            const lowConfidenceDrops = normalized.filter((candidate) =>
+                Number(candidate?.confidence || 0) < pass.min_confidence
+            ).length;
+            if (lowConfidenceDrops > 0) {
+                pipelineLogger.rejectionAdd({
+                    run_id: telemetry.run_id,
+                    sport: telemetry.sport,
+                    bucket: 'low_confidence',
+                    count: lowConfidenceDrops
+                });
+            }
+            pipelineLogger.recordFallback({
+                run_id: telemetry.run_id,
+                sport: telemetry.sport,
+                pre_fallback_count: normalized.length,
+                post_fallback_count: subset.length,
+                post_validation_after_fallback_count: subset.length
+            });
             return {
                 pass: pass.pass,
                 candidates: subset
@@ -649,6 +691,22 @@ function applyFallbackLadder(candidates, options = {}) {
 
     const fallbackDirectSafe = normalized.filter((candidate) => DIRECT_SAFE_MARKETS.has(normalizeMarketKey(candidate?.market || '')));
     if (fallbackDirectSafe.length >= requireCount) {
+        const lowConfidenceDrops = normalized.filter((candidate) => Number(candidate?.confidence || 0) < 80).length;
+        if (lowConfidenceDrops > 0) {
+            pipelineLogger.rejectionAdd({
+                run_id: telemetry.run_id,
+                sport: telemetry.sport,
+                bucket: 'low_confidence',
+                count: lowConfidenceDrops
+            });
+        }
+        pipelineLogger.recordFallback({
+            run_id: telemetry.run_id,
+            sport: telemetry.sport,
+            pre_fallback_count: normalized.length,
+            post_fallback_count: fallbackDirectSafe.length,
+            post_validation_after_fallback_count: fallbackDirectSafe.length
+        });
         return {
             pass: 'forced_safe_pool',
             candidates: fallbackDirectSafe.map((candidate) => ({
@@ -658,14 +716,22 @@ function applyFallbackLadder(candidates, options = {}) {
         };
     }
 
+    const forcedTop = normalized
+        .slice(0, Math.max(requireCount, 1))
+        .map((candidate) => ({
+            ...candidate,
+            confidence: Number(candidate?.confidence || 0) < 80 ? 80 : candidate.confidence
+        }));
+    pipelineLogger.recordFallback({
+        run_id: telemetry.run_id,
+        sport: telemetry.sport,
+        pre_fallback_count: normalized.length,
+        post_fallback_count: forcedTop.length,
+        post_validation_after_fallback_count: forcedTop.length
+    });
     return {
         pass: 'forced_top',
-        candidates: normalized
-            .slice(0, Math.max(requireCount, 1))
-            .map((candidate) => ({
-                ...candidate,
-                confidence: Number(candidate?.confidence || 0) < 80 ? 80 : candidate.confidence
-            }))
+        candidates: forcedTop
     };
 }
 
@@ -772,16 +838,33 @@ function filterConflictingCandidates(candidates, seedSelections = [], options = 
     const maxVolatile = Number.isFinite(Number(options.maxVolatile)) ? Number(options.maxVolatile) : 2;
     const locked = Array.isArray(seedSelections) ? seedSelections.slice() : [];
     const out = [];
+    const telemetry = resolveTelemetry(options);
     let volatileCount = locked.filter((row) => VOLATILE_MARKETS_12_LEG.has(normalizeMarketKey(row?.market))).length;
+    let conflictRejectCount = 0;
 
     for (const candidate of Array.isArray(candidates) ? candidates : []) {
         const key = normalizeMarketKey(candidate?.market);
         if (!key) continue;
-        if (VOLATILE_MARKETS_12_LEG.has(key) && volatileCount >= maxVolatile) continue;
+        if (VOLATILE_MARKETS_12_LEG.has(key) && volatileCount >= maxVolatile) {
+            conflictRejectCount += 1;
+            continue;
+        }
         const hasConflict = locked.concat(out).some((row) => areMarketsConflicting(candidate, row));
-        if (hasConflict) continue;
+        if (hasConflict) {
+            conflictRejectCount += 1;
+            continue;
+        }
         out.push(candidate);
         if (VOLATILE_MARKETS_12_LEG.has(key)) volatileCount += 1;
+    }
+
+    if (conflictRejectCount > 0) {
+        pipelineLogger.rejectionAdd({
+            run_id: telemetry.run_id,
+            sport: telemetry.sport,
+            bucket: 'conflict_reject',
+            count: conflictRejectCount
+        });
     }
 
     return out;
@@ -801,10 +884,24 @@ function strictSameMatchGate(matchContext, riskProfile) {
 }
 
 function selectDirectSecondarySameMatch(candidates, matchContext = {}, options = {}) {
+    const telemetry = resolveTelemetry(options, matchContext);
     const riskProfile = options.riskProfile || buildRiskProfile(matchContext, options.contextSignals || {});
     const ranked = Array.isArray(candidates) ? candidates.slice() : [];
-    const ladder = applyFallbackLadder(ranked, { requireCount: 2 });
-    const filtered = filterConflictingCandidates(ladder.candidates, [], { maxVolatile: options.forMega ? 1 : 2 });
+    const ladder = applyFallbackLadder(ranked, {
+        requireCount: 2,
+        telemetry
+    });
+    const filtered = filterConflictingCandidates(ladder.candidates, [], {
+        maxVolatile: options.forMega ? 1 : 2,
+        telemetry
+    });
+    pipelineLogger.recordFallback({
+        run_id: telemetry.run_id,
+        sport: telemetry.sport,
+        pre_fallback_count: 0,
+        post_fallback_count: 0,
+        post_validation_after_fallback_count: filtered.length
+    });
 
     const direct = filtered.find((candidate) => (
         candidate.priority_tier <= 2
@@ -828,6 +925,18 @@ function selectDirectSecondarySameMatch(candidates, matchContext = {}, options =
         && secondary.confidence >= 64
         && !areMarketsConflicting(direct, secondary)
     );
+    if (!direct && ranked.length > 0) {
+        pipelineLogger.rejectionAdd({
+            run_id: telemetry.run_id,
+            sport: telemetry.sport,
+            bucket: 'publish_skip',
+            metadata: {
+                reason: 'no_direct_after_conflict_and_fallback',
+                ranked_count: ranked.length,
+                filtered_count: filtered.length
+            }
+        });
+    }
 
     return {
         direct,

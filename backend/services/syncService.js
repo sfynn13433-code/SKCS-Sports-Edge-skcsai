@@ -5,6 +5,7 @@ const { buildLiveData } = require('./dataProvider');
 const { upsertCanonicalEvents } = require('./canonicalEvents');
 const { assertRapidApiCacheWallReady } = require('./dataProviders');
 const { buildMatchContext } = require('./normalizerService');
+const pipelineLogger = require('../utils/pipelineLogger');
 const config = require('../config');
 
 function isObject(value) {
@@ -36,6 +37,23 @@ function toNormalizationInput(rawMatch) {
         match,
         odds
     };
+}
+
+function hasAnySharpOdds(matchContext) {
+    const sharpOdds = isObject(matchContext?.sharp_odds) ? matchContext.sharp_odds : {};
+    return Object.values(sharpOdds).some((value) => Number.isFinite(Number(value)));
+}
+
+function hasMeaningfulContext(matchContext) {
+    const context = isObject(matchContext?.contextual_intelligence) ? matchContext.contextual_intelligence : null;
+    if (!context) return false;
+    if (context.weather) return true;
+    if (Array.isArray(context.injuries) && context.injuries.length > 0) return true;
+    if (Array.isArray(context.suspensions) && context.suspensions.length > 0) return true;
+    if (Array.isArray(context.expected_lineups) && context.expected_lineups.length > 0) return true;
+    if (Array.isArray(context.confirmed_lineups) && context.confirmed_lineups.length > 0) return true;
+    if (context.lineup_confirmed === true) return true;
+    return false;
 }
 
 function getSeasonStartYear() {
@@ -173,6 +191,16 @@ async function syncSports(options = {}) {
     const scopeLabel = requestedSports.length ? requestedSports.join(', ') : 'all sports';
     console.log(`[syncService] Starting sports data sync for REAL matches (${scopeLabel})...`);
     console.log(`[syncService] Using season config: SEASON_YEAR=${SEASON_YEAR}, SEASON_RANGE=${SEASON_RANGE}`);
+    const telemetryRunId = `sync_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    pipelineLogger.startRun({
+        run_id: telemetryRunId,
+        metadata: {
+            scope: scopeLabel,
+            requested_sports: requestedSports.length ? requestedSports : ['all'],
+            season_year: SEASON_YEAR,
+            season_range: SEASON_RANGE
+        }
+    });
 
     // FORCE REAL MODE: We ignore the 'test' config to ensure real data flows.
     try {
@@ -182,6 +210,15 @@ async function syncSports(options = {}) {
 
         if (!configs.length) {
             console.warn('[syncService] No matching sports configuration found for request:', requestedSports.join(', '));
+            const report = pipelineLogger.finishRun({
+                run_id: telemetryRunId,
+                status: 'completed',
+                metadata: {
+                    total_matches_processed: 0,
+                    note: 'no_matching_sports_config'
+                }
+            });
+            console.log('[syncService][pipeline_telemetry] %s', JSON.stringify(report, null, 2));
             return {
                 requestedSports,
                 totalMatchesProcessed: 0,
@@ -196,12 +233,65 @@ async function syncSports(options = {}) {
                 console.log(`[syncService] Fetching REAL matches for: ${item.sport} (league: ${item.leagueId || 'all'}, season: ${item.season})...`);
 
                 const rawMatches = await buildLiveData(item);
+                const rawMatchesList = Array.isArray(rawMatches) ? rawMatches : [];
+                pipelineLogger.stageAdd({
+                    run_id: telemetryRunId,
+                    sport: item.sport,
+                    stage: 'fetched_count',
+                    count: rawMatchesList.length
+                });
                 const normalizedMatches = [];
-                for (const rawMatch of (Array.isArray(rawMatches) ? rawMatches : [])) {
+                for (const rawMatch of rawMatchesList) {
                     try {
                         const normalizationInput = toNormalizationInput(rawMatch);
+                        if (!normalizationInput || !normalizationInput.match || !normalizationInput.odds) {
+                            pipelineLogger.rejectionAdd({
+                                run_id: telemetryRunId,
+                                sport: item.sport,
+                                bucket: 'legacy_schema_reject',
+                                metadata: { reason: 'missing_match_or_odds' }
+                            });
+                            continue;
+                        }
                         const normalized = buildMatchContext(normalizationInput);
-                        if (!normalized) continue;
+                        if (!normalized) {
+                            pipelineLogger.rejectionAdd({
+                                run_id: telemetryRunId,
+                                sport: item.sport,
+                                bucket: 'legacy_schema_reject',
+                                metadata: { reason: 'normalizer_returned_null' }
+                            });
+                            continue;
+                        }
+
+                        pipelineLogger.stageAdd({
+                            run_id: telemetryRunId,
+                            sport: item.sport,
+                            stage: 'normalized_count',
+                            count: 1
+                        });
+                        pipelineLogger.recordSportNormalization({
+                            run_id: telemetryRunId,
+                            sport: item.sport,
+                            provider_sport: rawMatch?.sport || rawMatch?.raw_provider_data?.sport || normalizationInput?.match?.sport || 'unknown',
+                            canonical_sport: normalized?.sport || item.sport
+                        });
+                        if (!hasAnySharpOdds(normalized)) {
+                            pipelineLogger.rejectionAdd({
+                                run_id: telemetryRunId,
+                                sport: item.sport,
+                                bucket: 'missing_odds',
+                                metadata: { match_id: normalized?.match_info?.match_id || null }
+                            });
+                        }
+                        if (!hasMeaningfulContext(normalized)) {
+                            pipelineLogger.rejectionAdd({
+                                run_id: telemetryRunId,
+                                sport: item.sport,
+                                bucket: 'missing_context',
+                                metadata: { match_id: normalized?.match_info?.match_id || null }
+                            });
+                        }
                         normalizedMatches.push(normalized);
                     } catch (normalizeErr) {
                         console.warn('[syncService] Normalization failed for one match (%s): %s', item.sport, normalizeErr.message);
@@ -211,7 +301,13 @@ async function syncSports(options = {}) {
                 if (normalizedMatches.length > 0) {
                     await upsertCanonicalEvents(normalizedMatches);
                     console.log(`[syncService] Found ${normalizedMatches.length} REAL matches for ${item.sport}. Running AI Analysis...`);
-                    await runPipelineForMatches({ matches: normalizedMatches });
+                    await runPipelineForMatches({
+                        matches: normalizedMatches,
+                        telemetry: {
+                            run_id: telemetryRunId,
+                            sport: item.sport
+                        }
+                    });
                     totalMatchesProcessed += normalizedMatches.length;
                     perSport.set(item.sport, (perSport.get(item.sport) || 0) + normalizedMatches.length);
                     console.log(`[syncService] ${item.sport}: pipeline complete for ${normalizedMatches.length} matches`);
@@ -239,12 +335,24 @@ async function syncSports(options = {}) {
             const rebuild = await rebuildFinalOutputs({
                 triggerSource: 'sync_service',
                 requestedSports: requestedSports.length ? requestedSports : ['all'],
+                telemetryRunId: telemetryRunId,
                 metadata: {
                     totalMatchesProcessed,
                     perSport: Array.from(perSport.entries()).map(([sport, matchesProcessed]) => ({ sport, matchesProcessed })),
                     errors: Array.from(perSportErrors.entries()).map(([sport, error]) => ({ sport, error }))
                 }
             });
+            const report = pipelineLogger.finishRun({
+                run_id: telemetryRunId,
+                status: 'completed',
+                metadata: {
+                    total_matches_processed: totalMatchesProcessed,
+                    per_sport: Array.from(perSport.entries()).map(([sport, matchesProcessed]) => ({ sport, matchesProcessed })),
+                    errors: Array.from(perSportErrors.entries()).map(([sport, error]) => ({ sport, error })),
+                    publish_run_id: rebuild?.publish_run?.id || null
+                }
+            });
+            console.log('[syncService][pipeline_telemetry] %s', JSON.stringify(report, null, 2));
             console.log('[syncService] Master sync complete! Real data is now live.');
             console.log(`[syncService] Summary: ${totalMatchesProcessed} matches processed, ${perSport.size} sports covered`);
             return {
@@ -257,6 +365,16 @@ async function syncSports(options = {}) {
             };
         } else {
             console.warn('[syncService] Sync finished but 0 real matches were found. Check your API Keys and season configuration.');
+            const report = pipelineLogger.finishRun({
+                run_id: telemetryRunId,
+                status: 'completed',
+                metadata: {
+                    total_matches_processed: 0,
+                    per_sport: Array.from(perSport.entries()).map(([sport, matchesProcessed]) => ({ sport, matchesProcessed })),
+                    errors: Array.from(perSportErrors.entries()).map(([sport, error]) => ({ sport, error }))
+                }
+            });
+            console.log('[syncService][pipeline_telemetry] %s', JSON.stringify(report, null, 2));
             return {
                 requestedSports,
                 totalMatchesProcessed: 0,
@@ -269,6 +387,12 @@ async function syncSports(options = {}) {
     } catch (error) {
         console.error('[syncService] Master sync failed:', error.message);
         console.error('[syncService] Stack trace:', error.stack);
+        const report = pipelineLogger.finishRun({
+            run_id: telemetryRunId,
+            status: 'failed',
+            metadata: { error: error.message }
+        });
+        console.log('[syncService][pipeline_telemetry] %s', JSON.stringify(report, null, 2));
         throw error;
     }
 }

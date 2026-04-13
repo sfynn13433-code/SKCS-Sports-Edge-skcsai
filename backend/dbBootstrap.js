@@ -293,6 +293,28 @@ async function bootstrap() {
             );
         `);
 
+        await query(`
+            CREATE TABLE IF NOT EXISTS debug_published (
+                id bigserial PRIMARY KEY,
+                publish_run_id bigint,
+                tier text,
+                sport text,
+                candidate jsonb NOT NULL,
+                rejection_metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
+                created_at timestamptz NOT NULL DEFAULT now()
+            );
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_debug_published_created_at
+            ON debug_published(created_at DESC);
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_debug_published_sport
+            ON debug_published(sport);
+        `);
+
         await cleanupLegacyFixtureRows();
 
         console.log('[dbBootstrap] All tables and seed data verified.');
