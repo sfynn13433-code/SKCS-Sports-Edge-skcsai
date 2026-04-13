@@ -586,6 +586,16 @@ function predictionIsNotStale(prediction, now = new Date()) {
     return hoursInPast <= 24; // reject fixtures that kicked off more than 24 hours ago
 }
 
+function predictionHasOnlyUpcomingKickoffs(prediction, now = new Date()) {
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    if (matches.length === 0) return false;
+
+    const kickoffs = matches.map(parseMatchKickoff).filter(Boolean);
+    if (kickoffs.length === 0) return false;
+
+    return kickoffs.every((kickoff) => kickoff.getTime() >= now.getTime());
+}
+
 function getPredictionPrimaryKickoff(prediction) {
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
     const kickoffs = matches
@@ -1111,6 +1121,7 @@ router.get('/', requireRole('user'), async (req, res) => {
         const scopedPredictions = (includeAll
             ? scopeBase
             : scopeBase
+                .filter((prediction) => predictionHasOnlyUpcomingKickoffs(prediction, now))
                 .filter((prediction) => predictionIsNotStale(prediction, now))
                 .filter((prediction) => predictionMatchesWindow(prediction, windowStart, windowEnd))
         ).sort((a, b) => includeAll

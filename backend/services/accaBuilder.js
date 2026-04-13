@@ -2448,7 +2448,32 @@ async function buildFinalForTier(tier, options = {}) {
         console.log('[accaBuilder DIAGNOSTICS] mega_zero_reason=%s', megaDiagnostics.mega_zero_reason || 'n/a');
 
         // ---------------------------------------------------------------------
-        // 3. MULTI LAYER (Third Priority)
+        // 3. DIRECT LAYER (Third Priority - reserve singles before combinators)
+        // ---------------------------------------------------------------------
+        const directRows = [];
+        const directSelections = takeAvailablePredictions(
+            limitedCandidates,
+            globalUsedFixtures,
+            weekLockedTeamCompetitionMap,
+            runTeamCompetitionMap,
+            categoryBuildCaps.direct
+        );
+        for (const prediction of directSelections) {
+            const matches = [toFinalMatchPayload(prediction)];
+            const total = computeTotalConfidence(matches);
+            const row = await insertFinalRow({
+                publish_run_id: publishRunId,
+                tier: t,
+                type: 'direct',
+                matches,
+                total_confidence: total,
+                risk_level: riskLevelFromConfidence(total)
+            }, client);
+            directRows.push(row);
+        }
+
+        // ---------------------------------------------------------------------
+        // 4. MULTI LAYER (Fourth Priority)
         // ---------------------------------------------------------------------
         const multiRows = [];
         const multiSelections = takeAvailablePredictions(
@@ -2471,7 +2496,7 @@ async function buildFinalForTier(tier, options = {}) {
         }
 
         // ---------------------------------------------------------------------
-        // 4. SAME MATCH LAYER (Fourth Priority)
+        // 5. SAME MATCH LAYER (Fifth Priority)
         // ---------------------------------------------------------------------
         const sameMatchRows = [];
         const sameMatchSelections = takeAvailablePredictions(
@@ -2494,7 +2519,7 @@ async function buildFinalForTier(tier, options = {}) {
         }
 
         // ---------------------------------------------------------------------
-        // 5. SECONDARY LAYER (Fifth Priority)
+        // 6. SECONDARY LAYER (Last Priority)
         // ---------------------------------------------------------------------
         const secondaryRows = [];
         const secondarySelections = takeAvailablePredictions(
@@ -2516,31 +2541,6 @@ async function buildFinalForTier(tier, options = {}) {
                 risk_level: riskLevelFromConfidence(total)
             }, client);
             secondaryRows.push(row);
-        }
-
-        // ---------------------------------------------------------------------
-        // 6. DIRECT LAYER (Last Priority - sweeps leftovers)
-        // ---------------------------------------------------------------------
-        const directRows = [];
-        const directSelections = takeAvailablePredictions(
-            limitedCandidates,
-            globalUsedFixtures,
-            weekLockedTeamCompetitionMap,
-            runTeamCompetitionMap,
-            categoryBuildCaps.direct
-        );
-        for (const prediction of directSelections) {
-            const matches = [toFinalMatchPayload(prediction)];
-            const total = computeTotalConfidence(matches);
-            const row = await insertFinalRow({
-                publish_run_id: publishRunId,
-                tier: t,
-                type: 'direct',
-                matches,
-                total_confidence: total,
-                risk_level: riskLevelFromConfidence(total)
-            }, client);
-            directRows.push(row);
         }
 
         console.log('[accaBuilder] tier=%s week_locked=%s direct=%s secondary=%s same_match=%s multi=%s acca_6match=%s mega_acca_12=%s',

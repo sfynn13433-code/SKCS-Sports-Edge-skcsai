@@ -1213,6 +1213,24 @@
         return { market: fallbackMarket, confidence: fallbackConfidence };
     }
 
+    function parseKickoffForClient(match) {
+        const value =
+            (match && (match.commence_time || match.match_date)) ||
+            (match && match.metadata && (match.metadata.match_time || match.metadata.kickoff || match.metadata.kickoff_time)) ||
+            null;
+        if (!value) return null;
+        const parsed = new Date(value);
+        return Number.isNaN(parsed.getTime()) ? null : parsed;
+    }
+
+    function predictionHasUpcomingKickoffs(pred, now = new Date()) {
+        const matches = Array.isArray(pred && pred.matches) ? pred.matches : [];
+        if (!matches.length) return false;
+        const kickoffs = matches.map(parseKickoffForClient).filter(Boolean);
+        if (!kickoffs.length) return false;
+        return kickoffs.every((kickoff) => kickoff.getTime() >= now.getTime());
+    }
+
     function normalizeMarketKey(value) {
         return String(value || '').trim().toLowerCase();
     }
@@ -1474,6 +1492,7 @@
                     if (!INCLUDE_ALL_MODE) {
                         if (!allowedTiers.includes(rowTier)) return false;
                         if (!predictionAllowsPlanAccess(r, activePlanId)) return false;
+                        if (!predictionHasUpcomingKickoffs(r)) return false;
                     }
                     const matches = Array.isArray(r.matches) ? r.matches : [];
                     if (sport === 'accumulators') {
@@ -1497,7 +1516,7 @@
 
         try {
             const cacheBust = Date.now();
-            let url = `${SKCS_BACKEND}/api/predictions?plan_id=${activePlanId}&history_days=14&window_days=14&_ts=${cacheBust}`;
+            let url = `${SKCS_BACKEND}/api/predictions?plan_id=${activePlanId}&history_days=0&window_days=14&_ts=${cacheBust}`;
             if (requestSport) {
                 url += `&sport=${requestSport}`;
             }
@@ -1519,7 +1538,7 @@
             let preds = (response.ok && data && Array.isArray(data.predictions)) ? data.predictions : [];
 
             if (preds.length === 0 && activePlanId.includes('elite')) {
-                let urlN = `${SKCS_BACKEND}/api/predictions?plan_id=core_30day_limitless&history_days=14&window_days=14&_ts=${cacheBust}`;
+                let urlN = `${SKCS_BACKEND}/api/predictions?plan_id=core_30day_limitless&history_days=0&window_days=14&_ts=${cacheBust}`;
                 if (requestSport) {
                     urlN += `&sport=${requestSport}`;
                 }
