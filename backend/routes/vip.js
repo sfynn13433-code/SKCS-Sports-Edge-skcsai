@@ -252,6 +252,7 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
         res.set('Pragma', 'no-cache');
         res.set('Expires', '0');
 
+        const includeAll = ['1', 'true'].includes(String(req.query.include_all || '').trim().toLowerCase());
         const day = normalizeDay(req.query.day || 'saturday');
         const now = new Date();
         const generatedAt = now.toISOString();
@@ -259,31 +260,41 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
         const masterPlan = getPlanCapabilities(MASTER_PLAN_ID);
         const dailyLimits = calculateDailyAllocations(MASTER_PLAN_ID, day) || {};
 
-        // Fetch the latest publish_run_id to avoid stale rows
-        const latestRunRes = await query(
-            `SELECT id FROM prediction_publish_runs WHERE status = 'completed' ORDER BY created_at DESC LIMIT 1`
-        );
-        const latestPublishRunId = latestRunRes.rows.length ? latestRunRes.rows[0].id : null;
+        // Fetch the latest publish_run_id to avoid stale rows (unless include_all bypass is active)
+        let latestPublishRunId = null;
+        if (!includeAll) {
+            const latestRunRes = await query(
+                `SELECT id FROM prediction_publish_runs WHERE status = 'completed' ORDER BY created_at DESC LIMIT 1`
+            );
+            latestPublishRunId = latestRunRes.rows.length ? latestRunRes.rows[0].id : null;
+        }
 
-        console.log('[vip/stress-payload] latest_publish_run_id=%s', latestPublishRunId);
+        console.log('[vip/stress-payload] latest_publish_run_id=%s include_all=%s', latestPublishRunId, includeAll ? '1' : '0');
 
-        // Filter by latest publish_run_id if available, otherwise fall back to tier-only
-        const queryText = latestPublishRunId
+        // include_all bypass: query wide set for UI stress testing without plan/tier gating.
+        const queryText = includeAll
             ? `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
                FROM predictions_final
-               WHERE publish_run_id = $1
-               ORDER BY total_confidence DESC, created_at DESC
-               LIMIT 3000`
-            : `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
-               FROM predictions_final
-               WHERE LOWER(COALESCE(tier, 'normal')) = ANY($1::text[])
-               ORDER BY total_confidence DESC, created_at DESC
-               LIMIT 3000`;
-        const queryParams = latestPublishRunId ? [latestPublishRunId] : [masterPlan.tiers.map((tier) => String(tier).toLowerCase())];
+               ORDER BY created_at DESC
+               LIMIT 2500`
+            : latestPublishRunId
+                ? `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
+                   FROM predictions_final
+                   WHERE publish_run_id = $1
+                   ORDER BY total_confidence DESC, created_at DESC
+                   LIMIT 3000`
+                : `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
+                   FROM predictions_final
+                   WHERE LOWER(COALESCE(tier, 'normal')) = ANY($1::text[])
+                   ORDER BY total_confidence DESC, created_at DESC
+                   LIMIT 3000`;
+        const queryParams = includeAll
+            ? []
+            : (latestPublishRunId ? [latestPublishRunId] : [masterPlan.tiers.map((tier) => String(tier).toLowerCase())]);
 
         const dbRes = await query(queryText, queryParams);
 
-        console.log('[vip/stress-payload] db_rows=%d tier_filter=%s', dbRes.rows.length, latestPublishRunId ? `run_${latestPublishRunId}` : 'tier-only');
+        console.log('[vip/stress-payload] db_rows=%d tier_filter=%s', dbRes.rows.length, includeAll ? 'include_all' : (latestPublishRunId ? `run_${latestPublishRunId}` : 'tier-only'));
 
         const rows = (dbRes.rows || []).map(shapePrediction).sort(compareRows);
 
@@ -317,19 +328,28 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
             if (row.section_type === 'direct') buckets.direct.push(row);
             else if (row.section_type === 'secondary') buckets.analytical_insights.push(row);
             else if (row.section_type === 'multi') buckets.multi.push(row);
-            else if (row.section_type === 'same_match' && row.validation_matrix?.valid === true) buckets.same_match.push(row);
+            else if (row.section_type === 'same_match' && (includeAll || row.validation_matrix?.valid === true)) buckets.same_match.push(row);
             else if (row.section_type === 'acca_6match') buckets.acca_6match.push(row);
-            else if (row.section_type === 'mega_acca_12' && megaIsValid(row, masterPlan, now)) buckets.mega_acca_12.push(row);
+            else if (row.section_type === 'mega_acca_12' && (includeAll || megaIsValid(row, masterPlan, now))) buckets.mega_acca_12.push(row);
         }
 
-        const selected = {
-            direct: buckets.direct.slice(0, required.direct),
-            analytical_insights: buckets.analytical_insights.slice(0, required.analytical_insights),
-            multi: buckets.multi.slice(0, required.multi),
-            same_match: buckets.same_match.slice(0, required.same_match),
-            acca_6match: buckets.acca_6match.slice(0, required.acca_6match),
-            mega_acca_12: buckets.mega_acca_12.slice(0, required.mega_acca_12)
-        };
+        const selected = includeAll
+            ? {
+                direct: buckets.direct,
+                analytical_insights: buckets.analytical_insights,
+                multi: buckets.multi,
+                same_match: buckets.same_match,
+                acca_6match: buckets.acca_6match,
+                mega_acca_12: buckets.mega_acca_12
+            }
+            : {
+                direct: buckets.direct.slice(0, required.direct),
+                analytical_insights: buckets.analytical_insights.slice(0, required.analytical_insights),
+                multi: buckets.multi.slice(0, required.multi),
+                same_match: buckets.same_match.slice(0, required.same_match),
+                acca_6match: buckets.acca_6match.slice(0, required.acca_6match),
+                mega_acca_12: buckets.mega_acca_12.slice(0, required.mega_acca_12)
+            };
 
         const fulfilled = {
             direct: selected.direct.length,
@@ -343,6 +363,7 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
         const payload = {
             generated_at_utc: new Date().toISOString(),
             baseline_plan: MASTER_PLAN_ID,
+            include_all: includeAll,
             day,
             quotas: required,
             fulfilled,
@@ -358,6 +379,7 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
             builder_version: 'skcs-card-uniqueness-v3',
             publish_run_id: latestPublishRunId,
             generated_at: generatedAt,
+            include_all: includeAll,
             payload,
             tier_coverage: buildCoverageMatrix(day, fulfilled, referenceDate, rows)
         });

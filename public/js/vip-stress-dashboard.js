@@ -11,6 +11,8 @@
     const coverageTableWrap = document.getElementById('coverageTableWrap');
     const sectionsWrap = document.getElementById('sectionsWrap');
     const errorBox = document.getElementById('errorBox');
+    const includeAllParam = new URLSearchParams(window.location.search).get('include_all');
+    const INCLUDE_ALL_MODE = !['0', 'false'].includes(String(includeAllParam || '1').trim().toLowerCase());
 
     let lastPayload = null;
 
@@ -162,7 +164,7 @@
     async function fetchPayload() {
         clearError();
         const day = daySelect.value || 'saturday';
-        const endpoint = `${API_BASE}/api/vip/stress-payload?day=${encodeURIComponent(day)}`;
+        const endpoint = `${API_BASE}/api/vip/stress-payload?day=${encodeURIComponent(day)}${INCLUDE_ALL_MODE ? '&include_all=1' : ''}`;
         try {
             const response = await fetch(endpoint, {
                 headers: {

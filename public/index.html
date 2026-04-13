@@ -1051,6 +1051,8 @@
     // Configuration: use shared frontend config first, with a safe fallback.
     const SKCS_BACKEND = window.API_BASE_URL || "https://skcs-sports-edge-skcsai.onrender.com";
     let activeSport = 'football';
+    const includeAllParam = new URLSearchParams(window.location.search).get('include_all');
+    const INCLUDE_ALL_MODE = ['1', 'true'].includes(String(includeAllParam || '').trim().toLowerCase());
 
     function getUserApiKey() {
         const direct = String(window.USER_API_KEY || '').trim();
@@ -1147,6 +1149,12 @@
     }
 
     function selectDirectInsights(predictions) {
+        if (INCLUDE_ALL_MODE) {
+            return (predictions || [])
+                .filter((pred) => isDirectInsightCandidate(pred))
+                .slice()
+                .sort((a, b) => getPredictionConfidenceScore(b) - getPredictionConfidenceScore(a));
+        }
         const byMatchId = new Map();
         (predictions || []).forEach((pred) => {
             if (!isDirectInsightCandidate(pred)) return;
@@ -1294,6 +1302,9 @@
     }
 
     function dedupePredictionFeed(predictions) {
+        if (INCLUDE_ALL_MODE) {
+            return Array.isArray(predictions) ? predictions.slice() : [];
+        }
         const seen = new Set();
         const out = [];
         (predictions || []).forEach((pred) => {
@@ -1390,6 +1401,9 @@
     }
 
     function applyUniqueAssetRule(predictions) {
+        if (INCLUDE_ALL_MODE) {
+            return Array.isArray(predictions) ? predictions.slice() : [];
+        }
         const categoryOrder = ['direct', 'secondary', 'same_match', 'multi', 'acca_6match', 'mega_acca_12'];
         const buckets = new Map(categoryOrder.map((key) => [key, []]));
 
@@ -1457,8 +1471,10 @@
                 const allowedTiers = getPredictionTiersForPlan(activePlanId);
                 const filtered = (rows || []).filter(r => {
                     const rowTier = String(r.tier || 'normal').toLowerCase();
-                    if (!allowedTiers.includes(rowTier)) return false;
-                    if (!predictionAllowsPlanAccess(r, activePlanId)) return false;
+                    if (!INCLUDE_ALL_MODE) {
+                        if (!allowedTiers.includes(rowTier)) return false;
+                        if (!predictionAllowsPlanAccess(r, activePlanId)) return false;
+                    }
                     const matches = Array.isArray(r.matches) ? r.matches : [];
                     if (sport === 'accumulators') {
                         const type = getSectionType(r);
@@ -1485,6 +1501,9 @@
             if (requestSport) {
                 url += `&sport=${requestSport}`;
             }
+            if (INCLUDE_ALL_MODE) {
+                url += '&include_all=1';
+            }
 
             let response = await fetch(url, {
                 method: 'GET',
@@ -1503,6 +1522,9 @@
                 let urlN = `${SKCS_BACKEND}/api/predictions?plan_id=core_30day_limitless&history_days=14&window_days=14&_ts=${cacheBust}`;
                 if (requestSport) {
                     urlN += `&sport=${requestSport}`;
+                }
+                if (INCLUDE_ALL_MODE) {
+                    urlN += '&include_all=1';
                 }
                 const r2 = await fetch(urlN, {
                     method: 'GET',
@@ -1626,16 +1648,18 @@
             if (!matchId) return;
             directByMatchId.set(matchId, firstMatch);
         });
-        const secondarySingles = singles.filter((p) => {
-            if (getSectionType(p) !== 'secondary') return false;
-            const firstMatch = (p && Array.isArray(p.matches) && p.matches[0]) ? p.matches[0] : {};
-            const directMatch = directByMatchId.get(String(firstMatch.match_id || '').trim());
-            if (!isDisplayFriendlySecondaryMarket(firstMatch.market)) return false;
-            return !directMatch || areSelectionsCompatible(directMatch, {
-                market: firstMatch.market,
-                prediction: firstMatch.prediction
+        const secondarySingles = INCLUDE_ALL_MODE
+            ? singles.filter((p) => getSectionType(p) === 'secondary')
+            : singles.filter((p) => {
+                if (getSectionType(p) !== 'secondary') return false;
+                const firstMatch = (p && Array.isArray(p.matches) && p.matches[0]) ? p.matches[0] : {};
+                const directMatch = directByMatchId.get(String(firstMatch.match_id || '').trim());
+                if (!isDisplayFriendlySecondaryMarket(firstMatch.market)) return false;
+                return !directMatch || areSelectionsCompatible(directMatch, {
+                    market: firstMatch.market,
+                    prediction: firstMatch.prediction
+                });
             });
-        });
         const secondaryByMatchId = new Map();
         secondarySingles.forEach((pred) => {
             const firstMatch = (pred && Array.isArray(pred.matches) && pred.matches[0]) ? pred.matches[0] : {};
@@ -1644,7 +1668,9 @@
             if (!secondaryByMatchId.has(matchId)) secondaryByMatchId.set(matchId, []);
             secondaryByMatchId.get(matchId).push(buildSecondaryMarketDisplayItem(pred));
         });
-        const directWithLinkedSecondary = directSingles.map((pred) => attachSecondaryMarkets(pred, secondaryByMatchId));
+        const directWithLinkedSecondary = INCLUDE_ALL_MODE
+            ? directSingles
+            : directSingles.map((pred) => attachSecondaryMarkets(pred, secondaryByMatchId));
         const multiPreds = normalizedPredictions.filter((p) => {
             const legs = getPredictionLegCount(p);
             const type = getSectionType(p);
