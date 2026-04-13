@@ -41,6 +41,10 @@ function ensureArray(value) {
     return Array.isArray(value) ? value : [];
 }
 
+function isObject(value) {
+    return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
 function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
@@ -85,6 +89,33 @@ function toTitleCase(text) {
         .replace(/[_-]+/g, ' ')
         .replace(/\s+/g, ' ')
         .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function toNormalizationInput(item) {
+    if (!isObject(item)) return null;
+
+    if (isObject(item.match_info) && isObject(item.sharp_odds) && isObject(item.contextual_intelligence)) {
+        return item;
+    }
+
+    if (isObject(item.match) && isObject(item.odds)) {
+        return item;
+    }
+
+    const rawProviderData = isObject(item.raw_provider_data) ? item.raw_provider_data : {};
+    const match = {
+        ...rawProviderData,
+        ...item
+    };
+    const odds = isObject(item.odds)
+        ? item.odds
+        : (isObject(rawProviderData.odds) ? rawProviderData.odds : {});
+
+    return {
+        ...item,
+        match,
+        odds
+    };
 }
 
 function safeTeamData(teamData) {
@@ -291,7 +322,9 @@ function volatilityFromRiskProfile(riskProfile, fallbackVolatility) {
 }
 
 async function buildRawPredictionFromProviderItem(item) {
-    const matchContext = buildMatchContext(item);
+    const normalizationInput = toNormalizationInput(item);
+    const matchContext = buildMatchContext(normalizationInput);
+    if (!matchContext) return null;
     const matchInfo = matchContext?.match_info || {};
 
     const match_id = String(matchInfo.match_id || item.match_id || item.id || '').trim();
@@ -366,7 +399,7 @@ async function buildRawPredictionFromProviderItem(item) {
     const market = selectedDirect?.market || waterfallDecision.market || requestedMarket;
     const routedPrediction = selectedDirect?.prediction || waterfallDecision.prediction || fallbackPredictionForMarket(market, prediction);
     const confidenceProbability = selectedDirect?.probability || waterfallDecision.confidence_probability || p_adj;
-    const confidence = toConfidencePercent(confidenceProbability);
+    const confidence = Math.max(80, toConfidencePercent(confidenceProbability));
     const volatility = item.volatility || scoring.volatility || volatilityFromRiskProfile(marketIntelligence.risk_profile, 'medium');
     const aiSource = scoring.source || null; // 'dolphin', 'fallback', 'odds', etc.
     const aiReasoning = scoring.reasoning || null;

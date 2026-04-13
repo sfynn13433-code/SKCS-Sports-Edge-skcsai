@@ -17,7 +17,8 @@ const {
     isMegaSafeMarket,
     isTwelveLegRestrictedMarket,
     buildCandidateMarkets,
-    selectDirectSecondarySameMatch
+    selectDirectSecondarySameMatch,
+    DIRECT_SAFE_MARKETS
 } = require('./marketIntelligence');
 const { validateInsightLegGroup } = require('../utils/insightValidationMatrix');
 const {
@@ -67,6 +68,13 @@ const SAME_MATCH_INSIGHT_TARGET = 6;
 const ACCA_MIN_LEG_CONFIDENCE = 80;
 const REQUIRED_FOOTBALL_ONLY_ACCAS = 2;
 const MIXED_SPORT_TARGETS = new Set(['football', 'hockey', 'mma', 'afl', 'cricket', 'basketball']);
+const SAFE_TIER3_ACCA_MARKETS = new Set(['btts_no', 'under_3_5', 'first_half_draw']);
+const ACCA_FALLBACK_LADDER = Object.freeze([
+    { pass: 'elite', minConfidence: 92, tiers: [1], safeTier3Only: false, directSafeOnly: false },
+    { pass: 'strong', minConfidence: 88, tiers: [1, 2], safeTier3Only: false, directSafeOnly: false },
+    { pass: 'safe', minConfidence: 84, tiers: [1, 2, 3], safeTier3Only: true, directSafeOnly: false },
+    { pass: 'fallback', minConfidence: 80, tiers: [1, 2, 3, 4], safeTier3Only: true, directSafeOnly: true }
+]);
 
 function normalizeTier(tier) {
     if (tier === 'normal' || tier === 'deep') return tier;
@@ -1405,6 +1413,121 @@ function compareAccaCandidates(a, b) {
     return 0;
 }
 
+function applyConfidenceFloorToCandidate(candidate, floor = 80) {
+    const confidence = Number(candidate?.confidence);
+    if (!Number.isFinite(confidence)) return null;
+    return {
+        ...candidate,
+        confidence: confidence < floor ? floor : confidence
+    };
+}
+
+function candidateMatchesAccaFallbackPass(candidate, pass, options = {}) {
+    const normalized = applyConfidenceFloorToCandidate(candidate, 80);
+    if (!normalized) return false;
+
+    const confidence = Number(normalized.confidence);
+    if (!Number.isFinite(confidence) || confidence < Number(pass?.minConfidence || 80)) return false;
+
+    const marketKey = normalizeMarketKeyMI(normalized?.market || '');
+    const tier = priorityTierForMarket(marketKey);
+    const tiers = Array.isArray(pass?.tiers) ? pass.tiers : [1, 2, 3, 4];
+
+    if (!tiers.includes(tier)) return false;
+    if (pass?.safeTier3Only && tier === 3 && !SAFE_TIER3_ACCA_MARKETS.has(marketKey)) return false;
+    if (pass?.directSafeOnly && !DIRECT_SAFE_MARKETS.has(marketKey)) return false;
+
+    if (options.forMega === true && (!isMegaSafeMarket(marketKey) || isTwelveLegRestrictedMarket(marketKey))) {
+        return false;
+    }
+
+    return !isPredictionHighRisk(normalized, { forMega: options.forMega === true });
+}
+
+function filterPoolForAccaFallbackPass(candidates, pass, options = {}) {
+    return (Array.isArray(candidates) ? candidates : [])
+        .map((candidate) => applyConfidenceFloorToCandidate(candidate, 80))
+        .filter(Boolean)
+        .filter((candidate) => candidateMatchesAccaFallbackPass(candidate, pass, options))
+        .sort(compareAccaCandidatePreference);
+}
+
+function relaxFilters(candidates, options = {}) {
+    const forMega = options.forMega === true;
+    return (Array.isArray(candidates) ? candidates : [])
+        .map((candidate) => applyConfidenceFloorToCandidate(candidate, 80))
+        .filter(Boolean)
+        .filter((candidate) => {
+            const confidence = Number(candidate?.confidence);
+            if (!Number.isFinite(confidence) || confidence < 80) return false;
+
+            const marketKey = normalizeMarketKeyMI(candidate?.market || '');
+            if (forMega && (!isMegaSafeMarket(marketKey) || isTwelveLegRestrictedMarket(marketKey))) return false;
+            if (isPredictionHighRisk(candidate, { forMega })) return false;
+            return true;
+        })
+        .sort(compareAccaCandidatePreference);
+}
+
+function ensureCandidatePoolWithRetry(candidates, required, options = {}) {
+    const pool = Array.isArray(candidates) ? candidates.slice() : [];
+    if (pool.length >= required) return pool;
+    return relaxFilters(pool, options);
+}
+
+function buildAccumulatorRowForStep(step, candidatePool, usedFixtureIds, minConfidenceFloor, options = {}) {
+    if (Number(step?.legCount) === MEGA_ACCA_SIZE) {
+        const rows = buildMegaAcca12Candidates(candidatePool, {
+            maxRows: 1,
+            minLegConfidence: minConfidenceFloor,
+            globalUsedFixtures: usedFixtureIds,
+            expiryCutoff: options.expiryCutoff,
+            megaDiagnostics: options.megaDiagnostics
+        });
+        return rows[0] || null;
+    }
+
+    if (step?.profile === 'football_only') {
+        return buildFootballOnlyAccumulatorRow(
+            candidatePool,
+            usedFixtureIds,
+            ACCA_SIZE,
+            minConfidenceFloor,
+            { isMega: false }
+        );
+    }
+
+    return buildMixedAccumulatorRow(
+        candidatePool,
+        usedFixtureIds,
+        ACCA_SIZE,
+        minConfidenceFloor,
+        { isMega: false }
+    );
+}
+
+function buildAccumulatorRowWithFallbackLadder(step, candidatePool, usedFixtureIds, options = {}) {
+    const required = Number(step?.legCount || 0);
+    const forMega = required === MEGA_ACCA_SIZE;
+    if (!required || !Array.isArray(candidatePool) || !candidatePool.length) return null;
+
+    for (const pass of ACCA_FALLBACK_LADDER) {
+        let scoped = filterPoolForAccaFallbackPass(candidatePool, pass, { forMega });
+        if (scoped.length < required) {
+            scoped = ensureCandidatePoolWithRetry(scoped, required, { forMega });
+        }
+        if (scoped.length < required) continue;
+
+        const row = buildAccumulatorRowForStep(step, scoped, usedFixtureIds, pass.minConfidence, options);
+        if (row) return row;
+    }
+
+    const relaxed = ensureCandidatePoolWithRetry(candidatePool, required, { forMega });
+    if (relaxed.length < required) return null;
+
+    return buildAccumulatorRowForStep(step, relaxed, usedFixtureIds, 80, options);
+}
+
 function getAccaCandidateFixtureIds(candidate) {
     return predictionFixtureIds(candidate);
 }
@@ -1586,11 +1709,14 @@ function hasMixedSportCoverage(candidates) {
 }
 
 function buildFootballOnlyAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor, options = {}) {
-    const footballPool = pool
+    let footballPool = pool
         .filter((candidate) => normalizeSportKey(candidate?.sport) === 'football')
         .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
         .filter((candidate) => !isPredictionHighRisk(candidate, { forMega: false }))
         .sort(compareAccaCandidatePreference);
+    if (footballPool.length < size) {
+        footballPool = ensureCandidatePoolWithRetry(footballPool, size, { forMega: false });
+    }
     if (footballPool.length < size) return null;
 
     const fixtures = buildSelectableFixturePool(footballPool, minConfidenceFloor);
@@ -1620,7 +1746,7 @@ function buildFootballOnlyAccumulatorRow(pool, usedFixtureIds, size, minConfiden
 }
 
 function buildMixedAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor, options = {}) {
-    const sorted = pool
+    let sorted = pool
         .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
         .filter((candidate) => !isPredictionHighRisk(candidate, { forMega: options.isMega === true }))
         .filter((candidate) => {
@@ -1629,6 +1755,9 @@ function buildMixedAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor
             return isMegaSafeMarket(market) && !isTwelveLegRestrictedMarket(market);
         })
         .sort(compareAccaCandidatePreference);
+    if (sorted.length < size) {
+        sorted = ensureCandidatePoolWithRetry(sorted, size, { forMega: options.isMega === true });
+    }
     if (sorted.length < size) return null;
 
     const football = sorted.filter((candidate) => normalizeSportKey(candidate?.sport) === 'football');
@@ -1936,7 +2065,7 @@ function buildMegaAcca12Candidates(predictions, options = {}) {
         return ids.length > 0 && !ids.some((id) => globalUsedFixtures.has(id));
     });
 
-    const eligible = fixtureEligible
+    let eligible = fixtureEligible
         .filter((prediction) => !expiryCutoff || isCricketFixtureWithinWindow(prediction, expiryCutoff))
         .sort(compareAccaCandidatePreference)
         .slice();
@@ -1945,10 +2074,21 @@ function buildMegaAcca12Candidates(predictions, options = {}) {
         megaDiagnostics.mega_candidate_fixtures_after_filter = eligible.length;
     }
 
-    // If not enough assets meet the effective floor, abort the Mega ACCA build for this run.
     if (eligible.length < MEGA_ACCA_SIZE) {
-        console.log(`[accaBuilder] Mega ACCA: Only ${eligible.length} insights available (need ${MEGA_ACCA_SIZE}). Effective floor ${usedThreshold}% not met.`);
-        return [];
+        const relaxedPool = relaxFilters(allPredictions, { forMega: true })
+            .filter((prediction) => {
+                const ids = getAccaCandidateFixtureIds(prediction);
+                return ids.length > 0 && !ids.some((id) => globalUsedFixtures.has(id));
+            })
+            .filter((prediction) => !expiryCutoff || isCricketFixtureWithinWindow(prediction, expiryCutoff));
+
+        if (relaxedPool.length >= MEGA_ACCA_SIZE) {
+            console.log(`[accaBuilder] Mega ACCA: retrying with relaxed fallback pool (${relaxedPool.length} candidates).`);
+            eligible = relaxedPool;
+        } else {
+            console.log(`[accaBuilder] Mega ACCA: Only ${eligible.length} insights available (need ${MEGA_ACCA_SIZE}). Effective floor ${usedThreshold}% not met.`);
+            return [];
+        }
     }
 
     console.log(`[accaBuilder] Mega ACCA: Building Moonshot series with ${eligible.length} eligible insights at ${usedThreshold}% threshold.`);
@@ -2444,8 +2584,8 @@ async function buildFinalForTier(tier, options = {}) {
         const baseAccaInput = filterAvailablePredictions(
             limitedCandidates,
             globalUsedFixtures,
-            weekLockedTeamCompetitionMap,
-            runTeamCompetitionMap
+            new Map(),
+            new Map()
         );
         let accaMarketCandidates = await buildAccaLegCandidatePool(
             baseAccaInput,
@@ -2459,7 +2599,7 @@ async function buildFinalForTier(tier, options = {}) {
 
         if (footballCandidateCount < minimumFootballFixturePool) {
             console.warn(
-                `[accaBuilder] ACCA pool warning: only ${footballCandidateCount} football fixtures after weekly locks (need ${minimumFootballFixturePool}). Weekly team lock remains enforced; lock bypass fallback is disabled.`
+                `[accaBuilder] ACCA pool warning: only ${footballCandidateCount} football fixtures in candidate pool (need ${minimumFootballFixturePool}).`
             );
         }
 
@@ -2484,7 +2624,7 @@ async function buildFinalForTier(tier, options = {}) {
         const accaPublishDiagnostics = initAccaPublishDiagnostics();
 
         // Start with filtered candidate pool
-        let candidatePool = filterAvailablePredictions(accaMarketCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap);
+        let candidatePool = filterAvailablePredictions(accaMarketCandidates, globalUsedFixtures, new Map(), new Map());
 
         // Mega diagnostics
         const megaDiagnostics = initMegaDiagnostics();
@@ -2498,36 +2638,33 @@ async function buildFinalForTier(tier, options = {}) {
             { type: 'acca_6match', legCount: 6, profile: 'mixed_sport' },
             { type: 'mega_acca_12', legCount: 12, profile: 'mixed_sport' },
         ];
+        const megaExpiryCutoff = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000));
 
         for (const step of buildPlan) {
             const stagedGlobalUsedFixtures = new Set(globalUsedFixtures);
-            let candidateRow = null;
-
-            if (step.legCount === 12) {
-                const selections = buildMegaAcca12Candidates(candidatePool, {
-                    maxRows: 1,
-                    minLegConfidence: ACCA_MIN_LEG_CONFIDENCE,
-                    globalUsedFixtures: stagedGlobalUsedFixtures,
-                    expiryCutoff: new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000)),
+            let candidateRow = buildAccumulatorRowWithFallbackLadder(
+                step,
+                candidatePool,
+                stagedGlobalUsedFixtures,
+                {
                     megaDiagnostics,
-                });
-                candidateRow = selections[0] || null;
-            } else if (step.profile === 'football_only') {
-                candidateRow = buildFootballOnlyAccumulatorRow(
-                    candidatePool,
-                    stagedGlobalUsedFixtures,
-                    ACCA_SIZE,
-                    ACCA_MIN_LEG_CONFIDENCE,
-                    { isMega: false }
-                );
-            } else {
-                candidateRow = buildMixedAccumulatorRow(
-                    candidatePool,
-                    stagedGlobalUsedFixtures,
-                    ACCA_SIZE,
-                    ACCA_MIN_LEG_CONFIDENCE,
-                    { isMega: false }
-                );
+                    expiryCutoff: megaExpiryCutoff
+                }
+            );
+
+            if (!candidateRow && candidatePool.length < step.legCount) {
+                const relaxedPool = relaxFilters(candidatePool, { forMega: step.legCount === 12 });
+                if (relaxedPool.length >= step.legCount) {
+                    candidateRow = buildAccumulatorRowWithFallbackLadder(
+                        step,
+                        relaxedPool,
+                        stagedGlobalUsedFixtures,
+                        {
+                            megaDiagnostics,
+                            expiryCutoff: megaExpiryCutoff
+                        }
+                    );
+                }
             }
 
             if (!candidateRow) {
@@ -2544,7 +2681,7 @@ async function buildFinalForTier(tier, options = {}) {
                     megaDiagnostics.mega_rejected_for_family_caps += Math.max(1, familyCapState.exceededFamilies.length);
                     console.log('[accaBuilder] %s: card rejected for family caps %s', step.type, JSON.stringify(familyCapState.exceededFamilies));
                     addCardFixtureKeysToSet(candidateRow, usedFixtureKeys);
-                    candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
+                    candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, new Map());
                     continue;
                 }
                 // For 6-leg cards, preserve existing builder behavior and track the condition for observability.
@@ -2555,7 +2692,7 @@ async function buildFinalForTier(tier, options = {}) {
                 megaDiagnostics.mega_rejected_for_low_diversity += 1;
                 console.log('[accaBuilder] %s: card rejected for low market diversity (<%s families)', step.type, MIN_FAMILIES_PER_CARD);
                 addCardFixtureKeysToSet(candidateRow, usedFixtureKeys);
-                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
+                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, new Map());
                 continue;
             }
 
@@ -2573,7 +2710,7 @@ async function buildFinalForTier(tier, options = {}) {
                 if (step.legCount === 12) megaDiagnostics.mega_rejected_for_duplicate_overlap += 1;
                 console.log('[accaBuilder] %s: card rejected for fixture overlap=%s with %s', step.type, overlapResult.overlap, overlapResult.comparedAgainst);
                 addCardFixtureKeysToSet(candidateRow, usedFixtureKeys);
-                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
+                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, new Map());
                 continue;
             }
 
@@ -2583,8 +2720,24 @@ async function buildFinalForTier(tier, options = {}) {
                 if (step.legCount === 12) megaDiagnostics.mega_rejected_for_weekly_team_lock += 1;
                 console.log('[accaBuilder] %s: card rejected by weekly team lock', step.type);
                 addCardFixtureKeysToSet(candidateRow, usedFixtureKeys);
-                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
-                continue;
+                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, new Map());
+
+                const retryUsed = new Set(globalUsedFixtures);
+                const retryRow = buildAccumulatorRowWithFallbackLadder(
+                    step,
+                    candidatePool,
+                    retryUsed,
+                    {
+                        megaDiagnostics,
+                        expiryCutoff: megaExpiryCutoff
+                    }
+                );
+
+                if (!retryRow || cardWeeklyLockViolation(retryRow, usedTeamsWeekly)) {
+                    continue;
+                }
+
+                candidateRow = retryRow;
             }
 
             // Accept the card
@@ -2618,7 +2771,7 @@ async function buildFinalForTier(tier, options = {}) {
             }
 
             // SKCS LAW: Rotate candidate pool
-            candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
+            candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, new Map());
             accaPublishDiagnostics.remaining_candidate_pool_after_each_publish.push({
                 type: step.type,
                 profile: step.profile,
@@ -2626,6 +2779,77 @@ async function buildFinalForTier(tier, options = {}) {
                 remaining: candidatePool.length,
             });
             console.log('[accaBuilder] %s: card accepted, remaining_pool=%s', step.type, candidatePool.length);
+        }
+
+        if (accaRows.length === 0) {
+            const fallbackStep = { type: 'acca_6match', legCount: 6, profile: 'mixed_sport' };
+            const fallbackUsed = new Set(globalUsedFixtures);
+            const fallbackPool = relaxFilters(accaMarketCandidates, { forMega: false });
+            const fallbackCard = buildAccumulatorRowWithFallbackLadder(
+                fallbackStep,
+                fallbackPool,
+                fallbackUsed,
+                {
+                    megaDiagnostics,
+                    expiryCutoff: megaExpiryCutoff
+                }
+            );
+
+            if (fallbackCard && !cardWeeklyLockViolation(fallbackCard, usedTeamsWeekly) && !exceedsCardOverlapLimit(fallbackCard, publishedCards).reject) {
+                reservePredictionFixtures(fallbackCard, globalUsedFixtures);
+                reservePredictionTeams(fallbackCard, runTeamCompetitionMap);
+                lockCardTeamsForWeek(fallbackCard, usedTeamsWeekly);
+                addCardFixtureKeysToSet(fallbackCard, usedFixtureKeys);
+                publishedCards.push(fallbackCard);
+
+                const inserted = await insertFinalRow({
+                    publish_run_id: publishRunId,
+                    tier: t,
+                    type: 'acca_6match',
+                    matches: fallbackCard.matches,
+                    total_confidence: fallbackCard.total_confidence,
+                    risk_level: fallbackCard.risk_level,
+                }, client);
+                accaRows.push(inserted);
+                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, new Map());
+                console.log('[accaBuilder] fallback acca_6match published.');
+            }
+        }
+
+        if (megaAccaRows.length === 0) {
+            const fallbackStep = { type: 'mega_acca_12', legCount: 12, profile: 'mixed_sport' };
+            const fallbackUsed = new Set(globalUsedFixtures);
+            const fallbackPool = relaxFilters(accaMarketCandidates, { forMega: true });
+            const fallbackCard = buildAccumulatorRowWithFallbackLadder(
+                fallbackStep,
+                fallbackPool,
+                fallbackUsed,
+                {
+                    megaDiagnostics,
+                    expiryCutoff: megaExpiryCutoff
+                }
+            );
+
+            if (fallbackCard && !cardWeeklyLockViolation(fallbackCard, usedTeamsWeekly) && !exceedsCardOverlapLimit(fallbackCard, publishedCards).reject) {
+                reservePredictionFixtures(fallbackCard, globalUsedFixtures);
+                reservePredictionTeams(fallbackCard, runTeamCompetitionMap);
+                lockCardTeamsForWeek(fallbackCard, usedTeamsWeekly);
+                addCardFixtureKeysToSet(fallbackCard, usedFixtureKeys);
+                publishedCards.push(fallbackCard);
+
+                const inserted = await insertFinalRow({
+                    publish_run_id: publishRunId,
+                    tier: t,
+                    type: 'mega_acca_12',
+                    matches: fallbackCard.matches,
+                    total_confidence: fallbackCard.total_confidence,
+                    risk_level: fallbackCard.risk_level,
+                }, client);
+                megaAccaRows.push(inserted);
+                megaDiagnostics.mega_final_cards_built += 1;
+                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, new Map());
+                console.log('[accaBuilder] fallback mega_acca_12 published.');
+            }
         }
 
         megaDiagnostics.mega_zero_reason = resolveMegaZeroReason(megaDiagnostics);
@@ -2655,8 +2879,8 @@ async function buildFinalForTier(tier, options = {}) {
         const directSelections = takeAvailablePredictions(
             limitedCandidates,
             globalUsedFixtures,
-            weekLockedTeamCompetitionMap,
-            runTeamCompetitionMap,
+            new Map(),
+            new Map(),
             categoryBuildCaps.direct
         );
         for (const prediction of directSelections) {
@@ -2678,10 +2902,10 @@ async function buildFinalForTier(tier, options = {}) {
         // ---------------------------------------------------------------------
         const multiRows = [];
         const multiSelections = takeAvailablePredictions(
-            buildMultiCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap)),
+            buildMultiCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, new Map(), new Map())),
             globalUsedFixtures,
-            weekLockedTeamCompetitionMap,
-            runTeamCompetitionMap,
+            new Map(),
+            new Map(),
             categoryBuildCaps.multi
         );
         for (const row of multiSelections) {
@@ -2701,10 +2925,10 @@ async function buildFinalForTier(tier, options = {}) {
         // ---------------------------------------------------------------------
         const sameMatchRows = [];
         const sameMatchSelections = takeAvailablePredictions(
-            await buildSameMatchCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap)),
+            await buildSameMatchCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, new Map(), new Map())),
             globalUsedFixtures,
-            weekLockedTeamCompetitionMap,
-            runTeamCompetitionMap,
+            new Map(),
+            new Map(),
             categoryBuildCaps.same_match
         );
         for (const row of sameMatchSelections) {
@@ -2724,10 +2948,10 @@ async function buildFinalForTier(tier, options = {}) {
         // ---------------------------------------------------------------------
         const secondaryRows = [];
         const secondarySelections = takeAvailablePredictions(
-            await buildSecondaryCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap)),
+            await buildSecondaryCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, new Map(), new Map())),
             globalUsedFixtures,
-            weekLockedTeamCompetitionMap,
-            runTeamCompetitionMap,
+            new Map(),
+            new Map(),
             categoryBuildCaps.secondary
         );
         for (const prediction of secondarySelections) {

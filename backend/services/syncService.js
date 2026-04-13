@@ -7,6 +7,37 @@ const { assertRapidApiCacheWallReady } = require('./dataProviders');
 const { buildMatchContext } = require('./normalizerService');
 const config = require('../config');
 
+function isObject(value) {
+    return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function toNormalizationInput(rawMatch) {
+    if (!isObject(rawMatch)) return null;
+
+    if (isObject(rawMatch.match_info) && isObject(rawMatch.sharp_odds) && isObject(rawMatch.contextual_intelligence)) {
+        return rawMatch;
+    }
+
+    if (isObject(rawMatch.match) && isObject(rawMatch.odds)) {
+        return rawMatch;
+    }
+
+    const rawProviderData = isObject(rawMatch.raw_provider_data) ? rawMatch.raw_provider_data : {};
+    const match = {
+        ...rawProviderData,
+        ...rawMatch
+    };
+    const odds = isObject(rawMatch.odds)
+        ? rawMatch.odds
+        : (isObject(rawProviderData.odds) ? rawProviderData.odds : {});
+
+    return {
+        ...rawMatch,
+        match,
+        odds
+    };
+}
+
 function getSeasonStartYear() {
     const now = new Date();
     const month = now.getUTCMonth() + 1; // 1-12
@@ -165,16 +196,17 @@ async function syncSports(options = {}) {
                 console.log(`[syncService] Fetching REAL matches for: ${item.sport} (league: ${item.leagueId || 'all'}, season: ${item.season})...`);
 
                 const rawMatches = await buildLiveData(item);
-                const normalizedMatches = (Array.isArray(rawMatches) ? rawMatches : [])
-                    .map((rawMatch) => {
-                        try {
-                            return buildMatchContext(rawMatch);
-                        } catch (normalizeErr) {
-                            console.warn('[syncService] Normalization failed for one match (%s): %s', item.sport, normalizeErr.message);
-                            return null;
-                        }
-                    })
-                    .filter(Boolean);
+                const normalizedMatches = [];
+                for (const rawMatch of (Array.isArray(rawMatches) ? rawMatches : [])) {
+                    try {
+                        const normalizationInput = toNormalizationInput(rawMatch);
+                        const normalized = buildMatchContext(normalizationInput);
+                        if (!normalized) continue;
+                        normalizedMatches.push(normalized);
+                    } catch (normalizeErr) {
+                        console.warn('[syncService] Normalization failed for one match (%s): %s', item.sport, normalizeErr.message);
+                    }
+                }
 
                 if (normalizedMatches.length > 0) {
                     await upsertCanonicalEvents(normalizedMatches);

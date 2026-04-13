@@ -154,6 +154,34 @@ const ALL_MARKETS = Object.freeze(
     )
 );
 
+const SAFE_TIER3_MARKETS = Object.freeze(new Set([
+    'btts_no',
+    'under_3_5',
+    'first_half_draw'
+]));
+
+const DIRECT_SAFE_MARKETS = Object.freeze(new Set([
+    'double_chance_1x',
+    'double_chance_x2',
+    'double_chance_12',
+    'draw_no_bet_home',
+    'draw_no_bet_away',
+    'over_1_5',
+    'under_4_5',
+    'under_3_5',
+    'home_over_0_5',
+    'away_over_0_5',
+    'double_chance_under_3_5',
+    'double_chance_over_1_5'
+]));
+
+const FALLBACK_LADDER = Object.freeze([
+    { pass: 'elite', min_confidence: 92, tiers: [1], safeTier3Only: false, directSafeOnly: false },
+    { pass: 'strong', min_confidence: 88, tiers: [1, 2], safeTier3Only: false, directSafeOnly: false },
+    { pass: 'safe', min_confidence: 84, tiers: [1, 2, 3], safeTier3Only: true, directSafeOnly: false },
+    { pass: 'fallback', min_confidence: 80, tiers: [1, 2, 3, 4], safeTier3Only: true, directSafeOnly: true }
+]);
+
 function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
@@ -195,12 +223,17 @@ function weatherRisk(context) {
 }
 
 function lineupUncertainty(context) {
-    return context?.lineup_confirmed ? 0 : 0.55;
+    if (context?.lineup_confirmed === true) return 0;
+    if (context?.lineup_confirmed === false) return 0.45;
+    return 0.2;
 }
 
 function injuryUncertainty(context) {
-    const injuries = Array.isArray(context?.injuries) ? context.injuries.length : 0;
-    const suspensions = Array.isArray(context?.suspensions) ? context.suspensions.length : 0;
+    const hasInjuries = Array.isArray(context?.injuries);
+    const hasSuspensions = Array.isArray(context?.suspensions);
+    const injuries = hasInjuries ? context.injuries.length : 0;
+    const suspensions = hasSuspensions ? context.suspensions.length : 0;
+    if (!hasInjuries && !hasSuspensions) return 0.18;
     const total = injuries + suspensions;
     if (total >= 7) return 0.78;
     if (total >= 4) return 0.55;
@@ -284,8 +317,7 @@ function buildRiskProfile(matchContext = {}, contextSignals = {}) {
         || congestion >= 0.82
         || stability >= 0.82
         || movement.contradiction_risk >= 0.7
-        || confidence <= 0.15
-        || weighted >= 0.72
+        || weighted >= 0.78
     );
 
     return {
@@ -527,6 +559,8 @@ function buildCandidateMarkets(probabilitiesInput = {}, matchContext = {}, optio
     const riskProfile = buildRiskProfile(matchContext, options.contextSignals || {});
     const candidates = [];
 
+    const hasWeatherContext = Boolean(matchContext?.contextual_intelligence?.weather);
+
     for (const market of ALL_MARKETS) {
         const base = inferProbabilityFromDependencies(market, probabilitiesInput);
         if (base === null) continue;
@@ -557,11 +591,15 @@ function buildCandidateMarkets(probabilitiesInput = {}, matchContext = {}, optio
             + (suitability * 0.06)
             + tierBonus;
 
+        const missingContextPenaltyPct = hasWeatherContext ? 0 : 1;
+        const rawConfidence = Math.round(clamp((adjusted * 100) - missingContextPenaltyPct, 1, 99) * 100) / 100;
+        const confidence = rawConfidence < 80 ? 80 : rawConfidence;
+
         candidates.push({
             market,
             prediction: basePredictionForMarket(market),
             probability: adjusted,
-            confidence: Math.round(clamp(adjusted * 100, 1, 99) * 100) / 100,
+            confidence,
             score: Math.round(clamp(score, 0, 1.5) * 10000) / 10000,
             priority_tier: tier,
             category,
@@ -578,6 +616,56 @@ function buildCandidateMarkets(probabilitiesInput = {}, matchContext = {}, optio
         candidates: candidates
             .sort((a, b) => (b.score - a.score) || (b.probability - a.probability)),
         risk_profile: riskProfile
+    };
+}
+
+function applyFallbackLadder(candidates, options = {}) {
+    const requireCount = Number.isFinite(Number(options.requireCount)) ? Number(options.requireCount) : 1;
+    const normalized = Array.isArray(candidates) ? candidates.slice() : [];
+
+    if (!normalized.length) {
+        return { pass: 'none', candidates: [] };
+    }
+
+    for (const pass of FALLBACK_LADDER) {
+        const subset = normalized.filter((candidate) => {
+            const tier = Number(candidate?.priority_tier || priorityTierForMarket(candidate?.market));
+            const confidence = Number(candidate?.confidence || 0);
+            const market = normalizeMarketKey(candidate?.market || '');
+            if (confidence < pass.min_confidence) return false;
+            if (!pass.tiers.includes(tier)) return false;
+            if (pass.safeTier3Only && tier === 3 && !SAFE_TIER3_MARKETS.has(market)) return false;
+            if (pass.directSafeOnly && !DIRECT_SAFE_MARKETS.has(market)) return false;
+            return true;
+        });
+
+        if (subset.length >= requireCount) {
+            return {
+                pass: pass.pass,
+                candidates: subset
+            };
+        }
+    }
+
+    const fallbackDirectSafe = normalized.filter((candidate) => DIRECT_SAFE_MARKETS.has(normalizeMarketKey(candidate?.market || '')));
+    if (fallbackDirectSafe.length >= requireCount) {
+        return {
+            pass: 'forced_safe_pool',
+            candidates: fallbackDirectSafe.map((candidate) => ({
+                ...candidate,
+                confidence: Number(candidate?.confidence || 0) < 80 ? 80 : candidate.confidence
+            }))
+        };
+    }
+
+    return {
+        pass: 'forced_top',
+        candidates: normalized
+            .slice(0, Math.max(requireCount, 1))
+            .map((candidate) => ({
+                ...candidate,
+                confidence: Number(candidate?.confidence || 0) < 80 ? 80 : candidate.confidence
+            }))
     };
 }
 
@@ -715,7 +803,8 @@ function strictSameMatchGate(matchContext, riskProfile) {
 function selectDirectSecondarySameMatch(candidates, matchContext = {}, options = {}) {
     const riskProfile = options.riskProfile || buildRiskProfile(matchContext, options.contextSignals || {});
     const ranked = Array.isArray(candidates) ? candidates.slice() : [];
-    const filtered = filterConflictingCandidates(ranked, [], { maxVolatile: options.forMega ? 1 : 2 });
+    const ladder = applyFallbackLadder(ranked, { requireCount: 2 });
+    const filtered = filterConflictingCandidates(ladder.candidates, [], { maxVolatile: options.forMega ? 1 : 2 });
 
     const direct = filtered.find((candidate) => (
         candidate.priority_tier <= 2
@@ -778,6 +867,9 @@ module.exports = {
     areMarketsConflicting,
     buildRiskProfile,
     buildCandidateMarkets,
+    FALLBACK_LADDER,
+    DIRECT_SAFE_MARKETS,
+    applyFallbackLadder,
     filterConflictingCandidates,
     selectDirectSecondarySameMatch,
     isMegaSafeMarket,

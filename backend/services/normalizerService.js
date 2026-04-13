@@ -150,6 +150,16 @@ function pickFirst(source, paths, fallback = null) {
     return fallback;
 }
 
+function pickFirstWithMatch(source, paths, fallback = null) {
+    const expandedPaths = [];
+    for (const path of paths) {
+        const stringPath = Array.isArray(path) ? path.join('.') : String(path);
+        expandedPaths.push(stringPath);
+        expandedPaths.push(`match.${stringPath}`);
+    }
+    return pickFirst(source, expandedPaths, fallback);
+}
+
 function buildFallbackMatchId(raw, matchInfo) {
     const explicit = normalizeString(
         pickFirst(raw, [
@@ -172,7 +182,7 @@ function buildFallbackMatchId(raw, matchInfo) {
 
 function normalizeProvider(raw) {
     const provider = normalizeString(
-        pickFirst(raw, [
+        pickFirstWithMatch(raw, [
             'provider',
             'provider_name',
             'metadata.provider',
@@ -187,7 +197,7 @@ function normalizeProvider(raw) {
 
 function normalizeSport(raw) {
     const key = normalizeString(
-        pickFirst(raw, ['sport', 'metadata.sport', 'raw_provider_data.sport']),
+        pickFirstWithMatch(raw, ['sport', 'metadata.sport', 'raw_provider_data.sport']),
         'football'
     ).toLowerCase();
     if (key === 'soccer' || key.startsWith('soccer_')) return 'football';
@@ -203,7 +213,7 @@ function buildMatchInfo(raw) {
     const matchInfo = { ...MATCH_INFO_TEMPLATE };
 
     matchInfo.league = normalizeString(
-        pickFirst(raw, [
+        pickFirstWithMatch(raw, [
             'league',
             'competition',
             'tournament',
@@ -218,7 +228,7 @@ function buildMatchInfo(raw) {
     );
 
     matchInfo.country = normalizeString(
-        pickFirst(raw, [
+        pickFirstWithMatch(raw, [
             'country',
             'metadata.country',
             'raw_provider_data.league.country',
@@ -227,7 +237,7 @@ function buildMatchInfo(raw) {
     );
 
     matchInfo.season = normalizeString(
-        pickFirst(raw, [
+        pickFirstWithMatch(raw, [
             'season',
             'metadata.season',
             'raw_provider_data.league.season',
@@ -236,7 +246,7 @@ function buildMatchInfo(raw) {
     );
 
     matchInfo.kickoff = toIsoString(
-        pickFirst(raw, [
+        pickFirstWithMatch(raw, [
             'date',
             'kickoff',
             'kickoff_time',
@@ -253,7 +263,7 @@ function buildMatchInfo(raw) {
     );
 
     matchInfo.venue = normalizeString(
-        pickFirst(raw, [
+        pickFirstWithMatch(raw, [
             'venue',
             'location',
             'metadata.venue',
@@ -266,7 +276,7 @@ function buildMatchInfo(raw) {
     );
 
     matchInfo.home_team = normalizeString(
-        pickFirst(raw, [
+        pickFirstWithMatch(raw, [
             'home_team',
             'homeTeam',
             'metadata.home_team',
@@ -280,7 +290,7 @@ function buildMatchInfo(raw) {
     );
 
     matchInfo.away_team = normalizeString(
-        pickFirst(raw, [
+        pickFirstWithMatch(raw, [
             'away_team',
             'awayTeam',
             'metadata.away_team',
@@ -294,7 +304,7 @@ function buildMatchInfo(raw) {
     );
 
     matchInfo.home_team_id = normalizeString(
-        pickFirst(raw, [
+        pickFirstWithMatch(raw, [
             'home_team_id',
             'metadata.home_team_id',
             'raw_provider_data.teams.home.id',
@@ -304,7 +314,7 @@ function buildMatchInfo(raw) {
     );
 
     matchInfo.away_team_id = normalizeString(
-        pickFirst(raw, [
+        pickFirstWithMatch(raw, [
             'away_team_id',
             'metadata.away_team_id',
             'raw_provider_data.teams.away.id',
@@ -314,7 +324,7 @@ function buildMatchInfo(raw) {
     );
 
     matchInfo.referee = normalizeString(
-        pickFirst(raw, [
+        pickFirstWithMatch(raw, [
             'referee',
             'metadata.referee',
             'raw_provider_data.fixture.referee',
@@ -323,7 +333,7 @@ function buildMatchInfo(raw) {
     );
 
     matchInfo.timezone = normalizeString(
-        pickFirst(raw, [
+        pickFirstWithMatch(raw, [
             'timezone',
             'metadata.timezone',
             'raw_provider_data.fixture.timezone',
@@ -332,7 +342,7 @@ function buildMatchInfo(raw) {
     );
 
     matchInfo.match_id = normalizeString(
-        pickFirst(raw, [
+        pickFirstWithMatch(raw, [
             'match_id',
             'id',
             'fixture_id',
@@ -811,6 +821,8 @@ function buildCompatibilityPayload(raw, matchContext, provider, sport) {
 }
 
 function buildMatchContext(rawMatch) {
+    if (!rawMatch) return null;
+
     const safeRaw = isObject(rawMatch) ? rawMatch : {};
 
     if (isMatchContext(safeRaw)) {
@@ -820,6 +832,10 @@ function buildMatchContext(rawMatch) {
             sharp_odds: { ...SHARP_ODDS_TEMPLATE, ...safeRaw.sharp_odds },
             contextual_intelligence: { ...CONTEXT_TEMPLATE, ...safeRaw.contextual_intelligence }
         };
+    }
+
+    if (!rawMatch || !rawMatch.match || !rawMatch.odds) {
+        return null; // reject legacy rows
     }
 
     const provider = normalizeProvider(safeRaw);

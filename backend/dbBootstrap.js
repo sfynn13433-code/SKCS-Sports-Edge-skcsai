@@ -2,6 +2,43 @@
 
 const { query } = require('./db');
 
+async function cleanupLegacyFixtureRows() {
+    const tableRes = await query(`SELECT to_regclass('public.fixtures') IS NOT NULL AS exists;`);
+    const fixturesExists = Boolean(tableRes.rows?.[0]?.exists);
+    if (!fixturesExists) {
+        console.log('[dbBootstrap] fixtures table not found; skipped legacy schema cleanup.');
+        return;
+    }
+
+    const columnRes = await query(`
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'fixtures'
+          AND column_name IN ('sharp_odds', 'contextual_intelligence', 'match_info');
+    `);
+
+    const columns = new Set((columnRes.rows || []).map((row) => String(row.column_name || '').toLowerCase()));
+    const hasRequiredColumns =
+        columns.has('sharp_odds')
+        && columns.has('contextual_intelligence')
+        && columns.has('match_info');
+
+    if (!hasRequiredColumns) {
+        console.log('[dbBootstrap] fixtures table missing MatchContext columns; skipped legacy schema cleanup.');
+        return;
+    }
+
+    const deleteRes = await query(`
+        DELETE FROM fixtures
+        WHERE sharp_odds IS NULL
+           OR contextual_intelligence IS NULL
+           OR match_info IS NULL;
+    `);
+
+    console.log('[dbBootstrap] Legacy fixture cleanup deleted %s row(s).', Number(deleteRes.rowCount || 0));
+}
+
 async function bootstrap() {
     console.log('[dbBootstrap] Ensuring tables and seed data exist...');
 
@@ -255,6 +292,8 @@ async function bootstrap() {
                 created_at timestamptz NOT NULL DEFAULT now()
             );
         `);
+
+        await cleanupLegacyFixtureRows();
 
         console.log('[dbBootstrap] All tables and seed data verified.');
     } catch (err) {

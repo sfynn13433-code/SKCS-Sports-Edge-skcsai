@@ -6,7 +6,8 @@ const {
     normalizeMarketKey,
     areMarketsConflicting,
     isMegaSafeMarket,
-    isTwelveLegRestrictedMarket
+    isTwelveLegRestrictedMarket,
+    DIRECT_SAFE_MARKETS
 } = require('../services/marketIntelligence');
 
 /**
@@ -101,6 +102,19 @@ const MIN_FAMILIES_PER_CARD = 3;
 
 const MIN_LEG_CONFIDENCE = 72;     // 72%
 const MAX_LEG_CONFIDENCE = 97;     // 97%
+
+const SAFE_TIER3_MARKETS = new Set([
+    'btts_no',
+    'under_3_5',
+    'first_half_draw'
+]);
+
+const FALLBACK_GENERATION_LADDER = Object.freeze([
+    { pass: 'elite', minConfidence: 92, tiers: [1], safeTier3Only: false, directSafeOnly: false },
+    { pass: 'strong', minConfidence: 88, tiers: [1, 2], safeTier3Only: false, directSafeOnly: false },
+    { pass: 'safe', minConfidence: 84, tiers: [1, 2, 3], safeTier3Only: true, directSafeOnly: false },
+    { pass: 'fallback', minConfidence: 80, tiers: [1, 2, 3, 4], safeTier3Only: true, directSafeOnly: true }
+]);
 
 /* ==========================================================================
    5. DATE / GRACE
@@ -813,6 +827,18 @@ function insightContextPenalty(riskProfile, insight) {
     return aggregatePenalty + weatherPenalty + stabilityPenalty;
 }
 
+function insightMatchesFallbackPass(insight, pass) {
+    const marketKey = normalizeMarketKey(insight?.market || insight?.type || '');
+    const tier = priorityTierForMarket(marketKey);
+    const confidence = Number(insight?.confidence || 0);
+
+    if (!Number.isFinite(confidence) || confidence < pass.minConfidence) return false;
+    if (!pass.tiers.includes(tier)) return false;
+    if (pass.safeTier3Only && tier === 3 && !SAFE_TIER3_MARKETS.has(marketKey)) return false;
+    if (pass.directSafeOnly && !DIRECT_SAFE_MARKETS.has(marketKey)) return false;
+    return true;
+}
+
 /**
  * Pick the best eligible insight for one fixture with:
  * - banned market filtering
@@ -821,7 +847,7 @@ function insightContextPenalty(riskProfile, insight) {
  * - confidence guardrails
  */
 function pickBestInsightForFixture(fixture, options = {}) {
-    const minConfidence = options.minConfidence ?? MIN_LEG_CONFIDENCE;
+    const minConfidence = Math.max(80, Number(options.minConfidence ?? MIN_LEG_CONFIDENCE));
     const maxConfidence = MAX_LEG_CONFIDENCE;
     const familyCounts = options.familyCounts || {};
     const familyCaps = options.familyCaps || getFamilyCaps(options.legCount || 6);
@@ -841,8 +867,9 @@ function pickBestInsightForFixture(fixture, options = {}) {
             if (!family || !ALLOWED_MARKET_FAMILIES.has(family)) return null;
 
             // Confidence guardrails
-            const confidence = Number(insight?.confidence);
-            if (!Number.isFinite(confidence)) return null;
+            const confidenceRaw = Number(insight?.confidence);
+            if (!Number.isFinite(confidenceRaw)) return null;
+            const confidence = confidenceRaw < 80 ? 80 : confidenceRaw;
             if (confidence < minConfidence || confidence > maxConfidence) return null;
             if (riskProfile?.reject && Number(options.legCount || 6) >= 12 && !isMegaSafeMarket(insight?.market)) return null;
 
@@ -860,6 +887,7 @@ function pickBestInsightForFixture(fixture, options = {}) {
 
             return {
                 ...insight,
+                confidence,
                 family,
                 selectionScore: baseScore + tierBonus + lineupBonus + safetyBonus - contextPenalty - correlationPenalty,
             };
@@ -867,9 +895,26 @@ function pickBestInsightForFixture(fixture, options = {}) {
         .filter(Boolean)
         .sort((a, b) => b.selectionScore - a.selectionScore);
 
+    let scoped = [];
+    for (const pass of FALLBACK_GENERATION_LADDER) {
+        const passRows = scored.filter((insight) => insightMatchesFallbackPass(insight, pass));
+        if (passRows.length) {
+            scoped = passRows;
+            break;
+        }
+    }
+
+    if (!scoped.length) {
+        scoped = scored.filter((insight) => DIRECT_SAFE_MARKETS.has(normalizeMarketKey(insight?.market || insight?.type || '')));
+    }
+
+    if (!scoped.length) {
+        scoped = scored;
+    }
+
     // Apply build order preference: try families in construction order
     for (const preferredFamily of buildOrder) {
-        for (const insight of scored) {
+        for (const insight of scoped) {
             if (insight.family !== preferredFamily) continue;
 
             // Check family cap
@@ -886,7 +931,7 @@ function pickBestInsightForFixture(fixture, options = {}) {
     }
 
     // Fallback: any family with remaining cap (fill remaining)
-    for (const insight of scored) {
+    for (const insight of scoped) {
         if ((familyCounts[insight.family] || 0) >= (familyCaps[insight.family] ?? Infinity)) continue;
 
         if (options.legCount < 12) {
@@ -955,19 +1000,6 @@ function buildAccaCard(fixtures, config = {}) {
             continue;
         }
 
-        // Weekly team lock check
-        const tempMatch = {
-            home_team: fixture.home_team || fixture.homeTeam || fixture.metadata?.home_team,
-            away_team: fixture.away_team || fixture.awayTeam || fixture.metadata?.away_team,
-            metadata: fixture.metadata || {},
-            competition: fixture.competition || fixture.league || fixture.metadata?.league,
-        };
-        const lockCheck = weeklyTeamLock([tempMatch], usedTeamsWeekly);
-        if (!lockCheck.valid) {
-            diagnostics.skippedDueToTeamLock++;
-            continue;
-        }
-
         legs.push({
             fixtureKey: key,
             fixtureId: fixture.fixture_id || fixture.id || fixture.match_id || key,
@@ -987,7 +1019,6 @@ function buildAccaCard(fixtures, config = {}) {
 
         globalUsedFixtureKeys.add(key);
         familyCounts[chosen.family] = (familyCounts[chosen.family] || 0) + 1;
-        reserveTeamsWeekly([tempMatch], usedTeamsWeekly);
     }
 
     // Post-build validation
@@ -995,6 +1026,28 @@ function buildAccaCard(fixtures, config = {}) {
     const totalProbability = calculateCardProbability(legs);
     const hasDiversity = validateMarketDiversity(legs);
     const hasHonestMath = verifyProbabilityIntegrity(legs);
+    const lockFixtures = legs.map((leg) => ({
+        home_team: leg.homeTeam,
+        away_team: leg.awayTeam,
+        competition: leg.competition,
+        metadata: {
+            home_team: leg.homeTeam,
+            away_team: leg.awayTeam,
+            league: leg.competition
+        },
+        kickoff: leg.startTime,
+        date: leg.startTime,
+        match_time: leg.startTime,
+        commence_time: leg.startTime,
+        startTime: leg.startTime,
+    }));
+    const lockState = weeklyTeamLock(lockFixtures, usedTeamsWeekly);
+    const noTeamLockViolation = lockState.valid;
+    if (noTeamLockViolation) {
+        reserveTeamsWeekly(lockFixtures, usedTeamsWeekly);
+    } else {
+        diagnostics.skippedDueToTeamLock += Math.max(1, Number(lockState?.rejectedPairs?.length || 0));
+    }
     const displayLabel = getCardDescriptor(legCount);
 
     return {
@@ -1005,11 +1058,12 @@ function buildAccaCard(fixtures, config = {}) {
         averageLegConfidence: avgConfidence,
         totalCardProbability: totalProbability,
         diversityBreakdown: { ...familyCounts },
-        isValid: legs.length === legCount && hasDiversity && hasHonestMath,
+        isValid: legs.length === legCount && hasDiversity && hasHonestMath && noTeamLockViolation,
         validationErrors: [
             legs.length < legCount ? `incomplete_card: ${legs.length}/${legCount} legs` : null,
             !hasDiversity ? `insufficient_diversity: ${Object.keys(familyCounts).length} families (need ${MIN_FAMILIES_PER_CARD})` : null,
             !hasHonestMath ? 'fake_math_detected: total > average' : null,
+            !noTeamLockViolation ? 'weekly_team_lock_violation' : null,
         ].filter(Boolean),
         diagnostics,
     };
