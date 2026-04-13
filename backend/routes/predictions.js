@@ -42,7 +42,8 @@ const SPORT_FILTER_MAP = {
     cricket: ['cricket']
 };
 
-const DEFAULT_UPCOMING_GRACE_MINUTES = 30;
+// IRON-CLAD DATE PATCH: 15-minute grace — matches more than 15 min past kickoff are rejected.
+const DEFAULT_UPCOMING_GRACE_MINUTES = 15;
 const DEFAULT_ACCA_STARTED_LOOKBACK_HOURS = 72;
 const DEFAULT_ACCA_WINDOW_LOOKBACK_HOURS = 168;
 
@@ -700,45 +701,42 @@ function predictionMatchesWindow(prediction, windowStart, windowEnd) {
     return !Number.isNaN(createdAt.getTime());
 }
 
-// Hard cutoff: reject any prediction whose earliest kickoff is more than 24 hours in the past
+// IRON-CLAD DATE PATCH: reject any prediction whose kickoff is older than UPCOMING_GRACE_MINUTES.
+// No recentlyPublished bypass — date lock is absolute.
 function predictionIsNotStale(prediction, now = new Date()) {
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
     if (matches.length === 0) return false;
 
     const kickoffStats = computePredictionKickoffStats(prediction, now);
     if (!kickoffStats.hasKickoffs) {
-        // No parseable kickoff dates — use created_at as a safety net
-        const created = new Date(prediction.created_at);
-        if (isNaN(created.getTime())) return false;
-        const hoursSinceCreation = (now.getTime() - created.getTime()) / (1000 * 60 * 60);
-        return hoursSinceCreation <= 48; // allow up to 48 hours since creation
+        // No parseable kickoff dates — reject outright (cannot verify timing).
+        return false;
     }
 
     if (kickoffStats.isAccumulator) {
-        return (
-            (kickoffStats.latestKickoffMs !== null && kickoffStats.latestKickoffMs >= kickoffStats.accaLookbackCutoffMs)
-            || kickoffStats.recentlyPublished
-        );
+        // For ACCAs: at least the latest leg must be within the grace window.
+        return kickoffStats.latestKickoffMs !== null && kickoffStats.latestKickoffMs >= kickoffStats.graceCutoffMs;
     }
 
-    const earliestKickoff = new Date(kickoffStats.earliestKickoffMs);
-    const hoursInPast = (now.getTime() - earliestKickoff.getTime()) / (1000 * 60 * 60);
-    return hoursInPast <= 24 || kickoffStats.recentlyPublished; // read-path resilience for freshly published cards
+    // Singles: the earliest (soonest) leg must still be within the grace window.
+    return kickoffStats.earliestKickoffMs !== null && kickoffStats.earliestKickoffMs >= kickoffStats.graceCutoffMs;
 }
 
+// IRON-CLAD DATE PATCH: strictly enforce the grace window — no recentlyPublished bypass.
 function predictionHasOnlyUpcomingKickoffs(prediction, now = new Date()) {
     const kickoffStats = computePredictionKickoffStats(prediction, now);
     if (!kickoffStats.hasKickoffs) return false;
 
     if (kickoffStats.isAccumulator) {
+        // For ACCAs: at least one leg must still be within the grace window.
         return (
             kickoffStats.hasUpcomingOrGrace
-            || (kickoffStats.latestKickoffMs !== null && kickoffStats.latestKickoffMs >= kickoffStats.accaLookbackCutoffMs)
-            || kickoffStats.recentlyPublished
+            || (kickoffStats.latestKickoffMs !== null && kickoffStats.latestKickoffMs >= kickoffStats.graceCutoffMs)
         );
     }
 
-    return kickoffStats.allUpcomingOrGrace || kickoffStats.recentlyPublished;
+    // Singles / secondary / same-match: ALL legs must be within the grace window.
+    return kickoffStats.allUpcomingOrGrace;
 }
 
 function getPredictionPrimaryKickoff(prediction) {

@@ -541,9 +541,11 @@ function isPublishablePrediction(prediction, tier, now = new Date()) {
         return false;
     }
 
-    // Strict pre-match rule: only fixtures strictly in the future are valid.
-    if (kickoff.getTime() <= now.getTime()) {
-        console.log(`[accaBuilder] Rejecting prediction for match ${prediction.match_id}: kickoff ${kickoff.toISOString()} is not strictly in the future.`);
+    // IRON-CLAD DATE PATCH: reject matches kicked off more than 15 minutes ago.
+    const ACCA_GRACE_MINUTES = 15;
+    const graceCutoffMs = now.getTime() - ACCA_GRACE_MINUTES * 60 * 1000;
+    if (kickoff.getTime() < graceCutoffMs) {
+        console.log(`[accaBuilder] Rejecting prediction for match ${prediction.match_id}: kickoff ${kickoff.toISOString()} is past the ${ACCA_GRACE_MINUTES}-minute grace window.`);
         return false;
     }
 

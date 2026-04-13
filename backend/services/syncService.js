@@ -8,8 +8,36 @@ const { buildMatchContext } = require('./normalizerService');
 const pipelineLogger = require('../utils/pipelineLogger');
 const config = require('../config');
 
+// IRON-CLAD DATE PATCH: matches kicked off more than this many minutes ago are dropped at sync time.
+const SYNC_GRACE_MINUTES = 15;
+
 function isObject(value) {
     return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+/**
+ * Returns true if the normalized match has a kickoff that is still within the
+ * 15-minute grace window (i.e. future or kicked off less than 15 minutes ago).
+ * Matches with no parseable kickoff are rejected to avoid polluting the pipeline.
+ */
+function isMatchWithinGraceWindow(normalizedMatch) {
+    const mi = isObject(normalizedMatch?.match_info) ? normalizedMatch.match_info : {};
+    const rawKickoff =
+        mi.kickoff ||
+        mi.match_time ||
+        mi.kickoff_time ||
+        mi.commence_time ||
+        normalizedMatch?.kickoff ||
+        normalizedMatch?.match_time ||
+        null;
+
+    if (!rawKickoff) return false; // no kickoff → reject
+
+    const kickoffMs = new Date(rawKickoff).getTime();
+    if (!Number.isFinite(kickoffMs)) return false; // unparseable → reject
+
+    const graceCutoffMs = Date.now() - SYNC_GRACE_MINUTES * 60 * 1000;
+    return kickoffMs >= graceCutoffMs;
 }
 
 function toNormalizationInput(rawMatch) {
@@ -291,6 +319,19 @@ async function syncSports(options = {}) {
                                 bucket: 'missing_context',
                                 metadata: { match_id: normalized?.match_info?.match_id || null }
                             });
+                        }
+                        // IRON-CLAD DATE PATCH: drop matches that are past the grace window.
+                        if (!isMatchWithinGraceWindow(normalized)) {
+                            pipelineLogger.rejectionAdd({
+                                run_id: telemetryRunId,
+                                sport: item.sport,
+                                bucket: 'stale_kickoff_rejected',
+                                metadata: {
+                                    match_id: normalized?.match_info?.match_id || null,
+                                    reason: 'kickoff_past_grace_window'
+                                }
+                            });
+                            continue;
                         }
                         normalizedMatches.push(normalized);
                     } catch (normalizeErr) {
