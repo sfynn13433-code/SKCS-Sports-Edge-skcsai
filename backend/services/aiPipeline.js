@@ -6,6 +6,11 @@ const { filterRawPrediction } = require('./filterEngine');
 const { buildFinalForTier } = require('./accaBuilder');
 const { getPredictionInputs } = require('./dataProvider');
 const { scoreMatch } = require('./aiScoring');
+const { buildMatchContext } = require('./normalizerService');
+const {
+    buildCandidateMarkets,
+    selectDirectSecondarySameMatch
+} = require('./marketIntelligence');
 const enrichFixtureWithContext = require('../src/services/contextIntelligence/aiPipeline');
 const adjustProbability = require('../src/services/contextIntelligence/adjustProbability');
 const { resolveDecision } = require('../src/services/marketRouter/waterfall');
@@ -63,7 +68,13 @@ function normalizeContextSignals(value) {
         weather_risk: read('weather_risk'),
         availability_risk: read('availability_risk'),
         discipline_risk: read('discipline_risk'),
-        stability_risk: read('stability_risk')
+        stability_risk: read('stability_risk'),
+        travel_fatigue_risk: read('travel_fatigue_risk'),
+        fixture_congestion_risk: read('fixture_congestion_risk'),
+        derby_risk: read('derby_risk'),
+        rotation_risk: read('rotation_risk'),
+        market_movement_risk: read('market_movement_risk'),
+        lineup_uncertainty_risk: read('lineup_uncertainty_risk')
     };
 }
 
@@ -89,7 +100,7 @@ function safeTeamData(teamData) {
     };
 }
 
-function deriveWaterfallProbabilities(predictionKey, pAdj) {
+function deriveWaterfallProbabilities(predictionKey, pAdj, matchContext = {}) {
     const pFav = clamp(toProb(pAdj), 0.10, 0.95);
 
     let home = 0.33;
@@ -123,7 +134,7 @@ function deriveWaterfallProbabilities(predictionKey, pAdj) {
     const over15 = clamp(Math.max(home, away) + 0.18, 0.55, 0.98);
     const under45 = clamp(0.92 - Math.abs(home - away) * 0.12 + draw * 0.06, 0.55, 0.98);
 
-    return {
+    const fallback = {
         home_win: home,
         away_win: away,
         draw,
@@ -134,6 +145,41 @@ function deriveWaterfallProbabilities(predictionKey, pAdj) {
         over_1_5: over15,
         under_4_5: under45
     };
+
+    const sharpOdds = matchContext && typeof matchContext.sharp_odds === 'object' ? matchContext.sharp_odds : {};
+    const merged = { ...fallback };
+    for (const [key, value] of Object.entries(sharpOdds)) {
+        const prob = toProb(value);
+        if (prob > 0) merged[key] = prob;
+    }
+
+    if (!merged.over_2_5) merged.over_2_5 = clamp((merged.over_1_5 || over15) - 0.12, 0.30, 0.90);
+    if (!merged.over_3_5) merged.over_3_5 = clamp((merged.over_2_5 || merged.over_1_5 || over15) - 0.16, 0.15, 0.82);
+    if (!merged.under_3_5) merged.under_3_5 = clamp(1 - merged.over_3_5 + 0.08, 0.20, 0.95);
+    if (!merged.under_2_5) merged.under_2_5 = clamp(1 - merged.over_2_5, 0.10, 0.90);
+    if (!merged.double_chance_12) merged.double_chance_12 = clamp((merged.home_win || home) + (merged.away_win || away), 0, 1);
+    if (!merged.home_over_0_5) merged.home_over_0_5 = clamp((merged.home_win || home) + 0.18, 0.48, 0.95);
+    if (!merged.away_over_0_5) merged.away_over_0_5 = clamp((merged.away_win || away) + 0.16, 0.44, 0.94);
+    if (!merged.home_over_1_5) merged.home_over_1_5 = clamp(merged.home_over_0_5 - 0.20, 0.12, 0.86);
+    if (!merged.away_over_1_5) merged.away_over_1_5 = clamp(merged.away_over_0_5 - 0.20, 0.10, 0.84);
+    if (!merged.btts_yes) merged.btts_yes = clamp(((merged.home_over_0_5 + merged.away_over_0_5) / 2) - 0.06, 0.24, 0.88);
+    if (!merged.btts_no) merged.btts_no = clamp(1 - merged.btts_yes, 0.12, 0.90);
+    if (!merged.double_chance_over_1_5) {
+        merged.double_chance_over_1_5 = clamp(
+            Math.max(merged.double_chance_1x || 0, merged.double_chance_x2 || 0, merged.double_chance_12 || 0) * (merged.over_1_5 || over15),
+            0.30,
+            0.98
+        );
+    }
+    if (!merged.double_chance_under_3_5) {
+        merged.double_chance_under_3_5 = clamp(
+            Math.max(merged.double_chance_1x || 0, merged.double_chance_x2 || 0, merged.double_chance_12 || 0) * (merged.under_3_5 || 0.70),
+            0.25,
+            0.96
+        );
+    }
+
+    return merged;
 }
 
 function toProb(value) {
@@ -174,85 +220,98 @@ function buildUiInsights(contextFixture, contextSignals) {
     return { weather, availability, stability };
 }
 
-function buildContextFixture(item, matchId, sport) {
-    const metadata = item?.metadata && typeof item.metadata === 'object' ? item.metadata : {};
-    const rawProviderData = item?.raw_provider_data && typeof item.raw_provider_data === 'object'
-        ? item.raw_provider_data
-        : {};
-
+function buildContextFixture(matchContext, item, sport) {
+    const info = matchContext?.match_info || {};
+    const context = matchContext?.contextual_intelligence || {};
     return {
-        id: matchId,
-        match_id: matchId,
+        ...matchContext,
+        id: info.match_id || item?.match_id || item?.id || null,
+        match_id: info.match_id || item?.match_id || item?.id || null,
         sport,
-        home_team: item.home_team || metadata.home_team || null,
-        away_team: item.away_team || metadata.away_team || null,
-        competition: item.league || item.competition || metadata.league || metadata.competition || null,
-        location:
-            item.location ||
-            item.venue ||
-            metadata.venue ||
-            rawProviderData?.venue?.name ||
-            rawProviderData?.venue?.city ||
-            metadata.city ||
-            'London',
-        kickoffTime:
-            item.date ||
-            item.commence_time ||
-            item.kickoff ||
-            item.match_time ||
-            metadata.match_time ||
-            metadata.kickoff ||
-            new Date().toISOString(),
-        teamData:
-            item.teamData ||
-            metadata.teamData ||
-            rawProviderData.teamData ||
-            {
-                injuries: [],
-                suspensions: [],
-                expectedXI: { reliability: 1 }
-            },
-        teamDiscipline:
-            item.teamDiscipline ||
-            metadata.teamDiscipline ||
-            rawProviderData.teamDiscipline ||
-            {
-                redCards: { last5Games: 0 },
-                yellowCardThreats: [],
-                bans: []
-            },
-        teamContext:
-            item.teamContext ||
-            metadata.teamContext ||
-            rawProviderData.teamContext ||
-            {
-                coachConflict: false,
-                execInstability: false,
-                playerLegalIssues: [],
-                fanViolence: false
+        home_team: info.home_team || item?.home_team || null,
+        away_team: info.away_team || item?.away_team || null,
+        competition: info.league || item?.league || item?.competition || null,
+        location: info.venue || item?.venue || item?.location || null,
+        kickoffTime: info.kickoff || item?.date || item?.kickoff || new Date().toISOString(),
+        teamData: {
+            injuries: ensureArray(context.injuries),
+            suspensions: ensureArray(context.suspensions),
+            expectedXI: {
+                reliability: context.lineup_confirmed ? 0.95 : 0.65
             }
+        },
+        teamDiscipline: {
+            redCards: { last5Games: 0 },
+            yellowCardThreats: [],
+            bans: ensureArray(context.suspensions)
+        },
+        teamContext: {
+            coachConflict: Boolean(context.coach_conflict),
+            execInstability: Boolean(context.boardroom_instability),
+            playerLegalIssues: ensureArray(context.public_incidents),
+            fanViolence: false,
+            morale: context.morale
+        }
     };
 }
 
+function fallbackPredictionForMarket(market, defaultPrediction = 'home_win') {
+    const key = String(market || '').trim().toLowerCase();
+    if (key.startsWith('double_chance_')) return key.replace('double_chance_', '');
+    if (key.startsWith('draw_no_bet_')) return key.endsWith('_away') ? 'away' : 'home';
+    if (key === 'home_win') return 'home_win';
+    if (key === 'away_win') return 'away_win';
+    if (key === 'draw') return 'draw';
+    if (key === 'btts_yes') return 'yes';
+    if (key === 'btts_no') return 'no';
+    if (key.includes('team_to_score_first_home')) return 'home';
+    if (key.includes('team_to_score_first_away')) return 'away';
+    if (key.includes('over')) return 'over';
+    if (key.includes('under')) return 'under';
+    return defaultPrediction;
+}
+
+function sanitizeMatchContextForStorage(matchContext) {
+    const source = matchContext && typeof matchContext === 'object' ? matchContext : {};
+    return {
+        match_info: { ...(source.match_info || {}) },
+        sharp_odds: { ...(source.sharp_odds || {}) },
+        contextual_intelligence: { ...(source.contextual_intelligence || {}) }
+    };
+}
+
+function volatilityFromRiskProfile(riskProfile, fallbackVolatility) {
+    if (!riskProfile || typeof riskProfile !== 'object') {
+        return fallbackVolatility || 'medium';
+    }
+    const aggregate = Number(riskProfile.aggregate_risk || 0);
+    if (aggregate >= 0.67) return 'high';
+    if (aggregate >= 0.38) return 'medium';
+    return 'low';
+}
+
 async function buildRawPredictionFromProviderItem(item) {
-    const match_id = String(item.match_id || item.id || '').trim();
+    const matchContext = buildMatchContext(item);
+    const matchInfo = matchContext?.match_info || {};
+
+    const match_id = String(matchInfo.match_id || item.match_id || item.id || '').trim();
     if (!match_id) throw new Error('match_id missing in provider item');
 
-    const sport = normalizeSport(item.sport);
+    const sport = normalizeSport(matchContext?.sport || item.sport || 'football');
     const requestedMarket = String(item.market || '1X2').trim();
 
     const scoring = await scoreMatch({
         match_id,
         sport,
-        home_team: item.home_team || null,
-        away_team: item.away_team || null,
+        home_team: matchInfo.home_team || item.home_team || null,
+        away_team: matchInfo.away_team || item.away_team || null,
         prediction: item.prediction || null,
         confidence: item.confidence,
-        raw_provider_data: item.raw_provider_data || null,
-        metadata: item.metadata || null
+        raw_provider_data: item.raw_provider_data || matchContext.raw_provider_data || null,
+        metadata: item.metadata || matchContext.metadata || null
     });
 
-    const providerPrediction = normalizePrediction(item.prediction);
+    const providerPrediction = normalizePrediction(item.prediction || matchContext.prediction);
     const predictionSource = providerPrediction ? 'provider' : 'ai_fallback';
     const fallbackPrediction = scoring.winner === 'home'
         ? 'home_win'
@@ -264,9 +323,9 @@ async function buildRawPredictionFromProviderItem(item) {
     const prediction = providerPrediction || fallbackPrediction;
     const baselineConfidence = typeof item.confidence === 'number' && Number.isFinite(item.confidence)
         ? item.confidence
-        : scoring.confidence;
+        : (Number.isFinite(Number(scoring.confidence)) ? Number(scoring.confidence) : 62);
     const p_base = toProbability(baselineConfidence);
-    const contextFixture = buildContextFixture(item, match_id, sport);
+    const contextFixture = buildContextFixture(matchContext, item, sport);
     let contextEnriched = null;
 
     try {
@@ -277,17 +336,38 @@ async function buildRawPredictionFromProviderItem(item) {
 
     const contextSignals = normalizeContextSignals(contextEnriched?.contextSignals);
     const p_adj = adjustProbability(p_base, contextSignals);
-    const waterfallProbabilities = deriveWaterfallProbabilities(prediction, p_adj);
+    const effectiveMatchContext = contextEnriched || contextFixture;
+    const storableMatchContext = sanitizeMatchContextForStorage(effectiveMatchContext);
+    const waterfallProbabilities = deriveWaterfallProbabilities(prediction, p_adj, effectiveMatchContext);
+    const marketIntelligence = buildCandidateMarkets(
+        waterfallProbabilities,
+        effectiveMatchContext,
+        { contextSignals }
+    );
+    const marketSelections = selectDirectSecondarySameMatch(
+        marketIntelligence.candidates,
+        effectiveMatchContext,
+        { contextSignals, riskProfile: marketIntelligence.risk_profile }
+    );
     const waterfallDecision = resolveDecision(waterfallProbabilities);
-    if (waterfallDecision.status === 'no_bet') {
+
+    if (marketIntelligence.risk_profile?.reject) {
+        console.log('[aiPipeline] risk-rejection fixture skipped match_id=%s aggregate_risk=%s', match_id, marketIntelligence.risk_profile.aggregate_risk);
+        return null;
+    }
+
+    if (waterfallDecision.status === 'no_bet' && !marketSelections.direct) {
         console.log('[aiPipeline] no-bet fixture skipped match_id=%s phase=%s', match_id, waterfallDecision.phase);
         return null;
     }
 
-    const market = waterfallDecision.market || requestedMarket;
-    const routedPrediction = waterfallDecision.prediction || prediction;
-    const confidence = toConfidencePercent(waterfallDecision.confidence_probability || p_adj);
-    const volatility = item.volatility || scoring.volatility;
+    const selectedDirect = marketSelections.direct || null;
+    const selectedSecondary = marketSelections.secondary || null;
+    const market = selectedDirect?.market || waterfallDecision.market || requestedMarket;
+    const routedPrediction = selectedDirect?.prediction || waterfallDecision.prediction || fallbackPredictionForMarket(market, prediction);
+    const confidenceProbability = selectedDirect?.probability || waterfallDecision.confidence_probability || p_adj;
+    const confidence = toConfidencePercent(confidenceProbability);
+    const volatility = item.volatility || scoring.volatility || volatilityFromRiskProfile(marketIntelligence.risk_profile, 'medium');
     const aiSource = scoring.source || null; // 'dolphin', 'fallback', 'odds', etc.
     const aiReasoning = scoring.reasoning || null;
     const uiInsights = buildUiInsights(contextFixture, contextSignals);
@@ -301,23 +381,25 @@ async function buildRawPredictionFromProviderItem(item) {
         volatility,
         odds: item.odds !== undefined ? item.odds : null,
         metadata: {
-            source: 'aiPipeline:v2-provider+aiScoring',
+            source: 'aiPipeline:v3-normalized+market-intelligence',
             data_mode: item.data_mode || null,
             prediction_source: predictionSource,
             ai_source: aiSource,
             ai_reasoning: aiReasoning,
-            provider: item.provider || null,
+            provider: item.provider || matchContext.provider || null,
             bookmaker: item.bookmaker || null,
-            home_team: item.home_team || null,
-            away_team: item.away_team || null,
-            match_time: item.date || item.commence_time || item.kickoff || item.match_time || null,
-            league: item.league || null,
+            home_team: matchInfo.home_team || item.home_team || null,
+            away_team: matchInfo.away_team || item.away_team || null,
+            match_time: matchInfo.kickoff || item.date || item.commence_time || item.kickoff || item.match_time || null,
+            league: matchInfo.league || item.league || null,
             tournament: item.tournament || null,
             stage: item.stage || item.round || null,
-            venue: item.venue || null,
-            country: item.country || null,
+            venue: matchInfo.venue || item.venue || null,
+            country: matchInfo.country || item.country || null,
             base_market: requestedMarket,
             base_prediction: prediction,
+            normalized_match_context: true,
+            match_context: storableMatchContext,
             context_intelligence: {
                 status: contextEnriched?.context_status || 'unavailable',
                 last_verified: new Date().toISOString(),
@@ -333,11 +415,28 @@ async function buildRawPredictionFromProviderItem(item) {
                 confidence_base_pct: Math.round(toProbability(baselineConfidence) * 10000) / 100,
                 confidence_adj_pct: confidence
             },
+            market_intelligence: {
+                direct_market: selectedDirect,
+                secondary_market: selectedSecondary,
+                same_match: marketSelections.same_match,
+                risk_profile: marketIntelligence.risk_profile,
+                ranked_markets: ensureArray(marketIntelligence.candidates)
+                    .slice(0, 20)
+                    .map((candidate) => ({
+                        market: candidate.market,
+                        prediction: candidate.prediction,
+                        confidence: candidate.confidence,
+                        probability: candidate.probability,
+                        score: candidate.score,
+                        priority_tier: candidate.priority_tier,
+                        category: candidate.category
+                    }))
+            },
             market_router: {
-                phase: waterfallDecision.phase,
-                status: waterfallDecision.status,
+                phase: selectedDirect ? 'market_intelligence_tiered' : waterfallDecision.phase,
+                status: selectedDirect ? 'locked' : waterfallDecision.status,
                 final_recommendation: {
-                    market: waterfallDecision.display_market || toTitleCase(market),
+                    market: selectedDirect ? toTitleCase(selectedDirect.market) : (waterfallDecision.display_market || toTitleCase(market)),
                     confidence
                 },
                 engine_log: ensureArray(waterfallDecision.engine_log),

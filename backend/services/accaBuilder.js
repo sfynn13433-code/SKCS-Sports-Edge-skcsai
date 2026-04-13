@@ -9,6 +9,16 @@ const { validatePredictionSet, areLegsCompatible } = require('../utils/marketCon
 const { detectConflicts } = require('../utils/conflictResolver');
 const { isValidCombination } = require('./conflictEngine');
 const { scoreMarkets } = require('./marketScoringEngine');
+const {
+    normalizeMarketKey: normalizeMarketKeyMI,
+    priorityTierForMarket,
+    areMarketsConflicting,
+    buildRiskProfile,
+    isMegaSafeMarket,
+    isTwelveLegRestrictedMarket,
+    buildCandidateMarkets,
+    selectDirectSecondarySameMatch
+} = require('./marketIntelligence');
 const { validateInsightLegGroup } = require('../utils/insightValidationMatrix');
 const {
     calculateTrueComboConfidence,
@@ -276,7 +286,13 @@ async function getAccaRules(client) {
 
 function toFinalMatchPayload(p) {
     const metadata = getMetadata(p);
-    const kickoff = metadata.match_time || metadata.kickoff || metadata.kickoff_time || null;
+    const matchContext = metadata.match_context && typeof metadata.match_context === 'object'
+        ? metadata.match_context
+        : null;
+    const matchInfo = matchContext && typeof matchContext.match_info === 'object'
+        ? matchContext.match_info
+        : {};
+    const kickoff = metadata.match_time || metadata.kickoff || metadata.kickoff_time || matchInfo.kickoff || null;
     const normalizedSport = normalizeSportKey(p.sport || metadata.sport || metadata.sport_key || '');
     const sportType = getSportTypeLabel(normalizedSport);
     return {
@@ -284,8 +300,8 @@ function toFinalMatchPayload(p) {
         match_id: p.match_id,
         sport: normalizedSport,
         sport_type: sportType,
-        home_team: metadata.home_team || null,
-        away_team: metadata.away_team || null,
+        home_team: metadata.home_team || matchInfo.home_team || null,
+        away_team: metadata.away_team || matchInfo.away_team || null,
         match_date: kickoff,
         commence_time: kickoff,
         market: p.market,
@@ -296,22 +312,31 @@ function toFinalMatchPayload(p) {
         metadata: {
             ...metadata,
             sport_type: sportType,
-            weekly_team_lock_applied: true
+            weekly_team_lock_applied: true,
+            normalized_match_context: metadata.normalized_match_context === true || Boolean(matchContext)
         }
     };
 }
 
 function toScoringMatchPayload(prediction) {
     const metadata = prediction.metadata || {};
+    const matchContext = metadata.match_context && typeof metadata.match_context === 'object'
+        ? metadata.match_context
+        : null;
+    const matchInfo = matchContext && typeof matchContext.match_info === 'object'
+        ? matchContext.match_info
+        : {};
     const normalizedSport = normalizeSportKey(prediction.sport || metadata.sport || '');
     return {
         match_id: prediction.match_id,
         sport: normalizedSport,
-        home_team: metadata.home_team || null,
-        away_team: metadata.away_team || null,
+        home_team: metadata.home_team || matchInfo.home_team || null,
+        away_team: metadata.away_team || matchInfo.away_team || null,
         base_prediction: prediction.prediction || null,
         base_confidence: prediction.confidence,
-        raw_provider_data: metadata.raw_provider_data || null
+        raw_provider_data: metadata.raw_provider_data || null,
+        sharp_odds: matchContext?.sharp_odds || null,
+        contextual_intelligence: matchContext?.contextual_intelligence || null
     };
 }
 
@@ -595,6 +620,108 @@ function sanitizeSameMatchLegGroup(legs) {
     return out;
 }
 
+function extractPredictionMatchContext(prediction) {
+    const metadata = getMetadata(prediction);
+    return metadata.match_context && typeof metadata.match_context === 'object'
+        ? metadata.match_context
+        : null;
+}
+
+function extractPredictionRiskProfile(prediction) {
+    const metadata = getMetadata(prediction);
+    const marketRisk = metadata?.market_intelligence?.risk_profile;
+    if (marketRisk && typeof marketRisk === 'object') return marketRisk;
+
+    const matchContext = extractPredictionMatchContext(prediction);
+    if (!matchContext) {
+        return {
+            aggregate_risk: 0.3,
+            reject: false,
+            weather_risk: 0,
+            lineup_uncertainty: 0.5,
+            injury_uncertainty: 0.25,
+            derby_risk: 0.25,
+            stability_risk: 0.2,
+            rotation_risk: 0.2
+        };
+    }
+
+    return buildRiskProfile(matchContext, metadata?.context_intelligence?.signals || {});
+}
+
+function isPredictionHighRisk(prediction, options = {}) {
+    const profile = extractPredictionRiskProfile(prediction);
+    if (profile.reject) return true;
+
+    if (options.forMega === true) {
+        return (
+            Number(profile.weather_risk || 0) > 0.5
+            || Number(profile.lineup_uncertainty || 0) > 0.55
+            || Number(profile.injury_uncertainty || 0) > 0.6
+            || Number(profile.derby_risk || 0) > 0.5
+            || Number(profile.rotation_risk || 0) > 0.55
+            || Number(profile.stability_risk || 0) > 0.55
+            || Number(profile.aggregate_risk || 0) > 0.62
+        );
+    }
+
+    return Number(profile.aggregate_risk || 0) > 0.78;
+}
+
+function buildMarketIntelligenceDerivedMarkets(prediction, options = {}) {
+    const metadata = getMetadata(prediction);
+    const matchContext = extractPredictionMatchContext(prediction);
+    if (!matchContext) return [];
+
+    const contextSignals = metadata?.context_intelligence?.signals || {};
+    const directMarketKey = normalizeMarketKeyMI(prediction?.market || '');
+    const maxRows = Number.isFinite(options.maxRows) ? options.maxRows : 3;
+    const excludeMarkets = new Set(
+        (Array.isArray(options.excludeMarkets) ? options.excludeMarkets : [])
+            .map((value) => normalizeMarketKeyMI(value))
+    );
+
+    const ranked = Array.isArray(metadata?.market_intelligence?.ranked_markets)
+        ? metadata.market_intelligence.ranked_markets
+        : buildCandidateMarkets(matchContext?.sharp_odds || {}, matchContext, { contextSignals }).candidates;
+
+    return uniqueBy(
+        ranked
+            .map((row) => ({
+                market: normalizeMarketKeyMI(row.market),
+                prediction: String(row.prediction || '').toLowerCase(),
+                confidence: Number(row.confidence),
+                priority_tier: Number(row.priority_tier || priorityTierForMarket(row.market))
+            }))
+            .filter((row) => row.market && Number.isFinite(row.confidence))
+            .filter((row) => row.market !== directMarketKey)
+            .filter((row) => !excludeMarkets.has(row.market))
+            .sort((a, b) => {
+                const tierDiff = a.priority_tier - b.priority_tier;
+                if (tierDiff !== 0) return tierDiff;
+                return Number(b.confidence || 0) - Number(a.confidence || 0);
+            })
+            .map((row) => ({
+                raw_id: prediction.raw_id,
+                match_id: prediction.match_id,
+                sport: prediction.sport,
+                market: row.market,
+                prediction: row.prediction || row.market,
+                confidence: row.confidence,
+                volatility: prediction.volatility,
+                odds: prediction.odds,
+                metadata: {
+                    ...(prediction.metadata || {}),
+                    market_key: row.market,
+                    market_type: row.priority_tier <= 2 ? 'secondary' : 'advanced',
+                    market_priority_tier: row.priority_tier,
+                    derived_from_market_intelligence: true
+                }
+            })),
+        (row) => `${row.match_id}:${row.market}`
+    ).slice(0, maxRows);
+}
+
 async function buildDerivedMarkets(prediction, options = {}) {
     const includeTypes = new Set(
         Array.isArray(options.includeTypes) && options.includeTypes.length
@@ -607,14 +734,32 @@ async function buildDerivedMarkets(prediction, options = {}) {
     );
     const maxRows = Number.isFinite(options.maxRows) ? options.maxRows : 1;
     const requireDisplayFriendlyMarkets = options.requireDisplayFriendlyMarkets === true;
+    const modelCandidates = buildMarketIntelligenceDerivedMarkets(prediction, options);
 
-    return uniqueBy(
+    const scoredCandidates = uniqueBy(
         (await scoreMarkets(toScoringMatchPayload(prediction)))
             .filter((market) => includeTypes.has(market.type))
             .filter((market) => !excludeMarkets.has(String(market.market || '').toUpperCase()))
             .sort((a, b) => (Number(b.confidence) || 0) - (Number(a.confidence) || 0))
             .map((market) => toSecondaryPayload(prediction, market))
             .filter((candidate) => isCompatibleWithPrimaryPrediction(prediction, candidate))
+            .filter((candidate) => !requireDisplayFriendlyMarkets || isSupplementaryDisplayMarket(candidate.market))
+            .filter((candidate) => !isPredictionHighRisk(candidate)),
+        (row) => `${row.match_id}:${row.market}`
+    );
+
+    return uniqueBy(
+        [
+            ...modelCandidates.filter((candidate) => isCompatibleWithPrimaryPrediction(prediction, candidate)),
+            ...scoredCandidates
+        ].filter((candidate) => {
+            const primaryKey = normalizeMarketKeyMI(prediction?.market || '');
+            const candidateKey = normalizeMarketKeyMI(candidate?.market || '');
+            return !areMarketsConflicting(
+                { market: primaryKey, prediction: prediction?.prediction },
+                { market: candidateKey, prediction: candidate?.prediction }
+            );
+        })
             .filter((candidate) => !requireDisplayFriendlyMarkets || isSupplementaryDisplayMarket(candidate.market)),
         (row) => `${row.match_id}:${row.market}`
     ).slice(0, maxRows);
@@ -652,6 +797,15 @@ async function buildSecondaryCandidates(predictions) {
 async function buildSameMatchCandidates(predictions) {
     const out = [];
     for (const prediction of predictions) {
+        const metadata = getMetadata(prediction);
+        const sameMatchGate = metadata?.market_intelligence?.same_match;
+        if (!sameMatchGate || sameMatchGate.allowed !== true) {
+            continue;
+        }
+        if (isPredictionHighRisk(prediction, { forMega: true })) {
+            continue;
+        }
+
         const derived = await buildDerivedMarkets(prediction, {
             includeTypes: ['primary', 'secondary', 'advanced'],
             excludeMarkets: ['MATCH_RESULT', 'MATCH_WINNER', 'WINNER', 'RACE_WINNER'],
@@ -664,6 +818,15 @@ async function buildSameMatchCandidates(predictions) {
             ...derived.map(toFinalMatchPayload)
         ]).slice(0, SAME_MATCH_INSIGHT_TARGET);
         if (legs.length < 2) continue;
+
+        const hasConflictingPair = legs.some((left, i) => legs.some((right, j) => {
+            if (i >= j) return false;
+            return areMarketsConflicting(
+                { market: normalizeMarketKeyMI(left.market), prediction: left.prediction },
+                { market: normalizeMarketKeyMI(right.market), prediction: right.prediction }
+            );
+        }));
+        if (hasConflictingPair) continue;
 
         const validation = validateInsightLegGroup(legs);
         if (!validation.valid) continue;
@@ -1086,6 +1249,7 @@ function normalizedAccaMarketKey(candidate) {
 function isSaferAccumulatorMarket(candidate) {
     const market = normalizedAccaMarketKey(candidate);
     if (!market) return false;
+    if (isMegaSafeMarket(market)) return true;
     if (market.startsWith('double_chance_')) return true;
     if (market.startsWith('draw_no_bet_')) return true;
     if (market.startsWith('combo_') || market.startsWith('combo_dc_')) return true;
@@ -1100,12 +1264,16 @@ function isSaferAccumulatorMarket(candidate) {
 function accumulatorMarketPriorityScore(candidate) {
     const market = normalizedAccaMarketKey(candidate);
     if (!market) return 0;
-    if (market.startsWith('combo_dc_') || market.startsWith('combo_')) return 5;
-    if (market.startsWith('double_chance_') || market.startsWith('draw_no_bet_')) return 4;
-    if (market.startsWith('under_') || market.startsWith('over_') || market.startsWith('btts_') || market.startsWith('team_total_') || market.includes('handicap') || market.startsWith('ht_ft_')) return 3;
-    if (market === 'match_winner') return 2;
-    if (market === '1x2') return 1;
-    return 2;
+    const tier = priorityTierForMarket(market);
+    if (isMegaSafeMarket(market)) {
+        return 8 - tier;
+    }
+    if (tier === 1) return 7;
+    if (tier === 2) return 5;
+    if (tier === 3) return 3;
+    if (market.startsWith('combo_dc_') || market.startsWith('combo_')) return 4;
+    if (market === 'match_winner' || market === '1x2') return 2;
+    return 1;
 }
 
 function parseGoalLineFromAccumulatorMarket(market = '') {
@@ -1125,17 +1293,13 @@ function isLowValueAccumulatorMarket(candidate) {
     const directLowValue = market === 'over_0_5' || market.includes('_over_0_5');
     if (directLowValue) return true;
 
-    if (market.startsWith('over_') || market.includes('_over_')) {
-        const line = parseGoalLineFromAccumulatorMarket(market);
-        if (Number.isFinite(line) && line <= 1.5) return true;
-    }
-
     return false;
 }
 
 function isEscalatedValueAccumulatorMarket(candidate) {
     const market = normalizedAccaMarketKey(candidate);
     if (!market) return false;
+    if (isMegaSafeMarket(market)) return true;
     if (market.startsWith('combo_') || market.startsWith('combo_dc_')) return true;
     if (market.startsWith('double_chance_') || market.startsWith('draw_no_bet_')) return true;
     if (market.startsWith('btts_')) return true;
@@ -1209,8 +1373,16 @@ function selectBestAccaCandidateFromPool(candidatePool, minConfidenceFloor) {
 }
 
 function compareAccaCandidatePreference(a, b) {
+    const riskA = Number(extractPredictionRiskProfile(a)?.aggregate_risk || 0);
+    const riskB = Number(extractPredictionRiskProfile(b)?.aggregate_risk || 0);
+    const riskDiff = riskA - riskB;
+    if (riskDiff !== 0) return riskDiff;
+
     const confidenceDiff = Number(b?.confidence || 0) - Number(a?.confidence || 0);
     if (confidenceDiff !== 0) return confidenceDiff;
+
+    const tierDiff = priorityTierForMarket(normalizedAccaMarketKey(a)) - priorityTierForMarket(normalizedAccaMarketKey(b));
+    if (tierDiff !== 0) return tierDiff;
 
     const marketPriorityDiff = accumulatorMarketPriorityScore(b) - accumulatorMarketPriorityScore(a);
     if (marketPriorityDiff !== 0) return marketPriorityDiff;
@@ -1273,6 +1445,12 @@ function buildSelectableFixturePool(candidates, minConfidenceFloor) {
                 id: fixtureId,
                 name: fixtureName || 'Unknown Match',
                 sport: normalizeSportKey(candidate?.sport),
+                home_team: home || null,
+                away_team: away || null,
+                matchContext: metadata?.match_context || null,
+                metadata: {
+                    context_intelligence: metadata?.context_intelligence || null
+                },
                 scoredMarkets: []
             });
         }
@@ -1411,6 +1589,7 @@ function buildFootballOnlyAccumulatorRow(pool, usedFixtureIds, size, minConfiden
     const footballPool = pool
         .filter((candidate) => normalizeSportKey(candidate?.sport) === 'football')
         .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
+        .filter((candidate) => !isPredictionHighRisk(candidate, { forMega: false }))
         .sort(compareAccaCandidatePreference);
     if (footballPool.length < size) return null;
 
@@ -1443,6 +1622,12 @@ function buildFootballOnlyAccumulatorRow(pool, usedFixtureIds, size, minConfiden
 function buildMixedAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor, options = {}) {
     const sorted = pool
         .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
+        .filter((candidate) => !isPredictionHighRisk(candidate, { forMega: options.isMega === true }))
+        .filter((candidate) => {
+            if (options.isMega !== true) return true;
+            const market = normalizeMarketKeyMI(candidate?.market || '');
+            return isMegaSafeMarket(market) && !isTwelveLegRestrictedMarket(market);
+        })
         .sort(compareAccaCandidatePreference);
     if (sorted.length < size) return null;
 
@@ -1531,6 +1716,10 @@ async function buildAccaLegCandidatePool(predictions, options = {}) {
     const byFixture = new Map();
 
     for (const prediction of Array.isArray(predictions) ? predictions : []) {
+        if (isPredictionHighRisk(prediction)) {
+            continue;
+        }
+
         const baseMetadata = getMetadata(prediction);
         const normalizedSport = normalizeSportKey(prediction?.sport || baseMetadata?.sport || '');
         const sportType = getSportTypeLabel(normalizedSport);
@@ -1576,6 +1765,7 @@ async function buildAccaLegCandidatePool(predictions, options = {}) {
             candidates.push(mapped);
         }
 
+        candidates.push(...buildMarketIntelligenceDerivedMarkets(prediction, { maxRows: 8 }));
         candidates.push(...buildExpandedFootballGoalLineCandidates(prediction, scoredMarkets, minConfidenceFloor));
         candidates.push(...buildFootballComboCandidates(prediction, scoredMarkets, minConfidenceFloor));
 
@@ -1722,6 +1912,15 @@ function buildMegaAcca12Candidates(predictions, options = {}) {
     for (const prediction of allPredictions) {
         if (isBannedMarket(prediction?.market, prediction?.prediction)) {
             if (megaDiagnostics) megaDiagnostics.mega_rejected_for_banned_market += 1;
+            continue;
+        }
+        if (isPredictionHighRisk(prediction, { forMega: true })) {
+            if (megaDiagnostics) megaDiagnostics.mega_rejected_for_confidence_floor += 1;
+            continue;
+        }
+        const normalizedMarket = normalizeMarketKeyMI(prediction?.market || '');
+        if (!isMegaSafeMarket(normalizedMarket) || isTwelveLegRestrictedMarket(normalizedMarket)) {
+            if (megaDiagnostics) megaDiagnostics.mega_rejected_for_family_caps += 1;
             continue;
         }
         const confidence = Number(prediction?.confidence);
@@ -2060,6 +2259,7 @@ function reservePredictionTeams(prediction, runTeamCompetitionMap) {
 
 function filterAvailablePredictions(predictions, usedFixtureIds, historicalTeamCompetitionMap, runTeamCompetitionMap) {
     return predictions.filter((prediction) => {
+        if (isPredictionHighRisk(prediction)) return false;
         const ids = predictionFixtureIds(prediction);
         if (!ids.length || ids.some((id) => usedFixtureIds.has(id))) return false;
         return isPredictionTeamAllowed(prediction, historicalTeamCompetitionMap, runTeamCompetitionMap);
@@ -2077,6 +2277,7 @@ function takeAvailablePredictions(predictions, usedFixtureIds, historicalTeamCom
 
     for (const prediction of predictions) {
         if (out.length >= limit) break;
+        if (isPredictionHighRisk(prediction)) continue;
         const ids = predictionFixtureIds(prediction);
         if (!ids.length || ids.some((id) => usedFixtureIds.has(id))) continue;
         if (!isPredictionTeamAllowed(prediction, historicalTeamCompetitionMap, runTeamCompetitionMap)) continue;

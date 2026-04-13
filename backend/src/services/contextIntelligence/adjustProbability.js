@@ -3,13 +3,22 @@ function adjustProbability(p_base, signals) {
     availability_risk: 0.40,
     stability_risk: 0.35,
     discipline_risk: 0.15,
-    weather_risk: 0.10
+    weather_risk: 0.10,
+    travel_fatigue_risk: 0.08,
+    fixture_congestion_risk: 0.08,
+    derby_risk: 0.10,
+    rotation_risk: 0.08,
+    market_movement_risk: 0.05,
+    lineup_uncertainty_risk: 0.10
   };
 
   let totalRiskPenalty = 0;
   for (const [key, value] of Object.entries(signals)) {
     if (weights[key]) {
-      totalRiskPenalty += weights[key] * value;
+      const normalized = Number(value);
+      if (Number.isFinite(normalized)) {
+        totalRiskPenalty += weights[key] * Math.max(0, Math.min(1, normalized));
+      }
     }
   }
 

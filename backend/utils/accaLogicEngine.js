@@ -1,5 +1,14 @@
 'use strict';
 
+const {
+    priorityTierForMarket,
+    normalizeMarketKey,
+    areMarketsConflicting,
+    isMegaSafeMarket,
+    isTwelveLegRestrictedMarket,
+    buildRiskProfile
+} = require('../services/marketIntelligence');
+
 /**
  * ACCA math + leg selection utilities.
  *
@@ -39,48 +48,56 @@ const ALLOWED_FAMILIES = new Set([
     'team_goals',
     'handicap',
     'ht_ft',
+    'half_markets',
+    'first_score',
     'corners',
     'cards',
     'combo'
 ]);
 
 const FAMILY_CAPS_6 = {
-    result: 2,
+    result: 1,
     double_chance: 2,
-    draw_no_bet: 2,
+    draw_no_bet: 1,
     totals: 2,
-    btts: 2,
+    btts: 1,
     team_goals: 2,
     handicap: 2,
     ht_ft: 1,
+    half_markets: 1,
+    first_score: 1,
     corners: 1,
     cards: 1,
-    combo: 2
+    combo: 1
 };
 
 const FAMILY_CAPS_12 = {
-    result: 3,
-    double_chance: 3,
+    result: 1,
+    double_chance: 4,
     draw_no_bet: 3,
     totals: 3,
-    btts: 3,
+    btts: 1,
     team_goals: 3,
     handicap: 3,
-    ht_ft: 2,
+    ht_ft: 1,
+    half_markets: 0,
+    first_score: 0,
     corners: 2,
     cards: 2,
-    combo: 4
+    combo: 2
 };
 
 const BUILD_ORDER = [
-    'combo',
     'double_chance',
     'draw_no_bet',
-    'handicap',
-    'team_goals',
-    'btts',
     'totals',
+    'team_goals',
+    'combo',
     'result',
+    'btts',
+    'half_markets',
+    'first_score',
+    'handicap',
     'ht_ft',
     'corners',
     'cards'
@@ -121,10 +138,26 @@ function normalizeMarketFamily(value) {
     if (raw.includes('combo') || raw.includes('+')) return 'combo';
     if (raw.includes('draw_no_bet') || raw.includes('dnb')) return 'draw_no_bet';
     if (raw.includes('double_chance') || raw.startsWith('dc_')) return 'double_chance';
-    if (raw.includes('team_total') || raw.includes('team_goals')) return 'team_goals';
+    if (
+        raw.includes('team_total')
+        || raw.includes('team_goals')
+        || raw.includes('home_over_0_5')
+        || raw.includes('away_over_0_5')
+        || raw.includes('home_over_1_5')
+        || raw.includes('away_over_1_5')
+    ) return 'team_goals';
     if (raw.includes('asian_handicap') || raw.includes('european_handicap') || raw.includes('handicap')) return 'handicap';
     if (raw.includes('btts')) return 'btts';
     if (raw.includes('ht_ft') || raw.includes('half-time/full-time')) return 'ht_ft';
+    if (
+        raw.includes('first_half')
+        || raw.includes('over_0_5_first_half')
+        || raw.includes('under_1_5_first_half')
+        || raw.includes('home_win_either_half')
+        || raw.includes('away_win_either_half')
+        || raw.includes('win_either_half')
+    ) return 'half_markets';
+    if (raw.includes('team_to_score_first')) return 'first_score';
     if (raw.includes('corner')) return 'corners';
     if (raw.includes('card') || raw.includes('yellow')) return 'cards';
     if (
@@ -151,9 +184,25 @@ function normalizeMarketTypeForVariety(market = {}) {
     if (raw.includes('double_chance') || raw.includes('dc_')) return 'double_chance';
     if (raw.includes('draw_no_bet') || raw.includes('dnb')) return 'draw_no_bet';
     if (raw.includes('asian_handicap') || raw.includes('european_handicap') || raw.includes('handicap')) return 'handicap';
-    if (raw.includes('team_total') || raw.includes('team_goals')) return 'team_goals';
+    if (
+        raw.includes('team_total')
+        || raw.includes('team_goals')
+        || raw.includes('home_over_0_5')
+        || raw.includes('away_over_0_5')
+        || raw.includes('home_over_1_5')
+        || raw.includes('away_over_1_5')
+    ) return 'team_goals';
     if (raw.includes('btts')) return 'btts';
     if (raw.includes('ht_ft')) return 'ht_ft';
+    if (
+        raw.includes('first_half')
+        || raw.includes('over_0_5_first_half')
+        || raw.includes('under_1_5_first_half')
+        || raw.includes('home_win_either_half')
+        || raw.includes('away_win_either_half')
+        || raw.includes('win_either_half')
+    ) return 'half_markets';
+    if (raw.includes('team_to_score_first')) return 'first_score';
     if (
         raw.includes('over_under')
         || raw.includes('over_')
@@ -177,7 +226,7 @@ function isLowValueTrapMarket(market = {}) {
     const line = parseGoalLineFromMarket(market);
 
     if (raw.includes('over_0_5') || prediction.includes('over_0_5')) return true;
-    if ((raw.includes('over_1_5') || prediction.includes('over_1_5')) && line !== null && line <= 1.5) return true;
+    if ((raw.includes('over_0_5') || raw.includes('team_over_0_5')) && line !== null && line <= 0.5) return true;
 
     return false;
 }
@@ -264,6 +313,95 @@ function filterExpiredFixtures(fixtures) {
     });
 }
 
+function normalizeTeamToken(value) {
+    return String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, ' ')
+        .replace(/[^a-z0-9 ]+/g, '')
+        .trim();
+}
+
+function extractFixtureTeams(fixture) {
+    const home = normalizeTeamToken(
+        fixture?.home_team
+        || fixture?.homeTeam
+        || fixture?.metadata?.home_team
+    );
+    const away = normalizeTeamToken(
+        fixture?.away_team
+        || fixture?.awayTeam
+        || fixture?.metadata?.away_team
+    );
+
+    if (home || away) return { home, away };
+
+    const name = String(fixture?.name || '').trim();
+    if (!name) return { home: '', away: '' };
+    const split = name.split(/\s+vs\s+|\s+v\s+/i);
+    if (split.length !== 2) return { home: '', away: '' };
+    return {
+        home: normalizeTeamToken(split[0]),
+        away: normalizeTeamToken(split[1])
+    };
+}
+
+function fixtureRiskProfile(fixture) {
+    const matchContext = fixture?.matchContext || fixture?.match_context || fixture?.metadata?.match_context;
+    if (!matchContext || typeof matchContext !== 'object') {
+        return { aggregate_risk: 0.28, reject: false, lineup_uncertainty: 0.5, weather_risk: 0.2 };
+    }
+    return buildRiskProfile(matchContext, fixture?.metadata?.context_intelligence?.signals || {});
+}
+
+function toSkcsSelectionFromMarket(market) {
+    const marketKey = normalizeMarketKey(market?.name || market?.market || market?.type || '');
+    const pickKey = String(market?.prediction || market?.pick || '').trim().toLowerCase();
+
+    if (!marketKey) return null;
+    if (marketKey === '1x2' || marketKey === 'match_result' || marketKey === 'match_winner' || marketKey === 'winner') {
+        if (pickKey.includes('home')) return { market: 'home_win', prediction: 'home_win' };
+        if (pickKey.includes('away')) return { market: 'away_win', prediction: 'away_win' };
+        return { market: 'draw', prediction: 'draw' };
+    }
+    if (marketKey.startsWith('double_chance_')) return { market: marketKey, prediction: marketKey.replace('double_chance_', '') };
+    if (marketKey === 'double_chance') {
+        if (pickKey === '1x' || pickKey.includes('home_or_draw')) return { market: 'double_chance_1x', prediction: '1x' };
+        if (pickKey === 'x2' || pickKey.includes('draw_or_away')) return { market: 'double_chance_x2', prediction: 'x2' };
+        return { market: 'double_chance_12', prediction: '12' };
+    }
+    if (marketKey.startsWith('draw_no_bet_')) return { market: marketKey, prediction: marketKey.endsWith('_away') ? 'away' : 'home' };
+    if (marketKey === 'draw_no_bet') return { market: pickKey === 'away' ? 'draw_no_bet_away' : 'draw_no_bet_home', prediction: pickKey };
+    if (marketKey === 'btts' || marketKey === 'btts_yes' || marketKey === 'btts_no') {
+        return pickKey === 'no'
+            ? { market: 'btts_no', prediction: 'no' }
+            : { market: 'btts_yes', prediction: 'yes' };
+    }
+    if (marketKey.startsWith('over_under_')) {
+        const lineToken = marketKey.replace('over_under_', '');
+        return pickKey === 'under'
+            ? { market: `under_${lineToken}`, prediction: 'under' }
+            : { market: `over_${lineToken}`, prediction: 'over' };
+    }
+    return {
+        market: marketKey,
+        prediction: pickKey || marketKey
+    };
+}
+
+function marketPriorityBoost(selection) {
+    const tier = priorityTierForMarket(selection?.market || '');
+    if (tier === 1) return 8;
+    if (tier === 2) return 5;
+    if (tier === 3) return 2;
+    return 0;
+}
+
+function selectionIsVolatile(selection) {
+    const market = normalizeMarketKey(selection?.market || '');
+    return isTwelveLegRestrictedMarket(market) || market === 'draw' || market.startsWith('combo_');
+}
+
 /**
  * ACCA leg selection:
  * - Global fixture dedupe across the entire run.
@@ -274,16 +412,40 @@ function filterExpiredFixtures(fixtures) {
 function selectAccaLegs(availableFixtures, globalUsedFixtures, targetLegCount) {
     const selectedLegs = [];
     const usedSet = globalUsedFixtures instanceof Set ? globalUsedFixtures : new Set();
-
-    const maxCombos = Number(targetLegCount) === 12 ? 4 : 2;
+    const legCount = Number(targetLegCount || 0);
+    const isMegaCard = legCount === 12;
+    const maxCombos = isMegaCard ? 1 : 2;
     const maxSameMarketType = Number(targetLegCount) === 12 ? 3 : 2;
+    const maxVolatileSelections = isMegaCard ? 1 : 2;
     let comboCount = 0;
+    let volatileSelectionCount = 0;
     const marketTypeCounts = {};
+    const familyCounts = {};
+    const familyCaps = isMegaCard ? FAMILY_CAPS_12 : FAMILY_CAPS_6;
+    const selectedSelections = [];
+    const usedTeams = new Set();
 
     for (const fixture of Array.isArray(availableFixtures) ? availableFixtures : []) {
         if (selectedLegs.length >= Number(targetLegCount || 0)) break;
         if (!fixture || !fixture.id) continue;
         if (usedSet.has(fixture.id)) continue;
+
+        const riskProfile = fixtureRiskProfile(fixture);
+        if (riskProfile.reject) continue;
+        if (isMegaCard && (
+            riskProfile.weather_risk > 0.5
+            || riskProfile.lineup_uncertainty > 0.55
+            || riskProfile.injury_uncertainty > 0.6
+            || riskProfile.derby_risk > 0.5
+            || riskProfile.rotation_risk > 0.55
+        )) {
+            continue;
+        }
+
+        const fixtureTeams = extractFixtureTeams(fixture);
+        if ((fixtureTeams.home && usedTeams.has(fixtureTeams.home)) || (fixtureTeams.away && usedTeams.has(fixtureTeams.away))) {
+            continue;
+        }
 
         const markets = Array.isArray(fixture.scoredMarkets) ? fixture.scoredMarkets.slice() : [];
         markets.sort((a, b) => toNumber(b?.confidence) - toNumber(a?.confidence));
@@ -301,6 +463,7 @@ function selectAccaLegs(availableFixtures, globalUsedFixtures, targetLegCount) {
                 const familyKey = normalizeMarketFamily(`${market?.type || ''} ${market?.name || ''} ${market?.market || ''}`);
                 if (!familyKey || !ALLOWED_FAMILIES.has(familyKey)) continue;
                 if (familyKey !== family) continue;
+                if ((familyCounts[familyKey] || 0) >= (familyCaps[familyKey] ?? Infinity)) continue;
 
                 if (isLowValueTrapMarket(market) && confidence >= 95 && hasEscalatedAlternative) {
                     continue;
@@ -308,9 +471,17 @@ function selectAccaLegs(availableFixtures, globalUsedFixtures, targetLegCount) {
 
                 const marketType = normalizeMarketTypeForVariety(market);
                 const isCombo = isComboMarket(market);
+                const selection = toSkcsSelectionFromMarket(market);
+                if (!selection) continue;
 
                 if (isCombo && comboCount >= maxCombos) continue;
                 if ((marketTypeCounts[marketType] || 0) >= maxSameMarketType) continue;
+                if (selectionIsVolatile(selection) && volatileSelectionCount >= maxVolatileSelections) continue;
+                if (isMegaCard && !isMegaSafeMarket(selection.market)) continue;
+                if (selectedSelections.some((existing) => areMarketsConflicting(existing, selection))) continue;
+
+                const priorityScore = marketPriorityBoost(selection);
+                const adjustedConfidence = confidence + priorityScore - (riskProfile.aggregate_risk * 10);
 
                 bestLeg = {
                     fixture_id: fixture.id,
@@ -318,13 +489,16 @@ function selectAccaLegs(availableFixtures, globalUsedFixtures, targetLegCount) {
                     sport: fixture.sport || 'Unknown Sport',
                     market: market.name || market.market || 'Unknown Market',
                     prediction: market.prediction || market.pick || 'Unknown',
-                    confidence: Number(confidence.toFixed(2)),
+                    confidence: Number(clamp(adjustedConfidence, MIN_CONFIDENCE, MAX_CONFIDENCE).toFixed(2)),
                     market_type: marketType,
-                    market_family: familyKey
+                    market_family: familyKey,
+                    _selection: selection
                 };
 
                 if (isCombo) comboCount += 1;
                 marketTypeCounts[marketType] = (marketTypeCounts[marketType] || 0) + 1;
+                familyCounts[familyKey] = (familyCounts[familyKey] || 0) + 1;
+                if (selectionIsVolatile(selection)) volatileSelectionCount += 1;
                 break;
             }
 
@@ -332,8 +506,20 @@ function selectAccaLegs(availableFixtures, globalUsedFixtures, targetLegCount) {
         }
 
         if (!bestLeg) continue;
-        selectedLegs.push(bestLeg);
+        selectedSelections.push(bestLeg._selection);
+        selectedLegs.push({
+            fixture_id: bestLeg.fixture_id,
+            match_name: bestLeg.match_name,
+            sport: bestLeg.sport,
+            market: bestLeg.market,
+            prediction: bestLeg.prediction,
+            confidence: bestLeg.confidence,
+            market_type: bestLeg.market_type,
+            market_family: bestLeg.market_family
+        });
         usedSet.add(fixture.id);
+        if (fixtureTeams.home) usedTeams.add(fixtureTeams.home);
+        if (fixtureTeams.away) usedTeams.add(fixtureTeams.away);
     }
 
     return selectedLegs;

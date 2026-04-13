@@ -1,5 +1,7 @@
 'use strict';
 
+const { areMarketsConflicting: areSkcsMarketsConflicting } = require('../services/marketIntelligence');
+
 // Conflict logic is deterministic and blocks ACCA creation when any conflict is present.
 
 const MARKET_CONFLICTS = [
@@ -14,6 +16,11 @@ function toKey(matchId, market) {
 function areMarketsConflicting(marketA, marketB) {
     if (!marketA || !marketB) return false;
     if (marketA === marketB) return false;
+
+    if (areSkcsMarketsConflicting({ market: marketA }, { market: marketB })) {
+        return true;
+    }
+
     for (const [a, b] of MARKET_CONFLICTS) {
         if ((marketA === a && marketB === b) || (marketA === b && marketB === a)) return true;
     }

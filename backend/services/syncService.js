@@ -4,6 +4,7 @@ const { runPipelineForMatches, rebuildFinalOutputs } = require('./aiPipeline');
 const { buildLiveData } = require('./dataProvider');
 const { upsertCanonicalEvents } = require('./canonicalEvents');
 const { assertRapidApiCacheWallReady } = require('./dataProviders');
+const { buildMatchContext } = require('./normalizerService');
 const config = require('../config');
 
 function getSeasonStartYear() {
@@ -163,15 +164,25 @@ async function syncSports(options = {}) {
             try {
                 console.log(`[syncService] Fetching REAL matches for: ${item.sport} (league: ${item.leagueId || 'all'}, season: ${item.season})...`);
 
-                const matches = await buildLiveData(item);
+                const rawMatches = await buildLiveData(item);
+                const normalizedMatches = (Array.isArray(rawMatches) ? rawMatches : [])
+                    .map((rawMatch) => {
+                        try {
+                            return buildMatchContext(rawMatch);
+                        } catch (normalizeErr) {
+                            console.warn('[syncService] Normalization failed for one match (%s): %s', item.sport, normalizeErr.message);
+                            return null;
+                        }
+                    })
+                    .filter(Boolean);
 
-                if (matches && matches.length > 0) {
-                    await upsertCanonicalEvents(matches);
-                    console.log(`[syncService] Found ${matches.length} REAL matches for ${item.sport}. Running AI Analysis...`);
-                    await runPipelineForMatches({ matches });
-                    totalMatchesProcessed += matches.length;
-                    perSport.set(item.sport, (perSport.get(item.sport) || 0) + matches.length);
-                    console.log(`[syncService] ${item.sport}: pipeline complete for ${matches.length} matches`);
+                if (normalizedMatches.length > 0) {
+                    await upsertCanonicalEvents(normalizedMatches);
+                    console.log(`[syncService] Found ${normalizedMatches.length} REAL matches for ${item.sport}. Running AI Analysis...`);
+                    await runPipelineForMatches({ matches: normalizedMatches });
+                    totalMatchesProcessed += normalizedMatches.length;
+                    perSport.set(item.sport, (perSport.get(item.sport) || 0) + normalizedMatches.length);
+                    console.log(`[syncService] ${item.sport}: pipeline complete for ${normalizedMatches.length} matches`);
                 } else {
                     console.warn(`[syncService] No upcoming REAL matches found for ${item.sport}. This could mean:`);
                     console.warn(`  - Season is over or hasn't started yet`);

@@ -1,5 +1,7 @@
 'use strict';
 
+const { areMarketsConflicting } = require('../services/marketIntelligence');
+
 // Football outcome universe
 const OUTCOMES = {
     H: 'H', // home
@@ -55,7 +57,45 @@ function outcomeSetForLeg(market, pick) {
     return null;
 }
 
+function toSkcsSelection(leg) {
+    const market = normMarket(leg?.market);
+    const pick = normPick(leg?.pick ?? leg?.prediction);
+
+    if (market === '1x2' || market === 'match_result' || market === 'match_winner') {
+        if (pick === 'HOME_WIN' || pick === 'HOME') return { market: 'home_win', prediction: 'home_win' };
+        if (pick === 'AWAY_WIN' || pick === 'AWAY') return { market: 'away_win', prediction: 'away_win' };
+        return { market: 'draw', prediction: 'draw' };
+    }
+    if (market.includes('double_chance')) {
+        if (pick === '1X' || pick === 'HOME_OR_DRAW') return { market: 'double_chance_1x', prediction: '1x' };
+        if (pick === 'X2' || pick === 'DRAW_OR_AWAY') return { market: 'double_chance_x2', prediction: 'x2' };
+        return { market: 'double_chance_12', prediction: '12' };
+    }
+    if (market.includes('draw_no_bet')) {
+        return pick === 'AWAY'
+            ? { market: 'draw_no_bet_away', prediction: 'away' }
+            : { market: 'draw_no_bet_home', prediction: 'home' };
+    }
+    if (market === 'btts_yes' || (market === 'btts' && pick === 'YES')) {
+        return { market: 'btts_yes', prediction: 'yes' };
+    }
+    if (market === 'btts_no' || (market === 'btts' && pick === 'NO')) {
+        return { market: 'btts_no', prediction: 'no' };
+    }
+    const overMatch = market.match(/^over_(\d+)_(\d)$/);
+    if (overMatch) return { market: `over_${overMatch[1]}_${overMatch[2]}`, prediction: 'over' };
+    const underMatch = market.match(/^under_(\d+)_(\d)$/);
+    if (underMatch) return { market: `under_${underMatch[1]}_${underMatch[2]}`, prediction: 'under' };
+    return market ? { market, prediction: String(pick || '').toLowerCase() } : null;
+}
+
 function areLegsCompatible(legA, legB) {
+    const skcsA = toSkcsSelection(legA);
+    const skcsB = toSkcsSelection(legB);
+    if (skcsA && skcsB && areMarketsConflicting(skcsA, skcsB)) {
+        return false;
+    }
+
     const setA = outcomeSetForLeg(legA.market, legA.pick ?? legA.prediction);
     const setB = outcomeSetForLeg(legB.market, legB.pick ?? legB.prediction);
 

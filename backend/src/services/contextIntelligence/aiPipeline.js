@@ -8,7 +8,7 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
 
 async function getCachedContext(fixture) {
-  const fixtureId = fixture.id;
+  const fixtureId = fixture?.match_info?.match_id || fixture?.match_id || fixture?.id;
   const CACHE_TTL_MS = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
 
   try {
@@ -56,7 +56,7 @@ async function getCachedContext(fixture) {
     return enrichedData;
 
   } catch (err) {
-    console.error(`[SKCS Edge] Cache Wrapper Error for ${fixture.id}:`, err.message);
+    console.error(`[SKCS Edge] Cache Wrapper Error for ${fixtureId || 'unknown'}:`, err.message);
     // Failsafe: If DB drops, run the core pipeline anyway so the app doesn't crash
     return await enrichFixtureWithContextCore(fixture);
   }

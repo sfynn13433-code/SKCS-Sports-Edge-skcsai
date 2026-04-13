@@ -3,7 +3,7 @@ values
     (
         'normal',
         60,
-        '["1X2","double_chance","over_2_5","btts_yes"]'::jsonb,
+        '["ALL"]'::jsonb,
         3,
         '["low","medium"]'::jsonb
     ),
