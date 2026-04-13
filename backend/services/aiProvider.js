@@ -7,6 +7,30 @@ const DOLPHIN_TIMEOUT = Number(process.env.DOLPHIN_TIMEOUT) || 120000; // 2 minu
 const DOLPHIN_MAX_TOKENS = Number(process.env.DOLPHIN_MAX_TOKENS) || 512;
 const DOLPHIN_TEMPERATURE = Number(process.env.DOLPHIN_TEMPERATURE) || 0.3;
 
+function extractAndParseJSON(rawResponse) {
+    try {
+        // 1. Strip markdown code blocks if the AI included them
+        let cleanedString = String(rawResponse || '').replace(/```json/gi, '').replace(/```/g, '').trim();
+
+        // 2. Find the first '{' and the last '}' to isolate the object
+        const startIndex = cleanedString.indexOf('{');
+        const endIndex = cleanedString.lastIndexOf('}');
+
+        if (startIndex === -1 || endIndex === -1) {
+            throw new Error('No JSON object found in response');
+        }
+
+        const jsonString = cleanedString.substring(startIndex, endIndex + 1);
+
+        // 3. Parse and return
+        return JSON.parse(jsonString);
+    } catch (error) {
+        console.error('[aiProvider] JSON Parsing Error:', error.message);
+        console.error('[aiProvider] Raw String Failed:', rawResponse);
+        return null; // Return null so the pipeline handles it gracefully instead of crashing
+    }
+}
+
 /**
  * Build the analysis prompt for Dolphin to evaluate a football match.
  * Uses the Dolphin 3.0 / Jamba chat template format.
@@ -28,7 +52,11 @@ function buildMatchAnalysisPrompt(match) {
         odds
     } = match;
 
-    const userContent = `You are an expert football match analyst. Analyze the following match and predict the outcome (home_win, draw, or away_win) with a confidence percentage (50-95).
+    const strictSystemCommand = 'SYSTEM COMMAND: You are a strict data processing API. You must evaluate the match data and return ONLY a valid JSON object. Do NOT include any introductory text, conversational filler, markdown formatting, or explanations outside the JSON. Your output must strictly match this exact format and nothing else: { "prediction": "home", "confidence": 85, "reasoning": "short text" }';
+
+    const userContent = `${strictSystemCommand}
+
+You are an expert football match analyst. Analyze the following match and predict the outcome (home_win, draw, or away_win) with a confidence percentage (50-95).
 
 Consider ALL available data:
 1. Recent form (last 5 matches)
@@ -85,36 +113,29 @@ ${userContent}<|im_end|>
  * Parse the Dolphin response to extract the JSON prediction.
  */
 function parsePredictionResponse(text) {
-    try {
-        // Try to find JSON in the response
-        const jsonMatch = text.match(/\{[\s\S]*"prediction"[\s\S]*\}/);
-        if (!jsonMatch) return null;
+    const parsed = extractAndParseJSON(text);
+    if (!parsed || typeof parsed !== 'object') return null;
 
-        const parsed = JSON.parse(jsonMatch[0]);
-        const predMap = {
-            'home': 'home_win',
-            'home win': 'home_win',
-            'home_win': 'home_win',
-            'draw': 'draw',
-            'away': 'away_win',
-            'away win': 'away_win',
-            'away_win': 'away_win'
-        };
+    const predMap = {
+        'home': 'home_win',
+        'home win': 'home_win',
+        'home_win': 'home_win',
+        'draw': 'draw',
+        'away': 'away_win',
+        'away win': 'away_win',
+        'away_win': 'away_win'
+    };
 
-        const prediction = predMap[String(parsed.prediction || '').toLowerCase().trim()] || null;
-        const confidence = typeof parsed.confidence === 'number' ? parsed.confidence : null;
+    const prediction = predMap[String(parsed.prediction || '').toLowerCase().trim()] || null;
+    const confidence = typeof parsed.confidence === 'number' ? parsed.confidence : null;
 
-        if (!prediction || !confidence) return null;
+    if (!prediction || !confidence) return null;
 
-        return {
-            prediction,
-            confidence: Math.max(50, Math.min(95, confidence)),
-            reasoning: parsed.reasoning || ''
-        };
-    } catch (e) {
-        console.error('[aiProvider] Failed to parse Dolphin response:', e.message);
-        return null;
-    }
+    return {
+        prediction,
+        confidence: Math.max(50, Math.min(95, confidence)),
+        reasoning: parsed.reasoning || ''
+    };
 }
 
 /**
@@ -172,5 +193,6 @@ async function isDolphinAvailable() {
 module.exports = {
     analyzeWithDolphin,
     isDolphinAvailable,
-    buildMatchAnalysisPrompt
+    buildMatchAnalysisPrompt,
+    extractAndParseJSON
 };
