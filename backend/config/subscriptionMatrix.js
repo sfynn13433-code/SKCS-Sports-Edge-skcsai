@@ -513,6 +513,7 @@ function getPlanAccessLevel(planId) {
 function predictionAllowsPlanAccess(prediction, planId) {
     const accessLevel = getPlanAccessLevel(planId);
     if (!accessLevel) return true;
+    const eliteFallbackAccess = new Set(['core', 'normal']);
 
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
     const tierAccessSets = matches
@@ -520,7 +521,11 @@ function predictionAllowsPlanAccess(prediction, planId) {
         .filter((value) => Array.isArray(value) && value.length > 0);
 
     if (tierAccessSets.length === 0) return true;
-    return tierAccessSets.every((allowed) => allowed.includes(accessLevel));
+    return tierAccessSets.every((allowed) => {
+        const normalized = allowed.map((value) => String(value || '').trim().toLowerCase());
+        if (normalized.includes(accessLevel)) return true;
+        return normalized.some((value) => eliteFallbackAccess.has(value));
+    });
 }
 
 function getPredictionCategory(prediction) {
