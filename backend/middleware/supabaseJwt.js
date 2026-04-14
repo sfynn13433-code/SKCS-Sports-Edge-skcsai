@@ -142,11 +142,19 @@ async function requireSupabaseUser(req, res, next) {
             : {};
         const profileRole = String(profile?.role || '').trim().toLowerCase();
         const metadataRole = String(userMetadata?.role || '').trim().toLowerCase();
+        // HARD-CODED ADMIN EMAIL BYPASS
+        const hardcodedAdminEmail = String(supaUser?.email || '').toLowerCase().trim() === 'sfynn13433@gmail.com';
         const metadataIsAdmin =
             userMetadata?.is_admin === true
             || userMetadata?.isAdmin === true
-            || metadataRole === 'admin';
+            || metadataRole === 'admin'
+            || hardcodedAdminEmail;
         const profileIsAdmin = profile?.is_admin === true || profileRole === 'admin' || metadataIsAdmin;
+        
+        // Log admin detection
+        if (hardcodedAdminEmail) {
+            console.log(`[SUPABASE_JWT] Admin email bypass triggered for: ${supaUser.email}`);
+        }
         const accessContext = resolveAccessContext({
             activeSubscriptions,
             profilePlanId: subscriptionContext?.plan_id || profile?.plan_id || null,

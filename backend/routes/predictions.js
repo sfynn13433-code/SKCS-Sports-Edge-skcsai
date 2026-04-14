@@ -1343,11 +1343,20 @@ function canUserAccessPlan(user, requestedPlanId) {
 // Default tier = deep (elite pool); subscription limits use /api/user/predictions
 router.get('/', requireSupabaseUser, async (req, res) => {
     try {
+        // HARD-CODED ADMIN BYPASS
+        const isHardcodedAdmin = String(req.user?.email || '').toLowerCase().trim() === 'sfynn13433@gmail.com';
+        if (isHardcodedAdmin) {
+            console.log(`[API/PREDICTIONS] Admin request detected: granting full access for ${req.user.email}`);
+        }
+
         let planId = resolveRequestedPlanId(req);
+        if (!planId) {
+            planId = isHardcodedAdmin ? 'VIP_30DAY' : req.query.plan_id;
+        }
         if (!planId) {
             return res.status(400).json({ error: 'Invalid plan ID' });
         }
-        if (!canUserAccessPlan(req.user, planId)) {
+        if (!isHardcodedAdmin && !canUserAccessPlan(req.user, planId)) {
             const fallbackPlanId = resolveBestKnownPlanId(req.user);
             if (!fallbackPlanId || !canUserAccessPlan(req.user, fallbackPlanId)) {
                 return res.status(403).json({ error: 'Plan access denied for user' });
@@ -1356,9 +1365,9 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         }
 
         const sport = req.query.sport;
-        const isAdminAudit = req.user?.is_admin === true || req.user?.isAdmin === true;
+        const isAdminAudit = req.user?.is_admin === true || req.user?.isAdmin === true || isHardcodedAdmin;
         const subscriptionViewTier = resolveRequestedSubscriptionViewTier(req, req.user);
-        if (!canAccessSubscriptionViewTier(req.user, subscriptionViewTier)) {
+        if (!isHardcodedAdmin && !canAccessSubscriptionViewTier(req.user, subscriptionViewTier)) {
             return res.status(403).json({ error: 'Tier tab access denied for user' });
         }
 
