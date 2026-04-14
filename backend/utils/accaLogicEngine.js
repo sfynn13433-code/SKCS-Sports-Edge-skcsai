@@ -20,7 +20,7 @@ const {
  * - Avoid "junk value" auto-picks like obvious Over 0.5 / Over 1.5 traps.
  */
 
-const MIN_CONFIDENCE = 80;
+const MIN_CONFIDENCE = 45;
 const MAX_CONFIDENCE = 99;
 
 const BANNED_PATTERNS = [

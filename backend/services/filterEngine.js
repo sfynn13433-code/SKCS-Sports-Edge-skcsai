@@ -10,8 +10,8 @@ function normalizeTier(tier) {
 
 // HARDCODED CONFIDENCE FLOORS - overrides database if needed
 const CONFIDENCE_FLOORS = {
-    normal: 50,
-    deep: 60
+    normal: 40,
+    deep: 50
 };
 
 async function getTierRules(tier, client) {

@@ -88,10 +88,10 @@ const MIXED_SPORT_TARGETS = new Set([
 ]);
 const SAFE_TIER3_ACCA_MARKETS = new Set(['btts_no', 'under_3_5', 'first_half_draw']);
 const ACCA_FALLBACK_LADDER = Object.freeze([
-    { pass: 'elite', minConfidence: 92, tiers: [1], safeTier3Only: false, directSafeOnly: false },
-    { pass: 'strong', minConfidence: 88, tiers: [1, 2], safeTier3Only: false, directSafeOnly: false },
-    { pass: 'safe', minConfidence: 84, tiers: [1, 2, 3], safeTier3Only: true, directSafeOnly: false },
-    { pass: 'fallback', minConfidence: 80, tiers: [1, 2, 3, 4], safeTier3Only: true, directSafeOnly: true }
+    { pass: 'elite', minConfidence: 75, tiers: [1], safeTier3Only: false, directSafeOnly: false },
+    { pass: 'strong', minConfidence: 65, tiers: [1, 2], safeTier3Only: false, directSafeOnly: false },
+    { pass: 'safe', minConfidence: 55, tiers: [1, 2, 3], safeTier3Only: true, directSafeOnly: false },
+    { pass: 'fallback', minConfidence: 45, tiers: [1, 2, 3, 4], safeTier3Only: true, directSafeOnly: true }
 ]);
 
 function normalizeTier(tier) {

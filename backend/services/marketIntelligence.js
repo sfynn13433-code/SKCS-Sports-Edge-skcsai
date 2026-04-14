@@ -226,9 +226,9 @@ const SAFE_MARKETS_ALLOWED = Object.freeze(new Set([
     'team_not_to_score'
 ]));
 
-const DIRECT_CONFIDENCE_MIN = 50;
-const SAFE_CONFIDENCE_MIN = 60;
-const ACCA_CONFIDENCE_MIN = 80;
+const DIRECT_CONFIDENCE_MIN = 35;
+const SAFE_CONFIDENCE_MIN = 45;
+const ACCA_CONFIDENCE_MIN = 55;
 
 const SAFE_MARKET_PATTERNS = Object.freeze([
     /^(over|under)_\d+_\d+_(points|runs|games)$/,
@@ -251,10 +251,10 @@ const MARKET_KEY_ALIASES = Object.freeze({
 });
 
 const FALLBACK_LADDER = Object.freeze([
-    { pass: 'elite', min_confidence: 92, tiers: [1], safeTier3Only: false, directSafeOnly: false },
-    { pass: 'strong', min_confidence: 88, tiers: [1, 2], safeTier3Only: false, directSafeOnly: false },
-    { pass: 'safe', min_confidence: 84, tiers: [1, 2, 3], safeTier3Only: true, directSafeOnly: false },
-    { pass: 'fallback', min_confidence: 80, tiers: [1, 2, 3, 4], safeTier3Only: true, directSafeOnly: true }
+    { pass: 'elite', min_confidence: 75, tiers: [1], safeTier3Only: false, directSafeOnly: false },
+    { pass: 'strong', min_confidence: 65, tiers: [1, 2], safeTier3Only: false, directSafeOnly: false },
+    { pass: 'safe', min_confidence: 55, tiers: [1, 2, 3], safeTier3Only: true, directSafeOnly: false },
+    { pass: 'fallback', min_confidence: 45, tiers: [1, 2, 3, 4], safeTier3Only: true, directSafeOnly: true }
 ]);
 
 function clamp(value, min, max) {
