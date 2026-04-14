@@ -8,6 +8,12 @@ function normalizeTier(tier) {
     throw new Error(`Invalid tier: ${tier}`);
 }
 
+// HARDCODED CONFIDENCE FLOORS - overrides database if needed
+const CONFIDENCE_FLOORS = {
+    normal: 50,
+    deep: 60
+};
+
 async function getTierRules(tier, client) {
     const t = normalizeTier(tier);
     const sql = `
@@ -21,12 +27,29 @@ async function getTierRules(tier, client) {
         where tier = $1
         limit 1;
     `;
-    const res = await (client ? client.query(sql, [t]) : query(sql, [t]));
-    if (!res.rows.length) {
-        throw new Error(`Missing tier_rules row for tier=${t}`);
+    try {
+        const res = await (client ? client.query(sql, [t]) : query(sql, [t]));
+        if (!res.rows.length) {
+            throw new Error(`Missing tier_rules row for tier=${t}`);
+        }
+        const rules = res.rows[0];
+        // Override min_confidence with hardcoded floor
+        if (CONFIDENCE_FLOORS[t] !== undefined) {
+            rules.min_confidence = CONFIDENCE_FLOORS[t];
+            console.log(`[filterEngine] Using hardcoded min_confidence=${rules.min_confidence} for tier=${t}`);
+        }
+        return rules;
+    } catch (err) {
+        console.warn(`[filterEngine] Failed to get tier_rules from DB for ${t}, using hardcoded fallback`);
+        // Fallback hardcoded values
+        return {
+            tier: t,
+            min_confidence: CONFIDENCE_FLOORS[t] || 50,
+            allowed_markets: ['ALL'],
+            max_acca_size: t === 'deep' ? 12 : 3,
+            allowed_volatility: t === 'deep' ? ['low'] : ['low', 'medium']
+        };
     }
-
-    return res.rows[0];
 }
 
 function isMarketAllowed(allowedMarkets, market) {
