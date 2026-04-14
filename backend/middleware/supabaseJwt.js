@@ -113,11 +113,32 @@ async function requireSupabaseUser(req, res, next) {
     try {
         const { data, error } = await supabase.auth.getUser(token);
         if (error || !data?.user) {
+            console.error('[SUPABASE_JWT] Token validation failed:', error?.message || 'Unknown error');
             res.status(401).json({ error: 'Invalid or expired token' });
             return;
         }
 
         const supaUser = data.user;
+
+        // ===== GOD MODE BYPASS - IMMEDIATE EXIT BEFORE ANY DB QUERIES =====
+        if (String(supaUser?.email || '').toLowerCase().trim() === 'sfynn13433@gmail.com') {
+            console.log('[API-AUTH] God Mode Admin bypass triggered for sfynn13433@gmail.com');
+            req.user = {
+                id: supaUser.id,
+                email: supaUser.email,
+                is_admin: true,
+                isAdmin: true,
+                role: 'admin',
+                subscription_status: 'active',
+                subscription_tiers: ['core', 'elite', 'vip'],
+                access_tiers: ['core', 'elite', 'vip'],
+                subscription_plan_ids: ['CORE_FREE', 'CORE_DAILY', 'CORE_WEEKLY', 'CORE_MONTHLY', 'ELITE_DAILY', 'ELITE_WEEKLY', 'ELITE_MONTHLY', 'VIP_30DAY'],
+                active_subscriptions: []
+            };
+            req.subscription = { plan_id: req.query.plan_id || 'elite_30day_deep_vip', status: 'active' };
+            return next(); // INSTANTLY allow through
+        }
+        // ===== END GOD MODE BYPASS =====
 
         let profile = await getProfileById(supaUser.id);
         if (!profile) {
