@@ -2571,14 +2571,76 @@ function takeAvailablePredictions(predictions, usedFixtureIds, historicalTeamCom
     return out;
 }
 
+const CORE_PLANS = ['core_4day_sprint', 'core_9day_run', 'core_14day_pro', 'core_30day_limitless'];
+const ELITE_PLANS = ['elite_4day_deep_dive', 'elite_9day_deep_strike', 'elite_14day_deep_pro', 'elite_30day_deep_vip'];
+const ALL_PLANS = [...CORE_PLANS, ...ELITE_PLANS];
+
+function getVisibilityForTierType(tier, type) {
+    const tierLower = String(tier || '').toLowerCase();
+    const typeLower = String(type || '').toLowerCase();
+    
+    if (typeLower === 'mega_acca_12') {
+        return ELITE_PLANS;
+    }
+    
+    if (typeLower === 'acca_6match') {
+        if (tierLower === 'deep') {
+            return ALL_PLANS;
+        }
+        return CORE_PLANS;
+    }
+    
+    if (typeLower === 'multi' || typeLower === 'same_match') {
+        return ALL_PLANS;
+    }
+    
+    if (typeLower === 'secondary') {
+        return ALL_PLANS;
+    }
+    
+    if (typeLower === 'direct') {
+        if (tierLower === 'deep') {
+            return ALL_PLANS;
+        }
+        return CORE_PLANS;
+    }
+    
+    return CORE_PLANS;
+}
+
+function extractSportFromMatches(matches) {
+    if (!Array.isArray(matches) || matches.length === 0) return 'football';
+    const firstSport = matches[0]?.sport;
+    if (firstSport) return normalizeSportKey(firstSport);
+    const metadata = matches[0]?.metadata || {};
+    return normalizeSportKey(metadata?.sport || 'football');
+}
+
+function extractMarketAndRecommendation(matches) {
+    if (!Array.isArray(matches) || matches.length === 0) {
+        return { market_type: 'unknown', recommendation: null };
+    }
+    const first = matches[0];
+    const marketType = first?.market_type || first?.market || first?.prediction_type || first?.metadata?.market_type || 'unknown';
+    const recommendation = first?.recommendation || first?.prediction || first?.selection || first?.home_team && first?.away_team 
+        ? `${first.home_team} vs ${first.away_team}` 
+        : null;
+    return { market_type: marketType, recommendation };
+}
+
 async function insertFinalRow({ publish_run_id, tier, type, matches, total_confidence, risk_level }, client) {
+    const plan_visibility = getVisibilityForTierType(tier, type);
+    const sport = extractSportFromMatches(matches);
+    const { market_type, recommendation } = extractMarketAndRecommendation(matches);
+    const expiresAt = new Date(Date.now() + (7 * 24 * 60 * 60 * 1000));
+    
     const res = await client.query(
         `
-        insert into predictions_final (publish_run_id, tier, type, matches, total_confidence, risk_level)
-        values ($1, $2, $3, $4::jsonb, $5, $6)
+        insert into predictions_final (publish_run_id, tier, type, matches, total_confidence, risk_level, plan_visibility, sport, market_type, recommendation, expires_at)
+        values ($1, $2, $3, $4::jsonb, $5, $6, $7::jsonb, $8, $9, $10, $11)
         returning *;
         `,
-        [publish_run_id || null, tier, type, JSON.stringify(matches), total_confidence, risk_level]
+        [publish_run_id || null, tier, type, JSON.stringify(matches), total_confidence, risk_level, JSON.stringify(plan_visibility), sport, market_type, recommendation, expiresAt]
     );
 
     return res.rows[0];
