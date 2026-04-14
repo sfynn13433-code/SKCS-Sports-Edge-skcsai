@@ -650,6 +650,18 @@
         wireButtons();
 
         const session = await getSession();
+        const ADMIN_EMAIL = 'sfynn13433@gmail.com';
+        const isAdmin = session?.user?.email?.toLowerCase() === ADMIN_EMAIL;
+
+        /* Admin bypass: send straight to dashboard, no experience page */
+        if (isAdmin) {
+            try {
+                localStorage.removeItem('skcs_experience_mode');
+                localStorage.removeItem('skcs_role');
+            } catch (e) { /* ignore */ }
+            window.location.href = 'index.html';
+            return;
+        }
 
         /* If no session at all, redirect to login */
         if (!session?.user) {

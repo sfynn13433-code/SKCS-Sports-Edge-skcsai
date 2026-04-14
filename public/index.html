@@ -2631,21 +2631,29 @@
             chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
         }
 
-        const experienceMode = (() => {
-            try { return localStorage.getItem('skcs_experience_mode') === '1'; } catch (_) { return false; }
-        })();
-
         const session = await getActiveSession(true);
-        // SFYNN Admin Bypass: allow sfynn13433@gmail.com unconditional access
-        const isAdmin = session?.user?.email?.toLowerCase() === 'sfynn13433@gmail.com';
-        
-        if (!session?.user && !experienceMode && !isAdmin) {
-            updateAuthLink(null);
-            window.location.href = 'login.html?next=index.html';
-            return;
-        }
+        const ADMIN_EMAIL = 'sfynn13433@gmail.com';
+        const isAdmin = session?.user?.email?.toLowerCase() === ADMIN_EMAIL;
 
-        updateAuthLink(session);
+        // KILL-SWITCH: Admin bypass - remove experience mode flags and stop ALL redirects
+        if (isAdmin) {
+            try {
+                localStorage.removeItem('skcs_experience_mode');
+                localStorage.removeItem('skcs_role');
+            } catch (e) { /* ignore */ }
+            updateAuthLink(session);
+        } else {
+            const experienceMode = (() => {
+                try { return localStorage.getItem('skcs_experience_mode') === '1'; } catch (_) { return false; }
+            })();
+
+            if (!session?.user && !experienceMode) {
+                updateAuthLink(null);
+                window.location.href = 'login.html?next=index.html';
+                return;
+            }
+            updateAuthLink(session);
+        }
 
         document.querySelectorAll('.tab-button').forEach(btn => {
             btn.addEventListener('click', function() {

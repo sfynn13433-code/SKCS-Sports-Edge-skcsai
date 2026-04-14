@@ -621,6 +621,8 @@ async function loadBillingStatus() {
   }
 }
 
+const ADMIN_EMAIL = 'sfynn13433@gmail.com';
+
 function showPaymentComingSoon(_method = '') {
   window.location.href = 'login.html?action=register&next=payment.html';
 }
@@ -630,6 +632,20 @@ async function selectPlan(tierId) {
     localStorage.setItem('skcs_plan_id', tierId);
     localStorage.setItem('skcs_plan_selected_at', new Date().toISOString());
   } catch (e) { /* ignore */ }
+  
+  // Admin bypass: if already logged in as admin, go straight to dashboard
+  if (supabaseClient) {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session?.user?.email?.toLowerCase() === ADMIN_EMAIL) {
+      try {
+        localStorage.removeItem('skcs_experience_mode');
+        localStorage.removeItem('skcs_role');
+      } catch (e) { /* ignore */ }
+      window.location.href = 'index.html';
+      return;
+    }
+  }
+  
   window.location.href = `login.html?action=register&plan=${encodeURIComponent(tierId)}&next=payment.html`;
 }
 
