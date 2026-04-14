@@ -4,7 +4,7 @@ const express = require('express');
 const { query } = require('../db');
 const { rebuildFinalOutputs } = require('../services/aiPipeline');
 const { requireRole } = require('../utils/auth');
-const { requireSupabaseUser, requireActiveSubscription } = require('../middleware/supabaseJwt');
+const { requireSupabaseUser } = require('../middleware/supabaseJwt');
 const config = require('../config');
 const { createClient } = require('@supabase/supabase-js');
 const moment = require('moment-timezone');
@@ -280,7 +280,7 @@ function canAccessSubscriptionViewTier(user, viewTier) {
     if (user?.is_admin === true || user?.isAdmin === true || user?.is_test_user === true) return true;
 
     const highest = resolveHighestAccessTier(user);
-    if (!highest) return false;
+    if (!highest) return requested === 'core';
     if (requested === 'core') return highest === 'core' || highest === 'elite' || highest === 'vip';
     if (requested === 'elite') return highest === 'elite' || highest === 'vip';
     return requested === 'vip' ? highest === 'vip' : false;
@@ -1326,6 +1326,10 @@ function canUserAccessPlan(user, requestedPlanId) {
         }
     }
 
+    if (!access.size) {
+        access.add('core');
+    }
+
     if (requestedPlanId.includes('deep_vip') || requestedPlanId === 'vip_30day') {
         return access.has('vip');
     }
@@ -1337,7 +1341,7 @@ function canUserAccessPlan(user, requestedPlanId) {
 
 // GET /api/predictions
 // Default tier = deep (elite pool); subscription limits use /api/user/predictions
-router.get('/', requireSupabaseUser, requireActiveSubscription, async (req, res) => {
+router.get('/', requireSupabaseUser, async (req, res) => {
     try {
         let planId = resolveRequestedPlanId(req);
         if (!planId) {

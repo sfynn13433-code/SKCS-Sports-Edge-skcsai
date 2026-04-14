@@ -1701,6 +1701,8 @@
         }
 
         async function fetchFromSupabase() {
+            supabaseFallbackStatus = 'disabled_for_tier_integrity';
+            return [];
             try {
                 const supabaseUrl = (window.SUPABASE_URL || '').replace(/\/+$/,'');
                 const anon = window.SUPABASE_ANON_KEY || '';
@@ -1771,7 +1773,7 @@
                 }
             });
 
-            if (response.status === 401 || response.status === 403) {
+            if (response.status === 401) {
                 redirectToSubscribeLocked();
                 return;
             }
@@ -2545,11 +2547,22 @@
         inputField.value = ""; 
         addMessage(msg, "user"); 
         try {
+            const accessToken = await getAccessTokenOrRedirect();
+            if (!accessToken) return;
+
             const response = await fetch(`${SKCS_BACKEND}/api/chat`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-api-key': getUserApiKey() },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': getUserApiKey(),
+                    'Authorization': `Bearer ${accessToken}`
+                },
                 body: JSON.stringify({ message: msg })
             });
+            if (response.status === 401) {
+                redirectToSubscribeLocked();
+                return;
+            }
             const data = await response.json();
             addMessage(data.response || "No response from EdgeMind BOT", "bot");
         } catch (error) { 

@@ -83,6 +83,12 @@ function resolveAccessContext({ activeSubscriptions = [], profilePlanId = null, 
         accessTiers.add('core');
     }
 
+    if (!ownedTiers.size) {
+        ownedTiers.add('core');
+        accessTiers.add('core');
+        plans.add('CORE_FREE');
+    }
+
     return {
         owned_tiers: Array.from(ownedTiers),
         access_tiers: Array.from(accessTiers),
@@ -149,10 +155,8 @@ async function requireSupabaseUser(req, res, next) {
         const verificationStatus = String(
             profile?.verification_status
             || userMetadata?.verification_status
-            || 'pending'
+            || 'approved'
         ).trim().toLowerCase();
-        const idStatus = String(userMetadata?.id_status || 'pending').trim().toLowerCase();
-        const faceStatus = String(userMetadata?.face_status || 'pending').trim().toLowerCase();
         const hasActiveSubscriptions = Array.isArray(activeSubscriptions) && activeSubscriptions.length > 0;
 
         req.user = {
@@ -169,8 +173,6 @@ async function requireSupabaseUser(req, res, next) {
             is_admin: profileIsAdmin,
             isAdmin: profileIsAdmin,
             verification_status: verificationStatus,
-            id_status: idStatus,
-            face_status: faceStatus,
             id_document_uploaded: userMetadata?.id_document_uploaded === true,
             selfie_uploaded: userMetadata?.selfie_uploaded === true,
             active_subscriptions: activeSubscriptions,

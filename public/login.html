@@ -175,10 +175,6 @@
                 <input type="text" id="registerSurname" placeholder="Surname" autocomplete="family-name" required>
             </div>
             <div class="form-group">
-                <label for="registerIdNumber">ID Number</label>
-                <input type="text" id="registerIdNumber" placeholder="National ID number" autocomplete="off" required>
-            </div>
-            <div class="form-group">
                 <label for="registerEmail">Email Address</label>
                 <input type="email" id="registerEmail" placeholder="your@email.com" autocomplete="email" required>
             </div>
@@ -201,14 +197,6 @@
             <div class="form-group">
                 <label for="registerPassword">Password</label>
                 <input type="password" id="registerPassword" placeholder="••••••••" autocomplete="new-password" required>
-            </div>
-            <div class="form-group">
-                <label for="registerIdDocument">ID Document Upload</label>
-                <input type="file" id="registerIdDocument" accept=".pdf,.jpg,.jpeg,.png" required>
-            </div>
-            <div class="form-group">
-                <label for="registerSelfie">Selfie Upload (Placeholder)</label>
-                <input type="file" id="registerSelfie" accept=".jpg,.jpeg,.png" required>
             </div>
             <button id="registerBtn" class="submit-btn">Register</button>
             <div id="registerMessage" class="message"></div>
@@ -311,25 +299,17 @@
         document.getElementById('registerBtn').addEventListener('click', async () => {
             const firstName = document.getElementById('registerFirstName').value.trim();
             const surname = document.getElementById('registerSurname').value.trim();
-            const idNumber = document.getElementById('registerIdNumber').value.trim();
             const email = document.getElementById('registerEmail').value;
             const phone = document.getElementById('registerPhone').value.trim();
             const street = document.getElementById('registerStreet').value.trim();
             const town = document.getElementById('registerTown').value.trim();
             const country = document.getElementById('registerCountry').value.trim();
             const password = document.getElementById('registerPassword').value;
-            const idDocumentFile = document.getElementById('registerIdDocument').files[0] || null;
-            const selfieFile = document.getElementById('registerSelfie').files[0] || null;
             const messageDiv = document.getElementById('registerMessage');
 
-            if (!firstName || !surname || !idNumber || !email || !phone || !street || !town || !country || !password) {
+            if (!firstName || !surname || !email || !phone || !street || !town || !country || !password) {
                 messageDiv.className = 'message error';
                 messageDiv.textContent = 'Please fill in all fields';
-                return;
-            }
-            if (!idDocumentFile || !selfieFile) {
-                messageDiv.className = 'message error';
-                messageDiv.textContent = 'Please upload your ID document and selfie';
                 return;
             }
             if (password.length < 6) {
@@ -353,21 +333,11 @@
                             first_name: firstName,
                             surname,
                             last_name: surname,
-                            id_number: idNumber,
                             phone,
                             street,
                             city: town,
                             town,
-                            country,
-                            verification_status: 'pending',
-                            id_status: 'pending',
-                            face_status: 'pending',
-                            id_document_uploaded: true,
-                            selfie_uploaded: true,
-                            id_document_url: `pending://id/${encodeURIComponent(idDocumentFile.name)}`,
-                            selfie_url: `pending://selfie/${encodeURIComponent(selfieFile.name)}`,
-                            id_document_filename: idDocumentFile.name,
-                            selfie_filename: selfieFile.name
+                            country
                         }
                     }
                 });
@@ -378,18 +348,24 @@
                     return;
                 }
 
-                // Keep registration + verification flow explicit for testing:
-                // do not auto-login immediately after signup, even if a session is returned.
-                if (data?.session) {
-                    try {
-                        await supabaseClient.auth.signOut();
-                    } catch (signOutErr) {
-                        console.warn('[login] sign-out after signup failed:', signOutErr?.message || signOutErr);
+                let session = data?.session || null;
+                if (!session) {
+                    const signInRes = await supabaseClient.auth.signInWithPassword({ email, password });
+                    if (!signInRes.error && signInRes.data?.session) {
+                        session = signInRes.data.session;
                     }
                 }
 
+                if (session) {
+                    const dest = sessionStorage.getItem('skcs_after_auth') || 'index.html';
+                    sessionStorage.removeItem('skcs_after_auth');
+                    window.location.href = dest;
+                    return;
+                }
+
                 messageDiv.className = 'message success';
-                messageDiv.textContent = 'Registration submitted. ID and selfie checks are pending manual admin approval.';
+                messageDiv.textContent = 'Registration complete. Please log in to continue.';
+                loginTab.click();
             } catch (error) {
                 messageDiv.className = 'message error';
                 messageDiv.textContent = 'Connection error';
