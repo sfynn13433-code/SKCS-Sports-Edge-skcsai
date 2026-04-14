@@ -326,12 +326,38 @@ function predictionMatchesSport(prediction, sportFilterValues) {
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
     if (matches.length === 0) return false;
 
+    // STRICT FIX: Always check the PRIMARY (first) match for sport
+    // This prevents ACCAs with mixed sports from appearing in wrong sport tabs
+    const primaryMatch = matches[0];
+    if (!primaryMatch) return false;
+
+    const primarySport = normalizePredictionSportKey(
+        primaryMatch?.sport || 
+        primaryMatch?.metadata?.sport || 
+        primaryMatch?.metadata?.sport_type || 
+        ''
+    );
+
+    // Primary match must be in the allowed set
+    if (!allowed.has(primarySport)) return false;
+
+    // For ACCA/multi: all matches should ideally be the same sport
+    // But we primarily check the first match for sport tab filtering
     const sectionType = inferSectionType(prediction);
     if (sectionType.includes('acca') || sectionType === 'multi') {
-        return matches.some((match) => allowed.has(normalizePredictionSportKey(match?.sport || '')));
+        // Strict: ALL matches in ACCA should match the sport
+        return matches.every((match) => {
+            const matchSport = normalizePredictionSportKey(
+                match?.sport || 
+                match?.metadata?.sport || 
+                match?.metadata?.sport_type || 
+                ''
+            );
+            return allowed.has(matchSport);
+        });
     }
 
-    return matches.every((match) => allowed.has(normalizePredictionSportKey(match?.sport || '')));
+    return true;
 }
 
 function extractTeamNames(predictions) {
