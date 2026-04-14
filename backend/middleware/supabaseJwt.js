@@ -38,7 +38,16 @@ function resolveAccessContext({ activeSubscriptions = [], profilePlanId = null, 
         return {
             owned_tiers: ['core', 'elite', 'vip'],
             access_tiers: ['core', 'elite', 'vip'],
-            subscription_plan_ids: ['core_all', 'elite_all', 'vip_all']
+            subscription_plan_ids: [
+                'CORE_FREE',
+                'CORE_DAILY',
+                'CORE_WEEKLY',
+                'CORE_MONTHLY',
+                'ELITE_DAILY',
+                'ELITE_WEEKLY',
+                'ELITE_MONTHLY',
+                'VIP_30DAY'
+            ]
         };
     }
 
@@ -140,8 +149,10 @@ async function requireSupabaseUser(req, res, next) {
         const verificationStatus = String(
             profile?.verification_status
             || userMetadata?.verification_status
-            || 'pending_verification'
+            || 'pending'
         ).trim().toLowerCase();
+        const idStatus = String(userMetadata?.id_status || 'pending').trim().toLowerCase();
+        const faceStatus = String(userMetadata?.face_status || 'pending').trim().toLowerCase();
         const hasActiveSubscriptions = Array.isArray(activeSubscriptions) && activeSubscriptions.length > 0;
 
         req.user = {
@@ -158,6 +169,8 @@ async function requireSupabaseUser(req, res, next) {
             is_admin: profileIsAdmin,
             isAdmin: profileIsAdmin,
             verification_status: verificationStatus,
+            id_status: idStatus,
+            face_status: faceStatus,
             id_document_uploaded: userMetadata?.id_document_uploaded === true,
             selfie_uploaded: userMetadata?.selfie_uploaded === true,
             active_subscriptions: activeSubscriptions,

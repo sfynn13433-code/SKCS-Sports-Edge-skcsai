@@ -179,19 +179,19 @@
                 <input type="text" id="registerIdNumber" placeholder="National ID number" autocomplete="off" required>
             </div>
             <div class="form-group">
-                <label for="registerEmail">Email</label>
+                <label for="registerEmail">Email Address</label>
                 <input type="email" id="registerEmail" placeholder="your@email.com" autocomplete="email" required>
             </div>
             <div class="form-group">
-                <label for="registerPhone">Phone</label>
+                <label for="registerPhone">Telephone Number</label>
                 <input type="tel" id="registerPhone" placeholder="+27..." autocomplete="tel" required>
             </div>
             <div class="form-group">
-                <label for="registerStreet">Street</label>
+                <label for="registerStreet">Street Address</label>
                 <input type="text" id="registerStreet" placeholder="Street address" autocomplete="address-line1" required>
             </div>
             <div class="form-group">
-                <label for="registerTown">Town</label>
+                <label for="registerTown">Town / City</label>
                 <input type="text" id="registerTown" placeholder="Town / City" autocomplete="address-level2" required>
             </div>
             <div class="form-group">
@@ -351,15 +351,21 @@
                     options: {
                         data: {
                             first_name: firstName,
+                            surname,
                             last_name: surname,
                             id_number: idNumber,
                             phone,
                             street,
+                            city: town,
                             town,
                             country,
-                            verification_status: 'pending_verification',
+                            verification_status: 'pending',
+                            id_status: 'pending',
+                            face_status: 'pending',
                             id_document_uploaded: true,
                             selfie_uploaded: true,
+                            id_document_url: `pending://id/${encodeURIComponent(idDocumentFile.name)}`,
+                            selfie_url: `pending://selfie/${encodeURIComponent(selfieFile.name)}`,
                             id_document_filename: idDocumentFile.name,
                             selfie_filename: selfieFile.name
                         }
@@ -383,7 +389,7 @@
                 }
 
                 messageDiv.className = 'message success';
-                messageDiv.textContent = 'Registration submitted with pending verification status. Verify your email, then wait for manual admin approval.';
+                messageDiv.textContent = 'Registration submitted. ID and selfie checks are pending manual admin approval.';
             } catch (error) {
                 messageDiv.className = 'message error';
                 messageDiv.textContent = 'Connection error';

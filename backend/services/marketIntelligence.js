@@ -168,13 +168,22 @@ const DIRECT_SAFE_MARKETS = Object.freeze(new Set([
     'double_chance_12',
     'draw_no_bet_home',
     'draw_no_bet_away',
+    'over_0_5',
     'over_1_5',
+    'over_2_5',
     'under_4_5',
     'under_3_5',
+    'under_2_5',
     'home_over_0_5',
     'away_over_0_5',
+    'home_over_1_5',
+    'away_over_1_5',
+    'btts_yes',
+    'btts_no',
     'double_chance_under_3_5',
-    'double_chance_over_1_5'
+    'double_chance_over_1_5',
+    'team_to_score',
+    'team_not_to_score'
 ]));
 
 const DIRECT_MARKETS_ALLOWED = Object.freeze(new Set([
@@ -189,14 +198,57 @@ const SAFE_MARKETS_ALLOWED = Object.freeze(new Set([
     'double_chance_12',
     'draw_no_bet_home',
     'draw_no_bet_away',
+    'over_0_5',
+    'over_1_5',
+    'over_2_5',
     'under_3_5',
+    'under_2_5',
     'home_over_0_5',
-    'away_over_0_5'
+    'away_over_0_5',
+    'home_over_1_5',
+    'away_over_1_5',
+    'btts_yes',
+    'btts_no',
+    'corners_over_7_5',
+    'corners_over_8_5',
+    'corners_over_9_5',
+    'corners_under_12_5',
+    'corners_under_11_5',
+    'corners_under_10_5',
+    'cards_over_2_5',
+    'cards_over_3_5',
+    'cards_over_4_5',
+    'cards_under_6_5',
+    'yellow_cards_over_2_5',
+    'yellow_cards_over_3_5',
+    'yellow_cards_over_4_5',
+    'team_to_score',
+    'team_not_to_score'
 ]));
 
 const DIRECT_CONFIDENCE_MIN = 60;
 const SAFE_CONFIDENCE_MIN = 75;
 const ACCA_CONFIDENCE_MIN = 80;
+
+const SAFE_MARKET_PATTERNS = Object.freeze([
+    /^(over|under)_\d+_\d+_(points|runs|games)$/,
+    /^(over|under)_\d+_\d+_(corners|cards)$/,
+    /^(corners|cards|yellow_cards|red_cards)_(over|under)_\d+_\d+$/,
+    /^total_(points|runs|games)_(over|under)(?:_\d+_\d+)?$/
+]);
+
+const MARKET_KEY_ALIASES = Object.freeze({
+    dnb_home: 'draw_no_bet_home',
+    dnb_away: 'draw_no_bet_away',
+    over_7_5_corners: 'corners_over_7_5',
+    over_8_5_corners: 'corners_over_8_5',
+    over_9_5_corners: 'corners_over_9_5',
+    under_12_5_corners: 'corners_under_12_5',
+    over_2_5_cards: 'cards_over_2_5',
+    over_3_5_cards: 'cards_over_3_5',
+    over_4_5_cards: 'cards_over_4_5',
+    under_6_5_cards: 'cards_under_6_5'
+});
 
 const FALLBACK_LADDER = Object.freeze([
     { pass: 'elite', min_confidence: 92, tiers: [1], safeTier3Only: false, directSafeOnly: false },
@@ -222,7 +274,11 @@ function normalizeProbability(value, fallback = null) {
 }
 
 function normalizeMarketKey(value) {
-    return String(value || '').trim().toLowerCase().replace(/\s+/g, '_');
+    const key = String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[\s-]+/g, '_');
+    return MARKET_KEY_ALIASES[key] || key;
 }
 
 function normalizeRisk(value, fallback = 0) {
@@ -230,6 +286,13 @@ function normalizeRisk(value, fallback = 0) {
     if (!Number.isFinite(n)) return fallback;
     if (n > 1 && n <= 100) return clamp(n / 100, 0, 1);
     return clamp(n, 0, 1);
+}
+
+function isSafeMarketAllowed(market) {
+    const key = normalizeMarketKey(market);
+    if (!key) return false;
+    if (SAFE_MARKETS_ALLOWED.has(key)) return true;
+    return SAFE_MARKET_PATTERNS.some((pattern) => pattern.test(key));
 }
 
 function resolveTelemetry(options = {}, matchContext = {}) {
@@ -914,7 +977,7 @@ function isDirectMarketCandidate(candidate) {
 function isSafeSinglesCandidate(candidate) {
     const market = normalizeMarketKey(candidate?.market || '');
     const confidence = Number(candidate?.confidence || 0);
-    return SAFE_MARKETS_ALLOWED.has(market) && confidence >= SAFE_CONFIDENCE_MIN;
+    return isSafeMarketAllowed(market) && confidence >= SAFE_CONFIDENCE_MIN;
 }
 
 function selectDirectSecondarySameMatch(candidates, matchContext = {}, options = {}) {

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKCS Subscribe</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: Arial, sans-serif;
+    }
+    .card {
+      text-align: center;
+      padding: 18px 20px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.78);
+    }
+    a { color: #93c5fd; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 style="margin:0 0 8px;font-size:1.15rem;">Opening Subscription Portal…</h1>
+    <p style="margin:0;">Redirecting to registration.</p>
+    <noscript>
+      <p style="margin-top:12px;">
+        JavaScript is required. Continue via
+        <a href="/login.html?register=1&next=subscription.html">registration</a>.
+      </p>
+    </noscript>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/config.js"></script>
+  <script>
+    (async function routeSubscribe() {
+      const search = new URLSearchParams(window.location.search);
+
+      const loginParams = new URLSearchParams();
+      loginParams.set('register', '1');
+      loginParams.set('next', 'subscription.html');
+      if (search.get('locked')) loginParams.set('locked', search.get('locked'));
+      if (search.get('message')) loginParams.set('message', search.get('message'));
+      const loginUrl = `/login.html?${loginParams.toString()}`;
+
+      const SUPABASE_URL = window.SUPABASE_URL || '';
+      const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
+      if (!window.supabase || !SUPABASE_URL || !SUPABASE_ANON_KEY) {
+        window.location.replace(loginUrl);
+        return;
+      }
+
+      try {
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const { data } = await client.auth.getSession();
+        if (data && data.session && data.session.user) {
+          const query = window.location.search || '';
+          window.location.replace(`/subscription.html${query}`);
+          return;
+        }
+      } catch (_err) {
+        // Fall through to registration redirect.
+      }
+
+      window.location.replace(loginUrl);
+    })();
+  </script>
+</body>
+</html>

@@ -72,8 +72,20 @@ const MEGA_ACCA_SIZE = 12;
 const ACCA_SIZE = 6;
 const SAME_MATCH_INSIGHT_TARGET = 6;
 const ACCA_MIN_LEG_CONFIDENCE = ACCA_CONFIDENCE_MIN;
-const REQUIRED_FOOTBALL_ONLY_ACCAS = 2;
-const MIXED_SPORT_TARGETS = new Set(['football', 'hockey', 'mma', 'afl', 'cricket', 'basketball']);
+const MIXED_SPORT_TARGETS = new Set([
+    'football',
+    'tennis',
+    'basketball',
+    'rugby',
+    'cricket',
+    'baseball',
+    'hockey',
+    'american_football',
+    'mma',
+    'afl',
+    'volleyball',
+    'handball'
+]);
 const SAFE_TIER3_ACCA_MARKETS = new Set(['btts_no', 'under_3_5', 'first_half_draw']);
 const ACCA_FALLBACK_LADDER = Object.freeze([
     { pass: 'elite', minConfidence: 92, tiers: [1], safeTier3Only: false, directSafeOnly: false },
@@ -2055,22 +2067,6 @@ function buildAcca6Candidates(predictions, maxRows = 6, options = {}) {
     if (sorted.length < ACCA_SIZE) return [];
 
     const rows = [];
-    const footballTarget = Math.min(REQUIRED_FOOTBALL_ONLY_ACCAS, Math.max(0, Number(maxRows) || 0));
-
-    for (let i = 0; i < footballTarget; i++) {
-        const row = buildFootballOnlyAccumulatorRow(
-            sorted,
-            globalUsedFixtures,
-            ACCA_SIZE,
-            minConfidenceFloor,
-            { isMega: false }
-        );
-        if (!row) {
-            console.warn(`[accaBuilder] ACCA football split warning: requested ${footballTarget} pure football ACCAs but only built ${i}.`);
-            return rows;
-        }
-        rows.push(row);
-    }
 
     while (rows.length < maxRows) {
         const row = buildMixedAccumulatorRow(sorted, globalUsedFixtures, ACCA_SIZE, minConfidenceFloor, { isMega: false });
@@ -2792,17 +2788,6 @@ async function buildFinalForTier(tier, options = {}) {
             { minLegConfidence: ACCA_MIN_LEG_CONFIDENCE }
         );
 
-        const minimumFootballFixturePool = REQUIRED_FOOTBALL_ONLY_ACCAS * ACCA_SIZE;
-        const footballCandidateCount = accaMarketCandidates
-            .filter((candidate) => normalizeSportKey(candidate?.sport) === 'football')
-            .length;
-
-        if (footballCandidateCount < minimumFootballFixturePool) {
-            console.warn(
-                `[accaBuilder] ACCA pool warning: only ${footballCandidateCount} football fixtures in candidate pool (need ${minimumFootballFixturePool}).`
-            );
-        }
-
         // -------------------------------------------------------------------------
         // ---------------------------------------------------------------------
         // SKCS LAW: Clean stale rows for this tier before publishing
@@ -2832,8 +2817,8 @@ async function buildFinalForTier(tier, options = {}) {
 
         // Build plan: 4 x 6-leg + 1 x 12-leg
         const buildPlan = [
-            { type: 'acca_6match', legCount: 6, profile: 'football_only' },
-            { type: 'acca_6match', legCount: 6, profile: 'football_only' },
+            { type: 'acca_6match', legCount: 6, profile: 'mixed_sport' },
+            { type: 'acca_6match', legCount: 6, profile: 'mixed_sport' },
             { type: 'acca_6match', legCount: 6, profile: 'mixed_sport' },
             { type: 'acca_6match', legCount: 6, profile: 'mixed_sport' },
             { type: 'mega_acca_12', legCount: 12, profile: 'mixed_sport' },
@@ -3081,7 +3066,7 @@ async function buildFinalForTier(tier, options = {}) {
             } else {
                 pipelineLogger.rejectionAdd({
                     run_id: telemetryRunId,
-                    sport: 'football',
+                    sport: normalizeSportKey(fallbackPool[0]?.sport || 'unknown'),
                     bucket: 'publish_skip',
                     metadata: {
                         tier: t,

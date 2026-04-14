@@ -202,6 +202,39 @@ button:hover { opacity: 0.9; }
   color: #fef9c3;
 }
 
+.payment-placeholder-panel {
+  margin: 0 auto 24px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: rgba(15, 23, 42, 0.88);
+}
+
+.payment-placeholder-panel h3 {
+  margin: 0 0 8px;
+  color: #e2e8f0;
+}
+
+.payment-placeholder-panel p {
+  margin: 0 0 14px;
+  color: #cbd5e1;
+  font-size: 0.92rem;
+}
+
+.payment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.payment-option-btn {
+  margin-top: 0;
+  width: 100%;
+  background: #334155;
+  color: #f8fafc;
+  border: 1px solid rgba(148, 163, 184, 0.55);
+}
+
 </style>
 </head>
 
@@ -239,6 +272,18 @@ button:hover { opacity: 0.9; }
   <h3>Important Terms & Conditions</h3>
   <p><strong>Pro-Rata Access:</strong> Join after 11:59 AM SAST and receive 50% of today's Direct 1x2 matches absolutely FREE. Your official subscription cycle will not begin until 00:00 midnight, ensuring you get your full paid subscription run.</p>
   <p><strong>No Refund Policy:</strong> All sales are final. Once a subscription has been paid for and activated, no refund requests will be accepted or processed.</p>
+</div>
+
+<div id="paymentPlaceholderPanel" class="payment-placeholder-panel">
+  <h3>Payment Options (Visual Placeholder)</h3>
+  <p>Select a method to preview checkout options. Payments are not processed yet.</p>
+  <div class="payment-grid">
+    <button type="button" class="payment-option-btn" onclick="showPaymentComingSoon('PayPal')">PayPal [Coming Soon]</button>
+    <button type="button" class="payment-option-btn" onclick="showPaymentComingSoon('Visa')">Visa [Coming Soon]</button>
+    <button type="button" class="payment-option-btn" onclick="showPaymentComingSoon('Mastercard')">Mastercard [Coming Soon]</button>
+    <button type="button" class="payment-option-btn" onclick="showPaymentComingSoon('Voucher')">Voucher [Coming Soon]</button>
+    <button type="button" class="payment-option-btn" onclick="showPaymentComingSoon('Crypto')">Crypto [Coming Soon]</button>
+  </div>
 </div>
 
 <div class="status-banner">
@@ -559,26 +604,31 @@ async function loadBillingStatus() {
     if (!banner || !billingStatus) return;
 
     if (billingStatus.billing_enabled) {
-      banner.innerHTML = "<strong>Billing live:</strong> Plans can be purchased normally.";
+      banner.innerHTML = "<strong>Billing live:</strong> Payment integration is active.";
       return;
     }
 
     if (billingStatus.subscription_open) {
-      banner.innerHTML = "<strong>Staging-open mode:</strong> Billing is not live yet, but plan activation is currently enabled for testing.";
+      banner.innerHTML = "<strong>Staging-open mode:</strong> Billing is still placeholder-only in this UI.";
       return;
     }
 
-    banner.innerHTML = "<strong>Invite-only access:</strong> Billing is not live yet. Approved accounts can still receive access, but plan buttons do not process real payments.";
+    banner.innerHTML = "<strong>Invite-only access:</strong> Billing is not live yet. Payment buttons are visual placeholders only.";
   } catch (err) {
     if (banner) {
-      banner.innerHTML = "<strong>Billing status unavailable:</strong> Plan activation may still work for approved accounts, but checkout is not live.";
+      banner.innerHTML = "<strong>Billing status unavailable:</strong> Payment buttons remain placeholder-only.";
     }
   }
 }
 
+function showPaymentComingSoon(_method = '') {
+  alert("Subscriptions opening soon");
+}
+
 async function selectPlan(tierId) {
   if (!supabaseClient) {
-    alert("Authentication is currently unavailable. Please refresh, then sign in again.");
+    alert("Please sign in or register first, then choose a plan.");
+    window.location.href = "login.html?next=subscription.html&register=1";
     return;
   }
 
@@ -590,38 +640,13 @@ async function selectPlan(tierId) {
     return;
   }
 
-  const SKCS_BACKEND = window.API_BASE_URL || "https://skcs-sports-edge-skcsai.onrender.com";
-  const token = session.access_token;
-
-  try {
-    const res = await fetch(SKCS_BACKEND + "/api/select-plan", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
-      },
-      body: JSON.stringify({ tier_id: tierId })
-    });
-
-    const data = await res.json();
-
-    if (res.ok && data.success) {
-      localStorage.setItem('skcs_plan_id', tierId);
-      localStorage.setItem('skcs_plan_selected_at', new Date().toISOString());
-      const freeLabel = Number(data.pro_rata_direct_free_percent || 0) > 0
-        ? `\nFree Direct 1x2 Access Today: ${data.pro_rata_direct_free_percent}%`
-        : '';
-      alert(`✅ Plan activated: ${data.tier_name || tierId}\nOfficial Start: ${new Date(data.official_start_time).toLocaleString()}\nExpires: ${new Date(data.expires_at || data.expiresAt).toLocaleDateString()}${freeLabel}`);
-      window.location.href = "index.html";
-    } else if (data.requires_payment) {
-      alert(data.message || "Billing is not live yet. Access is currently limited to approved accounts or staging mode.");
-    } else {
-      alert(data.error || "Failed to select plan. Please try again.");
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Connection error. Please try again.");
+  localStorage.setItem('skcs_plan_id', tierId);
+  localStorage.setItem('skcs_plan_selected_at', new Date().toISOString());
+  const panel = document.getElementById('paymentPlaceholderPanel');
+  if (panel && typeof panel.scrollIntoView === 'function') {
+    panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
+  showPaymentComingSoon(tierId);
 }
 
 function goBack() {
@@ -635,14 +660,12 @@ if (typeof checkSession === 'function') {
 showPublicLockNotice();
 loadBillingStatus();
 
+setPlanButtonsEnabled(true);
 if (!supabaseClient) {
-  setPlanButtonsEnabled(false);
   const banner = document.getElementById('billingBanner');
   if (banner) {
-    banner.innerHTML = "<strong>Authentication unavailable:</strong> Plan selection is temporarily disabled. Refresh the page and sign in again.";
+    banner.innerHTML = "<strong>Authentication unavailable:</strong> Registration or login is required before plan selection.";
   }
-} else {
-  setPlanButtonsEnabled(true);
 }
 
 document.querySelectorAll('.skcs-secondary').forEach((node) => {
@@ -652,6 +675,7 @@ document.querySelectorAll('.skcs-secondary').forEach((node) => {
 window.showCore = showCore;
 window.showElite = showElite;
 window.selectPlan = selectPlan;
+window.showPaymentComingSoon = showPaymentComingSoon;
 window.goBack = goBack;
 </script>
 

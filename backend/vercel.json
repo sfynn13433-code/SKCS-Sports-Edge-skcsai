@@ -4,6 +4,10 @@
   "outputDirectory": "public",
   "rewrites": [
     {
+      "source": "/subscribe",
+      "destination": "/subscribe/index.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/$1"
     }

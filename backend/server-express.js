@@ -309,9 +309,17 @@ app.get('/', (_req, res) => {
 });
 
 app.get('/subscribe', (req, res) => {
-  const queryIndex = req.originalUrl.indexOf('?');
-  const suffix = queryIndex >= 0 ? req.originalUrl.slice(queryIndex) : '';
-  res.redirect(`/subscription.html${suffix}`);
+  const params = new URLSearchParams({
+    register: '1',
+    next: 'subscription.html'
+  });
+  if (req.query?.locked !== undefined) {
+    params.set('locked', String(req.query.locked));
+  }
+  if (req.query?.message !== undefined) {
+    params.set('message', String(req.query.message));
+  }
+  res.redirect(`/login.html?${params.toString()}`);
 });
 
 async function proxyOdds(req, res) {
