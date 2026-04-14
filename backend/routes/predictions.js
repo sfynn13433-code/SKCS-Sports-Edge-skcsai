@@ -1260,6 +1260,56 @@ function resolveQueryTiers(planCapabilities, includeAll = false) {
     return Array.from(new Set(tiers));
 }
 
+// Helper: Check if a plan is in the visibility array
+function planVisibilityCheck(planId, visibilityArray) {
+    if (!planId) return false;
+    if (!Array.isArray(visibilityArray) || visibilityArray.length === 0) return false;
+    
+    // Direct match
+    if (visibilityArray.includes(planId)) return true;
+    
+    // Check tier-based access
+    const normalizedPlan = normalizePlanId(planId);
+    if (!normalizedPlan) return false;
+    
+    // Elite plans see everything
+    if (normalizedPlan.includes('elite') || normalizedPlan.includes('deep')) {
+        return true; // Elite sees all predictions
+    }
+    
+    // Core plans: check if visibility allows core plans
+    if (normalizedPlan.includes('core') || normalizedPlan.includes('normal')) {
+        return visibilityArray.some(v => 
+            v.includes('core') || v.includes('normal') || v.includes('4day') || v.includes('9day') || v.includes('14day') || v.includes('30day')
+        );
+    }
+    
+    // Admin bypass - admins can see everything
+    if (normalizedPlan.includes('admin')) return true;
+    
+    return false;
+}
+
+// Helper: Filter predictions by visibility based on user's plan
+function filterByVisibility(predictions, planId, isAdmin = false) {
+    if (isAdmin || !planId || planId.includes('admin')) {
+        return predictions; // Admin sees everything
+    }
+    
+    return predictions.filter(pred => {
+        const visibility = pred.plan_visibility;
+        
+        // No visibility set means visible to all (legacy data)
+        if (!visibility || !Array.isArray(visibility) || visibility.length === 0) {
+            return true;
+        }
+        
+        // Check if user's plan is in visibility
+        return planVisibilityCheck(planId, visibility);
+    });
+}
+
+
 function planRank(planId) {
     const normalized = normalizePlanId(planId);
     if (!normalized) return 0;
@@ -1441,7 +1491,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             }
 
             const dbRes = await query(queryStr, queryParams);
-            predictions = dbRes.rows || [];
+            predictions = filterByVisibility(dbRes.rows || [], planId, isAdminAudit);
         } catch (dbErr) {
             console.error('[predictions] primary DB query failed, falling back to Supabase:', dbErr.message);
         }
@@ -1459,7 +1509,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                         .limit(2500);
 
                     if (!error && Array.isArray(data) && data.length > 0) {
-                        predictions = data;
+                        predictions = filterByVisibility(data, planId, includeAll);
                     } else if (error) {
                         console.warn('[predictions] Supabase include_all fallback error:', error.message || error);
                     }
@@ -1508,7 +1558,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                                 return false;
                             }
                         });
-                        predictions = filtered;
+                        predictions = filterByVisibility(filtered, planId, isAdminAudit);
                     } else if (error) {
                         console.warn('[predictions] Supabase fallback error:', error.message || error);
                     }
