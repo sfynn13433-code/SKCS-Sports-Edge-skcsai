@@ -1094,7 +1094,14 @@
     }
 
     function redirectToSubscribeLocked() {
+        // If the user has experience_mode active, send them to the experience
+        // window instead of the subscription wall — this breaks the redirect loop.
         try {
+            const experienceMode = localStorage.getItem('skcs_experience_mode') === '1';
+            if (experienceMode) {
+                window.location.href = 'experience.html';
+                return;
+            }
             sessionStorage.setItem('skcs_public_lock_message', PUBLIC_LOCK_MESSAGE);
         } catch (e) { /* ignore */ }
         window.location.href = `/subscribe?locked=1&message=${encodeURIComponent(PUBLIC_LOCK_MESSAGE)}`;
@@ -2591,9 +2598,21 @@
         const session = await getActiveSession(true);
         if (!session?.user) {
             updateAuthLink(null);
-            redirectToSubscribeLocked();
+            // No active session: send to login (not subscription wall)
+            window.location.href = 'login.html?next=index.html';
             return;
         }
+
+        // Authenticated user without a subscription: allow access if experience_mode is on
+        // OLD: if (!subscription) redirect("/subscription")
+        // NEW: if (!subscription && !experience_mode) redirect("/subscription")
+        const experienceMode = (() => {
+            try { return localStorage.getItem('skcs_experience_mode') === '1'; } catch (_) { return false; }
+        })();
+
+        // If they have no subscription but are in experience mode, let them through.
+        // The experience window already showed them the upsell — no forced redirect.
+        // (Future: check actual subscription status from Supabase user_metadata here)
         updateAuthLink(session);
 
         document.querySelectorAll('.tab-button').forEach(btn => {

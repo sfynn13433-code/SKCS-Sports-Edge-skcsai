@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKCS AI Sports Edge – Welcome to Experience Mode</title>
+    <meta name="description" content="Explore SKCS AI Sports Edge before subscribing. See live AI signals, preview premium insights, and unlock full access when you're ready.">
+    <link rel="icon" href="data:,">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        /* ── Navbar ── */
+        .navbar {
+            background: #0d6efd;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .nav-right a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+        .nav-right a:hover { opacity: 1; }
+        .nav-badge {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 999px;
+            padding: 0.3rem 0.9rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        /* ── Hero banner ── */
+        .hero {
+            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+            padding: 3rem 2rem 2.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(96,165,250,0.2);
+        }
+        .experience-pill {
+            display: inline-block;
+            background: linear-gradient(90deg, #f59e0b, #ef4444);
+            color: white;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 0.35rem 1rem;
+            border-radius: 999px;
+            margin-bottom: 1.2rem;
+        }
+        .hero h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.75rem;
+            line-height: 1.2;
+        }
+        .hero h1 span { color: #60a5fa; }
+        .hero p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            background: #0d6efd;
+            color: white;
+            padding: 0.85rem 2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            display: inline-block;
+        }
+        .btn-primary:hover { background: #0b5ed7; transform: translateY(-1px); }
+        .btn-secondary {
+            background: transparent;
+            color: #94a3b8;
+            padding: 0.85rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            border: 1px solid #334155;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+            display: inline-block;
+        }
+        .btn-secondary:hover { border-color: #60a5fa; color: #60a5fa; }
+
+        /* ── Main layout ── */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+        }
+
+        /* ── Section headings ── */
+        .section-label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #60a5fa;
+            margin-bottom: 0.6rem;
+        }
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        .section-sub {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        /* ── AI Signals grid ── */
+        .signals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 3rem;
+        }
+
+        .signal-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1.25rem;
+            position: relative;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        .signal-card:hover { border-color: #60a5fa; transform: translateY(-2px); }
+        .signal-card.locked {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+        .signal-card.locked:hover { transform: none; border-color: #334155; }
+
+        .signal-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 0.3rem 0.7rem;
+            border-radius: 999px;
+            margin-bottom: 0.9rem;
+        }
+        .badge-free  { background: #064e3b; color: #34d399; border: 1px solid #065f46; }
+        .badge-locked { background: #1c1917; color: #78716c; border: 1px solid #292524; }
+
+        .signal-teams {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 0.4rem;
+        }
+        .signal-league {
+            font-size: 0.75rem;
+            color: #475569;
+            margin-bottom: 1rem;
+            letter-spacing: 0.04em;
+        }
+        .signal-prediction {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.75rem;
+            border-top: 1px solid #334155;
+        }
+        .signal-market { font-weight: 700; color: #34d399; font-size: 0.9rem; }
+        .signal-market.locked-text { color: #44403c; }
+        .signal-confidence {
+            background: #0f172a;
+            color: #60a5fa;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+        }
+        .signal-confidence.locked-conf { background: #1c1917; color: #44403c; }
+
+        .lock-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: rgba(15,23,42,0.55);
+            backdrop-filter: blur(2px);
+            gap: 0.4rem;
+        }
+        .lock-icon { font-size: 1.6rem; }
+        .lock-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #78716c;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        /* ── Intelligence factors ── */
+        .factors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+        .factor-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 1.25rem;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+        .factor-card:hover { border-color: #3b82f6; }
+        .factor-icon { font-size: 1.8rem; margin-bottom: 0.6rem; }
+        .factor-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 0.35rem;
+        }
+        .factor-desc { font-size: 0.78rem; color: #64748b; line-height: 1.4; }
+
+        /* ── CTA banner ── */
+        .cta-banner {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e1b4b 100%);
+            border: 1px solid rgba(96,165,250,0.3);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .cta-banner h2 {
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.75rem;
+        }
+        .cta-banner p {
+            color: #94a3b8;
+            font-size: 1rem;
+            max-width: 520px;
+            margin: 0 auto 1.75rem;
+            line-height: 1.6;
+        }
+        .cta-features {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+        .cta-chip {
+            background: rgba(96,165,250,0.1);
+            border: 1px solid rgba(96,165,250,0.25);
+            color: #93c5fd;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.4rem 0.9rem;
+            border-radius: 999px;
+        }
+        .btn-unlock {
+            background: linear-gradient(135deg, #0d6efd, #6366f1);
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            text-decoration: none;
+            display: inline-block;
+            transition: opacity 0.2s, transform 0.15s;
+            box-shadow: 0 4px 20px rgba(13,110,253,0.35);
+        }
+        .btn-unlock:hover { opacity: 0.92; transform: translateY(-2px); }
+
+        /* ── Flow steps ── */
+        .flow-steps {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 3rem;
+        }
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .step-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+        .step-dot.done { background: #065f46; color: #34d399; }
+        .step-dot.active { background: #0d6efd; color: white; }
+        .step-dot.future { background: #1e293b; color: #475569; border: 1px solid #334155; }
+        .step-label { font-size: 0.8rem; font-weight: 600; }
+        .step-label.done { color: #34d399; }
+        .step-label.active { color: white; }
+        .step-label.future { color: #475569; }
+        .step-arrow { color: #334155; font-size: 1rem; }
+
+        /* ── Disclaimer ── */
+        .disclaimer {
+            text-align: center;
+            font-size: 0.78rem;
+            color: #475569;
+            padding: 1.5rem 0 2rem;
+            border-top: 1px solid #1e293b;
+        }
+
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 1.7rem; }
+            .flow-steps { gap: 0.3rem; }
+            .step-label { font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="index.html" class="logo">SKCS AI Sports Edge</a>
+    <div class="nav-right">
+        <span class="nav-badge" id="modeBadge">⚡ Experience Mode</span>
+        <a href="subscription.html" id="upgradeLink">💎 Upgrade</a>
+        <a href="#" id="authLink">Logout</a>
+    </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+    <div class="experience-pill">⚡ Experience Mode Active</div>
+    <h1>Welcome to <span>SKCS AI Sports Edge</span></h1>
+    <p>You're now in Experience Mode. Explore live AI signals, see how our intelligence engine works, and unlock full premium access when you're ready.</p>
+
+    <!-- Journey flow -->
+    <div class="flow-steps">
+        <div class="flow-step">
+            <div class="step-dot done">✓</div>
+            <span class="step-label done">Registered</span>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="flow-step">
+            <div class="step-dot active">2</div>
+            <span class="step-label active">Experience Mode</span>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="flow-step">
+            <div class="step-dot future">3</div>
+            <span class="step-label future">Preview Insights</span>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="flow-step">
+            <div class="step-dot future">4</div>
+            <span class="step-label future">Optional Subscription</span>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="flow-step">
+            <div class="step-dot future">5</div>
+            <span class="step-label future">Full Dashboard</span>
+        </div>
+    </div>
+
+    <div class="hero-actions">
+        <a href="index.html" class="btn-primary" id="exploreDashboardBtn">🚀 Explore Dashboard</a>
+        <a href="subscription.html" class="btn-secondary">💎 View Plans</a>
+    </div>
+</div>
+
+<!-- Main content -->
+<div class="container">
+
+    <!-- Today's AI Signals -->
+    <div class="section-label">Today's AI Signals</div>
+    <div class="section-title">Live Predictions Preview</div>
+    <p class="section-sub">A sample of what SKCS AI generates daily. Subscribe to unlock all signals.</p>
+
+    <div class="signals-grid" id="signalsGrid">
+
+        <!-- FREE signal 1 -->
+        <div class="signal-card">
+            <div class="signal-badge badge-free">✓ Free Preview</div>
+            <div class="signal-teams">Arsenal vs Man City</div>
+            <div class="signal-league">⚽ Premier League</div>
+            <div class="signal-prediction">
+                <span class="signal-market">Under 2.5 Goals</span>
+                <span class="signal-confidence">94%</span>
+            </div>
+        </div>
+
+        <!-- FREE signal 2 -->
+        <div class="signal-card">
+            <div class="signal-badge badge-free">✓ Free Preview</div>
+            <div class="signal-teams">Novak Djokovic vs Carlos Alcaraz</div>
+            <div class="signal-league">🎾 Roland Garros</div>
+            <div class="signal-prediction">
+                <span class="signal-market">Home Win</span>
+                <span class="signal-confidence">87%</span>
+            </div>
+        </div>
+
+        <!-- LOCKED signal 1 -->
+        <div class="signal-card locked">
+            <div class="signal-badge badge-locked">🔒 Premium</div>
+            <div class="signal-teams">Chelsea vs Brighton</div>
+            <div class="signal-league">⚽ Premier League</div>
+            <div class="signal-prediction">
+                <span class="signal-market locked-text">████████</span>
+                <span class="signal-confidence locked-conf">93%</span>
+            </div>
+            <div class="lock-overlay">
+                <span class="lock-icon">🔒</span>
+                <span class="lock-label">Premium Signal</span>
+            </div>
+        </div>
+
+        <!-- LOCKED signal 2 -->
+        <div class="signal-card locked">
+            <div class="signal-badge badge-locked">🔒 Premium</div>
+            <div class="signal-teams">LA Lakers vs Boston Celtics</div>
+            <div class="signal-league">🏀 NBA</div>
+            <div class="signal-prediction">
+                <span class="signal-market locked-text">████████</span>
+                <span class="signal-confidence locked-conf">91%</span>
+            </div>
+            <div class="lock-overlay">
+                <span class="lock-icon">🔒</span>
+                <span class="lock-label">Premium Signal</span>
+            </div>
+        </div>
+
+        <!-- LOCKED signal 3 -->
+        <div class="signal-card locked">
+            <div class="signal-badge badge-locked">🔒 Premium</div>
+            <div class="signal-teams">All Blacks vs Springboks</div>
+            <div class="signal-league">🏉 Rugby International</div>
+            <div class="signal-prediction">
+                <span class="signal-market locked-text">████████</span>
+                <span class="signal-confidence locked-conf">88%</span>
+            </div>
+            <div class="lock-overlay">
+                <span class="lock-icon">🔒</span>
+                <span class="lock-label">Premium Signal</span>
+            </div>
+        </div>
+
+        <!-- LOCKED signal 4 -->
+        <div class="signal-card locked">
+            <div class="signal-badge badge-locked">🔒 Premium</div>
+            <div class="signal-teams">Real Madrid vs Barcelona</div>
+            <div class="signal-league">⚽ La Liga</div>
+            <div class="signal-prediction">
+                <span class="signal-market locked-text">████████</span>
+                <span class="signal-confidence locked-conf">96%</span>
+            </div>
+            <div class="lock-overlay">
+                <span class="lock-icon">🔒</span>
+                <span class="lock-label">Premium Signal</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SKCS AI Intelligence Factors -->
+    <div class="section-label">SKCS AI Intelligence Engine</div>
+    <div class="section-title">What Powers Every Signal</div>
+    <p class="section-sub">6 intelligence layers processed before any signal is published.</p>
+
+    <div class="factors-grid">
+        <div class="factor-card">
+            <div class="factor-icon">📥</div>
+            <div class="factor-name">API Data Collection</div>
+            <div class="factor-desc">Live fixtures, odds, injuries, weather from multiple trusted sources.</div>
+        </div>
+        <div class="factor-card">
+            <div class="factor-icon">🔄</div>
+            <div class="factor-name">Data Normalisation</div>
+            <div class="factor-desc">Unified SKCS format across all 13 sports for clean analysis.</div>
+        </div>
+        <div class="factor-card">
+            <div class="factor-icon">🤖</div>
+            <div class="factor-name">Baseline AI Model</div>
+            <div class="factor-desc">Historical stats and probability scoring for initial predictions.</div>
+        </div>
+        <div class="factor-card">
+            <div class="factor-icon">🧠</div>
+            <div class="factor-name">Deep Context Layer</div>
+            <div class="factor-desc">Injuries, suspensions, fatigue, and manager changes factored in.</div>
+        </div>
+        <div class="factor-card">
+            <div class="factor-icon">⚠️</div>
+            <div class="factor-name">Reality Check</div>
+            <div class="factor-desc">News, press conferences, and external volatility scoring.</div>
+        </div>
+        <div class="factor-card">
+            <div class="factor-icon">🎯</div>
+            <div class="factor-name">Decision Engine</div>
+            <div class="factor-desc">Final confidence score combining all 5 prior stages.</div>
+        </div>
+    </div>
+
+    <!-- Unlock CTA -->
+    <div class="cta-banner">
+        <h2>🔓 Unlock Full Access</h2>
+        <p>Get every signal, all 13 sports, direct markets, accumulators, and same-match bet builders — updated daily by the SKCS AI engine.</p>
+        <div class="cta-features">
+            <span class="cta-chip">⚽ 13 Sports</span>
+            <span class="cta-chip">🎯 Direct Markets</span>
+            <span class="cta-chip">🧮 Accumulators</span>
+            <span class="cta-chip">🔀 Multi Bets</span>
+            <span class="cta-chip">📊 Analytical Insights</span>
+            <span class="cta-chip">🤖 EdgeMind BOT</span>
+            <span class="cta-chip">📈 Accuracy Tracker</span>
+        </div>
+        <a href="subscription.html" class="btn-unlock">💎 Unlock Full Access →</a>
+        <br><br>
+        <a href="index.html" id="skipToDashboard" style="color:#475569;font-size:0.85rem;text-decoration:none;">
+            Skip for now — take me to the dashboard
+        </a>
+    </div>
+
+    <p class="disclaimer">
+        All insights are for informational and analytical purposes only. No gambling services are offered.
+        SKCS AI Sports Edge (PTY) Ltd — Reg: 2025/918368/07
+    </p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    /* ── Supabase client ── */
+    const SUPABASE_URL  = window.SUPABASE_URL  || '';
+    const SUPABASE_ANON = window.SUPABASE_ANON_KEY || '';
+    const sbClient = (window.supabase && SUPABASE_URL && SUPABASE_ANON)
+        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
+        : null;
+
+    /* ── Set experience_mode flag ── */
+    function activateExperienceMode() {
+        try {
+            localStorage.setItem('skcs_experience_mode', '1');
+            localStorage.setItem('skcs_role', 'trial');
+            sessionStorage.removeItem('skcs_public_lock_message');
+        } catch (e) { /* ignore */ }
+    }
+
+    /* ── Auth helpers ── */
+    async function getSession() {
+        if (!sbClient) return null;
+        try {
+            const { data, error } = await sbClient.auth.getSession();
+            if (error) return null;
+            return data?.session || null;
+        } catch (_) { return null; }
+    }
+
+    function updateAuthLink(session) {
+        const link = document.getElementById('authLink');
+        if (!link) return;
+        if (session?.user) {
+            link.textContent = 'Logout';
+            link.href = '#';
+            link.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    if (sbClient) await sbClient.auth.signOut();
+                    localStorage.removeItem('skcs_experience_mode');
+                    localStorage.removeItem('skcs_role');
+                } catch (_) {}
+                window.location.href = 'login.html';
+            });
+        } else {
+            link.textContent = 'Login';
+            link.href = 'login.html';
+        }
+    }
+
+    /* ── "Explore Dashboard" and "Skip" buttons ── */
+    function wireButtons() {
+        const exploreBtn = document.getElementById('exploreDashboardBtn');
+        const skipBtn    = document.getElementById('skipToDashboard');
+        function goToDashboard(e) {
+            if (e) e.preventDefault();
+            activateExperienceMode();
+            window.location.href = 'index.html';
+        }
+        if (exploreBtn) exploreBtn.addEventListener('click', goToDashboard);
+        if (skipBtn)    skipBtn.addEventListener('click', goToDashboard);
+    }
+
+    /* ── Init ── */
+    document.addEventListener('DOMContentLoaded', async () => {
+        activateExperienceMode();
+        wireButtons();
+
+        const session = await getSession();
+
+        /* If no session at all, redirect to login */
+        if (!session?.user) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        updateAuthLink(session);
+
+        /* Personalise greeting if name is available */
+        const firstName = session.user?.user_metadata?.first_name || '';
+        if (firstName) {
+            const h1 = document.querySelector('.hero h1');
+            if (h1) {
+                h1.innerHTML = `Welcome, <span>${firstName}</span> — SKCS AI Sports Edge`;
+            }
+        }
+    });
+})();
+</script>
+</body>
+</html>

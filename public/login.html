@@ -357,9 +357,9 @@
                 }
 
                 if (session) {
-                    const dest = sessionStorage.getItem('skcs_after_auth') || 'index.html';
                     sessionStorage.removeItem('skcs_after_auth');
-                    window.location.href = dest;
+                    // New users land on Experience Mode window, not subscription wall
+                    window.location.href = 'experience.html';
                     return;
                 }
 
