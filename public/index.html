@@ -90,6 +90,12 @@
         .prediction-details { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e9ecef; }
         .prediction { font-weight: 600; color: #198754; }
         .confidence { background-color: #e7f1ff; color: #0d6efd; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 600; font-size: 0.9rem; }
+        .direct-markets-menu { display: flex; flex-direction: column; gap: 0.5rem; max-width: 600px; }
+        .sport-menu-item { display: flex; align-items: center; padding: 1rem 1.5rem; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); cursor: pointer; transition: all 0.2s ease; }
+        .sport-menu-item:hover { transform: translateX(5px); box-shadow: 0 4px 8px rgba(0,0,0,0.12); }
+        .sport-emoji { font-size: 1.5rem; margin-right: 1rem; }
+        .sport-name { flex: 1; font-weight: 600; color: #212529; }
+        .sport-count { color: #0d6efd; font-weight: 600; }
         .note { font-size: 0.9rem; color: #6c757d; font-style: italic; margin-top: 2rem; text-align: center; }
         .framework-section { background-color: #212529; color: white; padding: 5rem 2rem; margin: 4rem 0; }
         .framework-container { max-width: 1200px; margin: 0 auto; }
@@ -749,58 +755,73 @@
             <!-- All tab contents -->
             <div id="direct-markets" class="tab-content active">
                 <h3 class="tab-title"><span class="sport-icon">🎯</span> Direct Markets</h3>
-                <p class="policy-note">Layer 1 direct market feed (confidence ≥ 50). All core markets including 1x2, Over/Under, BTTS, Double Chance, and Draw No Bet.</p>
-                <div class="prediction-category">
-                    <h4 class="sport-nav-link" style="color:#60a5fa;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('football')">⚽ Football (<span id="direct-football-count">0</span>)</h4>
-                    <div id="direct-football-matches" class="prediction-grid"><p>Loading...</p></div>
-                </div>
-                <div class="prediction-category">
-                    <h4 class="sport-nav-link" style="color:#0ea5e9;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('tennis')">🎾 Tennis (<span id="direct-tennis-count">0</span>)</h4>
-                    <div id="direct-tennis-matches" class="prediction-grid"><p>Loading...</p></div>
-                </div>
-                <div class="prediction-category">
-                    <h4 class="sport-nav-link" style="color:#f59e0b;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('basketball')">🏀 Basketball (<span id="direct-basketball-count">0</span>)</h4>
-                    <div id="direct-basketball-matches" class="prediction-grid"><p>Loading...</p></div>
-                </div>
-                <div class="prediction-category">
-                    <h4 class="sport-nav-link" style="color:#22c55e;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('rugby')">🏉 Rugby (<span id="direct-rugby-count">0</span>)</h4>
-                    <div id="direct-rugby-matches" class="prediction-grid"><p>Loading...</p></div>
-                </div>
-                <div class="prediction-category">
-                    <h4 class="sport-nav-link" style="color:#ef4444;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('cricket')">🏏 Cricket (<span id="direct-cricket-count">0</span>)</h4>
-                    <div id="direct-cricket-matches" class="prediction-grid"><p>Loading...</p></div>
-                </div>
-                <div class="prediction-category">
-                    <h4 class="sport-nav-link" style="color:#a855f7;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('baseball')">⚾ Baseball (<span id="direct-baseball-count">0</span>)</h4>
-                    <div id="direct-baseball-matches" class="prediction-grid"><p>Loading...</p></div>
-                </div>
-                <div class="prediction-category">
-                    <h4 class="sport-nav-link" style="color:#06b6d4;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('hockey')">🏒 Hockey (<span id="direct-hockey-count">0</span>)</h4>
-                    <div id="direct-hockey-matches" class="prediction-grid"><p>Loading...</p></div>
-                </div>
-                <div class="prediction-category">
-                    <h4 class="sport-nav-link" style="color:#f97316;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('formula1')">🏎️ Motorsport (<span id="direct-formula1-count">0</span>)</h4>
-                    <div id="direct-formula1-matches" class="prediction-grid"><p>Loading...</p></div>
-                </div>
-                <div class="prediction-category">
-                    <h4 class="sport-nav-link" style="color:#ec4899;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('mma')">🥊 MMA (<span id="direct-mma-count">0</span>)</h4>
-                    <div id="direct-mma-matches" class="prediction-grid"><p>Loading...</p></div>
-                </div>
-                <div class="prediction-category">
-                    <h4 class="sport-nav-link" style="color:#14b8a6;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('afl')">🦘 AFL (<span id="direct-afl-count">0</span>)</h4>
-                    <div id="direct-afl-matches" class="prediction-grid"><p>Loading...</p></div>
-                </div>
-                <div class="prediction-category">
-                    <h4 class="sport-nav-link" style="color:#8b5cf6;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('volleyball')">🏐 Volleyball (<span id="direct-volleyball-count">0</span>)</h4>
-                    <div id="direct-volleyball-matches" class="prediction-grid"><p>Loading...</p></div>
-                </div>
-                <div class="prediction-category">
-                    <h4 class="sport-nav-link" style="color:#eab308;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('handball')">🤾 Handball (<span id="direct-handball-count">0</span>)</h4>
-                    <div id="direct-handball-matches" class="prediction-grid"><p>Loading...</p></div>
-                </div>
-                <div class="prediction-category">
-                    <h4 class="sport-nav-link" style="color:#64748b;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('nfl')">🏈 NFL (<span id="direct-nfl-count">0</span>)</h4>
-                    <div id="direct-nfl-matches" class="prediction-grid"><p>Loading...</p></div>
+                <p class="policy-note">Select a sport below to view predictions. Click any sport to see all available insights.</p>
+                <div class="direct-markets-menu">
+                    <div class="sport-menu-item" onclick="switchSportTab('football')">
+                        <span class="sport-emoji">⚽</span>
+                        <span class="sport-name">Football</span>
+                        <span class="sport-count" id="direct-football-count">(0)</span>
+                    </div>
+                    <div class="sport-menu-item" onclick="switchSportTab('tennis')">
+                        <span class="sport-emoji">🎾</span>
+                        <span class="sport-name">Tennis</span>
+                        <span class="sport-count" id="direct-tennis-count">(0)</span>
+                    </div>
+                    <div class="sport-menu-item" onclick="switchSportTab('basketball')">
+                        <span class="sport-emoji">🏀</span>
+                        <span class="sport-name">Basketball</span>
+                        <span class="sport-count" id="direct-basketball-count">(0)</span>
+                    </div>
+                    <div class="sport-menu-item" onclick="switchSportTab('rugby')">
+                        <span class="sport-emoji">🏉</span>
+                        <span class="sport-name">Rugby</span>
+                        <span class="sport-count" id="direct-rugby-count">(0)</span>
+                    </div>
+                    <div class="sport-menu-item" onclick="switchSportTab('cricket')">
+                        <span class="sport-emoji">🏏</span>
+                        <span class="sport-name">Cricket</span>
+                        <span class="sport-count" id="direct-cricket-count">(0)</span>
+                    </div>
+                    <div class="sport-menu-item" onclick="switchSportTab('baseball')">
+                        <span class="sport-emoji">⚾</span>
+                        <span class="sport-name">Baseball</span>
+                        <span class="sport-count" id="direct-baseball-count">(0)</span>
+                    </div>
+                    <div class="sport-menu-item" onclick="switchSportTab('hockey')">
+                        <span class="sport-emoji">🏒</span>
+                        <span class="sport-name">Hockey</span>
+                        <span class="sport-count" id="direct-hockey-count">(0)</span>
+                    </div>
+                    <div class="sport-menu-item" onclick="switchSportTab('formula1')">
+                        <span class="sport-emoji">🏎️</span>
+                        <span class="sport-name">Motorsport</span>
+                        <span class="sport-count" id="direct-formula1-count">(0)</span>
+                    </div>
+                    <div class="sport-menu-item" onclick="switchSportTab('mma')">
+                        <span class="sport-emoji">🥊</span>
+                        <span class="sport-name">MMA</span>
+                        <span class="sport-count" id="direct-mma-count">(0)</span>
+                    </div>
+                    <div class="sport-menu-item" onclick="switchSportTab('afl')">
+                        <span class="sport-emoji">🦘</span>
+                        <span class="sport-name">AFL</span>
+                        <span class="sport-count" id="direct-afl-count">(0)</span>
+                    </div>
+                    <div class="sport-menu-item" onclick="switchSportTab('volleyball')">
+                        <span class="sport-emoji">🏐</span>
+                        <span class="sport-name">Volleyball</span>
+                        <span class="sport-count" id="direct-volleyball-count">(0)</span>
+                    </div>
+                    <div class="sport-menu-item" onclick="switchSportTab('handball')">
+                        <span class="sport-emoji">🤾</span>
+                        <span class="sport-name">Handball</span>
+                        <span class="sport-count" id="direct-handball-count">(0)</span>
+                    </div>
+                    <div class="sport-menu-item" onclick="switchSportTab('nfl')">
+                        <span class="sport-emoji">🏈</span>
+                        <span class="sport-name">NFL</span>
+                        <span class="sport-count" id="direct-nfl-count">(0)</span>
+                    </div>
                 </div>
             </div>
             <div id="football" class="tab-content">
@@ -1651,75 +1672,33 @@
     }
 
     function renderDirectMarkets(predictions) {
+        // Direct Markets tab is now a clean sport menu - just count predictions per sport
         try {
-            const normalizedPredictions = dedupePredictionFeed(predictions || []);
-            const bySportMatch = new Map(
-                DIRECT_MARKET_SPORTS.map((sportDef) => [sportDef.key, new Map()])
-            );
-
-            (normalizedPredictions || []).forEach((pred) => {
+            const bySport = {};
+            DIRECT_MARKET_SPORTS.forEach(s => { bySport[s.key] = 0; });
+            
+            (predictions || []).forEach((pred) => {
                 try {
                     if (!pred) return;
-                    if (getSectionType(pred) !== 'direct') return;
-                    if (getPredictionLegCount(pred) !== 1) return;
-
                     const firstMatch = getPrimaryMatch(pred);
-                    const marketKey = normalizeMarketKey(firstMatch && firstMatch.market);
-                    const prediction = String(firstMatch && firstMatch.prediction || '').trim();
-                    if (!marketKey || !prediction) return;
-
-                    const confidence = Math.max(0, Math.min(100, Math.round(getPredictionConfidenceScore(pred))));
-                    if (confidence < 50) return;
-
                     const sportKey = normalizeSportForFilter(
                         pred && pred.sport
                         || firstMatch && firstMatch.sport
                         || firstMatch && firstMatch.metadata && (firstMatch.metadata.sport || firstMatch.metadata.sport_type)
                         || ''
                     );
-                    if (!bySportMatch.has(sportKey)) return;
-
-                    const matchId = String(firstMatch && firstMatch.match_id || pred && pred.match_id || '').trim()
-                        || `direct-${sportKey}-${buildPredictionDisplayKey(pred)}`;
-                    const existing = bySportMatch.get(sportKey).get(matchId);
-                    if (!existing || getPredictionConfidenceScore(pred) > getPredictionConfidenceScore(existing)) {
-                        bySportMatch.get(sportKey).set(matchId, pred);
+                    if (bySport.hasOwnProperty(sportKey)) {
+                        bySport[sportKey]++;
                     }
-                } catch (e) {
-                    console.warn('[renderDirectMarkets] Error processing prediction:', e.message || e);
-                }
+                } catch (e) { /* ignore */ }
             });
-
+            
             DIRECT_MARKET_SPORTS.forEach((sportDef) => {
-                try {
-                    const sportMap = bySportMatch.get(sportDef.key);
-                    if (!sportMap) return;
-                    const rows = Array.from(sportMap.values() || [])
-                        .sort((a, b) => getPredictionConfidenceScore(b) - getPredictionConfidenceScore(a));
-                    const countEl = document.getElementById(`direct-${sportDef.key}-count`);
-                    if (countEl) countEl.textContent = String(rows.length);
-
-                    const container = document.getElementById(`direct-${sportDef.key}-matches`);
-                    if (!container) return;
-                    container.innerHTML = '';
-                    if (!rows.length) {
-                        container.innerHTML = `<p style="text-align:center;color:#4a5568;padding:20px;">No direct ${sportDef.label.toLowerCase()} markets available.</p>`;
-                        return;
-                    }
-
-                    rows.forEach((pred, idx) => {
-                        try {
-                            container.appendChild(createDirectMarketCard(pred, sportDef.key, `direct-${sportDef.key}-${idx}`));
-                        } catch (e) {
-                            console.warn('[renderDirectMarkets] Error creating card:', e.message || e);
-                        }
-                    });
-                } catch (e) {
-                    console.warn('[renderDirectMarkets] Error rendering sport:', e.message || e);
-                }
+                const countEl = document.getElementById(`direct-${sportDef.key}-count`);
+                if (countEl) countEl.textContent = `(${bySport[sportDef.key] || 0})`;
             });
         } catch (error) {
-            console.error('[renderDirectMarkets] Fatal error:', error.message || error);
+            console.error('[renderDirectMarkets] Error:', error.message || error);
         }
     }
 
