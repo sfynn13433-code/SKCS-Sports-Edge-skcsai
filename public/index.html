@@ -1134,6 +1134,8 @@
 
     // Admin toast notification
     function showAdminToast() {
+        // Set global admin flag to disarm ALL redirect functions
+        window.SKCS_ADMIN_UNLOCKED = true;
         const toast = document.createElement('div');
         toast.id = 'admin-toast';
         toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#059669;color:white;padding:1rem 1.5rem;border-radius:8px;font-weight:700;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.3);animation:slideIn 0.3s ease';
@@ -1153,6 +1155,11 @@
     }
 
     function redirectToSubscribeLocked() {
+        // GLOBAL KILL-SWITCH: If admin flag is set, refuse ALL redirects
+        if (window.SKCS_ADMIN_UNLOCKED) {
+            console.log('Admin bypass: redirect blocked');
+            return;
+        }
         // If the user has experience_mode active, send them to the experience
         // window instead of the subscription wall — this breaks the redirect loop.
         try {
@@ -1185,6 +1192,11 @@
     }
 
     async function getAccessTokenOrRedirect() {
+        // GLOBAL KILL-SWITCH: If admin flag is set, return real token immediately
+        if (window.SKCS_ADMIN_UNLOCKED) {
+            const session = await getActiveSession();
+            return session?.access_token || 'sfynn_admin_token';
+        }
         const session = await getActiveSession();
         if (session?.access_token) return session.access_token;
         // SFYNN Admin Bypass: unconditional access for admin email

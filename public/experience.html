@@ -658,6 +658,7 @@
             try {
                 localStorage.removeItem('skcs_experience_mode');
                 localStorage.removeItem('skcs_role');
+                window.SKCS_ADMIN_UNLOCKED = true;
             } catch (e) { /* ignore */ }
             window.location.href = 'index.html';
             return;
