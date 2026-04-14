@@ -1835,12 +1835,7 @@
         const requestSport = (sport === 'accumulators' || isDirectMarketsTab) ? '' : sport;
         let supabaseFallbackStatus = 'not_attempted';
         if (isDirectMarketsTab) {
-            DIRECT_MARKET_SPORTS.forEach((sportDef) => {
-                const section = document.getElementById(`direct-${sportDef.key}-matches`);
-                if (section) {
-                    section.innerHTML = '<p style="text-align:center;color:#4a5568;padding:20px;">Updating SKCS Insights...</p>';
-                }
-            });
+            // Direct Markets tab uses clean menu - no loading states needed
         } else if (container) {
             container.innerHTML = '<p style="text-align:center;color:#4a5568;padding:20px;">Updating SKCS Insights...</p>';
         }
