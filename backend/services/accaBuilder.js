@@ -217,16 +217,13 @@ function buildAccaV2({ tier, candidates, now = new Date() }) {
         if (t === 'deep') {
             const kickoffs = item.legs.map(getKickoffTimeFromMetadata).filter(Boolean);
             if (kickoffs.length) {
-                for (const k of kickoffs) {
+                const deepTimeViolation = kickoffs.some((k) => {
                     const sameDay = k.toISOString().slice(0, 10) === now.toISOString().slice(0, 10);
-                    if (!sameDay) {
-                        // Deep must be same day
-                        continue;
-                    }
-                    if (!withinHours(now, k, 2)) {
-                        continue;
-                    }
-                }
+                    if (!sameDay) return true;
+                    if (!withinHours(now, k, 2)) return true;
+                    return false;
+                });
+                if (deepTimeViolation) continue;
             }
         } else {
             // Normal tier: allow within 5 days if kickoff available
@@ -706,7 +703,8 @@ function toConflictCheckLeg(leg) {
     return { market: marketKey.toUpperCase(), prediction: predictionKey };
 }
 
-function sanitizeSameMatchLegGroup(legs) {
+function sanitizeSameMatchLegGroup(legs, options = {}) {
+    const { no_conflicting_markets = true } = options;
     const out = [];
 
     for (const leg of legs) {
@@ -714,7 +712,7 @@ function sanitizeSameMatchLegGroup(legs) {
             .map(toConflictCheckLeg)
             .filter(Boolean);
 
-        if (prospective.length > 0 && !isValidCombination(prospective)) {
+        if (prospective.length > 0 && !isValidCombination(prospective, { no_conflicting_markets })) {
             continue;
         }
 
@@ -898,7 +896,8 @@ async function buildSecondaryCandidates(predictions) {
     return uniqueBy(secondary, (row) => `${row.match_id}:${row.market}`);
 }
 
-async function buildSameMatchCandidates(predictions) {
+async function buildSameMatchCandidates(predictions, options = {}) {
+    const { no_conflicting_markets = true } = options;
     const out = [];
     for (const prediction of predictions) {
         const metadata = getMetadata(prediction);
@@ -920,10 +919,10 @@ async function buildSameMatchCandidates(predictions) {
         const legs = sanitizeSameMatchLegGroup([
             toFinalMatchPayload(prediction),
             ...derived.map(toFinalMatchPayload)
-        ]).slice(0, SAME_MATCH_INSIGHT_TARGET);
+        ], { no_conflicting_markets }).slice(0, SAME_MATCH_INSIGHT_TARGET);
         if (legs.length < 2) continue;
 
-        const hasConflictingPair = legs.some((left, i) => legs.some((right, j) => {
+        const hasConflictingPair = no_conflicting_markets && legs.some((left, i) => legs.some((right, j) => {
             if (i >= j) return false;
             return areMarketsConflicting(
                 { market: normalizeMarketKeyMI(left.market), prediction: left.prediction },
@@ -3197,7 +3196,9 @@ async function buildFinalForTier(tier, options = {}) {
         // ---------------------------------------------------------------------
         const sameMatchRows = [];
         const sameMatchSelections = takeAvailablePredictions(
-            await buildSameMatchCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, new Map(), new Map())),
+            await buildSameMatchCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, new Map(), new Map()), {
+                no_conflicting_markets: accaRules.no_conflicting_markets
+            }),
             globalUsedFixtures,
             new Map(),
             new Map(),

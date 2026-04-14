@@ -11,7 +11,7 @@ values
         'deep',
         75,
         '["ALL"]'::jsonb,
-        5,
+        12,
         '["low"]'::jsonb
     )
 on conflict (tier) do update set

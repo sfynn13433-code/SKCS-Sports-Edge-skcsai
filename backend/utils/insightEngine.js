@@ -639,7 +639,7 @@ function exceedsCardOverlapLimit(candidateCard, publishedCards) {
     }
 
     const candidateSet = getCardFixtureKeySet(candidateCard);
-    const limit = candidateLegs.length === 12 ? 4 : 2;
+    const limit = candidateLegs.length === 12 ? 6 : 2;
 
     for (const existingCard of Array.isArray(publishedCards) ? publishedCards : []) {
         const existingLegs = Array.isArray(existingCard?.legs)
@@ -864,7 +864,7 @@ function resolveTelemetryForFixture(fixture, options = {}) {
  */
 function pickBestInsightForFixture(fixture, options = {}) {
     const telemetry = resolveTelemetryForFixture(fixture, options);
-    const minConfidence = Math.max(80, Number(options.minConfidence ?? MIN_LEG_CONFIDENCE));
+    const minConfidence = Math.max(75, Number(options.minConfidence ?? MIN_LEG_CONFIDENCE));
     const maxConfidence = MAX_LEG_CONFIDENCE;
     const familyCounts = options.familyCounts || {};
     const familyCaps = options.familyCaps || getFamilyCaps(options.legCount || 6);
@@ -886,7 +886,7 @@ function pickBestInsightForFixture(fixture, options = {}) {
             // Confidence guardrails
             const confidenceRaw = Number(insight?.confidence);
             if (!Number.isFinite(confidenceRaw)) return null;
-            const confidence = confidenceRaw < 80 ? 80 : confidenceRaw;
+            const confidence = confidenceRaw < 75 ? 75 : confidenceRaw;
             if (confidence < minConfidence || confidence > maxConfidence) return null;
             if (riskProfile?.reject && Number(options.legCount || 6) >= 12 && !isMegaSafeMarket(insight?.market)) return null;
 

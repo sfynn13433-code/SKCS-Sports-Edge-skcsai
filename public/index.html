@@ -1128,6 +1128,11 @@
     async function getAccessTokenOrRedirect() {
         const session = await getActiveSession();
         if (session?.access_token) return session.access_token;
+        try {
+            if (localStorage.getItem('skcs_experience_mode') === '1') {
+                return 'skcs_experience_token';
+            }
+        } catch (e) { /* ignore */ }
         redirectToSubscribeLocked();
         return null;
     }

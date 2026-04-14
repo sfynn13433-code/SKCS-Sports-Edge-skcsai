@@ -330,7 +330,7 @@ async function initializeTables() {
             INSERT INTO tier_rules (tier, min_confidence, allowed_markets, max_acca_size, allowed_volatility)
             VALUES
                 ('normal', 60, '["ALL"]'::JSONB, 3, '["low","medium"]'::JSONB),
-                ('deep', 75, '["ALL"]'::JSONB, 5, '["low"]'::JSONB)
+                ('deep', 75, '["ALL"]'::JSONB, 12, '["low"]'::JSONB)
             ON CONFLICT (tier) DO UPDATE SET
                 min_confidence = EXCLUDED.min_confidence,
                 allowed_markets = EXCLUDED.allowed_markets,

@@ -155,7 +155,7 @@ async function bootstrap() {
             INSERT INTO tier_rules (tier, min_confidence, allowed_markets, max_acca_size, allowed_volatility)
             VALUES
                 ('normal', 60, '["ALL"]'::jsonb, 3, '["low","medium"]'::jsonb),
-                ('deep', 75, '["ALL"]'::jsonb, 5, '["low"]'::jsonb)
+                ('deep', 75, '["ALL"]'::jsonb, 12, '["low"]'::jsonb)
             ON CONFLICT (tier) DO UPDATE SET
                 min_confidence = EXCLUDED.min_confidence,
                 allowed_markets = EXCLUDED.allowed_markets,

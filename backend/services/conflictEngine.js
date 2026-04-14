@@ -185,7 +185,12 @@ function toSkcsMarket(market, pick) {
     return String(market || '').trim().toLowerCase();
 }
 
-function isValidCombination(legs) {
+function isValidCombination(legs, options = {}) {
+    const {
+        no_same_match = true,
+        no_conflicting_markets = true
+    } = options;
+
     if (!Array.isArray(legs) || legs.length === 0) return false;
 
     const perScopeState = new Map();
@@ -198,7 +203,7 @@ function isValidCombination(legs) {
 
         if (!market || !pick) return false;
         if (matchId) {
-            if (seenMatchIds.has(matchId)) return false;
+            if (no_same_match && seenMatchIds.has(matchId)) return false;
             seenMatchIds.add(matchId);
         }
 
@@ -215,37 +220,41 @@ function isValidCombination(legs) {
         // Same market duplicated within the same scope.
         if (scope.marketToPick.has(market)) return false;
 
-        // Check against conflict matrix
-        if (CONFLICT_MATRIX[market] && CONFLICT_MATRIX[market][pick]) {
-            const conflicts = CONFLICT_MATRIX[market][pick];
-            for (const conflict of conflicts) {
-                if (scope.marketToPick.has(conflict.market) && scope.marketToPick.get(conflict.market) === conflict.pick) {
-                    return false;
-                }
-            }
-        }
-
-        // Check if other existing picks conflict with THIS new pick
-        for (const [existingMarket, existingPick] of scope.marketToPick.entries()) {
-            if (CONFLICT_MATRIX[existingMarket] && CONFLICT_MATRIX[existingMarket][existingPick]) {
-                const conflicts = CONFLICT_MATRIX[existingMarket][existingPick];
+        // Check against conflict matrix (if no_conflicting_markets is enabled)
+        if (no_conflicting_markets) {
+            if (CONFLICT_MATRIX[market] && CONFLICT_MATRIX[market][pick]) {
+                const conflicts = CONFLICT_MATRIX[market][pick];
                 for (const conflict of conflicts) {
-                    if (conflict.market === market && conflict.pick === pick) {
+                    if (scope.marketToPick.has(conflict.market) && scope.marketToPick.get(conflict.market) === conflict.pick) {
                         return false;
                     }
                 }
             }
-        }
 
-        scope.marketToPick.set(market, pick);
-
-        const currentSelection = { market: toSkcsMarket(market, pick), prediction: pick };
-        for (const existingSelection of scope.skcsSelections) {
-            if (areMarketsConflicting(existingSelection, currentSelection)) {
-                return false;
+            // Check if other existing picks conflict with THIS new pick
+            for (const [existingMarket, existingPick] of scope.marketToPick.entries()) {
+                if (CONFLICT_MATRIX[existingMarket] && CONFLICT_MATRIX[existingMarket][existingPick]) {
+                    const conflicts = CONFLICT_MATRIX[existingMarket][existingPick];
+                    for (const conflict of conflicts) {
+                        if (conflict.market === market && conflict.pick === pick) {
+                            return false;
+                        }
+                    }
+                }
             }
+
+            scope.marketToPick.set(market, pick);
+
+            const currentSelection = { market: toSkcsMarket(market, pick), prediction: pick };
+            for (const existingSelection of scope.skcsSelections) {
+                if (areMarketsConflicting(existingSelection, currentSelection)) {
+                    return false;
+                }
+            }
+            scope.skcsSelections.push(currentSelection);
+        } else {
+            scope.marketToPick.set(market, pick);
         }
-        scope.skcsSelections.push(currentSelection);
     }
 
     return true;
