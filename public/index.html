@@ -1301,7 +1301,13 @@
         { key: 'rugby', label: 'Rugby' },
         { key: 'cricket', label: 'Cricket' },
         { key: 'baseball', label: 'Baseball' },
-        { key: 'hockey', label: 'Hockey' }
+        { key: 'hockey', label: 'Hockey' },
+        { key: 'formula1', label: 'Motorsport' },
+        { key: 'mma', label: 'MMA' },
+        { key: 'afl', label: 'AFL' },
+        { key: 'volleyball', label: 'Volleyball' },
+        { key: 'handball', label: 'Handball' },
+        { key: 'nfl', label: 'NFL' }
     ];
     const DIRECT_MARKET_OUTCOMES = new Set(['home_win', 'draw', 'away_win']);
 
@@ -1316,6 +1322,9 @@
         if (key.startsWith('rugbyunion_')) return 'rugby';
         if (key.startsWith('aussierules_')) return 'afl';
         if (key.startsWith('mma_')) return 'mma';
+        if (key.startsWith('formula1') || key === 'f1' || key === 'motorsport') return 'formula1';
+        if (key.startsWith('volleyball')) return 'volleyball';
+        if (key.startsWith('handball')) return 'handball';
         return key;
     }
 
@@ -1593,56 +1602,75 @@
     }
 
     function renderDirectMarkets(predictions) {
-        const normalizedPredictions = dedupePredictionFeed(predictions);
-        const bySportMatch = new Map(
-            DIRECT_MARKET_SPORTS.map((sportDef) => [sportDef.key, new Map()])
-        );
-
-        normalizedPredictions.forEach((pred) => {
-            if (getSectionType(pred) !== 'direct') return;
-            if (getPredictionLegCount(pred) !== 1) return;
-
-            const firstMatch = getPrimaryMatch(pred);
-            const outcome = resolveDirectMarketOutcome(firstMatch);
-            if (!outcome) return;
-
-            const confidence = Math.max(0, Math.min(100, Math.round(getPredictionConfidenceScore(pred))));
-            if (confidence < 60) return;
-
-            const sportKey = normalizeSportForFilter(
-                pred && pred.sport
-                || firstMatch && firstMatch.sport
-                || firstMatch && firstMatch.metadata && (firstMatch.metadata.sport || firstMatch.metadata.sport_type)
-                || ''
+        try {
+            const normalizedPredictions = dedupePredictionFeed(predictions || []);
+            const bySportMatch = new Map(
+                DIRECT_MARKET_SPORTS.map((sportDef) => [sportDef.key, new Map()])
             );
-            if (!bySportMatch.has(sportKey)) return;
 
-            const matchId = String(firstMatch && firstMatch.match_id || pred && pred.match_id || '').trim()
-                || `direct-${sportKey}-${buildPredictionDisplayKey(pred)}`;
-            const existing = bySportMatch.get(sportKey).get(matchId);
-            if (!existing || getPredictionConfidenceScore(pred) > getPredictionConfidenceScore(existing)) {
-                bySportMatch.get(sportKey).set(matchId, pred);
-            }
-        });
+            (normalizedPredictions || []).forEach((pred) => {
+                try {
+                    if (!pred) return;
+                    if (getSectionType(pred) !== 'direct') return;
+                    if (getPredictionLegCount(pred) !== 1) return;
 
-        DIRECT_MARKET_SPORTS.forEach((sportDef) => {
-            const rows = Array.from(bySportMatch.get(sportDef.key).values())
-                .sort((a, b) => getPredictionConfidenceScore(b) - getPredictionConfidenceScore(a));
-            const countEl = document.getElementById(`direct-${sportDef.key}-count`);
-            if (countEl) countEl.textContent = String(rows.length);
+                    const firstMatch = getPrimaryMatch(pred);
+                    const outcome = resolveDirectMarketOutcome(firstMatch);
+                    if (!outcome) return;
 
-            const container = document.getElementById(`direct-${sportDef.key}-matches`);
-            if (!container) return;
-            container.innerHTML = '';
-            if (!rows.length) {
-                container.innerHTML = `<p style="text-align:center;color:#4a5568;padding:20px;">No direct ${sportDef.label.toLowerCase()} markets available.</p>`;
-                return;
-            }
+                    const confidence = Math.max(0, Math.min(100, Math.round(getPredictionConfidenceScore(pred))));
+                    if (confidence < 60) return;
 
-            rows.forEach((pred, idx) => {
-                container.appendChild(createDirectMarketCard(pred, sportDef.key, `direct-${sportDef.key}-${idx}`));
+                    const sportKey = normalizeSportForFilter(
+                        pred && pred.sport
+                        || firstMatch && firstMatch.sport
+                        || firstMatch && firstMatch.metadata && (firstMatch.metadata.sport || firstMatch.metadata.sport_type)
+                        || ''
+                    );
+                    if (!bySportMatch.has(sportKey)) return;
+
+                    const matchId = String(firstMatch && firstMatch.match_id || pred && pred.match_id || '').trim()
+                        || `direct-${sportKey}-${buildPredictionDisplayKey(pred)}`;
+                    const existing = bySportMatch.get(sportKey).get(matchId);
+                    if (!existing || getPredictionConfidenceScore(pred) > getPredictionConfidenceScore(existing)) {
+                        bySportMatch.get(sportKey).set(matchId, pred);
+                    }
+                } catch (e) {
+                    console.warn('[renderDirectMarkets] Error processing prediction:', e.message || e);
+                }
             });
-        });
+
+            DIRECT_MARKET_SPORTS.forEach((sportDef) => {
+                try {
+                    const sportMap = bySportMatch.get(sportDef.key);
+                    if (!sportMap) return;
+                    const rows = Array.from(sportMap.values() || [])
+                        .sort((a, b) => getPredictionConfidenceScore(b) - getPredictionConfidenceScore(a));
+                    const countEl = document.getElementById(`direct-${sportDef.key}-count`);
+                    if (countEl) countEl.textContent = String(rows.length);
+
+                    const container = document.getElementById(`direct-${sportDef.key}-matches`);
+                    if (!container) return;
+                    container.innerHTML = '';
+                    if (!rows.length) {
+                        container.innerHTML = `<p style="text-align:center;color:#4a5568;padding:20px;">No direct ${sportDef.label.toLowerCase()} markets available.</p>`;
+                        return;
+                    }
+
+                    rows.forEach((pred, idx) => {
+                        try {
+                            container.appendChild(createDirectMarketCard(pred, sportDef.key, `direct-${sportDef.key}-${idx}`));
+                        } catch (e) {
+                            console.warn('[renderDirectMarkets] Error creating card:', e.message || e);
+                        }
+                    });
+                } catch (e) {
+                    console.warn('[renderDirectMarkets] Error rendering sport:', e.message || e);
+                }
+            });
+        } catch (error) {
+            console.error('[renderDirectMarkets] Fatal error:', error.message || error);
+        }
     }
 
     function outcomeSetForSelection(market, prediction) {
