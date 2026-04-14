@@ -113,6 +113,186 @@ function getSportFilterValues(sport) {
     return SPORT_FILTER_MAP[key] || [key];
 }
 
+function normalizeInsightTierLabel(value) {
+    const tier = String(value || '').trim().toLowerCase();
+    if (!tier) return null;
+    if (tier === 'core' || tier === 'normal') return 'core';
+    if (tier === 'elite' || tier === 'deep') return 'elite';
+    if (tier === 'vip') return 'vip';
+    return null;
+}
+
+function normalizeAccessTokenToTier(value) {
+    const token = String(value || '').trim().toLowerCase();
+    if (!token) return null;
+
+    if (
+        token === 'vip'
+        || token === 'vip_30day'
+        || token.includes('deep_vip')
+        || token.endsWith('_vip')
+    ) {
+        return 'vip';
+    }
+    if (
+        token === 'elite'
+        || token === 'deep'
+        || token === 'pro'
+        || token === 'strike'
+        || token === 'deep_dive'
+        || token === 'deep_pro'
+        || token === 'deep_strike'
+        || token.startsWith('elite_')
+    ) {
+        return 'elite';
+    }
+    if (
+        token === 'core'
+        || token === 'normal'
+        || token === 'core_free'
+        || token.startsWith('core_')
+    ) {
+        return 'core';
+    }
+    return null;
+}
+
+function extractRawPredictionTierAccess(prediction) {
+    const out = new Set();
+    const rowTier = normalizeInsightTierLabel(prediction?.tier);
+    if (rowTier) out.add(rowTier);
+
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    for (const match of matches) {
+        const access = match?.metadata?.tier_access;
+        if (!Array.isArray(access)) continue;
+        for (const token of access) {
+            const normalized = normalizeAccessTokenToTier(token);
+            if (normalized) out.add(normalized);
+        }
+    }
+    return out;
+}
+
+function inferPredictionOutputTier(prediction) {
+    const raw = extractRawPredictionTierAccess(prediction);
+    if (raw.has('vip')) return 'vip';
+    if (raw.has('elite')) return 'elite';
+    return 'core';
+}
+
+function inferPredictionOutputSection(prediction) {
+    const sectionType = inferSectionType(prediction);
+    if (sectionType === 'mega_acca_12') return 'mega';
+    if (sectionType === 'acca_6match') return 'acca';
+    if (sectionType === 'direct') return 'direct';
+    return 'singles';
+}
+
+function inferPredictionOutputSport(prediction) {
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    const first = matches[0] || {};
+    return normalizePredictionSportKey(
+        first?.sport
+        || first?.metadata?.sport
+        || first?.metadata?.sport_type
+        || prediction?.sport
+        || 'unknown'
+    );
+}
+
+function inferPredictionOutputConfidence(prediction) {
+    const total = Number(prediction?.total_confidence);
+    if (Number.isFinite(total)) return roundConfidence(Math.max(0, Math.min(100, total)));
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    const first = matches[0] || {};
+    const firstConfidence = Number(first?.confidence);
+    if (Number.isFinite(firstConfidence)) return roundConfidence(Math.max(0, Math.min(100, firstConfidence)));
+    return 0;
+}
+
+function extractPredictionPrimaryMatchId(prediction) {
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    const first = matches[0] || {};
+    return String(first?.match_id || prediction?.match_id || '').trim() || null;
+}
+
+function extractPredictionPrimaryMarket(prediction) {
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    const first = matches[0] || {};
+    return normalizeMarketKey(first?.market || prediction?.market || '') || null;
+}
+
+function shapePredictionOutputContract(prediction) {
+    return {
+        ...prediction,
+        source_tier: String(prediction?.tier || '').trim().toLowerCase() || null,
+        source_section_type: inferSectionType(prediction),
+        tier: inferPredictionOutputTier(prediction),
+        section: inferPredictionOutputSection(prediction),
+        sport: inferPredictionOutputSport(prediction),
+        confidence: inferPredictionOutputConfidence(prediction),
+        match_id: extractPredictionPrimaryMatchId(prediction),
+        market: extractPredictionPrimaryMarket(prediction)
+    };
+}
+
+function resolveHighestAccessTier(user) {
+    if (user?.is_admin === true || user?.isAdmin === true || user?.is_test_user === true) {
+        return 'vip';
+    }
+
+    const access = new Set(
+        (Array.isArray(user?.access_tiers) ? user.access_tiers : [])
+            .map(normalizeAccessTokenToTier)
+            .filter(Boolean)
+    );
+    if (!access.size) {
+        const fallback = normalizeAccessTokenToTier(user?.plan_id);
+        if (fallback) access.add(fallback);
+    }
+
+    if (access.has('vip')) return 'vip';
+    if (access.has('elite')) return 'elite';
+    if (access.has('core')) return 'core';
+    return null;
+}
+
+function resolveRequestedSubscriptionViewTier(req, user) {
+    const requested = String(
+        req.query?.view_tier
+        || req.query?.tier_tab
+        || req.query?.subscription_tier
+        || req.query?.tier
+        || ''
+    ).trim().toLowerCase();
+
+    if (requested === 'core' || requested === 'elite' || requested === 'vip') {
+        return requested;
+    }
+
+    return resolveHighestAccessTier(user) || 'core';
+}
+
+function canAccessSubscriptionViewTier(user, viewTier) {
+    const requested = String(viewTier || '').trim().toLowerCase();
+    if (!requested) return false;
+    if (user?.is_admin === true || user?.isAdmin === true || user?.is_test_user === true) return true;
+
+    const highest = resolveHighestAccessTier(user);
+    if (!highest) return false;
+    if (requested === 'core') return highest === 'core' || highest === 'elite' || highest === 'vip';
+    if (requested === 'elite') return highest === 'elite' || highest === 'vip';
+    return requested === 'vip' ? highest === 'vip' : false;
+}
+
+function isTierVisibleForView(predictionTier, viewTier) {
+    const rank = { core: 1, elite: 2, vip: 3 };
+    const predictionRank = rank[normalizeInsightTierLabel(predictionTier)] || 1;
+    const viewRank = rank[normalizeInsightTierLabel(viewTier)] || 1;
+    return predictionRank <= viewRank;
+}
+
 // FIX 3: ACCA CLASSIFICATION - Trust explicit DB types and check team pairs
 function inferSectionType(prediction) {
     const explicit = String(prediction?.section_type || prediction?.type || '').trim().toLowerCase();
@@ -1080,43 +1260,107 @@ function resolveQueryTiers(planCapabilities, includeAll = false) {
     return Array.from(new Set(tiers));
 }
 
+function planRank(planId) {
+    const normalized = normalizePlanId(planId);
+    if (!normalized) return 0;
+    const plan = getPlan(normalized);
+    if (!plan) return 0;
+
+    let tierWeight = 0;
+    if (normalized.includes('deep_vip') || normalized === 'vip_30day') {
+        tierWeight = 3;
+    } else if (plan.tier === 'elite') {
+        tierWeight = 2;
+    } else if (plan.tier === 'core') {
+        tierWeight = 1;
+    }
+    return (tierWeight * 1000) + Number(plan.days || 0);
+}
+
+function resolveBestKnownPlanId(user) {
+    const fromSubscriptions = (Array.isArray(user?.subscription_plan_ids) ? user.subscription_plan_ids : [])
+        .map((planId) => normalizePlanId(planId))
+        .filter(Boolean)
+        .sort((a, b) => planRank(b) - planRank(a));
+
+    if (fromSubscriptions.length > 0) return fromSubscriptions[0];
+
+    const fromProfile = normalizePlanId(user?.plan_id);
+    if (fromProfile) return fromProfile;
+
+    const highestAccess = resolveHighestAccessTier(user);
+    if (highestAccess === 'vip') return 'elite_30day_deep_vip';
+    if (highestAccess === 'elite') return 'elite_14day_deep_pro';
+    return 'core_30day_limitless';
+}
+
 function resolveRequestedPlanId(req) {
     const fromQuery = String(req.query?.plan_id || '').trim();
-    const fromProfile = String(req.user?.plan_id || '').trim();
-    return normalizePlanId(fromQuery || fromProfile || 'elite_30day_deep_vip');
+    const requested = normalizePlanId(fromQuery);
+    if (requested) return requested;
+    return resolveBestKnownPlanId(req.user);
 }
 
 function canUserAccessPlan(user, requestedPlanId) {
     if (!user || !requestedPlanId) return false;
-    if (user.is_admin === true || user.is_test_user === true) return true;
+    if (user.is_admin === true || user.isAdmin === true || user.is_test_user === true) return true;
 
-    const userPlanId = normalizePlanId(user.plan_id);
-    if (!userPlanId) return false;
-    if (userPlanId === requestedPlanId) return true;
-
-    // Keep current elite -> core fallback working for low inventory days.
-    const userPlan = getPlan(userPlanId);
     const requestedPlan = getPlan(requestedPlanId);
-    if (!userPlan || !requestedPlan) return false;
-    return userPlan.tier === 'elite' && requestedPlan.tier === 'core';
+    if (!requestedPlan) return false;
+
+    const access = new Set(
+        (Array.isArray(user?.access_tiers) ? user.access_tiers : [])
+            .map(normalizeAccessTokenToTier)
+            .filter(Boolean)
+    );
+
+    if (!access.size) {
+        const fallbackPlan = normalizePlanId(user?.plan_id);
+        const fallbackPlanMeta = fallbackPlan ? getPlan(fallbackPlan) : null;
+        if (fallbackPlanMeta) {
+            if (fallbackPlan.includes('deep_vip') || fallbackPlan === 'vip_30day') {
+                access.add('vip');
+            } else {
+                access.add(fallbackPlanMeta.tier === 'elite' ? 'elite' : 'core');
+            }
+        }
+    }
+
+    if (requestedPlanId.includes('deep_vip') || requestedPlanId === 'vip_30day') {
+        return access.has('vip');
+    }
+    if (requestedPlan.tier === 'elite') {
+        return access.has('elite') || access.has('vip');
+    }
+    return access.has('core') || access.has('elite') || access.has('vip');
 }
 
 // GET /api/predictions
 // Default tier = deep (elite pool); subscription limits use /api/user/predictions
 router.get('/', requireSupabaseUser, requireActiveSubscription, async (req, res) => {
     try {
-        const planId = resolveRequestedPlanId(req);
+        let planId = resolveRequestedPlanId(req);
         if (!planId) {
             return res.status(400).json({ error: 'Invalid plan ID' });
         }
         if (!canUserAccessPlan(req.user, planId)) {
-            return res.status(403).json({ error: 'Plan access denied for user' });
+            const fallbackPlanId = resolveBestKnownPlanId(req.user);
+            if (!fallbackPlanId || !canUserAccessPlan(req.user, fallbackPlanId)) {
+                return res.status(403).json({ error: 'Plan access denied for user' });
+            }
+            planId = fallbackPlanId;
         }
 
         const sport = req.query.sport;
+        const isAdminAudit = req.user?.is_admin === true || req.user?.isAdmin === true;
+        const subscriptionViewTier = resolveRequestedSubscriptionViewTier(req, req.user);
+        if (!canAccessSubscriptionViewTier(req.user, subscriptionViewTier)) {
+            return res.status(403).json({ error: 'Tier tab access denied for user' });
+        }
+
         const includeAllRequested = ['1', 'true'].includes(String(req.query.include_all || '').trim().toLowerCase());
-        const includeAll = includeAllRequested && (req.user?.is_admin === true || req.user?.is_test_user === true);
-        const sportFilterValues = getSportFilterValues(sport);
+        const includeAll = isAdminAudit || (includeAllRequested && (isAdminAudit || req.user?.is_test_user === true));
+        const sportFilterValues = isAdminAudit ? [] : getSportFilterValues(sport);
         
         let historyWindowDays = Number(req.query.history_days);
         if (isNaN(historyWindowDays)) {
@@ -1128,7 +1372,10 @@ router.get('/', requireSupabaseUser, requireActiveSubscription, async (req, res)
         
         const futureWindowDays = Math.max(1, Math.min(14, Number(req.query.window_days) || 7));
 
-        console.log(`[PREDICTIONS] Request for Plan: ${planId}, Sport: ${sport || 'all'}, include_all=${includeAll ? '1' : '0'}`);
+        console.log(
+            `[PREDICTIONS] Request for Plan: ${planId}, Sport: ${sport || 'all'}, include_all=${includeAll ? '1' : '0'}, ` +
+            `view_tier=${subscriptionViewTier}, admin_audit=${isAdminAudit ? '1' : '0'}`
+        );
 
         // Get plan capabilities from subscription matrix
         const planCapabilities = getPlanCapabilities(planId);
@@ -1366,7 +1613,8 @@ router.get('/', requireSupabaseUser, requireActiveSubscription, async (req, res)
             stale_gate_rows: 0,
             window_gate_rows: 0,
             scoped_rows: 0,
-            plan_filtered_rows: 0
+            plan_filtered_rows: 0,
+            subscription_tier_filtered_rows: 0
         };
 
         const sportFilteredPredictions = hydratedPredictions.filter((prediction) => predictionMatchesSport(prediction, sportFilterValues));
@@ -1413,6 +1661,12 @@ router.get('/', requireSupabaseUser, requireActiveSubscription, async (req, res)
             );
         stageCounts.plan_filtered_rows = planFilteredPredictions.length;
 
+        const contractShapedPredictions = planFilteredPredictions.map(shapePredictionOutputContract);
+        const subscriptionTierFilteredPredictions = (isAdminAudit || includeAll)
+            ? contractShapedPredictions
+            : contractShapedPredictions.filter((prediction) => isTierVisibleForView(prediction.tier, subscriptionViewTier));
+        stageCounts.subscription_tier_filtered_rows = subscriptionTierFilteredPredictions.length;
+
         const megaAccaDailyAllocation = getMegaAccaDailyAllocation(planId, now, {
             subscriptionStart: req.user?.official_start_time || null,
             predictions: scopedWithTiming
@@ -1426,7 +1680,8 @@ router.get('/', requireSupabaseUser, requireActiveSubscription, async (req, res)
             upcoming_gate_excluded: Math.max(0, stageCounts.display_filtered_rows - stageCounts.upcoming_gate_rows),
             stale_gate_excluded: Math.max(0, stageCounts.upcoming_gate_rows - stageCounts.stale_gate_rows),
             date_window_excluded: Math.max(0, stageCounts.stale_gate_rows - stageCounts.window_gate_rows),
-            plan_filter_excluded: Math.max(0, stageCounts.scoped_rows - stageCounts.plan_filtered_rows)
+            plan_filter_excluded: Math.max(0, stageCounts.scoped_rows - stageCounts.plan_filtered_rows),
+            subscription_tier_excluded: Math.max(0, stageCounts.plan_filtered_rows - stageCounts.subscription_tier_filtered_rows)
         };
 
         res.status(200).json({
@@ -1434,6 +1689,9 @@ router.get('/', requireSupabaseUser, requireActiveSubscription, async (req, res)
             sport: sport || 'all',
             publish_run_source: publishRunSource,
             include_all: includeAll,
+            admin_audit: isAdminAudit,
+            subscription_view_tier: subscriptionViewTier,
+            user_access_tiers: Array.isArray(req.user?.access_tiers) ? req.user.access_tiers : [],
             day: todayName,
             history_days: historyWindowDays,
             window_days: futureWindowDays,
@@ -1461,8 +1719,8 @@ router.get('/', requireSupabaseUser, requireActiveSubscription, async (req, res)
                 stage_counts: stageCounts,
                 drop_counts: dropCounts
             },
-            count: planFilteredPredictions.length,
-            predictions: planFilteredPredictions
+            count: subscriptionTierFilteredPredictions.length,
+            predictions: subscriptionTierFilteredPredictions
         });
     } catch (err) {
         console.error('[predictions] Route Error:', err);

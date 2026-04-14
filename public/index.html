@@ -728,23 +728,48 @@
         <p class="section-description" id="planDescription"></p>
         <div class="tabs-container">
             <div class="tabs-header">
-                <button class="tab-button active" data-tab="football"><span class="sport-icon">⚽</span> Football</button>
-                <button class="tab-button" data-tab="accumulators"><span class="sport-icon">🧮</span> Accumulators</button>
-                <button class="tab-button" data-tab="rugby"><span class="sport-icon">🏉</span> Rugby</button>
-                <button class="tab-button" data-tab="afl"><span class="sport-icon">🏐</span> AFL</button>
-                <button class="tab-button" data-tab="baseball"><span class="sport-icon">⚾</span> Baseball</button>
-                <button class="tab-button" data-tab="basketball"><span class="sport-icon">🏀</span> Basketball</button>
-                <button class="tab-button" data-tab="formula1"><span class="sport-icon">🏎️</span> Formula 1</button>
-                <button class="tab-button" data-tab="cricket"><span class="sport-icon">🏏</span> Cricket</button>
-                <button class="tab-button" data-tab="nfl"><span class="sport-icon">🏈</span> NFL</button>
-                <button class="tab-button" data-tab="hockey"><span class="sport-icon">🏒</span> Hockey</button>
-                <button class="tab-button" data-tab="mma"><span class="sport-icon">🤼</span> MMA</button>
-                <button class="tab-button" data-tab="handball"><span class="sport-icon">🤾</span> Handball</button>
-                <button class="tab-button" data-tab="volleyball"><span class="sport-icon">🏐</span> Volleyball</button>
-                <button class="tab-button" data-tab="tennis"><span class="sport-icon">🎾</span> Tennis</button>
+                <button class="tab-button active" data-tab="direct-markets"><span class="sport-icon">🎯</span> DIRECT MARKETS</button>
+                <button class="tab-button" data-tab="accumulators"><span class="sport-icon">🧮</span> ACCA</button>
+                <button class="tab-button" data-tab="football"><span class="sport-icon">⚽</span> SOCCER</button>
+                <button class="tab-button" data-tab="tennis"><span class="sport-icon">🎾</span> TENNIS</button>
+                <button class="tab-button" data-tab="basketball"><span class="sport-icon">🏀</span> BASKETBALL</button>
+                <button class="tab-button" data-tab="rugby"><span class="sport-icon">🏉</span> RUGBY</button>
+                <button class="tab-button" data-tab="cricket"><span class="sport-icon">🏏</span> CRICKET</button>
             </div>
             <!-- All tab contents -->
-            <div id="football" class="tab-content active">
+            <div id="direct-markets" class="tab-content active">
+                <h3 class="tab-title"><span class="sport-icon">🎯</span> Direct Markets</h3>
+                <p class="policy-note">Layer 1 direct market feed (confidence ≥ 60). Only Home Win, Draw, Away Win are shown here.</p>
+                <div class="prediction-category">
+                    <h4 style="color:#60a5fa;margin-bottom:1rem;">⚽ Football (<span id="direct-football-count">0</span>)</h4>
+                    <div id="direct-football-matches" class="prediction-grid"><p>Loading...</p></div>
+                </div>
+                <div class="prediction-category">
+                    <h4 style="color:#0ea5e9;margin-bottom:1rem;">🎾 Tennis (<span id="direct-tennis-count">0</span>)</h4>
+                    <div id="direct-tennis-matches" class="prediction-grid"><p>Loading...</p></div>
+                </div>
+                <div class="prediction-category">
+                    <h4 style="color:#f59e0b;margin-bottom:1rem;">🏀 Basketball (<span id="direct-basketball-count">0</span>)</h4>
+                    <div id="direct-basketball-matches" class="prediction-grid"><p>Loading...</p></div>
+                </div>
+                <div class="prediction-category">
+                    <h4 style="color:#22c55e;margin-bottom:1rem;">🏉 Rugby (<span id="direct-rugby-count">0</span>)</h4>
+                    <div id="direct-rugby-matches" class="prediction-grid"><p>Loading...</p></div>
+                </div>
+                <div class="prediction-category">
+                    <h4 style="color:#ef4444;margin-bottom:1rem;">🏏 Cricket (<span id="direct-cricket-count">0</span>)</h4>
+                    <div id="direct-cricket-matches" class="prediction-grid"><p>Loading...</p></div>
+                </div>
+                <div class="prediction-category">
+                    <h4 style="color:#a855f7;margin-bottom:1rem;">⚾ Baseball (<span id="direct-baseball-count">0</span>)</h4>
+                    <div id="direct-baseball-matches" class="prediction-grid"><p>Loading...</p></div>
+                </div>
+                <div class="prediction-category">
+                    <h4 style="color:#06b6d4;margin-bottom:1rem;">🏒 Hockey (<span id="direct-hockey-count">0</span>)</h4>
+                    <div id="direct-hockey-matches" class="prediction-grid"><p>Loading...</p></div>
+                </div>
+            </div>
+            <div id="football" class="tab-content">
                 <h3 class="tab-title"><span class="sport-icon">⚽</span> Football Insights</h3>
                 <div id="football-tier-summary" class="tier-allocation-summary" style="display:none;">
                     <h4>Your Daily Insight Allocation</h4>
@@ -1058,7 +1083,7 @@
         ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
         : null;
     let authSession = null;
-    let activeSport = 'football';
+    let activeSport = 'direct-markets';
     const includeAllParam = new URLSearchParams(window.location.search).get('include_all');
     const INCLUDE_ALL_MODE = ['1', 'true'].includes(String(includeAllParam || '').trim().toLowerCase());
 
@@ -1072,7 +1097,7 @@
         try {
             sessionStorage.setItem('skcs_public_lock_message', PUBLIC_LOCK_MESSAGE);
         } catch (e) { /* ignore */ }
-        window.location.href = `subscription.html?locked=1&message=${encodeURIComponent(PUBLIC_LOCK_MESSAGE)}`;
+        window.location.href = `/subscribe?locked=1&message=${encodeURIComponent(PUBLIC_LOCK_MESSAGE)}`;
     }
 
     async function getActiveSession(forceReload = false) {
@@ -1127,9 +1152,14 @@
     }
 
     function getPredictionTiersForPlan(planId) {
-        return String(planId || '').includes('elite')
-            ? ['deep', 'elite', 'normal', 'core']
-            : ['normal', 'core'];
+        const key = String(planId || '').toLowerCase();
+        if (key.includes('deep_vip') || key.includes('vip_30day')) {
+            return ['vip', 'elite', 'core', 'deep', 'normal'];
+        }
+        if (key.includes('elite')) {
+            return ['elite', 'core', 'deep', 'normal'];
+        }
+        return ['core', 'normal'];
     }
 
     function getPlanAccessLevel(planId) {
@@ -1165,8 +1195,27 @@
      * Updated to handle the 'type' column instead of 'sport'
      */
     function getSectionType(pred) {
+        const canonical = String(pred && pred.section || '').toLowerCase();
+        if (canonical === 'mega') return 'mega_acca_12';
+        if (canonical === 'acca') return 'acca_6match';
+        if (canonical === 'direct') return 'direct';
+        if (canonical === 'singles') {
+            const rawSinglesType = String(pred && (pred.section_type || pred.type) || '').toLowerCase();
+            return rawSinglesType || 'secondary';
+        }
         return String(pred && (pred.section_type || pred.type) || '').toLowerCase();
     }
+
+    const DIRECT_MARKET_SPORTS = [
+        { key: 'football', label: 'Football' },
+        { key: 'tennis', label: 'Tennis' },
+        { key: 'basketball', label: 'Basketball' },
+        { key: 'rugby', label: 'Rugby' },
+        { key: 'cricket', label: 'Cricket' },
+        { key: 'baseball', label: 'Baseball' },
+        { key: 'hockey', label: 'Hockey' }
+    ];
+    const DIRECT_MARKET_OUTCOMES = new Set(['home_win', 'draw', 'away_win']);
 
     function normalizeSportForFilter(value) {
         const key = String(value || '').trim().toLowerCase();
@@ -1407,6 +1456,107 @@
         return out;
     }
 
+    function resolveDirectMarketOutcome(match) {
+        const marketKey = normalizeMarketKey(match && match.market);
+        const predictionKey = String(match && match.prediction || '').trim().toLowerCase();
+
+        if (DIRECT_MARKET_OUTCOMES.has(marketKey)) {
+            return marketKey;
+        }
+
+        if (marketKey === '1x2' || marketKey === 'match_result' || marketKey === 'match_winner') {
+            if (predictionKey === 'home_win' || predictionKey === 'home') return 'home_win';
+            if (predictionKey === 'away_win' || predictionKey === 'away') return 'away_win';
+            if (predictionKey === 'draw' || predictionKey === 'x') return 'draw';
+        }
+
+        return null;
+    }
+
+    function directOutcomeLabel(token) {
+        if (token === 'home_win') return 'HOME WIN';
+        if (token === 'away_win') return 'AWAY WIN';
+        if (token === 'draw') return 'DRAW';
+        return 'DIRECT MARKET';
+    }
+
+    function createDirectMarketCard(pred, sport, cardId) {
+        const card = document.createElement('div');
+        card.className = 'prediction-card';
+        card.id = cardId;
+
+        const firstMatch = getPrimaryMatch(pred);
+        const matchInfo = formatMatchInfo(firstMatch, sport);
+        const confidence = Math.max(0, Math.min(100, Math.round(getPredictionConfidenceScore(pred))));
+        const outcome = resolveDirectMarketOutcome(firstMatch);
+
+        card.innerHTML = `
+            <div class="match-info">
+                <div class="teams" style="font-weight:bold; color:#1a202c; font-size:1.1rem; line-height:1.4;">${matchInfo.teams}</div>
+                <div class="match-date" style="color:#4a5568; font-size:0.75rem; margin-top:8px; letter-spacing:1px;">${matchInfo.context}</div>
+            </div>
+            <div class="prediction-details" style="margin-top:12px; border-top:1px solid #e2e8f0; padding-top:12px; display:flex; justify-content:space-between; align-items:center;">
+                <div class="prediction" style="color:#059669; font-weight:bold;">${directOutcomeLabel(outcome)}</div>
+                <div class="confidence" style="color:#4a5568; font-size:0.85rem;">${confidence}% Confidence</div>
+            </div>
+        `;
+
+        return card;
+    }
+
+    function renderDirectMarkets(predictions) {
+        const normalizedPredictions = dedupePredictionFeed(predictions);
+        const bySportMatch = new Map(
+            DIRECT_MARKET_SPORTS.map((sportDef) => [sportDef.key, new Map()])
+        );
+
+        normalizedPredictions.forEach((pred) => {
+            if (getSectionType(pred) !== 'direct') return;
+            if (getPredictionLegCount(pred) !== 1) return;
+
+            const firstMatch = getPrimaryMatch(pred);
+            const outcome = resolveDirectMarketOutcome(firstMatch);
+            if (!outcome) return;
+
+            const confidence = Math.max(0, Math.min(100, Math.round(getPredictionConfidenceScore(pred))));
+            if (confidence < 60) return;
+
+            const sportKey = normalizeSportForFilter(
+                pred && pred.sport
+                || firstMatch && firstMatch.sport
+                || firstMatch && firstMatch.metadata && (firstMatch.metadata.sport || firstMatch.metadata.sport_type)
+                || ''
+            );
+            if (!bySportMatch.has(sportKey)) return;
+
+            const matchId = String(firstMatch && firstMatch.match_id || pred && pred.match_id || '').trim()
+                || `direct-${sportKey}-${buildPredictionDisplayKey(pred)}`;
+            const existing = bySportMatch.get(sportKey).get(matchId);
+            if (!existing || getPredictionConfidenceScore(pred) > getPredictionConfidenceScore(existing)) {
+                bySportMatch.get(sportKey).set(matchId, pred);
+            }
+        });
+
+        DIRECT_MARKET_SPORTS.forEach((sportDef) => {
+            const rows = Array.from(bySportMatch.get(sportDef.key).values())
+                .sort((a, b) => getPredictionConfidenceScore(b) - getPredictionConfidenceScore(a));
+            const countEl = document.getElementById(`direct-${sportDef.key}-count`);
+            if (countEl) countEl.textContent = String(rows.length);
+
+            const container = document.getElementById(`direct-${sportDef.key}-matches`);
+            if (!container) return;
+            container.innerHTML = '';
+            if (!rows.length) {
+                container.innerHTML = `<p style="text-align:center;color:#4a5568;padding:20px;">No direct ${sportDef.label.toLowerCase()} markets available.</p>`;
+                return;
+            }
+
+            rows.forEach((pred, idx) => {
+                container.appendChild(createDirectMarketCard(pred, sportDef.key, `direct-${sportDef.key}-${idx}`));
+            });
+        });
+    }
+
     function outcomeSetForSelection(market, prediction) {
         const marketKey = normalizeMarketKey(market);
         const predictionKey = String(prediction || '').trim().toLowerCase();
@@ -1535,10 +1685,18 @@
         if (!accessToken) return;
 
         const activePlanId = resolveUserPlanId(userPlanId);
-        const container = document.getElementById(sport + '-matches');
-        const requestSport = sport === 'accumulators' ? '' : sport;
+        const isDirectMarketsTab = sport === 'direct-markets';
+        const container = isDirectMarketsTab ? null : document.getElementById(sport + '-matches');
+        const requestSport = (sport === 'accumulators' || isDirectMarketsTab) ? '' : sport;
         let supabaseFallbackStatus = 'not_attempted';
-        if (container) {
+        if (isDirectMarketsTab) {
+            DIRECT_MARKET_SPORTS.forEach((sportDef) => {
+                const section = document.getElementById(`direct-${sportDef.key}-matches`);
+                if (section) {
+                    section.innerHTML = '<p style="text-align:center;color:#4a5568;padding:20px;">Updating SKCS Insights...</p>';
+                }
+            });
+        } else if (container) {
             container.innerHTML = '<p style="text-align:center;color:#4a5568;padding:20px;">Updating SKCS Insights...</p>';
         }
 
@@ -1647,6 +1805,10 @@
 
             // If backend returned predictions use them
             if (preds.length > 0) {
+                if (sport === 'direct-markets') {
+                    renderDirectMarkets(preds);
+                    return;
+                }
                 if (sport === 'football') {
                     renderFootballInsights(preds);
                     return;
@@ -1662,6 +1824,10 @@
             // Backend returned no predictions or errored: try Supabase fallback
             const supaPreds = await fetchFromSupabase();
             if (supaPreds && supaPreds.length > 0) {
+                if (sport === 'direct-markets') {
+                    renderDirectMarkets(supaPreds);
+                    return;
+                }
                 if (sport === 'football') {
                     renderFootballInsights(supaPreds);
                     return;
@@ -1678,6 +1844,10 @@
             }
 
             // Nothing found - show friendly message
+            if (sport === 'direct-markets') {
+                renderDirectMarkets([]);
+                return;
+            }
             if (sport === 'football') {
                 renderFootballInsights([]);
                 return;
@@ -1695,6 +1865,10 @@
             // Try Supabase fallback on error
             const supaPreds = await fetchFromSupabase();
             if (supaPreds && supaPreds.length > 0) {
+                if (sport === 'direct-markets') {
+                    renderDirectMarkets(supaPreds);
+                    return;
+                }
                 if (sport === 'football') {
                     renderFootballInsights(supaPreds);
                     return;
@@ -1708,6 +1882,10 @@
             }
             if (supabaseFallbackStatus === 'rls_or_auth_denied') {
                 console.warn('[Insights] Supabase fallback denied by RLS/auth policy after backend error.');
+            }
+            if (sport === 'direct-markets') {
+                renderDirectMarkets([]);
+                return;
             }
             if (sport === 'football') {
                 renderFootballInsights([]);
@@ -1926,7 +2104,10 @@
      * Create a Direct prediction card
      */
     function getTierLabel(pred) {
-        return String(pred && pred.tier || '').toLowerCase() === 'deep' ? 'Elite Tier' : 'Core Tier';
+        const tier = String(pred && pred.tier || '').toLowerCase();
+        if (tier === 'vip') return 'VIP Tier';
+        if (tier === 'elite' || tier === 'deep') return 'Elite Tier';
+        return 'Core Tier';
     }
 
     function renderAccumulatorInsights(predictions, planMeta) {
@@ -2415,7 +2596,7 @@
             });
         });
         
-        fetchPredictions('football');
+        fetchPredictions('direct-markets');
 
         // Scroll to top button
         const scrollBtn = document.getElementById('scrollTopBtn');

@@ -19,7 +19,12 @@ const {
     isTwelveLegRestrictedMarket,
     buildCandidateMarkets,
     selectDirectSecondarySameMatch,
-    DIRECT_SAFE_MARKETS
+    DIRECT_SAFE_MARKETS,
+    DIRECT_MARKETS_ALLOWED,
+    SAFE_MARKETS_ALLOWED,
+    DIRECT_CONFIDENCE_MIN,
+    SAFE_CONFIDENCE_MIN,
+    ACCA_CONFIDENCE_MIN
 } = require('./marketIntelligence');
 const { validateInsightLegGroup } = require('../utils/insightValidationMatrix');
 const {
@@ -66,7 +71,7 @@ const {
 const MEGA_ACCA_SIZE = 12;
 const ACCA_SIZE = 6;
 const SAME_MATCH_INSIGHT_TARGET = 6;
-const ACCA_MIN_LEG_CONFIDENCE = 80;
+const ACCA_MIN_LEG_CONFIDENCE = ACCA_CONFIDENCE_MIN;
 const REQUIRED_FOOTBALL_ONLY_ACCAS = 2;
 const MIXED_SPORT_TARGETS = new Set(['football', 'hockey', 'mma', 'afl', 'cricket', 'basketball']);
 const SAFE_TIER3_ACCA_MARKETS = new Set(['btts_no', 'under_3_5', 'first_half_draw']);
@@ -417,6 +422,35 @@ function getMetadata(prediction) {
     return prediction && typeof prediction.metadata === 'object' && prediction.metadata !== null
         ? prediction.metadata
         : {};
+}
+
+function selectionMarketKey(prediction) {
+    return normalizeMarketKeyMI(
+        prediction?.market
+        || prediction?.metadata?.market_key
+        || prediction?.metadata?.market
+        || ''
+    );
+}
+
+function selectionConfidence(prediction) {
+    const value = Number(prediction?.confidence);
+    return Number.isFinite(value) ? value : 0;
+}
+
+function isDirectMarketSelection(prediction) {
+    const market = selectionMarketKey(prediction);
+    return DIRECT_MARKETS_ALLOWED.has(market) && selectionConfidence(prediction) >= DIRECT_CONFIDENCE_MIN;
+}
+
+function isSafeSinglesSelection(prediction) {
+    const market = selectionMarketKey(prediction);
+    return SAFE_MARKETS_ALLOWED.has(market) && selectionConfidence(prediction) >= SAFE_CONFIDENCE_MIN;
+}
+
+function isAccumulatorEligibleMarket(prediction) {
+    const market = selectionMarketKey(prediction);
+    return market && !DIRECT_MARKETS_ALLOWED.has(market) && selectionConfidence(prediction) >= ACCA_MIN_LEG_CONFIDENCE;
 }
 
 function parseKickoff(prediction) {
@@ -1920,7 +1954,7 @@ async function buildAccaLegCandidatePool(predictions, options = {}) {
         }
 
         const candidates = [];
-        if (Number(prediction?.confidence) >= minConfidenceFloor) {
+        if (isAccumulatorEligibleMarket(prediction) && Number(prediction?.confidence) >= minConfidenceFloor) {
             candidates.push({
                 ...prediction,
                 sport: normalizedSport,
@@ -1941,6 +1975,7 @@ async function buildAccaLegCandidatePool(predictions, options = {}) {
             );
             if (!mapped) continue;
             if (Number(mapped.confidence) < minConfidenceFloor) continue;
+            if (!isAccumulatorEligibleMarket(mapped)) continue;
             candidates.push(mapped);
         }
 
@@ -1950,7 +1985,8 @@ async function buildAccaLegCandidatePool(predictions, options = {}) {
 
         if (!candidates.length) continue;
         const eligibleCandidates = candidates
-            .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor);
+            .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
+            .filter((candidate) => isAccumulatorEligibleMarket(candidate));
         if (!eligibleCandidates.length) continue;
 
         const rankedCandidates = eligibleCandidates.slice().sort(compareAccaCandidatePreference);
@@ -3128,7 +3164,7 @@ async function buildFinalForTier(tier, options = {}) {
         // ---------------------------------------------------------------------
         const directRows = [];
         const directSelections = takeAvailablePredictions(
-            limitedCandidates,
+            limitedCandidates.filter((candidate) => isDirectMarketSelection(candidate)),
             globalUsedFixtures,
             new Map(),
             new Map(),
@@ -3198,8 +3234,11 @@ async function buildFinalForTier(tier, options = {}) {
         // 6. SECONDARY LAYER (Last Priority)
         // ---------------------------------------------------------------------
         const secondaryRows = [];
+        const safeSinglesPool = (
+            await buildSecondaryCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, new Map(), new Map()))
+        ).filter((candidate) => isSafeSinglesSelection(candidate));
         const secondarySelections = takeAvailablePredictions(
-            await buildSecondaryCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, new Map(), new Map())),
+            safeSinglesPool,
             globalUsedFixtures,
             new Map(),
             new Map(),

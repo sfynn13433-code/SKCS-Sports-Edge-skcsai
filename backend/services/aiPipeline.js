@@ -491,7 +491,7 @@ async function buildRawPredictionFromProviderItem(item) {
     const market = selectedDirect?.market || waterfallDecision.market || requestedMarket;
     const routedPrediction = selectedDirect?.prediction || waterfallDecision.prediction || fallbackPredictionForMarket(market, prediction);
     const confidenceProbability = selectedDirect?.probability || waterfallDecision.confidence_probability || p_adj;
-    const confidence = Math.max(80, toConfidencePercent(confidenceProbability));
+    const confidence = Math.max(60, toConfidencePercent(confidenceProbability));
     const volatility = item.volatility || scoring.volatility || volatilityFromRiskProfile(marketIntelligence.risk_profile, 'medium');
     const aiSource = scoring.source || null; // 'dolphin', 'fallback', 'odds', etc.
     const aiReasoning = scoring.reasoning || null;

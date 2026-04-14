@@ -6,6 +6,7 @@ const { areMarketsConflicting: areSkcsMarketsConflicting } = require('../service
 
 const MARKET_CONFLICTS = [
     ['over_2_5', 'under_2_5'],
+    ['over_3_5', 'under_3_5'],
     ['btts_yes', 'btts_no']
 ];
 

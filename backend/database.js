@@ -748,6 +748,23 @@ async function getLatestSubscriptionByUserId(userId) {
     return res.rows[0] || null;
 }
 
+async function getActiveSubscriptionsByUserId(userId, now = new Date()) {
+    const ok = await ensureDbInitialized();
+    if (!ok || !userId) return [];
+
+    const res = await pool.query(
+        `SELECT *
+         FROM subscriptions
+         WHERE user_id = $1
+           AND status IN ('active', 'day_zero_bonus', 'day_zero_lite')
+           AND expiration_time >= $2
+         ORDER BY payment_timestamp DESC, created_at DESC`,
+        [userId, now.toISOString()]
+    );
+
+    return Array.isArray(res.rows) ? res.rows : [];
+}
+
 async function upsertProfile({ id, email, subscription_status = 'inactive', is_test_user = false, plan_id = null, plan_tier = null, plan_expires_at = null }) {
     const ok = await ensureDbInitialized();
     if (!ok) return null;
@@ -836,6 +853,7 @@ module.exports = {
     createSubscriptionRecord,
     getProfileById,
     getLatestSubscriptionByUserId,
+    getActiveSubscriptionsByUserId,
     upsertProfile,
     hasUsedDayZeroForUser,
     updateAccuracyStats,

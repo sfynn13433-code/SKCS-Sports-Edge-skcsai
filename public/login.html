@@ -167,12 +167,48 @@
         <!-- Register Form -->
         <div id="registerForm" class="form">
             <div class="form-group">
+                <label for="registerFirstName">First Name</label>
+                <input type="text" id="registerFirstName" placeholder="First name" autocomplete="given-name" required>
+            </div>
+            <div class="form-group">
+                <label for="registerSurname">Surname</label>
+                <input type="text" id="registerSurname" placeholder="Surname" autocomplete="family-name" required>
+            </div>
+            <div class="form-group">
+                <label for="registerIdNumber">ID Number</label>
+                <input type="text" id="registerIdNumber" placeholder="National ID number" autocomplete="off" required>
+            </div>
+            <div class="form-group">
                 <label for="registerEmail">Email</label>
                 <input type="email" id="registerEmail" placeholder="your@email.com" autocomplete="email" required>
             </div>
             <div class="form-group">
+                <label for="registerPhone">Phone</label>
+                <input type="tel" id="registerPhone" placeholder="+27..." autocomplete="tel" required>
+            </div>
+            <div class="form-group">
+                <label for="registerStreet">Street</label>
+                <input type="text" id="registerStreet" placeholder="Street address" autocomplete="address-line1" required>
+            </div>
+            <div class="form-group">
+                <label for="registerTown">Town</label>
+                <input type="text" id="registerTown" placeholder="Town / City" autocomplete="address-level2" required>
+            </div>
+            <div class="form-group">
+                <label for="registerCountry">Country</label>
+                <input type="text" id="registerCountry" placeholder="Country" autocomplete="country-name" required>
+            </div>
+            <div class="form-group">
                 <label for="registerPassword">Password</label>
                 <input type="password" id="registerPassword" placeholder="••••••••" autocomplete="new-password" required>
+            </div>
+            <div class="form-group">
+                <label for="registerIdDocument">ID Document Upload</label>
+                <input type="file" id="registerIdDocument" accept=".pdf,.jpg,.jpeg,.png" required>
+            </div>
+            <div class="form-group">
+                <label for="registerSelfie">Selfie Upload (Placeholder)</label>
+                <input type="file" id="registerSelfie" accept=".jpg,.jpeg,.png" required>
             </div>
             <button id="registerBtn" class="submit-btn">Register</button>
             <div id="registerMessage" class="message"></div>
@@ -273,13 +309,27 @@
 
         // Register handler
         document.getElementById('registerBtn').addEventListener('click', async () => {
+            const firstName = document.getElementById('registerFirstName').value.trim();
+            const surname = document.getElementById('registerSurname').value.trim();
+            const idNumber = document.getElementById('registerIdNumber').value.trim();
             const email = document.getElementById('registerEmail').value;
+            const phone = document.getElementById('registerPhone').value.trim();
+            const street = document.getElementById('registerStreet').value.trim();
+            const town = document.getElementById('registerTown').value.trim();
+            const country = document.getElementById('registerCountry').value.trim();
             const password = document.getElementById('registerPassword').value;
+            const idDocumentFile = document.getElementById('registerIdDocument').files[0] || null;
+            const selfieFile = document.getElementById('registerSelfie').files[0] || null;
             const messageDiv = document.getElementById('registerMessage');
 
-            if (!email || !password) {
+            if (!firstName || !surname || !idNumber || !email || !phone || !street || !town || !country || !password) {
                 messageDiv.className = 'message error';
                 messageDiv.textContent = 'Please fill in all fields';
+                return;
+            }
+            if (!idDocumentFile || !selfieFile) {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Please upload your ID document and selfie';
                 return;
             }
             if (password.length < 6) {
@@ -297,7 +347,23 @@
 
                 const { data, error } = await supabaseClient.auth.signUp({
                     email,
-                    password
+                    password,
+                    options: {
+                        data: {
+                            first_name: firstName,
+                            last_name: surname,
+                            id_number: idNumber,
+                            phone,
+                            street,
+                            town,
+                            country,
+                            verification_status: 'pending_verification',
+                            id_document_uploaded: true,
+                            selfie_uploaded: true,
+                            id_document_filename: idDocumentFile.name,
+                            selfie_filename: selfieFile.name
+                        }
+                    }
                 });
 
                 if (error) {
@@ -317,7 +383,7 @@
                 }
 
                 messageDiv.className = 'message success';
-                messageDiv.textContent = 'Registration submitted. Verify your email, then login to continue.';
+                messageDiv.textContent = 'Registration submitted with pending verification status. Verify your email, then wait for manual admin approval.';
             } catch (error) {
                 messageDiv.className = 'message error';
                 messageDiv.textContent = 'Connection error';

@@ -2,7 +2,13 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const config = require('../config');
-const { getProfileById, getLatestSubscriptionByUserId, upsertProfile } = require('../database');
+const {
+    getProfileById,
+    getLatestSubscriptionByUserId,
+    getActiveSubscriptionsByUserId,
+    upsertProfile
+} = require('../database');
+const { getPlan, normalizePlanId } = require('../config/subscriptionPlans');
 const { ACTIVE_SUBSCRIPTION_STATUSES, buildSubscriptionContext } = require('../services/subscriptionTiming');
 
 const hasSupabaseConfig =
@@ -12,6 +18,68 @@ const hasSupabaseConfig =
 const supabase = hasSupabaseConfig
     ? createClient(config.supabase.url, config.supabase.anonKey)
     : null;
+
+function resolveAccessTierFromPlanId(planId) {
+    const raw = String(planId || '').trim().toLowerCase();
+    if (!raw) return null;
+
+    const normalized = normalizePlanId(raw) || raw;
+    if (normalized.includes('deep_vip') || normalized === 'vip_30day') {
+        return 'vip';
+    }
+
+    const plan = getPlan(normalized);
+    if (!plan) return null;
+    return plan.tier === 'elite' ? 'elite' : 'core';
+}
+
+function resolveAccessContext({ activeSubscriptions = [], profilePlanId = null, isAdmin = false }) {
+    if (isAdmin) {
+        return {
+            owned_tiers: ['core', 'elite', 'vip'],
+            access_tiers: ['core', 'elite', 'vip'],
+            subscription_plan_ids: ['core_all', 'elite_all', 'vip_all']
+        };
+    }
+
+    const plans = new Set();
+    const ownedTiers = new Set();
+
+    for (const row of Array.isArray(activeSubscriptions) ? activeSubscriptions : []) {
+        const planId = normalizePlanId(row?.tier_id) || String(row?.tier_id || '').trim();
+        if (!planId) continue;
+        plans.add(planId);
+        const tier = resolveAccessTierFromPlanId(planId);
+        if (tier) ownedTiers.add(tier);
+    }
+
+    const normalizedProfilePlan = normalizePlanId(profilePlanId) || String(profilePlanId || '').trim();
+    if (normalizedProfilePlan) {
+        plans.add(normalizedProfilePlan);
+        const tier = resolveAccessTierFromPlanId(normalizedProfilePlan);
+        if (tier) ownedTiers.add(tier);
+    }
+
+    const accessTiers = new Set();
+    if (ownedTiers.has('vip')) {
+        accessTiers.add('vip');
+        accessTiers.add('elite');
+        accessTiers.add('core');
+    }
+    if (ownedTiers.has('elite')) {
+        accessTiers.add('elite');
+        accessTiers.add('core');
+    }
+    if (ownedTiers.has('core')) {
+        accessTiers.add('core');
+    }
+
+    return {
+        owned_tiers: Array.from(ownedTiers),
+        access_tiers: Array.from(accessTiers),
+        subscription_plan_ids: Array.from(plans)
+    };
+}
 
 async function requireSupabaseUser(req, res, next) {
     if (!supabase) {
@@ -47,26 +115,62 @@ async function requireSupabaseUser(req, res, next) {
         }
 
         const latestSubscription = await getLatestSubscriptionByUserId(supaUser.id);
+        const activeSubscriptions = await getActiveSubscriptionsByUserId(supaUser.id, new Date());
         const subscriptionContext = buildSubscriptionContext({
             profile,
             subscription: latestSubscription,
             now: new Date()
         });
 
+        const userMetadata = supaUser?.user_metadata && typeof supaUser.user_metadata === 'object'
+            ? supaUser.user_metadata
+            : {};
         const profileRole = String(profile?.role || '').trim().toLowerCase();
-        const profileIsAdmin = profile?.is_admin === true || profileRole === 'admin';
+        const metadataRole = String(userMetadata?.role || '').trim().toLowerCase();
+        const metadataIsAdmin =
+            userMetadata?.is_admin === true
+            || userMetadata?.isAdmin === true
+            || metadataRole === 'admin';
+        const profileIsAdmin = profile?.is_admin === true || profileRole === 'admin' || metadataIsAdmin;
+        const accessContext = resolveAccessContext({
+            activeSubscriptions,
+            profilePlanId: subscriptionContext?.plan_id || profile?.plan_id || null,
+            isAdmin: profileIsAdmin
+        });
+        const verificationStatus = String(
+            profile?.verification_status
+            || userMetadata?.verification_status
+            || 'pending_verification'
+        ).trim().toLowerCase();
+        const hasActiveSubscriptions = Array.isArray(activeSubscriptions) && activeSubscriptions.length > 0;
 
         req.user = {
             id: supaUser.id,
             email: supaUser.email,
-            first_name: profile?.first_name || null,
-            last_name: profile?.last_name || null,
-            id_number: profile?.id_number || null,
-            country: profile?.country || null,
-            role: profileRole || 'user',
+            first_name: profile?.first_name || userMetadata?.first_name || null,
+            last_name: profile?.last_name || userMetadata?.last_name || userMetadata?.surname || null,
+            id_number: profile?.id_number || userMetadata?.id_number || null,
+            phone: userMetadata?.phone || null,
+            street: userMetadata?.street || null,
+            town: userMetadata?.town || null,
+            country: profile?.country || userMetadata?.country || null,
+            role: profileRole || metadataRole || 'user',
             is_admin: profileIsAdmin,
-            ...subscriptionContext
+            isAdmin: profileIsAdmin,
+            verification_status: verificationStatus,
+            id_document_uploaded: userMetadata?.id_document_uploaded === true,
+            selfie_uploaded: userMetadata?.selfie_uploaded === true,
+            active_subscriptions: activeSubscriptions,
+            subscription_tiers: accessContext.owned_tiers,
+            access_tiers: accessContext.access_tiers,
+            subscription_plan_ids: accessContext.subscription_plan_ids,
+            ...subscriptionContext,
+            is_test_user: profile?.is_test_user === true || userMetadata?.is_test_user === true
         };
+
+        if (hasActiveSubscriptions && !ACTIVE_SUBSCRIPTION_STATUSES.has(req.user.subscription_status)) {
+            req.user.subscription_status = 'active';
+        }
 
         next();
     } catch (err) {

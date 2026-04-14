@@ -177,6 +177,27 @@ const DIRECT_SAFE_MARKETS = Object.freeze(new Set([
     'double_chance_over_1_5'
 ]));
 
+const DIRECT_MARKETS_ALLOWED = Object.freeze(new Set([
+    'home_win',
+    'draw',
+    'away_win'
+]));
+
+const SAFE_MARKETS_ALLOWED = Object.freeze(new Set([
+    'double_chance_1x',
+    'double_chance_x2',
+    'double_chance_12',
+    'draw_no_bet_home',
+    'draw_no_bet_away',
+    'under_3_5',
+    'home_over_0_5',
+    'away_over_0_5'
+]));
+
+const DIRECT_CONFIDENCE_MIN = 60;
+const SAFE_CONFIDENCE_MIN = 75;
+const ACCA_CONFIDENCE_MIN = 80;
+
 const FALLBACK_LADDER = Object.freeze([
     { pass: 'elite', min_confidence: 92, tiers: [1], safeTier3Only: false, directSafeOnly: false },
     { pass: 'strong', min_confidence: 88, tiers: [1, 2], safeTier3Only: false, directSafeOnly: false },
@@ -609,7 +630,7 @@ function buildCandidateMarkets(probabilitiesInput = {}, matchContext = {}, optio
 
         const missingContextPenaltyPct = hasWeatherContext ? 0 : 1;
         const rawConfidence = Math.round(clamp((adjusted * 100) - missingContextPenaltyPct, 1, 99) * 100) / 100;
-        const confidence = rawConfidence < 80 ? 80 : rawConfidence;
+        const confidence = Math.round(clamp(rawConfidence, 1, 99) * 100) / 100;
 
         candidates.push({
             market,
@@ -772,6 +793,29 @@ function byAwayBias(market) {
         || key === 'team_to_score_first_away';
 }
 
+function conflictPairKey(marketA, marketB) {
+    return [normalizeMarketKey(marketA), normalizeMarketKey(marketB)].sort().join('::');
+}
+
+const HARD_MARKET_CONFLICT_PAIRS = Object.freeze(new Set([
+    conflictPairKey('home_win', 'draw'),
+    conflictPairKey('home_win', 'away_win'),
+    conflictPairKey('home_win', 'double_chance_1x'),
+    conflictPairKey('home_win', 'double_chance_12'),
+    conflictPairKey('home_win', 'draw_no_bet_home'),
+    conflictPairKey('away_win', 'draw'),
+    conflictPairKey('away_win', 'double_chance_x2'),
+    conflictPairKey('away_win', 'double_chance_12'),
+    conflictPairKey('away_win', 'draw_no_bet_away'),
+    conflictPairKey('draw', 'double_chance_12'),
+    conflictPairKey('double_chance_1x', 'double_chance_x2'),
+    conflictPairKey('double_chance_1x', 'double_chance_12'),
+    conflictPairKey('double_chance_x2', 'double_chance_12'),
+    conflictPairKey('btts_yes', 'btts_no'),
+    conflictPairKey('over_2_5', 'under_2_5'),
+    conflictPairKey('over_3_5', 'under_3_5')
+]));
+
 function areMarketsConflicting(selectionA, selectionB) {
     const a = normalizeMarketKey(selectionA?.market || selectionA);
     const b = normalizeMarketKey(selectionB?.market || selectionB);
@@ -779,40 +823,7 @@ function areMarketsConflicting(selectionA, selectionB) {
     if (a === b) return true;
     if (marketSemanticKey(a) === marketSemanticKey(b)) return true;
 
-    if ((a === 'home_win' && (b === 'away_win' || b === 'double_chance_x2' || b === 'draw_no_bet_away' || byAwayBias(b)))
-        || (b === 'home_win' && (a === 'away_win' || a === 'double_chance_x2' || a === 'draw_no_bet_away' || byAwayBias(a)))) {
-        return true;
-    }
-    if ((a === 'away_win' && (b === 'home_win' || b === 'double_chance_1x' || b === 'draw_no_bet_home' || byHomeBias(b)))
-        || (b === 'away_win' && (a === 'home_win' || a === 'double_chance_1x' || a === 'draw_no_bet_home' || byHomeBias(a)))) {
-        return true;
-    }
-    if ((a === 'draw' && (b === 'double_chance_12' || byHomeBias(b) || byAwayBias(b)))
-        || (b === 'draw' && (a === 'double_chance_12' || byHomeBias(a) || byAwayBias(a)))) {
-        return true;
-    }
-    if ((a === 'btts_no' && (b === 'btts_yes' || b === 'btts_over_2_5' || b === 'over_3_5'))
-        || (b === 'btts_no' && (a === 'btts_yes' || a === 'btts_over_2_5' || a === 'over_3_5'))) {
-        return true;
-    }
-    if ((a === 'under_3_5' && (b === 'over_3_5' || b === 'btts_over_2_5'))
-        || (b === 'under_3_5' && (a === 'over_3_5' || a === 'btts_over_2_5'))) {
-        return true;
-    }
-    if ((a === 'draw_no_bet_home' && (b === 'away_win' || b === 'draw_no_bet_away' || b === 'double_chance_x2'))
-        || (b === 'draw_no_bet_home' && (a === 'away_win' || a === 'draw_no_bet_away' || a === 'double_chance_x2'))) {
-        return true;
-    }
-    if ((a === 'draw_no_bet_away' && (b === 'home_win' || b === 'draw_no_bet_home' || b === 'double_chance_1x'))
-        || (b === 'draw_no_bet_away' && (a === 'home_win' || a === 'draw_no_bet_home' || a === 'double_chance_1x'))) {
-        return true;
-    }
-    if ((a === 'double_chance_1x' && (b === 'away_win' || b === 'draw_no_bet_away'))
-        || (b === 'double_chance_1x' && (a === 'away_win' || a === 'draw_no_bet_away'))) {
-        return true;
-    }
-    if ((a === 'double_chance_x2' && (b === 'home_win' || b === 'draw_no_bet_home'))
-        || (b === 'double_chance_x2' && (a === 'home_win' || a === 'draw_no_bet_home'))) {
+    if (HARD_MARKET_CONFLICT_PAIRS.has(conflictPairKey(a, b))) {
         return true;
     }
 
@@ -839,12 +850,22 @@ function filterConflictingCandidates(candidates, seedSelections = [], options = 
     const locked = Array.isArray(seedSelections) ? seedSelections.slice() : [];
     const out = [];
     const telemetry = resolveTelemetry(options);
+    const usedMatchIds = new Set(
+        locked
+            .map((row) => String(row?.match_id || row?.metadata?.match_id || '').trim())
+            .filter(Boolean)
+    );
     let volatileCount = locked.filter((row) => VOLATILE_MARKETS_12_LEG.has(normalizeMarketKey(row?.market))).length;
     let conflictRejectCount = 0;
 
     for (const candidate of Array.isArray(candidates) ? candidates : []) {
         const key = normalizeMarketKey(candidate?.market);
         if (!key) continue;
+        const matchId = String(candidate?.match_id || candidate?.metadata?.match_id || '').trim();
+        if (matchId && usedMatchIds.has(matchId)) {
+            conflictRejectCount += 1;
+            continue;
+        }
         if (VOLATILE_MARKETS_12_LEG.has(key) && volatileCount >= maxVolatile) {
             conflictRejectCount += 1;
             continue;
@@ -855,6 +876,7 @@ function filterConflictingCandidates(candidates, seedSelections = [], options = 
             continue;
         }
         out.push(candidate);
+        if (matchId) usedMatchIds.add(matchId);
         if (VOLATILE_MARKETS_12_LEG.has(key)) volatileCount += 1;
     }
 
@@ -883,46 +905,57 @@ function strictSameMatchGate(matchContext, riskProfile) {
     );
 }
 
+function isDirectMarketCandidate(candidate) {
+    const market = normalizeMarketKey(candidate?.market || '');
+    const confidence = Number(candidate?.confidence || 0);
+    return DIRECT_MARKETS_ALLOWED.has(market) && confidence >= DIRECT_CONFIDENCE_MIN;
+}
+
+function isSafeSinglesCandidate(candidate) {
+    const market = normalizeMarketKey(candidate?.market || '');
+    const confidence = Number(candidate?.confidence || 0);
+    return SAFE_MARKETS_ALLOWED.has(market) && confidence >= SAFE_CONFIDENCE_MIN;
+}
+
 function selectDirectSecondarySameMatch(candidates, matchContext = {}, options = {}) {
     const telemetry = resolveTelemetry(options, matchContext);
     const riskProfile = options.riskProfile || buildRiskProfile(matchContext, options.contextSignals || {});
     const ranked = Array.isArray(candidates) ? candidates.slice() : [];
-    const ladder = applyFallbackLadder(ranked, {
-        requireCount: 2,
+    const directPool = ranked.filter(isDirectMarketCandidate);
+    const safeSinglesPool = ranked.filter(isSafeSinglesCandidate);
+
+    const directFiltered = filterConflictingCandidates(directPool, [], {
+        maxVolatile: 0,
         telemetry
     });
-    const filtered = filterConflictingCandidates(ladder.candidates, [], {
+    const direct = directFiltered[0] || null;
+
+    const safeFiltered = filterConflictingCandidates(safeSinglesPool, direct ? [direct] : [], {
         maxVolatile: options.forMega ? 1 : 2,
         telemetry
     });
+    const secondary = safeFiltered.find((candidate) => {
+        if (!direct) return true;
+        if (candidate.market === direct.market) return false;
+        if (areMarketsConflicting(direct, candidate)) return false;
+        if (marketSemanticKey(candidate.market) === marketSemanticKey(direct.market)) return false;
+        return true;
+    }) || null;
+
     pipelineLogger.recordFallback({
         run_id: telemetry.run_id,
         sport: telemetry.sport,
         pre_fallback_count: 0,
         post_fallback_count: 0,
-        post_validation_after_fallback_count: filtered.length
+        post_validation_after_fallback_count: (direct ? 1 : 0) + (secondary ? 1 : 0)
     });
-
-    const direct = filtered.find((candidate) => (
-        candidate.priority_tier <= 2
-        && candidate.context_safety >= 0.32
-        && candidate.confidence >= 55
-    )) || filtered[0] || null;
-
-    const secondary = filtered.find((candidate) => {
-        if (!direct) return true;
-        if (candidate.market === direct.market) return false;
-        if (areMarketsConflicting(direct, candidate)) return false;
-        if (marketSemanticKey(candidate.market) === marketSemanticKey(direct.market)) return false;
-        return candidate.confidence >= 50;
-    }) || null;
 
     const sameMatchAllowed = Boolean(
         direct
         && secondary
         && strictSameMatchGate(matchContext, riskProfile)
-        && direct.confidence >= 68
-        && secondary.confidence >= 64
+        && direct.confidence >= SAFE_CONFIDENCE_MIN
+        && secondary.confidence >= SAFE_CONFIDENCE_MIN
         && !areMarketsConflicting(direct, secondary)
     );
     if (!direct && ranked.length > 0) {
@@ -933,7 +966,7 @@ function selectDirectSecondarySameMatch(candidates, matchContext = {}, options =
             metadata: {
                 reason: 'no_direct_after_conflict_and_fallback',
                 ranked_count: ranked.length,
-                filtered_count: filtered.length
+                filtered_count: directFiltered.length
             }
         });
     }
@@ -978,6 +1011,11 @@ module.exports = {
     buildCandidateMarkets,
     FALLBACK_LADDER,
     DIRECT_SAFE_MARKETS,
+    DIRECT_MARKETS_ALLOWED,
+    SAFE_MARKETS_ALLOWED,
+    DIRECT_CONFIDENCE_MIN,
+    SAFE_CONFIDENCE_MIN,
+    ACCA_CONFIDENCE_MIN,
     applyFallbackLadder,
     filterConflictingCandidates,
     selectDirectSecondarySameMatch,

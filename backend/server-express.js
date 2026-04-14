@@ -308,6 +308,12 @@ app.get('/', (_req, res) => {
   res.redirect('/index.html');
 });
 
+app.get('/subscribe', (req, res) => {
+  const queryIndex = req.originalUrl.indexOf('?');
+  const suffix = queryIndex >= 0 ? req.originalUrl.slice(queryIndex) : '';
+  res.redirect(`/subscription.html${suffix}`);
+});
+
 async function proxyOdds(req, res) {
   if (!process.env.ODDS_API_KEY) {
     return res.status(503).json({ error: 'Odds API not configured' });
