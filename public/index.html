@@ -1200,24 +1200,43 @@
     }
 
     async function getAccessTokenOrRedirect() {
-        // GLOBAL KILL-SWITCH: If admin flag is set, return real token immediately
+        // Check for admin unlock flag FIRST
         if (window.SKCS_ADMIN_UNLOCKED) {
-            const session = await getActiveSession();
-            return session?.access_token || 'sfynn_admin_token';
+            // Use cached session if available, otherwise fetch fresh
+            let session = authSession;
+            if (!session && supabaseClient) {
+                try {
+                    const { data } = await supabaseClient.auth.getSession();
+                    session = data?.session;
+                } catch (e) {
+                    console.warn('[getAccessTokenOrRedirect] Failed to get session for admin:', e);
+                }
+            }
+            if (session?.access_token) {
+                console.log('[getAccessTokenOrRedirect] Admin: returning real access token');
+                return session.access_token;
+            }
         }
+        
         const session = await getActiveSession();
         if (session?.access_token) return session.access_token;
-        // SFYNN Admin Bypass: unconditional access for admin email
+        
+        // Check email as fallback
         const userEmail = session?.user?.email || '';
-        if (userEmail.toLowerCase() === 'sfynn13433@gmail.com') {
-            return session.access_token || 'sfynn_admin_token';
+        if (userEmail.toLowerCase() === ADMIN_EMAIL && session?.access_token) {
+            return session.access_token;
         }
+        
         try {
             if (localStorage.getItem('skcs_experience_mode') === '1') {
                 return 'skcs_experience_token';
             }
         } catch (e) { /* ignore */ }
-        redirectToSubscribeLocked();
+        
+        // Only redirect if NOT admin bypass
+        if (!window.SKCS_ADMIN_UNLOCKED) {
+            redirectToSubscribeLocked();
+        }
         return null;
     }
 
@@ -2753,6 +2772,10 @@
         console.log('Waiting for Supabase session to resolve...');
         const session = await waitForSupabaseSession(5000);
         console.log('Supabase session resolved:', session ? 'session found' : 'no session');
+        
+        // Update the session cache so getAccessTokenOrRedirect() can use it
+        authSession = session;
+        console.log('Auth session cached, access_token:', session?.access_token ? 'present' : 'missing');
         
         const isAdmin = session?.user?.email?.toLowerCase() === ADMIN_EMAIL;
 
