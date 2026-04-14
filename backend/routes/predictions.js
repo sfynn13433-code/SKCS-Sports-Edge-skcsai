@@ -1753,6 +1753,24 @@ router.post('/rebuild', requireRole('admin'), async (_req, res) => {
     }
 });
 
+// Clear ALL predictions data
+router.post('/clear-all', requireRole('admin'), async (_req, res) => {
+    try {
+        console.log('[predictions] Clearing ALL data...');
+        await query(`DELETE FROM predictions_filtered`);
+        await query(`DELETE FROM predictions_raw`);
+        const finalResult = await query(`DELETE FROM predictions_final`);
+        res.status(200).json({ 
+            ok: true, 
+            message: "All data cleared. Trigger /api/pipeline/sync to pull fresh data.",
+            deleted_final: finalResult.rowCount 
+        });
+    } catch (err) {
+        console.error('[predictions] clear-all error:', err);
+        res.status(500).json({ error: 'Clear failed', details: err.message });
+    }
+});
+
 // Clear test data from raw and filtered tables
 router.post('/clear-test', requireRole('admin'), async (_req, res) => {
     try {
