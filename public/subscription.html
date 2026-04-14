@@ -622,21 +622,15 @@ async function loadBillingStatus() {
 }
 
 function showPaymentComingSoon(_method = '') {
-  try {
-    localStorage.setItem('skcs_experience_mode', '1');
-    localStorage.setItem('skcs_role', 'trial');
-  } catch (e) { /* ignore */ }
-  window.location.href = 'index.html';
+  window.location.href = 'login.html?action=register&next=payment.html';
 }
 
 async function selectPlan(tierId) {
   try {
-    localStorage.setItem('skcs_experience_mode', '1');
-    localStorage.setItem('skcs_role', 'trial');
     localStorage.setItem('skcs_plan_id', tierId);
     localStorage.setItem('skcs_plan_selected_at', new Date().toISOString());
   } catch (e) { /* ignore */ }
-  window.location.href = 'index.html';
+  window.location.href = `login.html?action=register&plan=${encodeURIComponent(tierId)}&next=payment.html`;
 }
 
 function goBack() {

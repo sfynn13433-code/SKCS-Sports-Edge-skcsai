@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKCS AI Sports Edge - Payment</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .container { max-width: 600px; padding: 2rem; text-align: center; }
+        .card { background: #1e293b; border-radius: 16px; padding: 3rem; border: 1px solid #334155; }
+        h1 { color: white; margin-bottom: 1rem; font-size: 2rem; }
+        .badge { display: inline-block; background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; font-size: 0.75rem; font-weight: 800; padding: 0.3rem 1rem; border-radius: 999px; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.1em; }
+        p { color: #94a3b8; margin-bottom: 2rem; line-height: 1.6; }
+        .placeholder-notice { background: #0f172a; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; border: 1px dashed #475569; }
+        .placeholder-notice h3 { color: #60a5fa; margin-bottom: 0.5rem; }
+        .placeholder-notice p { font-size: 0.9rem; margin-bottom: 0; }
+        .btn-primary { background: #0d6efd; color: white; padding: 1rem 2rem; border-radius: 8px; font-weight: 700; text-decoration: none; border: none; cursor: pointer; font-size: 1rem; }
+        .btn-primary:hover { background: #0b5ed7; }
+        .admin-badge { background: #059669; color: white; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 700; margin-bottom: 1rem; display: inline-block; }
+        .nav { position: fixed; top: 0; left: 0; right: 0; background: #0d6efd; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .nav a { color: white; text-decoration: none; font-weight: 600; }
+        .loading { color: #60a5fa; }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="index.html">SKCS AI Sports Edge</a>
+        <a href="subscription.html">Back to Plans</a>
+    </nav>
+    
+    <div class="container">
+        <div class="card" id="mainCard">
+            <p class="loading">Loading payment portal...</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script>
+    (function() {
+        'use strict';
+        
+        const SUPABASE_URL = window.SUPABASE_URL || '';
+        const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
+        const supabaseClient = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY)
+            ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+            : null;
+        
+        const ADMIN_EMAIL = 'sfynn13433@gmail.com';
+        const mainCard = document.getElementById('mainCard');
+        
+        async function init() {
+            // Admin bypass: sfynn13433@gmail.com goes straight to dashboard
+            if (supabaseClient) {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session?.user?.email?.toLowerCase() === ADMIN_EMAIL) {
+                    mainCard.innerHTML = `
+                        <div class="admin-badge">ADMIN BYPASS ACTIVE</div>
+                        <h1>Payment Portal</h1>
+                        <p>Welcome, Admin. Redirecting to dashboard...</p>
+                        <a href="index.html" class="btn-primary">Go to Dashboard</a>
+                    `;
+                    setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+                    return;
+                }
+            }
+            
+            // Regular user: show payment placeholder
+            const planId = localStorage.getItem('skcs_plan_id') || 'Not selected';
+            mainCard.innerHTML = `
+                <span class="badge">Payment Portal</span>
+                <h1>Complete Your Subscription</h1>
+                <div class="placeholder-notice">
+                    <h3>Payment Integration Coming Soon</h3>
+                    <p>Your selected plan: <strong>${planId}</strong></p>
+                    <p style="margin-top:0.5rem;">Payment processing is being set up. You'll be notified when payments go live.</p>
+                </div>
+                <p>For now, enjoy <strong>Experience Mode</strong> access to explore the platform.</p>
+                <a href="index.html" class="btn-primary">Enter Dashboard (Experience Mode)</a>
+                <br><br>
+                <a href="subscription.html" style="color:#94a3b8;text-decoration:none;font-size:0.9rem;">← Change Plan</a>
+            `;
+            
+            // Set experience mode flags
+            try {
+                localStorage.setItem('skcs_experience_mode', '1');
+                localStorage.setItem('skcs_role', 'trial');
+            } catch (e) { /* ignore */ }
+        }
+        
+        // Listen for auth state changes (post-confirmation routing)
+        if (supabaseClient) {
+            supabaseClient.auth.onAuthStateChange((event, session) => {
+                if (event === 'SIGNED_IN' && session?.user) {
+                    if (session.user.email?.toLowerCase() === ADMIN_EMAIL) {
+                        window.location.href = 'index.html';
+                    }
+                }
+            });
+        }
+        
+        init();
+    })();
+    </script>
+</body>
+</html>

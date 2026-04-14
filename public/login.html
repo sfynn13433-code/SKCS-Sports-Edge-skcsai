@@ -362,7 +362,10 @@
                         localStorage.setItem('skcs_experience_mode', '1');
                         localStorage.setItem('skcs_role', 'trial');
                     } catch (e) { /* ignore */ }
-                    window.location.href = 'experience.html';
+                    // Post-confirmation routing: follow 'next' param or default to payment
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const next = urlParams.get('next') || 'payment.html';
+                    window.location.href = next;
                     return;
                 }
 
@@ -374,6 +377,17 @@
                 messageDiv.textContent = 'Connection error';
             }
         });
+
+        // Post-confirmation routing: listen for auth state changes (email confirmation)
+        if (supabaseClient) {
+            supabaseClient.auth.onAuthStateChange((event, session) => {
+                if (event === 'SIGNED_IN' && session?.user) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const next = urlParams.get('next') || 'payment.html';
+                    window.location.href = next;
+                }
+            });
+        }
     </script>
 </body>
 </html>
