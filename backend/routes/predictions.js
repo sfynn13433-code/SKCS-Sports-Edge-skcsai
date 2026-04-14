@@ -1753,10 +1753,12 @@ router.post('/rebuild', requireRole('admin'), async (_req, res) => {
     }
 });
 
-// Clear ALL predictions data + caches
+// Clear ALL predictions data + caches from BOTH PostgreSQL AND Supabase
 router.post('/clear-all', requireRole('admin'), async (_req, res) => {
     try {
-        console.log('[predictions] Clearing ALL data and caches...');
+        console.log('[predictions] Clearing ALL data from PostgreSQL and Supabase...');
+        
+        // Clear PostgreSQL
         await query(`DELETE FROM predictions_filtered`);
         await query(`DELETE FROM predictions_raw`);
         const finalResult = await query(`DELETE FROM predictions_final`);
@@ -1764,10 +1766,31 @@ router.post('/clear-all', requireRole('admin'), async (_req, res) => {
         await query(`DELETE FROM rapidapi_cache`);
         await query(`DELETE FROM context_intelligence_cache`);
         await query(`DELETE FROM fixture_context_cache`);
+        
+        // Clear Supabase (if configured)
+        let supabaseCleared = false;
+        if (config.supabase && config.supabase.url && config.supabase.anonKey) {
+            try {
+                const sb = createClient(config.supabase.url, config.supabase.anonKey);
+                await sb.from('predictions_filtered').delete().neq('id', 0);
+                await sb.from('predictions_raw').delete().neq('id', 0);
+                await sb.from('predictions_final').delete().neq('id', 0);
+                await sb.from('prediction_publish_runs').delete().neq('id', 0);
+                await sb.from('rapidapi_cache').delete().neq('cache_key', 'x');
+                await sb.from('context_intelligence_cache').delete().neq('cache_key', 'x');
+                await sb.from('fixture_context_cache').delete().neq('fixture_id', 'x');
+                supabaseCleared = true;
+                console.log('[predictions] Supabase tables cleared');
+            } catch (sbErr) {
+                console.warn('[predictions] Supabase clear failed:', sbErr.message);
+            }
+        }
+        
         res.status(200).json({ 
             ok: true, 
-            message: "All data and caches cleared. Trigger /api/pipeline/sync to pull fresh data.",
-            deleted_final: finalResult.rowCount 
+            message: "All data cleared from PostgreSQL" + (supabaseCleared ? ' and Supabase' : '') + ". Now trigger /api/pipeline/sync to pull fresh April 14 data.",
+            deleted_final: finalResult.rowCount,
+            supabase_cleared: supabaseCleared
         });
     } catch (err) {
         console.error('[predictions] clear-all error:', err);
