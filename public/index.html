@@ -741,31 +741,31 @@
                 <h3 class="tab-title"><span class="sport-icon">🎯</span> Direct Markets</h3>
                 <p class="policy-note">Layer 1 direct market feed (confidence ≥ 60). Only Home Win, Draw, Away Win are shown here.</p>
                 <div class="prediction-category">
-                    <h4 style="color:#60a5fa;margin-bottom:1rem;">⚽ Football (<span id="direct-football-count">0</span>)</h4>
+                    <h4 class="sport-nav-link" style="color:#60a5fa;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('football')">⚽ Football (<span id="direct-football-count">0</span>)</h4>
                     <div id="direct-football-matches" class="prediction-grid"><p>Loading...</p></div>
                 </div>
                 <div class="prediction-category">
-                    <h4 style="color:#0ea5e9;margin-bottom:1rem;">🎾 Tennis (<span id="direct-tennis-count">0</span>)</h4>
+                    <h4 class="sport-nav-link" style="color:#0ea5e9;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('tennis')">🎾 Tennis (<span id="direct-tennis-count">0</span>)</h4>
                     <div id="direct-tennis-matches" class="prediction-grid"><p>Loading...</p></div>
                 </div>
                 <div class="prediction-category">
-                    <h4 style="color:#f59e0b;margin-bottom:1rem;">🏀 Basketball (<span id="direct-basketball-count">0</span>)</h4>
+                    <h4 class="sport-nav-link" style="color:#f59e0b;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('basketball')">🏀 Basketball (<span id="direct-basketball-count">0</span>)</h4>
                     <div id="direct-basketball-matches" class="prediction-grid"><p>Loading...</p></div>
                 </div>
                 <div class="prediction-category">
-                    <h4 style="color:#22c55e;margin-bottom:1rem;">🏉 Rugby (<span id="direct-rugby-count">0</span>)</h4>
+                    <h4 class="sport-nav-link" style="color:#22c55e;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('rugby')">🏉 Rugby (<span id="direct-rugby-count">0</span>)</h4>
                     <div id="direct-rugby-matches" class="prediction-grid"><p>Loading...</p></div>
                 </div>
                 <div class="prediction-category">
-                    <h4 style="color:#ef4444;margin-bottom:1rem;">🏏 Cricket (<span id="direct-cricket-count">0</span>)</h4>
+                    <h4 class="sport-nav-link" style="color:#ef4444;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('cricket')">🏏 Cricket (<span id="direct-cricket-count">0</span>)</h4>
                     <div id="direct-cricket-matches" class="prediction-grid"><p>Loading...</p></div>
                 </div>
                 <div class="prediction-category">
-                    <h4 style="color:#a855f7;margin-bottom:1rem;">⚾ Baseball (<span id="direct-baseball-count">0</span>)</h4>
+                    <h4 class="sport-nav-link" style="color:#a855f7;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('baseball')">⚾ Baseball (<span id="direct-baseball-count">0</span>)</h4>
                     <div id="direct-baseball-matches" class="prediction-grid"><p>Loading...</p></div>
                 </div>
                 <div class="prediction-category">
-                    <h4 style="color:#06b6d4;margin-bottom:1rem;">🏒 Hockey (<span id="direct-hockey-count">0</span>)</h4>
+                    <h4 class="sport-nav-link" style="color:#06b6d4;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('hockey')">🏒 Hockey (<span id="direct-hockey-count">0</span>)</h4>
                     <div id="direct-hockey-matches" class="prediction-grid"><p>Loading...</p></div>
                 </div>
             </div>
@@ -1128,6 +1128,11 @@
     async function getAccessTokenOrRedirect() {
         const session = await getActiveSession();
         if (session?.access_token) return session.access_token;
+        // SFYNN Admin Bypass: unconditional access for admin email
+        const userEmail = session?.user?.email || '';
+        if (userEmail.toLowerCase() === 'sfynn13433@gmail.com') {
+            return session.access_token || 'sfynn_admin_token';
+        }
         try {
             if (localStorage.getItem('skcs_experience_mode') === '1') {
                 return 'skcs_experience_token';
@@ -2605,16 +2610,15 @@
         })();
 
         const session = await getActiveSession(true);
-        if (!session?.user && !experienceMode) {
+        // SFYNN Admin Bypass: allow sfynn13433@gmail.com unconditional access
+        const isAdmin = session?.user?.email?.toLowerCase() === 'sfynn13433@gmail.com';
+        
+        if (!session?.user && !experienceMode && !isAdmin) {
             updateAuthLink(null);
-            // No active session and no experience mode: send to login
             window.location.href = 'login.html?next=index.html';
             return;
         }
 
-        // Authenticated user without a subscription: allow access if experience_mode is on
-        // OLD: if (!subscription) redirect("/subscription")
-        // NEW: if (!subscription && !experience_mode) redirect("/subscription")
         updateAuthLink(session);
 
         document.querySelectorAll('.tab-button').forEach(btn => {
@@ -2631,6 +2635,22 @@
         });
         
         fetchPredictions('direct-markets');
+
+        // Sport tab switcher for Direct Markets links
+        window.switchSportTab = function(sportKey) {
+            const tabBtn = document.querySelector(`.tab-button[data-tab="${sportKey}"]`);
+            if (tabBtn) {
+                tabBtn.click();
+            } else {
+                // Fallback: switch directly
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                const content = document.getElementById(sportKey);
+                if (content) content.classList.add('active');
+                activeSport = sportKey;
+                fetchPredictions(sportKey);
+            }
+        };
 
         // Scroll to top button
         const scrollBtn = document.getElementById('scrollTopBtn');
