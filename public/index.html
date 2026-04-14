@@ -737,6 +737,14 @@
                 <button class="tab-button" data-tab="basketball"><span class="sport-icon">🏀</span> BASKETBALL</button>
                 <button class="tab-button" data-tab="rugby"><span class="sport-icon">🏉</span> RUGBY</button>
                 <button class="tab-button" data-tab="cricket"><span class="sport-icon">🏏</span> CRICKET</button>
+                <button class="tab-button" data-tab="baseball"><span class="sport-icon">⚾</span> BASEBALL</button>
+                <button class="tab-button" data-tab="hockey"><span class="sport-icon">🏒</span> HOCKEY</button>
+                <button class="tab-button" data-tab="formula1"><span class="sport-icon">🏎️</span> MOTORSPORT</button>
+                <button class="tab-button" data-tab="mma"><span class="sport-icon">🥊</span> MMA</button>
+                <button class="tab-button" data-tab="afl"><span class="sport-icon">🦘</span> AFL</button>
+                <button class="tab-button" data-tab="volleyball"><span class="sport-icon">🏐</span> VOLLEYBALL</button>
+                <button class="tab-button" data-tab="handball"><span class="sport-icon">🤾</span> HANDBALL</button>
+                <button class="tab-button" data-tab="nfl"><span class="sport-icon">🏈</span> NFL</button>
             </div>
             <!-- All tab contents -->
             <div id="direct-markets" class="tab-content active">
@@ -1897,6 +1905,13 @@
 
             let data = null;
             try { data = await response.json(); } catch (e) { data = null; }
+            
+            // DEBUG: Log API response to verify data binding
+            console.log('[API] Response status:', response.status);
+            console.log('[API] Response data:', data);
+            console.log('[API] Predictions count:', data?.predictions?.length || 0);
+            console.log('[API] isAdmin:', window.SKCS_ADMIN_UNLOCKED);
+            console.log('[API] accessToken:', accessToken ? 'present' : 'missing');
 
             let preds = (response.ok && data && Array.isArray(data.predictions)) ? data.predictions : [];
 
@@ -1922,6 +1937,7 @@
                 }
                 let d2 = null;
                 try { d2 = await r2.json(); } catch (e) { d2 = null; }
+                console.log('[API] Fallback response status:', r2.status, 'predictions:', d2?.predictions?.length || 0);
                 if (r2.ok && d2 && Array.isArray(d2.predictions) && d2.predictions.length > 0) {
                     preds = d2.predictions;
                 }
