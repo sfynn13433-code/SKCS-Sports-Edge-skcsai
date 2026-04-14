@@ -653,24 +653,42 @@ function goBack() {
   window.history.back();
 }
 
+async function initSubscriptionPage() {
+  // Admin bypass: if admin lands here, send them back to dashboard
+  if (supabaseClient) {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session?.user?.email?.toLowerCase() === ADMIN_EMAIL) {
+      console.log('🔓 Admin detected on subscription page, redirecting to dashboard');
+      try {
+        localStorage.removeItem('skcs_experience_mode');
+        localStorage.removeItem('skcs_role');
+      } catch (e) { /* ignore */ }
+      window.location.href = 'index.html';
+      return;
+    }
+  }
+  
+  showPublicLockNotice();
+  loadBillingStatus();
+  setPlanButtonsEnabled(true);
+  
+  if (!supabaseClient) {
+    const banner = document.getElementById('billingBanner');
+    if (banner) {
+      banner.innerHTML = "<strong>Authentication unavailable:</strong> Registration or login is required before plan selection.";
+    }
+  }
+  
+  document.querySelectorAll('.skcs-secondary').forEach((node) => {
+    node.innerHTML = node.innerHTML.replace(/\bSecondary\b/g, 'Analytical Insights');
+  });
+}
+
 // Initialize
 if (typeof checkSession === 'function') {
   checkSession();
 }
-showPublicLockNotice();
-loadBillingStatus();
-
-setPlanButtonsEnabled(true);
-if (!supabaseClient) {
-  const banner = document.getElementById('billingBanner');
-  if (banner) {
-    banner.innerHTML = "<strong>Authentication unavailable:</strong> Registration or login is required before plan selection.";
-  }
-}
-
-document.querySelectorAll('.skcs-secondary').forEach((node) => {
-  node.innerHTML = node.innerHTML.replace(/\bSecondary\b/g, 'Analytical Insights');
-});
+initSubscriptionPage();
 
 window.showCore = showCore;
 window.showElite = showElite;

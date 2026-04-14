@@ -1099,6 +1099,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/config.js"></script>
     <!-- ========== REPLACED SCRIPT SECTION ========== -->
+    <style>
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+    </style>
     <script>
     // Configuration: use shared frontend config first, with a safe fallback.
     const SKCS_BACKEND = window.API_BASE_URL || "https://skcs-sports-edge-skcsai.onrender.com";
@@ -1108,10 +1112,39 @@
     const supabaseClient = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY)
         ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
         : null;
+    const ADMIN_EMAIL = 'sfynn13433@gmail.com';
     let authSession = null;
     let activeSport = 'direct-markets';
     const includeAllParam = new URLSearchParams(window.location.search).get('include_all');
     const INCLUDE_ALL_MODE = ['1', 'true'].includes(String(includeAllParam || '').trim().toLowerCase());
+
+    // ASYNC LOCKDOWN: Force wait for Supabase to fully resolve session
+    async function waitForSupabaseSession(timeoutMs = 5000) {
+        if (!supabaseClient) return null;
+        const start = Date.now();
+        while (Date.now() - start < timeoutMs) {
+            const { data, error } = await supabaseClient.auth.getSession();
+            if (!error && data?.session !== undefined) {
+                return data.session;
+            }
+            await new Promise(r => setTimeout(r, 50));
+        }
+        return null;
+    }
+
+    // Admin toast notification
+    function showAdminToast() {
+        const toast = document.createElement('div');
+        toast.id = 'admin-toast';
+        toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#059669;color:white;padding:1rem 1.5rem;border-radius:8px;font-weight:700;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.3);animation:slideIn 0.3s ease';
+        toast.innerHTML = '🔓 Admin Access Granted — Dashboard Unlocked';
+        document.body.appendChild(toast);
+        console.log('🔓 Admin detected, unlocking dashboard');
+        setTimeout(() => {
+            toast.style.animation = 'fadeOut 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
 
     function getUserApiKey() {
         const direct = String(window.USER_API_KEY || '').trim();
@@ -2631,16 +2664,21 @@
             chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
         }
 
-        const session = await getActiveSession(true);
-        const ADMIN_EMAIL = 'sfynn13433@gmail.com';
+        // ASYNC LOCKDOWN: Wait for Supabase to fully resolve BEFORE any redirects
+        console.log('Waiting for Supabase session to resolve...');
+        const session = await waitForSupabaseSession(5000);
+        console.log('Supabase session resolved:', session ? 'session found' : 'no session');
+        
         const isAdmin = session?.user?.email?.toLowerCase() === ADMIN_EMAIL;
 
         // KILL-SWITCH: Admin bypass - remove experience mode flags and stop ALL redirects
         if (isAdmin) {
+            console.log('🔓 Admin detected, unlocking dashboard');
             try {
                 localStorage.removeItem('skcs_experience_mode');
                 localStorage.removeItem('skcs_role');
             } catch (e) { /* ignore */ }
+            showAdminToast();
             updateAuthLink(session);
         } else {
             const experienceMode = (() => {
