@@ -749,7 +749,7 @@
             <!-- All tab contents -->
             <div id="direct-markets" class="tab-content active">
                 <h3 class="tab-title"><span class="sport-icon">🎯</span> Direct Markets</h3>
-                <p class="policy-note">Layer 1 direct market feed (confidence ≥ 60). Only Home Win, Draw, Away Win are shown here.</p>
+                <p class="policy-note">Layer 1 direct market feed (confidence ≥ 50). All core markets including 1x2, Over/Under, BTTS, Double Chance, and Draw No Bet.</p>
                 <div class="prediction-category">
                     <h4 class="sport-nav-link" style="color:#60a5fa;margin-bottom:1rem;cursor:pointer;" onclick="switchSportTab('football')">⚽ Football (<span id="direct-football-count">0</span>)</h4>
                     <div id="direct-football-matches" class="prediction-grid"><p>Loading...</p></div>
@@ -1578,11 +1578,31 @@
         return null;
     }
 
-    function directOutcomeLabel(token) {
-        if (token === 'home_win') return 'HOME WIN';
-        if (token === 'away_win') return 'AWAY WIN';
-        if (token === 'draw') return 'DRAW';
-        return 'DIRECT MARKET';
+    function directOutcomeLabel(market, prediction) {
+        const marketKey = normalizeMarketKey(market);
+        const predKey = String(prediction || '').trim().toLowerCase();
+        
+        if (marketKey === '1x2' || marketKey === 'match_result' || marketKey === 'match_winner') {
+            if (predKey === 'home_win' || predKey === 'home') return 'HOME WIN (1)';
+            if (predKey === 'away_win' || predKey === 'away') return 'AWAY WIN (2)';
+            if (predKey === 'draw' || predKey === 'x') return 'DRAW (X)';
+        }
+        if (marketKey === 'double_chance') {
+            if (predKey === '1x') return 'HOME/DRAW (1X)';
+            if (predKey === 'x2') return 'DRAW/AWAY (X2)';
+            if (predKey === '12') return 'HOME/AWAY (12)';
+        }
+        if (marketKey === 'draw_no_bet') {
+            if (predKey === 'home') return 'HOME (DNB)';
+            if (predKey === 'away') return 'AWAY (DNB)';
+        }
+        if (marketKey === 'over_under' || marketKey.includes('over') || marketKey.includes('under')) {
+            return prediction.toUpperCase();
+        }
+        if (marketKey === 'btts' || marketKey === 'both_teams_to_score') {
+            return predKey === 'yes' ? 'BTTS: YES' : 'BTTS: NO';
+        }
+        return `${marketKey.toUpperCase()}: ${prediction}`;
     }
 
     function createDirectMarketCard(pred, sport, cardId) {
@@ -1593,15 +1613,17 @@
         const firstMatch = getPrimaryMatch(pred);
         const matchInfo = formatMatchInfo(firstMatch, sport);
         const confidence = Math.max(0, Math.min(100, Math.round(getPredictionConfidenceScore(pred))));
-        const outcome = resolveDirectMarketOutcome(firstMatch);
+        const marketKey = normalizeMarketKey(firstMatch && firstMatch.market);
+        const prediction = String(firstMatch && firstMatch.prediction || '').trim();
 
         card.innerHTML = `
             <div class="match-info">
+                <div class="market-badge" style="display:inline-block;background:#0d6efd;color:white;font-size:0.65rem;padding:2px 8px;border-radius:4px;margin-bottom:6px;">${marketKey ? marketKey.toUpperCase() : 'MARKET'}</div>
                 <div class="teams" style="font-weight:bold; color:#1a202c; font-size:1.1rem; line-height:1.4;">${matchInfo.teams}</div>
                 <div class="match-date" style="color:#4a5568; font-size:0.75rem; margin-top:8px; letter-spacing:1px;">${matchInfo.context}</div>
             </div>
             <div class="prediction-details" style="margin-top:12px; border-top:1px solid #e2e8f0; padding-top:12px; display:flex; justify-content:space-between; align-items:center;">
-                <div class="prediction" style="color:#059669; font-weight:bold;">${directOutcomeLabel(outcome)}</div>
+                <div class="prediction" style="color:#059669; font-weight:bold;">${directOutcomeLabel(marketKey, prediction)}</div>
                 <div class="confidence" style="color:#4a5568; font-size:0.85rem;">${confidence}% Confidence</div>
             </div>
         `;
@@ -1623,11 +1645,12 @@
                     if (getPredictionLegCount(pred) !== 1) return;
 
                     const firstMatch = getPrimaryMatch(pred);
-                    const outcome = resolveDirectMarketOutcome(firstMatch);
-                    if (!outcome) return;
+                    const marketKey = normalizeMarketKey(firstMatch && firstMatch.market);
+                    const prediction = String(firstMatch && firstMatch.prediction || '').trim();
+                    if (!marketKey || !prediction) return;
 
                     const confidence = Math.max(0, Math.min(100, Math.round(getPredictionConfidenceScore(pred))));
-                    if (confidence < 60) return;
+                    if (confidence < 50) return;
 
                     const sportKey = normalizeSportForFilter(
                         pred && pred.sport

@@ -2,14 +2,14 @@ insert into tier_rules (tier, min_confidence, allowed_markets, max_acca_size, al
 values
     (
         'normal',
-        60,
+        50,
         '["ALL"]'::jsonb,
         3,
         '["low","medium"]'::jsonb
     ),
     (
         'deep',
-        75,
+        60,
         '["ALL"]'::jsonb,
         12,
         '["low"]'::jsonb
