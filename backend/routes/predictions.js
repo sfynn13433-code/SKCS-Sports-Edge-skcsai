@@ -1753,16 +1753,20 @@ router.post('/rebuild', requireRole('admin'), async (_req, res) => {
     }
 });
 
-// Clear ALL predictions data
+// Clear ALL predictions data + caches
 router.post('/clear-all', requireRole('admin'), async (_req, res) => {
     try {
-        console.log('[predictions] Clearing ALL data...');
+        console.log('[predictions] Clearing ALL data and caches...');
         await query(`DELETE FROM predictions_filtered`);
         await query(`DELETE FROM predictions_raw`);
         const finalResult = await query(`DELETE FROM predictions_final`);
+        await query(`DELETE FROM prediction_publish_runs`);
+        await query(`DELETE FROM rapidapi_cache`);
+        await query(`DELETE FROM context_intelligence_cache`);
+        await query(`DELETE FROM fixture_context_cache`);
         res.status(200).json({ 
             ok: true, 
-            message: "All data cleared. Trigger /api/pipeline/sync to pull fresh data.",
+            message: "All data and caches cleared. Trigger /api/pipeline/sync to pull fresh data.",
             deleted_final: finalResult.rowCount 
         });
     } catch (err) {
