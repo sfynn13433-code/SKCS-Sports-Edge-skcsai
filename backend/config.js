@@ -2,7 +2,7 @@
 require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });
 
 module.exports = {
-    DATA_MODE: process.env.DATA_MODE || 'test',
+    DATA_MODE: process.env.DATA_MODE || 'live',
     database: {
         url: process.env.DATABASE_URL,
     },
