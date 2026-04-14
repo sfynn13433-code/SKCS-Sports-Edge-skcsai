@@ -2584,6 +2584,158 @@ async function insertFinalRow({ publish_run_id, tier, type, matches, total_confi
     return res.rows[0];
 }
 
+async function insertStage1Rows(predictions, client) {
+    if (!predictions || predictions.length === 0) return [];
+    
+    const values = [];
+    const params = [];
+    let paramIndex = 1;
+    
+    for (const pred of predictions) {
+        const fixtureId = pred.fixture_id || pred.match_id || pred.id || null;
+        const sport = normalizeSportKey(pred.sport || 'unknown');
+        const marketType = pred.market_type || pred.market || 'unknown';
+        const recommendation = pred.recommendation || pred.prediction || pred.selection || null;
+        const confidence = Number(pred.confidence) || 0;
+        const riskLevel = pred.risk_level || 'medium';
+        const baselineProb = Number(pred.baseline_probability) || Number(pred.probability) || null;
+        const impliedOdds = Number(pred.implied_odds) || null;
+        const marketEfficiency = Number(pred.market_efficiency_score) || null;
+        
+        values.push(`($${paramIndex}, $${paramIndex + 1}, $${paramIndex + 2}, $${paramIndex + 3}, $${paramIndex + 4}, $${paramIndex + 5}, $${paramIndex + 6}, $${paramIndex + 7}, $${paramIndex + 8})`);
+        params.push(
+            fixtureId,
+            sport,
+            marketType,
+            recommendation,
+            confidence,
+            riskLevel,
+            baselineProb,
+            impliedOdds,
+            marketEfficiency
+        );
+        paramIndex += 9;
+    }
+    
+    const res = await client.query(
+        `INSERT INTO predictions_stage_1 
+         (fixture_id, sport, market_type, recommendation, confidence, risk_level, baseline_probability, implied_odds, market_efficiency_score)
+         VALUES ${values.join(', ')}
+         RETURNING id, fixture_id`,
+        params
+    );
+    
+    return res.rows;
+}
+
+async function insertStage2Rows(stage1Rows, predictions, client) {
+    if (!stage1Rows || stage1Rows.length === 0) return [];
+    
+    const values = [];
+    const params = [];
+    let paramIndex = 1;
+    
+    const predMap = new Map();
+    for (const pred of predictions) {
+        const key = pred.fixture_id || pred.match_id || pred.id;
+        predMap.set(key, pred);
+    }
+    
+    for (const stage1Row of stage1Rows) {
+        const pred = predMap.get(stage1Row.fixture_id) || {};
+        const adjustedConfidence = Number(pred.adjusted_confidence) || Number(pred.confidence) || 0;
+        const confidenceAdj = Number(pred.confidence_adjustment) || 0;
+        const teamFormImpact = Number(pred.team_form_impact) || 0;
+        const injuryImpact = Number(pred.injury_impact) || 0;
+        const suspensionImpact = Number(pred.suspension_impact) || 0;
+        const homeAdvantageImpact = Number(pred.home_advantage_impact) || 0;
+        const weatherImpact = Number(pred.weather_impact) || 0;
+        const deepAnalysisScore = Number(pred.deep_analysis_score) || Number(pred.ai_score) || null;
+        const volatilityAdj = Number(pred.volatility_adjustment) || 0;
+        
+        values.push(`($${paramIndex}, $${paramIndex + 1}, $${paramIndex + 2}, $${paramIndex + 3}, $${paramIndex + 4}, $${paramIndex + 5}, $${paramIndex + 6}, $${paramIndex + 7}, $${paramIndex + 8}, $${paramIndex + 9})`);
+        params.push(
+            stage1Row.id,
+            stage1Row.fixture_id,
+            adjustedConfidence,
+            confidenceAdj,
+            teamFormImpact,
+            injuryImpact,
+            suspensionImpact,
+            homeAdvantageImpact,
+            weatherImpact,
+            deepAnalysisScore,
+            volatilityAdj
+        );
+        paramIndex += 11;
+    }
+    
+    if (values.length === 0) return [];
+    
+    const res = await client.query(
+        `INSERT INTO predictions_stage_2 
+         (stage_1_id, fixture_id, adjusted_confidence, confidence_adjustment, team_form_impact, injury_impact, suspension_impact, home_advantage_impact, weather_impact, deep_analysis_score, volatility_adjustment)
+         VALUES ${values.join(', ')}
+         RETURNING id, fixture_id`,
+        params
+    );
+    
+    return res.rows;
+}
+
+async function insertStage3Rows(stage2Rows, predictions, client) {
+    if (!stage2Rows || stage2Rows.length === 0) return [];
+    
+    const values = [];
+    const params = [];
+    let paramIndex = 1;
+    
+    const predMap = new Map();
+    for (const pred of predictions) {
+        const key = pred.fixture_id || pred.match_id || pred.id;
+        predMap.set(key, pred);
+    }
+    
+    for (const stage2Row of stage2Rows) {
+        const pred = predMap.get(stage2Row.fixture_id) || {};
+        const finalConfidence = Number(pred.final_confidence) || Number(pred.adjusted_confidence) || Number(pred.confidence) || 0;
+        const validationScore = Number(pred.validation_score) || null;
+        const newsSentimentImpact = Number(pred.news_sentiment_impact) || 0;
+        const travelFatigueImpact = Number(pred.travel_fatigue_impact) || 0;
+        const scheduleCongestionImpact = Number(pred.schedule_congestion_impact) || 0;
+        const externalFactors = pred.external_factors ? JSON.stringify(pred.external_factors) : null;
+        const riskFlags = pred.risk_flags ? JSON.stringify(pred.risk_flags) : null;
+        const volatilityScore = Number(pred.volatility_score) || null;
+        
+        values.push(`($${paramIndex}, $${paramIndex + 1}, $${paramIndex + 2}, $${paramIndex + 3}, $${paramIndex + 4}, $${paramIndex + 5}, $${paramIndex + 6}, $${paramIndex + 7}, $${paramIndex + 8}, $${paramIndex + 9})`);
+        params.push(
+            stage2Row.id,
+            stage2Row.fixture_id,
+            finalConfidence,
+            validationScore,
+            newsSentimentImpact,
+            travelFatigueImpact,
+            scheduleCongestionImpact,
+            externalFactors,
+            riskFlags,
+            volatilityScore
+        );
+        paramIndex += 10;
+    }
+    
+    if (values.length === 0) return [];
+    
+    const res = await client.query(
+        `INSERT INTO predictions_stage_3 
+         (stage_2_id, fixture_id, final_confidence, validation_score, news_sentiment_impact, travel_fatigue_impact, schedule_congestion_impact, external_factors, risk_flags, volatility_score)
+         VALUES ${values.join(', ')}
+         RETURNING id, fixture_id`,
+        params
+    );
+    
+    return res.rows;
+}
+
 async function insertDebugPublishedRow({ publish_run_id, tier, sport, candidate, rejection_metadata }, client) {
     const res = await client.query(
         `
@@ -2758,9 +2910,18 @@ async function buildFinalForTier(tier, options = {}) {
             now,
             telemetryRunId
         });
+        
         const weekLockedTeamCompetitionMap = await loadWeekLockedTeamCompetitionMap(client, now);
         const runTeamCompetitionMap = new Map();
         const globalUsedFixtures = new Set();
+        
+        await client.query('DELETE FROM predictions_stage_1 WHERE created_at < NOW() - INTERVAL \'1 day\'');
+        await client.query('DELETE FROM predictions_stage_2 WHERE created_at < NOW() - INTERVAL \'1 day\'');
+        await client.query('DELETE FROM predictions_stage_3 WHERE created_at < NOW() - INTERVAL \'1 day\'');
+        
+        const stage1Rows = await insertStage1Rows(valid, client);
+        console.log('[accaBuilder] Stage 1: inserted %s predictions', stage1Rows.length);
+        
         const perMatchLimited = enforcePerMatchLimit(valid, accaRules.max_per_match);
         const perSportLimited = enforcePerSportLimit(
             perMatchLimited,
@@ -2786,6 +2947,16 @@ async function buildFinalForTier(tier, options = {}) {
             baseAccaInput,
             { minLegConfidence: ACCA_MIN_LEG_CONFIDENCE }
         );
+
+        if (stage1Rows.length > 0) {
+            const stage2Rows = await insertStage2Rows(stage1Rows, limitedCandidates, client);
+            console.log('[accaBuilder] Stage 2: inserted %s predictions', stage2Rows.length);
+            
+            if (stage2Rows.length > 0) {
+                const stage3Rows = await insertStage3Rows(stage2Rows, limitedCandidates, client);
+                console.log('[accaBuilder] Stage 3: inserted %s predictions', stage3Rows.length);
+            }
+        }
 
         // -------------------------------------------------------------------------
         // ---------------------------------------------------------------------
@@ -3357,4 +3528,10 @@ async function buildFinalForTier(tier, options = {}) {
     });
 }
 
-module.exports = { buildFinalForTier, buildAccaV2 };
+module.exports = { 
+    buildFinalForTier, 
+    buildAccaV2,
+    insertStage1Rows,
+    insertStage2Rows,
+    insertStage3Rows
+};
