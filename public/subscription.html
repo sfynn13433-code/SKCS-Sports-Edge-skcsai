@@ -622,31 +622,21 @@ async function loadBillingStatus() {
 }
 
 function showPaymentComingSoon(_method = '') {
-  alert("Subscriptions opening soon");
+  try {
+    localStorage.setItem('skcs_experience_mode', '1');
+    localStorage.setItem('skcs_role', 'trial');
+  } catch (e) { /* ignore */ }
+  window.location.href = 'index.html';
 }
 
 async function selectPlan(tierId) {
-  if (!supabaseClient) {
-    alert("Please sign in or register first, then choose a plan.");
-    window.location.href = "login.html?next=subscription.html&register=1";
-    return;
-  }
-
-  const { data: { session } } = await supabaseClient.auth.getSession();
-  
-  if (!session || !session.user) {
-    alert("Please sign in or register first, then choose a plan.");
-    window.location.href = "login.html?next=subscription.html&register=1";
-    return;
-  }
-
-  localStorage.setItem('skcs_plan_id', tierId);
-  localStorage.setItem('skcs_plan_selected_at', new Date().toISOString());
-  const panel = document.getElementById('paymentPlaceholderPanel');
-  if (panel && typeof panel.scrollIntoView === 'function') {
-    panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-  showPaymentComingSoon(tierId);
+  try {
+    localStorage.setItem('skcs_experience_mode', '1');
+    localStorage.setItem('skcs_role', 'trial');
+    localStorage.setItem('skcs_plan_id', tierId);
+    localStorage.setItem('skcs_plan_selected_at', new Date().toISOString());
+  } catch (e) { /* ignore */ }
+  window.location.href = 'index.html';
 }
 
 function goBack() {
