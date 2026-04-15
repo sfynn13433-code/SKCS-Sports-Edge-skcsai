@@ -836,7 +836,7 @@
                         <span class="allocation-value"><span id="football-direct-count">0</span> available</span>
                     </div>
                     <div class="allocation-row">
-                        <span class="allocation-label">📊 Analytical Insights:</span>
+                        <span class="allocation-label">📊 Secondary Insights:</span>
                         <span class="allocation-value"><span id="football-secondary-count">0</span> available</span>
                     </div>
                     <div class="allocation-row">
@@ -851,10 +851,6 @@
                 <div id="football-direct" class="prediction-category">
                     <h4 style="color:#60a5fa;margin-bottom:1rem;">⚽ Direct Insights</h4>
                     <div id="football-direct-matches" class="prediction-grid"><p>Loading...</p></div>
-                </div>
-                <div id="football-secondary" class="prediction-category">
-                    <h4 style="color:#fbbf24;margin-bottom:1rem;">📊 Analytical Insights</h4>
-                    <div id="football-secondary-matches" class="prediction-grid"><p>Loading...</p></div>
                 </div>
                 <div id="football-multi" class="prediction-category">
                     <h4 style="color:#c084fc;margin-bottom:1rem;">🔀 Multi (Combined Selections)</h4>
@@ -2460,22 +2456,21 @@
     function renderInsightsPanel(prediction) {
         const payload = prediction || {};
         const weather = payload.weather || {};
-        const weatherDesc = weather.description || 'Unavailable';
-        const weatherEmoji = weather.emoji || '\u2753';
-        const weatherTemp = weather.temp !== null ? `${weather.temp}\u00B0C` : '';
-        const weatherWind = weather.wind !== null ? `${weather.wind}km/h` : '';
-        const availability = payload.availability || 'No major absences';
-        const stability = payload.stability || 'Unknown';
+        const weatherDesc = weather.description || '';
+        const weatherEmoji = weather.emoji || '';
+        const weatherTemp = weather.temp !== null && weather.temp !== undefined ? `${weather.temp}\u00B0C` : '';
+        const weatherWind = weather.wind !== null && weather.wind !== undefined ? `${weather.wind}km/h` : '';
         
-        const weatherDisplay = weatherDesc !== 'Unavailable' 
-            ? `${weatherEmoji} ${weatherDesc}${weatherTemp ? ' ' + weatherTemp : ''}${weatherWind ? ' | Wind ' + weatherWind : ''}`
-            : `${weatherEmoji} Weather data unavailable`;
+        const hasWeatherData = weatherDesc || weatherTemp || weatherWind;
+        if (!hasWeatherData) {
+            return '';
+        }
+        
+        const weatherDisplay = `${weatherEmoji} ${weatherDesc}${weatherTemp ? ' ' + weatherTemp : ''}${weatherWind ? ' | ' + weatherWind : ''}`.trim();
         
         return `
             <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
                 <span style="display:inline-block;background:#e0f2fe;color:#075985;padding:5px 8px;border-radius:999px;font-size:0.74rem;font-weight:700;">${weatherDisplay}</span>
-                <span style="display:inline-block;background:#ecfdf3;color:#166534;padding:5px 8px;border-radius:999px;font-size:0.74rem;font-weight:700;">Availability: ${availability}</span>
-                <span style="display:inline-block;background:#fef3c7;color:#92400e;padding:5px 8px;border-radius:999px;font-size:0.74rem;font-weight:700;">Stability: ${stability}</span>
             </div>
         `;
     }
@@ -2486,7 +2481,6 @@
         card.id = cardId;
 
         let badgesHtml = '';
-        let engineLogHtml = '';
         let warningHtml = '';
 
         const firstMatch = getPrimaryMatch(pred);
@@ -2502,7 +2496,6 @@
             ? pred.secondary_insights
             : (Array.isArray(meta.secondary_markets) ? meta.secondary_markets : []);
         
-        const engineLog = getPredictionEngineLog(pred);
         const insightsHtml = renderInsightsPanel(pred);
         
         // EdgeMind Bot Report
@@ -2511,30 +2504,46 @@
         // High-Risk Warning Logic (50% - 68%)
         if (finalRecommendation.confidence >= 50 && finalRecommendation.confidence <= 68) {
             warningHtml = `
-                <div class="risk-warning" style="margin-top: 10px; padding: 10px; border-left: 4px solid orange; background: #fff3cd;">
-                    ⚠️ <strong>High Risk / Not a Safe Bet (${finalRecommendation.confidence}%).</strong> 
+                <div class="risk-warning" style="margin-top: 10px; padding: 10px; border-left: 4px solid orange; background: #fff3cd; color: #856404; border-radius: 4px;">
+                    ⚠️ <strong>High Risk / Not a Safe Bet (${finalRecommendation.confidence}%).</strong><br>
                     Please select an option from the Secondary Insights below.
                 </div>
             `;
         }
 
-        // Secondary Insights - Nested Dropdown Layout
-        const secondaryInsightsHtml = secondaryMarkets.length
-            ? `<button class="secondary-toggle" data-card-id="${cardId}" style="margin-top:10px;width:100%;padding:8px;background:#e7f1ff;color:#0d6efd;border:1px solid #93c5fd;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:700;">Secondary Insights (${secondaryMarkets.length})</button>
-               <div class="secondary-markets" id="secondary-${cardId}" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid #e2e8f0;">
-                    <div style="font-size:0.8rem;font-weight:700;color:#0d6efd;margin-bottom:8px;">🔮 Secondary Insights (High Confidence)</div>
-                    ${secondaryMarkets.slice(0, 4).map((market) => {
-                        const label = typeof market === 'string'
-                            ? market
-                            : (market.label || market.prediction || market.market || 'Secondary Market');
-                        const confidence = typeof market === 'object' && market !== null && market.confidence ? ` <span style="color:#059669;font-weight:bold;">${market.confidence}%</span>` : '';
-                        const description = typeof market === 'object' && market !== null && market.description
-                            ? `<div style="font-size:0.75rem;color:#64748b;margin-top:2px;">${market.description}</div>`
-                            : '';
-                        return `<div style="font-size:0.9rem;color:#1f2937;margin-bottom:10px;padding:8px;background:#f0fdf4;border-radius:4px;border:1px solid #bbf7d0;">• ${label} ${confidence}${description}</div>`;
-                    }).join('')}
-               </div>`
-            : '';
+        // Secondary Insights - Nested <details>/<summary> Dropdown Layout
+        let secondaryInsightsHtml = '';
+        if (Array.isArray(secondaryMarkets) && secondaryMarkets.length > 0) {
+            const listItems = secondaryMarkets.slice(0, 4).map((market) => {
+                const label = typeof market === 'string'
+                    ? market
+                    : (market.type || market.label || market.prediction || market.market || 'Secondary Market');
+                const confidence = typeof market === 'object' && market !== null && market.confidence 
+                    ? `<span style="color:#059669;font-weight:bold;">${market.confidence}%</span>` 
+                    : '';
+                const description = typeof market === 'object' && market !== null && market.description
+                    ? `<div style="font-size:0.75rem;color:#64748b;margin-top:2px;">${market.description}</div>`
+                    : '';
+                return `<li style="padding:8px 0;border-bottom:1px solid #eee;list-style:none;">${label} - ${confidence}${description}</li>`;
+            }).join('');
+
+            secondaryInsightsHtml = `
+                <details class="secondary-insights-dropdown" style="margin-top:15px;background:#f8f9fa;padding:10px;border-radius:6px;border:1px solid #dee2e6;">
+                    <summary style="cursor:pointer;font-weight:bold;color:#0d6efd;user-select:none;">
+                        📊 View Secondary Insights (${Math.min(secondaryMarkets.length, 4)} Available)
+                    </summary>
+                    <ul style="padding-left:0;margin-top:10px;margin-bottom:0;list-style:none;">
+                        ${listItems}
+                    </ul>
+                </details>
+            `;
+        } else {
+            secondaryInsightsHtml = `
+                <div style="margin-top:15px;padding:10px;font-size:0.9em;color:#6c757d;background:#f8f9fa;border-radius:6px;text-align:center;">
+                    No Secondary Insights passed the 76% confidence threshold for this fixture.
+                </div>
+            `;
+        }
 
         card.innerHTML = `
             ${badgesHtml}
@@ -2542,26 +2551,19 @@
                 <div class="teams" style="font-weight:bold; color:#1a202c; font-size:1.1rem; line-height:1.4;">${matchInfo.teams}</div>
                 <div class="match-date" style="color:#4a5568; font-size:0.75rem; margin-top:8px; letter-spacing:1px;">${matchInfo.context}</div>
             </div>
-            <div class="prediction-details" style="margin-top:12px; border-top:1px solid #e2e8f0; padding-top:12px; display:flex; justify-content:space-between; align-items:center;">
-                <div class="prediction" style="color:#059669; font-weight:bold;">${finalRecommendation.market || fallbackLabel}</div>
-                <div class="confidence" style="color:#4a5568; font-size:0.85rem;">${finalRecommendation.confidence}% Confidence</div>
+            <div style="margin-top:10px;font-size:0.8em;color:#6c757d;text-transform:uppercase;font-weight:600;">Direct Insight (1X2)</div>
+            <div class="prediction-details" style="margin-top:4px;padding-top:8px;display:flex;justify-content:space-between;align-items:center;">
+                <div class="prediction" style="color:#059669; font-weight:bold;font-size:1.2em;">${finalRecommendation.market || fallbackLabel}</div>
+                <div class="confidence" style="color:#4a5568; font-size:1em;font-weight:600;">${finalRecommendation.confidence}%</div>
             </div>
             ${warningHtml}
-            ${edgeMindReportText ? `<div style="margin-top:10px;padding:10px;border-radius:6px;background:#f8fafc;color:#334155;font-size:0.85rem;line-height:1.5;border-left:3px solid #6366f1;"><strong>🤖 EdgeMind Bot:</strong> ${edgeMindReportText}</div>` : ''}
+            <div style="margin-top:12px;padding:10px;background:#e9ecef;border-radius:6px;border-left:4px solid #6c757d;">
+                <div style="font-size:0.85em;font-weight:bold;color:#495057;margin-bottom:6px;">🤖 EdgeMind Bot</div>
+                <p style="font-size:0.85em;line-height:1.4;color:#495057;margin:0;font-style:italic;">"${edgeMindReportText}"</p>
+            </div>
             ${insightsHtml}
             ${secondaryInsightsHtml}
         `;
-
-        const toggleBtn = card.querySelector('.secondary-toggle');
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', function() {
-                const secondaryDiv = document.getElementById(`secondary-${cardId}`);
-                if (!secondaryDiv) return;
-                const isHidden = secondaryDiv.style.display === 'none';
-                secondaryDiv.style.display = isHidden ? 'block' : 'none';
-                toggleBtn.textContent = isHidden ? 'Hide Secondary Insights' : 'View Secondary Insights';
-            });
-        }
 
         return card;
     }
