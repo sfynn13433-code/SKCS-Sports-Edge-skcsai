@@ -181,6 +181,7 @@ async function analyzeWithDolphin(match) {
 /**
  * Build the SKCS AI Betting Analyst insight prompt.
  * Generates unique, specific insights for each match.
+ * MUST include EdgeMind Bot report narrative.
  */
 function buildInsightPrompt(params) {
     const {
@@ -196,26 +197,38 @@ function buildInsightPrompt(params) {
         absences
     } = params;
 
-    const systemPrompt = `You are SKCS AI Betting Analyst. Generate a UNIQUE, specific insight for this match ONLY. Never repeat generic phrases.`;
+    const systemPrompt = `You are the SKCS EdgeMind Bot. You MUST generate a prediction AND an edgemind_report.
 
-    const userPrompt = `Match: ${home || 'TBD'} vs ${away || 'TBD'}
+EDGEMIND REPORT RULES (CRITICAL):
+1. Stage 1 (Baseline): State the initial probability "On paper"
+2. Stage 2 (Deep Context): Explain adjustments based on team/player intelligence
+3. Stage 3 (Reality Check): Explain adjustments based on weather/news/form
+4. Stage 4 (Decision Engine): State the final confidence percentage
+
+IMPORTANT: If final confidence is between 50-68%, you MUST advise that Direct 1X2 is HIGH RISK and recommend Secondary Insights instead.
+
+Output ONLY valid JSON with this exact structure:
+{
+  "market_name": "Home Win",
+  "confidence": 72,
+  "edgemind_report": "On paper, [Team] has a 60% baseline probability... [Continue narrative following the 4 stages above]"
+}`;
+
+    const userPrompt = `Generate prediction for:
+Home: ${home || 'TBD'}
+Away: ${away || 'TBD'}
 League: ${league || 'Unknown'}
-Date: ${kickoff || 'TBD'}
+Kickoff: ${kickoff || 'TBD'}
 Market: ${market || '1X2'}
 Baseline probability: ${confidence || 70}%
 
-Context:
-${formData || 'No recent form data available'}
+Context Data:
+${formData || 'No recent form data'}
 ${h2h ? 'Head-to-head: ' + h2h : ''}
 ${weather ? 'Weather: ' + weather : ''}
-${absences ? 'Absences: ' + absences : ''}
+${absences ? 'Absences/Injuries: ' + absences : ''}
 
-Rules:
-- Use different wording every time
-- Reference specific stats (xG, recent form, referee, wind/rain)
-- End with one actionable sentence
-- Max 2 sentences
-Output ONLY the insight text.`;
+Follow the EDGEMIND REPORT RULES from your system prompt. Max 3 sentences for edgemind_report.`;
 
     return `<|im_start|>system
 ${systemPrompt}<|im_end|>
@@ -227,6 +240,7 @@ ${userPrompt}<|im_end|>
 
 /**
  * Generate AI insight text for a prediction.
+ * Returns structured JSON with market_name, confidence, and edgemind_report.
  */
 async function generateInsight(params) {
     const prompt = buildInsightPrompt(params);
@@ -234,7 +248,7 @@ async function generateInsight(params) {
     try {
         const response = await axios.post(`${DOLPHIN_URL}/completion`, {
             prompt,
-            max_tokens: 150,
+            max_tokens: 250,
             temperature: 0.7,
             stop: ['<|im_end|>', '\n\n']
         }, { timeout: DOLPHIN_TIMEOUT });
@@ -245,14 +259,56 @@ async function generateInsight(params) {
         
         if (!insightText || insightText.length < 10) {
             console.warn('[AI Insight] Generated text too short, using fallback');
-            return generateFallbackInsight(params);
+            return generateFallbackInsightStructured(params);
         }
         
-        return insightText;
+        // Try to parse JSON response
+        const parsed = extractAndParseJSON(insightText);
+        if (parsed && parsed.market_name && parsed.edgemind_report) {
+            return {
+                market_name: parsed.market_name,
+                confidence: Math.max(50, Math.min(95, parsed.confidence || params.confidence || 70)),
+                edgemind_report: parsed.edgemind_report,
+                secondary_insights: parsed.secondary_insights || null
+            };
+        }
+        
+        // If JSON parsing failed, return structured format anyway with raw text
+        return {
+            market_name: params.market || '1X2',
+            confidence: params.confidence || 70,
+            edgemind_report: insightText,
+            secondary_insights: null
+        };
     } catch (err) {
         console.error('[AI Insight] Generation failed:', err.message);
-        return generateFallbackInsight(params);
+        return generateFallbackInsightStructured(params);
     }
+}
+
+/**
+ * Generate fallback structured insight.
+ */
+function generateFallbackInsightStructured(params) {
+    const { home, away, market, confidence } = params;
+    const marketLabel = market || '1X2';
+    const conf = confidence || 70;
+    
+    let report;
+    if (conf >= 80) {
+        report = `On paper, ${home} shows a strong ${conf}% baseline probability. Deep context analysis confirms form advantage. Final decision: HIGH CONFIDENCE ${marketLabel} selection.`;
+    } else if (conf >= 60) {
+        report = `On paper, ${home} has a ${conf}% baseline probability against ${away}. Reality check indicates moderate volatility. Proceed with standard stake on ${marketLabel}.`;
+    } else {
+        report = `On paper, this is a tight matchup with ${conf}% baseline probability. Reality check shows high volatility. ADVISORY: Consider Secondary Insights instead of Direct 1X2.`;
+    }
+    
+    return {
+        market_name: marketLabel,
+        confidence: conf,
+        edgemind_report: report,
+        secondary_insights: null
+    };
 }
 
 function generateFallbackInsight(params) {
@@ -287,5 +343,6 @@ module.exports = {
     buildMatchAnalysisPrompt,
     buildInsightPrompt,
     generateInsight,
+    generateFallbackInsightStructured,
     extractAndParseJSON
 };

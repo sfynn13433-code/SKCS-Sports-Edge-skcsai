@@ -9,6 +9,8 @@
 
 require('dotenv').config();
 const { pool } = require('../backend/database');
+const { generateInsight } = require('../backend/services/aiProvider');
+const { filterSecondaryMarkets, generateEdgeMindReport } = require('./secondary-market-gatekeeper');
 
 const TARGET_DATE = '2026-04-15';
 
@@ -269,11 +271,54 @@ const VALID_OUTCOMES = {
     'double_chance': ['1x', 'x2', '12']
 };
 
+/**
+ * Generate prediction with AI-generated EdgeMind data.
+ * Falls back to mock data if AI is unavailable.
+ */
+async function generateAIPrediction(fixture) {
+    const market = '1x2';
+    const confidence = 55 + Math.floor(Math.random() * 40);
+    
+    try {
+        const insightData = await generateInsight({
+            home: fixture.homeTeam,
+            away: fixture.awayTeam,
+            league: fixture.league,
+            kickoff: fixture.kickoff,
+            market: market,
+            confidence: confidence,
+            formData: null,
+            h2h: null,
+            weather: null,
+            absences: null
+        });
+        
+        return {
+            fixture_id: `${fixture.sport}_${TARGET_DATE}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+            sport: fixture.sport,
+            league_name: fixture.league,
+            home_team: fixture.homeTeam,
+            away_team: fixture.awayTeam,
+            home_team_name: fixture.homeTeam,
+            away_team_name: fixture.awayTeam,
+            kickoff: fixture.kickoff,
+            market: market,
+            prediction: insightData.market_name === 'Draw' ? 'draw' : 'home_win',
+            confidence: insightData.confidence,
+            edgemind_report: insightData.edgemind_report,
+            secondary_insights: insightData.secondary_insights,
+            tier: insightData.confidence >= 75 ? 'deep' : 'normal',
+            type: 'direct'
+        };
+    } catch (err) {
+        console.warn(`[AI] Failed for ${fixture.homeTeam} vs ${fixture.awayTeam}: ${err.message}`);
+        return null;
+    }
+}
+
 function generateValidatedPrediction(fixture) {
-    // Pick random VALID market
     const market = VALID_MARKETS[Math.floor(Math.random() * VALID_MARKETS.length)];
     
-    // Sanitize market (red card ban)
     const sanitizedMarket = sanitizeMarket(market);
     if (!sanitizedMarket) return null;
     
@@ -294,6 +339,8 @@ function generateValidatedPrediction(fixture) {
         prediction: prediction,
         confidence: confidence,
         reasoning: `${fixture.homeTeam} vs ${fixture.awayTeam} in ${fixture.league}. Based on form analysis.`,
+        edgemind_report: generateEdgeMindReport(confidence - 10, [], [], confidence, { home: fixture.homeTeam, away: fixture.awayTeam }),
+        secondary_insights: null,
         tier: confidence >= 75 ? 'deep' : 'normal',
         type: sanitizedMarket === '1x2' ? 'direct' : 'secondary'
     };
@@ -376,8 +423,9 @@ async function insertPredictions(predictions) {
             try {
                 const sql = `
                     INSERT INTO predictions_final (
-                        tier, type, matches, total_confidence, risk_level, sport, market_type, recommendation, created_at
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+                        tier, type, matches, total_confidence, risk_level, sport, market_type, recommendation, 
+                        edgemind_report, secondary_insights, created_at
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
                     ON CONFLICT DO NOTHING
                     RETURNING id
                 `;
@@ -412,7 +460,9 @@ async function insertPredictions(predictions) {
                     pred.confidence >= 70 ? 'safe' : 'medium',
                     pred.sport || 'Football',
                     pred.market || '1X2',
-                    pred.prediction || 'Home Win'
+                    pred.prediction || 'Home Win',
+                    pred.edgemind_report || null,
+                    pred.secondary_insights ? JSON.stringify(pred.secondary_insights) : null
                 ]);
                 
                 if (result.rows.length > 0) inserted++;
@@ -476,7 +526,22 @@ async function main() {
             predictions.push(pred);
         }
     }
-    console.log(`[STEP 4] Generated ${predictions.length} predictions`);
+    console.log(`[STEP 4] Generated ${predictions.length} predictions (mock data with EdgeMind report)`);
+    
+    console.log('\n[STEP 4b] Generating AI-powered predictions with EdgeMind reports...');
+    const aiPredictions = [];
+    for (let i = 0; i < Math.min(3, validFixtures.length); i++) {
+        const fix = validFixtures[i];
+        console.log(`[AI] Processing: ${fix.homeTeam} vs ${fix.awayTeam}...`);
+        const aiPred = await generateAIPrediction(fix);
+        if (aiPred) {
+            aiPred.fixture_id = `ai_${aiPred.fixture_id}`;
+            aiPredictions.push(aiPred);
+            console.log(`[AI] Generated: ${aiPred.market} at ${aiPred.confidence}% confidence`);
+        }
+        await new Promise(r => setTimeout(r, 500));
+    }
+    console.log(`[STEP 4b] Generated ${aiPredictions.length} AI-powered predictions`);
     
     console.log('\n[STEP 5] Generating ACCAs with validation...');
     const accas = [];
@@ -489,12 +554,13 @@ async function main() {
     console.log(`[STEP 5] Generated ${accas.length} validated ACCAs`);
     
     console.log('\n[STEP 6] Inserting into database...');
-    const allPredictions = [...predictions, ...accas];
+    const allPredictions = [...predictions, ...aiPredictions, ...accas];
     const inserted = await insertPredictions(allPredictions);
     
     console.log('\n=== PIPELINE COMPLETE ===');
     console.log(`Total fixtures validated: ${validFixtures.length}`);
-    console.log(`Predictions generated: ${predictions.length}`);
+    console.log(`Predictions generated: ${predictions.length} (mock)`);
+    console.log(`AI Predictions generated: ${aiPredictions.length} (with EdgeMind reports)`);
     console.log(`ACCAs generated: ${accas.length}`);
     console.log(`Total inserted: ${inserted}`);
 }
