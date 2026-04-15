@@ -1125,8 +1125,8 @@
     <!-- Scroll to top button -->
     <button id="scrollTopBtn" title="Go to top">⬆️</button>
 
-    <script src="js/config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
     <!-- ========== REPLACED SCRIPT SECTION ========== -->
     <style>
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -1139,18 +1139,7 @@
     const SUPABASE_URL = window.SUPABASE_URL || '';
     const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
     const supabaseClient = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY)
-        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            auth: {
-                persistSession: false,
-                autoRefreshToken: false,
-                detectSessionInUrl: true,
-                storage: {
-                    getItem: () => null,
-                    setItem: () => {},
-                    removeItem: () => {}
-                }
-            }
-        })
+        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
         : null;
     const ADMIN_EMAIL = 'sfynn13433@gmail.com';
     let authSession = null;
