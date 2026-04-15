@@ -210,22 +210,54 @@
     <script>
         const API_BASE_URL = window.API_BASE_URL || '';
         
-        // SUPABASE CLIENT INITIALIZATION - ensure client is always created
+        // SUPABASE CLIENT INITIALIZATION - Robust version handling different bundling patterns
         (function initSupabaseClient() {
             if (window.supabaseClient && window.supabaseClient.auth) {
                 console.log("[Supabase] Client already initialized");
                 return;
             }
-            if (typeof supabase !== 'undefined' && supabase.createClient) {
-                window.supabaseClient = supabase.createClient(
-                    window.SUPABASE_URL || 'https://ghzjntdvaptuxfpvhybb.supabase.co',
-                    window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoempudGR2YXB0dXhmcHZoeWJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNDAzNzIsImV4cCI6MjA4NzgxNjM3Mn0.nWxOY0lDIDDvexELk9De2aEfPfM5iJjoaW91tbL7YQk',
-                    { auth: { persistSession: true, storageKey: 'skcs-auth', storage: window.localStorage } }
-                );
-                console.log("[Supabase] Client instantiated in login.html");
-            } else {
-                console.error("[Supabase] ERROR: supabase library not found or createClient missing!");
-                console.error("[Supabase] typeof supabase:", typeof supabase);
+            
+            try {
+                console.log("[Supabase] Attempting to find createClient...");
+                
+                if (typeof supabase === 'undefined') {
+                    throw new Error("Supabase object is completely missing.");
+                }
+
+                // Hunt for the correct createClient method depending on how the bundle wrapped it
+                if (typeof supabase.createClient === 'function') {
+                    console.log("[Supabase] Found standard supabase.createClient");
+                    window.supabaseClient = supabase.createClient(
+                        window.SUPABASE_URL || 'https://ghzjntdvaptuxfpvhybb.supabase.co',
+                        window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoempudGR2YXB0dXhmcHZoeWJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNDAzNzIsImV4cCI6MjA4NzgxNjM3Mn0.nWxOY0lDIDDvexELk9De2aEfPfM5iJjoaW91tbL7YQk',
+                        { auth: { persistSession: true, storageKey: 'skcs-auth', storage: window.localStorage } }
+                    );
+                    
+                } else if (supabase.supabase && typeof supabase.supabase.createClient === 'function') {
+                    console.log("[Supabase] Found nested supabase.supabase.createClient");
+                    window.supabaseClient = supabase.supabase.createClient(
+                        window.SUPABASE_URL || 'https://ghzjntdvaptuxfpvhybb.supabase.co',
+                        window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoempudGR2YXB0dXhmcHZoeWJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNDAzNzIsImV4cCI6MjA4NzgxNjM3Mn0.nWxOY0lDIDDvexELk9De2aEfPfM5iJjoaW91tbL7YQk',
+                        { auth: { persistSession: true, storageKey: 'skcs-auth', storage: window.localStorage } }
+                    );
+                    
+                } else if (supabase.default && typeof supabase.default.createClient === 'function') {
+                    console.log("[Supabase] Found default supabase.default.createClient");
+                    window.supabaseClient = supabase.default.createClient(
+                        window.SUPABASE_URL || 'https://ghzjntdvaptuxfpvhybb.supabase.co',
+                        window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoempudGR2YXB0dXhmcHZoeWJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNDAzNzIsImV4cCI6MjA4NzgxNjM3Mn0.nWxOY0lDIDDvexELk9De2aEfPfM5iJjoaW91tbL7YQk',
+                        { auth: { persistSession: true, storageKey: 'skcs-auth', storage: window.localStorage } }
+                    );
+                    
+                } else {
+                    console.error("[Supabase] The supabase object exists, but createClient is nowhere to be found. Object structure:", Object.keys(supabase));
+                    throw new Error("createClient not found in bundle.");
+                }
+
+                console.log("[Supabase] Client successfully initialized!");
+
+            } catch (error) {
+                console.error("[Supabase] Initialization failed:", error.message);
             }
         })();
         const supabaseClient = window.supabaseClient || null;
