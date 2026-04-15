@@ -16,6 +16,9 @@ const { getPredictionWindow } = require('../utils/dateNormalization');
 const { areLegsCompatible } = require('../utils/marketConsistency');
 const { getCardDescriptor } = require('../utils/insightEngine');
 const { buildContextInsightsFromMetadata } = require('../utils/contextInsights');
+const { enrichWithWeather } = require('../utils/weather');
+const { enrichWithAvailability } = require('../utils/availability');
+const { filterPredictionsByUsagePolicy, markFixtureUsed } = require('../utils/insightUsage');
 
 const router = express.Router();
 
@@ -1700,8 +1703,14 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                 const away = m?.away_team || m?.metadata?.away_team || null;
                 const homeKey = home ? String(home).toLowerCase() : null;
                 const awayKey = away ? String(away).toLowerCase() : null;
+                const homeName = typeof home === 'object' ? (home?.name || home?.team_name || home?.team || home) : home;
+                const awayName = typeof away === 'object' ? (away?.name || away?.team_name || away?.team || away) : away;
                 return {
                     ...enrichMatchMetadata(m, row),
+                    home_team: homeName || home,
+                    away_team: awayName || away,
+                    home_team_name: homeName || m?.home_team_name || m?.home_name || String(homeName || home || ''),
+                    away_team_name: awayName || m?.away_team_name || m?.away_name || String(awayName || away || ''),
                     home_team_info: homeKey ? (teamInfoByName.get(homeKey) || null) : null,
                     away_team_info: awayKey ? (teamInfoByName.get(awayKey) || null) : null
                 };
@@ -1782,6 +1791,9 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             : contractShapedPredictions.filter((prediction) => isTierVisibleForView(prediction.tier, subscriptionViewTier));
         stageCounts.subscription_tier_filtered_rows = subscriptionTierFilteredPredictions.length;
 
+        const predictionsWithWeather = await enrichWithWeather(subscriptionTierFilteredPredictions);
+        const predictionsEnriched = await enrichWithAvailability(predictionsWithWeather);
+
         const megaAccaDailyAllocation = getMegaAccaDailyAllocation(planId, now, {
             subscriptionStart: req.user?.official_start_time || null,
             predictions: scopedWithTiming
@@ -1834,8 +1846,8 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                 stage_counts: stageCounts,
                 drop_counts: dropCounts
             },
-            count: subscriptionTierFilteredPredictions.length,
-            predictions: subscriptionTierFilteredPredictions
+            count: predictionsEnriched.length,
+            predictions: predictionsEnriched
         });
     } catch (err) {
         console.error('[predictions] Route Error:', err);

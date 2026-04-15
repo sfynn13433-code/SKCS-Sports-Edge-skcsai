@@ -179,6 +179,97 @@ async function analyzeWithDolphin(match) {
 }
 
 /**
+ * Build the SKCS AI Betting Analyst insight prompt.
+ * Generates unique, specific insights for each match.
+ */
+function buildInsightPrompt(params) {
+    const {
+        home,
+        away,
+        league,
+        kickoff,
+        market,
+        confidence,
+        formData,
+        h2h,
+        weather,
+        absences
+    } = params;
+
+    const systemPrompt = `You are SKCS AI Betting Analyst. Generate a UNIQUE, specific insight for this match ONLY. Never repeat generic phrases.`;
+
+    const userPrompt = `Match: ${home || 'TBD'} vs ${away || 'TBD'}
+League: ${league || 'Unknown'}
+Date: ${kickoff || 'TBD'}
+Market: ${market || '1X2'}
+Baseline probability: ${confidence || 70}%
+
+Context:
+${formData || 'No recent form data available'}
+${h2h ? 'Head-to-head: ' + h2h : ''}
+${weather ? 'Weather: ' + weather : ''}
+${absences ? 'Absences: ' + absences : ''}
+
+Rules:
+- Use different wording every time
+- Reference specific stats (xG, recent form, referee, wind/rain)
+- End with one actionable sentence
+- Max 2 sentences
+Output ONLY the insight text.`;
+
+    return `<|im_start|>system
+${systemPrompt}<|im_end|>
+<|im_start|>user
+${userPrompt}<|im_end|>
+<|im_start|>assistant
+`;
+}
+
+/**
+ * Generate AI insight text for a prediction.
+ */
+async function generateInsight(params) {
+    const prompt = buildInsightPrompt(params);
+    
+    try {
+        const response = await axios.post(`${DOLPHIN_URL}/completion`, {
+            prompt,
+            max_tokens: 150,
+            temperature: 0.7,
+            stop: ['<|im_end|>', '\n\n']
+        }, { timeout: DOLPHIN_TIMEOUT });
+
+        let insightText = response.data?.response || response.data?.choices?.[0]?.text || '';
+        insightText = insightText.replace(/<\|im_end\|>/g, '').trim();
+        insightText = insightText.replace(/<\|im_start\|>.*?assistant\s*/gi, '').trim();
+        
+        if (!insightText || insightText.length < 10) {
+            console.warn('[AI Insight] Generated text too short, using fallback');
+            return generateFallbackInsight(params);
+        }
+        
+        return insightText;
+    } catch (err) {
+        console.error('[AI Insight] Generation failed:', err.message);
+        return generateFallbackInsight(params);
+    }
+}
+
+function generateFallbackInsight(params) {
+    const { home, away, market, confidence } = params;
+    const marketLabel = market || '1X2';
+    const conf = confidence || 70;
+    
+    if (conf >= 80) {
+        return `${home} look strong at home with high confidence. The ${marketLabel} market is favored.`;
+    } else if (conf >= 60) {
+        return `${home} have a moderate edge over ${away}. Consider the ${marketLabel} market.`;
+    } else {
+        return `This is a tight matchup between ${home} and ${away}. Proceed with caution on the ${marketLabel} market.`;
+    }
+}
+
+/**
  * Check if Dolphin server is available.
  */
 async function isDolphinAvailable() {
@@ -194,5 +285,7 @@ module.exports = {
     analyzeWithDolphin,
     isDolphinAvailable,
     buildMatchAnalysisPrompt,
+    buildInsightPrompt,
+    generateInsight,
     extractAndParseJSON
 };

@@ -1125,8 +1125,8 @@
     <!-- Scroll to top button -->
     <button id="scrollTopBtn" title="Go to top">⬆️</button>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/config.js"></script>
+    <script src="js/supabase-bundle.js"></script>
     <!-- ========== REPLACED SCRIPT SECTION ========== -->
     <style>
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -1136,11 +1136,7 @@
     // Configuration: use shared frontend config first, with a safe fallback.
     const SKCS_BACKEND = window.API_BASE_URL || "https://skcs-sports-edge-skcsai.onrender.com";
     const PUBLIC_LOCK_MESSAGE = "Platform opening soon. Registration available.";
-    const SUPABASE_URL = window.SUPABASE_URL || '';
-    const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
-    const supabaseClient = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY)
-        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-        : null;
+    const supabaseClient = window.supabase || null;
     const ADMIN_EMAIL = 'sfynn13433@gmail.com';
     let authSession = null;
     let activeSport = 'direct-markets';
@@ -1176,6 +1172,28 @@
             setTimeout(() => toast.remove(), 300);
         }, 3000);
     }
+
+    // Admin Debug Panel
+    window.showRawPrediction = async function() {
+        const API_BASE = window.API_BASE_URL || 'https://skcs-sports-edge-skcsai.onrender.com';
+        try {
+            const res = await fetch(`${API_BASE}/api/predictions?sport=football&include_all=true`);
+            const data = await res.json();
+            const firstPred = data.predictions && data.predictions[0];
+            if (firstPred) {
+                console.log('=== RAW PREDICTION PAYLOAD ===');
+                console.table(firstPred);
+                console.log('Full JSON:');
+                console.log(JSON.stringify(firstPred, null, 2));
+                alert('Raw Prediction:\n\n' + JSON.stringify(firstPred, null, 2));
+            } else {
+                alert('No predictions found in response');
+            }
+        } catch (err) {
+            console.error('[Admin Debug] Error:', err);
+            alert('Failed to fetch predictions: ' + err.message);
+        }
+    };
 
     function getUserApiKey() {
         const direct = String(window.USER_API_KEY || '').trim();
@@ -1418,21 +1436,57 @@
         const type = getSectionType(pred);
         const legCount = getPredictionLegCount(pred);
         if (legCount !== 1) return false;
+        
+        const firstMatch = getPrimaryMatch(pred);
+        const market = firstMatch ? getMatchMarket(firstMatch) : '';
+        const normalizedMarket = normalizeMarketKey(market);
+        
+        const is1X2Market = normalizedMarket === '1x2' || 
+                            normalizedMarket === 'match_result' ||
+                            normalizedMarket === 'home_win' ||
+                            normalizedMarket === 'away_win' ||
+                            normalizedMarket === 'draw' ||
+                            normalizedMarket === '1x2' ||
+                            normalizedMarket === '1x2' ||
+                            normalizedMarket.includes('1x2') ||
+                            normalizedMarket === 'matchwinner' ||
+                            normalizedMarket === 'result';
+        
         if (hasFinalRecommendation(pred)) return true;
-        if (type === 'direct' || type === 'single') return true;
+        if (type === 'direct' || type === 'single') return is1X2Market || true;
         return !type;
     }
 
+    function is1X2Market(market) {
+        const normalizedMarket = normalizeMarketKey(market);
+        return normalizedMarket === '1x2' || 
+               normalizedMarket === 'match_result' ||
+               normalizedMarket === 'home_win' ||
+               normalizedMarket === 'away_win' ||
+               normalizedMarket === 'draw' ||
+               normalizedMarket.includes('1x2') ||
+               normalizedMarket === 'matchwinner' ||
+               normalizedMarket === 'result' ||
+               normalizedMarket === 'full_time_result';
+    }
+
     function selectDirectInsights(predictions) {
+        const candidates = (predictions || [])
+            .filter((pred) => isDirectInsightCandidate(pred))
+            .filter((pred) => {
+                const firstMatch = getPrimaryMatch(pred);
+                const market = firstMatch ? getMatchMarket(firstMatch) : '';
+                return is1X2Market(market);
+            });
+        
         if (INCLUDE_ALL_MODE) {
-            return (predictions || [])
-                .filter((pred) => isDirectInsightCandidate(pred))
+            return candidates
                 .slice()
                 .sort((a, b) => getPredictionConfidenceScore(b) - getPredictionConfidenceScore(a));
         }
+        
         const byMatchId = new Map();
-        (predictions || []).forEach((pred) => {
-            if (!isDirectInsightCandidate(pred)) return;
+        candidates.forEach((pred) => {
             const firstMatch = getPrimaryMatch(pred);
             const matchId = String(firstMatch && firstMatch.match_id || '').trim();
             const key = matchId || `no-match-${buildPredictionDisplayKey(pred)}`;
@@ -1741,7 +1795,8 @@
 
     function isDisplayFriendlySecondaryMarket(market) {
         const marketKey = normalizeMarketKey(market);
-        return marketKey !== 'corners_under' && marketKey !== 'corners_over';
+        const is1X2 = is1X2Market(market);
+        return !is1X2 && marketKey !== 'corners_under' && marketKey !== 'corners_over';
     }
 
     function dedupeSecondaryDisplayItems(items) {
@@ -2098,7 +2153,11 @@
             directByMatchId.set(matchId, firstMatch);
         });
         const secondarySingles = INCLUDE_ALL_MODE
-            ? singles.filter((p) => getSectionType(p) === 'secondary')
+            ? singles.filter((p) => {
+                const firstMatch = (p && Array.isArray(p.matches) && p.matches[0]) ? p.matches[0] : {};
+                const market = getMatchMarket(firstMatch);
+                return !is1X2Market(market);
+            })
             : singles.filter((p) => {
                 if (getSectionType(p) !== 'secondary') return false;
                 const firstMatch = (p && Array.isArray(p.matches) && p.matches[0]) ? p.matches[0] : {};
@@ -2373,14 +2432,23 @@
         `;
     }
 
-    function renderInsightsPanel(insights) {
-        const payload = insights && typeof insights === 'object' ? insights : {};
-        const weather = payload.weather || 'Unavailable';
+    function renderInsightsPanel(prediction) {
+        const payload = prediction || {};
+        const weather = payload.weather || {};
+        const weatherDesc = weather.description || 'Unavailable';
+        const weatherEmoji = weather.emoji || '\u2753';
+        const weatherTemp = weather.temp !== null ? `${weather.temp}\u00B0C` : '';
+        const weatherWind = weather.wind !== null ? `${weather.wind}km/h` : '';
         const availability = payload.availability || 'No major absences';
         const stability = payload.stability || 'Unknown';
+        
+        const weatherDisplay = weatherDesc !== 'Unavailable' 
+            ? `${weatherEmoji} ${weatherDesc}${weatherTemp ? ' ' + weatherTemp : ''}${weatherWind ? ' | Wind ' + weatherWind : ''}`
+            : `${weatherEmoji} Weather data unavailable`;
+        
         return `
             <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
-                <span style="display:inline-block;background:#e0f2fe;color:#075985;padding:5px 8px;border-radius:999px;font-size:0.74rem;font-weight:700;">Weather: ${weather}</span>
+                <span style="display:inline-block;background:#e0f2fe;color:#075985;padding:5px 8px;border-radius:999px;font-size:0.74rem;font-weight:700;">${weatherDisplay}</span>
                 <span style="display:inline-block;background:#ecfdf3;color:#166534;padding:5px 8px;border-radius:999px;font-size:0.74rem;font-weight:700;">Availability: ${availability}</span>
                 <span style="display:inline-block;background:#fef3c7;color:#92400e;padding:5px 8px;border-radius:999px;font-size:0.74rem;font-weight:700;">Stability: ${stability}</span>
             </div>
@@ -2401,10 +2469,7 @@
         const reasoning = meta.reasoning || '';
         const secondaryMarkets = Array.isArray(meta.secondary_markets) ? meta.secondary_markets : [];
         const engineLog = getPredictionEngineLog(pred);
-        const insights = getPredictionInsights(pred);
-        const badgesHtml = renderCardBadges(pred);
-        const engineLogHtml = renderEngineLogPanel(engineLog);
-        const insightsHtml = renderInsightsPanel(insights);
+        const insightsHtml = renderInsightsPanel(pred);
 
         const secondaryHtml = secondaryMarkets.length
             ? `<button class="secondary-toggle" data-card-id="${cardId}" style="margin-top:10px;width:100%;padding:8px;background:#e7f1ff;color:#0d6efd;border:1px solid #93c5fd;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:700;">View Secondary Insights</button>
@@ -2469,7 +2534,7 @@
         const finalRecommendation = getFinalRecommendation(pred, fallbackLabel, fallbackConfidence);
         const badgesHtml = renderCardBadges(pred);
         const engineLogHtml = renderEngineLogPanel(getPredictionEngineLog(pred));
-        const insightsHtml = renderInsightsPanel(getPredictionInsights(pred));
+        const insightsHtml = renderInsightsPanel(pred);
 
         const legsHtml = (pred.matches || []).map((m, idx) => {
             const info = formatMatchInfo(m, sport);
@@ -2574,7 +2639,7 @@
                 <div style="color:#4a5568; font-size:0.85rem;">Total Ticket Probability: ${compoundProbability}%</div>
             </div>
             ${reasoning ? `<div style="margin-top:10px;padding:10px;border-radius:6px;background:#f8fafc;color:#334155;font-size:0.85rem;line-height:1.5;"><strong>AI Insight:</strong> ${reasoning}</div>` : ''}
-            ${renderInsightsPanel(getPredictionInsights(pred))}
+            ${renderInsightsPanel(pred)}
             ${renderEngineLogPanel(getPredictionEngineLog(pred))}
         `;
 
@@ -2629,21 +2694,45 @@
         const findTeam = (obj, side) => {
             if (!obj) return null;
             const keys = side === 'home' 
-                ? ['home_team', 'home', 'homeTeam', 'player1'] 
-                : ['away_team', 'away', 'awayTeam', 'player2'];
+                ? ['home_team', 'home', 'homeTeam', 'player1', 'home_team_name', 'home_name'] 
+                : ['away_team', 'away', 'awayTeam', 'player2', 'away_team_name', 'away_name'];
             
-            for (let k of keys) if (obj[k]) return obj[k];
+            for (let k of keys) {
+                if (obj[k] !== undefined && obj[k] !== null) {
+                    const val = obj[k];
+                    if (typeof val === 'object' && val !== null) {
+                        return val.name || val.team_name || val.team || val.full_name || String(val);
+                    }
+                    return String(val);
+                }
+            }
             if (obj.metadata) {
-                for (let k of keys) if (obj.metadata[k]) return obj.metadata[k];
+                for (let k of keys) {
+                    if (obj.metadata[k] !== undefined && obj.metadata[k] !== null) {
+                        const val = obj.metadata[k];
+                        if (typeof val === 'object' && val !== null) {
+                            return val.name || val.team_name || val.team || val.full_name || String(val);
+                        }
+                        return String(val);
+                    }
+                }
                 if (obj.metadata.ai) {
-                    for (let k of keys) if (obj.metadata.ai[k]) return obj.metadata.ai[k];
+                    for (let k of keys) {
+                        if (obj.metadata.ai[k] !== undefined && obj.metadata.ai[k] !== null) {
+                            const val = obj.metadata.ai[k];
+                            if (typeof val === 'object' && val !== null) {
+                                return val.name || val.team_name || val.team || val.full_name || String(val);
+                            }
+                            return String(val);
+                        }
+                    }
                 }
             }
             return null;
         };
 
-        const h = findTeam(match, 'home') || "Team A";
-        const a = findTeam(match, 'away') || "Team B";
+        const h = findTeam(match, 'home') || match.home_team_name || match.home_name || "Unknown Home";
+        const a = findTeam(match, 'away') || match.away_team_name || match.away_name || "Unknown Away";
         const homeInfo = match.home_team_info || null;
         const awayInfo = match.away_team_info || null;
         const homeLogo = homeInfo && homeInfo.logo ? `<img src="${homeInfo.logo}" alt="${h}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px;"/>` : '';
@@ -2676,12 +2765,15 @@
             try {
                 const matchDate = new Date(rawMatchTime);
                 if (!Number.isNaN(matchDate.getTime())) {
-                    const day = String(matchDate.getDate()).padStart(2, '0');
-                    const month = String(matchDate.getMonth() + 1).padStart(2, '0');
-                    const year = String(matchDate.getFullYear()).slice(-2);
-                    const hours = String(matchDate.getHours()).padStart(2, '0');
-                    const mins = String(matchDate.getMinutes()).padStart(2, '0');
-                    dateTimeStr = `${day}/${month}/${year} ${hours}:${mins}`;
+                    dateTimeStr = matchDate.toLocaleString('en-ZA', {
+                        timeZone: 'Africa/Johannesburg',
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    });
                 }
             } catch (e) {
                 dateTimeStr = '';
@@ -2773,6 +2865,16 @@
             } catch (e) { /* ignore */ }
             showAdminToast();
             updateAuthLink(session);
+            
+            // Add admin debug button to nav
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks) {
+                const debugBtn = document.createElement('button');
+                debugBtn.innerHTML = '🔍 Debug';
+                debugBtn.style.cssText = 'background:#dc3545;color:white;border:none;padding:0.5rem 1rem;border-radius:6px;font-weight:700;cursor:pointer;margin-left:0.5rem;';
+                debugBtn.onclick = showRawPrediction;
+                navLinks.appendChild(debugBtn);
+            }
         } else {
             const experienceMode = (() => {
                 try { return localStorage.getItem('skcs_experience_mode') === '1'; } catch (_) { return false; }

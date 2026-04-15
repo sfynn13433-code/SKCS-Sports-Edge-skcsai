@@ -36,8 +36,8 @@
     </noscript>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/config.js"></script>
+  <script src="/js/supabase-bundle.js"></script>
   <script>
     (async function routeSubscribe() {
       const search = new URLSearchParams(window.location.search);
@@ -49,16 +49,13 @@
       if (search.get('message')) loginParams.set('message', search.get('message'));
       const loginUrl = `/login.html?${loginParams.toString()}`;
 
-      const SUPABASE_URL = window.SUPABASE_URL || '';
-      const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
-      if (!window.supabase || !SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      if (!window.supabase) {
         window.location.replace(loginUrl);
         return;
       }
 
       try {
-        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        const { data } = await client.auth.getSession();
+        const { data } = await window.supabase.auth.getSession();
         if (data && data.session && data.session.user) {
           const query = window.location.search || '';
           window.location.replace(`/subscription.html${query}`);

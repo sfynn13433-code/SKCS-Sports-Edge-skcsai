@@ -578,18 +578,14 @@
     </p>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
+<script src="js/supabase-bundle.js"></script>
 <script>
 (function () {
     'use strict';
 
-    /* ── Supabase client ── */
-    const SUPABASE_URL  = window.SUPABASE_URL  || '';
-    const SUPABASE_ANON = window.SUPABASE_ANON_KEY || '';
-    const sbClient = (window.supabase && SUPABASE_URL && SUPABASE_ANON)
-        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
-        : null;
+    /* ── Supabase client (initialized by supabase-bundle.js) ── */
+    const sbClient = window.supabase || null;
 
     /* ── Set experience_mode flag ── */
     function activateExperienceMode() {

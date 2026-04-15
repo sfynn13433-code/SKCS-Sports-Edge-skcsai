@@ -35,17 +35,13 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/config.js"></script>
+    <script src="js/supabase-bundle.js"></script>
     <script>
     (function() {
         'use strict';
         
-        const SUPABASE_URL = window.SUPABASE_URL || '';
-        const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
-        const supabaseClient = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY)
-            ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-            : null;
+        const supabaseClient = window.supabase || null;
         
         const ADMIN_EMAIL = 'sfynn13433@gmail.com';
         const mainCard = document.getElementById('mainCard');

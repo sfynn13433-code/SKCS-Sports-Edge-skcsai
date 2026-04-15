@@ -520,28 +520,10 @@ button:hover { opacity: 0.9; }
 
 </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/config.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/supabase-bundle.js"></script>
 <script>
-const SUPABASE_URL = window.SUPABASE_URL || "";
-const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || "";
-
-function createSupabaseClientSafe() {
-  if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-    return null;
-  }
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-    return null;
-  }
-  try {
-    return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  } catch (err) {
-    console.error('[subscription] failed to initialize supabase client:', err);
-    return null;
-  }
-}
-
-const supabaseClient = createSupabaseClientSafe();
+const supabaseClient = window.supabase || null;
 let billingStatus = null;
 
 function showPublicLockNotice() {
