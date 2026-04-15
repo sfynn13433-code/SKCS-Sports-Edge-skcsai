@@ -206,59 +206,38 @@
     </div>
 
     <script src="js/config.js"></script>
-    <script src="js/supabase-bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-init.js"></script>
     <script>
         const API_BASE_URL = window.API_BASE_URL || '';
         
-        // SUPABASE CLIENT INITIALIZATION - Robust version handling different bundling patterns
+        // SUPABASE CLIENT INITIALIZATION - Use CDN version with safe storage
         (function initSupabaseClient() {
             if (window.supabaseClient && window.supabaseClient.auth) {
                 console.log("[Supabase] Client already initialized");
                 return;
             }
             
-            try {
-                console.log("[Supabase] Attempting to find createClient...");
+            // Wait for supabase-init.js to initialize the client
+            let attempts = 0;
+            const maxAttempts = 30;
+            
+            function checkInit() {
+                attempts++;
+                if (window.supabaseClient && window.supabaseClient.auth) {
+                    console.log("[Supabase] Client ready after " + attempts + " checks");
+                    return;
+                }
                 
-                if (typeof supabase === 'undefined') {
-                    throw new Error("Supabase object is completely missing.");
+                if (attempts >= maxAttempts) {
+                    console.error("[Supabase] Timeout waiting for client initialization");
+                    return;
                 }
-
-                // Hunt for the correct createClient method depending on how the bundle wrapped it
-                if (typeof supabase.createClient === 'function') {
-                    console.log("[Supabase] Found standard supabase.createClient");
-                    window.supabaseClient = supabase.createClient(
-                        window.SUPABASE_URL || 'https://ghzjntdvaptuxfpvhybb.supabase.co',
-                        window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoempudGR2YXB0dXhmcHZoeWJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNDAzNzIsImV4cCI6MjA4NzgxNjM3Mn0.nWxOY0lDIDDvexELk9De2aEfPfM5iJjoaW91tbL7YQk',
-                        { auth: { persistSession: true, storageKey: 'skcs-auth', storage: window.localStorage } }
-                    );
-                    
-                } else if (supabase.supabase && typeof supabase.supabase.createClient === 'function') {
-                    console.log("[Supabase] Found nested supabase.supabase.createClient");
-                    window.supabaseClient = supabase.supabase.createClient(
-                        window.SUPABASE_URL || 'https://ghzjntdvaptuxfpvhybb.supabase.co',
-                        window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoempudGR2YXB0dXhmcHZoeWJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNDAzNzIsImV4cCI6MjA4NzgxNjM3Mn0.nWxOY0lDIDDvexELk9De2aEfPfM5iJjoaW91tbL7YQk',
-                        { auth: { persistSession: true, storageKey: 'skcs-auth', storage: window.localStorage } }
-                    );
-                    
-                } else if (supabase.default && typeof supabase.default.createClient === 'function') {
-                    console.log("[Supabase] Found default supabase.default.createClient");
-                    window.supabaseClient = supabase.default.createClient(
-                        window.SUPABASE_URL || 'https://ghzjntdvaptuxfpvhybb.supabase.co',
-                        window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoempudGR2YXB0dXhmcHZoeWJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNDAzNzIsImV4cCI6MjA4NzgxNjM3Mn0.nWxOY0lDIDDvexELk9De2aEfPfM5iJjoaW91tbL7YQk',
-                        { auth: { persistSession: true, storageKey: 'skcs-auth', storage: window.localStorage } }
-                    );
-                    
-                } else {
-                    console.error("[Supabase] The supabase object exists, but createClient is nowhere to be found. Object structure:", Object.keys(supabase));
-                    throw new Error("createClient not found in bundle.");
-                }
-
-                console.log("[Supabase] Client successfully initialized!");
-
-            } catch (error) {
-                console.error("[Supabase] Initialization failed:", error.message);
+                
+                setTimeout(checkInit, 100);
             }
+            
+            checkInit();
         })();
         const supabaseClient = window.supabaseClient || null;
 
@@ -295,6 +274,24 @@
             } catch (e) { /* ignore */ }
         })();
 
+        // Helper to get client with waiting
+        async function getSupabaseClient() {
+            // If already ready, return immediately
+            if (window.supabaseClient && window.supabaseClient.auth) {
+                return window.supabaseClient;
+            }
+            
+            // Wait up to 3 seconds for initialization
+            for (let i = 0; i < 30; i++) {
+                await new Promise(r => setTimeout(r, 100));
+                if (window.supabaseClient && window.supabaseClient.auth) {
+                    return window.supabaseClient;
+                }
+            }
+            
+            return null;
+        }
+
         // Login handler
         document.getElementById('loginBtn').addEventListener('click', async () => {
             const email = document.getElementById('loginEmail').value;
@@ -308,12 +305,12 @@
             }
 
             try {
-                // Use window.supabaseClient directly with proper null check
-                const client = window.supabaseClient;
+                // Wait for client to be ready
+                const client = await getSupabaseClient();
                 if (!client || !client.auth) {
-                    console.error("[Supabase] Client missing. supabase:", typeof supabase, "createClient:", typeof supabase?.createClient);
+                    console.error("[Supabase] Client not available");
                     messageDiv.className = 'message error';
-                    messageDiv.textContent = 'Authentication system is initializing. Please refresh the page.';
+                    messageDiv.textContent = 'Authentication system not ready. Please refresh the page.';
                     return;
                 }
 
@@ -368,12 +365,12 @@
             }
 
             try {
-                // Use window.supabaseClient directly with proper null check
-                const client = window.supabaseClient;
+                // Wait for client to be ready
+                const client = await getSupabaseClient();
                 if (!client || !client.auth) {
-                    console.error("[Supabase] Client missing. supabase:", typeof supabase, "createClient:", typeof supabase?.createClient);
+                    console.error("[Supabase] Client not available");
                     messageDiv.className = 'message error';
-                    messageDiv.textContent = 'Authentication system is initializing. Please refresh the page.';
+                    messageDiv.textContent = 'Authentication system not ready. Please refresh the page.';
                     return;
                 }
 

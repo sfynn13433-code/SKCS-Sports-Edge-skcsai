@@ -1126,7 +1126,8 @@
     <button id="scrollTopBtn" title="Go to top">⬆️</button>
 
     <script src="js/config.js"></script>
-    <script src="js/supabase-bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-init.js"></script>
     <!-- ========== REPLACED SCRIPT SECTION ========== -->
     <style>
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -1137,23 +1138,21 @@
     const SKCS_BACKEND = window.API_BASE_URL || "https://skcs-sports-edge-skcsai.onrender.com";
     const PUBLIC_LOCK_MESSAGE = "Platform opening soon. Registration available.";
 
-    // SUPABASE CLIENT INITIALIZATION - create instance after bundle loads
-    if (typeof supabase !== 'undefined' && supabase.createClient) {
-        window.supabaseClient = supabase.createClient(
-            window.SUPABASE_URL || 'https://ghzjntdvaptuxfpvhybb.supabase.co',
-            window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoempudGR2YXB0dXhmcHZoeWJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNDAzNzIsImV4cCI6MjA4NzgxNjM3Mn0.nWxOY0lDIDDvexELk9De2aEfPfM5iJjoaW91tbL7YQk',
-            {
-                auth: {
-                    persistSession: true,
-                    storageKey: 'skcs-auth',
-                    storage: window.localStorage
-                }
-            }
-        );
-        console.log("[Supabase] Client instantiated globally as window.supabaseClient");
-    } else {
-        console.error("[Supabase] Library not found. Ensure bundle is loaded.");
+    // Wait for supabase-init.js to initialize the client
+    let checkCount = 0;
+    function waitForClient() {
+        checkCount++;
+        if (window.supabaseClient && window.supabaseClient.auth) {
+            console.log("[Supabase] Client ready in index.html after " + checkCount + " checks");
+            return;
+        }
+        if (checkCount < 50) {
+            setTimeout(waitForClient, 100);
+        } else {
+            console.error("[Supabase] Timeout waiting for client");
+        }
     }
+    waitForClient();
 
     const supabaseClient = window.supabaseClient || null;
     const ADMIN_EMAIL = 'sfynn13433@gmail.com';

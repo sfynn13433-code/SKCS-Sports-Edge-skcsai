@@ -579,19 +579,21 @@
 </div>
 
 <script src="js/config.js"></script>
-<script src="js/supabase-bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-init.js"></script>
 <script>
 (function () {
     'use strict';
 
-    // SUPABASE CLIENT INITIALIZATION
-    if (typeof supabase !== 'undefined' && supabase.createClient) {
-        window.supabaseClient = supabase.createClient(
-            window.SUPABASE_URL || 'https://ghzjntdvaptuxfpvhybb.supabase.co',
-            window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoempudGR2YXB0dXhmcHZoeWJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNDAzNzIsImV4cCI6MjA4NzgxNjM3Mn0.nWxOY0lDIDDvexELk9De2aEfPfM5iJjoaW91tbL7YQk',
-            { auth: { persistSession: true, storageKey: 'skcs-auth', storage: window.localStorage } }
-        );
+    // Wait for supabase-init.js to initialize
+    let checkCount = 0;
+    function waitForClient() {
+        checkCount++;
+        if (window.supabaseClient && window.supabaseClient.auth) return;
+        if (checkCount < 50) setTimeout(waitForClient, 100);
     }
+    waitForClient();
+    
     /* ── Supabase client ── */
     const sbClient = window.supabaseClient || null;
 
