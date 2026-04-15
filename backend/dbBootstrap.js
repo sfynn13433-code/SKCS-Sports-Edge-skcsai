@@ -150,12 +150,12 @@ async function bootstrap() {
             );
         `);
 
-        // Seed tier_rules
+        // Seed tier_rules (lowered thresholds to allow more predictions)
         await query(`
             INSERT INTO tier_rules (tier, min_confidence, allowed_markets, max_acca_size, allowed_volatility)
             VALUES
-                ('normal', 50, '["ALL"]'::jsonb, 3, '["low","medium"]'::jsonb),
-                ('deep', 60, '["ALL"]'::jsonb, 12, '["low"]'::jsonb)
+                ('normal', 35, '["ALL"]'::jsonb, 3, '["low","medium","high"]'::jsonb),
+                ('deep', 45, '["ALL"]'::jsonb, 12, '["low","medium"]'::jsonb)
             ON CONFLICT (tier) DO UPDATE SET
                 min_confidence = EXCLUDED.min_confidence,
                 allowed_markets = EXCLUDED.allowed_markets,
@@ -163,14 +163,14 @@ async function bootstrap() {
                 allowed_volatility = EXCLUDED.allowed_volatility;
         `);
 
-        // Seed acca_rules
+        // Seed acca_rules (allow high volatility now)
         await query(`
             INSERT INTO acca_rules (rule_name, rule_value)
             VALUES
                 ('no_same_match', 'true'::jsonb),
                 ('no_conflicting_markets', 'true'::jsonb),
                 ('max_per_match', '1'::jsonb),
-                ('allow_high_volatility', 'false'::jsonb)
+                ('allow_high_volatility', 'true'::jsonb)
             ON CONFLICT (rule_name) DO UPDATE SET
                 rule_value = EXCLUDED.rule_value;
         `);

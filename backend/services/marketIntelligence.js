@@ -251,10 +251,10 @@ const MARKET_KEY_ALIASES = Object.freeze({
 });
 
 const FALLBACK_LADDER = Object.freeze([
-    { pass: 'elite', min_confidence: 75, tiers: [1], safeTier3Only: false, directSafeOnly: false },
-    { pass: 'strong', min_confidence: 65, tiers: [1, 2], safeTier3Only: false, directSafeOnly: false },
-    { pass: 'safe', min_confidence: 55, tiers: [1, 2, 3], safeTier3Only: true, directSafeOnly: false },
-    { pass: 'fallback', min_confidence: 45, tiers: [1, 2, 3, 4], safeTier3Only: true, directSafeOnly: true }
+    { pass: 'elite', min_confidence: 70, tiers: [1], safeTier3Only: false, directSafeOnly: false },
+    { pass: 'strong', min_confidence: 60, tiers: [1, 2], safeTier3Only: false, directSafeOnly: false },
+    { pass: 'safe', min_confidence: 50, tiers: [1, 2, 3], safeTier3Only: true, directSafeOnly: false },
+    { pass: 'fallback', min_confidence: 35, tiers: [1, 2, 3, 4], safeTier3Only: true, directSafeOnly: true }
 ]);
 
 function clamp(value, min, max) {

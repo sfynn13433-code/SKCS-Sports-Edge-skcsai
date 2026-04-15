@@ -9,9 +9,10 @@ function normalizeTier(tier) {
 }
 
 // HARDCODED CONFIDENCE FLOORS - overrides database if needed
+// Lowered from 40/50 to 35/45 to allow more predictions through
 const CONFIDENCE_FLOORS = {
-    normal: 40,
-    deep: 50
+    normal: 35,
+    deep: 45
 };
 
 async function getTierRules(tier, client) {
@@ -44,10 +45,11 @@ async function getTierRules(tier, client) {
         // Fallback hardcoded values
         return {
             tier: t,
-            min_confidence: CONFIDENCE_FLOORS[t] || 50,
+            min_confidence: CONFIDENCE_FLOORS[t] || 45,
             allowed_markets: ['ALL'],
             max_acca_size: t === 'deep' ? 12 : 3,
-            allowed_volatility: t === 'deep' ? ['low'] : ['low', 'medium']
+            // Allow high volatility for normal tier (frontend will show warning badge)
+            allowed_volatility: t === 'deep' ? ['low', 'medium'] : ['low', 'medium', 'high']
         };
     }
 }

@@ -325,12 +325,12 @@ async function initializeTables() {
             rule_value JSONB NOT NULL
         )`);
 
-        // Initial Rules Data
+        // Initial Rules Data (lowered thresholds to allow more predictions)
         await client.query(`
             INSERT INTO tier_rules (tier, min_confidence, allowed_markets, max_acca_size, allowed_volatility)
             VALUES
-                ('normal', 50, '["ALL"]'::JSONB, 3, '["low","medium"]'::JSONB),
-                ('deep', 60, '["ALL"]'::JSONB, 12, '["low"]'::JSONB)
+                ('normal', 35, '["ALL"]'::JSONB, 3, '["low","medium","high"]'::JSONB),
+                ('deep', 45, '["ALL"]'::JSONB, 12, '["low","medium"]'::JSONB)
             ON CONFLICT (tier) DO UPDATE SET
                 min_confidence = EXCLUDED.min_confidence,
                 allowed_markets = EXCLUDED.allowed_markets,
@@ -344,7 +344,7 @@ async function initializeTables() {
                 ('no_same_match', 'true'::JSONB),
                 ('no_conflicting_markets', 'true'::JSONB),
                 ('max_per_match', '1'::JSONB),
-                ('allow_high_volatility', 'false'::JSONB)
+                ('allow_high_volatility', 'true'::JSONB)
             ON CONFLICT (rule_name) DO UPDATE SET
                 rule_value = EXCLUDED.rule_value;
         `);
