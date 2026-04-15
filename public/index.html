@@ -757,67 +757,67 @@
                 <h3 class="tab-title"><span class="sport-icon">🎯</span> Direct Markets</h3>
                 <p class="policy-note">Select a sport below to view predictions. Click any sport to see all available insights.</p>
                 <div class="direct-markets-menu">
-                    <div class="sport-menu-item" onclick="switchSportTab('football')">
+                    <div class="sport-menu-item" data-sport="football">
                         <span class="sport-emoji">⚽</span>
                         <span class="sport-name">Football</span>
                         <span class="sport-count" id="direct-football-count">(0)</span>
                     </div>
-                    <div class="sport-menu-item" onclick="switchSportTab('tennis')">
+                    <div class="sport-menu-item" data-sport="tennis">
                         <span class="sport-emoji">🎾</span>
                         <span class="sport-name">Tennis</span>
                         <span class="sport-count" id="direct-tennis-count">(0)</span>
                     </div>
-                    <div class="sport-menu-item" onclick="switchSportTab('basketball')">
+                    <div class="sport-menu-item" data-sport="basketball">
                         <span class="sport-emoji">🏀</span>
                         <span class="sport-name">Basketball</span>
                         <span class="sport-count" id="direct-basketball-count">(0)</span>
                     </div>
-                    <div class="sport-menu-item" onclick="switchSportTab('rugby')">
+                    <div class="sport-menu-item" data-sport="rugby">
                         <span class="sport-emoji">🏉</span>
                         <span class="sport-name">Rugby</span>
                         <span class="sport-count" id="direct-rugby-count">(0)</span>
                     </div>
-                    <div class="sport-menu-item" onclick="switchSportTab('cricket')">
+                    <div class="sport-menu-item" data-sport="cricket">
                         <span class="sport-emoji">🏏</span>
                         <span class="sport-name">Cricket</span>
                         <span class="sport-count" id="direct-cricket-count">(0)</span>
                     </div>
-                    <div class="sport-menu-item" onclick="switchSportTab('baseball')">
+                    <div class="sport-menu-item" data-sport="baseball">
                         <span class="sport-emoji">⚾</span>
                         <span class="sport-name">Baseball</span>
                         <span class="sport-count" id="direct-baseball-count">(0)</span>
                     </div>
-                    <div class="sport-menu-item" onclick="switchSportTab('hockey')">
+                    <div class="sport-menu-item" data-sport="hockey">
                         <span class="sport-emoji">🏒</span>
                         <span class="sport-name">Hockey</span>
                         <span class="sport-count" id="direct-hockey-count">(0)</span>
                     </div>
-                    <div class="sport-menu-item" onclick="switchSportTab('formula1')">
+                    <div class="sport-menu-item" data-sport="formula1">
                         <span class="sport-emoji">🏎️</span>
                         <span class="sport-name">Motorsport</span>
                         <span class="sport-count" id="direct-formula1-count">(0)</span>
                     </div>
-                    <div class="sport-menu-item" onclick="switchSportTab('mma')">
+                    <div class="sport-menu-item" data-sport="mma">
                         <span class="sport-emoji">🥊</span>
                         <span class="sport-name">MMA</span>
                         <span class="sport-count" id="direct-mma-count">(0)</span>
                     </div>
-                    <div class="sport-menu-item" onclick="switchSportTab('afl')">
+                    <div class="sport-menu-item" data-sport="afl">
                         <span class="sport-emoji">🦘</span>
                         <span class="sport-name">AFL</span>
                         <span class="sport-count" id="direct-afl-count">(0)</span>
                     </div>
-                    <div class="sport-menu-item" onclick="switchSportTab('volleyball')">
+                    <div class="sport-menu-item" data-sport="volleyball">
                         <span class="sport-emoji">🏐</span>
                         <span class="sport-name">Volleyball</span>
                         <span class="sport-count" id="direct-volleyball-count">(0)</span>
                     </div>
-                    <div class="sport-menu-item" onclick="switchSportTab('handball')">
+                    <div class="sport-menu-item" data-sport="handball">
                         <span class="sport-emoji">🤾</span>
                         <span class="sport-name">Handball</span>
                         <span class="sport-count" id="direct-handball-count">(0)</span>
                     </div>
-                    <div class="sport-menu-item" onclick="switchSportTab('nfl')">
+                    <div class="sport-menu-item" data-sport="nfl">
                         <span class="sport-emoji">🏈</span>
                         <span class="sport-name">NFL</span>
                         <span class="sport-count" id="direct-nfl-count">(0)</span>
@@ -2797,6 +2797,17 @@
                 this.classList.add('active');
                 fetchPredictions(activeSport);
             });
+        });
+
+        // Event delegation for sport menu items (CSP-compliant)
+        document.addEventListener('click', function(e) {
+            const sportItem = e.target.closest('.sport-menu-item[data-sport]');
+            if (sportItem) {
+                const sportKey = sportItem.getAttribute('data-sport');
+                if (sportKey && typeof switchSportTab === 'function') {
+                    switchSportTab(sportKey);
+                }
+            }
         });
         
         fetchPredictions('direct-markets');
