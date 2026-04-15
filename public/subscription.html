@@ -523,7 +523,15 @@ button:hover { opacity: 0.9; }
     <script src="js/config.js"></script>
     <script src="js/supabase-bundle.js"></script>
 <script>
-const supabaseClient = window.supabase || null;
+// SUPABASE CLIENT INITIALIZATION
+if (typeof supabase !== 'undefined' && supabase.createClient) {
+    window.supabaseClient = supabase.createClient(
+        window.SUPABASE_URL || 'https://ghzjntdvaptuxfpvhybb.supabase.co',
+        window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoempudGR2YXB0dXhmcHZoeWJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNDAzNzIsImV4cCI6MjA4NzgxNjM3Mn0.nWxOY0lDIDDvexELk9De2aEfPfM5iJjoaW91tbL7YQk',
+        { auth: { persistSession: true, storageKey: 'skcs-auth', storage: window.localStorage } }
+    );
+}
+const supabaseClient = window.supabaseClient || null;
 let billingStatus = null;
 
 function showPublicLockNotice() {
