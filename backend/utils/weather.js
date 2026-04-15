@@ -1,6 +1,6 @@
 'use strict';
 
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const axios = require('axios');
 
 const weatherCache = new Map();
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
@@ -42,19 +42,32 @@ async function getWeather(latitude, longitude, kickoffTimestamp) {
     }
 
     try {
-        const dateStr = new Date(kickoffTimestamp).toISOString().split('T')[0];
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,precipitation,rain,wind_speed_10m,weather_code&timezone=Africa/Johannesburg&start=${dateStr}&end=${dateStr}`;
+        const dateStr = kickoffTimestamp 
+            ? new Date(kickoffTimestamp).toISOString().split('T')[0] 
+            : new Date().toISOString().split('T')[0];
         
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`Open-Meteo API error: ${res.status}`);
+        const response = await axios.get(
+            `https://api.open-meteo.com/v1/forecast`,
+            {
+                params: {
+                    latitude,
+                    longitude,
+                    hourly: 'temperature_2m,precipitation,rain,wind_speed_10m,weather_code',
+                    timezone: 'auto',
+                    start_date: dateStr,
+                    end_date: dateStr
+                },
+                timeout: 10000
+            }
+        );
         
-        const data = await res.json();
+        const data = response.data;
         
         if (!data.hourly || !data.hourly.time || data.hourly.time.length === 0) {
             return { description: 'Unavailable', temp: null, wind: null, rain: null, emoji: '\u2753' };
         }
 
-        const kickoffHour = new Date(kickoffTimestamp).getHours();
+        const kickoffHour = kickoffTimestamp ? new Date(kickoffTimestamp).getHours() : 12;
         const hourIndex = Math.min(Math.max(0, kickoffHour), data.hourly.time.length - 1);
         
         const weatherCode = data.hourly.weather_code?.[hourIndex] ?? 0;
@@ -76,11 +89,10 @@ async function getWeather(latitude, longitude, kickoffTimestamp) {
         };
 
         weatherCache.set(cacheKey, { data: result, timestamp: now });
-        console.log(`[Weather] Fetched for ${latitude},${longitude}: ${description} ${temp}\u00B0C`);
         
         return result;
     } catch (err) {
-        console.error(`[Weather] Failed to fetch weather:`, err.message);
+        console.warn(`[Weather] Failed:`, err.message);
         return { description: 'Unavailable', temp: null, wind: null, rain: null, emoji: '\u2753' };
     }
 }
@@ -104,7 +116,7 @@ async function enrichWithWeather(predictions) {
                 pred.weather = { description: 'Unknown', temp: null, wind: null, rain: null, emoji: '\u2753' };
             }
         } catch (err) {
-            console.warn(`[Weather] Error enriching prediction:`, err.message);
+            console.warn(`[Weather] Error enriching:`, err.message);
             pred.weather = { description: 'Unavailable', temp: null, wind: null, rain: null, emoji: '\u2753' };
         }
         

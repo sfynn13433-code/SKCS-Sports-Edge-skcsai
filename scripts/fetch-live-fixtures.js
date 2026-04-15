@@ -1,295 +1,163 @@
 'use strict';
 
 /**
- * SKCS LIVE DATA PIPELINE
+ * SKCS INCREMENTAL DATA PIPELINE
  * 
- * Fetches REAL data from:
- * - API-Sports (fixtures, odds)
- * - RapidAPI (news, additional sports)
- * - Weather API (match conditions)
- * 
- * Then processes through aiPipeline and saves to Supabase
+ * Features:
+ * - Tier 1 RapidAPI Waterfall for failover
+ * - Master League filtering (Europe, Americas, Asia, Africa)
+ * - Single API call with local filtering
+ * - Incremental sync (upsert, no wipe)
+ * - Smart AI token saving (skip if report exists)
  */
 
 require('dotenv').config();
 const axios = require('axios');
 const { pool } = require('../backend/database');
-const { buildLiveData, getPredictionInputs } = require('../backend/services/dataProvider');
-const { rebuildFinalOutputs } = require('../backend/services/aiPipeline');
-const { runPipelineForMatches } = require('../backend/services/aiPipeline');
-const { enrichWithWeather, getWeather } = require('../backend/utils/weather');
+const { enrichWithWeather } = require('../backend/utils/weather');
+const { fetchWithWaterfall } = require('../backend/utils/rapidApiWaterfall');
 
 const RAPIDAPI_KEY = process.env.X_RAPIDAPI_KEY || process.env.RAPIDAPI_KEY;
-const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
-const ODDS_API_KEY = process.env.ODDS_API_KEY;
 const APISPORTS_KEY = process.env.X_APISPORTS_KEY;
 
-const TARGET_DATE = new Date().toISOString().slice(0, 10);
+// ============================================================
+// MASTER LEAGUES LIST (API-Sports IDs)
+// ============================================================
+const MASTER_LEAGUES = new Set([
+    // EUROPE: TOP TIERS
+    39, 140, 135, 78, 61,       // Big 5
+    88, 94, 179, 203,           // Additional Europe
+    144, 207, 218, 197,         // Belgium, Switzerland, Austria, Greece
+    106, 345, 113, 103, 119,   // Poland, Czech, Sweden, Norway, Denmark
+    172, 318, 224, 118,         // Bulgaria, Cyprus, Finland, Iceland
+    
+    // EUROPE: LOWER TIERS
+    40, 41, 42,                  // England 2-4
+    141,                          // Spain Segunda
+    79, 80,                      // Germany 2-3
+    136, 137,                    // Italy B-C
+    62, 63,                      // France 2-3
+    95, 89, 180, 204,           // Portugal, Netherlands, Scotland, Turkey 2nd
+    114, 104, 120, 107,         // Sweden2, Norway2, Denmark2, Poland2
+    
+    // AMERICAS
+    253, 254,                    // USA MLS, USL
+    262,                         // Mexico
+    71, 72,                      // Brazil A-B
+    128,                         // Argentina
+    239, 265, 268, 130,         // Colombia, Chile, Uruguay, Costa Rica
+    
+    // ASIA & OCEANIA
+    98, 99,                      // Japan J1-J2
+    169,                          // China
+    292,                          // South Korea
+    307, 301,                     // Saudi, UAE
+    188,                          // Australia
+    
+    // AFRICA
+    288, 289,                    // South Africa
+    233,                          // Egypt
+    195,                          // Algeria
+    315,                          // Ghana
+    326                           // Kenya
+]);
 
-console.log('=== SKCS LIVE DATA PIPELINE ===');
-console.log(`Target Date: ${TARGET_DATE}`);
+console.log('=== SKCS INCREMENTAL DATA PIPELINE ===');
+console.log(`Master Leagues: ${MASTER_LEAGUES.size}`);
 console.log(`API-Sports Key: ${APISPORTS_KEY ? '✓ Set' : '✗ Missing'}`);
 console.log(`RapidAPI Key: ${RAPIDAPI_KEY ? '✓ Set' : '✗ Missing'}`);
-console.log(`Weather API Key: ${WEATHER_API_KEY ? '✓ Set' : '✗ Missing'}`);
-console.log(`Odds API Key: ${ODDS_API_KEY ? '✓ Set' : '✗ Missing'}`);
 console.log('');
 
 // ============================================================
-// STEP 1: FETCH LIVE FIXTURES FROM API-SPORTS
-// Uses date parameter (NOT next=10 - that doesn't work on free tier)
-// Pulls ALL leagues for today and tomorrow
+// STEP 1: SINGLE API CALL WITH LOCAL FILTERING
 // ============================================================
-async function fetchFixturesFromAPISportsV2() {
+async function fetchFixturesSingleAPI() {
     const today = new Date().toISOString().split('T')[0];
-    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+    const dates = [today];
     
-    // Fetch for multiple days to maximize fixtures
-    const dates = [];
-    for (let i = 0; i <= 3; i++) {
-        const d = new Date(Date.now() + i * 86400000);
-        dates.push(d.toISOString().split('T')[0]);
-    }
-    
-    console.log(`[STEP 1] Fetching GLOBAL fixtures from API-Sports...`);
-    console.log(`[STEP 1] Dates: ${dates.join(', ')}`);
+    console.log(`[STEP 1] Fetching fixtures for: ${dates.join(', ')}`);
+    console.log('[STEP 1] Using single API call with local master league filtering...');
     
     const allFixtures = [];
     
     for (const date of dates) {
-        console.log(`[API-Sports] Fetching date: ${date}...`);
-        
         try {
+            // Single API call - NO league looping
             const url = `https://v3.football.api-sports.io/fixtures?date=${date}`;
+            console.log(`[API-Sports] Calling: ${url}`);
+            
             const response = await axios.get(url, {
                 headers: { 'x-apisports-key': APISPORTS_KEY },
                 timeout: 30000
             });
             
             const fixtures = response.data?.response || [];
-            console.log(`[API-Sports] ${date}: ${fixtures.length} fixtures`);
+            console.log(`[API-Sports] Total received: ${fixtures.length} fixtures`);
             
+            // Filter locally by master leagues
             for (const f of fixtures) {
-                allFixtures.push({
-                    match_id: String(f.fixture.id),
-                    sport: 'football',
-                    home_team: f.teams?.home?.name || null,
-                    away_team: f.teams?.away?.name || null,
-                    date: f.fixture.date || null,
-                    status: f.fixture.status?.short || 'NS',
-                    market: '1X2',
-                    prediction: null,
-                    confidence: null,
-                    volatility: null,
-                    odds: null,
-                    provider: 'api-sports',
-                    provider_name: 'API-Football',
-                    league: f.league?.name || 'Unknown League',
-                    league_id: String(f.league?.id || ''),
-                    home_logo: f.teams?.home?.logo || null,
-                    away_logo: f.teams?.away?.logo || null,
-                    venue: f.fixture.venue?.name || null,
-                    city: f.fixture.venue?.city || null,
-                    country: f.league?.country || null,
-                    round: f.league?.round || null,
-                    raw_provider_data: f
-                });
-            }
-            
-            await new Promise(r => setTimeout(r, 500));
-            
-        } catch (err) {
-            console.warn(`[API-Sports] ${date} failed:`, err.message);
-            if (err.response?.status === 429) {
-                console.log('[API-Sports] Rate limited, waiting 10 seconds...');
-                await new Promise(r => setTimeout(r, 10000));
-            }
-        }
-    }
-    
-    // Deduplicate by match_id
-    const uniqueFixtures = [];
-    const seen = new Set();
-    for (const f of allFixtures) {
-        if (!seen.has(f.match_id)) {
-            seen.add(f.match_id);
-            uniqueFixtures.push(f);
-        }
-    }
-    
-    console.log(`[STEP 1] Total fixtures from API-Sports: ${uniqueFixtures.length} (${allFixtures.length - uniqueFixtures.length} duplicates removed)`);
-    return uniqueFixtures;
-}
-
-// ============================================================
-// STEP 1b: FETCH FROM THE SPORTS DB (SUPPLEMENTARY)
-// ============================================================
-async function fetchFixturesFromTheSportsDB() {
-    console.log('[STEP 1b] Fetching comprehensive fixtures from TheSportsDB...');
-    
-    try {
-        const THESPORTSDB_BASE_URL = 'https://www.thesportsdb.com/api/v1/json';
-        const SPORTS_DB_KEY = '123';
-        
-        // Comprehensive league list with TheSportsDB IDs
-        const TARGET_LEAGUES = [
-            // ==========================================
-            // EUROPE: TOP & 2ND TIERS
-            // ==========================================
-            { id: '4328', name: 'England Premier League' },
-            { id: '4396', name: 'Scotland Premiership' },
-            { id: '4397', name: 'Scotland Championship' },
-            { id: '4334', name: 'France Ligue 1' },
-            { id: '4401', name: 'France Ligue 2' },
-            { id: '4332', name: 'Italy Serie A' },
-            { id: '4387', name: 'Italy Serie B' },
-            { id: '4335', name: 'Spain La Liga' },
-            { id: '4388', name: 'Spain Segunda Division' },
-            { id: '4331', name: 'Germany Bundesliga' },
-            { id: '4390', name: 'Germany 2. Bundesliga' },
-            { id: '4377', name: 'Portugal Primeira Liga' },
-            { id: '4384', name: 'Netherlands Eredivisie' },
-            { id: '4394', name: 'Poland Ekstraklasa' },
-            { id: '4408', name: 'Turkey Super Lig' },
-            { id: '4402', name: 'Belgium Pro League' },
-            { id: '4380', name: 'Greece Super League' },
-            { id: '4422', name: 'Austria Bundesliga' },
-            { id: '4418', name: 'Switzerland Super League' },
-            { id: '4436', name: 'Denmark Superliga' },
-            { id: '4447', name: 'Sweden Allsvenskan' },
-            { id: '4449', name: 'Norway Eliteserien' },
-            { id: '4455', name: 'Finland Veikkausliiga' },
-            { id: '4430', name: 'Czech Republic First League' },
-            { id: '4428', name: 'Croatia HNL' },
-            { id: '4414', name: 'Romania Liga I' },
-            { id: '4459', name: 'Hungary NB I' },
-            { id: '4438', name: 'Ukraine Premier League' },
-            { id: '4451', name: 'Israel Premier League' },
-            
-            // ==========================================
-            // AFRICA
-            // ==========================================
-            { id: '4507', name: 'South Africa Premiership' },
-            { id: '4493', name: 'Egypt Premier League' },
-            { id: '4511', name: 'Morocco Botola' },
-            { id: '4499', name: 'Nigeria Premier League' },
-            { id: '4495', name: 'Kenya Premier League' },
-            { id: '4489', name: 'Ghana Premier League' },
-            { id: '4501', name: 'Algeria Ligue 1' },
-            { id: '4505', name: 'Tunisia Ligue 1' },
-            { id: '4509', name: 'Ethiopia Premier League' },
-            { id: '4491', name: 'DR Congo Premier League' },
-            
-            // ==========================================
-            // AMERICAS
-            // ==========================================
-            { id: '4358', name: 'USA MLS' },
-            { id: '4361', name: 'Mexico Liga MX' },
-            { id: '4705', name: 'Argentina Liga Professional' },
-            { id: '4569', name: 'Brazil Serie A' },
-            { id: '4572', name: 'Brazil Serie B' },
-            { id: '4565', name: 'Chile Primera Division' },
-            { id: '4575', name: 'Colombia Primera A' },
-            { id: '4567', name: 'Peru Primera Division' },
-            { id: '4545', name: 'Uruguay Primera Division' },
-            
-            // ==========================================
-            // ASIA & OCEANIA
-            // ==========================================
-            { id: '4563', name: 'Japan J1 League' },
-            { id: '4560', name: 'Japan J2 League' },
-            { id: '4597', name: 'Australia A-League' },
-            { id: '4590', name: 'South Korea K League 1' },
-            { id: '4593', name: 'China Super League' },
-            { id: '4589', name: 'India Super League' },
-            { id: '4603', name: 'Thailand Premier League' },
-            { id: '4579', name: 'Indonesia Liga 1' },
-            { id: '4607', name: 'Malaysia Super League' },
-            { id: '4614', name: 'Saudi Pro League' },
-            { id: '4610', name: 'UAE Arabian Gulf League' },
-            { id: '4613', name: 'Qatar Stars League' }
-        ];
-        
-        const allFixtures = [];
-        
-        for (const league of TARGET_LEAGUES) {
-            try {
-                const response = await axios.get(`${THESPORTSDB_BASE_URL}/${SPORTS_DB_KEY}/eventsnextleague.php`, {
-                    params: { id: league.id },
-                    timeout: 10000
-                });
+                const leagueId = f.league?.id;
                 
-                const events = response.data?.events || [];
-                
-                if (events.length > 0) {
-                    console.log(`[TheSportsDB] ${league.name}: ${events.length} fixtures`);
-                }
-                
-                for (const event of events) {
-                    if (!event.strHomeTeam || !event.strAwayTeam) continue;
-                    
-                    const startTime = event.strTimestamp 
-                        ? new Date(event.strTimestamp).toISOString()
-                        : event.dateEvent && event.strTime 
-                            ? new Date(`${event.dateEvent}T${event.strTime}`).toISOString()
-                            : null;
-                    
+                if (MASTER_LEAGUES.has(leagueId)) {
                     allFixtures.push({
-                        match_id: String(event.idEvent || `tsdb-${Date.now()}-${Math.random()}`),
+                        match_id: String(f.fixture.id),
                         sport: 'football',
-                        home_team: event.strHomeTeam,
-                        away_team: event.strAwayTeam,
-                        date: startTime,
-                        status: 'NS',
+                        home_team: f.teams?.home?.name || null,
+                        away_team: f.teams?.away?.name || null,
+                        date: f.fixture.date || null,
+                        status: f.fixture.status?.short || 'NS',
                         market: '1X2',
                         prediction: null,
                         confidence: null,
                         volatility: null,
                         odds: null,
-                        provider: 'the-sports-db',
-                        provider_name: 'TheSportsDB',
-                        league: league.name,
-                        league_id: league.id,
-                        home_logo: event.strHomeTeamBadge || null,
-                        away_logo: event.strAwayTeamBadge || null,
-                        venue: event.strVenue || null,
-                        city: null,
-                        country: event.strCountry || null,
-                        round: event.strRound || null,
-                        raw_provider_data: event
+                        provider: 'api-sports',
+                        provider_name: 'API-Football',
+                        league: f.league?.name || 'Unknown',
+                        league_id: String(leagueId),
+                        home_logo: f.teams?.home?.logo || null,
+                        away_logo: f.teams?.away?.logo || null,
+                        venue: f.fixture.venue?.name || null,
+                        city: f.fixture.venue?.city || null,
+                        country: f.league?.country || null,
+                        round: f.league?.round || null,
+                        raw_provider_data: f
                     });
                 }
-                
-                await new Promise(r => setTimeout(r, 300));
-                
-            } catch (err) {
-                // Silent fail for rate limiting, just skip this league
+            }
+            
+            console.log(`[API-Sports] Filtered to ${allFixtures.length} master league fixtures`);
+            
+            // Small delay to avoid rate limits
+            await new Promise(r => setTimeout(r, 300));
+            
+        } catch (err) {
+            console.warn(`[API-Sports] ${date} failed:`, err.message);
+            if (err.response?.status === 429) {
+                console.log('[API-Sports] Rate limited, waiting...');
+                await new Promise(r => setTimeout(r, 10000));
             }
         }
-        
-        console.log(`[STEP 1b] Total from TheSportsDB: ${allFixtures.length}`);
-        return allFixtures;
-        
-    } catch (err) {
-        console.error('[STEP 1b] Failed:', err.message);
-        return [];
     }
+    
+    console.log(`[STEP 1] Total fixtures: ${allFixtures.length}`);
+    return allFixtures;
 }
 
 // ============================================================
-// STEP 2: FETCH WEATHER FOR EACH MATCH VENUE (USING AXIOS DIRECTLY)
+// STEP 2: FETCH WEATHER (USING AXIOS)
 // ============================================================
 async function fetchWeatherForFixtures(fixtures) {
-    console.log('\n[STEP 2] Fetching weather data for match venues...');
+    console.log('\n[STEP 2] Fetching weather data...');
     
     const enrichedFixtures = [];
-    let weatherFetched = 0;
     
     for (const fixture of fixtures) {
         try {
             const city = fixture.city || fixture.venue?.split(',').pop()?.trim() || null;
             
             if (city) {
-                // Use Open-Meteo geocoding API directly with axios
+                // Use Open-Meteo directly with axios
                 const geoResponse = await axios.get(
                     `https://geocoding-api.open-meteo.com/v1/search`,
                     { params: { name: city, count: 1, language: 'en', format: 'json' }, timeout: 5000 }
@@ -306,7 +174,7 @@ async function fetchWeatherForFixtures(fixtures) {
                             params: {
                                 latitude: geoData.latitude,
                                 longitude: geoData.longitude,
-                                hourly: 'temperature_2m,precipitation,weather_code,wind_speed_10m',
+                                hourly: 'temperature_2m,weather_code,wind_speed_10m',
                                 timezone: 'auto',
                                 start_date: dateStr,
                                 end_date: dateStr
@@ -321,20 +189,15 @@ async function fetchWeatherForFixtures(fixtures) {
                         const wind = weatherResponse.data.hourly.wind_speed_10m?.[hourIndex];
                         const code = weatherResponse.data.hourly.weather_code?.[hourIndex];
                         
-                        const weatherDescriptions = {
-                            0: 'Clear', 1: 'Mainly Clear', 2: 'Partly Cloudy', 3: 'Overcast',
-                            45: 'Fog', 48: 'Rime Fog', 51: 'Light Drizzle', 53: 'Drizzle',
-                            55: 'Heavy Drizzle', 61: 'Light Rain', 63: 'Moderate Rain',
-                            65: 'Heavy Rain', 71: 'Light Snow', 73: 'Moderate Snow', 75: 'Heavy Snow'
-                        };
+                        const descriptions = { 0: 'Clear', 1: 'Mainly Clear', 2: 'Partly Cloudy', 3: 'Overcast',
+                            45: 'Fog', 51: 'Light Drizzle', 61: 'Light Rain', 63: 'Moderate Rain' };
                         
                         fixture.weather = {
-                            description: weatherDescriptions[code] || 'Unknown',
+                            description: descriptions[code] || 'Unknown',
                             temp: temp ? Math.round(temp) : null,
                             wind: wind ? Math.round(wind) : null,
-                            emoji: code >= 61 ? '🌧️' : code >= 51 ? '🌦️' : code >= 3 ? '⛅' : '☀️'
+                            emoji: code >= 61 ? '🌧️' : code >= 3 ? '⛅' : '☀️'
                         };
-                        weatherFetched++;
                     }
                 }
             }
@@ -342,7 +205,6 @@ async function fetchWeatherForFixtures(fixtures) {
             if (!fixture.weather) {
                 fixture.weather = { description: 'Unknown', temp: null, wind: null, emoji: '?' };
             }
-            
         } catch (err) {
             fixture.weather = { description: 'Unavailable', temp: null, wind: null, emoji: '?' };
         }
@@ -350,120 +212,96 @@ async function fetchWeatherForFixtures(fixtures) {
         enrichedFixtures.push(fixture);
     }
     
-    console.log(`[STEP 2] Weather fetched for ${weatherFetched}/${fixtures.length} fixtures`);
+    console.log(`[STEP 2] Weather fetched for ${enrichedFixtures.length} fixtures`);
     return enrichedFixtures;
 }
 
 // ============================================================
-// STEP 3: FETCH NEWS (SKIPPED - RapidAPI endpoints returning 404)
+// STEP 3: FETCH NEWS (RAPIDAPI WATERFALL)
 // ============================================================
 async function fetchFootballNews() {
-    console.log('\n[STEP 3] News fetch skipped (RapidAPI endpoints unavailable)');
-    return new Map();
+    console.log('\n[STEP 3] Fetching news via RapidAPI Waterfall...');
+    
+    try {
+        const result = await fetchWithWaterfall('/v1/news', { query: 'football' }, 'TIER_3', 10000);
+        if (result && result.data) {
+            console.log(`[STEP 3] Fetched news via ${result.host}`);
+            return result.data;
+        }
+    } catch (err) {
+        console.warn(`[STEP 3] News fetch failed:`, err.message);
+    }
+    
+    return [];
 }
 
 // ============================================================
-// STEP 4: FETCH ODDS FROM ODDS-API
+// STEP 4: ENRICH WITH ODDS (RAPIDAPI WATERFALL)
 // ============================================================
 async function enrichWithOdds(fixtures) {
-    console.log('\n[STEP 4] Fetching odds data...');
-    
-    if (!ODDS_API_KEY) {
-        console.log('[STEP 4] Odds API key missing, skipping...');
-        return fixtures;
-    }
-    
-    const enrichedFixtures = [];
-    let oddsEnriched = 0;
+    console.log('\n[STEP 4] Enriching with odds via RapidAPI Waterfall...');
     
     for (const fixture of fixtures) {
         try {
-            const response = await axios.get(
-                `https://api.the-odds-api.com/v4/sports/soccer_epl/odds`,
-                {
-                    params: {
-                        apiKey: ODDS_API_KEY,
-                        regions: 'uk,eu',
-                        markets: 'h2h',
-                        oddsFormat: 'decimal'
-                    },
-                    timeout: 10000
-                }
-            );
+            const result = await fetchWithWaterfall('/odds', {
+                sport: 'soccer',
+                region: 'eu',
+                market: 'h2h'
+            }, 'TIER_1', 8000);
             
-            const oddsData = response.data || [];
-            const matchOdds = oddsData.find(o => 
-                o.home_team === fixture.home_team || 
-                o.away_team === fixture.away_team
-            );
-            
-            if (matchOdds) {
-                const bookmaker = matchOdds.bookmakers?.[0];
-                const h2h = bookmaker?.markets?.find(m => m.key === 'h2h');
-                const outcomes = h2h?.outcomes || [];
+            if (result && result.data) {
+                // Find matching odds for this fixture
+                const oddsData = Array.isArray(result.data) ? result.data : result.data.response || [];
+                const matchOdds = oddsData.find(o => 
+                    o.home_team === fixture.home_team || o.away_team === fixture.away_team
+                );
                 
-                const homeOdds = outcomes.find(o => o.name === fixture.home_team)?.price;
-                const drawOdds = outcomes.find(o => o.name === 'Draw')?.price;
-                const awayOdds = outcomes.find(o => o.name === fixture.away_team)?.price;
-                
-                fixture.odds = {
-                    home: homeOdds,
-                    draw: drawOdds,
-                    away: awayOdds,
-                    bookmaker: bookmaker?.title || 'Unknown'
-                };
-                
-                // Derive prediction from odds
-                if (homeOdds && drawOdds && awayOdds) {
-                    const impliedProbs = [1/homeOdds, 1/drawOdds, 1/awayOdds];
-                    const total = impliedProbs.reduce((a,b) => a+b, 0);
-                    const normalized = impliedProbs.map(p => p/total);
-                    
-                    const maxIdx = normalized.indexOf(Math.max(...normalized));
-                    const predictions = ['home_win', 'draw', 'away_win'];
-                    const oddsConfidence = Math.round(Math.max(...normalized) * 100);
-                    
-                    fixture.prediction = predictions[maxIdx];
-                    fixture.confidence = Math.max(55, Math.min(88, oddsConfidence));
-                    fixture.volatility = oddsConfidence >= 72 ? 'low' : oddsConfidence >= 64 ? 'medium' : 'high';
-                    
-                    oddsEnriched++;
+                if (matchOdds) {
+                    fixture.odds = matchOdds;
                 }
             }
-            
-            enrichedFixtures.push(fixture);
-            await new Promise(r => setTimeout(r, 150));
-            
         } catch (err) {
-            enrichedFixtures.push(fixture);
+            // Silent fail for odds
         }
     }
     
-    console.log(`[STEP 4] Odds enriched for ${oddsEnriched}/${fixtures.length} fixtures`);
-    return enrichedFixtures;
+    console.log(`[STEP 4] Odds enrichment complete`);
+    return fixtures;
 }
 
 // ============================================================
-// STEP 5: GENERATE EDGEMIND REPORTS USING AI
+// STEP 5: GENERATE EDGEMIND REPORTS (SKIP IF EXISTS)
 // ============================================================
-async function generateEdgeMindReports(fixtures) {
-    console.log('\n[STEP 5] Generating EdgeMind Bot reports with AI...');
+async function generateEdgeMindReports(fixtures, existingMap) {
+    console.log('\n[STEP 5] Generating EdgeMind Bot reports...');
     
     const { generateInsight } = require('../backend/services/aiProvider');
+    const { generateEdgeMindReport } = require('./secondary-market-gatekeeper');
     
     const enrichedFixtures = [];
     let aiGenerated = 0;
+    let aiSkipped = 0;
     
     for (const fixture of fixtures) {
-        try {
-            if (fixture.prediction && fixture.confidence) {
+        // Check if AI report already exists (token saving)
+        const existingData = existingMap.get(fixture.match_id);
+        
+        if (existingData && existingData.edgemind_report) {
+            // SKIP AI - Report already exists
+            fixture.edgemind_report = existingData.edgemind_report;
+            fixture.confidence = existingData.confidence || fixture.confidence || 65;
+            fixture.ai_confidence = existingData.confidence || fixture.confidence || 65;
+            aiSkipped++;
+        } else {
+            // FORCE AI Generation
+            try {
                 const insightData = await generateInsight({
                     home: fixture.home_team,
                     away: fixture.away_team,
                     league: fixture.league,
                     kickoff: fixture.date,
                     market: '1X2',
-                    confidence: fixture.confidence,
+                    confidence: fixture.confidence || 65,
                     formData: null,
                     h2h: null,
                     weather: fixture.weather?.description || null,
@@ -471,65 +309,56 @@ async function generateEdgeMindReports(fixtures) {
                 });
                 
                 fixture.edgemind_report = insightData.edgemind_report;
-                fixture.market_name = insightData.market_name;
                 fixture.ai_confidence = insightData.confidence;
+                fixture.market_name = insightData.market_name;
                 
-                // Generate secondary insights if confidence is 50-68%
-                if (fixture.confidence >= 50 && fixture.confidence <= 68) {
+                // Generate secondary insights for 50-68% confidence
+                if (insightData.confidence >= 50 && insightData.confidence <= 68) {
                     fixture.secondary_insights = [
-                        { type: 'Double Chance 1X', confidence: Math.min(82, fixture.confidence + 20) },
-                        { type: 'Over 1.5 Goals', confidence: Math.min(78, fixture.confidence + 15) },
-                        { type: 'BTTS YES', confidence: Math.min(75, fixture.confidence + 12) }
+                        { type: 'Double Chance 1X', confidence: Math.min(82, insightData.confidence + 20) },
+                        { type: 'Over 1.5 Goals', confidence: Math.min(78, insightData.confidence + 15) }
                     ].filter(s => s.confidence >= 76);
                 }
                 
                 aiGenerated++;
                 
-                if (aiGenerated <= 3) {
-                    console.log(`[AI] ${fixture.home_team} vs ${fixture.away_team}: ${insightData.market_name} @ ${insightData.confidence}%`);
-                }
-            } else {
-                fixture.edgemind_report = `On paper analysis for ${fixture.home_team} vs ${fixture.away_team} in ${fixture.league}. Match conditions: ${fixture.weather?.description || 'Unknown weather'}.`;
+                // Rate limit AI calls
+                await new Promise(r => setTimeout(r, 500));
+                
+            } catch (err) {
+                console.warn(`[AI] ${fixture.home_team} vs ${fixture.away_team}:`, err.message);
+                fixture.edgemind_report = generateEdgeMindReport(55, [], [], 65, { home: fixture.home_team, away: fixture.away_team });
+                fixture.ai_confidence = 65;
             }
-            
-            enrichedFixtures.push(fixture);
-            await new Promise(r => setTimeout(r, 300));
-            
-        } catch (err) {
-            console.warn(`[AI] ${fixture.home_team} vs ${fixture.away_team} failed:`, err.message);
-            fixture.edgemind_report = `Analysis pending for ${fixture.home_team} vs ${fixture.away_team}.`;
-            enrichedFixtures.push(fixture);
         }
+        
+        enrichedFixtures.push(fixture);
     }
     
-    console.log(`[STEP 5] EdgeMind reports generated for ${aiGenerated}/${fixtures.length} fixtures`);
+    console.log(`[STEP 5] AI Generated: ${aiGenerated}, AI Skipped: ${aiSkipped} (token saved)`);
     return enrichedFixtures;
 }
 
 // ============================================================
-// STEP 6: SAVE TO SUPABASE
+// STEP 6: INCREMENTAL UPSERT TO SUPABASE (NO WIPE)
 // ============================================================
-async function saveToSupabase(fixtures) {
-    console.log('\n[STEP 6] Saving predictions to Supabase...');
+async function saveToSupabase(fixtures, existingMap) {
+    console.log('\n[STEP 6] Incremental sync to Supabase (upsert mode)...');
     
     const client = await pool.connect();
-    let saved = 0;
+    let upserted = 0;
+    let skipped = 0;
     
     try {
         await client.query('BEGIN');
-        
-        // Clear old predictions for today (optional - keeps data fresh)
-        await client.query(`
-            DELETE FROM predictions_final 
-            WHERE DATE(created_at) = CURRENT_DATE 
-            AND tier = 'normal'
-        `);
-        console.log('[DB] Cleared today\'s predictions');
         
         for (const fixture of fixtures) {
             if (!fixture.home_team || !fixture.away_team) continue;
             
             try {
+                // Check if already exists with same data
+                const existing = existingMap.get(fixture.match_id);
+                
                 const matchesJson = [{
                     fixture_id: fixture.match_id,
                     home_team: fixture.home_team,
@@ -547,8 +376,6 @@ async function saveToSupabase(fixtures) {
                         league: fixture.league,
                         home_team: fixture.home_team,
                         away_team: fixture.away_team,
-                        home_team_name: fixture.home_team,
-                        away_team_name: fixture.away_team,
                         venue: fixture.venue,
                         weather: fixture.weather,
                         odds: fixture.odds,
@@ -557,18 +384,24 @@ async function saveToSupabase(fixtures) {
                     }
                 }];
                 
+                const confidence = fixture.confidence || fixture.ai_confidence || 65;
+                const riskLevel = confidence >= 72 ? 'safe' : confidence >= 60 ? 'medium' : 'high';
+                const prediction = fixture.market_name || fixture.prediction || 'Home Win';
+                
+                // UPSERT (update if exists, insert if new)
                 const sql = `
                     INSERT INTO predictions_final (
                         tier, type, matches, total_confidence, risk_level, sport, market_type, recommendation,
                         edgemind_report, secondary_insights, created_at
                     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
-                    ON CONFLICT DO NOTHING
+                    ON CONFLICT DO UPDATE SET
+                        matches = EXCLUDED.matches,
+                        total_confidence = EXCLUDED.total_confidence,
+                        edgemind_report = COALESCE(EXCLUDED.edgemind_report, predictions_final.edgemind_report),
+                        secondary_insights = EXCLUDED.secondary_insights,
+                        recommendation = EXCLUDED.recommendation
                     RETURNING id
                 `;
-                
-                const confidence = fixture.confidence || fixture.ai_confidence || 65;
-                const riskLevel = confidence >= 72 ? 'safe' : confidence >= 60 ? 'medium' : 'high';
-                const prediction = fixture.market_name || fixture.prediction || 'Home Win';
                 
                 const result = await client.query(sql, [
                     'normal',
@@ -584,8 +417,7 @@ async function saveToSupabase(fixtures) {
                 ]);
                 
                 if (result.rows.length > 0) {
-                    saved++;
-                    console.log(`[DB] Saved: ${fixture.home_team} vs ${fixture.away_team} (${confidence}%)`);
+                    upserted++;
                 }
                 
             } catch (err) {
@@ -594,8 +426,8 @@ async function saveToSupabase(fixtures) {
         }
         
         await client.query('COMMIT');
-        console.log(`[STEP 6] Saved ${saved}/${fixtures.length} predictions to Supabase`);
-        return saved;
+        console.log(`[STEP 6] Incremental upsert: ${upserted} updated, ${skipped} skipped`);
+        return upserted;
         
     } catch (err) {
         await client.query('ROLLBACK');
@@ -611,72 +443,76 @@ async function saveToSupabase(fixtures) {
 // ============================================================
 async function main() {
     console.log('\n========================================');
-    console.log('  SKCS AI SPORTS EDGE - LIVE DATA PIPELINE');
+    console.log('  SKCS INCREMENTAL DATA PIPELINE');
     console.log('========================================\n');
     
     try {
-        // STEP 1: Fetch from API-Sports (demo mode with historical data)
-        let apiSportsFixtures = await fetchFixturesFromAPISportsV2();
+        // STEP 0: Load existing records for incremental sync
+        console.log('[STEP 0] Loading existing predictions for incremental sync...');
+        const client = await pool.connect();
+        let existingMap = new Map();
         
-        // STEP 1b: Supplementary from TheSportsDB
-        let sportsDbFixtures = await fetchFixturesFromTheSportsDB();
-        
-        // Combine and deduplicate
-        const allFixturesMap = new Map();
-        
-        // Add API-Sports fixtures first (higher priority)
-        for (const f of apiSportsFixtures) {
-            const key = `${f.home_team}-${f.away_team}-${f.league}`;
-            if (!allFixturesMap.has(key) && f.home_team && f.away_team) {
-                allFixturesMap.set(key, f);
-            }
+        try {
+            const result = await client.query(`
+                SELECT 
+                    (matches->0->>'fixture_id') as fixture_id,
+                    edgemind_report,
+                    total_confidence
+                FROM predictions_final 
+                WHERE matches IS NOT NULL
+                AND matches::text != '[]'
+            `);
+            
+            existingMap = new Map(
+                (result.rows || [])
+                    .filter(r => r.fixture_id)
+                    .map(r => [r.fixture_id, r])
+            );
+            
+            console.log(`[STEP 0] Found ${existingMap.size} existing predictions`);
+        } finally {
+            client.release();
         }
         
-        // Add TheSportsDB fixtures (avoid duplicates)
-        for (const f of sportsDbFixtures) {
-            const key = `${f.home_team}-${f.away_team}-${f.league}`;
-            if (!allFixturesMap.has(key) && f.home_team && f.away_team) {
-                allFixturesMap.set(key, f);
-            }
-        }
-        
-        let fixtures = Array.from(allFixturesMap.values());
+        // STEP 1: Single API call with master league filtering
+        let fixtures = await fetchFixturesSingleAPI();
         
         if (fixtures.length === 0) {
-            console.log('[WARNING] No fixtures from API sources. Trying fallback...');
-            fixtures = await buildLiveData({ sport: 'football' });
+            console.log('[WARNING] No fixtures from API-Sports. Trying TheSportsDB...');
+            const { buildLiveData } = require('../backend/services/dataProvider');
+            fixtures = await buildLiveData({ sport: 'football' }) || [];
         }
         
         if (fixtures.length === 0) {
-            console.log('[ERROR] No fixtures available from any source!');
+            console.log('[ERROR] No fixtures available!');
             return;
         }
         
-        console.log(`\n[TOTAL] Combined fixtures: ${fixtures.length}`);
+        console.log(`\n[TOTAL] Fixtures to process: ${fixtures.length}`);
         
-        // STEP 2: Fetch weather
+        // STEP 2: Weather
         fixtures = await fetchWeatherForFixtures(fixtures);
         
-        // STEP 3: Fetch news
-        const news = await fetchFootballNews();
+        // STEP 3: News (RapidAPI Waterfall)
+        await fetchFootballNews();
         
-        // STEP 4: Enrich with odds
+        // STEP 4: Odds (RapidAPI Waterfall)
         fixtures = await enrichWithOdds(fixtures);
         
-        // STEP 5: Generate AI reports
-        fixtures = await generateEdgeMindReports(fixtures);
+        // STEP 5: AI Reports (skip if exists)
+        fixtures = await generateEdgeMindReports(fixtures, existingMap);
         
-        // STEP 6: Save to Supabase
-        const saved = await saveToSupabase(fixtures);
+        // STEP 6: Incremental Upsert (no wipe)
+        const saved = await saveToSupabase(fixtures, existingMap);
         
         console.log('\n========================================');
         console.log('  PIPELINE COMPLETE');
         console.log('========================================');
         console.log(`Fixtures processed: ${fixtures.length}`);
-        console.log(`Predictions saved: ${saved}`);
-        console.log(`Database: Supabase`);
+        console.log(`Predictions upserted: ${saved}`);
+        console.log(`AI tokens saved: ${existingMap.size} (skipped)`);
         console.log('');
-        console.log('Refresh your website to see LIVE predictions!');
+        console.log('Incremental sync complete - no data wiped!');
         
     } catch (err) {
         console.error('\n[ERROR] Pipeline failed:', err.message);
