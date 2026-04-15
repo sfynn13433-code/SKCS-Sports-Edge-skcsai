@@ -2485,6 +2485,9 @@
         card.className = 'prediction-card';
         card.id = cardId;
 
+        let badgesHtml = '';
+        let engineLogHtml = '';
+
         const firstMatch = getPrimaryMatch(pred);
         const matchInfo = formatMatchInfo(firstMatch, sport);
         const fallbackLabel = formatPrediction(firstMatch);
