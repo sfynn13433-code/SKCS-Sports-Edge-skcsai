@@ -210,15 +210,24 @@
     <script>
         const API_BASE_URL = window.API_BASE_URL || '';
         
-        // SUPABASE CLIENT INITIALIZATION
-        if (typeof supabase !== 'undefined' && supabase.createClient) {
-            window.supabaseClient = supabase.createClient(
-                window.SUPABASE_URL || 'https://ghzjntdvaptuxfpvhybb.supabase.co',
-                window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoempudGR2YXB0dXhmcHZoeWJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNDAzNzIsImV4cCI6MjA4NzgxNjM3Mn0.nWxOY0lDIDDvexELk9De2aEfPfM5iJjoaW91tbL7YQk',
-                { auth: { persistSession: true, storageKey: 'skcs-auth', storage: window.localStorage } }
-            );
-            console.log("[Supabase] Client instantiated in login.html");
-        }
+        // SUPABASE CLIENT INITIALIZATION - ensure client is always created
+        (function initSupabaseClient() {
+            if (window.supabaseClient && window.supabaseClient.auth) {
+                console.log("[Supabase] Client already initialized");
+                return;
+            }
+            if (typeof supabase !== 'undefined' && supabase.createClient) {
+                window.supabaseClient = supabase.createClient(
+                    window.SUPABASE_URL || 'https://ghzjntdvaptuxfpvhybb.supabase.co',
+                    window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoempudGR2YXB0dXhmcHZoeWJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNDAzNzIsImV4cCI6MjA4NzgxNjM3Mn0.nWxOY0lDIDDvexELk9De2aEfPfM5iJjoaW91tbL7YQk',
+                    { auth: { persistSession: true, storageKey: 'skcs-auth', storage: window.localStorage } }
+                );
+                console.log("[Supabase] Client instantiated in login.html");
+            } else {
+                console.error("[Supabase] ERROR: supabase library not found or createClient missing!");
+                console.error("[Supabase] typeof supabase:", typeof supabase);
+            }
+        })();
         const supabaseClient = window.supabaseClient || null;
 
         // Tab switching
@@ -267,13 +276,16 @@
             }
 
             try {
-                if (!supabaseClient) {
+                // Use window.supabaseClient directly with proper null check
+                const client = window.supabaseClient;
+                if (!client || !client.auth) {
+                    console.error("[Supabase] Client missing. supabase:", typeof supabase, "createClient:", typeof supabase?.createClient);
                     messageDiv.className = 'message error';
-                    messageDiv.textContent = 'Supabase Auth is not configured.';
+                    messageDiv.textContent = 'Authentication system is initializing. Please refresh the page.';
                     return;
                 }
 
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                const { data, error } = await client.auth.signInWithPassword({
                     email,
                     password
                 });
@@ -294,8 +306,9 @@
                 sessionStorage.removeItem('skcs_after_auth');
                 window.location.href = dest;
             } catch (error) {
+                console.error("[Login] Error:", error);
                 messageDiv.className = 'message error';
-                messageDiv.textContent = 'Connection error';
+                messageDiv.textContent = 'Connection error: ' + (error.message || 'Unknown error');
             }
         });
 
@@ -323,13 +336,16 @@
             }
 
             try {
-                if (!supabaseClient) {
+                // Use window.supabaseClient directly with proper null check
+                const client = window.supabaseClient;
+                if (!client || !client.auth) {
+                    console.error("[Supabase] Client missing. supabase:", typeof supabase, "createClient:", typeof supabase?.createClient);
                     messageDiv.className = 'message error';
-                    messageDiv.textContent = 'Supabase Auth is not configured.';
+                    messageDiv.textContent = 'Authentication system is initializing. Please refresh the page.';
                     return;
                 }
 
-                const { data, error } = await supabaseClient.auth.signUp({
+                const { data, error } = await client.auth.signUp({
                     email,
                     password,
                     options: {
@@ -354,7 +370,7 @@
 
                 let session = data?.session || null;
                 if (!session) {
-                    const signInRes = await supabaseClient.auth.signInWithPassword({ email, password });
+                    const signInRes = await client.auth.signInWithPassword({ email, password });
                     if (!signInRes.error && signInRes.data?.session) {
                         session = signInRes.data.session;
                     }
@@ -383,8 +399,8 @@
         });
 
         // Post-confirmation routing: listen for auth state changes (email confirmation)
-        if (supabaseClient) {
-            supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (window.supabaseClient && window.supabaseClient.auth) {
+            window.supabaseClient.auth.onAuthStateChange((event, session) => {
                 if (event === 'SIGNED_IN' && session?.user) {
                     const urlParams = new URLSearchParams(window.location.search);
                     const next = urlParams.get('next') || 'payment.html';
