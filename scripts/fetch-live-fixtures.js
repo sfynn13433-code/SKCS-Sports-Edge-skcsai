@@ -35,90 +35,248 @@ console.log(`Odds API Key: ${ODDS_API_KEY ? '✓ Set' : '✗ Missing'}`);
 console.log('');
 
 // ============================================================
-// STEP 1: FETCH REAL FIXTURES FROM API-SPORTS
+// STEP 1: FETCH LIVE FIXTURES FROM API-SPORTS
+// Uses date parameter (NOT next=10 - that doesn't work on free tier)
+// Pulls ALL leagues for today and tomorrow
 // ============================================================
-async function fetchFixturesFromAPISports() {
-    console.log('[STEP 1] Fetching real fixtures from API-Sports...');
+async function fetchFixturesFromAPISportsV2() {
+    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+    
+    // Fetch for multiple days to maximize fixtures
+    const dates = [];
+    for (let i = 0; i <= 3; i++) {
+        const d = new Date(Date.now() + i * 86400000);
+        dates.push(d.toISOString().split('T')[0]);
+    }
+    
+    console.log(`[STEP 1] Fetching GLOBAL fixtures from API-Sports...`);
+    console.log(`[STEP 1] Dates: ${dates.join(', ')}`);
+    
+    const allFixtures = [];
+    
+    for (const date of dates) {
+        console.log(`[API-Sports] Fetching date: ${date}...`);
+        
+        try {
+            const url = `https://v3.football.api-sports.io/fixtures?date=${date}`;
+            const response = await axios.get(url, {
+                headers: { 'x-apisports-key': APISPORTS_KEY },
+                timeout: 30000
+            });
+            
+            const fixtures = response.data?.response || [];
+            console.log(`[API-Sports] ${date}: ${fixtures.length} fixtures`);
+            
+            for (const f of fixtures) {
+                allFixtures.push({
+                    match_id: String(f.fixture.id),
+                    sport: 'football',
+                    home_team: f.teams?.home?.name || null,
+                    away_team: f.teams?.away?.name || null,
+                    date: f.fixture.date || null,
+                    status: f.fixture.status?.short || 'NS',
+                    market: '1X2',
+                    prediction: null,
+                    confidence: null,
+                    volatility: null,
+                    odds: null,
+                    provider: 'api-sports',
+                    provider_name: 'API-Football',
+                    league: f.league?.name || 'Unknown League',
+                    league_id: String(f.league?.id || ''),
+                    home_logo: f.teams?.home?.logo || null,
+                    away_logo: f.teams?.away?.logo || null,
+                    venue: f.fixture.venue?.name || null,
+                    city: f.fixture.venue?.city || null,
+                    country: f.league?.country || null,
+                    round: f.league?.round || null,
+                    raw_provider_data: f
+                });
+            }
+            
+            await new Promise(r => setTimeout(r, 500));
+            
+        } catch (err) {
+            console.warn(`[API-Sports] ${date} failed:`, err.message);
+            if (err.response?.status === 429) {
+                console.log('[API-Sports] Rate limited, waiting 10 seconds...');
+                await new Promise(r => setTimeout(r, 10000));
+            }
+        }
+    }
+    
+    // Deduplicate by match_id
+    const uniqueFixtures = [];
+    const seen = new Set();
+    for (const f of allFixtures) {
+        if (!seen.has(f.match_id)) {
+            seen.add(f.match_id);
+            uniqueFixtures.push(f);
+        }
+    }
+    
+    console.log(`[STEP 1] Total fixtures from API-Sports: ${uniqueFixtures.length} (${allFixtures.length - uniqueFixtures.length} duplicates removed)`);
+    return uniqueFixtures;
+}
+
+// ============================================================
+// STEP 1b: FETCH FROM THE SPORTS DB (SUPPLEMENTARY)
+// ============================================================
+async function fetchFixturesFromTheSportsDB() {
+    console.log('[STEP 1b] Fetching comprehensive fixtures from TheSportsDB...');
     
     try {
-        const today = new Date().toISOString().slice(0, 10);
-        const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+        const THESPORTSDB_BASE_URL = 'https://www.thesportsdb.com/api/v1/json';
+        const SPORTS_DB_KEY = '123';
         
-        const leagues = [
-            { id: '4328', name: 'Premier League' },
-            { id: '4334', name: 'Ligue 1' },
-            { id: '4332', name: 'Serie A' },
-            { id: '4335', name: 'La Liga' },
-            { id: '4331', name: 'Bundesliga' },
-            { id: '4391', name: 'Champions League' }
+        // Comprehensive league list with TheSportsDB IDs
+        const TARGET_LEAGUES = [
+            // ==========================================
+            // EUROPE: TOP & 2ND TIERS
+            // ==========================================
+            { id: '4328', name: 'England Premier League' },
+            { id: '4396', name: 'Scotland Premiership' },
+            { id: '4397', name: 'Scotland Championship' },
+            { id: '4334', name: 'France Ligue 1' },
+            { id: '4401', name: 'France Ligue 2' },
+            { id: '4332', name: 'Italy Serie A' },
+            { id: '4387', name: 'Italy Serie B' },
+            { id: '4335', name: 'Spain La Liga' },
+            { id: '4388', name: 'Spain Segunda Division' },
+            { id: '4331', name: 'Germany Bundesliga' },
+            { id: '4390', name: 'Germany 2. Bundesliga' },
+            { id: '4377', name: 'Portugal Primeira Liga' },
+            { id: '4384', name: 'Netherlands Eredivisie' },
+            { id: '4394', name: 'Poland Ekstraklasa' },
+            { id: '4408', name: 'Turkey Super Lig' },
+            { id: '4402', name: 'Belgium Pro League' },
+            { id: '4380', name: 'Greece Super League' },
+            { id: '4422', name: 'Austria Bundesliga' },
+            { id: '4418', name: 'Switzerland Super League' },
+            { id: '4436', name: 'Denmark Superliga' },
+            { id: '4447', name: 'Sweden Allsvenskan' },
+            { id: '4449', name: 'Norway Eliteserien' },
+            { id: '4455', name: 'Finland Veikkausliiga' },
+            { id: '4430', name: 'Czech Republic First League' },
+            { id: '4428', name: 'Croatia HNL' },
+            { id: '4414', name: 'Romania Liga I' },
+            { id: '4459', name: 'Hungary NB I' },
+            { id: '4438', name: 'Ukraine Premier League' },
+            { id: '4451', name: 'Israel Premier League' },
+            
+            // ==========================================
+            // AFRICA
+            // ==========================================
+            { id: '4507', name: 'South Africa Premiership' },
+            { id: '4493', name: 'Egypt Premier League' },
+            { id: '4511', name: 'Morocco Botola' },
+            { id: '4499', name: 'Nigeria Premier League' },
+            { id: '4495', name: 'Kenya Premier League' },
+            { id: '4489', name: 'Ghana Premier League' },
+            { id: '4501', name: 'Algeria Ligue 1' },
+            { id: '4505', name: 'Tunisia Ligue 1' },
+            { id: '4509', name: 'Ethiopia Premier League' },
+            { id: '4491', name: 'DR Congo Premier League' },
+            
+            // ==========================================
+            // AMERICAS
+            // ==========================================
+            { id: '4358', name: 'USA MLS' },
+            { id: '4361', name: 'Mexico Liga MX' },
+            { id: '4705', name: 'Argentina Liga Professional' },
+            { id: '4569', name: 'Brazil Serie A' },
+            { id: '4572', name: 'Brazil Serie B' },
+            { id: '4565', name: 'Chile Primera Division' },
+            { id: '4575', name: 'Colombia Primera A' },
+            { id: '4567', name: 'Peru Primera Division' },
+            { id: '4545', name: 'Uruguay Primera Division' },
+            
+            // ==========================================
+            // ASIA & OCEANIA
+            // ==========================================
+            { id: '4563', name: 'Japan J1 League' },
+            { id: '4560', name: 'Japan J2 League' },
+            { id: '4597', name: 'Australia A-League' },
+            { id: '4590', name: 'South Korea K League 1' },
+            { id: '4593', name: 'China Super League' },
+            { id: '4589', name: 'India Super League' },
+            { id: '4603', name: 'Thailand Premier League' },
+            { id: '4579', name: 'Indonesia Liga 1' },
+            { id: '4607', name: 'Malaysia Super League' },
+            { id: '4614', name: 'Saudi Pro League' },
+            { id: '4610', name: 'UAE Arabian Gulf League' },
+            { id: '4613', name: 'Qatar Stars League' }
         ];
         
         const allFixtures = [];
         
-        for (const league of leagues) {
+        for (const league of TARGET_LEAGUES) {
             try {
-                const url = `https://v3.football.api-sports.io/fixtures`;
-                const response = await axios.get(url, {
-                    params: {
-                        league: league.id,
-                        season: '2025',
-                        from: today,
-                        to: tomorrow,
-                        status: 'NS'
-                    },
-                    headers: {
-                        'x-apisports-key': APISPORTS_KEY
-                    },
-                    timeout: 15000
+                const response = await axios.get(`${THESPORTSDB_BASE_URL}/${SPORTS_DB_KEY}/eventsnextleague.php`, {
+                    params: { id: league.id },
+                    timeout: 10000
                 });
                 
-                const fixtures = response.data?.response || [];
-                console.log(`[API-Sports] ${league.name}: ${fixtures.length} fixtures`);
+                const events = response.data?.events || [];
                 
-                for (const f of fixtures) {
+                if (events.length > 0) {
+                    console.log(`[TheSportsDB] ${league.name}: ${events.length} fixtures`);
+                }
+                
+                for (const event of events) {
+                    if (!event.strHomeTeam || !event.strAwayTeam) continue;
+                    
+                    const startTime = event.strTimestamp 
+                        ? new Date(event.strTimestamp).toISOString()
+                        : event.dateEvent && event.strTime 
+                            ? new Date(`${event.dateEvent}T${event.strTime}`).toISOString()
+                            : null;
+                    
                     allFixtures.push({
-                        match_id: String(f.fixture.id),
+                        match_id: String(event.idEvent || `tsdb-${Date.now()}-${Math.random()}`),
                         sport: 'football',
-                        home_team: f.teams?.home?.name || null,
-                        away_team: f.teams?.away?.name || null,
-                        date: f.fixture.date || null,
-                        status: f.fixture.status?.short || 'NS',
+                        home_team: event.strHomeTeam,
+                        away_team: event.strAwayTeam,
+                        date: startTime,
+                        status: 'NS',
                         market: '1X2',
                         prediction: null,
                         confidence: null,
                         volatility: null,
-                        odds: f.odds?.values?.[0] || null,
-                        provider: 'api-sports',
-                        provider_name: 'API-Football',
+                        odds: null,
+                        provider: 'the-sports-db',
+                        provider_name: 'TheSportsDB',
                         league: league.name,
                         league_id: league.id,
-                        home_logo: f.teams?.home?.logo || null,
-                        away_logo: f.teams?.away?.logo || null,
-                        venue: f.fixture.venue?.name || null,
-                        city: f.fixture.venue?.city || null,
-                        country: f.league?.country || null,
-                        round: f.league?.round || null,
-                        raw_provider_data: f
+                        home_logo: event.strHomeTeamBadge || null,
+                        away_logo: event.strAwayTeamBadge || null,
+                        venue: event.strVenue || null,
+                        city: null,
+                        country: event.strCountry || null,
+                        round: event.strRound || null,
+                        raw_provider_data: event
                     });
                 }
                 
                 await new Promise(r => setTimeout(r, 300));
+                
             } catch (err) {
-                console.error(`[API-Sports] ${league.name} failed:`, err.message);
+                // Silent fail for rate limiting, just skip this league
             }
         }
         
-        console.log(`[STEP 1] Total fixtures fetched: ${allFixtures.length}`);
+        console.log(`[STEP 1b] Total from TheSportsDB: ${allFixtures.length}`);
         return allFixtures;
         
     } catch (err) {
-        console.error('[STEP 1] Failed:', err.message);
+        console.error('[STEP 1b] Failed:', err.message);
         return [];
     }
 }
 
 // ============================================================
-// STEP 2: FETCH WEATHER FOR EACH MATCH VENUE
+// STEP 2: FETCH WEATHER FOR EACH MATCH VENUE (USING AXIOS DIRECTLY)
 // ============================================================
 async function fetchWeatherForFixtures(fixtures) {
     console.log('\n[STEP 2] Fetching weather data for match venues...');
@@ -128,41 +286,68 @@ async function fetchWeatherForFixtures(fixtures) {
     
     for (const fixture of fixtures) {
         try {
-            // Try to get city/country for weather lookup
             const city = fixture.city || fixture.venue?.split(',').pop()?.trim() || null;
-            const country = fixture.country || null;
             
-            if (city && country) {
-                // Use Open-Meteo geocoding + weather
+            if (city) {
+                // Use Open-Meteo geocoding API directly with axios
                 const geoResponse = await axios.get(
                     `https://geocoding-api.open-meteo.com/v1/search`,
-                    { params: { name: city, count: 1 }, timeout: 5000 }
+                    { params: { name: city, count: 1, language: 'en', format: 'json' }, timeout: 5000 }
                 );
                 
                 const geoData = geoResponse.data?.results?.[0];
                 
-                if (geoData) {
-                    const weather = await getWeather(geoData.latitude, geoData.longitude, fixture.date);
-                    fixture.weather = weather;
-                    weatherFetched++;
+                if (geoData && geoData.latitude && geoData.longitude) {
+                    const dateStr = fixture.date ? fixture.date.split('T')[0] : new Date().toISOString().split('T')[0];
                     
-                    if (weatherFetched <= 3) {
-                        console.log(`[Weather] ${fixture.home_team} vs ${fixture.away_team}: ${weather.description} ${weather.temp}°C`);
+                    const weatherResponse = await axios.get(
+                        `https://api.open-meteo.com/v1/forecast`,
+                        {
+                            params: {
+                                latitude: geoData.latitude,
+                                longitude: geoData.longitude,
+                                hourly: 'temperature_2m,precipitation,weather_code,wind_speed_10m',
+                                timezone: 'auto',
+                                start_date: dateStr,
+                                end_date: dateStr
+                            },
+                            timeout: 5000
+                        }
+                    );
+                    
+                    if (weatherResponse.data?.hourly) {
+                        const hourIndex = fixture.date ? new Date(fixture.date).getHours() : 12;
+                        const temp = weatherResponse.data.hourly.temperature_2m?.[hourIndex];
+                        const wind = weatherResponse.data.hourly.wind_speed_10m?.[hourIndex];
+                        const code = weatherResponse.data.hourly.weather_code?.[hourIndex];
+                        
+                        const weatherDescriptions = {
+                            0: 'Clear', 1: 'Mainly Clear', 2: 'Partly Cloudy', 3: 'Overcast',
+                            45: 'Fog', 48: 'Rime Fog', 51: 'Light Drizzle', 53: 'Drizzle',
+                            55: 'Heavy Drizzle', 61: 'Light Rain', 63: 'Moderate Rain',
+                            65: 'Heavy Rain', 71: 'Light Snow', 73: 'Moderate Snow', 75: 'Heavy Snow'
+                        };
+                        
+                        fixture.weather = {
+                            description: weatherDescriptions[code] || 'Unknown',
+                            temp: temp ? Math.round(temp) : null,
+                            wind: wind ? Math.round(wind) : null,
+                            emoji: code >= 61 ? '🌧️' : code >= 51 ? '🌦️' : code >= 3 ? '⛅' : '☀️'
+                        };
+                        weatherFetched++;
                     }
                 }
             }
             
             if (!fixture.weather) {
-                fixture.weather = { description: 'Unknown', temp: null, wind: null, rain: null, emoji: '?' };
+                fixture.weather = { description: 'Unknown', temp: null, wind: null, emoji: '?' };
             }
             
-            enrichedFixtures.push(fixture);
-            await new Promise(r => setTimeout(r, 100));
-            
         } catch (err) {
-            fixture.weather = { description: 'Unavailable', temp: null, wind: null, rain: null, emoji: '?' };
-            enrichedFixtures.push(fixture);
+            fixture.weather = { description: 'Unavailable', temp: null, wind: null, emoji: '?' };
         }
+        
+        enrichedFixtures.push(fixture);
     }
     
     console.log(`[STEP 2] Weather fetched for ${weatherFetched}/${fixtures.length} fixtures`);
@@ -170,51 +355,11 @@ async function fetchWeatherForFixtures(fixtures) {
 }
 
 // ============================================================
-// STEP 3: FETCH NEWS FROM RAPIDAPI
+// STEP 3: FETCH NEWS (SKIPPED - RapidAPI endpoints returning 404)
 // ============================================================
 async function fetchFootballNews() {
-    console.log('\n[STEP 3] Fetching football news from RapidAPI...');
-    
-    const newsCache = new Map();
-    
-    try {
-        const leagues = [
-            { name: 'Premier League', id: '4328' },
-            { name: 'La Liga', id: '4335' },
-            { name: 'Serie A', id: '4332' },
-            { name: 'Bundesliga', id: '4331' },
-            { name: 'Ligue 1', id: '4334' }
-        ];
-        
-        for (const league of leagues) {
-            try {
-                const response = await axios.get(
-                    `https://${process.env.RAPIDAPI_HOST_NEWSNOW || 'newsnow.p.rapidapi.com'}/news`,
-                    {
-                        params: { query: `${league.name} football team`, language: 'en' },
-                        headers: {
-                            'x-rapidapi-key': RAPIDAPI_KEY,
-                            'x-rapidapi-host': process.env.RAPIDAPI_HOST_NEWSNOW || 'newsnow.p.rapidapi.com'
-                        },
-                        timeout: 10000
-                    }
-                );
-                
-                const articles = response.data?.results || [];
-                newsCache.set(league.name, articles.slice(0, 5));
-                console.log(`[News] ${league.name}: ${articles.length} articles`);
-                
-                await new Promise(r => setTimeout(r, 200));
-            } catch (err) {
-                console.warn(`[News] ${league.name} failed:`, err.message);
-            }
-        }
-        
-    } catch (err) {
-        console.error('[STEP 3] News fetch failed:', err.message);
-    }
-    
-    return newsCache;
+    console.log('\n[STEP 3] News fetch skipped (RapidAPI endpoints unavailable)');
+    return new Map();
 }
 
 // ============================================================
@@ -470,11 +615,35 @@ async function main() {
     console.log('========================================\n');
     
     try {
-        // STEP 1: Fetch real fixtures
-        let fixtures = await fetchFixturesFromAPISports();
+        // STEP 1: Fetch from API-Sports (demo mode with historical data)
+        let apiSportsFixtures = await fetchFixturesFromAPISportsV2();
+        
+        // STEP 1b: Supplementary from TheSportsDB
+        let sportsDbFixtures = await fetchFixturesFromTheSportsDB();
+        
+        // Combine and deduplicate
+        const allFixturesMap = new Map();
+        
+        // Add API-Sports fixtures first (higher priority)
+        for (const f of apiSportsFixtures) {
+            const key = `${f.home_team}-${f.away_team}-${f.league}`;
+            if (!allFixturesMap.has(key) && f.home_team && f.away_team) {
+                allFixturesMap.set(key, f);
+            }
+        }
+        
+        // Add TheSportsDB fixtures (avoid duplicates)
+        for (const f of sportsDbFixtures) {
+            const key = `${f.home_team}-${f.away_team}-${f.league}`;
+            if (!allFixturesMap.has(key) && f.home_team && f.away_team) {
+                allFixturesMap.set(key, f);
+            }
+        }
+        
+        let fixtures = Array.from(allFixturesMap.values());
         
         if (fixtures.length === 0) {
-            console.log('[WARNING] No fixtures from API-Sports. Trying fallback sources...');
+            console.log('[WARNING] No fixtures from API sources. Trying fallback...');
             fixtures = await buildLiveData({ sport: 'football' });
         }
         
@@ -482,6 +651,8 @@ async function main() {
             console.log('[ERROR] No fixtures available from any source!');
             return;
         }
+        
+        console.log(`\n[TOTAL] Combined fixtures: ${fixtures.length}`);
         
         // STEP 2: Fetch weather
         fixtures = await fetchWeatherForFixtures(fixtures);

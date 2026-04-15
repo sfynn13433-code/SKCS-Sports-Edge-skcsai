@@ -518,6 +518,204 @@ app.post('/api/grade-predictions', requireRefreshKey, async (req, res) => {
     }
 });
 
+// ============================================================
+// TIERED CRON SYNC ENDPOINTS
+// External cron jobs should hit these at different intervals
+// ============================================================
+
+const { fetchWithWaterfall, fetchLiveScores } = require('./utils/rapidApiWaterfall');
+const { pool } = require('./database');
+
+// TIER 1: LIVE SYNC (Hits Tier 1 APIs) -> Run every 5 minutes
+// Uses fetchWithWaterfall() to grab live scores, red cards, and shifting odds.
+// DOES NOT wipe the database. Uses Supabase upsert to update existing rows.
+app.get('/api/cron/sync-live', requireRole('admin'), async (req, res) => {
+    console.log('[cron/sync-live] Starting tier-1 live sync...');
+    
+    try {
+        const today = new Date().toISOString().split('T')[0];
+        const liveData = await fetchLiveScores(today);
+        
+        if (liveData && liveData.data) {
+            const fixtures = Array.isArray(liveData.data) ? liveData.data : liveData.data.response || [];
+            console.log(`[cron/sync-live] Fetched ${fixtures.length} live fixtures via ${liveData.host}`);
+            
+            const client = await pool.connect();
+            let upserted = 0;
+            
+            try {
+                for (const f of fixtures.slice(0, 50)) {
+                    const matchId = String(f.fixture?.id || f.id || '');
+                    const homeTeam = f.teams?.home?.name || f.home_team || '';
+                    const awayTeam = f.teams?.away?.name || f.away_team || '';
+                    const status = f.fixture?.status?.short || f.status || 'NS';
+                    const score = f.goals ? `${f.goals.home}-${f.goals.away}` : null;
+                    
+                    if (matchId && homeTeam && awayTeam) {
+                        await client.query(`
+                            INSERT INTO predictions_final (tier, type, matches, sport, market_type, recommendation, created_at)
+                            VALUES ('live', 'direct', $1::jsonb, 'football', '1X2', $2, NOW())
+                            ON CONFLICT DO UPDATE SET
+                                matches = EXCLUDED.matches,
+                                recommendation = EXCLUDED.recommendation
+                        `, [{
+                            fixture_id: matchId,
+                            home_team: homeTeam,
+                            away_team: awayTeam,
+                            score,
+                            status,
+                            metadata: { live_data: true, source: liveData.host }
+                        }, `${homeTeam} ${score || 'vs'} ${awayTeam}`]);
+                        
+                        upserted++;
+                    }
+                }
+            } finally {
+                client.release();
+            }
+            
+            console.log(`[cron/sync-live] Completed: ${upserted} fixtures upserted`);
+        }
+        
+        res.json({ message: 'Live sync complete', status: 'ok' });
+        
+    } catch (err) {
+        console.error('[cron/sync-live] Failed:', err.message);
+        res.status(500).json({ error: 'Live sync failed' });
+    }
+});
+
+// TIER 2: STANDARD SYNC (Hits Tier 2 APIs) -> Run every 60 minutes
+// Hits AllSportsApi, Cricbuzz, Sofascore for general fixture generation
+// and injury updates for the upcoming week.
+app.get('/api/cron/sync-standard', requireRole('admin'), async (req, res) => {
+    console.log('[cron/sync-standard] Starting tier-2 standard sync...');
+    
+    try {
+        const fixtures = await fetchWithWaterfall('/v1/fixtures', { sport: 'soccer' }, 'TIER_2', 10000);
+        
+        if (fixtures && fixtures.data) {
+            const data = Array.isArray(fixtures.data) ? fixtures.data : fixtures.data.response || [];
+            console.log(`[cron/sync-standard] Fetched ${data.length} fixtures via ${fixtures.host}`);
+            
+            const client = await pool.connect();
+            let upserted = 0;
+            
+            try {
+                for (const f of data.slice(0, 100)) {
+                    const matchId = String(f.id || f.fixture?.id || '');
+                    if (matchId) {
+                        await client.query(`
+                            INSERT INTO predictions_final (tier, type, matches, sport, market_type, recommendation, created_at)
+                            VALUES ('standard', 'direct', $1::jsonb, 'football', '1X2', $2, NOW())
+                            ON CONFLICT DO UPDATE SET
+                                matches = EXCLUDED.matches
+                        `, [{
+                            fixture_id: matchId,
+                            home_team: f.home_team || f.teams?.home?.name,
+                            away_team: f.away_team || f.teams?.away?.name,
+                            date: f.date || f.fixture?.date,
+                            metadata: { source: fixtures.host }
+                        }, `vs`]);
+                        
+                        upserted++;
+                    }
+                }
+            } finally {
+                client.release();
+            }
+            
+            console.log(`[cron/sync-standard] Completed: ${upserted} fixtures upserted`);
+        }
+        
+        res.json({ message: 'Standard sync complete', status: 'ok' });
+        
+    } catch (err) {
+        console.error('[cron/sync-standard] Failed:', err.message);
+        res.status(500).json({ error: 'Standard sync failed' });
+    }
+});
+
+// TIER 3: DEEP SYNC (Hits Tier 3 APIs) -> Run every 24 hours (Midnight)
+// Hits Football News API, MMA, F1 for deep EdgeMind context.
+// Saves summaries to Supabase so the AI has context for the day.
+app.get('/api/cron/sync-deep', requireRole('admin'), async (req, res) => {
+    console.log('[cron/sync-deep] Starting tier-3 deep sync...');
+    
+    try {
+        const newsData = await fetchWithWaterfall('/v1/news', { query: 'football match analysis' }, 'TIER_3', 15000);
+        
+        if (newsData && newsData.data) {
+            const articles = Array.isArray(newsData.data) ? newsData.data : newsData.data.results || [];
+            console.log(`[cron/sync-deep] Fetched ${articles.length} news articles via ${newsData.host}`);
+            
+            const client = await pool.connect();
+            let saved = 0;
+            
+            try {
+                for (const article of articles.slice(0, 20)) {
+                    const title = article.title || article.headline || '';
+                    const summary = article.description || article.summary || '';
+                    
+                    if (title) {
+                        await client.query(`
+                            INSERT INTO predictions_final (tier, type, matches, sport, market_type, recommendation, edgemind_report, created_at)
+                            VALUES ('deep', 'context', '[]'::jsonb, 'football', 'news', $1, $2, NOW())
+                            ON CONFLICT DO NOTHING
+                        `, [title, summary.substring(0, 500)]);
+                        
+                        saved++;
+                    }
+                }
+            } finally {
+                client.release();
+            }
+            
+            console.log(`[cron/sync-deep] Completed: ${saved} articles saved`);
+        }
+        
+        res.json({ message: 'Deep sync complete', status: 'ok' });
+        
+    } catch (err) {
+        console.error('[cron/sync-deep] Failed:', err.message);
+        res.status(500).json({ error: 'Deep sync failed' });
+    }
+});
+
+// FULL PIPELINE SYNC (Uses the main fetch-live-fixtures.js script)
+app.get('/api/cron/sync-full', requireRole('admin'), async (req, res) => {
+    console.log('[cron/sync-full] Starting full pipeline sync...');
+    
+    try {
+        const scriptPath = path.join(__dirname, '..', 'scripts', 'fetch-live-fixtures.js');
+        
+        await new Promise((resolve, reject) => {
+            const child = spawn(process.execPath, [scriptPath], {
+                env: { ...process.env },
+                stdio: ['ignore', 'pipe', 'pipe'],
+                timeout: 15 * 60 * 1000
+            });
+            
+            child.stdout.on('data', (chunk) => { process.stdout.write(chunk); });
+            child.stderr.on('data', (chunk) => { process.stderr.write(chunk); });
+            
+            child.on('close', (code) => {
+                if (code === 0) resolve();
+                else reject(new Error(`Script exited with code ${code}`));
+            });
+            
+            child.on('error', reject);
+        });
+        
+        console.log('[cron/sync-full] Completed');
+        res.json({ message: 'Full sync complete', status: 'ok' });
+        
+    } catch (err) {
+        console.error('[cron/sync-full] Failed:', err.message);
+        res.status(500).json({ error: 'Full sync failed' });
+    }
+});
+
 // --- Error handler -------------------------------------------------------------
 app.use((err, _req, res, _next) => {
   console.error('[error]', err);
