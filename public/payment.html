@@ -56,8 +56,8 @@
         
         async function init() {
             // Admin bypass: sfynn13433@gmail.com goes straight to dashboard
-            if (supabaseClient) {
-                const { data: { session } } = await supabaseClient.auth.getSession();
+            if (window.supabaseClient) {
+                const { data: { session } } = await window.supabaseClient.auth.getSession();
                 if (session?.user?.email?.toLowerCase() === ADMIN_EMAIL) {
                     mainCard.innerHTML = `
                         <div class="admin-badge">ADMIN BYPASS ACTIVE</div>
@@ -94,8 +94,8 @@
         }
         
         // Listen for auth state changes (post-confirmation routing)
-        if (supabaseClient) {
-            supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (window.supabaseClient) {
+            window.supabaseClient.auth.onAuthStateChange((event, session) => {
                 if (event === 'SIGNED_IN' && session?.user) {
                     if (session.user.email?.toLowerCase() === ADMIN_EMAIL) {
                         window.location.href = 'index.html';

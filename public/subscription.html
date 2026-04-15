@@ -624,8 +624,8 @@ async function selectPlan(tierId) {
   } catch (e) { /* ignore */ }
   
   // Admin bypass: if already logged in as admin, go straight to dashboard
-  if (supabaseClient) {
-    const { data: { session } } = await supabaseClient.auth.getSession();
+  if (window.supabaseClient) {
+    const { data: { session } } = await window.supabaseClient.auth.getSession();
     if (session?.user?.email?.toLowerCase() === ADMIN_EMAIL) {
       try {
         localStorage.removeItem('skcs_experience_mode');
@@ -645,8 +645,8 @@ function goBack() {
 
 async function initSubscriptionPage() {
   // Admin bypass: if admin lands here, send them back to dashboard
-  if (supabaseClient) {
-    const { data: { session } } = await supabaseClient.auth.getSession();
+  if (window.supabaseClient) {
+    const { data: { session } } = await window.supabaseClient.auth.getSession();
     if (session?.user?.email?.toLowerCase() === ADMIN_EMAIL) {
       console.log('🔓 Admin detected on subscription page, redirecting to dashboard');
       try {
