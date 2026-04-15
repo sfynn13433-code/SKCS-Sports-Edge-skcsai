@@ -1494,15 +1494,32 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             }
 
             // include_all bypass: return wide historical set for UI stress testing.
+            // But still filter by sport when sport parameter is provided.
             let queryStr = '';
             let queryParams = [];
             if (includeAll) {
-                queryStr = `
-                    SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at
-                    FROM predictions_final pf
-                    ORDER BY created_at DESC
-                    LIMIT 2500;
-                `;
+                // Even in include_all mode, respect sport filtering when specified
+                const sportFilterValues = getSportFilterValues(sport);
+                if (sportFilterValues.length > 0) {
+                    // Filter by sport - use OR condition to match any of the allowed sport values
+                    const sportPlaceholders = sportFilterValues.map((_, i) => `$${i + 1}`).join(', ');
+                    queryStr = `
+                        SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at
+                        FROM predictions_final pf
+                        WHERE LOWER(COALESCE(pf.sport, 'football')) IN (${sportPlaceholders})
+                        ORDER BY created_at DESC
+                        LIMIT 2500;
+                    `;
+                    queryParams = sportFilterValues.map(s => s.toLowerCase());
+                } else {
+                    // No sport filter - return all
+                    queryStr = `
+                        SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at
+                        FROM predictions_final pf
+                        ORDER BY created_at DESC
+                        LIMIT 2500;
+                    `;
+                }
             } else {
                 // Query ALL predictions with matching tier (don't restrict by publish_run_id).
                 // The date windowing and subscription filtering below handles what the user sees.
