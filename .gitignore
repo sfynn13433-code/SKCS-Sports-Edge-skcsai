@@ -37,6 +37,23 @@ MANIFEST
 # Exclude local environment, IDE, and log files
 backend/scripts/_vendor/
 .idea/
+.windsurf/
+.qwen/
+.vscode/
 backend/scripts/results/
 chaos_run.log
 chaos_run.err.log
+
+# Archive folder (quarantine)
+_archive/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
