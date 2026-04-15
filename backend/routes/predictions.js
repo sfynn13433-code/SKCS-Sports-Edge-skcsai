@@ -1544,12 +1544,21 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             if ((!predictions || predictions.length === 0) && config.supabase && config.supabase.url && config.supabase.anonKey) {
                 console.log('[predictions] DB empty - attempting Supabase fallback');
                 const sb = createClient(config.supabase.url, config.supabase.anonKey);
+                const sportFilterValues = getSportFilterValues(sport);
+                
                 if (includeAll) {
-                    const { data, error } = await sb
+                    let query = sb
                         .from('predictions_final')
                         .select('*')
                         .order('created_at', { ascending: false })
                         .limit(2500);
+                    
+                    // Apply sport filter even in includeAll mode
+                    if (sportFilterValues.length > 0) {
+                        query = query.in('sport', sportFilterValues);
+                    }
+
+                    const { data, error } = await query;
 
                     if (!error && Array.isArray(data) && data.length > 0) {
                         predictions = filterByVisibility(data, planId, includeAll);
