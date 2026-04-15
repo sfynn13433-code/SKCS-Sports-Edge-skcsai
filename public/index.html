@@ -1384,6 +1384,14 @@
         return (pred && Array.isArray(pred.matches) && pred.matches[0]) ? pred.matches[0] : {};
     }
 
+    function getMatchMarket(match) {
+        return match?.market_type || match?.market || '';
+    }
+
+    function getMatchRecommendation(match) {
+        return match?.recommendation || match?.prediction || '';
+    }
+
     function getPredictionConfidenceScore(pred) {
         const finalRec = pred && pred.final_recommendation && typeof pred.final_recommendation === 'object'
             ? pred.final_recommendation
@@ -1602,8 +1610,8 @@
     }
 
     function resolveDirectMarketOutcome(match) {
-        const marketKey = normalizeMarketKey(match && match.market);
-        const predictionKey = String(match && match.prediction || '').trim().toLowerCase();
+        const marketKey = normalizeMarketKey(getMatchMarket(match));
+        const predictionKey = String(getMatchRecommendation(match) || '').trim().toLowerCase();
 
         if (DIRECT_MARKET_OUTCOMES.has(marketKey)) {
             return marketKey;
@@ -1653,8 +1661,8 @@
         const firstMatch = getPrimaryMatch(pred);
         const matchInfo = formatMatchInfo(firstMatch, sport);
         const confidence = Math.max(0, Math.min(100, Math.round(getPredictionConfidenceScore(pred))));
-        const marketKey = normalizeMarketKey(firstMatch && firstMatch.market);
-        const prediction = String(firstMatch && firstMatch.prediction || '').trim();
+        const marketKey = normalizeMarketKey(getMatchMarket(firstMatch));
+        const prediction = String(getMatchRecommendation(firstMatch) || '').trim();
 
         card.innerHTML = `
             <div class="match-info">
@@ -1751,12 +1759,14 @@
     function buildSecondaryMarketDisplayItem(pred) {
         const firstMatch = (pred && Array.isArray(pred.matches) && pred.matches[0]) ? pred.matches[0] : {};
         const metadata = firstMatch.metadata || {};
+        const market = getMatchMarket(firstMatch);
+        const recommendation = getMatchRecommendation(firstMatch);
         return {
-            market: firstMatch.market || '',
-            prediction: firstMatch.prediction || '',
+            market: market || '',
+            prediction: recommendation || '',
             confidence: Math.max(0, Math.min(100, Math.round(Number(firstMatch.confidence || pred.total_confidence || 0)))),
-            label: formatMarketSelectionLabel(firstMatch.market, firstMatch.prediction),
-            description: buildSecondaryMarketDescription(firstMatch.market, metadata.market_description || '')
+            label: formatMarketSelectionLabel(market, recommendation),
+            description: buildSecondaryMarketDescription(market, metadata.market_description || '')
         };
     }
 
@@ -2093,10 +2103,11 @@
                 if (getSectionType(p) !== 'secondary') return false;
                 const firstMatch = (p && Array.isArray(p.matches) && p.matches[0]) ? p.matches[0] : {};
                 const directMatch = directByMatchId.get(String(firstMatch.match_id || '').trim());
-                if (!isDisplayFriendlySecondaryMarket(firstMatch.market)) return false;
+                const market = getMatchMarket(firstMatch);
+                if (!isDisplayFriendlySecondaryMarket(market)) return false;
                 return !directMatch || areSelectionsCompatible(directMatch, {
-                    market: firstMatch.market,
-                    prediction: firstMatch.prediction
+                    market: market,
+                    prediction: getMatchRecommendation(firstMatch)
                 });
             });
         const secondaryByMatchId = new Map();
@@ -2690,7 +2701,7 @@
      * Format prediction text
      */
     function formatPrediction(match) {
-        return formatMarketSelectionLabel(match && match.market, match && match.prediction);
+        return formatMarketSelectionLabel(getMatchMarket(match), getMatchRecommendation(match));
     }
 
     // --- EdgeMind BOT AND UI HELPERS ---
