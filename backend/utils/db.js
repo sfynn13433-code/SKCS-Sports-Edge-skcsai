@@ -1,3 +1,5 @@
 'use strict';
 
-module.exports = require('../db');
+// REDIRECTING TO ROOT TO PREVENT DUPLICATE POOLS
+const db = require('../db');
+module.exports = db;
