@@ -11,7 +11,7 @@
  * - Smart AI token saving (skip if report exists)
  */
 
-require('dotenv').config();
+require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });
 const axios = require('axios');
 const { pool } = require('../backend/database');
 const { enrichWithWeather } = require('../backend/utils/weather');

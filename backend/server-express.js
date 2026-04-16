@@ -682,7 +682,6 @@ app.get('/api/cron/sync-deep', verifyCronSecret, async (req, res) => {
 });
 
 // SIMPLE SYNC - No validation, direct insert
-const { spawn } = require('child_process');
 app.get('/api/cron/sync-simple', verifyCronSecret, async (req, res) => {
     console.log('[cron/sync-simple] Starting simple sync (no validation)...');
     

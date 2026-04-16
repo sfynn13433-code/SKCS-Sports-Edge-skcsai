@@ -5,7 +5,7 @@
  * Pulls ALL fixtures and inserts directly into predictions_final
  */
 
-require('dotenv').config();
+require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });
 const axios = require('axios');
 const { Pool } = require('pg');
 
@@ -76,15 +76,16 @@ async function insertDirect(fixtures) {
         for (const f of fixtures) {
             if (!f.home_team || !f.away_team) continue;
             
-            const matches = [{
-                fixture_id: f.match_id,
-                home_team: f.home_team,
-                away_team: f.away_team,
-                league: f.league,
-                date: f.date,
-                venue: f.venue,
-                status: f.status
-            }];
+            // Proper JSON escaping
+            const matchesJson = JSON.stringify([{
+                fixture_id: String(f.match_id || ''),
+                home_team: String(f.home_team || ''),
+                away_team: String(f.away_team || ''),
+                league: String(f.league || ''),
+                date: String(f.date || ''),
+                venue: String(f.venue || ''),
+                status: String(f.status || '')
+            }]);
             
             // Direct insert - no validation!
             await client.query(`
@@ -96,9 +97,12 @@ async function insertDirect(fixtures) {
                     'football', '1X2', 'vs', NOW()
                 )
                 ON CONFLICT DO NOTHING
-            `, [matches]);
+            `, [matchesJson]);
             
             inserted++;
+            if (inserted % 50 === 0) {
+                console.log(`[INSERT] ${inserted}...`);
+            }
         }
         
         await client.query('COMMIT');
