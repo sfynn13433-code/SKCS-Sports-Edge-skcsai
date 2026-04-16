@@ -300,6 +300,61 @@ async function generateEdgeMindReports(fixtures, existingMap) {
 }
 
 // ============================================================
+// PHASE 1: SAVE FIXTURES TO EVENTS TABLE
+// ============================================================
+async function saveFixturesToEvents(fixtures) {
+    console.log('\n[PHASE 1] Saving fixtures to events table...');
+    
+    const client = await pool.connect();
+    let upserted = 0;
+    
+    try {
+        await client.query('BEGIN');
+        
+        // Map fixtures to events table schema - limit to 100 for speed
+        const mappedEvents = fixtures.slice(0, 100).map(f => ({
+            id: f.match_id || String(f.fixture?.id || ''),
+            sport_key: 'football',
+            commence_time: f.date || new Date().toISOString(),
+            home_team: f.home_team,
+            away_team: f.away_team
+        })).filter(e => e.id && e.home_team && e.away_team);
+        
+        console.log(`[PHASE 1] Upserting ${mappedEvents.length} events...`);
+        
+        // Upsert each event
+        for (const event of mappedEvents) {
+            try {
+                await client.query(`
+                    INSERT INTO events (id, sport_key, commence_time, home_team, away_team)
+                    VALUES ($1, $2, $3, $4, $5)
+                    ON CONFLICT (id) DO UPDATE SET
+                        sport_key = EXCLUDED.sport_key,
+                        commence_time = EXCLUDED.commence_time,
+                        home_team = EXCLUDED.home_team,
+                        away_team = EXCLUDED.away_team
+                `, [event.id, event.sport_key, event.commence_time, event.home_team, event.away_team]);
+                
+                upserted++;
+            } catch (err) {
+                console.warn(`[PHASE 1] Failed to upsert event ${event.id}:`, err.message);
+            }
+        }
+        
+        await client.query('COMMIT');
+        console.log(`PHASE 1 SUCCESS: ${upserted} matches upserted into the events table.`);
+        return upserted;
+        
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error('[PHASE 1 ERROR]:', err.message);
+        throw err;
+    } finally {
+        client.release();
+    }
+}
+
+// ============================================================
 // STEP 6: INCREMENTAL UPSERT TO SUPABASE (NO WIPE)
 // ============================================================
 async function saveToSupabase(fixtures, existingMap) {
@@ -448,6 +503,11 @@ async function runLiveSync() {
         console.log(`\n[TOTAL] Fixtures to process: ${fixtures.length}`);
         fixturesProcessed = fixtures.length;
         
+        // ============================================================
+        // PHASE 1: Save raw fixtures to events table
+        // ============================================================
+        const eventsUpserted = await saveFixturesToEvents(fixtures);
+        
         // STEP 2: Weather
         fixtures = await fetchWeatherForFixtures(fixtures);
         
@@ -476,6 +536,7 @@ async function runLiveSync() {
             success: true, 
             fixtures: fixturesProcessed, 
             upserted: predictionsUpserted,
+            eventsUpserted,
             aiTokensSaved: existingMap.size
         };
         
