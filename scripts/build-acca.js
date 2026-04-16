@@ -4,44 +4,44 @@ const { Pool } = require('pg');
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 // ============================================================
-// PHASE 3B: ACCA BUILDER
+// HOTFIX: STRICT 6-LEG & 12-LEG ACCA ENFORCEMENT
 // ============================================================
 
 async function buildAccumulators() {
-    console.log('\n=== PHASE 3B: ACCA BUILDER ===\n');
+    console.log('\n=== PHASE 3B: STRICT ACCA BUILDER (6-Fold & 12-Fold) ===\n');
     
     const client = await pool.connect();
-    let totalAccas = 0;
-    let totalLegs = 0;
+    let sixLegAccas = 0;
+    let twelveLegAccas = 0;
+    let discardedRemainder = 0;
     
     try {
-        // STEP 1: Fetch rules
-        console.log('[STEP 1] Fetching acca_rules and tier_rules...');
+        // STEP 1: Fetch strict rules
+        console.log('[STEP 1] Fetching strict acca_rules...');
         
-        const [accaRulesResult, tierRulesResult] = await Promise.all([
-            client.query('SELECT * FROM acca_rules'),
-            client.query('SELECT * FROM tier_rules')
-        ]);
+        const rulesResult = await client.query('SELECT * FROM acca_rules');
+        const rules = rulesResult.rows;
         
-        const accaRules = accaRulesResult.rows;
-        const tierRules = tierRulesResult.rows;
+        const exactLegs6 = rules.find(r => r.rule_name === 'exact_legs_6')?.rule_value;
+        const exactLegs12 = rules.find(r => r.rule_name === 'exact_legs_12')?.rule_value;
+        const tier6 = rules.find(r => r.rule_name === '6fold_tier')?.rule_value;
+        const tier12 = rules.find(r => r.rule_name === '12fold_tier')?.rule_value;
         
-        console.log(`[STEP 1] Found ${accaRules.length} acca rules, ${tierRules.length} tier rules`);
+        console.log(`[STEP 1] Rules: 6-fold=${exactLegs6} (tier=${tier6}), 12-fold=${exactLegs12} (tier=${tier12})`);
         
-        // STEP 2: Fetch candidates - join with events to get future matches only
+        // STEP 2: Fetch candidates for each tier
         console.log('\n[STEP 2] Fetching candidate predictions from future matches...');
         
-        const candidatesResult = await client.query(`
+        const allCandidates = [];
+        
+        // Fetch normal tier candidates for 6-fold
+        const normalResult = await client.query(`
             SELECT 
                 pf.id,
                 pf.matches,
                 pf.total_confidence,
                 pf.risk_level,
                 pf.tier,
-                pf.type,
-                pf.sport,
-                pf.market_type,
-                pf.recommendation,
                 e.id as event_id,
                 e.home_team,
                 e.away_team,
@@ -50,93 +50,152 @@ async function buildAccumulators() {
             JOIN LATERAL jsonb_array_elements(pf.matches) m ON true
             JOIN events e ON e.id = (m->>'fixture_id')::text
             WHERE pf.type = 'direct'
+            AND pf.tier = $1
             AND e.commence_time > NOW()
             AND (e.status IS NULL OR e.status != 'FT')
-            AND pf.tier IN ('normal', 'deep')
             ORDER BY pf.total_confidence DESC
-            LIMIT 200
-        `);
+            LIMIT 500
+        `, [tier6]);
         
-        const candidates = candidatesResult.rows;
-        console.log(`[STEP 2] Found ${candidates.length} candidate predictions`);
+        // Fetch deep tier candidates for 12-fold
+        const deepResult = await client.query(`
+            SELECT 
+                pf.id,
+                pf.matches,
+                pf.total_confidence,
+                pf.risk_level,
+                pf.tier,
+                e.id as event_id,
+                e.home_team,
+                e.away_team,
+                e.commence_time
+            FROM predictions_final pf
+            JOIN LATERAL jsonb_array_elements(pf.matches) m ON true
+            JOIN events e ON e.id = (m->>'fixture_id')::text
+            WHERE pf.type = 'direct'
+            AND pf.tier = $1
+            AND e.commence_time > NOW()
+            AND (e.status IS NULL OR e.status != 'FT')
+            ORDER BY pf.total_confidence DESC
+            LIMIT 1000
+        `, [tier12]);
         
-        if (candidates.length === 0) {
-            console.log('No candidates available for accumulators');
-            return { accas: 0, legs: 0 };
+        const normalCandidates = normalResult.rows;
+        const deepCandidates = deepResult.rows;
+        
+        console.log(`[STEP 2] Normal candidates: ${normalCandidates.length}, Deep candidates: ${deepCandidates.length}`);
+        
+        // STEP 3: Build 6-Fold Accumulators (Normal Tier)
+        console.log('\n[STEP 3a] Building 6-Fold Accumulators...');
+        
+        const legCount6 = 6;
+        const usedFixtures6 = new Set();
+        const matchesFor6Fold = [];
+        
+        for (const c of normalCandidates) {
+            if (c.event_id && !usedFixtures6.has(c.event_id)) {
+                usedFixtures6.add(c.event_id);
+                matchesFor6Fold.push(c);
+            }
         }
         
-        // STEP 3: Build accumulators
-        console.log('\n[STEP 3] Building accumulators...');
+        // Chunk into exact 6-leg arrays
+        const sixFoldChunks = Math.floor(matchesFor6Fold.length / legCount6);
+        discardedRemainder += matchesFor6Fold.length % legCount6;
         
-        // Group by tier
-        const normalCandidates = candidates.filter(c => c.tier === 'normal');
-        const deepCandidates = candidates.filter(c => c.tier === 'deep');
-        
-        const accaConfigs = [
-            { name: 'Safe Double', minLegs: 2, maxLegs: 2, risk: 'low', source: 'normal', count: 10 },
-            { name: 'Medium Acca 3-Fold', minLegs: 3, maxLegs: 3, risk: 'medium', source: 'normal', count: 5 },
-            { name: 'Deep 4-Fold', minLegs: 4, maxLegs: 4, risk: 'medium', source: 'deep', count: 5 },
-            { name: 'High Roller 5-Fold', minLegs: 5, maxLegs: 5, risk: 'high', source: 'deep', count: 3 }
-        ];
-        
-        for (const config of accaConfigs) {
-            const poolCandidates = config.source === 'deep' ? deepCandidates : normalCandidates;
+        for (let i = 0; i < sixFoldChunks; i++) {
+            const chunk = matchesFor6Fold.slice(i * legCount6, (i + 1) * legCount6);
             
-            // Get unique fixtures for this pool
-            const usedFixtures = new Set();
-            const poolMatches = [];
-            
-            for (const c of poolCandidates) {
-                if (poolMatches.length >= config.maxLegs) break;
-                if (c.event_id && !usedFixtures.has(c.event_id)) {
-                    usedFixtures.add(c.event_id);
-                    poolMatches.push(c);
-                }
-            }
-            
-            if (poolMatches.length < config.minLegs) {
-                console.log(`[STEP 3] Skipping ${config.name} - not enough matches`);
-                continue;
-            }
-            
-            // Build accumulator matches array
-            const finalMatches = poolMatches.map((m, idx) => ({
+            const finalMatches = chunk.map((m, idx) => ({
                 fixture_id: m.event_id,
                 home_team: m.home_team,
                 away_team: m.away_team,
-                league: m.league || null,
                 commence_time: m.commence_time,
                 market: '1X2',
                 prediction: m.recommendation,
                 confidence: m.total_confidence,
-                metadata: { leg_index: idx, acca_name: config.name }
+                metadata: { leg_index: idx, acca_name: 'Standard 6-Fold' }
             }));
             
-            const avgConfidence = poolMatches.reduce((sum, m) => sum + (m.total_confidence || 65), 0) / poolMatches.length;
-            const riskLevel = config.risk;
+            const avgConfidence = chunk.reduce((sum, m) => sum + (m.total_confidence || 65), 0) / chunk.length;
             
-            // STEP 4: Insert directly into predictions_final as ACCA type
             await client.query(`
                 INSERT INTO predictions_final (tier, type, matches, total_confidence, risk_level, sport, market_type, recommendation, created_at)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
             `, [
-                config.source,
+                tier6,
                 'acca',
                 JSON.stringify(finalMatches),
-                avgConfidence,
-                riskLevel,
+                avgConfidence.toFixed(1),
+                'medium',
                 'football',
                 '1X2',
-                config.name
+                'Standard 6-Fold'
             ]);
             
-            console.log(`[STEP 3] Built ${config.name}: ${poolMatches.length} legs, tier=${config.source}, confidence=${avgConfidence.toFixed(1)}`);
-            totalAccas++;
-            totalLegs += poolMatches.length;
+            sixLegAccas++;
         }
         
-        console.log(`\nPHASE 3B SUCCESS: Built ${totalAccas} accumulators containing ${totalLegs} total legs and published to predictions_final.`);
-        return { accas: totalAccas, legs: totalLegs };
+        console.log(`[STEP 3a] Built ${sixLegAccas} x 6-Fold accumulators, discarded ${matchesFor6Fold.length % legCount6} remainder`);
+        
+        // STEP 4: Build 12-Fold Accumulators (Deep Tier)
+        console.log('\n[STEP 3b] Building 12-Fold Accumulators...');
+        
+        const legCount12 = 12;
+        const usedFixtures12 = new Set();
+        const matchesFor12Fold = [];
+        
+        for (const c of deepCandidates) {
+            if (c.event_id && !usedFixtures12.has(c.event_id)) {
+                usedFixtures12.add(c.event_id);
+                matchesFor12Fold.push(c);
+            }
+        }
+        
+        // Chunk into exact 12-leg arrays
+        const twelveFoldChunks = Math.floor(matchesFor12Fold.length / legCount12);
+        discardedRemainder += matchesFor12Fold.length % legCount12;
+        
+        for (let i = 0; i < twelveFoldChunks; i++) {
+            const chunk = matchesFor12Fold.slice(i * legCount12, (i + 1) * legCount12);
+            
+            const finalMatches = chunk.map((m, idx) => ({
+                fixture_id: m.event_id,
+                home_team: m.home_team,
+                away_team: m.away_team,
+                commence_time: m.commence_time,
+                market: '1X2',
+                prediction: m.recommendation,
+                confidence: m.total_confidence,
+                metadata: { leg_index: idx, acca_name: 'Mega 12-Fold' }
+            }));
+            
+            const avgConfidence = chunk.reduce((sum, m) => sum + (m.total_confidence || 65), 0) / chunk.length;
+            
+            await client.query(`
+                INSERT INTO predictions_final (tier, type, matches, total_confidence, risk_level, sport, market_type, recommendation, created_at)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+            `, [
+                tier12,
+                'acca',
+                JSON.stringify(finalMatches),
+                avgConfidence.toFixed(1),
+                'high',
+                'football',
+                '1X2',
+                'Mega 12-Fold'
+            ]);
+            
+            twelveLegAccas++;
+        }
+        
+        console.log(`[STEP 3b] Built ${twelveLegAccas} x 12-Fold accumulators, discarded ${matchesFor12Fold.length % legCount12} remainder`);
+        
+        const totalLegs = (sixLegAccas * legCount6) + (twelveLegAccas * legCount12);
+        
+        console.log(`\nHOTFIX SUCCESS: Built ${sixLegAccas} 6-leg accas and ${twelveLegAccas} 12-leg accas. Discarded ${discardedRemainder} remainder predictions.`);
+        
+        return { sixLeg: sixLegAccas, twelveLeg: twelveLegAccas, discarded: discardedRemainder, totalLegs };
         
     } catch (err) {
         console.error('[ERROR]', err.message);
