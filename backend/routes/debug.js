@@ -132,6 +132,23 @@ router.get('/db', async (_req, res) => {
     }
 });
 
+router.get('/predictions-count', async (_req, res) => {
+    try {
+        const result = await query(`
+            SELECT 
+                COUNT(*)::int as total,
+                COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '24 hours')::int as last_24h,
+                COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '1 hour')::int as last_hour
+            FROM predictions_final
+        `);
+        const counts = result.rows[0] || { total: 0, last_24h: 0, last_hour: 0 };
+        res.status(200).json({ ok: true, ...counts });
+    } catch (err) {
+        console.error('[debug/predictions-count] error:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 router.get('/pipeline-status', async (req, res) => {
     const sport = normalizeSportKey(req.query.sport || 'football');
     const planId = String(req.query.plan_id || 'elite_30day_deep_vip').trim();
