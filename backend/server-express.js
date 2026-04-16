@@ -543,18 +543,22 @@ function verifyCronSecret(req, res, next) {
 app.get('/api/cron/sync-live', verifyCronSecret, async (req, res) => {
     console.log('[cron/sync-live] Starting tier-1 live sync...');
     
+    const debugInfo = {
+        hasApiKey: !!process.env.X_APISPORTS_KEY,
+        hasDbUrl: !!process.env.DATABASE_URL
+    };
+    console.log('[cron/sync-live] Config check:', debugInfo);
+    
     try {
-        const hasApiKey = !!process.env.X_APISPORTS_KEY;
-        const hasDbUrl = !!process.env.DATABASE_URL;
-        console.log('[cron/sync-live] Config check:', { hasApiKey, hasDbUrl });
-        
         const result = await runLiveSync();
+        const finalCount = await query('SELECT COUNT(*) as cnt FROM predictions_final');
         console.log('[cron/sync-live] Result:', JSON.stringify(result));
-        res.json({ status: 'ok', ...result });
+        console.log('[cron/sync-live] Final count:', finalCount.rows[0]?.cnt);
+        res.json({ status: 'ok', syncResult: result, debugInfo, dbCount: finalCount.rows[0]?.cnt });
         
     } catch (err) {
         console.error('[cron/sync-live] Failed:', err.message, err.stack);
-        res.json({ status: 'error', message: 'Live sync failed', error: err.message });
+        res.json({ status: 'error', message: 'Live sync failed', error: err.message, debugInfo });
     }
 });
 
