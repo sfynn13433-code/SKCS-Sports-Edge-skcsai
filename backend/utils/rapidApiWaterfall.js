@@ -4,6 +4,9 @@ const axios = require('axios');
 
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY || process.env.X_RAPIDAPI_KEY;
 
+// Import cache utilities
+const { cachedAxios, CACHE_TTL } = require('./apiCache');
+
 const TIER_1_HOSTS = [
     'football-hub.p.rapidapi.com',
     'football-api.p.rapidapi.com',
@@ -59,21 +62,28 @@ async function fetchWithWaterfall(endpoint, params = {}, tier = 'TIER_1', timeou
 
     for (let i = 0; i < hosts.length; i++) {
         const host = hosts[i];
+        
+        // Check cache before making request
+        const cacheKey = `${host}${endpoint}?${Object.entries(params).sort().map(([k,v]) => `${k}=${v}`).join('&')}`;
+        
         try {
             console.log(`[Waterfall-${tier}] Attempting: ${host}${endpoint}`);
             
-            const response = await axios.get(`https://${host}${endpoint}`, {
+            // Use cached axios call
+            const result = await cachedAxios({
+                url: `https://${host}${endpoint}`,
                 params,
                 headers: {
                     'x-rapidapi-key': RAPIDAPI_KEY,
                     'x-rapidapi-host': host
                 },
                 timeout: timeoutMs
-            });
+            }, host);
 
-            if (response.status === 200 && response.data) {
-                console.log(`[Waterfall-${tier}] Success via ${host}!`);
-                return { data: response.data, host };
+            if (result.data) {
+                const fromMsg = result.fromCache ? ' (FROM CACHE)' : '';
+                console.log(`[Waterfall-${tier}] Success via ${host}${fromMsg}!`);
+                return { data: result.data, host };
             }
         } catch (error) {
             const status = error.response?.status || 'TIMEOUT/NETWORK';
