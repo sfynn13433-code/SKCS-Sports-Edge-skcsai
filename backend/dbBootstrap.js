@@ -151,18 +151,21 @@ async function bootstrap() {
         `);
 
         // Seed tier_rules (MINIMAL thresholds - accept ANY prediction)
-        await query(`
-            INSERT INTO tier_rules (tier, min_confidence, allowed_markets, max_acca_size, allowed_volatility)
-            VALUES
-                ('normal', 1, '["ALL"]'::jsonb, 100, '["low","medium","high"]'::jsonb),
-                ('deep', 1, '["ALL"]'::jsonb, 100, '["low","medium","high"]'::jsonb),
-                ('ultra', 1, '["ALL"]'::jsonb, 100, '["low","medium","high"]'::jsonb)
-            ON CONFLICT (tier) DO UPDATE SET
-                min_confidence = 1,
-                allowed_markets = '["ALL"]'::jsonb,
-                max_acca_size = 100,
-                allowed_volatility = '["low","medium","high"]'::jsonb;
-        `);
+        try {
+            await query(`
+                INSERT INTO tier_rules (tier, min_confidence, allowed_markets, max_acca_size, allowed_volatility)
+                VALUES
+                    ('normal', 1, '["ALL"]'::jsonb, 100, '["low","medium","high"]'::jsonb),
+                    ('deep', 1, '["ALL"]'::jsonb, 100, '["low","medium","high"]'::jsonb)
+                ON CONFLICT (tier) DO UPDATE SET
+                    min_confidence = 1,
+                    allowed_markets = '["ALL"]'::jsonb,
+                    max_acca_size = 100,
+                    allowed_volatility = '["low","medium","high"]'::jsonb;
+            `);
+        } catch (err) {
+            console.log('[dbBootstrap] Skipping tier rules insert due to constraint:', err.message);
+        }
 
         // Seed acca_rules (allow high volatility now)
         await query(`

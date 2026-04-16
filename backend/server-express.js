@@ -546,8 +546,7 @@ app.get('/api/admin/reset-tier-rules', async (_req, res) => {
             INSERT INTO tier_rules (tier, min_confidence, allowed_markets, max_acca_size, allowed_volatility)
             VALUES
                 ('normal', 1, '["ALL"]'::jsonb, 100, '["low","medium","high"]'::jsonb),
-                ('deep', 1, '["ALL"]'::jsonb, 100, '["low","medium","high"]'::jsonb),
-                ('ultra', 1, '["ALL"]'::jsonb, 100, '["low","medium","high"]'::jsonb)
+                ('deep', 1, '["ALL"]'::jsonb, 100, '["low","medium","high"]'::jsonb)
             ON CONFLICT (tier) DO UPDATE SET
                 min_confidence = 1,
                 allowed_markets = '["ALL"]'::jsonb,

@@ -130,11 +130,18 @@ function mapTheSportsDbFixture(event, fallbackLeagueId) {
 
     if (!leagueId || !fixtureId) return null;
 
+    const homeTeam = event?.strHomeTeam || null;
+    const awayTeam = event?.strAwayTeam || null;
+    if (!homeTeam || !awayTeam) {
+        console.warn(`[dataProvider] Skipping TheSportsDB fixture ${fixtureId}: missing team name (home=${homeTeam}, away=${awayTeam})`);
+        return null;
+    }
+
     return {
         fixture_id: fixtureId,
         league_id: leagueId,
-        home_team: event?.strHomeTeam || null,
-        away_team: event?.strAwayTeam || null,
+        home_team: homeTeam,
+        away_team: awayTeam,
         start_time: normalizeTheSportsDbStartTime(event),
         status: 'NS',
         league_name: event?.strLeague || event?.strLeagueAlternate || null,
@@ -272,13 +279,21 @@ async function fetchOddsData(sportKey) {
 
     const normalizedSport = normalizeSportKey(sportKey);
 
-    return data.map(event => {
+    const out = [];
+    for (const event of data) {
+        const homeTeam = event.home_team || null;
+        const awayTeam = event.away_team || null;
+        if (!homeTeam || !awayTeam) {
+            console.warn(`[dataProvider] Skipping OddsAPI event ${event.id}: missing team name (home=${homeTeam}, away=${awayTeam})`);
+            continue;
+        }
+
         const marketView = derivePredictionFromH2HOutcomes(event);
-        return {
+        out.push({
         match_id: `odds-${event.id}`,
         sport: normalizedSport,
-        home_team: event.home_team,
-        away_team: event.away_team,
+        home_team: homeTeam,
+        away_team: awayTeam,
         date: event.commence_time || null,
         market: '1X2',
         prediction: marketView?.prediction || null,
@@ -291,8 +306,10 @@ async function fetchOddsData(sportKey) {
         bookmaker: marketView?.bookmaker || null
         ,
         raw_provider_data: event
-    };
-    });
+        });
+    }
+
+    return out;
 }
 
 async function fetchSportsDataOrg(sport, leagueCode) {
@@ -340,11 +357,17 @@ function futureStr(days) {
 function normalizeFixture(f, sport) {
     // Football v3 format
     if (f?.fixture?.id) {
+        const homeTeam = f.teams?.home?.name || null;
+        const awayTeam = f.teams?.away?.name || null;
+        if (!homeTeam || !awayTeam) {
+            console.warn(`[dataProvider] Skipping fixture ${f.fixture.id}: missing team name (home=${homeTeam}, away=${awayTeam})`);
+            return null;
+        }
         return {
             match_id: String(f.fixture.id),
             sport,
-            home_team: f.teams?.home?.name || null,
-            away_team: f.teams?.away?.name || null,
+            home_team: homeTeam,
+            away_team: awayTeam,
             date: f.fixture?.date || null,
             status: f.fixture?.status?.short || null,
             market: '1X2',
@@ -369,6 +392,11 @@ function normalizeFixture(f, sport) {
     const status = f.status?.short || f.game?.status?.short || null;
     const league = f.league?.name || f.competition?.name || f.tournament?.name || humanizeCompetitionLabel(sport);
     const venue = f.venue?.name || f.game?.venue?.name || f.race?.circuit?.name || null;
+
+    if (!home || !away) {
+        console.warn(`[dataProvider] Skipping fixture: missing team name (home=${home}, away=${away})`);
+        return null;
+    }
 
     return {
         match_id: id ? String(id) : `live-${sport}-${home}-${away}`,
@@ -448,7 +476,7 @@ async function buildLiveData(options = {}) {
         }
 
         if (fixtures.length > 0) {
-            const out = fixtures.slice(0, maxFixturesPerSource).map(f => normalizeFixture(f, sport));
+            const out = fixtures.slice(0, maxFixturesPerSource).map(f => normalizeFixture(f, sport)).filter(Boolean);
             console.log(`[dataProvider] ${sport}: API-Sports fetched=${fixtures.length} returned=${out.length}`);
             return out;
         }

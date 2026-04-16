@@ -543,6 +543,7 @@ async function buildRawPredictionFromProviderItem(item) {
             market_intelligence: {
                 direct_market: selectedDirect,
                 secondary_market: selectedSecondary,
+                rule_of_4_markets: marketSelections.rule_of_4_markets || [],
                 same_match: marketSelections.same_match,
                 risk_profile: marketIntelligence.risk_profile,
                 ranked_markets: ensureArray(marketIntelligence.candidates)

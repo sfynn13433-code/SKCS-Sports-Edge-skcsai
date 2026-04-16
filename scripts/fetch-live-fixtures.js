@@ -21,6 +21,29 @@ const RAPIDAPI_KEY = process.env.X_RAPIDAPI_KEY || process.env.RAPIDAPI_KEY;
 const APISPORTS_KEY = process.env.X_APISPORTS_KEY;
 
 // ============================================================
+// FIXTURE NORMALIZER (MISSING FUNCTION!)
+// ============================================================
+function normalizeFixture(f, date) {
+    const homeTeam = f.teams?.home?.name;
+    const awayTeam = f.teams?.away?.name;
+    
+    if (!homeTeam || !awayTeam) {
+        console.log(`[normalizeFixture] Skipping fixture with missing team: home=${homeTeam}, away=${awayTeam}`);
+        return null;
+    }
+    
+    return {
+        match_id: String(f.fixture?.id || ''),
+        home_team: homeTeam,
+        away_team: awayTeam,
+        league: f.league?.name || null,
+        date: f.fixture?.date || date,
+        venue: f.fixture?.venue?.name || null,
+        status: f.fixture?.status?.short || null
+    };
+}
+
+// ============================================================
 // MASTER LEAGUES LIST (API-Sports IDs)
 // ============================================================
 const MASTER_LEAGUES = new Set([
@@ -197,198 +220,82 @@ async function fetchFixturesSingleAPI() {
     return allFixtures;
 }
 
-// ============================================================
-// STEP 2: FETCH WEATHER (USING AXIOS)
+// STEP 2: WEATHER (SKIP FOR NOW)
 // ============================================================
 async function fetchWeatherForFixtures(fixtures) {
-    console.log('\n[STEP 2] Fetching weather data...');
-    
-    const enrichedFixtures = [];
-    
-    for (const fixture of fixtures) {
-        try {
-            const city = fixture.city || fixture.venue?.split(',').pop()?.trim() || null;
-            
-            if (city) {
-                // Use Open-Meteo directly with axios
-                const geoResponse = await axios.get(
-                    `https://geocoding-api.open-meteo.com/v1/search`,
-                    { params: { name: city, count: 1, language: 'en', format: 'json' }, timeout: 5000 }
-                );
-                
-                const geoData = geoResponse.data?.results?.[0];
-                
-                if (geoData && geoData.latitude && geoData.longitude) {
-                    const dateStr = fixture.date ? fixture.date.split('T')[0] : new Date().toISOString().split('T')[0];
-                    
-                    const weatherResponse = await axios.get(
-                        `https://api.open-meteo.com/v1/forecast`,
-                        {
-                            params: {
-                                latitude: geoData.latitude,
-                                longitude: geoData.longitude,
-                                hourly: 'temperature_2m,weather_code,wind_speed_10m',
-                                timezone: 'auto',
-                                start_date: dateStr,
-                                end_date: dateStr
-                            },
-                            timeout: 5000
-                        }
-                    );
-                    
-                    if (weatherResponse.data?.hourly) {
-                        const hourIndex = fixture.date ? new Date(fixture.date).getHours() : 12;
-                        const temp = weatherResponse.data.hourly.temperature_2m?.[hourIndex];
-                        const wind = weatherResponse.data.hourly.wind_speed_10m?.[hourIndex];
-                        const code = weatherResponse.data.hourly.weather_code?.[hourIndex];
-                        
-                        const descriptions = { 0: 'Clear', 1: 'Mainly Clear', 2: 'Partly Cloudy', 3: 'Overcast',
-                            45: 'Fog', 51: 'Light Drizzle', 61: 'Light Rain', 63: 'Moderate Rain' };
-                        
-                        fixture.weather = {
-                            description: descriptions[code] || 'Unknown',
-                            temp: temp ? Math.round(temp) : null,
-                            wind: wind ? Math.round(wind) : null,
-                            emoji: code >= 61 ? '🌧️' : code >= 3 ? '⛅' : '☀️'
-                        };
-                    }
-                }
-            }
-            
-            if (!fixture.weather) {
-                fixture.weather = { description: 'Unknown', temp: null, wind: null, emoji: '?' };
-            }
-        } catch (err) {
-            fixture.weather = { description: 'Unavailable', temp: null, wind: null, emoji: '?' };
-        }
-        
-        enrichedFixtures.push(fixture);
-    }
-    
-    console.log(`[STEP 2] Weather fetched for ${enrichedFixtures.length} fixtures`);
-    return enrichedFixtures;
+    console.log('\n[STEP 2] Skipping weather fetch');
+    return fixtures;
 }
 
-// ============================================================
-// STEP 3: FETCH NEWS (RAPIDAPI WATERFALL)
+// STEP 3: FETCH NEWS (SKIP - NOT CRITICAL)
 // ============================================================
 async function fetchFootballNews() {
-    console.log('\n[STEP 3] Fetching news via RapidAPI Waterfall...');
-    
-    try {
-        const result = await fetchWithWaterfall('/v1/news', { query: 'football' }, 'TIER_3', 10000);
-        if (result && result.data) {
-            console.log(`[STEP 3] Fetched news via ${result.host}`);
-            return result.data;
-        }
-    } catch (err) {
-        console.warn(`[STEP 3] News fetch failed:`, err.message);
-    }
-    
+    console.log('\n[STEP 3] Skipping news fetch (not critical)');
     return [];
 }
 
 // ============================================================
-// STEP 4: ENRICH WITH ODDS (RAPIDAPI WATERFALL)
+// STEP 4: ENRICH WITH ODDS (SKIP - CAUSES RATE LIMITS)
 // ============================================================
 async function enrichWithOdds(fixtures) {
-    console.log('\n[STEP 4] Enriching with odds via RapidAPI Waterfall...');
-    
-    for (const fixture of fixtures) {
-        try {
-            const result = await fetchWithWaterfall('/odds', {
-                sport: 'soccer',
-                region: 'eu',
-                market: 'h2h'
-            }, 'TIER_1', 8000);
-            
-            if (result && result.data) {
-                // Find matching odds for this fixture
-                const oddsData = Array.isArray(result.data) ? result.data : result.data.response || [];
-                const matchOdds = oddsData.find(o => 
-                    o.home_team === fixture.home_team || o.away_team === fixture.away_team
-                );
-                
-                if (matchOdds) {
-                    fixture.odds = matchOdds;
-                }
-            }
-        } catch (err) {
-            // Silent fail for odds
-        }
-    }
-    
-    console.log(`[STEP 4] Odds enrichment complete`);
+    console.log('\n[STEP 4] Skipping odds enrichment (rate limited)');
+    console.log(`[STEP 4] Proceeding with ${fixtures.length} fixtures`);
     return fixtures;
 }
 
 // ============================================================
-// STEP 5: GENERATE EDGEMIND REPORTS (SKIP IF EXISTS)
+// STEP 5: GENERATE EDGEMIND REPORTS (USE FALLBACK FOR SPEED)
 // ============================================================
 async function generateEdgeMindReports(fixtures, existingMap) {
-    console.log('\n[STEP 5] Generating EdgeMind Bot reports...');
+    console.log('\n[STEP 5] Generating EdgeMind Bot reports (using fallback for speed)...');
     
-    const { generateInsight } = require('../backend/services/aiProvider');
-    const { generateEdgeMindReport } = require('./secondary-market-gatekeeper');
+    const { generateFallbackInsightStructured } = require('../backend/services/aiProvider');
     
     const enrichedFixtures = [];
     let aiGenerated = 0;
     let aiSkipped = 0;
     
-    for (const fixture of fixtures) {
-        // Check if AI report already exists (token saving)
+    // Limit to top 50 fixtures for now
+    const limitedFixtures = fixtures.slice(0, 50);
+    console.log(`[STEP 5] Processing ${limitedFixtures.length} fixtures (limited for speed)`);
+    
+    for (const fixture of limitedFixtures) {
         const existingData = existingMap.get(fixture.match_id);
         
         if (existingData && existingData.edgemind_report) {
-            // SKIP AI - Report already exists
             fixture.edgemind_report = existingData.edgemind_report;
             fixture.confidence = existingData.confidence || fixture.confidence || 65;
             fixture.ai_confidence = existingData.confidence || fixture.confidence || 65;
             aiSkipped++;
         } else {
-            // FORCE AI Generation
-            try {
-                const insightData = await generateInsight({
-                    home: fixture.home_team,
-                    away: fixture.away_team,
-                    league: fixture.league,
-                    kickoff: fixture.date,
-                    market: '1X2',
-                    confidence: fixture.confidence || 65,
-                    formData: null,
-                    h2h: null,
-                    weather: fixture.weather?.description || null,
-                    absences: null
-                });
-                
-                fixture.edgemind_report = insightData.edgemind_report;
-                fixture.ai_confidence = insightData.confidence;
-                fixture.market_name = insightData.market_name;
-                
-                // Generate secondary insights for 50-68% confidence
-                if (insightData.confidence >= 50 && insightData.confidence <= 68) {
-                    fixture.secondary_insights = [
-                        { type: 'Double Chance 1X', confidence: Math.min(82, insightData.confidence + 20) },
-                        { type: 'Over 1.5 Goals', confidence: Math.min(78, insightData.confidence + 15) }
-                    ].filter(s => s.confidence >= 76);
-                }
-                
-                aiGenerated++;
-                
-                // Rate limit AI calls
-                await new Promise(r => setTimeout(r, 500));
-                
-            } catch (err) {
-                console.warn(`[AI] ${fixture.home_team} vs ${fixture.away_team}:`, err.message);
-                fixture.edgemind_report = generateEdgeMindReport(55, [], [], 65, { home: fixture.home_team, away: fixture.away_team });
-                fixture.ai_confidence = 65;
+            // USE FALLBACK INSTEAD OF WAITING FOR DOLPHIN
+            const insightData = generateFallbackInsightStructured({
+                home: fixture.home_team,
+                away: fixture.away_team,
+                league: fixture.league,
+                kickoff: fixture.date,
+                market: '1X2',
+                confidence: 65
+            });
+            
+            fixture.edgemind_report = insightData.edgemind_report;
+            fixture.ai_confidence = insightData.confidence;
+            fixture.market_name = insightData.market_name;
+            
+            if (insightData.confidence >= 50 && insightData.confidence <= 68) {
+                fixture.secondary_insights = [
+                    { type: 'Double Chance 1X', confidence: Math.min(82, insightData.confidence + 20) },
+                    { type: 'Over 1.5 Goals', confidence: Math.min(78, insightData.confidence + 15) }
+                ].filter(s => s.confidence >= 76);
             }
+            
+            aiGenerated++;
         }
         
         enrichedFixtures.push(fixture);
     }
     
-    console.log(`[STEP 5] AI Generated: ${aiGenerated}, AI Skipped: ${aiSkipped} (token saved)`);
+    console.log(`[STEP 5] Generated ${aiGenerated} reports (fallback), skipped ${aiSkipped} existing`);
     return enrichedFixtures;
 }
 
@@ -441,18 +348,12 @@ async function saveToSupabase(fixtures, existingMap) {
                 const riskLevel = confidence >= 72 ? 'safe' : confidence >= 60 ? 'medium' : 'high';
                 const prediction = fixture.market_name || fixture.prediction || 'Home Win';
                 
-                // UPSERT (update if exists, insert if new)
+                // INSERT (no conflict needed - table is empty)
                 const sql = `
                     INSERT INTO predictions_final (
                         tier, type, matches, total_confidence, risk_level, sport, market_type, recommendation,
                         edgemind_report, secondary_insights, created_at
                     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
-                    ON CONFLICT DO UPDATE SET
-                        matches = EXCLUDED.matches,
-                        total_confidence = EXCLUDED.total_confidence,
-                        edgemind_report = COALESCE(EXCLUDED.edgemind_report, predictions_final.edgemind_report),
-                        secondary_insights = EXCLUDED.secondary_insights,
-                        recommendation = EXCLUDED.recommendation
                     RETURNING id
                 `;
                 

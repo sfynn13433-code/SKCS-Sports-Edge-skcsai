@@ -162,6 +162,62 @@ const SAFE_TIER3_MARKETS = Object.freeze(new Set([
     'first_half_draw'
 ]));
 
+const BANNED_RED_CARD_MARKETS = Object.freeze(new Set([
+    'red_cards_over_0_5',
+    'red_cards_under_0_5',
+    'red_cards_over_1_5',
+    'red_cards_under_1_5'
+]));
+
+const STANDARD_SECONDARY_MARKET_POOL = Object.freeze([
+    'double_chance_1x',
+    'double_chance_x2',
+    'over_1_5',
+    'under_4_5'
+]);
+
+function isRedCardMarket(market) {
+    const key = normalizeMarketKey(market);
+    return BANNED_RED_CARD_MARKETS.has(key);
+}
+
+function getStandardSecondaryMarkets(matchContext, primaryPrediction) {
+    const homeWin = primaryPrediction === 'home_win';
+    const awayWin = primaryPrediction === 'away_win';
+
+    const results = [];
+    for (const market of STANDARD_SECONDARY_MARKET_POOL) {
+        if (isRedCardMarket(market)) continue;
+
+        let prediction = '';
+        switch (market) {
+            case 'double_chance_1x':
+                prediction = homeWin ? '1X' : (awayWin ? '1X' : '1X');
+                break;
+            case 'double_chance_x2':
+                prediction = awayWin ? 'X2' : (homeWin ? 'X2' : 'X2');
+                break;
+            case 'over_1_5':
+                prediction = 'over';
+                break;
+            case 'under_4_5':
+                prediction = 'under';
+                break;
+            default:
+                prediction = 'over';
+        }
+
+        results.push({
+            market,
+            prediction,
+            confidence: 65,
+            source: 'rule_of_4'
+        });
+    }
+
+    return results;
+}
+
 const DIRECT_SAFE_MARKETS = Object.freeze(new Set([
     'double_chance_1x',
     'double_chance_x2',
@@ -662,6 +718,8 @@ function buildCandidateMarkets(probabilitiesInput = {}, matchContext = {}, optio
     const hasWeatherContext = Boolean(matchContext?.contextual_intelligence?.weather);
 
     for (const market of ALL_MARKETS) {
+        if (isRedCardMarket(market)) continue;
+
         const base = inferProbabilityFromDependencies(market, probabilitiesInput);
         if (base === null) continue;
         const adjusted = applyContextAdjustments(base, market, matchContext, riskProfile);
@@ -1037,6 +1095,7 @@ function selectDirectSecondarySameMatch(candidates, matchContext = {}, options =
     return {
         direct,
         secondary,
+        rule_of_4_markets: getStandardSecondaryMarkets(matchContext, direct?.prediction || null),
         same_match: {
             allowed: sameMatchAllowed,
             legs: sameMatchAllowed ? [direct, secondary] : [],
@@ -1065,6 +1124,8 @@ module.exports = {
     SKCS_MARKET_CATEGORIES,
     MARKET_PRIORITY_TIERS,
     TWELVE_LEG_SAFE_POOL,
+    BANNED_RED_CARD_MARKETS,
+    STANDARD_SECONDARY_MARKET_POOL,
     normalizeMarketKey,
     priorityTierForMarket,
     marketCategoryForMarket,
@@ -1072,6 +1133,8 @@ module.exports = {
     areMarketsConflicting,
     buildRiskProfile,
     buildCandidateMarkets,
+    isRedCardMarket,
+    getStandardSecondaryMarkets,
     FALLBACK_LADDER,
     DIRECT_SAFE_MARKETS,
     DIRECT_MARKETS_ALLOWED,

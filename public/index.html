@@ -2778,8 +2778,8 @@
             return null;
         };
 
-        const h = findTeam(match, 'home') || match.home_team_name || match.home_name || "Unknown Home";
-        const a = findTeam(match, 'away') || match.away_team_name || match.away_name || "Unknown Away";
+        const h = findTeam(match, 'home') || match.home_team_name || match.home_name || '';
+        const a = findTeam(match, 'away') || match.away_team_name || match.away_name || '';
         const homeInfo = match.home_team_info || null;
         const awayInfo = match.away_team_info || null;
         const homeLogo = homeInfo && homeInfo.logo ? `<img src="${homeInfo.logo}" alt="${h}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px;"/>` : '';
