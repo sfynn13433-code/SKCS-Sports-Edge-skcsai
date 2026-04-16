@@ -25,6 +25,11 @@ function getAllowedUserKeys() {
 // We pull from process.env INSIDE the function to ensure we get the latest Render values
 function requireRole(role) {
     return (req, res, next) => {
+        const requestPath = req.originalUrl || req.path || '';
+        if (requestPath.startsWith('/api/cron/') || requestPath.startsWith('/cron/')) {
+            return next();
+        }
+
         const key = req.headers['x-api-key'];
 
         // Get fresh values from environment
