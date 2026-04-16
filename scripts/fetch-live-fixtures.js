@@ -244,10 +244,35 @@ async function enrichWithOdds(fixtures) {
 }
 
 // ============================================================
-// STEP 5: GENERATE EDGEMIND REPORTS (USE FALLBACK FOR SPEED)
+// STEP 5: GENERATE EDGEMIND REPORTS (READ FROM EVENTS TABLE)
 // ============================================================
 async function generateEdgeMindReports(fixtures, existingMap) {
-    console.log('\n[STEP 5] Generating EdgeMind Bot reports (using fallback for speed)...');
+    console.log('\n[STEP 5] Generating EdgeMind Bot reports...');
+    
+    // PHASE 2: Fetch matches from events table instead of using passthrough
+    const client = await pool.connect();
+    let eventsFromDB = [];
+    
+    try {
+        const result = await client.query(`
+            SELECT id, home_team, away_team, commence_time, sport_key
+            FROM events
+            WHERE commence_time > NOW()
+            AND commence_time < NOW() + INTERVAL '7 days'
+            ORDER BY commence_time ASC
+            LIMIT 100
+        `);
+        eventsFromDB = result.rows;
+        console.log(`PHASE 2 SUCCESS: Fetched ${eventsFromDB.length} matches from the 'events' table for AI processing.`);
+    } catch (err) {
+        console.error('[PHASE 2 ERROR]: Failed to fetch from events table:', err.message);
+    } finally {
+        client.release();
+    }
+    
+    // Use events from DB if available, otherwise fall back to passed fixtures
+    const matchesToProcess = eventsFromDB.length > 0 ? eventsFromDB : fixtures.slice(0, 50);
+    console.log(`[STEP 5] Processing ${matchesToProcess.length} fixtures`);
     
     const { generateFallbackInsightStructured } = require('../backend/services/aiProvider');
     
@@ -255,12 +280,16 @@ async function generateEdgeMindReports(fixtures, existingMap) {
     let aiGenerated = 0;
     let aiSkipped = 0;
     
-    // Limit to top 50 fixtures for now
-    const limitedFixtures = fixtures.slice(0, 50);
-    console.log(`[STEP 5] Processing ${limitedFixtures.length} fixtures (limited for speed)`);
+    // Limit for speed
+    const limitedFixtures = matchesToProcess.slice(0, 50);
     
     for (const fixture of limitedFixtures) {
-        const existingData = existingMap.get(fixture.match_id);
+        // Handle both DB format (flat) and API format (nested)
+        const matchId = fixture.id || fixture.match_id || String(fixture.fixture?.id || '');
+        const homeTeam = fixture.home_team || fixture.home_team_name || fixture.home_team?.name || '';
+        const awayTeam = fixture.away_team || fixture.away_team_name || fixture.away_team?.name || '';
+        
+        const existingData = existingMap.get(matchId);
         
         if (existingData && existingData.edgemind_report) {
             fixture.edgemind_report = existingData.edgemind_report;
@@ -270,10 +299,10 @@ async function generateEdgeMindReports(fixtures, existingMap) {
         } else {
             // USE FALLBACK INSTEAD OF WAITING FOR DOLPHIN
             const insightData = generateFallbackInsightStructured({
-                home: fixture.home_team,
-                away: fixture.away_team,
-                league: fixture.league,
-                kickoff: fixture.date,
+                home: homeTeam,
+                away: awayTeam,
+                league: fixture.league || null,
+                kickoff: fixture.commence_time || fixture.date || null,
                 market: '1X2',
                 confidence: 65
             });
@@ -281,6 +310,9 @@ async function generateEdgeMindReports(fixtures, existingMap) {
             fixture.edgemind_report = insightData.edgemind_report;
             fixture.ai_confidence = insightData.confidence;
             fixture.market_name = insightData.market_name;
+            fixture.home_team = homeTeam;
+            fixture.away_team = awayTeam;
+            fixture.match_id = matchId;
             
             if (insightData.confidence >= 50 && insightData.confidence <= 68) {
                 fixture.secondary_insights = [
