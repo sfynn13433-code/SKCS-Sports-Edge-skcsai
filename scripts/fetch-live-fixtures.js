@@ -72,8 +72,15 @@ console.log('');
 // STEP 1: SINGLE API CALL WITH LOCAL FILTERING
 // ============================================================
 async function fetchFixturesSingleAPI() {
-    const today = new Date().toISOString().split('T')[0];
-    const dates = [today];
+    const today = new Date();
+    const dates = [];
+    
+    // Fetch for today + next 7 days to cover all upcoming matches
+    for (let i = 0; i <= 7; i++) {
+        const d = new Date(today);
+        d.setDate(today.getDate() + i);
+        dates.push(d.toISOString().split('T')[0]);
+    }
     
     console.log(`[STEP 1] Fetching fixtures for: ${dates.join(', ')}`);
     console.log('[STEP 1] Using single API call with local master league filtering...');
@@ -439,12 +446,15 @@ async function saveToSupabase(fixtures, existingMap) {
 }
 
 // ============================================================
-// MAIN EXECUTION
+// MAIN EXECUTION (EXPORTED)
 // ============================================================
-async function main() {
+async function runLiveSync() {
     console.log('\n========================================');
     console.log('  SKCS INCREMENTAL DATA PIPELINE');
     console.log('========================================\n');
+    
+    let fixturesProcessed = 0;
+    let predictionsUpserted = 0;
     
     try {
         // STEP 0: Load existing records for incremental sync
@@ -485,10 +495,11 @@ async function main() {
         
         if (fixtures.length === 0) {
             console.log('[ERROR] No fixtures available!');
-            return;
+            return { success: false, fixtures: 0, upserted: 0 };
         }
         
         console.log(`\n[TOTAL] Fixtures to process: ${fixtures.length}`);
+        fixturesProcessed = fixtures.length;
         
         // STEP 2: Weather
         fixtures = await fetchWeatherForFixtures(fixtures);
@@ -503,23 +514,41 @@ async function main() {
         fixtures = await generateEdgeMindReports(fixtures, existingMap);
         
         // STEP 6: Incremental Upsert (no wipe)
-        const saved = await saveToSupabase(fixtures, existingMap);
+        predictionsUpserted = await saveToSupabase(fixtures, existingMap);
         
         console.log('\n========================================');
         console.log('  PIPELINE COMPLETE');
         console.log('========================================');
         console.log(`Fixtures processed: ${fixtures.length}`);
-        console.log(`Predictions upserted: ${saved}`);
+        console.log(`Predictions upserted: ${predictionsUpserted}`);
         console.log(`AI tokens saved: ${existingMap.size} (skipped)`);
         console.log('');
         console.log('Incremental sync complete - no data wiped!');
         
+        return { 
+            success: true, 
+            fixtures: fixturesProcessed, 
+            upserted: predictionsUpserted,
+            aiTokensSaved: existingMap.size
+        };
+        
     } catch (err) {
         console.error('\n[ERROR] Pipeline failed:', err.message);
-        process.exit(1);
+        return { success: false, error: err.message };
     }
-    
-    process.exit(0);
 }
 
-main();
+// Run directly if executed from command line
+if (require.main === module) {
+    runLiveSync()
+        .then(result => {
+            console.log('[RESULT]', JSON.stringify(result));
+            process.exit(result.success ? 0 : 1);
+        })
+        .catch(err => {
+            console.error('[FATAL]', err.message);
+            process.exit(1);
+        });
+}
+
+module.exports = { runLiveSync };
