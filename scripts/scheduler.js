@@ -7,6 +7,7 @@ const { jobLogger } = require('../backend/utils/jobLogger');
 const { runLiveSync } = require('../scripts/fetch-live-fixtures');
 const { buildAccumulators } = require('../scripts/build-acca');
 const { resolveResults } = require('../scripts/resolve-results');
+const { dbCleanup } = require('../scripts/db-cleanup');
 
 console.log('\n=== SKCS AUTOMATED CRON SCHEDULER ===\n');
 
@@ -58,10 +59,27 @@ cron.schedule('*/15 * * * *', async () => {
     }
 });
 
+// Job 4: Database Cleanup - Daily at 3 AM
+cron.schedule('0 3 * * *', async () => {
+    console.log('\n[CRON] Triggered: db-cleanup (daily)');
+    
+    try {
+        const result = await jobLogger.wrap('db_cleanup', async () => {
+            return await dbCleanup();
+        });
+        
+        console.log('[CRON] db-cleanup completed:', result);
+        
+    } catch (err) {
+        console.error('[CRON] db-cleanup FAILED:', err.message);
+    }
+});
+
 console.log('CRON JOBS SCHEDULED:');
 console.log('- fetch-live-fixtures: Every 10 minutes');
 console.log('- resolve-results: Every 15 minutes');  
 console.log('- acca-builder: Every 30 minutes');
+console.log('- db-cleanup: Daily at 03:00');
 console.log('\nScheduler running. Press Ctrl+C to stop.\n');
 
 // Keep process alive
