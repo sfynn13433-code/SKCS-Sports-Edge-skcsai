@@ -71,6 +71,52 @@ console.log('');
 // ============================================================
 // STEP 1: SINGLE API CALL WITH LOCAL FILTERING
 // ============================================================
+// NEW: Fetch ALL leagues (no filtering)
+async function fetchAllLeaguesFixtures() {
+    const today = new Date();
+    const dates = [];
+    
+    // Fetch for today + next 14 days to cover all upcoming matches
+    for (let i = 0; i <= 14; i++) {
+        const d = new Date(today);
+        d.setDate(today.getDate() + i);
+        dates.push(d.toISOString().split('T')[0]);
+    }
+    
+    console.log(`[ALL LEAGUES] Fetching fixtures for dates: ${dates.join(', ')}`);
+    console.log('[ALL LEAGUES] Fetching ALL leagues (no filtering)...');
+    
+    const allFixtures = [];
+    
+    for (const date of dates) {
+        try {
+            const url = `https://v3.football.api-sports.io/fixtures?date=${date}`;
+            console.log(`[API-Sports] Calling: ${url}`);
+            
+            const response = await axios.get(url, {
+                headers: { 'x-apisports-key': APISPORTS_KEY },
+                timeout: 30000
+            });
+            
+            const fixtures = response.data?.response || [];
+            console.log(`[API-Sports] ${date}: ${fixtures.length} fixtures`);
+            
+            // Add ALL fixtures (no filtering!)
+            for (const f of fixtures) {
+                const fixture = normalizeFixture(f, date);
+                if (fixture) {
+                    allFixtures.push(fixture);
+                }
+            }
+        } catch (err) {
+            console.error(`[API-Sports] Error for ${date}:`, err.message);
+        }
+    }
+    
+    console.log(`[ALL LEAGUES] Total fixtures: ${allFixtures.length}`);
+    return allFixtures;
+}
+
 async function fetchFixturesSingleAPI() {
     const today = new Date();
     const dates = [];
@@ -484,8 +530,8 @@ async function runLiveSync() {
             client.release();
         }
         
-        // STEP 1: Single API call with master league filtering
-        let fixtures = await fetchFixturesSingleAPI();
+        // STEP 1: Fetch ALL leagues (no filtering!)
+        let fixtures = await fetchAllLeaguesFixtures();
         
         if (fixtures.length === 0) {
             console.log('[WARNING] No fixtures from API-Sports. Trying TheSportsDB...');
