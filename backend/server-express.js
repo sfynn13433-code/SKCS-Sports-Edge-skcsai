@@ -681,6 +681,43 @@ app.get('/api/cron/sync-deep', verifyCronSecret, async (req, res) => {
     }
 });
 
+// SIMPLE SYNC - No validation, direct insert
+const { spawn } = require('child_process');
+app.get('/api/cron/sync-simple', verifyCronSecret, async (req, res) => {
+    console.log('[cron/sync-simple] Starting simple sync (no validation)...');
+    
+    const scriptPath = path.join(__dirname, '..', 'scripts', 'simple-sync.js');
+    
+    try {
+        await new Promise((resolve, reject) => {
+            const child = spawn(process.execPath, [scriptPath], {
+                env: { ...process.env },
+                stdio: ['ignore', 'pipe', 'pipe'],
+                timeout: 10 * 60 * 1000
+            });
+            
+            let stdout = '';
+            let stderr = '';
+            child.stdout.on('data', (chunk) => { stdout += chunk; });
+            child.stderr.on('data', (chunk) => { stderr += chunk; });
+            
+            child.on('close', (code) => {
+                if (code === 0) resolve();
+                else reject(new Error(`Script exited with code ${code}: ${stderr || stdout}`));
+            });
+            
+            child.on('error', reject);
+        });
+        
+        console.log('[cron/sync-simple] Completed');
+        res.json({ message: 'Simple sync complete', status: 'ok' });
+        
+    } catch (err) {
+        console.error('[cron/sync-simple] Failed:', err.message);
+        res.status(500).json({ error: 'Simple sync failed' });
+    }
+});
+
 // FULL PIPELINE SYNC (Uses the main fetch-live-fixtures.js script)
 app.get('/api/cron/sync-full', verifyCronSecret, async (req, res) => {
     console.log('[cron/sync-full] Starting full pipeline sync...');
