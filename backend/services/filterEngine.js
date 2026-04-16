@@ -4,15 +4,16 @@ const { query, withTransaction } = require('../db');
 const { validateRawPredictionForInsert } = require('../utils/validation');
 
 function normalizeTier(tier) {
-    if (tier === 'normal' || tier === 'deep') return tier;
+    if (tier === 'normal' || tier === 'deep' || tier === 'ultra') return tier;
     throw new Error(`Invalid tier: ${tier}`);
 }
 
-// HARDCODED CONFIDENCE FLOORS - overrides database if needed
-// Lowered from 40/50 to 35/45 to allow more predictions through
+// HARDCODED CONFIDENCE FLOORS - Intelligence Boost (Phase 8.5)
+// 75% Gatekeeper: Only allow high-confidence predictions through
 const CONFIDENCE_FLOORS = {
-    normal: 35,
-    deep: 45
+    normal: 65,   // Raised from 35 - filter out low-confidence noise
+    deep: 70,      // Raised from 45 - medium confidence
+    ultra: 75      // VIP tier - only verified edge picks
 };
 
 async function getTierRules(tier, client) {
