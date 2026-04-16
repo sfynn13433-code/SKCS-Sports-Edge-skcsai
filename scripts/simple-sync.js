@@ -5,7 +5,7 @@
  * Pulls ALL fixtures and inserts directly into predictions_final
  */
 
-require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });
+// dotenv loaded by parent
 const axios = require('axios');
 const { Pool } = require('pg');
 

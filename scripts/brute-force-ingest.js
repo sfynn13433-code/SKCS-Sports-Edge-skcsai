@@ -1,9 +1,12 @@
 'use strict';
 
 /**
- * BRUTE-FORCE SCRIPT: Insert ALL sports fixtures for April 15, 2026
- * directly into predictions_final table and trigger pipeline.
+ * AI-DISABLED: This script was inserting random sports (basketball, rugby, volleyball, etc.)
+ * alongside real football fixtures, corrupting the predictions_final table with mixed sports data.
+ * Use scripts/fetch-live-fixtures.js instead for clean football-only data.
  */
+// module.exports disabled - see above
+return;
 
 require('dotenv').config();
 const { pool } = require('../backend/database');
@@ -304,6 +307,10 @@ async function verifyInsertedData() {
 }
 
 async function main() {
+    console.log('[DISABLED] This script is disabled - it was corrupting data with random sports.');
+    console.log('[USE] scripts/fetch-live-fixtures.js for clean football-only data.');
+    return;
+    
     console.log('=== BRUTE-FORCE DATA INGESTION ===');
     console.log(`Target Date: ${TARGET_DATE}`);
     console.log('');
