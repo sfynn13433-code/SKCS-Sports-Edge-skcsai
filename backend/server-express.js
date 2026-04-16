@@ -572,14 +572,23 @@ app.get('/api/cron/sync-live', verifyCronSecret, async (req, res) => {
     
     try {
         const result = await runLiveSync();
-        const finalCount = await query('SELECT COUNT(*) as cnt FROM predictions_final');
-        console.log('[cron/sync-live] Result:', JSON.stringify(result));
-        console.log('[cron/sync-live] Final count:', finalCount.rows[0]?.cnt);
-        res.json({ status: 'ok', syncResult: result, debugInfo, dbCount: finalCount.rows[0]?.cnt });
+        
+        // Return simple summary instead of full data dump (fixes Cron-job.org 64KB limit)
+        const summary = {
+            status: 'ok',
+            success: result.success,
+            fixtures: result.fixtures || 0,
+            upserted: result.upserted || 0,
+            eventsUpserted: result.eventsUpserted || 0,
+            aiTokensSaved: result.aiTokensSaved || 0
+        };
+        
+        console.log('[cron/sync-live] Result:', JSON.stringify(summary));
+        res.json(summary);
         
     } catch (err) {
         console.error('[cron/sync-live] Failed:', err.message, err.stack);
-        res.json({ status: 'error', message: 'Live sync failed', error: err.message, debugInfo });
+        res.json({ status: 'error', message: err.message });
     }
 });
 
@@ -672,11 +681,12 @@ app.get('/api/cron/sync-deep', verifyCronSecret, async (req, res) => {
             console.log(`[cron/sync-deep] Completed: ${saved} articles saved`);
         }
         
-        res.json({ message: 'Deep sync complete', status: 'ok' });
+        // Return simple summary (fixes Cron-job.org 64KB limit)
+        res.json({ status: 'ok', articlesSaved: saved });
         
     } catch (err) {
         console.error('[cron/sync-deep] Failed:', err.message);
-        res.status(500).json({ error: 'Deep sync failed' });
+        res.json({ status: 'error', message: err.message });
     }
 });
 
