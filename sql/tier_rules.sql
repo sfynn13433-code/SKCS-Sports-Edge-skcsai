@@ -2,17 +2,17 @@ insert into tier_rules (tier, min_confidence, allowed_markets, max_acca_size, al
 values
     (
         'normal',
-        50,
+        40,
         '["ALL"]'::jsonb,
         3,
-        '["low","medium"]'::jsonb
+        '["low","medium","high"]'::jsonb
     ),
     (
         'deep',
-        60,
+        40,
         '["ALL"]'::jsonb,
         12,
-        '["low"]'::jsonb
+        '["low","medium","high"]'::jsonb
     )
 on conflict (tier) do update set
     min_confidence = excluded.min_confidence,

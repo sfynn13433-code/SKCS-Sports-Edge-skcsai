@@ -538,6 +538,24 @@ function verifyCronSecret(req, res, next) {
     next();
 }
 
+// ADMIN: Update tier rules to allow more predictions
+app.get('/api/admin/update-tier-rules', async (_req, res) => {
+    try {
+        await query(`
+            INSERT INTO tier_rules (tier, min_confidence, allowed_markets, max_acca_size, allowed_volatility)
+            VALUES
+                ('normal', 40, '["ALL"]'::jsonb, 3, '["low","medium","high"]'::jsonb),
+                ('deep', 40, '["ALL"]'::jsonb, 12, '["low","medium","high"]'::jsonb)
+            ON CONFLICT (tier) DO UPDATE SET
+                min_confidence = 40,
+                allowed_volatility = '["low","medium","high"]'::jsonb
+        `);
+        res.json({ ok: true, message: 'Tier rules updated' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // TIER 1: LIVE SYNC -> Run every 5 minutes
 // Uses the main pipeline from fetch-live-fixtures.js with Master League filtering
 app.get('/api/cron/sync-live', verifyCronSecret, async (req, res) => {
