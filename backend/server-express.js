@@ -530,10 +530,16 @@ const { pool } = require('./database');
 
 const CRON_SECRET = process.env.CRON_SECRET || 'skcs_super_secret_cron_key_2026';
 
+// Allow secret via header OR query parameter for easier cron-job.org configuration
 function verifyCronSecret(req, res, next) {
-    const provided = req.headers['x-cron-secret'];
-    if (!provided || provided !== CRON_SECRET) {
-        console.warn(`[cron-auth] Rejected: missing or invalid x-cron-secret from ${req.ip}`);
+    const headerSecret = req.headers['x-cron-secret'];
+    const querySecret = req.query.secret;
+    
+    const validSecret = headerSecret || querySecret;
+    
+    if (!validSecret || validSecret !== CRON_SECRET) {
+        console.warn(`[cron-auth] Rejected: missing or invalid secret from ${req.ip}`);
+        console.warn(`[cron-auth] Header: '${headerSecret}', Query: '${querySecret}', Expected: '${CRON_SECRET}'`);
         return res.status(401).json({ status: 'error', message: 'Unauthorized' });
     }
     next();
