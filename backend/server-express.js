@@ -23,6 +23,7 @@ const { requireSupabaseUser } = require('./middleware/supabaseJwt');
 const cron         = require('node-cron');
 const { syncAllSports, syncSports }      = require('./services/syncService');
 const { bootstrap }          = require('./dbBootstrap');
+const { runLiveSync }       = require('../scripts/fetch-live-fixtures');
 const {
     calculateExpirationTime,
     calculateSubscriptionStart,
@@ -523,72 +524,44 @@ app.post('/api/grade-predictions', requireRefreshKey, async (req, res) => {
 // External cron jobs should hit these at different intervals
 // ============================================================
 
-const { fetchWithWaterfall, fetchLiveScores } = require('./utils/rapidApiWaterfall');
+const { fetchWithWaterfall } = require('./utils/rapidApiWaterfall');
 const { pool } = require('./database');
 
-// TIER 1: LIVE SYNC (Hits Tier 1 APIs) -> Run every 5 minutes
-// Uses fetchWithWaterfall() to grab live scores, red cards, and shifting odds.
-// DOES NOT wipe the database. Uses Supabase upsert to update existing rows.
-app.get('/api/cron/sync-live', requireRole('admin'), async (req, res) => {
+const CRON_SECRET = process.env.CRON_SECRET || 'skcs_super_secret_cron_key_2026';
+
+function verifyCronSecret(req, res, next) {
+    const provided = req.headers['x-cron-secret'];
+    if (!provided || provided !== CRON_SECRET) {
+        console.warn(`[cron-auth] Rejected: missing or invalid x-cron-secret from ${req.ip}`);
+        return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+    }
+    next();
+}
+
+// TIER 1: LIVE SYNC -> Run every 5 minutes
+// Uses the main pipeline from fetch-live-fixtures.js with Master League filtering
+app.get('/api/cron/sync-live', verifyCronSecret, async (req, res) => {
     console.log('[cron/sync-live] Starting tier-1 live sync...');
     
     try {
-        const today = new Date().toISOString().split('T')[0];
-        const liveData = await fetchLiveScores(today);
+        const hasApiKey = !!process.env.X_APISPORTS_KEY;
+        const hasDbUrl = !!process.env.DATABASE_URL;
+        console.log('[cron/sync-live] Config check:', { hasApiKey, hasDbUrl });
         
-        if (liveData && liveData.data) {
-            const fixtures = Array.isArray(liveData.data) ? liveData.data : liveData.data.response || [];
-            console.log(`[cron/sync-live] Fetched ${fixtures.length} live fixtures via ${liveData.host}`);
-            
-            const client = await pool.connect();
-            let upserted = 0;
-            
-            try {
-                for (const f of fixtures.slice(0, 50)) {
-                    const matchId = String(f.fixture?.id || f.id || '');
-                    const homeTeam = f.teams?.home?.name || f.home_team || '';
-                    const awayTeam = f.teams?.away?.name || f.away_team || '';
-                    const status = f.fixture?.status?.short || f.status || 'NS';
-                    const score = f.goals ? `${f.goals.home}-${f.goals.away}` : null;
-                    
-                    if (matchId && homeTeam && awayTeam) {
-                        await client.query(`
-                            INSERT INTO predictions_final (tier, type, matches, sport, market_type, recommendation, created_at)
-                            VALUES ('live', 'direct', $1::jsonb, 'football', '1X2', $2, NOW())
-                            ON CONFLICT DO UPDATE SET
-                                matches = EXCLUDED.matches,
-                                recommendation = EXCLUDED.recommendation
-                        `, [{
-                            fixture_id: matchId,
-                            home_team: homeTeam,
-                            away_team: awayTeam,
-                            score,
-                            status,
-                            metadata: { live_data: true, source: liveData.host }
-                        }, `${homeTeam} ${score || 'vs'} ${awayTeam}`]);
-                        
-                        upserted++;
-                    }
-                }
-            } finally {
-                client.release();
-            }
-            
-            console.log(`[cron/sync-live] Completed: ${upserted} fixtures upserted`);
-        }
-        
-        res.json({ message: 'Live sync complete', status: 'ok' });
+        const result = await runLiveSync();
+        console.log('[cron/sync-live] Result:', JSON.stringify(result));
+        res.json({ status: 'ok', ...result });
         
     } catch (err) {
-        console.error('[cron/sync-live] Failed:', err.message);
-        res.status(500).json({ error: 'Live sync failed' });
+        console.error('[cron/sync-live] Failed:', err.message, err.stack);
+        res.json({ status: 'error', message: 'Live sync failed', error: err.message });
     }
 });
 
 // TIER 2: STANDARD SYNC (Hits Tier 2 APIs) -> Run every 60 minutes
 // Hits AllSportsApi, Cricbuzz, Sofascore for general fixture generation
 // and injury updates for the upcoming week.
-app.get('/api/cron/sync-standard', requireRole('admin'), async (req, res) => {
+app.get('/api/cron/sync-standard', verifyCronSecret, async (req, res) => {
     console.log('[cron/sync-standard] Starting tier-2 standard sync...');
     
     try {
@@ -639,7 +612,7 @@ app.get('/api/cron/sync-standard', requireRole('admin'), async (req, res) => {
 // TIER 3: DEEP SYNC (Hits Tier 3 APIs) -> Run every 24 hours (Midnight)
 // Hits Football News API, MMA, F1 for deep EdgeMind context.
 // Saves summaries to Supabase so the AI has context for the day.
-app.get('/api/cron/sync-deep', requireRole('admin'), async (req, res) => {
+app.get('/api/cron/sync-deep', verifyCronSecret, async (req, res) => {
     console.log('[cron/sync-deep] Starting tier-3 deep sync...');
     
     try {
@@ -683,7 +656,7 @@ app.get('/api/cron/sync-deep', requireRole('admin'), async (req, res) => {
 });
 
 // FULL PIPELINE SYNC (Uses the main fetch-live-fixtures.js script)
-app.get('/api/cron/sync-full', requireRole('admin'), async (req, res) => {
+app.get('/api/cron/sync-full', verifyCronSecret, async (req, res) => {
     console.log('[cron/sync-full] Starting full pipeline sync...');
     
     try {
