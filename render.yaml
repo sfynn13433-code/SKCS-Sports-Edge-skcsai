@@ -4,7 +4,6 @@ services:
     env: node
     region: frankfurt
     plan: free
-    rootDir: backend
     buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /api/health
@@ -69,10 +68,9 @@ services:
     env: node
     region: frankfurt
     plan: free
-    rootDir: backend
     schedule: "0 2 * * 1"
     buildCommand: npm install
-    startCommand: node deploy-trigger.js
+    startCommand: node backend/deploy-trigger.js
     envVars:
       - key: SKCS_TRIGGER_HOST
         sync: false
