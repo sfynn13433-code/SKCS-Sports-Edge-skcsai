@@ -97,10 +97,27 @@ async function resolveResults() {
 // GRADING FUNCTION
 // ============================================================
 
+function classifyAIInsight(result, confidence, weatherRisk = null) {
+    if (result === 'WON' && confidence >= 75) {
+        return 'VERIFIED_EDGE';
+    } else if (result === 'WON' && confidence < 75) {
+        return 'LUCKY_WIN';
+    } else if (result === 'LOST' && confidence >= 75) {
+        let insight = 'CRITICAL_FAIL';
+        if (weatherRisk && weatherRisk > 0.4) {
+            insight += '|WEATHER';
+        }
+        return insight;
+    } else if (result === 'LOST' && confidence < 75) {
+        return 'EXPECTED_VARIANCE';
+    }
+    return 'UNKNOWN';
+}
+
 async function gradePrediction(client, fixtureId, homeScore, awayScore, status) {
     // Find predictions for this fixture
     const predResult = await client.query(`
-        SELECT id, matches, recommendation
+        SELECT id, matches, recommendation, total_confidence
         FROM predictions_final
         WHERE matches::text LIKE '%${fixtureId}%'
     `);
@@ -109,10 +126,18 @@ async function gradePrediction(client, fixtureId, homeScore, awayScore, status) 
         return;
     }
     
-for (const pred of predResult.rows) {
+    const actualOutcome = homeScore > awayScore ? 'home' : (homeScore < awayScore ? 'away' : 'draw');
+    let insightStats = { verified_edge: 0, lucky_win: 0, critical_fail: 0, expected_variance: 0 };
+    
+    for (const pred of predResult.rows) {
         let result = 'VOID';
+        let aiInsight = 'UNKNOWN';
         
         try {
+            // 1. Extract confidence (total_confidence from predictions_final)
+            const confidence = pred.total_confidence || 50;
+            
+            // 2. Extract prediction and determine outcome
             const rec = pred.recommendation?.toLowerCase() || '';
             
             // More comprehensive grading for 1X2 markets
@@ -127,6 +152,10 @@ for (const pred of predResult.rows) {
                 result = homeScore > awayScore ? 'WON' : 'LOST';
             }
             
+            // 3. Classify AI Insight
+            aiInsight = classifyAIInsight(result, confidence);
+            insightStats[aiInsight.toLowerCase().replace('|', '_').split('_')[0]]++;
+            
             // Extract market from matches JSON
             let market = '1X2';
             try {
@@ -136,7 +165,7 @@ for (const pred of predResult.rows) {
                 }
             } catch (e) {}
             
-            // Insert into predictions_accuracy
+            // Insert into predictions_accuracy with AI insight
             await client.query(`
                 INSERT INTO predictions_accuracy (
                     prediction_final_id, 
@@ -150,21 +179,28 @@ for (const pred of predResult.rows) {
                     event_status,
                     sport,
                     market,
-                    prediction_type
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+                    prediction_type,
+                    confidence,
+                    evaluation_notes
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
             `, [
                 pred.id, 0, fixtureId, pred.recommendation, 
                 `${homeScore}-${awayScore}`, result === 'WON',
                 homeScore, awayScore, status, 'football',
-                market, 'direct'
+                market, 'direct',
+                confidence,
+                aiInsight
             ]);
             
-            console.log(`[GRADED] Prediction ${pred.id}: ${result} (predicted: ${pred.recommendation}, actual: ${homeScore}-${awayScore})`);
+            console.log(`[GRADED] ${pred.id}: ${result} | ${aiInsight} | conf=${confidence}% | ${pred.recommendation} vs ${homeScore}-${awayScore}`);
             
         } catch (err) {
             console.error(`[GRADE ERROR] Failed to grade prediction ${pred.id}:`, err.message);
         }
     }
+    
+    // Log insight summary
+    console.log(`[INSIGHT] ${Object.entries(insightStats).map(([k,v])=>`${k}:${v}`).join(', ')}`);
 }
 
 // Run if executed directly
