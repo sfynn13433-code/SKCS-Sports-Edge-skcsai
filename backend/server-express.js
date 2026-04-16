@@ -539,19 +539,22 @@ function verifyCronSecret(req, res, next) {
     next();
 }
 
-// v3 - force redeploy - ADMIN: Update tier rules to allow more predictions
-app.get('/api/admin/update-tier-rules', async (_req, res) => {
+// ADMIN: Force reset tier rules to minimal (accept ALL)
+app.get('/api/admin/reset-tier-rules', async (_req, res) => {
     try {
         await query(`
             INSERT INTO tier_rules (tier, min_confidence, allowed_markets, max_acca_size, allowed_volatility)
             VALUES
-                ('normal', 40, '["ALL"]'::jsonb, 3, '["low","medium","high"]'::jsonb),
-                ('deep', 40, '["ALL"]'::jsonb, 12, '["low","medium","high"]'::jsonb)
+                ('normal', 1, '["ALL"]'::jsonb, 100, '["low","medium","high"]'::jsonb),
+                ('deep', 1, '["ALL"]'::jsonb, 100, '["low","medium","high"]'::jsonb),
+                ('ultra', 1, '["ALL"]'::jsonb, 100, '["low","medium","high"]'::jsonb)
             ON CONFLICT (tier) DO UPDATE SET
-                min_confidence = 40,
-                allowed_volatility = '["low","medium","high"]'::jsonb
+                min_confidence = 1,
+                allowed_markets = '["ALL"]'::jsonb,
+                max_acca_size = 100,
+                allowed_volatility = '["low","medium","high"]'::jsonb;
         `);
-        res.json({ ok: true, message: 'Tier rules updated' });
+        res.json({ ok: true, message: 'Tier rules reset to minimal' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
