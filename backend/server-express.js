@@ -212,7 +212,8 @@ app.get('/api/health', (_req, res) => {
     timestamp: new Date().toISOString(),
     version: process.env.npm_package_version || '1.0.0',
     uptime: Math.floor(process.uptime()),
-    env: process.env.NODE_ENV || 'development'
+    env: process.env.NODE_ENV || 'development',
+    test_marker: 'v3-' + Date.now()
   });
 });
 
