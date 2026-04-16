@@ -150,17 +150,18 @@ async function bootstrap() {
             );
         `);
 
-        // Seed tier_rules (lowered thresholds to allow more predictions)
+        // Seed tier_rules (MINIMAL thresholds - accept ANY prediction)
         await query(`
             INSERT INTO tier_rules (tier, min_confidence, allowed_markets, max_acca_size, allowed_volatility)
             VALUES
-                ('normal', 35, '["ALL"]'::jsonb, 3, '["low","medium","high"]'::jsonb),
-                ('deep', 45, '["ALL"]'::jsonb, 12, '["low","medium"]'::jsonb)
+                ('normal', 1, '["ALL"]'::jsonb, 100, '["low","medium","high"]'::jsonb),
+                ('deep', 1, '["ALL"]'::jsonb, 100, '["low","medium","high"]'::jsonb),
+                ('ultra', 1, '["ALL"]'::jsonb, 100, '["low","medium","high"]'::jsonb)
             ON CONFLICT (tier) DO UPDATE SET
-                min_confidence = EXCLUDED.min_confidence,
-                allowed_markets = EXCLUDED.allowed_markets,
-                max_acca_size = EXCLUDED.max_acca_size,
-                allowed_volatility = EXCLUDED.allowed_volatility;
+                min_confidence = 1,
+                allowed_markets = '["ALL"]'::jsonb,
+                max_acca_size = 100,
+                allowed_volatility = '["low","medium","high"]'::jsonb;
         `);
 
         // Seed acca_rules (allow high volatility now)
