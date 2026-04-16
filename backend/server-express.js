@@ -539,7 +539,7 @@ function verifyCronSecret(req, res, next) {
     next();
 }
 
-// v2 - ADMIN: Update tier rules to allow more predictions
+// v3 - force redeploy - ADMIN: Update tier rules to allow more predictions
 app.get('/api/admin/update-tier-rules', async (_req, res) => {
     try {
         await query(`
