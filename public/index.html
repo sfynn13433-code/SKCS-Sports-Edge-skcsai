@@ -1151,6 +1151,7 @@
     const ADMIN_EMAIL = 'sfynn13433@gmail.com';
     let authSession = null;
     let activeSport = 'direct-markets';
+    let sharedInsightsState = [];
     const includeAllParam = new URLSearchParams(window.location.search).get('include_all');
     const INCLUDE_ALL_MODE = ['1', 'true'].includes(String(includeAllParam || '').trim().toLowerCase());
 
@@ -1394,6 +1395,12 @@
         { key: 'nfl', label: 'NFL' }
     ];
     const DIRECT_MARKET_OUTCOMES = new Set(['home_win', 'draw', 'away_win']);
+    const EDGE_MIND_PLACEHOLDER_PATTERNS = [
+        'passed stages 1-4',
+        'suitable for multi construction',
+        'full elite pipeline and low-volatility kill-switch',
+        'edgemind analysis is processing data for this fixture'
+    ];
 
     function normalizeSportForFilter(value) {
         const key = String(value || '').trim().toLowerCase();
@@ -1410,6 +1417,102 @@
         if (key.startsWith('volleyball')) return 'volleyball';
         if (key.startsWith('handball')) return 'handball';
         return key;
+    }
+
+    function humanizeToken(value) {
+        return String(value || '')
+            .trim()
+            .replace(/[_-]+/g, ' ')
+            .replace(/\s+/g, ' ')
+            .replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+
+    function extractTeamNameValue(value) {
+        if (value === null || value === undefined) return '';
+        if (typeof value === 'string' || typeof value === 'number') return String(value).trim();
+        if (typeof value !== 'object') return '';
+        return String(
+            value.name
+            || value.team_name
+            || value.team
+            || value.full_name
+            || value.display_name
+            || value.short_name
+            || value.title
+            || ''
+        ).trim();
+    }
+
+    function resolveMatchTeamName(match, side) {
+        if (!match || typeof match !== 'object') return '';
+        const directKeys = side === 'home'
+            ? ['home_team', 'home', 'homeTeam', 'homeTeamName', 'home_team_name', 'home_name', 'team_home', 'player1']
+            : ['away_team', 'away', 'awayTeam', 'awayTeamName', 'away_team_name', 'away_name', 'team_away', 'player2'];
+        const metaKeys = side === 'home'
+            ? ['home_team', 'home', 'homeTeam', 'homeTeamName', 'home_team_name', 'home_name']
+            : ['away_team', 'away', 'awayTeam', 'awayTeamName', 'away_team_name', 'away_name'];
+
+        for (const key of directKeys) {
+            const value = extractTeamNameValue(match[key]);
+            if (value) return value;
+        }
+
+        const fromTeams = side === 'home'
+            ? extractTeamNameValue(match.teams && (match.teams.home || match.teams.homeTeam || match.teams.team_home))
+            : extractTeamNameValue(match.teams && (match.teams.away || match.teams.awayTeam || match.teams.team_away));
+        if (fromTeams) return fromTeams;
+
+        const meta = match.metadata || {};
+        for (const key of metaKeys) {
+            const value = extractTeamNameValue(meta[key]);
+            if (value) return value;
+        }
+
+        const fromMetaTeams = side === 'home'
+            ? extractTeamNameValue(meta.teams && (meta.teams.home || meta.teams.homeTeam || meta.team_home))
+            : extractTeamNameValue(meta.teams && (meta.teams.away || meta.teams.awayTeam || meta.team_away));
+        if (fromMetaTeams) return fromMetaTeams;
+
+        return '';
+    }
+
+    function parseLooseDateForClient(value) {
+        if (!value) return null;
+        if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+        if (typeof value === 'number') {
+            const fromNumber = new Date(value);
+            return Number.isNaN(fromNumber.getTime()) ? null : fromNumber;
+        }
+
+        const raw = String(value).trim();
+        if (!raw) return null;
+
+        const nativeParsed = new Date(raw);
+        if (!Number.isNaN(nativeParsed.getTime())) return nativeParsed;
+
+        const slashMatch = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:[ T](\d{1,2})(?::(\d{2}))?(?::(\d{2}))?)?(?:\s*(Z|[+-]\d{2}:?\d{2}))?$/i);
+        if (slashMatch) {
+            const day = Number(slashMatch[1]);
+            const month = Number(slashMatch[2]);
+            const yearRaw = Number(slashMatch[3]);
+            const hours = Number(slashMatch[4] || 0);
+            const minutes = Number(slashMatch[5] || 0);
+            const seconds = Number(slashMatch[6] || 0);
+            const tz = String(slashMatch[7] || '').trim();
+            const year = yearRaw < 100 ? 2000 + yearRaw : yearRaw;
+
+            if (tz) {
+                const tzNormalized = tz === 'Z' ? 'Z' : (tz.includes(':') ? tz : `${tz.slice(0, 3)}:${tz.slice(3)}`);
+                const iso = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}${tzNormalized}`;
+                const parsedIso = new Date(iso);
+                return Number.isNaN(parsedIso.getTime()) ? null : parsedIso;
+            }
+
+            const fromParts = new Date(Date.UTC(year, month - 1, day, hours, minutes, seconds));
+            return Number.isNaN(fromParts.getTime()) ? null : fromParts;
+        }
+
+        return null;
     }
 
     function getPredictionLegCount(pred) {
@@ -1591,8 +1694,7 @@
             (match && match.metadata && (match.metadata.match_time || match.metadata.kickoff || match.metadata.kickoff_time)) ||
             null;
         if (!value) return null;
-        const parsed = new Date(value);
-        return Number.isNaN(parsed.getTime()) ? null : parsed;
+        return parseLooseDateForClient(value);
     }
 
     function predictionHasUpcomingKickoffs(pred, now = new Date()) {
@@ -1776,31 +1878,72 @@
         return card;
     }
 
+    function isDoubleChancePrediction(pred) {
+        const firstMatch = getPrimaryMatch(pred);
+        const marketKey = normalizeMarketKey(getMatchMarket(firstMatch));
+        if (marketKey.includes('double_chance')) return true;
+        const recommendation = String(getMatchRecommendation(firstMatch) || '').trim().toLowerCase();
+        return recommendation === '1x' || recommendation === 'x2' || recommendation === '12';
+    }
+
+    function calculateSportTotal(sportCode, insights) {
+        const scoped = (insights || []).filter((pred) => {
+            const firstMatch = getPrimaryMatch(pred);
+            const sportKey = normalizeSportForFilter(
+                pred && pred.sport
+                || firstMatch && firstMatch.sport
+                || firstMatch && firstMatch.metadata && (firstMatch.metadata.sport || firstMatch.metadata.sport_type)
+                || ''
+            );
+            return sportKey === sportCode;
+        });
+
+        const directCount = scoped.filter((pred) => {
+            const type = getSectionType(pred);
+            const legs = getPredictionLegCount(pred);
+            if (isDoubleChancePrediction(pred)) return false;
+            if (type === 'direct' || type === 'single') return true;
+            return legs === 1 && is1X2Market(getMatchMarket(getPrimaryMatch(pred)));
+        }).length;
+
+        const secondaryCount = scoped.filter((pred) => {
+            const type = getSectionType(pred);
+            const legs = getPredictionLegCount(pred);
+            if (isDoubleChancePrediction(pred)) return false;
+            if (type === 'same_match') return false;
+            return type === 'secondary_multi' || type === 'multi' || (legs >= 2 && legs <= 3);
+        }).length;
+
+        const sameMatchCount = scoped.filter((pred) => {
+            const type = getSectionType(pred);
+            const legs = getPredictionLegCount(pred);
+            if (legs <= 1) return false;
+            return type === 'same_match' || new Set((pred.matches || []).map((m) => String(m && m.match_id || '').trim()).filter(Boolean)).size === 1;
+        }).length;
+
+        const doubleChanceCount = scoped.filter((pred) => isDoubleChancePrediction(pred)).length;
+        const totalMarriedCount = directCount + secondaryCount;
+
+        return {
+            totalMarriedCount,
+            directCount,
+            secondaryCount,
+            sameMatchCount,
+            doubleChanceCount
+        };
+    }
+
     function renderDirectMarkets(predictions) {
-        // Direct Markets tab is now a clean sport menu - just count predictions per sport
+        const source = Array.isArray(sharedInsightsState) && sharedInsightsState.length
+            ? sharedInsightsState
+            : (Array.isArray(predictions) ? predictions : []);
+
         try {
-            const bySport = {};
-            DIRECT_MARKET_SPORTS.forEach(s => { bySport[s.key] = 0; });
-            
-            (predictions || []).forEach((pred) => {
-                try {
-                    if (!pred) return;
-                    const firstMatch = getPrimaryMatch(pred);
-                    const sportKey = normalizeSportForFilter(
-                        pred && pred.sport
-                        || firstMatch && firstMatch.sport
-                        || firstMatch && firstMatch.metadata && (firstMatch.metadata.sport || firstMatch.metadata.sport_type)
-                        || ''
-                    );
-                    if (bySport.hasOwnProperty(sportKey)) {
-                        bySport[sportKey]++;
-                    }
-                } catch (e) { /* ignore */ }
-            });
-            
             DIRECT_MARKET_SPORTS.forEach((sportDef) => {
                 const countEl = document.getElementById(`direct-${sportDef.key}-count`);
-                if (countEl) countEl.textContent = `(${bySport[sportDef.key] || 0})`;
+                if (!countEl) return;
+                const totals = calculateSportTotal(sportDef.key, source);
+                countEl.textContent = `(${totals.totalMarriedCount || 0})`;
             });
         } catch (error) {
             console.error('[renderDirectMarkets] Error:', error.message || error);
@@ -2079,8 +2222,6 @@
         }
 
         async function fetchFromSupabase() {
-            supabaseFallbackStatus = 'disabled_for_tier_integrity';
-            return [];
             try {
                 const supabaseUrl = (window.SUPABASE_URL || '').replace(/\/+$/,'');
                 const anon = window.SUPABASE_ANON_KEY || '';
@@ -2088,23 +2229,76 @@
                     supabaseFallbackStatus = 'missing_supabase_config';
                     return [];
                 }
+                const now = new Date();
+                const utcStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+                const utcEnd = new Date(utcStart.getTime() + (24 * 60 * 60 * 1000));
+                const utcStartIso = utcStart.toISOString();
+                const utcEndIso = utcEnd.toISOString();
+                const PAGE_SIZE = 500;
+                const MAX_ROWS = 5000;
 
-                const res = await fetch(`${supabaseUrl}/rest/v1/predictions_final?select=*&order=created_at.desc`, {
-                    method: 'GET',
-                    cache: 'no-store',
-                    headers: {
-                        'apikey': anon,
-                        'Authorization': `Bearer ${anon}`
+                async function fetchTableRows(tableName) {
+                    const rows = [];
+                    for (let offset = 0; offset < MAX_ROWS; offset += PAGE_SIZE) {
+                        const params = new URLSearchParams();
+                        params.set('select', '*');
+                        params.set('order', 'created_at.desc');
+                        params.append('created_at', `gte.${utcStartIso}`);
+                        params.append('created_at', `lt.${utcEndIso}`);
+                        params.set('limit', String(PAGE_SIZE));
+                        params.set('offset', String(offset));
+
+                        const res = await fetch(`${supabaseUrl}/rest/v1/${tableName}?${params.toString()}`, {
+                            method: 'GET',
+                            cache: 'no-store',
+                            headers: {
+                                'apikey': anon,
+                                'Authorization': `Bearer ${anon}`,
+                                'Prefer': 'count=exact'
+                            }
+                        });
+
+                        if (res.status === 401 || res.status === 403) {
+                            return { status: 'rls_or_auth_denied', rows: [] };
+                        }
+                        if (res.status === 404) {
+                            return { status: 'table_not_found', rows: [] };
+                        }
+                        if (!res.ok) {
+                            return { status: `http_${res.status}`, rows: [] };
+                        }
+
+                        const chunk = await res.json();
+                        if (!Array.isArray(chunk) || chunk.length === 0) break;
+                        rows.push(...chunk);
+                        if (chunk.length < PAGE_SIZE) break;
                     }
-                });
-                if (!res.ok) {
-                    supabaseFallbackStatus = (res.status === 401 || res.status === 403)
-                        ? 'rls_or_auth_denied'
-                        : `http_${res.status}`;
-                    console.warn(`[Supabase fallback] blocked with status ${res.status}.`);
+
+                    return { status: 'ok', rows };
+                }
+
+                const tablesToTry = ['prediction_final', 'predictions_final'];
+                let rows = [];
+                let tableStatus = 'table_not_found';
+                for (const tableName of tablesToTry) {
+                    const result = await fetchTableRows(tableName);
+                    tableStatus = result.status;
+                    if (result.status === 'rls_or_auth_denied') {
+                        supabaseFallbackStatus = result.status;
+                        console.warn(`[Supabase fallback] access denied by RLS/auth for table "${tableName}".`);
+                        return [];
+                    }
+                    if (result.status === 'ok' && Array.isArray(result.rows) && result.rows.length > 0) {
+                        rows = result.rows;
+                        break;
+                    }
+                }
+
+                if (!rows.length) {
+                    supabaseFallbackStatus = tableStatus;
                     return [];
                 }
-                const rows = await res.json();
+
                 const allowedTiers = getPredictionTiersForPlan(activePlanId);
                 const filtered = (rows || []).filter(r => {
                     const rowTier = String(r.tier || 'normal').toLowerCase();
@@ -2199,6 +2393,7 @@
 
             // If backend returned predictions use them
             if (preds.length > 0) {
+                sharedInsightsState = Array.isArray(preds) ? preds.slice() : [];
                 if (sport === 'direct-markets') {
                     renderDirectMarkets(preds);
                     return;
@@ -2218,6 +2413,7 @@
             // Backend returned no predictions or errored: try Supabase fallback
             const supaPreds = await fetchFromSupabase();
             if (supaPreds && supaPreds.length > 0) {
+                sharedInsightsState = Array.isArray(supaPreds) ? supaPreds.slice() : [];
                 if (sport === 'direct-markets') {
                     renderDirectMarkets(supaPreds);
                     return;
@@ -2259,6 +2455,7 @@
             // Try Supabase fallback on error
             const supaPreds = await fetchFromSupabase();
             if (supaPreds && supaPreds.length > 0) {
+                sharedInsightsState = Array.isArray(supaPreds) ? supaPreds.slice() : [];
                 if (sport === 'direct-markets') {
                     renderDirectMarkets(supaPreds);
                     return;
@@ -2378,11 +2575,15 @@
         setFootballSection('football-multi-matches', multiPreds, createMultiCard, 'No football multi insights available.');
         setFootballSection('football-same-matches', sameMatchPreds, createMultiCard, 'No same-match football bet builders available.');
 
+        const sharedSource = Array.isArray(sharedInsightsState) && sharedInsightsState.length
+            ? sharedInsightsState
+            : normalizedPredictions;
+        const footballTotals = calculateSportTotal('football', sharedSource);
         const counts = {
-            'football-direct-count': directSingles.length,
-            'football-secondary-count': secondarySingles.length,
-            'football-multi-count': multiPreds.length,
-            'football-same-count': sameMatchPreds.length
+            'football-direct-count': footballTotals.directCount,
+            'football-secondary-count': footballTotals.secondaryCount,
+            'football-multi-count': footballTotals.secondaryCount,
+            'football-same-count': footballTotals.sameMatchCount
         };
 
         Object.entries(counts).forEach(([id, value]) => {
@@ -2614,23 +2815,58 @@
     function renderInsightsPanel(prediction) {
         const payload = prediction || {};
         const weather = payload.weather || {};
-        const weatherDesc = weather.description || '';
-        const weatherEmoji = weather.emoji || '';
+        const weatherDesc = String(weather.description || '').trim();
+        const weatherEmoji = String(weather.emoji || '').trim();
         const weatherTemp = weather.temp !== null && weather.temp !== undefined ? `${weather.temp}\u00B0C` : '';
         const weatherWind = weather.wind !== null && weather.wind !== undefined ? `${weather.wind}km/h` : '';
-        
-        const hasWeatherData = weatherDesc || weatherTemp || weatherWind;
+
+        const isUnknownWeather = weatherDesc.toLowerCase() === 'unknown' || weatherDesc.toLowerCase() === 'unavailable';
+        const hasWeatherData = weatherTemp || weatherWind || (!isUnknownWeather && weatherDesc);
         if (!hasWeatherData) {
             return '';
         }
-        
-        const weatherDisplay = `${weatherEmoji} ${weatherDesc}${weatherTemp ? ' ' + weatherTemp : ''}${weatherWind ? ' | ' + weatherWind : ''}`.trim();
+
+        const weatherLabel = isUnknownWeather ? '' : weatherDesc;
+        const safeEmoji = weatherEmoji === '\u2753' ? '' : weatherEmoji;
+        const weatherDisplay = `${safeEmoji}${safeEmoji && weatherLabel ? ' ' : ''}${weatherLabel}${weatherTemp ? ' ' + weatherTemp : ''}${weatherWind ? ' | ' + weatherWind : ''}`.trim();
+        if (!weatherDisplay) return '';
         
         return `
             <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
                 <span style="display:inline-block;background:#e0f2fe;color:#075985;padding:5px 8px;border-radius:999px;font-size:0.74rem;font-weight:700;">${weatherDisplay}</span>
             </div>
         `;
+    }
+
+    function isPlaceholderEdgeMindText(value) {
+        const text = String(value || '').trim().toLowerCase();
+        if (!text) return true;
+        return EDGE_MIND_PLACEHOLDER_PATTERNS.some((pattern) => text.includes(pattern));
+    }
+
+    function buildDynamicEdgeMindText(insight, match, finalRecommendation) {
+        const metadata = (match && match.metadata) ? match.metadata : {};
+        const homeTeam = resolveMatchTeamName(match, 'home') || 'Home Team';
+        const awayTeam = resolveMatchTeamName(match, 'away') || 'Away Team';
+        const league = String(metadata.league || metadata.competition || match.league || humanizeToken(match.sport || insight.sport || 'fixture')).trim();
+        const marketLabel = String(finalRecommendation && finalRecommendation.market || formatPrediction(match) || 'Primary Market').trim();
+        const confidence = normalizeConfidencePercent(finalRecommendation && finalRecommendation.confidence, normalizeConfidencePercent(getPredictionConfidenceScore(insight), 0));
+        return `${homeTeam} vs ${awayTeam} (${league || 'Live Fixture'}): ${marketLabel} is currently rated ${Math.round(confidence)}% after live context checks.`;
+    }
+
+    function resolveEdgeMindText(insight, match, finalRecommendation, reasoning) {
+        const candidates = [
+            insight && insight.edgeMindAnalysis,
+            insight && insight.edgemind_report,
+            reasoning,
+            match && match.metadata && match.metadata.reasoning
+        ];
+        for (const candidate of candidates) {
+            const text = String(candidate || '').trim();
+            if (!text) continue;
+            if (!isPlaceholderEdgeMindText(text)) return text;
+        }
+        return buildDynamicEdgeMindText(insight || {}, match || {}, finalRecommendation || {});
     }
 
     function createPredictionCard(pred, sport, cardId) {
@@ -2655,7 +2891,7 @@
         const insightsHtml = renderInsightsPanel(pred);
         
         // EdgeMind Bot Report
-        const edgeMindReportText = pred.edgemind_report || reasoning || "EdgeMind analysis is processing data for this fixture...";
+        const edgeMindReportText = resolveEdgeMindText(pred, firstMatch, finalRecommendation, reasoning);
         
         // High-Risk Warning Logic (<75%)
         if (isHighRiskPrimary) {
@@ -2896,48 +3132,8 @@
                 .join(' ');
         };
 
-        const findTeam = (obj, side) => {
-            if (!obj) return null;
-            const keys = side === 'home' 
-                ? ['home_team', 'home', 'homeTeam', 'player1', 'home_team_name', 'home_name'] 
-                : ['away_team', 'away', 'awayTeam', 'player2', 'away_team_name', 'away_name'];
-            
-            for (let k of keys) {
-                if (obj[k] !== undefined && obj[k] !== null) {
-                    const val = obj[k];
-                    if (typeof val === 'object' && val !== null) {
-                        return val.name || val.team_name || val.team || val.full_name || String(val);
-                    }
-                    return String(val);
-                }
-            }
-            if (obj.metadata) {
-                for (let k of keys) {
-                    if (obj.metadata[k] !== undefined && obj.metadata[k] !== null) {
-                        const val = obj.metadata[k];
-                        if (typeof val === 'object' && val !== null) {
-                            return val.name || val.team_name || val.team || val.full_name || String(val);
-                        }
-                        return String(val);
-                    }
-                }
-                if (obj.metadata.ai) {
-                    for (let k of keys) {
-                        if (obj.metadata.ai[k] !== undefined && obj.metadata.ai[k] !== null) {
-                            const val = obj.metadata.ai[k];
-                            if (typeof val === 'object' && val !== null) {
-                                return val.name || val.team_name || val.team || val.full_name || String(val);
-                            }
-                            return String(val);
-                        }
-                    }
-                }
-            }
-            return null;
-        };
-
-        const h = findTeam(match, 'home') || match.home_team_name || match.home_name || '';
-        const a = findTeam(match, 'away') || match.away_team_name || match.away_name || '';
+        const h = resolveMatchTeamName(match, 'home') || match.home_team_name || match.home_name || 'Home Team';
+        const a = resolveMatchTeamName(match, 'away') || match.away_team_name || match.away_name || 'Away Team';
         const homeInfo = match.home_team_info || null;
         const awayInfo = match.away_team_info || null;
         const homeLogo = homeInfo && homeInfo.logo ? `<img src="${homeInfo.logo}" alt="${h}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px;"/>` : '';
@@ -2968,8 +3164,8 @@
         let dateTimeStr = '';
         if (rawMatchTime) {
             try {
-                const matchDate = new Date(rawMatchTime);
-                if (!Number.isNaN(matchDate.getTime())) {
+                const matchDate = parseLooseDateForClient(rawMatchTime);
+                if (matchDate && !Number.isNaN(matchDate.getTime())) {
                     dateTimeStr = matchDate.toLocaleString('en-ZA', {
                         timeZone: 'Africa/Johannesburg',
                         day: '2-digit',
