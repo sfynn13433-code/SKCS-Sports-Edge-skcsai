@@ -51,6 +51,7 @@ const SPORT_FILTER_MAP = {
 const DEFAULT_UPCOMING_GRACE_MINUTES = 15;
 const DEFAULT_ACCA_STARTED_LOOKBACK_HOURS = 72;
 const DEFAULT_ACCA_WINDOW_LOOKBACK_HOURS = 168;
+const ELITE_CONFIDENCE_FLOOR = 75;
 
 function parseBoundedInt(value, fallback, min, max) {
     const parsed = Number.parseInt(value, 10);
@@ -696,6 +697,13 @@ function normalizeConfidence(confidence) {
     return Math.max(0, Math.min(100, Math.round(confidence)));
 }
 
+function toConfidencePercent(value, fallback = 0) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return fallback;
+    const normalized = n > 0 && n <= 1 ? n * 100 : n;
+    return Math.max(0, Math.min(100, normalized));
+}
+
 function roundConfidence(value) {
     if (!Number.isFinite(Number(value))) return 0;
     return Math.round(Number(value) * 100) / 100;
@@ -725,6 +733,35 @@ function resolveAverageLegConfidence(prediction) {
     }
 
     return computeAverageLegConfidence(matches);
+}
+
+function getPredictionConfidencePercent(prediction) {
+    const fromTotal = toConfidencePercent(prediction?.total_confidence, NaN);
+    if (Number.isFinite(fromTotal) && fromTotal > 0) return roundConfidence(fromTotal);
+
+    const fromFinal = toConfidencePercent(
+        prediction?.final_recommendation?.confidence
+        ?? prediction?.matches?.[0]?.final_recommendation?.confidence,
+        NaN
+    );
+    if (Number.isFinite(fromFinal) && fromFinal > 0) return roundConfidence(fromFinal);
+
+    const fromFirstMatch = toConfidencePercent(prediction?.matches?.[0]?.confidence, NaN);
+    if (Number.isFinite(fromFirstMatch) && fromFirstMatch > 0) return roundConfidence(fromFirstMatch);
+
+    const fromAverage = toConfidencePercent(resolveAverageLegConfidence(prediction), NaN);
+    if (Number.isFinite(fromAverage)) return roundConfidence(fromAverage);
+
+    return 0;
+}
+
+function planRequiresEliteConfidenceFloor(planId, planCapabilities) {
+    const tier = String(planCapabilities?.tier || '').trim().toLowerCase();
+    if (tier === 'elite') return true;
+
+    const key = String(planId || '').trim().toLowerCase();
+    if (!key) return false;
+    return key.includes('elite') || key.includes('vip') || key.includes('deep');
 }
 
 function normalizeOdds(odds) {
@@ -1738,6 +1775,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             window_gate_rows: 0,
             scoped_rows: 0,
             plan_filtered_rows: 0,
+            elite_floor_rows: 0,
             subscription_tier_filtered_rows: 0
         };
 
@@ -1785,7 +1823,15 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             );
         stageCounts.plan_filtered_rows = planFilteredPredictions.length;
 
-        const contractShapedPredictions = planFilteredPredictions.map(shapePredictionOutputContract);
+        const enforceEliteFloor = !includeAll
+            && !isAdminAudit
+            && planRequiresEliteConfidenceFloor(planId, planCapabilities);
+        const eliteFloorPredictions = enforceEliteFloor
+            ? planFilteredPredictions.filter((prediction) => getPredictionConfidencePercent(prediction) >= ELITE_CONFIDENCE_FLOOR)
+            : planFilteredPredictions;
+        stageCounts.elite_floor_rows = eliteFloorPredictions.length;
+
+        const contractShapedPredictions = eliteFloorPredictions.map(shapePredictionOutputContract);
         const subscriptionTierFilteredPredictions = (isAdminAudit || includeAll)
             ? contractShapedPredictions
             : contractShapedPredictions.filter((prediction) => isTierVisibleForView(prediction.tier, subscriptionViewTier));
@@ -1808,7 +1854,8 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             stale_gate_excluded: Math.max(0, stageCounts.upcoming_gate_rows - stageCounts.stale_gate_rows),
             date_window_excluded: Math.max(0, stageCounts.stale_gate_rows - stageCounts.window_gate_rows),
             plan_filter_excluded: Math.max(0, stageCounts.scoped_rows - stageCounts.plan_filtered_rows),
-            subscription_tier_excluded: Math.max(0, stageCounts.plan_filtered_rows - stageCounts.subscription_tier_filtered_rows)
+            elite_floor_excluded: Math.max(0, stageCounts.plan_filtered_rows - stageCounts.elite_floor_rows),
+            subscription_tier_excluded: Math.max(0, stageCounts.elite_floor_rows - stageCounts.subscription_tier_filtered_rows)
         };
 
         res.status(200).json({
@@ -1840,7 +1887,9 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                 gate_config: {
                     upcoming_grace_minutes: UPCOMING_GRACE_MINUTES,
                     acca_started_lookback_hours: ACCA_STARTED_LOOKBACK_HOURS,
-                    acca_window_lookback_hours: ACCA_WINDOW_LOOKBACK_HOURS
+                    acca_window_lookback_hours: ACCA_WINDOW_LOOKBACK_HOURS,
+                    elite_confidence_floor: ELITE_CONFIDENCE_FLOOR,
+                    elite_floor_enforced: enforceEliteFloor
                 },
                 db_counts: readPathDbCounts,
                 stage_counts: stageCounts,

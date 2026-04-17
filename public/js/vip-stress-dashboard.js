@@ -145,6 +145,55 @@
         return Array.isArray(prediction.matches) && prediction.matches.length ? prediction.matches[0] : {};
     }
 
+    function normalizeMarketKey(value) {
+        return String(value || '').trim().toLowerCase();
+    }
+
+    function resolveLegPrediction(match) {
+        return String(
+            match?.prediction
+            || match?.recommendation
+            || match?.pick
+            || match?.selection
+            || match?.outcome
+            || match?.metadata?.prediction
+            || match?.metadata?.recommendation
+            || match?.metadata?.pick
+            || match?.metadata?.selection
+            || match?.metadata?.predicted_outcome
+            || ''
+        ).trim();
+    }
+
+    function formatLegSelection(match) {
+        const market = String(match?.market || match?.market_type || '').trim();
+        let prediction = resolveLegPrediction(match);
+        const marketKey = normalizeMarketKey(market);
+
+        if (!prediction) {
+            if (marketKey === '1x2' || marketKey === 'match_result' || marketKey === 'full_time_result') prediction = 'home_win';
+            else if (marketKey.includes('double_chance')) prediction = '1x';
+            else if (marketKey.includes('over')) prediction = 'over';
+            else if (marketKey.includes('under')) prediction = 'under';
+            else prediction = 'selection';
+        }
+
+        const predKey = String(prediction).trim().toLowerCase();
+        if (marketKey === '1x2' || marketKey === 'match_result' || marketKey === 'full_time_result') {
+            if (predKey === 'home_win' || predKey === 'home') return 'HOME WIN';
+            if (predKey === 'away_win' || predKey === 'away') return 'AWAY WIN';
+            if (predKey === 'draw' || predKey === 'x') return 'DRAW';
+        }
+        if (marketKey.includes('double_chance')) {
+            if (predKey === '1x') return 'DOUBLE CHANCE 1X';
+            if (predKey === 'x2') return 'DOUBLE CHANCE X2';
+            if (predKey === '12') return 'DOUBLE CHANCE 12';
+        }
+        if (marketKey.includes('over')) return `OVER (${market || 'line'})`;
+        if (marketKey.includes('under')) return `UNDER (${market || 'line'})`;
+        return String(prediction || 'SELECTION').replace(/_/g, ' ').toUpperCase();
+    }
+
     function renderStats(payload) {
         const fulfilled = payload.fulfilled || {};
         const quotas = payload.quotas || {};
@@ -218,7 +267,7 @@
         const legsPreview = Array.isArray(prediction.matches) && prediction.matches.length > 1
             ? `<div class="legs">${prediction.matches.map((m, idx) => {
                 const legConfidence = Math.max(0, Math.min(100, Math.round(Number(m.confidence || 0))));
-                return `${idx + 1}. ${safe(m.home_team || m.metadata?.home_team)} vs ${safe(m.away_team || m.metadata?.away_team)} — ${safe(m.market)} ${safe(m.prediction)} | ${legConfidence}%`;
+                return `${idx + 1}. ${safe(m.home_team || m.metadata?.home_team)} vs ${safe(m.away_team || m.metadata?.away_team)} — ${safe(m.market)} ${formatLegSelection(m)} | ${legConfidence}%`;
             }).join('<br>')}</div>`
             : '';
 

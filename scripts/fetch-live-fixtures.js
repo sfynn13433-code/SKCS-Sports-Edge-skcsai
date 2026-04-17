@@ -405,6 +405,10 @@ async function saveToSupabase(fixtures, existingMap) {
             try {
                 // Check if already exists with same data
                 const existing = existingMap.get(fixture.match_id);
+                if (existing && existing.id) {
+                    skipped++;
+                    continue;
+                }
                 
                 const matchesJson = [{
                     fixture_id: fixture.match_id,
@@ -435,7 +439,7 @@ async function saveToSupabase(fixtures, existingMap) {
                 const riskLevel = confidence >= 72 ? 'safe' : confidence >= 60 ? 'medium' : 'high';
                 const prediction = fixture.market_name || fixture.prediction || 'Home Win';
                 
-                // INSERT (no conflict needed - table is empty)
+                // Insert only for unseen fixture IDs to keep sync idempotent.
                 const sql = `
                     INSERT INTO predictions_final (
                         tier, type, matches, total_confidence, risk_level, sport, market_type, recommendation,
@@ -498,13 +502,15 @@ async function runLiveSync() {
         
         try {
             const result = await client.query(`
-                SELECT 
+                SELECT DISTINCT ON ((matches->0->>'fixture_id'))
+                    id,
                     (matches->0->>'fixture_id') as fixture_id,
                     edgemind_report,
                     total_confidence
                 FROM predictions_final 
                 WHERE matches IS NOT NULL
                 AND matches::text != '[]'
+                ORDER BY (matches->0->>'fixture_id'), created_at DESC, id DESC
             `);
             
             existingMap = new Map(

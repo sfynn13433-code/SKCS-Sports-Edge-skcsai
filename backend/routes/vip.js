@@ -16,6 +16,7 @@ const router = express.Router();
 
 const MASTER_PLAN_ID = 'elite_30day_deep_vip';
 const DAY_NAMES = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+const ELITE_CONFIDENCE_FLOOR = 75;
 
 function normalizeDay(dayName) {
     const normalized = String(dayName || '').trim().toLowerCase();
@@ -108,6 +109,13 @@ function roundConfidence(value) {
     return Math.round(Number(value) * 100) / 100;
 }
 
+function toConfidencePercent(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return 0;
+    const normalized = n > 0 && n <= 1 ? n * 100 : n;
+    return Math.max(0, Math.min(100, normalized));
+}
+
 function computeAverageLegConfidence(matches = []) {
     const values = (Array.isArray(matches) ? matches : [])
         .map((match) => Number(match?.confidence))
@@ -122,6 +130,12 @@ function resolveAverageLegConfidence(row, matches = []) {
     const fromMetadata = Number(matches?.[0]?.metadata?.average_leg_confidence);
     if (Number.isFinite(fromMetadata)) return roundConfidence(Math.max(0, Math.min(100, fromMetadata)));
     return computeAverageLegConfidence(matches);
+}
+
+function getPredictionConfidencePercent(row) {
+    const explicit = toConfidencePercent(row?.total_confidence);
+    if (explicit > 0) return roundConfidence(explicit);
+    return resolveAverageLegConfidence(row, Array.isArray(row?.matches) ? row.matches : []);
 }
 
 function megaIsValid(row, plan, now = new Date()) {
@@ -325,10 +339,13 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
         };
 
         for (const row of rows) {
-            if (row.section_type === 'direct') buckets.direct.push(row);
-            else if (row.section_type === 'secondary') buckets.analytical_insights.push(row);
-            else if (row.section_type === 'multi') buckets.multi.push(row);
-            else if (row.section_type === 'same_match' && (includeAll || row.validation_matrix?.valid === true)) buckets.same_match.push(row);
+            const confidencePct = getPredictionConfidencePercent(row);
+            const passesEliteFloor = confidencePct >= ELITE_CONFIDENCE_FLOOR;
+
+            if (row.section_type === 'direct' && (includeAll || passesEliteFloor)) buckets.direct.push(row);
+            else if (row.section_type === 'secondary' && (includeAll || passesEliteFloor)) buckets.analytical_insights.push(row);
+            else if (row.section_type === 'multi' && passesEliteFloor) buckets.multi.push(row);
+            else if (row.section_type === 'same_match' && passesEliteFloor && (includeAll || row.validation_matrix?.valid === true)) buckets.same_match.push(row);
             else if (row.section_type === 'acca_6match') buckets.acca_6match.push(row);
             else if (row.section_type === 'mega_acca_12' && (includeAll || megaIsValid(row, masterPlan, now))) buckets.mega_acca_12.push(row);
         }
