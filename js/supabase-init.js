@@ -64,17 +64,21 @@
 
     // Initialize when script loads
     function initSupabase() {
+        const authConfig = {
+            storage: window.localStorage,
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+            storageKey: 'skcs-auth'
+        };
+
         // Check if supabase is already loaded from CDN
         if (window.supabase && window.supabase.createClient) {
             console.log('[Supabase] CDN version already loaded');
             
             // Create client with safe storage
             window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-                auth: {
-                    persistSession: true,
-                    storageKey: 'skcs-auth',
-                    storage: new SafeStorageAdapter()
-                }
+                auth: authConfig
             });
             
             console.log('[Supabase] Client initialized with safe storage adapter');
@@ -100,11 +104,7 @@
                 console.log('[Supabase] CDN loaded after ' + attempts + ' checks');
                 
                 window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-                    auth: {
-                        persistSession: true,
-                        storageKey: 'skcs-auth',
-                        storage: new SafeStorageAdapter()
-                    }
+                    auth: authConfig
                 });
                 
                 console.log('[Supabase] Client initialized with safe storage adapter');

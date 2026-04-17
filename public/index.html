@@ -1152,6 +1152,7 @@
     let authSession = null;
     let activeSport = 'direct-markets';
     let sharedInsightsState = [];
+    let isInitialLoadComplete = false;
     const includeAllParam = new URLSearchParams(window.location.search).get('include_all');
     const INCLUDE_ALL_MODE = ['1', 'true'].includes(String(includeAllParam || '').trim().toLowerCase());
 
@@ -2320,7 +2321,7 @@
                     return { status: 'ok', rows };
                 }
 
-                const tablesToTry = ['prediction_final', 'predictions_final'];
+                const tablesToTry = ['predictions_final', 'prediction_final'];
                 let rows = [];
                 let tableStatus = 'table_not_found';
                 for (const tableName of tablesToTry) {
@@ -3362,7 +3363,10 @@
             }
         });
         
-        fetchPredictions('direct-markets');
+        if (!isInitialLoadComplete) {
+            fetchPredictions('direct-markets');
+            isInitialLoadComplete = true;
+        }
 
         // Sport tab switcher for Direct Markets links
         window.switchSportTab = function(sportKey) {
