@@ -288,8 +288,25 @@ async function generateEdgeMindReports(fixtures, existingMap) {
         const matchId = fixture.id || fixture.match_id || String(fixture.fixture?.id || '');
         const homeTeam = fixture.home_team || fixture.home_team_name || fixture.home_team?.name || '';
         const awayTeam = fixture.away_team || fixture.away_team_name || fixture.away_team?.name || '';
+        const normalizedFixtureId = String(matchId || '').trim();
+        const kickoffValue =
+            fixture.commence_time ||
+            fixture.date ||
+            fixture.match_date ||
+            fixture.kickoff ||
+            fixture.start_time ||
+            null;
+
+        fixture.match_id = normalizedFixtureId;
+        fixture.fixture_id = normalizedFixtureId;
+        fixture.home_team = homeTeam;
+        fixture.away_team = awayTeam;
+        fixture.commence_time = kickoffValue;
+        fixture.date = kickoffValue;
+        fixture.sport = fixture.sport || fixture.sport_key || 'football';
+        fixture.market = fixture.market || '1X2';
         
-        const existingData = existingMap.get(matchId);
+        const existingData = existingMap.get(normalizedFixtureId);
         
         if (existingData && existingData.edgemind_report) {
             fixture.edgemind_report = existingData.edgemind_report;
@@ -312,7 +329,8 @@ async function generateEdgeMindReports(fixtures, existingMap) {
             fixture.market_name = insightData.market_name;
             fixture.home_team = homeTeam;
             fixture.away_team = awayTeam;
-            fixture.match_id = matchId;
+            fixture.match_id = normalizedFixtureId;
+            fixture.fixture_id = normalizedFixtureId;
             
             if (insightData.confidence >= 50 && insightData.confidence <= 68) {
                 fixture.secondary_insights = [
@@ -395,6 +413,7 @@ async function saveToSupabase(fixtures, existingMap) {
     const client = await pool.connect();
     let upserted = 0;
     let skipped = 0;
+    const seenFixtureIds = new Set();
     
     try {
         await client.query('BEGIN');
@@ -403,22 +422,44 @@ async function saveToSupabase(fixtures, existingMap) {
             if (!fixture.home_team || !fixture.away_team) continue;
             
             try {
+                const fixtureId = String(fixture.match_id || fixture.fixture_id || '').trim();
+                const kickoffValue =
+                    fixture.commence_time ||
+                    fixture.date ||
+                    fixture.match_date ||
+                    fixture.kickoff ||
+                    fixture.start_time ||
+                    null;
+
+                if (!fixtureId) {
+                    skipped++;
+                    continue;
+                }
+
                 // Check if already exists with same data
-                const existing = existingMap.get(fixture.match_id);
+                const existing = existingMap.get(fixtureId);
                 if (existing && existing.id) {
                     skipped++;
                     continue;
                 }
+
+                // Guard against duplicate rows within the same sync run.
+                if (seenFixtureIds.has(fixtureId)) {
+                    skipped++;
+                    continue;
+                }
+                seenFixtureIds.add(fixtureId);
                 
                 const matchesJson = [{
-                    fixture_id: fixture.match_id,
+                    fixture_id: fixtureId,
                     home_team: fixture.home_team,
                     away_team: fixture.away_team,
                     home_team_name: fixture.home_team,
                     away_team_name: fixture.away_team,
                     sport: fixture.sport,
                     league: fixture.league,
-                    commence_time: fixture.date,
+                    commence_time: kickoffValue,
+                    match_date: kickoffValue,
                     market: fixture.market || '1X2',
                     prediction: fixture.prediction || 'home_win',
                     confidence: fixture.confidence || fixture.ai_confidence || 65,
@@ -427,6 +468,8 @@ async function saveToSupabase(fixtures, existingMap) {
                         league: fixture.league,
                         home_team: fixture.home_team,
                         away_team: fixture.away_team,
+                        match_time: kickoffValue,
+                        kickoff: kickoffValue,
                         venue: fixture.venue,
                         weather: fixture.weather,
                         odds: fixture.odds,
@@ -445,6 +488,7 @@ async function saveToSupabase(fixtures, existingMap) {
                         tier, type, matches, total_confidence, risk_level, sport, market_type, recommendation,
                         edgemind_report, secondary_insights, created_at
                     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
+                    ON CONFLICT DO NOTHING
                     RETURNING id
                 `;
                 
@@ -463,6 +507,8 @@ async function saveToSupabase(fixtures, existingMap) {
                 
                 if (result.rows.length > 0) {
                     upserted++;
+                } else {
+                    skipped++;
                 }
                 
             } catch (err) {
@@ -506,10 +552,13 @@ async function runLiveSync() {
                     id,
                     (matches->0->>'fixture_id') as fixture_id,
                     edgemind_report,
-                    total_confidence
+                    total_confidence AS confidence
                 FROM predictions_final 
                 WHERE matches IS NOT NULL
                 AND matches::text != '[]'
+                AND LOWER(COALESCE(tier, '')) = 'normal'
+                AND LOWER(COALESCE(type, '')) = 'direct'
+                AND NULLIF(TRIM(matches->0->>'fixture_id'), '') IS NOT NULL
                 ORDER BY (matches->0->>'fixture_id'), created_at DESC, id DESC
             `);
             

@@ -133,6 +133,27 @@ async function bootstrap() {
         `);
 
         await query(`
+            CREATE UNIQUE INDEX IF NOT EXISTS uq_predictions_final_live_direct_fixture_market
+            ON predictions_final (
+                LOWER(COALESCE(sport, '')),
+                LOWER(COALESCE(market_type, '')),
+                (CASE
+                    WHEN jsonb_typeof(matches) = 'array'
+                    THEN NULLIF(BTRIM(matches->0->>'fixture_id'), '')
+                    ELSE NULL
+                END)
+            )
+            WHERE LOWER(COALESCE(tier, '')) = 'normal'
+              AND LOWER(COALESCE(type, '')) = 'direct'
+              AND publish_run_id IS NULL
+              AND (CASE
+                    WHEN jsonb_typeof(matches) = 'array'
+                    THEN NULLIF(BTRIM(matches->0->>'fixture_id'), '')
+                    ELSE NULL
+                END) IS NOT NULL;
+        `);
+
+        await query(`
             CREATE TABLE IF NOT EXISTS tier_rules (
                 tier text PRIMARY KEY CHECK (tier IN ('normal', 'deep')),
                 min_confidence numeric NOT NULL,
