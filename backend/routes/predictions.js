@@ -1764,7 +1764,8 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         }
 
         const includeAllRequested = ['1', 'true'].includes(String(req.query.include_all || '').trim().toLowerCase());
-        const includeAll = isAdminAudit || (includeAllRequested && (isAdminAudit || req.user?.is_test_user === true));
+        // Require explicit include_all request; do not auto-enable full-history mode for admins.
+        const includeAll = includeAllRequested && (isAdminAudit || req.user?.is_test_user === true);
         const sportFilterValues = isAdminAudit ? [] : getSportFilterValues(sport);
         
         let historyWindowDays = Number(req.query.history_days);
