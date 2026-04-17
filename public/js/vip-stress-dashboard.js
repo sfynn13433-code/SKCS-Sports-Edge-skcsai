@@ -39,6 +39,108 @@
         return value === undefined || value === null || value === '' ? (fallback || '-') : value;
     }
 
+    function toNumber(value, fallback = 0) {
+        const n = Number(value);
+        return Number.isFinite(n) ? n : fallback;
+    }
+
+    function parseMetadata(metadata) {
+        if (!metadata) return {};
+        if (typeof metadata === 'string') {
+            try {
+                const parsed = JSON.parse(metadata);
+                return parsed && typeof parsed === 'object' ? parsed : {};
+            } catch (_error) {
+                return {};
+            }
+        }
+        return typeof metadata === 'object' ? metadata : {};
+    }
+
+    function resolveIntelligenceBadgeState(prediction, leg) {
+        const parsedMeta = parseMetadata(leg?.metadata || prediction?.metadata || {});
+        const contextIntell = (parsedMeta.context_intelligence && typeof parsedMeta.context_intelligence === 'object')
+            ? parsedMeta.context_intelligence
+            : {};
+        const signals = (contextIntell.signals && typeof contextIntell.signals === 'object')
+            ? contextIntell.signals
+            : ((parsedMeta.signals && typeof parsedMeta.signals === 'object') ? parsedMeta.signals : {});
+
+        const weatherRiskRaw = (
+            signals.weather_risk
+            ?? contextIntell.weather_risk
+            ?? parsedMeta.weather_risk_coefficient
+            ?? prediction?.weather_risk_coefficient
+            ?? 0
+        );
+        const weatherRisk = Math.max(0, Math.min(1, toNumber(weatherRiskRaw, 0)));
+
+        const confidenceRaw = (
+            contextIntell.p_adj
+            ?? parsedMeta.p_adj_after_context_risks
+            ?? parsedMeta.confidence_pct
+            ?? prediction?.confidence_pct
+            ?? prediction?.total_confidence
+            ?? leg?.confidence
+            ?? 0
+        );
+        const normalizedRawConfidence = toNumber(confidenceRaw, 0);
+        const confidence = normalizedRawConfidence > 0 && normalizedRawConfidence < 1
+            ? normalizedRawConfidence * 100
+            : normalizedRawConfidence;
+
+        const statusRaw = (
+            prediction?.ai_insight
+            ?? parsedMeta.ai_insight
+            ?? contextIntell.ai_insight
+            ?? (confidence >= 75 ? 'VERIFIED_EDGE' : 'PENDING')
+        );
+        const status = String(statusRaw || 'PENDING').trim().toUpperCase();
+
+        return {
+            weatherRisk,
+            confidence: Number.isFinite(confidence) ? confidence : 0,
+            status
+        };
+    }
+
+    function renderIntelligenceBadges(prediction, leg) {
+        const badgeState = resolveIntelligenceBadgeState(prediction, leg);
+        const confidence = Math.max(0, Math.min(100, badgeState.confidence));
+        const weatherRiskPercent = Math.round(badgeState.weatherRisk * 100);
+        const parts = [];
+
+        if (badgeState.status === 'VERIFIED_EDGE') {
+            parts.push(`
+                <div class="intel-badge ultra">
+                  <span class="intel-icon">💎</span>
+                  ULTRA TIER: ${confidence.toFixed(1)}% Confidence
+                </div>
+            `);
+        }
+
+        if (badgeState.weatherRisk > 0) {
+            parts.push(`
+                <div class="intel-badge weather">
+                  <span class="intel-icon">🌧️</span>
+                  Weather Risk: ${weatherRiskPercent}% Penalty Applied
+                </div>
+            `);
+        }
+
+        if (badgeState.status === 'EXPECTED_VARIANCE' || confidence < 75) {
+            parts.push(`
+                <div class="intel-badge filtered">
+                  <span class="intel-icon">🛡️</span>
+                  Filtered: ${confidence.toFixed(1)}% (Failed 75% Gate)
+                </div>
+            `);
+        }
+
+        if (!parts.length) return '';
+        return `<div class="intel-badges">${parts.join('')}</div>`;
+    }
+
     function firstLeg(prediction) {
         return Array.isArray(prediction.matches) && prediction.matches.length ? prediction.matches[0] : {};
     }
@@ -110,6 +212,7 @@
             : `${safe(leg.market)} • ${safe(leg.prediction)} • ${compound}%`;
         const kickoff = safe(leg.commence_time || leg.match_date || leg.metadata?.kickoff_time || leg.metadata?.match_time);
         const league = safe(leg.metadata?.league || leg.league || leg.sport || prediction.section_type);
+        const intelligenceBadges = renderIntelligenceBadges(prediction, leg);
         const validation = prediction.validation_matrix;
 
         const legsPreview = Array.isArray(prediction.matches) && prediction.matches.length > 1
@@ -136,6 +239,7 @@
             <div class="teams">${teams}</div>
             <div class="line">${line}</div>
             <div class="line">${league} • ${kickoff}</div>
+            ${intelligenceBadges}
             ${validationInfo}
             ${legsPreview}
             ${insightsFooter}

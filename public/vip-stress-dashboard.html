@@ -227,6 +227,49 @@
     line-height: 1.45;
   }
 
+  .intel-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .intel-badge {
+    display: inline-flex;
+    align-items: center;
+    width: max-content;
+    max-width: 100%;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.35;
+    white-space: nowrap;
+  }
+
+  .intel-icon {
+    margin-right: 6px;
+  }
+
+  .intel-badge.ultra {
+    background: #3b0764;
+    color: #f5d0fe;
+    border: 1px solid #a855f7;
+    box-shadow: 0 8px 16px rgba(59, 7, 100, 0.35);
+  }
+
+  .intel-badge.weather {
+    background: #0f172a;
+    color: #7dd3fc;
+    border-left: 2px solid #3b82f6;
+  }
+
+  .intel-badge.filtered {
+    background: #7f1d1d;
+    color: #fecaca;
+    opacity: 0.8;
+  }
+
   .analytical {
     border-color: rgba(251, 191, 36, 0.66);
     background: linear-gradient(130deg, rgba(120, 53, 15, 0.45), rgba(30, 41, 59, 0.78));
