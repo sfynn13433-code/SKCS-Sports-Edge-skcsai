@@ -1429,9 +1429,15 @@
 
     function extractTeamNameValue(value) {
         if (value === null || value === undefined) return '';
-        if (typeof value === 'string' || typeof value === 'number') return String(value).trim();
+        if (typeof value === 'string' || typeof value === 'number') {
+            const normalized = String(value).trim();
+            const lowered = normalized.toLowerCase();
+            if (!normalized) return '';
+            if (lowered === 'unknown' || lowered === 'unknown home' || lowered === 'unknown away') return '';
+            return normalized;
+        }
         if (typeof value !== 'object') return '';
-        return String(
+        const normalized = String(
             value.name
             || value.team_name
             || value.team
@@ -1441,6 +1447,10 @@
             || value.title
             || ''
         ).trim();
+        const lowered = normalized.toLowerCase();
+        if (!normalized) return '';
+        if (lowered === 'unknown' || lowered === 'unknown home' || lowered === 'unknown away') return '';
+        return normalized;
     }
 
     function resolveMatchTeamName(match, side) {
@@ -1472,6 +1482,32 @@
             ? extractTeamNameValue(meta.teams && (meta.teams.home || meta.teams.homeTeam || meta.team_home))
             : extractTeamNameValue(meta.teams && (meta.teams.away || meta.teams.awayTeam || meta.team_away));
         if (fromMetaTeams) return fromMetaTeams;
+
+        const fromMatchInfo = side === 'home'
+            ? extractTeamNameValue((match.match_info && (match.match_info.home_team || match.match_info.home || match.match_info.homeTeam))
+                || (meta.match_info && (meta.match_info.home_team || meta.match_info.home || meta.match_info.homeTeam))
+                || (meta.match_context && meta.match_context.match_info && (meta.match_context.match_info.home_team || meta.match_context.match_info.home || meta.match_context.match_info.homeTeam)))
+            : extractTeamNameValue((match.match_info && (match.match_info.away_team || match.match_info.away || match.match_info.awayTeam))
+                || (meta.match_info && (meta.match_info.away_team || meta.match_info.away || meta.match_info.awayTeam))
+                || (meta.match_context && meta.match_context.match_info && (meta.match_context.match_info.away_team || meta.match_context.match_info.away || meta.match_context.match_info.awayTeam)));
+        if (fromMatchInfo) return fromMatchInfo;
+
+        const labelSource = String(
+            match.match_name
+            || match.fixture_name
+            || match.event_name
+            || meta.match_name
+            || meta.fixture_name
+            || meta.event_name
+            || meta.header_info
+            || ''
+        ).trim();
+        if (labelSource) {
+            const parts = labelSource.split(/\s+vs\s+|\s+v\s+/i).map((x) => x.trim()).filter(Boolean);
+            if (parts.length >= 2) {
+                return side === 'home' ? parts[0] : parts[1];
+            }
+        }
 
         return '';
     }
@@ -1622,7 +1658,11 @@
             .filter((pred) => {
                 const firstMatch = getPrimaryMatch(pred);
                 const market = firstMatch ? getMatchMarket(firstMatch) : '';
-                return is1X2Market(market);
+                if (is1X2Market(market)) return true;
+                const type = getSectionType(pred);
+                if (type !== 'direct' && type !== 'single') return false;
+                const recommendation = String(getMatchRecommendation(firstMatch) || '').trim().toLowerCase();
+                return recommendation === 'home_win' || recommendation === 'away_win' || recommendation === 'draw' || recommendation === 'home' || recommendation === 'away' || recommendation === 'x';
             });
         
         if (INCLUDE_ALL_MODE) {
@@ -1897,21 +1937,24 @@
             );
             return sportKey === sportCode;
         });
+        const singles = scoped.filter((pred) => getPredictionLegCount(pred) === 1);
+        const directPreds = selectDirectInsights(singles).filter((pred) => !isDoubleChancePrediction(pred));
+        const directKeys = new Set(directPreds.map((pred) => buildPredictionDisplayKey(pred)));
 
-        const directCount = scoped.filter((pred) => {
-            const type = getSectionType(pred);
-            const legs = getPredictionLegCount(pred);
+        const secondaryCount = singles.filter((pred) => {
             if (isDoubleChancePrediction(pred)) return false;
-            if (type === 'direct' || type === 'single') return true;
-            return legs === 1 && is1X2Market(getMatchMarket(getPrimaryMatch(pred)));
+            const type = getSectionType(pred);
+            if (type === 'same_match') return false;
+            if (directKeys.has(buildPredictionDisplayKey(pred))) return false;
+            return type === 'secondary' || type === 'secondary_multi' || type === 'single' || type === 'direct';
         }).length;
 
-        const secondaryCount = scoped.filter((pred) => {
+        const multiCount = scoped.filter((pred) => {
+            if (isDoubleChancePrediction(pred)) return false;
             const type = getSectionType(pred);
             const legs = getPredictionLegCount(pred);
-            if (isDoubleChancePrediction(pred)) return false;
             if (type === 'same_match') return false;
-            return type === 'secondary_multi' || type === 'multi' || (legs >= 2 && legs <= 3);
+            return type === 'multi' || (legs >= 2 && legs <= 3);
         }).length;
 
         const sameMatchCount = scoped.filter((pred) => {
@@ -1922,12 +1965,12 @@
         }).length;
 
         const doubleChanceCount = scoped.filter((pred) => isDoubleChancePrediction(pred)).length;
-        const totalMarriedCount = directCount + secondaryCount;
+        const totalMarriedCount = directPreds.length + secondaryCount + multiCount;
 
         return {
             totalMarriedCount,
-            directCount,
-            secondaryCount,
+            directCount: directPreds.length,
+            secondaryCount: secondaryCount + multiCount,
             sameMatchCount,
             doubleChanceCount
         };
@@ -2575,15 +2618,11 @@
         setFootballSection('football-multi-matches', multiPreds, createMultiCard, 'No football multi insights available.');
         setFootballSection('football-same-matches', sameMatchPreds, createMultiCard, 'No same-match football bet builders available.');
 
-        const sharedSource = Array.isArray(sharedInsightsState) && sharedInsightsState.length
-            ? sharedInsightsState
-            : normalizedPredictions;
-        const footballTotals = calculateSportTotal('football', sharedSource);
         const counts = {
-            'football-direct-count': footballTotals.directCount,
-            'football-secondary-count': footballTotals.secondaryCount,
-            'football-multi-count': footballTotals.secondaryCount,
-            'football-same-count': footballTotals.sameMatchCount
+            'football-direct-count': directWithLinkedSecondary.length,
+            'football-secondary-count': secondarySingles.length,
+            'football-multi-count': multiPreds.length,
+            'football-same-count': sameMatchPreds.length
         };
 
         Object.entries(counts).forEach(([id, value]) => {
@@ -2969,10 +3008,10 @@
         const firstMatch = getPrimaryMatch(pred);
         const firstMeta = firstMatch.metadata || {};
         const predictionDetails = pred.prediction_details || firstMeta.prediction_details || {};
-        const reasoning = predictionDetails.reasoning || firstMeta.reasoning || '';
         const fallbackLabel = predictionDetails.outcome || 'Multi Bet';
         const fallbackConfidence = Math.max(0, Math.min(100, Math.round(getPredictionConfidenceScore(pred))));
         const finalRecommendation = getFinalRecommendation(pred, fallbackLabel, fallbackConfidence);
+        const reasoning = resolveEdgeMindText(pred, firstMatch, finalRecommendation, predictionDetails.reasoning || firstMeta.reasoning || '');
         const badgesHtml = renderCardBadges(pred);
         const engineLogHtml = renderEngineLogPanel(getPredictionEngineLog(pred));
         const insightsHtml = renderInsightsPanel(pred);
@@ -3015,7 +3054,6 @@
         const firstMatch = (pred.matches && pred.matches[0]) ? pred.matches[0] : {};
         const firstMeta = firstMatch.metadata || {};
         const predictionDetails = pred.prediction_details || firstMeta.prediction_details || {};
-        const reasoning = predictionDetails.reasoning || firstMeta.reasoning || '';
         const legCount = Array.isArray(pred.matches) ? pred.matches.length : 0;
         const isMegaAcca = getSectionType(pred) === 'mega_acca_12' || legCount >= 12;
         const dynamicTicketLabel = isMegaAcca ? '12 MATCH MEGA ACCA' : '6 MATCH ACCA';
@@ -3030,6 +3068,7 @@
             : rawOutcome;
         const badgesHtml = renderCardBadges(pred);
         const compoundProbability = Math.max(0, Math.min(100, Math.round(Number(pred.total_confidence || 0) * 100) / 100));
+        const reasoning = resolveEdgeMindText(pred, firstMatch, { market: outcome, confidence: compoundProbability }, predictionDetails.reasoning || firstMeta.reasoning || '');
 
         const normalizeSportForAccaBadge = (value) => {
             const key = String(value || '').trim().toLowerCase();

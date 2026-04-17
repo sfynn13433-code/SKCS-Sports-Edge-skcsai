@@ -425,7 +425,11 @@ function humanizeToken(value) {
 function extractTeamNameValue(value) {
     if (value === null || value === undefined) return '';
     if (typeof value === 'string' || typeof value === 'number') {
-        return String(value).trim();
+        const normalized = String(value).trim();
+        const lowered = normalized.toLowerCase();
+        if (!normalized) return '';
+        if (lowered === 'unknown' || lowered === 'unknown home' || lowered === 'unknown away') return '';
+        return normalized;
     }
     if (typeof value !== 'object') return '';
 
@@ -439,7 +443,11 @@ function extractTeamNameValue(value) {
         || value.title
         || '';
 
-    return String(candidate || '').trim();
+    const normalized = String(candidate || '').trim();
+    const lowered = normalized.toLowerCase();
+    if (!normalized) return '';
+    if (lowered === 'unknown' || lowered === 'unknown home' || lowered === 'unknown away') return '';
+    return normalized;
 }
 
 function resolveMatchTeamName(match, side) {
@@ -469,6 +477,46 @@ function resolveMatchTeamName(match, side) {
         ? extractTeamNameValue(match?.metadata?.teams?.home || match?.metadata?.teams?.homeTeam || match?.metadata?.team_home)
         : extractTeamNameValue(match?.metadata?.teams?.away || match?.metadata?.teams?.awayTeam || match?.metadata?.team_away);
     if (fromMetadataTeams) return fromMetadataTeams;
+
+    const fromMatchInfo = side === 'home'
+        ? extractTeamNameValue(
+            match?.match_info?.home_team
+            || match?.match_info?.home
+            || match?.match_info?.homeTeam
+            || match?.metadata?.match_info?.home_team
+            || match?.metadata?.match_info?.home
+            || match?.metadata?.match_info?.homeTeam
+            || match?.metadata?.match_context?.match_info?.home_team
+            || match?.metadata?.match_context?.match_info?.home
+            || match?.metadata?.match_context?.match_info?.homeTeam
+        )
+        : extractTeamNameValue(
+            match?.match_info?.away_team
+            || match?.match_info?.away
+            || match?.match_info?.awayTeam
+            || match?.metadata?.match_info?.away_team
+            || match?.metadata?.match_info?.away
+            || match?.metadata?.match_info?.awayTeam
+            || match?.metadata?.match_context?.match_info?.away_team
+            || match?.metadata?.match_context?.match_info?.away
+            || match?.metadata?.match_context?.match_info?.awayTeam
+        );
+    if (fromMatchInfo) return fromMatchInfo;
+
+    const labelSource = String(
+        match?.match_name
+        || match?.fixture_name
+        || match?.event_name
+        || match?.metadata?.match_name
+        || match?.metadata?.fixture_name
+        || match?.metadata?.event_name
+        || match?.metadata?.header_info
+        || ''
+    ).trim();
+    if (labelSource) {
+        const parts = labelSource.split(/\s+vs\s+|\s+v\s+/i).map((x) => x.trim()).filter(Boolean);
+        if (parts.length >= 2) return side === 'home' ? parts[0] : parts[1];
+    }
 
     return '';
 }
@@ -1186,6 +1234,12 @@ function resolveEdgeMindAnalysis(prediction) {
     return buildDynamicEdgeMindAnalysis(prediction);
 }
 
+function resolveReasoningForDisplay(prediction, fallbackReasoning) {
+    const text = String(fallbackReasoning || '').trim();
+    if (text && !isPlaceholderEdgeMindReport(text)) return text;
+    return resolveEdgeMindAnalysis(prediction);
+}
+
 function enrichPredictionDetails(prediction) {
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
     const firstMatch = matches[0] || {};
@@ -1231,6 +1285,7 @@ function enrichPredictionDetails(prediction) {
         stability: contextInsights?.chips?.stability || 'Unknown'
     };
     const edgeMindAnalysis = resolveEdgeMindAnalysis(prediction);
+    const resolvedReasoning = resolveReasoningForDisplay(prediction, fallbackReasoning);
 
     return {
         ...prediction,
@@ -1246,7 +1301,7 @@ function enrichPredictionDetails(prediction) {
         prediction_details: {
             ...(prediction?.prediction_details || {}),
             outcome: finalOutcome,
-            reasoning: String(fallbackReasoning).trim(),
+            reasoning: resolvedReasoning,
             context_status: contextInsights?.status || 'unavailable'
         }
     };
@@ -1352,17 +1407,68 @@ function sanitizeSameMatchMatchesForDisplay(matches) {
     return out;
 }
 
+function buildDisplayFixtureKey(match) {
+    const matchId = String(match?.match_id || match?.metadata?.match_id || '').trim();
+    if (matchId) return `id:${matchId}`;
+
+    const home = normalizeTeamSignaturePart(resolveMatchTeamName(match, 'home'));
+    const away = normalizeTeamSignaturePart(resolveMatchTeamName(match, 'away'));
+    const kickoff = String(
+        match?.commence_time
+        || match?.match_date
+        || match?.metadata?.match_time
+        || match?.metadata?.kickoff
+        || match?.metadata?.kickoff_time
+        || ''
+    ).trim();
+    if (home || away || kickoff) return `fallback:${home}:${away}:${kickoff}`;
+
+    const market = normalizeMarketKey(match?.market || match?.market_type || '');
+    const prediction = String(match?.prediction || match?.recommendation || '').trim().toLowerCase();
+    return `fallback:${home}:${away}:${kickoff}:${market}:${prediction}`;
+}
+
+function sanitizeAccumulatorMatchesForDisplay(matches, minimumLegs = 2) {
+    const out = [];
+    const seen = new Set();
+
+    for (const match of (Array.isArray(matches) ? matches : [])) {
+        const key = buildDisplayFixtureKey(match);
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        out.push(match);
+    }
+
+    if (out.length === 0) return Array.isArray(matches) ? matches : [];
+    if (out.length < minimumLegs) return out;
+    return out;
+}
+
 function sanitizePredictionForDisplay(prediction) {
-    if (inferSectionType(prediction) !== 'same_match') return prediction;
+    const sectionType = inferSectionType(prediction);
+
+    if (sectionType === 'same_match') {
+        const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+        const sanitizedMatches = sanitizeSameMatchMatchesForDisplay(matches);
+        if (!sanitizedMatches.length) return prediction;
+
+        return {
+            ...prediction,
+            matches: sanitizedMatches
+        };
+    }
 
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
-    const sanitizedMatches = sanitizeSameMatchMatchesForDisplay(matches);
-    if (!sanitizedMatches.length) return prediction;
+    if (sectionType === 'multi' || sectionType === 'acca_6match' || sectionType === 'mega_acca_12' || sectionType.includes('acca')) {
+        const minLegs = sectionType === 'mega_acca_12' ? 8 : sectionType === 'acca_6match' || sectionType.includes('acca') ? 4 : 2;
+        const sanitizedMatches = sanitizeAccumulatorMatchesForDisplay(matches, minLegs);
+        return {
+            ...prediction,
+            matches: sanitizedMatches
+        };
+    }
 
-    return {
-        ...prediction,
-        matches: sanitizedMatches
-    };
+    return prediction;
 }
 
 async function getLatestRelevantPublishRunId(requestedSport) {
