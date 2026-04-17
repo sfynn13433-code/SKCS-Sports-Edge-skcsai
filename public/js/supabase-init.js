@@ -1,5 +1,5 @@
 // SKCS AI Sports Edge - Supabase Client Initialization
-// Load directly from CDN to avoid ITP issues with localStorage
+// Supports both CDN namespace (`window.supabase.createClient`) and local bundle client (`window.supabase`)
 
 (function() {
     'use strict';
@@ -64,11 +64,18 @@
 
     // Initialize when script loads
     function initSupabase() {
-        // Check if supabase is already loaded from CDN
+        if (window.supabaseClient && window.supabaseClient.auth) {
+            console.log('[Supabase] Client already initialized');
+            return;
+        }
+
+        if (window.supabase && window.supabase.auth) {
+            window.supabaseClient = window.supabase;
+            console.log('[Supabase] Using pre-initialized local bundle client');
+            return;
+        }
+
         if (window.supabase && window.supabase.createClient) {
-            console.log('[Supabase] CDN version already loaded');
-            
-            // Create client with safe storage
             window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
                 auth: {
                     persistSession: true,
@@ -76,29 +83,26 @@
                     storage: new SafeStorageAdapter()
                 }
             });
-            
             console.log('[Supabase] Client initialized with safe storage adapter');
             return;
         }
-        
-        // If supabase object exists but createClient is missing, log error
-        if (window.supabase && !window.supabase.createClient) {
-            console.error('[Supabase] Library loaded but createClient is missing. Object keys:', Object.keys(window.supabase));
-            return;
-        }
-        
-        // supabase not loaded yet, wait for it
-        console.log('[Supabase] Waiting for CDN to load...');
+
+        console.log('[Supabase] Waiting for library to load...');
         let attempts = 0;
         const maxAttempts = 50;
         
         const checkInterval = setInterval(function() {
             attempts++;
             
+            if (window.supabase && window.supabase.auth) {
+                clearInterval(checkInterval);
+                window.supabaseClient = window.supabase;
+                console.log('[Supabase] Local bundle client detected after ' + attempts + ' checks');
+                return;
+            }
+
             if (window.supabase && window.supabase.createClient) {
                 clearInterval(checkInterval);
-                console.log('[Supabase] CDN loaded after ' + attempts + ' checks');
-                
                 window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
                     auth: {
                         persistSession: true,
@@ -113,7 +117,7 @@
             
             if (attempts >= maxAttempts) {
                 clearInterval(checkInterval);
-                console.error('[Supabase] Timeout waiting for CDN to load');
+                console.error('[Supabase] Timeout waiting for Supabase library to load');
             }
         }, 100);
     }
