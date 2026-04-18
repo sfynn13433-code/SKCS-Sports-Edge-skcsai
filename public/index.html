@@ -2293,7 +2293,7 @@
     function isDisplayFriendlySecondaryMarket(market) {
         const marketKey = normalizeMarketKey(market);
         const is1X2 = is1X2Market(market);
-        return !is1X2 && marketKey !== 'corners_under' && marketKey !== 'corners_over';
+        return !is1X2 && marketKey !== '1x2' && marketKey !== 'match_result';
     }
 
     function dedupeSecondaryDisplayItems(items) {
@@ -2403,22 +2403,22 @@
 
     function buildSyntheticBackupMarkets(firstMatch, baseConfidence) {
         const primary = String(getMatchRecommendation(firstMatch) || '').trim().toLowerCase();
-        const conservative = Math.max(60, Math.min(90, Math.round(baseConfidence + 8)));
+        const conservative = Math.max(76, Math.min(92, Math.round(baseConfidence + 18)));
         const out = [];
 
         if (primary === 'home_win' || primary === 'home') {
             out.push({ market: 'double_chance_1x', prediction: '1x', confidence: conservative });
-            out.push({ market: 'draw_no_bet_home', prediction: 'home', confidence: Math.max(60, conservative - 4) });
+            out.push({ market: 'draw_no_bet_home', prediction: 'home', confidence: Math.max(76, conservative - 4) });
         } else if (primary === 'away_win' || primary === 'away') {
             out.push({ market: 'double_chance_x2', prediction: 'x2', confidence: conservative });
-            out.push({ market: 'draw_no_bet_away', prediction: 'away', confidence: Math.max(60, conservative - 4) });
+            out.push({ market: 'draw_no_bet_away', prediction: 'away', confidence: Math.max(76, conservative - 4) });
         } else {
             out.push({ market: 'double_chance_12', prediction: '12', confidence: conservative });
-            out.push({ market: 'double_chance_1x', prediction: '1x', confidence: Math.max(60, conservative - 5) });
+            out.push({ market: 'double_chance_1x', prediction: '1x', confidence: Math.max(76, conservative - 5) });
         }
 
-        out.push({ market: 'under_3_5', prediction: 'under', confidence: Math.max(60, conservative - 2) });
-        out.push({ market: 'over_1_5', prediction: 'over', confidence: Math.max(60, conservative - 3) });
+        out.push({ market: 'under_3_5', prediction: 'under', confidence: Math.max(76, conservative - 2) });
+        out.push({ market: 'over_1_5', prediction: 'over', confidence: Math.max(76, conservative - 3) });
 
         return out.map((item) => ({
             ...item,
@@ -2433,23 +2433,33 @@
         const fromMetadata = Array.isArray(meta?.secondary_markets) ? meta.secondary_markets : [];
         const fromRanked = buildSecondaryCandidatesFromRankedMarkets(firstMatch);
 
-        const isHighRiskPrimary = Number(finalRecommendation?.confidence || 0) < 75;
+        const confidenceScore = Number(finalRecommendation?.confidence || 0);
+        const isExtremeRiskPrimary = confidenceScore >= 0 && confidenceScore <= 58;
+        const requiresPivot = confidenceScore < 70;
         let candidates = dedupeSecondaryCandidates([
             ...fromPrediction,
             ...fromMetadata,
             ...fromRanked
         ]);
 
-        if (isHighRiskPrimary && !candidates.length) {
+        if (requiresPivot && !candidates.length) {
             candidates = dedupeSecondaryCandidates(buildSyntheticBackupMarkets(firstMatch, finalRecommendation.confidence || 0));
         }
 
-        const minConfidence = isHighRiskPrimary ? 60 : 0;
-        return candidates
+        const minConfidence = requiresPivot ? 76 : 0;
+        let shaped = candidates
             .filter((item) => !item.market || isDisplayFriendlySecondaryMarket(item.market))
             .filter((item) => Number(item.confidence || 0) >= minConfidence)
             .sort((a, b) => Number(b.confidence || 0) - Number(a.confidence || 0))
             .slice(0, 4);
+
+        if (isExtremeRiskPrimary && shaped.length < 4) {
+            const synthetic = dedupeSecondaryCandidates(buildSyntheticBackupMarkets(firstMatch, finalRecommendation.confidence || 0))
+                .filter((item) => Number(item.confidence || 0) >= 76);
+            shaped = dedupeSecondaryCandidates([...shaped, ...synthetic]).slice(0, 4);
+        }
+
+        return shaped;
     }
 
     function attachSecondaryMarkets(pred, secondaryByMatchId) {
@@ -3231,7 +3241,8 @@
         }
 
         const secondaryMarkets = resolveSecondaryMarketsForCard(pred, firstMatch, finalRecommendation);
-        const isHighRiskPrimary = confidenceScore < 70; // Secondary backup rules apply if under 70%
+        const isHighRiskPrimary = confidenceScore >= 59 && confidenceScore <= 69;
+        const isExtremeRiskPrimary = confidenceScore >= 0 && confidenceScore <= 58;
 
         const insightsHtml = renderInsightsPanel(pred);
         const edgeMindReportText = resolveEdgeMindText(pred, firstMatch, finalRecommendation, reasoning);
@@ -3249,10 +3260,17 @@
                 return `<li style="padding:8px 0;border-bottom:1px solid #eee;list-style:none;">${label} - ${confDisplay}${description}</li>`;
             }).join('');
 
+            const detailsOpen = isExtremeRiskPrimary ? 'open' : '';
+            const summaryLabel = isExtremeRiskPrimary
+                ? `🚨 MANDATORY SECONDARY PIVOT (${Math.min(secondaryMarkets.length, 4)}/4)`
+                : `📊 View Secondary Insights (${Math.min(secondaryMarkets.length, 4)} Available)`;
+            const detailsStyle = isExtremeRiskPrimary
+                ? 'margin-top:15px;background:#fff1f2;padding:12px;border-radius:6px;border:2px solid #ef4444;'
+                : 'margin-top:15px;background:#f8f9fa;padding:10px;border-radius:6px;border:1px solid #dee2e6;';
             secondaryInsightsHtml = `
-                <details class="secondary-insights-dropdown" style="margin-top:15px;background:#f8f9fa;padding:10px;border-radius:6px;border:1px solid #dee2e6;">
+                <details ${detailsOpen} class="secondary-insights-dropdown" style="${detailsStyle}">
                     <summary style="cursor:pointer;font-weight:bold;color:#0d6efd;user-select:none;">
-                        📊 View Secondary Insights (${Math.min(secondaryMarkets.length, 4)} Available)
+                        ${summaryLabel}
                     </summary>
                     <ul style="padding-left:0;margin-top:10px;margin-bottom:0;list-style:none;">
                         ${listItems}
@@ -3261,10 +3279,12 @@
             `;
         } else {
             secondaryInsightsHtml = `
-                <div style="margin-top:15px;padding:10px;font-size:0.9em;color:#6c757d;background:#f8f9fa;border-radius:6px;text-align:center;">
-                    ${isHighRiskPrimary
-                        ? 'No backup secondary markets are currently available above safe thresholds.'
-                        : 'No secondary insights available for this fixture.'}
+                <div style="margin-top:15px;padding:10px;font-size:0.9em;color:#6c757d;background:${isExtremeRiskPrimary ? '#fff1f2' : '#f8f9fa'};border-radius:6px;text-align:center;border:${isExtremeRiskPrimary ? '2px solid #ef4444' : '1px solid transparent'};">
+                    ${isExtremeRiskPrimary
+                        ? 'Extreme risk alert: 4 compliant secondary markets are required. No valid pivot set is currently available.'
+                        : (isHighRiskPrimary
+                        ? 'No backup secondary markets are currently available at the required 76%+ threshold.'
+                        : 'No secondary insights available for this fixture.')}
                 </div>
             `;
         }
@@ -3281,6 +3301,12 @@
                 <div class="confidence" style="background-color:${riskColor}15; color:${riskColor}; padding:0.3rem 0.8rem; border-radius:20px; font-size:0.9em; font-weight:600;">${confidenceScore}%</div>
             </div>
             ${warningHtml}
+            ${isExtremeRiskPrimary ? `
+            <div style="margin-top:12px;padding:14px;border:2px solid #dc2626;background:#fee2e2;color:#7f1d1d;border-radius:8px;text-align:center;">
+                <div style="font-size:1.05rem;font-weight:800;line-height:1.4;">DO NOT BET THIS DIRECT 1X2 MARKET.</div>
+                <div style="font-size:0.9rem;font-weight:700;margin-top:6px;">Use the 4 Secondary Markets below.</div>
+            </div>
+            ` : ''}
             <div style="margin-top:12px;padding:10px;background:#e9ecef;border-radius:6px;border-left:4px solid #6c757d;">
                 <div style="font-size:0.85em;font-weight:bold;color:#495057;margin-bottom:6px;">🤖 EdgeMind Bot</div>
                 <p style="font-size:0.85em;line-height:1.4;color:#495057;margin:0;font-style:italic;">"${edgeMindReportText}"</p>

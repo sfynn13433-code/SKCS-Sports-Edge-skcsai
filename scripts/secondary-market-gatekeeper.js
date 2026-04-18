@@ -61,6 +61,50 @@ const SECONDARY_MARKET_ALLOWLIST = [
     'Cards U 1.5', 'Cards U 2.5', 'Cards U 3.5', 'Cards U 4.5', 'Cards U 5.5', 'Cards U 6.5'
 ];
 
+const SECONDARY_MIN_CONFIDENCE = 76;
+const EXTREME_SECONDARY_COUNT = 4;
+
+function toNumber(value, fallback = 0) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function normalizeMarketPhrase(value) {
+    return String(value || '')
+        .toLowerCase()
+        .replace(/[_-]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .replace(/([0-9])\s+([0-9])/g, '$1.$2');
+}
+
+function normalizeDirectOutcome(value) {
+    const key = String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[\s-]+/g, '_');
+
+    if (key === 'home' || key === 'home_win' || key === '1') return 'home';
+    if (key === 'draw' || key === 'x') return 'draw';
+    if (key === 'away' || key === 'away_win' || key === '2') return 'away';
+    return null;
+}
+
+function resolveDirectRiskTier(confidence) {
+    const score = Math.max(0, Math.min(100, Math.round(toNumber(confidence, 0))));
+
+    if (score >= 80) {
+        return { score, tier: 'safe', label: 'HIGH_CONFIDENCE_SAFE', requiresSecondaryPivot: false, requiresExactFourSecondary: false };
+    }
+    if (score >= 70) {
+        return { score, tier: 'moderate', label: 'MODERATE_RISK', requiresSecondaryPivot: false, requiresExactFourSecondary: false };
+    }
+    if (score >= 59) {
+        return { score, tier: 'high', label: 'HIGH_RISK', requiresSecondaryPivot: true, requiresExactFourSecondary: false };
+    }
+    return { score, tier: 'extreme', label: 'EXTREME_RISK', requiresSecondaryPivot: true, requiresExactFourSecondary: true };
+}
+
 /**
  * Filter secondary markets according to strict governance rules
  * @param {Array} allGeneratedSecondaryMarkets - Raw markets from AI generation
@@ -76,18 +120,21 @@ function filterSecondaryMarkets(allGeneratedSecondaryMarkets) {
         const confidence = typeof market === 'object' && market !== null 
             ? parseFloat(market.confidence) 
             : 50;
-        return confidence >= 76;
+        return confidence >= SECONDARY_MIN_CONFIDENCE;
     });
     
     // Step 2: Filter by allowlist
     const validMarkets = highConfidenceMarkets.filter(market => {
-        const marketType = typeof market === 'object' && market !== null 
+        const rawMarketType = typeof market === 'object' && market !== null 
             ? (market.type || market.label || market.prediction || market.market || '')
             : String(market);
+        const marketType = normalizeMarketPhrase(rawMarketType);
+        if (!marketType) return false;
         
-        return SECONDARY_MARKET_ALLOWLIST.some(allowed => 
-            marketType.toLowerCase().includes(allowed.toLowerCase()) ||
-            allowed.toLowerCase().includes(marketType.toLowerCase())
+        return SECONDARY_MARKET_ALLOWLIST.some(allowed => {
+            const normalizedAllowed = normalizeMarketPhrase(allowed);
+            return marketType.includes(normalizedAllowed) || normalizedAllowed.includes(marketType);
+        }
         );
     });
     
@@ -98,7 +145,7 @@ function filterSecondaryMarkets(allGeneratedSecondaryMarkets) {
             const confB = typeof b === 'object' ? parseFloat(b.confidence) : 50;
             return confB - confA;
         })
-        .slice(0, 4);
+        .slice(0, EXTREME_SECONDARY_COUNT);
 }
 
 /**
@@ -136,7 +183,7 @@ function generateEdgeMindReport(baselineProb, contextAdjustments, volatilityAdju
         report += `\n\n💡 **RECOMMENDATION:** Pivot to the Secondary Insights below for safer options.`;
     } else if (confidence >= 0 && confidence <= 58) {
         report += `\n\n🛑 **CRITICAL WARNING:** The Direct 1X2 market at ${confidence}% is EXTREME RISK.`;
-        report += `\n\n🚫 **ACTION REQUIRED:** Do NOT place a direct market bet on this fixture. Use the Secondary Insights instead.`;
+        report += `\n\n🚫 **ACTION REQUIRED:** Do NOT place a direct market bet on this fixture. Use the 4 Secondary Insights instead.`;
     }
     
     return report;
@@ -147,27 +194,39 @@ function generateEdgeMindReport(baselineProb, contextAdjustments, volatilityAdju
  * Accepts full 0-100 confidence range
  */
 function validateDirectMarket(prediction) {
-    const confidence = parseFloat(prediction.confidence) || 0;
-    const allowedOutcomes = ['home', 'away', 'draw', '1', 'x', '2', 'home win', 'away win', 'draw'];
+    const confidence = toNumber(prediction && prediction.confidence, 0);
+    const outcome = normalizeDirectOutcome(
+        prediction && (prediction.prediction || prediction.recommendation || prediction.pick || prediction.selection || prediction.outcome)
+    );
+    const risk = resolveDirectRiskTier(confidence);
     
     if (confidence < 0 || confidence > 100) {
         return {
             valid: false,
-            reason: `Direct market confidence ${confidence}% is outside allowed range (0-100%)`
+            reason: `Direct market confidence ${confidence}% is outside allowed range (0-100%)`,
+            risk_tier: risk.tier,
+            risk_label: risk.label
         };
     }
     
-    const outcome = (prediction.prediction || prediction.market || '').toLowerCase();
-    const isValidOutcome = allowedOutcomes.some(o => outcome.includes(o));
-    
-    if (!isValidOutcome) {
+    if (!outcome) {
         return {
             valid: false,
-            reason: `Direct market outcome "${outcome}" is not in allowed 1X2 list`
+            reason: `Direct market outcome "${prediction && (prediction.prediction || prediction.recommendation || prediction.pick || prediction.selection || prediction.outcome || '')}" is not in allowed 1X2 list (Home/Draw/Away).`,
+            risk_tier: risk.tier,
+            risk_label: risk.label
         };
     }
     
-    return { valid: true };
+    return {
+        valid: true,
+        confidence: risk.score,
+        outcome,
+        risk_tier: risk.tier,
+        risk_label: risk.label,
+        requires_secondary_pivot: risk.requiresSecondaryPivot,
+        requires_exact_four_secondary: risk.requiresExactFourSecondary
+    };
 }
 
 /**
@@ -178,20 +237,50 @@ function processPredictionWithGovernance(rawPrediction) {
         direct_market: null,
         secondary_insights: [],
         edgemind_report: null,
-        warnings: []
+        warnings: [],
+        risk_tier: null,
+        risk_label: null,
+        requires_secondary_pivot: false
     };
     
     // Validate and extract direct market
     const directValidation = validateDirectMarket(rawPrediction);
     if (directValidation.valid) {
-        result.direct_market = rawPrediction;
+        result.direct_market = {
+            ...rawPrediction,
+            prediction: directValidation.outcome
+        };
+        result.risk_tier = directValidation.risk_tier;
+        result.risk_label = directValidation.risk_label;
+        result.requires_secondary_pivot = directValidation.requires_secondary_pivot;
     } else {
         result.warnings.push(directValidation.reason);
+        result.risk_tier = directValidation.risk_tier || null;
+        result.risk_label = directValidation.risk_label || null;
+        result.requires_secondary_pivot = false;
     }
     
     // Filter secondary markets
     const rawSecondary = rawPrediction.secondary_markets || [];
-    result.secondary_insights = filterSecondaryMarkets(rawSecondary);
+    const filteredSecondary = filterSecondaryMarkets(rawSecondary);
+    result.secondary_insights = filteredSecondary;
+
+    if (directValidation.valid && directValidation.requires_secondary_pivot) {
+        if (!filteredSecondary.length) {
+            result.warnings.push('Direct 1X2 risk pivot required but no compliant secondary markets were available.');
+        }
+
+        if (directValidation.requires_exact_four_secondary) {
+            const topFour = filteredSecondary.slice(0, EXTREME_SECONDARY_COUNT);
+            result.secondary_insights = topFour;
+            if (topFour.length !== EXTREME_SECONDARY_COUNT) {
+                result.direct_market = null;
+                result.warnings.push(
+                    `Extreme risk enforcement failed: exactly ${EXTREME_SECONDARY_COUNT} secondary markets (>=${SECONDARY_MIN_CONFIDENCE}% and allowlisted) are required.`
+                );
+            }
+        }
+    }
     
     // Generate EdgeMind report if we have a valid prediction
     if (result.direct_market) {
@@ -202,6 +291,15 @@ function processPredictionWithGovernance(rawPrediction) {
             rawPrediction.confidence,
             rawPrediction
         );
+    }
+
+    if (result.warnings.length) {
+        console.warn('[secondary-market-gatekeeper] governance warnings:', {
+            fixture: rawPrediction && (rawPrediction.fixture_id || rawPrediction.id || null),
+            risk_tier: result.risk_tier,
+            risk_label: result.risk_label,
+            warnings: result.warnings
+        });
     }
     
     return result;

@@ -272,6 +272,7 @@
         const leg = firstLeg(prediction);
         const sectionType = String(prediction.section_type || prediction.type || '').toLowerCase();
         const isAcca = sectionType === 'acca_6match' || sectionType === 'mega_acca_12';
+        const isDirect = sectionType === 'direct' || sectionType === 'single';
         const teams = `${safe(leg.home_team || leg.metadata?.home_team)} vs ${safe(leg.away_team || leg.metadata?.away_team)}`;
         const compound = Math.max(0, Math.min(100, Math.round(Number(prediction.total_confidence || 0) * 100) / 100));
         const line = isAcca
@@ -300,6 +301,30 @@
         const engineLogFooter = engineLog.length
             ? `<div class="line">${engineLog.map((line) => safe(line)).join(' | ')}</div>`
             : '';
+        const secondaryInsights = Array.isArray(prediction.secondary_insights) ? prediction.secondary_insights.slice(0, 4) : [];
+        const isHighRiskDirect = isDirect && compound >= 59 && compound <= 69;
+        const isExtremeRiskDirect = isDirect && compound >= 0 && compound <= 58;
+        const secondaryPivotHtml = (isHighRiskDirect || isExtremeRiskDirect)
+            ? `
+            <div style="margin-top:10px;padding:${isExtremeRiskDirect ? '12px' : '10px'};border:${isExtremeRiskDirect ? '2px solid #dc2626' : '1px solid #f97316'};background:${isExtremeRiskDirect ? '#fee2e2' : '#fff7ed'};color:${isExtremeRiskDirect ? '#7f1d1d' : '#9a3412'};border-radius:8px;">
+              <div style="font-weight:800;font-size:${isExtremeRiskDirect ? '0.95rem' : '0.88rem'};line-height:1.4;">
+                ${isExtremeRiskDirect ? 'DO NOT BET DIRECT 1X2. USE SECONDARY MARKETS.' : 'HIGH RISK: PIVOT TO SECONDARY MARKETS.'}
+              </div>
+              <div style="margin-top:6px;font-size:0.8rem;font-weight:700;">
+                ${isExtremeRiskDirect ? `Secondary set: ${secondaryInsights.length}/4` : `Secondary set available: ${secondaryInsights.length}`}
+              </div>
+              ${secondaryInsights.length ? `
+                <ul style="margin-top:8px;padding-left:16px;">
+                    ${secondaryInsights.map((item) => {
+                        const label = safe(item?.label || item?.market || item?.prediction, 'Secondary');
+                        const conf = toNumber(item?.confidence, 0);
+                        return `<li>${label} (${conf.toFixed(0)}%)</li>`;
+                    }).join('')}
+                </ul>
+              ` : ''}
+            </div>
+            `
+            : '';
 
         return `
           <article class="card">
@@ -307,6 +332,7 @@
             <div class="line">${line}</div>
             <div class="line">${league} • ${kickoff}</div>
             ${intelligenceBadges}
+            ${secondaryPivotHtml}
             ${validationInfo}
             ${legsPreview}
             ${insightsFooter}

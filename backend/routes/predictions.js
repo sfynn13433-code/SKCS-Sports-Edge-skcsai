@@ -700,7 +700,7 @@ function buildSecondaryMarketDescription(market, fallbackDescription = '') {
 
 function isDisplayFriendlySecondaryMarket(market) {
     const marketKey = normalizeMarketKey(market);
-    return marketKey !== 'corners_under' && marketKey !== 'corners_over';
+    return marketKey !== '1x2' && marketKey !== 'match_result' && marketKey !== 'full_time_result';
 }
 
 function isCompatibleSecondaryMarket(primaryMatch, secondaryMarket) {
@@ -2126,9 +2126,8 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             );
         stageCounts.plan_filtered_rows = planFilteredPredictions.length;
 
-        const enforceEliteFloor = !includeAll
-            && !isAdminAudit
-            && planRequiresEliteConfidenceFloor(planId, planCapabilities);
+        // SKCS RULE UPDATE: Allow 0-100% 1X2 matches through to trigger UI warnings.
+        const enforceEliteFloor = false; // Disabled by Admin
         const eliteFloorPredictions = enforceEliteFloor
             ? planFilteredPredictions.filter((prediction) => {
                 const sectionType = inferSectionType(prediction);

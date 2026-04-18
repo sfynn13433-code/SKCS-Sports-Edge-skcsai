@@ -476,6 +476,335 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- ============================================================================
+-- DB-Level Secondary Market Governance Enforcement
+-- - Allowlist at schema level
+-- - Minimum confidence >= 76 for all secondary market payloads
+-- - Max 4 secondary markets per fixture
+-- - Direct market pivot enforcement for 59-69 and 0-58 bands
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS skcs_secondary_market_allowlist (
+    allow_phrase TEXT PRIMARY KEY,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+INSERT INTO skcs_secondary_market_allowlist (allow_phrase, is_active)
+VALUES
+    ('double chance 1x', TRUE),
+    ('double chance x2', TRUE),
+    ('double chance 12', TRUE),
+    ('dc 1x', TRUE),
+    ('dc x2', TRUE),
+    ('dc 12', TRUE),
+    ('1x', TRUE),
+    ('x2', TRUE),
+    ('12', TRUE),
+    ('draw no bet home', TRUE),
+    ('draw no bet away', TRUE),
+    ('dnb home', TRUE),
+    ('dnb away', TRUE),
+    ('home dnb', TRUE),
+    ('away dnb', TRUE),
+    ('over 0.5 goals', TRUE),
+    ('over 1.5 goals', TRUE),
+    ('over 2.5 goals', TRUE),
+    ('over 3.5 goals', TRUE),
+    ('under 2.5 goals', TRUE),
+    ('under 3.5 goals', TRUE),
+    ('o 0.5', TRUE),
+    ('o 1.5', TRUE),
+    ('o 2.5', TRUE),
+    ('o 3.5', TRUE),
+    ('u 2.5', TRUE),
+    ('u 3.5', TRUE),
+    ('home over 0.5', TRUE),
+    ('home over 1.5', TRUE),
+    ('away over 0.5', TRUE),
+    ('away over 1.5', TRUE),
+    ('home o 0.5', TRUE),
+    ('home o 1.5', TRUE),
+    ('away o 0.5', TRUE),
+    ('away o 1.5', TRUE),
+    ('home team over 0.5', TRUE),
+    ('away team over 0.5', TRUE),
+    ('btts yes', TRUE),
+    ('btts no', TRUE),
+    ('both teams to score yes', TRUE),
+    ('both teams to score no', TRUE),
+    ('btts & over 2.5', TRUE),
+    ('btts & under 3.5', TRUE),
+    ('btts + o2.5', TRUE),
+    ('btts + u3.5', TRUE),
+    ('win & btts yes', TRUE),
+    ('win & btts no', TRUE),
+    ('under 4.5 goals', TRUE),
+    ('double chance + under 3.5', TRUE),
+    ('double chance + over 1.5', TRUE),
+    ('dc + u3.5', TRUE),
+    ('dc + o1.5', TRUE),
+    ('over 0.5 first half', TRUE),
+    ('under 1.5 first half', TRUE),
+    ('first half draw', TRUE),
+    ('fh over 0.5', TRUE),
+    ('fh under 1.5', TRUE),
+    ('fh draw', TRUE),
+    ('home win either half', TRUE),
+    ('away win either half', TRUE),
+    ('home win 2nd half', TRUE),
+    ('away win 2nd half', TRUE),
+    ('over 6.5 corners', TRUE),
+    ('over 7.5 corners', TRUE),
+    ('over 8.5 corners', TRUE),
+    ('over 9.5 corners', TRUE),
+    ('over 10.5 corners', TRUE),
+    ('over 11.5 corners', TRUE),
+    ('over 12.5 corners', TRUE),
+    ('under 7.5 corners', TRUE),
+    ('under 8.5 corners', TRUE),
+    ('under 9.5 corners', TRUE),
+    ('under 10.5 corners', TRUE),
+    ('under 11.5 corners', TRUE),
+    ('under 12.5 corners', TRUE),
+    ('corners o 6.5', TRUE),
+    ('corners o 7.5', TRUE),
+    ('corners o 8.5', TRUE),
+    ('corners o 9.5', TRUE),
+    ('corners o 10.5', TRUE),
+    ('corners o 11.5', TRUE),
+    ('corners o 12.5', TRUE),
+    ('corners u 7.5', TRUE),
+    ('corners u 8.5', TRUE),
+    ('corners u 9.5', TRUE),
+    ('corners u 10.5', TRUE),
+    ('corners u 11.5', TRUE),
+    ('corners u 12.5', TRUE),
+    ('over 1.5 yellow cards', TRUE),
+    ('over 2.5 yellow cards', TRUE),
+    ('over 3.5 yellow cards', TRUE),
+    ('over 4.5 yellow cards', TRUE),
+    ('over 5.5 yellow cards', TRUE),
+    ('over 6.5 yellow cards', TRUE),
+    ('under 1.5 yellow cards', TRUE),
+    ('under 2.5 yellow cards', TRUE),
+    ('under 3.5 yellow cards', TRUE),
+    ('under 4.5 yellow cards', TRUE),
+    ('under 5.5 yellow cards', TRUE),
+    ('under 6.5 yellow cards', TRUE),
+    ('cards o 1.5', TRUE),
+    ('cards o 2.5', TRUE),
+    ('cards o 3.5', TRUE),
+    ('cards o 4.5', TRUE),
+    ('cards o 5.5', TRUE),
+    ('cards o 6.5', TRUE),
+    ('cards u 1.5', TRUE),
+    ('cards u 2.5', TRUE),
+    ('cards u 3.5', TRUE),
+    ('cards u 4.5', TRUE),
+    ('cards u 5.5', TRUE),
+    ('cards u 6.5', TRUE)
+ON CONFLICT (allow_phrase) DO UPDATE
+SET is_active = EXCLUDED.is_active;
+
+CREATE OR REPLACE FUNCTION skcs_to_numeric_safe(p_text TEXT, p_default NUMERIC DEFAULT NULL)
+RETURNS NUMERIC AS $$
+BEGIN
+    IF p_text IS NULL OR BTRIM(p_text) = '' THEN
+        RETURN p_default;
+    END IF;
+    IF p_text ~ '^-?[0-9]+(\.[0-9]+)?$' THEN
+        RETURN p_text::NUMERIC;
+    END IF;
+    RETURN p_default;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION skcs_is_secondary_market_allowed(p_market_text TEXT)
+RETURNS BOOLEAN AS $$
+DECLARE
+    v_market TEXT := LOWER(COALESCE(TRIM(p_market_text), ''));
+BEGIN
+    v_market := REGEXP_REPLACE(v_market, '[_\-]+', ' ', 'g');
+    v_market := REGEXP_REPLACE(v_market, '\s+', ' ', 'g');
+    v_market := REGEXP_REPLACE(v_market, '([0-9])\s+([0-9])', E'\\1.\\2', 'g');
+    IF v_market = '' THEN
+        RETURN FALSE;
+    END IF;
+
+    RETURN EXISTS (
+        SELECT 1
+        FROM skcs_secondary_market_allowlist a
+        WHERE a.is_active = TRUE
+          AND (
+            v_market LIKE '%' || REGEXP_REPLACE(REGEXP_REPLACE(a.allow_phrase, '[_\-]+', ' ', 'g'), '([0-9])\s+([0-9])', E'\\1.\\2', 'g') || '%'
+            OR REGEXP_REPLACE(REGEXP_REPLACE(a.allow_phrase, '[_\-]+', ' ', 'g'), '([0-9])\s+([0-9])', E'\\1.\\2', 'g') LIKE '%' || v_market || '%'
+          )
+    );
+END;
+$$ LANGUAGE plpgsql STABLE;
+
+CREATE OR REPLACE FUNCTION trg_enforce_secondary_market_governance()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_row JSONB := to_jsonb(NEW);
+    v_type TEXT := LOWER(
+        COALESCE(
+            NULLIF(BTRIM(v_row->>'section_type'), ''),
+            NULLIF(BTRIM(v_row->>'type'), ''),
+            ''
+        )
+    );
+    v_matches JSONB := COALESCE(v_row->'matches', '[]'::JSONB);
+    v_secondary JSONB := COALESCE(v_row->'secondary_insights', '[]'::JSONB);
+    v_fixture_key TEXT;
+    v_row_conf NUMERIC;
+    v_leg JSONB;
+    v_item JSONB;
+    v_market_text TEXT;
+    v_conf NUMERIC;
+    v_existing_secondary_count INT := 0;
+    v_min_secondary_conf CONSTANT NUMERIC := 76;
+    v_max_secondary_count CONSTANT INT := 4;
+BEGIN
+    IF jsonb_typeof(v_matches) = 'array' AND jsonb_array_length(v_matches) > 0 THEN
+        v_fixture_key := COALESCE(
+            NULLIF(BTRIM(v_matches->0->>'match_id'), ''),
+            NULLIF(BTRIM(v_matches->0->>'fixture_id'), '')
+        );
+    END IF;
+
+    -- Secondary rows: strict min confidence + strict allowlist + max 4 per fixture.
+    IF v_type = 'secondary' THEN
+        IF jsonb_typeof(v_matches) <> 'array' OR jsonb_array_length(v_matches) = 0 THEN
+            RAISE EXCEPTION 'SKCS Secondary Governance: secondary row must include matches payload.';
+        END IF;
+
+        FOR v_leg IN SELECT value FROM jsonb_array_elements(v_matches)
+        LOOP
+            v_market_text := LOWER(
+                COALESCE(
+                    NULLIF(BTRIM(v_leg->>'market'), ''),
+                    NULLIF(BTRIM(v_leg->'metadata'->>'market'), ''),
+                    NULLIF(BTRIM(v_leg->'metadata'->>'market_type'), ''),
+                    NULLIF(BTRIM(v_leg->>'prediction'), ''),
+                    ''
+                )
+            );
+
+            v_conf := COALESCE(
+                skcs_to_numeric_safe(v_leg->>'confidence', NULL),
+                skcs_to_numeric_safe(v_row->>'total_confidence', NULL),
+                skcs_to_numeric_safe(v_row->>'confidence', NULL),
+                0
+            );
+
+            IF v_conf < v_min_secondary_conf THEN
+                RAISE EXCEPTION 'SKCS Secondary Governance: market confidence % is below required %.', v_conf, v_min_secondary_conf;
+            END IF;
+
+            IF NOT skcs_is_secondary_market_allowed(v_market_text) THEN
+                RAISE EXCEPTION 'SKCS Secondary Governance: market "%" is not in secondary allowlist.', v_market_text;
+            END IF;
+        END LOOP;
+
+        IF v_fixture_key IS NOT NULL THEN
+            SELECT COUNT(*)
+            INTO v_existing_secondary_count
+            FROM predictions_final pf
+            WHERE LOWER(
+                COALESCE(
+                    NULLIF(BTRIM(to_jsonb(pf)->>'section_type'), ''),
+                    NULLIF(BTRIM(to_jsonb(pf)->>'type'), ''),
+                    ''
+                )
+            ) = 'secondary'
+              AND COALESCE(
+                    NULLIF(BTRIM(to_jsonb(pf)->'matches'->0->>'match_id'), ''),
+                    NULLIF(BTRIM(to_jsonb(pf)->'matches'->0->>'fixture_id'), '')
+                  ) = v_fixture_key
+              AND (
+                    TG_OP <> 'UPDATE'
+                    OR COALESCE(to_jsonb(pf)->>'id', '') <> COALESCE(v_row->>'id', '')
+                  );
+
+            IF v_existing_secondary_count >= v_max_secondary_count THEN
+                RAISE EXCEPTION 'SKCS Secondary Governance: fixture % already has % secondary markets (max %).',
+                    v_fixture_key, v_existing_secondary_count, v_max_secondary_count;
+            END IF;
+        END IF;
+    END IF;
+
+    -- Direct rows: enforce pivot payload requirements on low-confidence bands.
+    IF v_type IN ('direct', 'single') THEN
+        v_row_conf := COALESCE(
+            skcs_to_numeric_safe(v_row->>'total_confidence', NULL),
+            skcs_to_numeric_safe(v_row->>'confidence', NULL),
+            CASE
+                WHEN jsonb_typeof(v_matches) = 'array' AND jsonb_array_length(v_matches) > 0
+                THEN skcs_to_numeric_safe(v_matches->0->>'confidence', 0)
+                ELSE 0
+            END
+        );
+
+        IF v_row_conf BETWEEN 59 AND 69 THEN
+            IF jsonb_typeof(v_secondary) <> 'array' OR jsonb_array_length(v_secondary) = 0 THEN
+                RAISE EXCEPTION 'SKCS Direct Governance: high-risk direct market (%) must attach secondary insights.', v_row_conf;
+            END IF;
+        END IF;
+
+        IF v_row_conf BETWEEN 0 AND 58 THEN
+            IF jsonb_typeof(v_secondary) <> 'array' OR jsonb_array_length(v_secondary) <> v_max_secondary_count THEN
+                RAISE EXCEPTION 'SKCS Direct Governance: extreme-risk direct market (%) requires exactly % secondary markets.',
+                    v_row_conf, v_max_secondary_count;
+            END IF;
+        END IF;
+
+        IF jsonb_typeof(v_secondary) = 'array' THEN
+            IF jsonb_array_length(v_secondary) > v_max_secondary_count THEN
+                RAISE EXCEPTION 'SKCS Secondary Governance: secondary_insights exceeds max size of %.', v_max_secondary_count;
+            END IF;
+
+            FOR v_item IN SELECT value FROM jsonb_array_elements(v_secondary)
+            LOOP
+                v_market_text := LOWER(
+                    COALESCE(
+                        NULLIF(BTRIM(v_item->>'market'), ''),
+                        NULLIF(BTRIM(v_item->>'label'), ''),
+                        NULLIF(BTRIM(v_item->>'type'), ''),
+                        NULLIF(BTRIM(v_item->>'prediction'), ''),
+                        ''
+                    )
+                );
+                v_conf := COALESCE(skcs_to_numeric_safe(v_item->>'confidence', NULL), 0);
+
+                IF v_conf < v_min_secondary_conf THEN
+                    RAISE EXCEPTION 'SKCS Secondary Governance: attached secondary confidence % is below required %.',
+                        v_conf, v_min_secondary_conf;
+                END IF;
+
+                IF NOT skcs_is_secondary_market_allowed(v_market_text) THEN
+                    RAISE EXCEPTION 'SKCS Secondary Governance: attached secondary "%" is not in allowlist.', v_market_text;
+                END IF;
+            END LOOP;
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DO $$
+BEGIN
+    IF to_regclass('public.predictions_final') IS NOT NULL THEN
+        DROP TRIGGER IF EXISTS enforce_secondary_market_governance ON public.predictions_final;
+        CREATE TRIGGER enforce_secondary_market_governance
+        BEFORE INSERT OR UPDATE ON public.predictions_final
+        FOR EACH ROW
+        EXECUTE FUNCTION trg_enforce_secondary_market_governance();
+    END IF;
+END
+$$;
+
 GRANT EXECUTE ON FUNCTION process_subscription_purchase(UUID, INT) TO authenticated;
 GRANT EXECUTE ON FUNCTION get_available_market_counts(UUID, skcs_insight_format) TO authenticated;
 GRANT EXECUTE ON FUNCTION consume_wallet_quota(UUID, TEXT) TO authenticated;

@@ -50,8 +50,8 @@ FAILURE TO FOLLOW THESE RULES WILL RESULT IN CASCADING SYSTEM FAILURES. READ, VE
 * **4-Tier Risk Framework (MANDATORY):**
   * **80% - 100%:** ✅ High Confidence / Safe (Green)
   * **70% - 79%:** 📊 Moderate Risk (Blue)
-  * **59% - 69%:** ⚠️ High Risk / Volatile (Orange) — UI and EdgeMind Bot MUST warn users to pivot to Secondary Insights.
-  * **0% - 58%:** 🛑 Extreme Risk / Danger (Red) — UI and EdgeMind Bot MUST explicitly instruct users NOT to bet the direct market and to use Secondary Insights.
+  * **59% - 69%:** ⚠️ High Risk / Volatile (Orange) — Backend MUST flag as High Risk and attach secondary insights. UI and EdgeMind Bot MUST warn users to pivot to Secondary Insights.
+  * **0% - 58%:** 🛑 Extreme Risk / Danger (Red) — Backend MUST flag as Extreme Risk and enforce payload with **exactly 4 top Secondary Insights**. UI and EdgeMind Bot MUST explicitly instruct users NOT to bet the direct market and to use the 4 Secondary Insights.
 
 **3. Secondary Market Rules:**
 * **Thresholds:** MUST have a confidence score of 76% or higher.
@@ -66,6 +66,7 @@ FAILURE TO FOLLOW THESE RULES WILL RESULT IN CASCADING SYSTEM FAILURES. READ, VE
   * Half Markets: Over 0.5 FH, Under 1.5 FH, FH Draw, Home/Away Win Either Half
   * Corners: Over 6.5 through 12.5 | Under 7.5 through 12.5
   * Cards: Over 1.5 through 6.5 | Under 1.5 through 6.5
+* **Database Enforcement (MANDATORY):** Secondary rules must be enforced at DB level via schema objects (allowlist table + triggers), not only in JavaScript runtime checks.
 
 **4. EdgeMind Bot Report (AI Reasoning Summary):**
 * **Requirement:** Every generated prediction MUST include a conversational narrative string explaining the journey from the baseline probability to the final confidence score, acting as the user's expert betting advisor. 
