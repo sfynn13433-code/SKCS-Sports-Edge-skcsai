@@ -2422,7 +2422,7 @@ async function loadValidFilteredPredictions(tier, client, options = {}) {
           )
         order by r.confidence desc, r.created_at desc;
         `,
-        [t, now.toISOString()]
+        [t]
     );
 
     const mappedRows = res.rows.map((row) => ({
@@ -2785,13 +2785,36 @@ async function insertFinalRow({ publish_run_id, tier, type, matches, total_confi
 
 async function insertStage1Rows(predictions, client) {
     if (!predictions || predictions.length === 0) return [];
+
+    const fixtureIds = predictions
+        .map((pred) => pred?.fixture_id || pred?.match_id || pred?.id || null)
+        .filter(Boolean)
+        .map((value) => String(value));
+    const uniqueFixtureIds = [...new Set(fixtureIds)];
+    const validFixtureIds = new Set();
+
+    if (uniqueFixtureIds.length > 0) {
+        const fixtureRes = await client.query(
+            'SELECT id::text AS id FROM normalized_fixtures WHERE id::text = ANY($1::text[])',
+            [uniqueFixtureIds]
+        );
+        for (const row of fixtureRes.rows) {
+            validFixtureIds.add(String(row.id));
+        }
+    }
     
     const values = [];
     const params = [];
     let paramIndex = 1;
+    let skippedMissingFixtureRef = 0;
     
     for (const pred of predictions) {
         const fixtureId = pred.fixture_id || pred.match_id || pred.id || null;
+        const fixtureIdText = fixtureId ? String(fixtureId) : '';
+        if (!fixtureIdText || !validFixtureIds.has(fixtureIdText)) {
+            skippedMissingFixtureRef += 1;
+            continue;
+        }
         const sport = normalizeSportKey(pred.sport || 'unknown');
         const marketType = pred.market_type || pred.market || 'unknown';
         const recommendation = pred.recommendation || pred.prediction || pred.selection || null;
@@ -2803,7 +2826,7 @@ async function insertStage1Rows(predictions, client) {
         
         values.push(`($${paramIndex}, $${paramIndex + 1}, $${paramIndex + 2}, $${paramIndex + 3}, $${paramIndex + 4}, $${paramIndex + 5}, $${paramIndex + 6}, $${paramIndex + 7}, $${paramIndex + 8})`);
         params.push(
-            fixtureId,
+            fixtureIdText,
             sport,
             marketType,
             recommendation,
@@ -2815,6 +2838,8 @@ async function insertStage1Rows(predictions, client) {
         );
         paramIndex += 9;
     }
+
+    if (values.length === 0) return [];
     
     const res = await client.query(
         `INSERT INTO predictions_stage_1 
@@ -2869,6 +2894,10 @@ async function insertStage2Rows(stage1Rows, predictions, client) {
         paramIndex += 11;
     }
     
+    if (skippedMissingFixtureRef > 0) {
+        console.warn('[accaBuilder] Stage 1 skipped %s predictions with missing normalized_fixtures reference', skippedMissingFixtureRef);
+    }
+
     if (values.length === 0) return [];
     
     const res = await client.query(

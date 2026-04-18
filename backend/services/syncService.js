@@ -16,9 +16,15 @@ const config = require('../config');
 const SYNC_GRACE_MINUTES = 15;
 // Maximum future window accepted at sync time — matches beyond 7 days are ignored.
 const SYNC_FUTURE_DAYS = 7;
+const SPORT_FETCH_STAGGER_MS = Math.max(0, Number(process.env.SPORT_FETCH_STAGGER_MS || 1200));
+const DEFAULT_SYNC_WINDOW_DAYS = Math.max(2, Math.min(3, Number(process.env.LIVE_FETCH_WINDOW_DAYS || 3)));
 
 function isObject(value) {
     return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -191,7 +197,24 @@ const SPORTS_CONFIG = [
     // Formula 1 + MMA
     { sport: 'formula1', leagueId: null, season: SEASON_YEAR, oddsKey: null },
     { sport: 'mma', leagueId: null, season: SEASON_YEAR, oddsKey: 'mma_mixed_martial_arts' },
+    { sport: 'tennis', leagueId: null, season: SEASON_YEAR, oddsKey: null },
+    { sport: 'cricket', leagueId: null, season: SEASON_YEAR, oddsKey: null },
 ];
+
+function normalizeSportToken(value) {
+    const token = String(value || '').trim().toLowerCase();
+    if (!token) return '';
+    const aliases = {
+        nfl: 'american_football',
+        'american-football': 'american_football',
+        motorsport: 'formula1',
+        'formula-1': 'formula1',
+        formula_1: 'formula1',
+        basketball_nba: 'basketball',
+        nba: 'basketball'
+    };
+    return aliases[token] || token;
+}
 
 function normalizeRequestedSports(input) {
     if (!input) return [];
@@ -199,7 +222,7 @@ function normalizeRequestedSports(input) {
     const values = Array.isArray(input) ? input : [input];
     return values
         .flatMap((value) => String(value || '').split(','))
-        .map((value) => String(value || '').trim().toLowerCase())
+        .map((value) => normalizeSportToken(value))
         .filter(Boolean);
 }
 
@@ -213,8 +236,18 @@ function getSportsConfigForRequest(input) {
     }
 
     const requestedSet = new Set(requestedSports);
+    if (requestedSet.has('all')) {
+        return {
+            configs: SPORTS_CONFIG,
+            requestedSports: ['all']
+        };
+    }
+
     return {
-        configs: SPORTS_CONFIG.filter((item) => requestedSet.has(String(item.sport || '').toLowerCase())),
+        configs: SPORTS_CONFIG.filter((item) => {
+            const itemSport = normalizeSportToken(item.sport);
+            return requestedSet.has(itemSport);
+        }),
         requestedSports
     };
 }
@@ -271,11 +304,15 @@ async function syncSports(options = {}) {
             };
         }
 
-        for (const item of configs) {
+        for (let index = 0; index < configs.length; index += 1) {
+            const item = configs[index];
             try {
                 console.log(`[syncService] Fetching REAL matches for: ${item.sport} (league: ${item.leagueId || 'all'}, season: ${item.season})...`);
 
-                const rawMatches = await buildLiveData(item);
+                const rawMatches = await buildLiveData({
+                    ...item,
+                    windowDays: DEFAULT_SYNC_WINDOW_DAYS
+                });
                 const rawMatchesList = Array.isArray(rawMatches) ? rawMatches : [];
                 pipelineLogger.stageAdd({
                     run_id: telemetryRunId,
@@ -382,6 +419,11 @@ async function syncSports(options = {}) {
                 console.error(`[syncService] Stack trace:`, sportErr.stack);
                 perSportErrors.set(item.sport, errorMsg);
                 // Continue with next sport instead of failing completely
+            } finally {
+                if (index < configs.length - 1 && SPORT_FETCH_STAGGER_MS > 0) {
+                    console.log(`[syncService] Stagger delay ${SPORT_FETCH_STAGGER_MS}ms before next sport fetch...`);
+                    await sleep(SPORT_FETCH_STAGGER_MS);
+                }
             }
         }
 

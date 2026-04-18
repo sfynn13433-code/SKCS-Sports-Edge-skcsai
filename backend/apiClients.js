@@ -14,6 +14,7 @@ class APISportsClient {
             afl:              'https://v1.afl.api-sports.io',
             baseball:         'https://v1.baseball.api-sports.io',
             basketball:       'https://v1.basketball.api-sports.io',
+            cricket:          'https://v1.cricket.api-sports.io',
             formula1:         'https://v1.formula-1.api-sports.io',
             handball:         'https://v1.handball.api-sports.io',
             hockey:           'https://v1.hockey.api-sports.io',
@@ -21,6 +22,7 @@ class APISportsClient {
             nba:              'https://v2.nba.api-sports.io',
             american_football:'https://v1.american-football.api-sports.io',
             rugby:            'https://v1.rugby.api-sports.io',
+            tennis:           'https://v1.tennis.api-sports.io',
             volleyball:       'https://v1.volleyball.api-sports.io'
         };
         return urls[sport] || urls.football;
@@ -37,12 +39,14 @@ class APISportsClient {
             nba: 'API_NBA_KEY',
             afl: 'API_AFL_KEY',
             baseball: 'API_BASEBALL_KEY',
+            cricket: 'API_CRICKET_KEY',
             formula1: 'API_FORMULA1_KEY',
             handball: 'API_HANDBALL_KEY',
             hockey: 'API_HOCKEY_KEY',
             mma: 'API_MMA_KEY',
             american_football: 'API_NFL_KEY',
             rugby: 'API_RUGBY_KEY',
+            tennis: 'API_TENNIS_KEY',
             volleyball: 'API_VOLLEYBALL_KEY'
         };
         return prefixes[sport] || 'API_FOOTBALL_KEY';

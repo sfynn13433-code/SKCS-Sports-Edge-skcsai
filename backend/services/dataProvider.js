@@ -93,6 +93,9 @@ function normalizeRequestedSport(sport) {
     if (key === 'mlb') return 'baseball';
     if (key === 'nhl') return 'hockey';
     if (key === 'nfl') return 'american_football';
+    if (key === 'motorsport') return 'formula1';
+    if (key === 'formula-1' || key === 'formula_1') return 'formula1';
+    if (key === 'american-football') return 'american_football';
     return key;
 }
 
@@ -424,7 +427,11 @@ async function buildLiveData(options = {}) {
     const leagueId = options.leagueId || null;
     const season = options.season || null;
     const today = todayStr();
-    const windowEnd = futureStr(7);
+    const requestedWindowDays = Number(options.windowDays ?? process.env.LIVE_FETCH_WINDOW_DAYS ?? 3);
+    const windowDays = Number.isFinite(requestedWindowDays)
+        ? Math.max(2, Math.min(3, Math.round(requestedWindowDays)))
+        : 3;
+    const windowEnd = futureStr(windowDays);
     const maxFixturesPerSource = 80;
     const requestedLeagueId = leagueId ? String(leagueId).trim() : null;
     const isSupportedLeagueId = requestedLeagueId ? SUPPORTED_LEAGUES.includes(requestedLeagueId) : false;
@@ -464,7 +471,7 @@ async function buildLiveData(options = {}) {
     try {
         const queryOpts = { from: today, to: windowEnd };
 
-        console.log(`[dataProvider] ${sport}: Fetching fixtures for league=${leagueId}, season=${season}, dateRange=${today} to ${windowEnd}`);
+        console.log(`[dataProvider] ${sport}: Fetching fixtures for league=${leagueId}, season=${season}, dateRange=${today} to ${windowEnd} (${windowDays * 24}h window)`);
         
         let data = await client.getFixtures(leagueId, season, queryOpts, sport);
         let fixtures = data?.response || [];
