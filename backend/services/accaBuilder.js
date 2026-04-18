@@ -72,6 +72,7 @@ const MEGA_ACCA_SIZE = 12;
 const ACCA_SIZE = 6;
 const SAME_MATCH_INSIGHT_TARGET = 6;
 const ACCA_MIN_LEG_CONFIDENCE = ACCA_CONFIDENCE_MIN;
+const VOLUME_CAP_MULTIPLIER = 5;
 const MIXED_SPORT_TARGETS = new Set([
     'football',
     'tennis',
@@ -1090,8 +1091,8 @@ async function buildSameMatchCandidates(predictions, options = {}) {
     return out;
 }
 
-function buildMultiCandidates(predictions, maxRows = 16) {
-    const direct = predictions.slice(0, 12);
+function buildMultiCandidates(predictions, maxRows = 16 * VOLUME_CAP_MULTIPLIER) {
+    const direct = predictions.slice(0, 12 * VOLUME_CAP_MULTIPLIER);
     const combos = [];
 
     for (let size = 2; size <= 3; size++) {
@@ -2337,31 +2338,31 @@ function normalizeRequestedSports(requestedSports = []) {
 
 function getPerSportCandidateLimit(requestedSports = []) {
     const sports = normalizeRequestedSports(requestedSports);
-    if (sports.length === 1) return 80;
-    if (sports.length > 1) return 48;
-    return 48;
+    if (sports.length === 1) return 80 * VOLUME_CAP_MULTIPLIER;
+    if (sports.length > 1) return 48 * VOLUME_CAP_MULTIPLIER;
+    return 48 * VOLUME_CAP_MULTIPLIER;
 }
 
 function getCategoryBuildCaps(requestedSports = []) {
     const sports = normalizeRequestedSports(requestedSports);
     if (sports.length === 1) {
         return {
-            direct: 24,
+            direct: Infinity,
             secondary: 12,
-            same_match: 6,
-            multi: 8,
-            acca_6match: 5,
-            mega_acca_12: 2
+            same_match: 6 * VOLUME_CAP_MULTIPLIER,
+            multi: 8 * VOLUME_CAP_MULTIPLIER,
+            acca_6match: 5 * VOLUME_CAP_MULTIPLIER,
+            mega_acca_12: 2 * VOLUME_CAP_MULTIPLIER
         };
     }
 
     return {
-        direct: 80,
+        direct: Infinity,
         secondary: 64,
-        same_match: 48,
-        multi: 24,
-        acca_6match: 16,
-        mega_acca_12: 8
+        same_match: 48 * VOLUME_CAP_MULTIPLIER,
+        multi: 24 * VOLUME_CAP_MULTIPLIER,
+        acca_6match: 16 * VOLUME_CAP_MULTIPLIER,
+        mega_acca_12: 8 * VOLUME_CAP_MULTIPLIER
     };
 }
 
@@ -2769,7 +2770,7 @@ async function insertFinalRow({ publish_run_id, tier, type, matches, total_confi
     const plan_visibility = getVisibilityForTierType(tier, type);
     const sport = extractSportFromMatches(matches);
     const { market_type, recommendation } = extractMarketAndRecommendation(matches);
-    const expiresAt = new Date(Date.now() + (7 * 24 * 60 * 60 * 1000));
+    const expiresAtIso = new Date(Date.now() + (7 * 24 * 60 * 60 * 1000)).toISOString();
     
     const res = await client.query(
         `
@@ -2777,7 +2778,7 @@ async function insertFinalRow({ publish_run_id, tier, type, matches, total_confi
         values ($1, $2, $3, $4::jsonb, $5, $6, $7::jsonb, $8, $9, $10, $11)
         returning *;
         `,
-        [publish_run_id || null, tier, type, JSON.stringify(matches), total_confidence, risk_level, JSON.stringify(plan_visibility), sport, market_type, recommendation, expiresAt]
+        [publish_run_id || null, tier, type, JSON.stringify(matches), total_confidence, risk_level, JSON.stringify(plan_visibility), sport, market_type, recommendation, expiresAtIso]
     );
 
     return res.rows[0];
@@ -3158,7 +3159,7 @@ async function buildFinalForTier(tier, options = {}) {
         const categoryBuildCaps = getCategoryBuildCaps(options.requestedSports);
 
         // Limit candidates to prevent combinatorial explosion and timeouts
-        const MAX_ACCA_CANDIDATES = 320;
+        const MAX_ACCA_CANDIDATES = 320 * VOLUME_CAP_MULTIPLIER;
         const limitedCandidates = perSportLimited.slice(0, MAX_ACCA_CANDIDATES);
         addStageBySport(
             telemetryRunId,
@@ -3215,11 +3216,8 @@ async function buildFinalForTier(tier, options = {}) {
 
         // Build plan: 4 x 6-leg + 1 x 12-leg
         const buildPlan = [
-            { type: 'acca_6match', legCount: 6, profile: 'mixed_sport' },
-            { type: 'acca_6match', legCount: 6, profile: 'mixed_sport' },
-            { type: 'acca_6match', legCount: 6, profile: 'mixed_sport' },
-            { type: 'acca_6match', legCount: 6, profile: 'mixed_sport' },
-            { type: 'mega_acca_12', legCount: 12, profile: 'mixed_sport' },
+            ...Array.from({ length: categoryBuildCaps.acca_6match }, () => ({ type: 'acca_6match', legCount: 6, profile: 'mixed_sport' })),
+            ...Array.from({ length: categoryBuildCaps.mega_acca_12 }, () => ({ type: 'mega_acca_12', legCount: 12, profile: 'mixed_sport' })),
         ];
         const megaExpiryCutoff = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000));
 
@@ -3551,7 +3549,7 @@ async function buildFinalForTier(tier, options = {}) {
             globalUsedFixtures,
             new Map(),
             new Map(),
-            categoryBuildCaps.direct
+            Infinity
         );
         for (const prediction of directSelections) {
             const matches = [toFinalMatchPayload(prediction)];

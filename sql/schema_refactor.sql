@@ -389,22 +389,18 @@ ON CONFLICT (plan_id) DO NOTHING;
 -- ============================================================================
 
 -- View for active predictions by sport
-CREATE OR REPLACE VIEW active_predictions_by_sport AS
-SELECT 
-    nf.sport,
-    pf.prediction_type,
-    COUNT(*) as prediction_count,
-    AVG(pf.confidence) as avg_confidence,
-    MAX(pf.confidence) as max_confidence,
-    MIN(pf.confidence) as min_confidence
+CREATE OR REPLACE VIEW public.active_predictions_by_sport AS
+SELECT
+    COALESCE(sport, 'unknown'::text) AS sport,
+    tier,
+    COUNT(*) AS prediction_count,
+    AVG(total_confidence)::integer AS avg_confidence,
+    MAX(total_confidence)::integer AS max_confidence,
+    MIN(total_confidence)::integer AS min_confidence
 FROM predictions_final pf
-JOIN normalized_fixtures nf ON pf.fixture_id = nf.id
-WHERE 
-    nf.kickoff_utc > NOW()
-    AND pf.expires_at > NOW()
-    AND nf.status = 'scheduled'
-GROUP BY nf.sport, pf.prediction_type
-ORDER BY nf.sport, prediction_type;
+WHERE expires_at > (NOW() AT TIME ZONE 'UTC') OR expires_at IS NULL
+GROUP BY sport, tier
+ORDER BY pf.sport, tier;
 
 -- View for today's predictions
 CREATE OR REPLACE VIEW todays_predictions AS

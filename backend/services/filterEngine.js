@@ -1,58 +1,89 @@
 'use strict';
 
-const { query, withTransaction } = require('../db');
+const { withTransaction } = require('../db');
 const { validateRawPredictionForInsert } = require('../utils/validation');
+const { createClient } = require('@supabase/supabase-js');
+const config = require('../config');
 
 function normalizeTier(tier) {
     if (tier === 'normal' || tier === 'deep' || tier === 'ultra') return tier;
     throw new Error(`Invalid tier: ${tier}`);
 }
 
-// HARDCODED CONFIDENCE FLOORS - Intelligence Boost (Phase 8.5)
-// 75% Gatekeeper: Only allow high-confidence predictions through
-const CONFIDENCE_FLOORS = {
-    normal: 65,   // Raised from 35 - filter out low-confidence noise
-    deep: 70,      // Raised from 45 - medium confidence
-    ultra: 75      // VIP tier - only verified edge picks
-};
+const SUPABASE_URL = String(process.env.SUPABASE_URL || config?.supabase?.url || '').trim();
+const SUPABASE_KEY = String(
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+    || process.env.SUPABASE_KEY
+    || process.env.SUPABASE_ANON_KEY
+    || config?.supabase?.anonKey
+    || ''
+).trim();
 
-async function getTierRules(tier, client) {
-    const t = normalizeTier(tier);
-    const sql = `
-        select
-            tier,
-            min_confidence,
-            allowed_markets,
-            max_acca_size,
-            allowed_volatility
-        from tier_rules
-        where tier = $1
-        limit 1;
-    `;
-    try {
-        const res = await (client ? client.query(sql, [t]) : query(sql, [t]));
-        if (!res.rows.length) {
-            throw new Error(`Missing tier_rules row for tier=${t}`);
+const supabase = SUPABASE_URL && SUPABASE_KEY
+    ? createClient(SUPABASE_URL, SUPABASE_KEY, {
+        auth: { persistSession: false, autoRefreshToken: false }
+    })
+    : null;
+
+function normalizeRuleArray(value) {
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') {
+        const text = value.trim();
+        if (!text) return [];
+        try {
+            const parsed = JSON.parse(text);
+            return Array.isArray(parsed) ? parsed : [text];
+        } catch (_error) {
+            return [text];
         }
-        const rules = res.rows[0];
-        // Override min_confidence with hardcoded floor
-        if (CONFIDENCE_FLOORS[t] !== undefined) {
-            rules.min_confidence = CONFIDENCE_FLOORS[t];
-            console.log(`[filterEngine] Using hardcoded min_confidence=${rules.min_confidence} for tier=${t}`);
-        }
-        return rules;
-    } catch (err) {
-        console.warn(`[filterEngine] Failed to get tier_rules from DB for ${t}, using hardcoded fallback`);
-        // Fallback hardcoded values
-        return {
-            tier: t,
-            min_confidence: CONFIDENCE_FLOORS[t] || 45,
-            allowed_markets: ['ALL'],
-            max_acca_size: t === 'deep' ? 12 : 3,
-            // Allow high volatility for normal tier (frontend will show warning badge)
-            allowed_volatility: t === 'deep' ? ['low', 'medium'] : ['low', 'medium', 'high']
-        };
     }
+    return [];
+}
+
+function mapRuleRow(rule) {
+    return {
+        tier: normalizeTier(rule?.tier),
+        min_confidence: Number(rule?.min_confidence),
+        allowed_markets: normalizeRuleArray(rule?.allowed_markets),
+        allowed_volatility: normalizeRuleArray(rule?.allowed_volatility),
+        max_acca_size: Number(rule?.max_acca_size)
+    };
+}
+
+async function fetchTierRulesMap() {
+    if (!supabase) {
+        throw new Error('CRITICAL: Failed to fetch tier_rules from database.');
+    }
+
+    const { data: tierRules, error: rulesError } = await supabase.from('tier_rules').select('*');
+    if (rulesError || !tierRules) throw new Error('CRITICAL: Failed to fetch tier_rules from database.');
+
+    const rulesMap = tierRules.reduce((acc, rule) => {
+        const mapped = mapRuleRow(rule);
+        acc[mapped.tier] = mapped;
+        return acc;
+    }, {});
+
+    return rulesMap;
+}
+
+function getTierRules(tier, rulesMap) {
+    const t = normalizeTier(tier);
+    const rules = rulesMap?.[t];
+    if (!rules) {
+        throw new Error(`Missing tier_rules row for tier=${t}`);
+    }
+    if (!Number.isFinite(rules.min_confidence)) {
+        throw new Error(`Invalid min_confidence in tier_rules for tier=${t}`);
+    }
+    if (!Array.isArray(rules.allowed_markets)) {
+        throw new Error(`Invalid allowed_markets in tier_rules for tier=${t}`);
+    }
+    if (!Array.isArray(rules.allowed_volatility)) {
+        throw new Error(`Invalid allowed_volatility in tier_rules for tier=${t}`);
+    }
+
+    return rules;
 }
 
 function isMarketAllowed(allowedMarkets, market) {
@@ -182,8 +213,9 @@ function evaluateRawAgainstTier(raw, rules) {
     return { is_valid: true, reject_reason: null };
 }
 
-async function filterRawPrediction({ rawId, tier }, client) {
-    const rules = await getTierRules(tier, client);
+async function filterRawPrediction({ rawId, tier, rulesMap }, client) {
+    const activeRulesMap = rulesMap || await fetchTierRulesMap();
+    const rules = getTierRules(tier, activeRulesMap);
 
     const rawRes = await client.query('select * from predictions_raw where id = $1 limit 1;', [rawId]);
     if (!rawRes.rows.length) {
@@ -211,6 +243,7 @@ async function filterLatestRawBatch({ tier, limit = 500 }) {
     const normalizedTier = normalizeTier(tier);
 
     return withTransaction(async (client) => {
+        const rulesMap = await fetchTierRulesMap();
         const rawRes = await client.query(
             'select id from predictions_raw order by created_at desc limit $1;',
             [limit]
@@ -218,7 +251,7 @@ async function filterLatestRawBatch({ tier, limit = 500 }) {
 
         const filtered = [];
         for (const row of rawRes.rows) {
-            const out = await filterRawPrediction({ rawId: row.id, tier: normalizedTier }, client);
+            const out = await filterRawPrediction({ rawId: row.id, tier: normalizedTier, rulesMap }, client);
             filtered.push(out);
         }
         return filtered;
