@@ -311,17 +311,15 @@ app.get('/', (_req, res) => {
 });
 
 app.get('/subscribe', (req, res) => {
-  const params = new URLSearchParams({
-    register: '1',
-    next: 'subscription.html'
-  });
+  const params = new URLSearchParams();
   if (req.query?.locked !== undefined) {
     params.set('locked', String(req.query.locked));
   }
   if (req.query?.message !== undefined) {
     params.set('message', String(req.query.message));
   }
-  res.redirect(`/login.html?${params.toString()}`);
+  const query = params.toString();
+  res.redirect(`/subscribe/index.html${query ? `?${query}` : ''}`);
 });
 
 async function proxyOdds(req, res) {
