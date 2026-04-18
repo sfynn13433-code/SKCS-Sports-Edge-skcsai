@@ -2,12 +2,30 @@
 
 const express = require('express');
 const { getPredictionsByTier, getProfileById } = require('../database');
+const { query } = require('../db');
 const { requireSupabaseUser, requireActiveSubscription } = require('../middleware/supabaseJwt');
 const config = require('../config');
 const { getTierKeyForPlan } = require('../config/subscriptionPlans');
 const { filterPredictionsForSubscriptionAccess } = require('../services/subscriptionTiming');
 
 const router = express.Router();
+
+const FORMAT_ALIASES = {
+    direct: 'Direct',
+    analytical: 'Analytical',
+    multi: 'Multi',
+    same_match: 'Same Match',
+    acca: 'ACCA',
+    mega_acca: 'Mega ACCA'
+};
+
+const QUOTA_ALIASES = {
+    direct: 'direct',
+    analytical: 'analytical',
+    multi: 'multi',
+    same_match: 'same_match',
+    edgemind: 'edgemind'
+};
 
 router.get('/subscription-summary', requireSupabaseUser, async (req, res) => {
     try {
@@ -86,6 +104,63 @@ router.get('/predictions', requireSupabaseUser, requireActiveSubscription, async
     } catch (error) {
         console.error('PREDICTIONS ERROR:', error);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.get('/market-counts', requireSupabaseUser, async (req, res) => {
+    try {
+        const rawFormat = String(req.query.format || 'direct').trim().toLowerCase();
+        const format = FORMAT_ALIASES[rawFormat];
+        if (!format) {
+            return res.status(400).json({ error: 'Invalid format. Use direct|analytical|multi|same_match|acca|mega_acca' });
+        }
+
+        const result = await query(
+            `SELECT sport, available_count
+             FROM get_available_market_counts($1, $2::skcs_insight_format)`,
+            [req.user.id, format]
+        );
+
+        const counts = {};
+        for (const row of result.rows || []) {
+            const key = String(row.sport || '').trim();
+            if (!key) continue;
+            counts[key] = Number(row.available_count || 0);
+        }
+
+        return res.status(200).json({
+            format,
+            user_id: req.user.id,
+            counts
+        });
+    } catch (error) {
+        console.error('MARKET COUNTS ERROR:', error);
+        return res.status(500).json({ error: 'Failed to fetch market counts' });
+    }
+});
+
+router.post('/consume-insight', requireSupabaseUser, async (req, res) => {
+    try {
+        const rawCategory = String(req.body?.category || '').trim().toLowerCase();
+        const category = QUOTA_ALIASES[rawCategory];
+        if (!category) {
+            return res.status(400).json({ error: 'Invalid category. Use direct|analytical|multi|same_match|edgemind' });
+        }
+
+        const result = await query(
+            'SELECT consume_wallet_quota($1, $2) AS success',
+            [req.user.id, category]
+        );
+        const success = Boolean(result.rows?.[0]?.success);
+
+        if (!success) {
+            return res.status(429).json({ error: `Daily limit reached for ${category}` });
+        }
+
+        return res.status(200).json({ success: true, category });
+    } catch (error) {
+        console.error('CONSUME INSIGHT ERROR:', error);
+        return res.status(500).json({ error: 'Failed to consume insight quota' });
     }
 });
 

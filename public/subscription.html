@@ -680,6 +680,9 @@ async function initSubscriptionPage() {
   document.querySelectorAll('.skcs-secondary').forEach((node) => {
     node.innerHTML = node.innerHTML.replace(/\bSecondary\b/g, 'Analytical Insights');
   });
+  document.querySelectorAll('.skcs-multi').forEach((node) => {
+    node.innerHTML = node.innerHTML.replace(/\bMulti\b/g, 'Double Chance &amp; Specials');
+  });
 }
 
 // Initialize

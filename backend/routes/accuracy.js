@@ -51,9 +51,9 @@ function normalizeTypeKey(value) {
 
 function humanizeTypeKey(key) {
     const labels = {
-        direct: 'Direct',
-        secondary: 'Secondary',
-        multi: 'Multi',
+        direct: 'Direct Markets (1X2)',
+        secondary: 'Analytical Insights',
+        multi: 'Double Chance & Specials',
         same_match: 'Same Match',
         acca: 'ACCA'
     };

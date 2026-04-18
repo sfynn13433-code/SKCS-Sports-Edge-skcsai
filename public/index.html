@@ -839,7 +839,12 @@
                     </div>
 
                     <div class="allocation-row">
-                        <span class="allocation-label">🔀 Multi (Combined):</span>
+                        <span class="allocation-label">🔀 Double Chance &amp; Specials:</span>
+                        <span class="allocation-value"><span id="football-secondary-count">0</span> available</span>
+                    </div>
+
+                    <div class="allocation-row">
+                        <span class="allocation-label">🔗 Multi (Combined):</span>
                         <span class="allocation-value"><span id="football-multi-count">0</span> available</span>
                     </div>
                     <div class="allocation-row">
@@ -851,8 +856,12 @@
                     <h4 style="color:#60a5fa;margin-bottom:1rem;">⚽ Direct Insights</h4>
                     <div id="football-direct-matches" class="prediction-grid"><p>Loading...</p></div>
                 </div>
+                <div id="football-secondary" class="prediction-category">
+                    <h4 style="color:#c084fc;margin-bottom:1rem;">🔀 Double Chance &amp; Specials</h4>
+                    <div id="football-secondary-matches" class="prediction-grid"><p>Loading...</p></div>
+                </div>
                 <div id="football-multi" class="prediction-category">
-                    <h4 style="color:#c084fc;margin-bottom:1rem;">🔀 Multi (Combined Selections)</h4>
+                    <h4 style="color:#7c3aed;margin-bottom:1rem;">🔗 Multi (Combined Selections)</h4>
                     <div id="football-multi-matches" class="prediction-grid"><p>Loading...</p></div>
                 </div>
                 <div id="football-same" class="prediction-category">
@@ -2188,7 +2197,6 @@
         const directKeys = new Set(directPreds.map((pred) => buildPredictionDisplayKey(pred)));
 
         const secondaryCount = singles.filter((pred) => {
-            if (isDoubleChancePrediction(pred)) return false;
             const type = getSectionType(pred);
             if (type === 'same_match') return false;
             if (directKeys.has(buildPredictionDisplayKey(pred))) return false;
@@ -2196,7 +2204,6 @@
         }).length;
 
         const multiCount = scoped.filter((pred) => {
-            if (isDoubleChancePrediction(pred)) return false;
             const type = getSectionType(pred);
             const legs = getPredictionLegCount(pred);
             if (type === 'same_match') return false;
@@ -2822,10 +2829,11 @@
                 return !is1X2Market(market);
             })
             : singles.filter((p) => {
-                if (getSectionType(p) !== 'secondary') return false;
                 const firstMatch = (p && Array.isArray(p.matches) && p.matches[0]) ? p.matches[0] : {};
                 const directMatch = directByMatchId.get(String(firstMatch.match_id || '').trim());
                 const market = getMatchMarket(firstMatch);
+                const type = getSectionType(p);
+                if (type === 'same_match' || type === 'multi' || type === 'acca_6match' || type === 'mega_acca_12') return false;
                 if (!isDisplayFriendlySecondaryMarket(market)) return false;
                 return !directMatch || areSelectionsCompatible(directMatch, {
                     market: market,
@@ -2861,8 +2869,8 @@
         if (tierSummary) tierSummary.style.display = 'block';
 
         setFootballSection('football-direct-matches', directWithLinkedSecondary, createPredictionCard, 'No direct football insights available.');
-        setFootballSection('football-secondary-matches', secondarySingles, createPredictionCard, 'No football analytical insights available.');
-        setFootballSection('football-multi-matches', multiPreds, createMultiCard, 'No football multi insights available.');
+        setFootballSection('football-secondary-matches', secondarySingles, createPredictionCard, 'No football double chance or special insights available.');
+        setFootballSection('football-multi-matches', multiPreds, createMultiCard, 'No football multi-leg insights available.');
         setFootballSection('football-same-matches', sameMatchPreds, createMultiCard, 'No same-match football bet builders available.');
 
         const counts = {
