@@ -3193,36 +3193,60 @@
         const finalRecommendation = getFinalRecommendation(pred, fallbackLabel, fallbackConfidence);
         const meta = firstMatch.metadata || {};
         const reasoning = meta.reasoning || '';
+
+        const confidenceScore = Number(finalRecommendation.confidence || 0);
         
-        const secondaryMarkets = resolveSecondaryMarketsForCard(pred, firstMatch, finalRecommendation);
-        const isHighRiskPrimary = Number(finalRecommendation.confidence || 0) < 75;
+        // ==========================================
+        // SKCS 4-TIER RISK FRAMEWORK
+        // ==========================================
+        let riskColor = '';
+        let riskBadge = '';
         
-        const insightsHtml = renderInsightsPanel(pred);
-        
-        // EdgeMind Bot Report
-        const edgeMindReportText = resolveEdgeMindText(pred, firstMatch, finalRecommendation, reasoning);
-        
-        // High-Risk Warning Logic (<75%)
-        if (isHighRiskPrimary) {
+        if (confidenceScore >= 80) {
+            // 80% - 100%: Safe / High Confidence
+            riskColor = '#10b981'; // Emerald Green
+            riskBadge = '✅ HIGH CONFIDENCE';
+        } else if (confidenceScore >= 70) {
+            // 70% - 79%: Standard / Moderate Risk
+            riskColor = '#3b82f6'; // Blue
+            riskBadge = '📊 MODERATE RISK';
+        } else if (confidenceScore >= 59) {
+            // 59% - 69%: High Risk (Orange Warning)
+            riskColor = '#f97316'; // Orange
+            riskBadge = '⚠️ HIGH RISK';
             warningHtml = `
-                <div class="risk-warning" style="margin-top: 10px; padding: 10px; border-left: 4px solid orange; background: #fff3cd; color: #856404; border-radius: 4px;">
-                    ⚠️ <strong>High Risk / Not a Safe Bet (${finalRecommendation.confidence}%).</strong><br>
-                    Please select an option from the Secondary Insights below.
+                <div class="risk-warning" style="margin-top: 10px; padding: 10px; border-left: 4px solid #f97316; background: #fff7ed; color: #9a3412; border-radius: 4px; font-size: 0.85em;">
+                    <strong>${riskBadge} (${confidenceScore}%):</strong> This direct market is volatile. We strongly recommend selecting a safer option from the Secondary Insights below.
+                </div>
+            `;
+        } else {
+            // 0% - 58%: Extreme Risk (Red Warning)
+            riskColor = '#ef4444'; // Red
+            riskBadge = '🛑 EXTREME RISK';
+            warningHtml = `
+                <div class="risk-warning" style="margin-top: 10px; padding: 10px; border-left: 4px solid #ef4444; background: #fef2f2; color: #991b1b; border-radius: 4px; font-size: 0.85em;">
+                    <strong>${riskBadge} (${confidenceScore}%):</strong> Do not bet the direct market on this fixture. Please pivot to the safer Secondary Insights below.
                 </div>
             `;
         }
+
+        const secondaryMarkets = resolveSecondaryMarketsForCard(pred, firstMatch, finalRecommendation);
+        const isHighRiskPrimary = confidenceScore < 70; // Secondary backup rules apply if under 70%
+
+        const insightsHtml = renderInsightsPanel(pred);
+        const edgeMindReportText = resolveEdgeMindText(pred, firstMatch, finalRecommendation, reasoning);
 
         // Secondary Insights - Nested <details>/<summary> Dropdown Layout
         let secondaryInsightsHtml = '';
         if (Array.isArray(secondaryMarkets) && secondaryMarkets.length > 0) {
             const listItems = secondaryMarkets.slice(0, 4).map((market) => {
                 const label = market.label || formatMarketSelectionLabel(market.market, market.prediction);
-                const confidenceValue = normalizeConfidencePercent(market.confidence, 0);
-                const confidence = `<span style="color:#059669;font-weight:bold;">${confidenceValue.toFixed(0)}%</span>`;
+                const confValue = normalizeConfidencePercent(market.confidence, 0);
+                const confDisplay = `<span style="color:#059669;font-weight:bold;">${confValue.toFixed(0)}%</span>`;
                 const description = market.description
                     ? `<div style="font-size:0.75rem;color:#64748b;margin-top:2px;">${market.description}</div>`
                     : '';
-                return `<li style="padding:8px 0;border-bottom:1px solid #eee;list-style:none;">${label} - ${confidence}${description}</li>`;
+                return `<li style="padding:8px 0;border-bottom:1px solid #eee;list-style:none;">${label} - ${confDisplay}${description}</li>`;
             }).join('');
 
             secondaryInsightsHtml = `
@@ -3239,7 +3263,7 @@
             secondaryInsightsHtml = `
                 <div style="margin-top:15px;padding:10px;font-size:0.9em;color:#6c757d;background:#f8f9fa;border-radius:6px;text-align:center;">
                     ${isHighRiskPrimary
-                        ? 'No backup secondary markets are currently available above 60% confidence.'
+                        ? 'No backup secondary markets are currently available above safe thresholds.'
                         : 'No secondary insights available for this fixture.'}
                 </div>
             `;
@@ -3253,8 +3277,8 @@
             </div>
             <div style="margin-top:10px;font-size:0.8em;color:#6c757d;text-transform:uppercase;font-weight:600;">Direct Insight (1X2)</div>
             <div class="prediction-details" style="margin-top:4px;padding-top:8px;display:flex;justify-content:space-between;align-items:center;">
-                <div class="prediction" style="color:#059669; font-weight:bold;font-size:1.2em;">${finalRecommendation.market || fallbackLabel}</div>
-                <div class="confidence" style="color:#4a5568; font-size:1em;font-weight:600;">${finalRecommendation.confidence}%</div>
+                <div class="prediction" style="color:${riskColor}; font-weight:bold;font-size:1.2em;">${finalRecommendation.market || fallbackLabel}</div>
+                <div class="confidence" style="background-color:${riskColor}15; color:${riskColor}; padding:0.3rem 0.8rem; border-radius:20px; font-size:0.9em; font-weight:600;">${confidenceScore}%</div>
             </div>
             ${warningHtml}
             <div style="margin-top:12px;padding:10px;background:#e9ecef;border-radius:6px;border-left:4px solid #6c757d;">
