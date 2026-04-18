@@ -1449,7 +1449,26 @@
     window.showRawPrediction = async function() {
         const API_BASE = window.API_BASE_URL || 'https://skcs-sports-edge-skcsai.onrender.com';
         try {
-            const res = await fetch(`${API_BASE}/api/predictions?sport=football&include_all=true`);
+            // FIX: Grab the token first!
+            const accessToken = await getAccessTokenOrRedirect();
+            if (!accessToken) {
+                alert('No access token available for debug call.');
+                return;
+            }
+
+            // FIX: Pass the Authorization header in the fetch request
+            const res = await fetch(`${API_BASE}/api/predictions?sport=football&include_all=true`, {
+                method: 'GET',
+                cache: 'no-store',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            
             const data = await res.json();
             const firstPred = data.predictions && data.predictions[0];
             if (firstPred) {
