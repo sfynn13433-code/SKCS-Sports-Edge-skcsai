@@ -43,6 +43,12 @@ GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT")
 GOOGLE_CLOUD_LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION") or "global"
 GOOGLE_GENAI_USE_VERTEXAI = os.getenv("GOOGLE_GENAI_USE_VERTEXAI", "").strip().lower() in {"1", "true", "yes", "on"}
 VERTEX_GEMINI_MODEL = os.getenv("VERTEX_GEMINI_MODEL") or "gemini-2.5-flash"
+DEFAULT_GEMINI_MODEL_CHAIN = "gemini-2.5-flash,gemini-2.0-flash,gemini-2.0-flash-lite,gemini-1.5-flash"
+GEMINI_MODEL_CHAIN = [
+    model.strip()
+    for model in (os.getenv("GEMINI_MODEL_CHAIN") or DEFAULT_GEMINI_MODEL_CHAIN).split(",")
+    if model.strip()
+]
 PROVIDER_CHAIN_JSON = os.getenv("SKCS_PROVIDER_CHAIN_JSON")
 EVENT_LIMIT = int(os.getenv("SKCS_EVENT_LIMIT") or "0")
 MINIMUM_EVENT_COUNT = int(os.getenv("SKCS_MINIMUM_EVENT_COUNT") or "15")
@@ -331,7 +337,8 @@ def build_provider_registry():
             "name": "Gemini",
             "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
             "api_key": GEMINI_API_KEY,
-            "model": "gemini-2.5-flash",
+            "model": GEMINI_MODEL_CHAIN[0] if GEMINI_MODEL_CHAIN else "gemini-2.5-flash",
+            "models": GEMINI_MODEL_CHAIN or ["gemini-2.5-flash"],
             "timeout": 15.0,
             "max_attempts": 2,
             "use_response_format": True,
@@ -407,6 +414,7 @@ def build_provider_registry():
                 "base_url": provider["base_url"],
                 "api_key": api_key,
                 "model": provider["model"],
+                "models": provider.get("models") or [provider["model"]],
                 "timeout": float(provider.get("timeout", 15.0)),
                 "max_attempts": int(provider.get("max_attempts", 2)),
                 "use_response_format": bool(provider.get("use_response_format", True)),
@@ -757,36 +765,51 @@ async def get_real_skcs_intelligence(event):
     match = extract_match(event)
 
     async def request_model(provider):
-        for attempt in range(1, provider["max_attempts"] + 1):
-            try:
-                messages = [
-                    {"role": "system", "content": SKCS_SYSTEM_PROMPT},
-                    {"role": "user", "content": prompt},
-                ]
-                if provider.get("transport") == "google_genai":
-                    content = await asyncio.to_thread(query_vertex_gemini, provider, messages)
-                    return normalize_ai_payload(json.loads(content))
+        messages = [
+            {"role": "system", "content": SKCS_SYSTEM_PROMPT},
+            {"role": "user", "content": prompt},
+        ]
 
-                client = PROVIDER_CLIENTS[provider["name"]]
-                if provider["name"] == "Local Dolphin":
-                    content = await asyncio.to_thread(query_dolphin_with_streaming, provider, messages)
-                    return normalize_ai_payload(json.loads(content))
+        if provider.get("transport") == "google_genai":
+            content = await asyncio.to_thread(query_vertex_gemini, provider, messages)
+            payload = normalize_ai_payload(json.loads(content))
+            payload["provider_model"] = provider["model"]
+            return payload
 
-                kwargs = {
-                    "model": provider["model"],
-                    "messages": messages,
-                    "temperature": 0.2,
-                    "timeout": provider["timeout"],
-                }
-                if provider.get("use_response_format", True):
-                    kwargs["response_format"] = {"type": "json_object"}
-                response = await client.chat.completions.create(**kwargs)
-                content = response.choices[0].message.content or "{}"
-                return normalize_ai_payload(json.loads(content))
-            except Exception:
-                if attempt == provider["max_attempts"]:
-                    raise
-                await asyncio.sleep(4 * attempt)
+        client = PROVIDER_CLIENTS[provider["name"]]
+        model_candidates = provider.get("models") or [provider["model"]]
+        last_error = None
+
+        for model_name in model_candidates:
+            for attempt in range(1, provider["max_attempts"] + 1):
+                try:
+                    if provider["name"] == "Local Dolphin":
+                        content = await asyncio.to_thread(query_dolphin_with_streaming, provider, messages)
+                        payload = normalize_ai_payload(json.loads(content))
+                        payload["provider_model"] = provider.get("model")
+                        return payload
+
+                    kwargs = {
+                        "model": model_name,
+                        "messages": messages,
+                        "temperature": 0.2,
+                        "timeout": provider["timeout"],
+                    }
+                    if provider.get("use_response_format", True):
+                        kwargs["response_format"] = {"type": "json_object"}
+                    response = await client.chat.completions.create(**kwargs)
+                    content = response.choices[0].message.content or "{}"
+                    payload = normalize_ai_payload(json.loads(content))
+                    payload["provider_model"] = model_name
+                    return payload
+                except Exception as exc:
+                    last_error = exc
+                    if attempt < provider["max_attempts"]:
+                        await asyncio.sleep(4 * attempt)
+            # Model exhausted; move to next model candidate for this provider.
+            continue
+
+        raise last_error or RuntimeError(f"{provider['name']} failed without exception detail.")
 
     for provider in PROVIDERS:
         try:

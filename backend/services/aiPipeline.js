@@ -69,6 +69,17 @@ function normalizeContextSignals(value) {
         if (!Number.isFinite(n)) return 0;
         return clamp(n, 0, 1);
     };
+    const sourceMarketAdjustments = isObject(source.market_adjustments)
+        ? source.market_adjustments
+        : (isObject(source.marketAdjustments) ? source.marketAdjustments : {});
+    const marketAdjustments = {};
+    for (const [key, valueRaw] of Object.entries(sourceMarketAdjustments)) {
+        const valueNum = Number(valueRaw);
+        if (Number.isFinite(valueNum)) {
+            marketAdjustments[key] = valueNum;
+        }
+    }
+
     return {
         weather_risk: read('weather_risk'),
         availability_risk: read('availability_risk'),
@@ -79,7 +90,8 @@ function normalizeContextSignals(value) {
         derby_risk: read('derby_risk'),
         rotation_risk: read('rotation_risk'),
         market_movement_risk: read('market_movement_risk'),
-        lineup_uncertainty_risk: read('lineup_uncertainty_risk')
+        lineup_uncertainty_risk: read('lineup_uncertainty_risk'),
+        market_adjustments: marketAdjustments
     };
 }
 
@@ -490,7 +502,12 @@ async function buildRawPredictionFromProviderItem(item) {
     const selectedSecondary = marketSelections.secondary || null;
     const market = selectedDirect?.market || waterfallDecision.market || requestedMarket;
     const routedPrediction = selectedDirect?.prediction || waterfallDecision.prediction || fallbackPredictionForMarket(market, prediction);
-    const confidenceProbability = selectedDirect?.probability || waterfallDecision.confidence_probability || p_adj;
+    const confidenceProbabilityRaw = selectedDirect?.probability || waterfallDecision.confidence_probability || p_adj;
+    const confidenceProbability = adjustProbability.applyMarketAdjustment(
+        confidenceProbabilityRaw,
+        market,
+        contextSignals.market_adjustments
+    );
     const confidence = Math.max(60, toConfidencePercent(confidenceProbability));
     const volatility = item.volatility || scoring.volatility || volatilityFromRiskProfile(marketIntelligence.risk_profile, 'medium');
     const aiSource = scoring.source || null; // 'dolphin', 'fallback', 'odds', etc.

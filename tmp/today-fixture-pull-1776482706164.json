@@ -1,0 +1,106 @@
+{
+  "generated_at": "2026-04-18T03:25:06.164Z",
+  "date": "2026-04-18",
+  "results": [
+    {
+      "sport": "football",
+      "provider": "api-sports",
+      "date": "2026-04-18",
+      "count": 1774,
+      "status": "ok"
+    },
+    {
+      "sport": "basketball",
+      "provider": "api-sports",
+      "date": "2026-04-18",
+      "count": 316,
+      "status": "ok"
+    },
+    {
+      "sport": "rugby",
+      "provider": "api-sports",
+      "date": "2026-04-18",
+      "count": 77,
+      "status": "ok"
+    },
+    {
+      "sport": "baseball",
+      "provider": "api-sports",
+      "date": "2026-04-18",
+      "count": 94,
+      "status": "ok"
+    },
+    {
+      "sport": "hockey",
+      "provider": "api-sports",
+      "date": "2026-04-18",
+      "count": 76,
+      "status": "ok"
+    },
+    {
+      "sport": "formula1",
+      "provider": "api-sports",
+      "date": "2026-04-18",
+      "count": 4,
+      "status": "ok"
+    },
+    {
+      "sport": "mma",
+      "provider": "api-sports",
+      "date": "2026-04-18",
+      "count": 5,
+      "status": "ok"
+    },
+    {
+      "sport": "afl",
+      "provider": "api-sports",
+      "date": "2026-04-18",
+      "count": 3,
+      "status": "ok"
+    },
+    {
+      "sport": "volleyball",
+      "provider": "api-sports",
+      "date": "2026-04-18",
+      "count": 110,
+      "status": "ok"
+    },
+    {
+      "sport": "handball",
+      "provider": "api-sports",
+      "date": "2026-04-18",
+      "count": 187,
+      "status": "ok"
+    },
+    {
+      "sport": "american_football",
+      "provider": "api-sports",
+      "date": "2026-04-18",
+      "count": 0,
+      "status": "ok"
+    },
+    {
+      "sport": "tennis",
+      "provider": "api-sports",
+      "date": "2026-04-18",
+      "count": 0,
+      "status": "error",
+      "detail": "getaddrinfo ENOTFOUND v1.tennis.api-sports.io"
+    },
+    {
+      "sport": "cricket",
+      "provider": "api-sports",
+      "date": "2026-04-18",
+      "count": 0,
+      "status": "error",
+      "detail": "getaddrinfo ENOTFOUND v1.cricket.api-sports.io"
+    },
+    {
+      "sport": "cricket",
+      "provider": "cricapi",
+      "date": "2026-04-18",
+      "count": 0,
+      "status": "ok"
+    }
+  ]
+}

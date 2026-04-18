@@ -1,0 +1,465 @@
+{
+  "startedAt": "2026-04-16T18:53:59.271Z",
+  "completedAt": "2026-04-16T18:57:07.254Z",
+  "results": [
+    {
+      "name": "SUPABASE_URL + SUPABASE_ANON_KEY",
+      "status": "ok_limited",
+      "detail": "auth settings 200; anon key works but rest root requires service_role"
+    },
+    {
+      "name": "DATABASE_URL",
+      "status": "ok",
+      "detail": "query succeeded (1)"
+    },
+    {
+      "name": "X_APISPORTS_KEY",
+      "status": "ok",
+      "detail": "status 200"
+    },
+    {
+      "name": "ODDS_API_KEY",
+      "status": "ok",
+      "detail": "status 200"
+    },
+    {
+      "name": "CRICKETDATA_API_KEY",
+      "status": "ok",
+      "detail": "status 200"
+    },
+    {
+      "name": "X_AUTH_TOKEN",
+      "status": "ok",
+      "detail": "status 200"
+    },
+    {
+      "name": "SPORTS_DB_KEY",
+      "status": "warning",
+      "detail": "status 404"
+    },
+    {
+      "name": "WEATHER_API_KEY",
+      "status": "ok",
+      "detail": "status 200"
+    },
+    {
+      "name": "GEMINI_API_KEY",
+      "status": "ok",
+      "detail": "working model: gemini-2.5-flash",
+      "workingModel": "gemini-2.5-flash",
+      "failedModels": []
+    },
+    {
+      "name": "RapidAPI host sweep",
+      "status": "warning",
+      "detail": "hosts=65 ok=1 reachable=54 invalid=3 error=4 rate_limited=0",
+      "hostResults": [
+        {
+          "env": "RAPIDAPI_HOST",
+          "host": "sofascore.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_AI_FOOTBALL_PREDICTIONS",
+          "host": "ai-football-soccer-predictions.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_ALLSCORES",
+          "host": "allscores.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_ALLSPORTS",
+          "host": "allsportsapi2.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_AUSSIE_RULES",
+          "host": "australian-rules-api.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_BASEBALL_STATS",
+          "host": "baseball-stats.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_BLACKTOP_F1",
+          "host": "blacktop-formula-1-api.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_CRICBUZZ",
+          "host": "cricbuzz-cricket.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_CRICKET_API",
+          "host": "cricketapi.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_CRICKET_FOOTBALL_SCORE",
+          "host": "cricket-football-score.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_CRICVAULT",
+          "host": "cricvault.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_DAILY_FOOTBALL_PREDICTIONS",
+          "host": "daily-football-predictions-api.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_ESPN",
+          "host": "espn.p.rapidapi.com",
+          "status": "invalid",
+          "detail": "status 403"
+        },
+        {
+          "env": "RAPIDAPI_HOST_F1",
+          "host": "f1-motorsport-data.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_F1_ALL_TIME",
+          "host": "formula-1-all-time-statistics.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_F1_LIVE_MOTORSPORT",
+          "host": "f1-live-motorsport-data.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_FLASHLIVE",
+          "host": "flashlive-sports.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_FLASHSCORE",
+          "host": "flashscore.p.rapidapi.com",
+          "status": "invalid",
+          "detail": "status 403"
+        },
+        {
+          "env": "RAPIDAPI_HOST_FOOTBALL_API",
+          "host": "football_api12.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_FOOTBALL_API_7",
+          "host": "football-api7.p.rapidapi.com",
+          "status": "error",
+          "detail": "timeout of 9000ms exceeded"
+        },
+        {
+          "env": "RAPIDAPI_HOST_FOOTBALL_CLUBS",
+          "host": "football-clubs-api.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_FOOTBALL_HUB",
+          "host": "football-hub1.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 400 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_FOOTBALL_NEWS",
+          "host": "football-news.p.rapidapi.com",
+          "status": "error",
+          "detail": "timeout of 9000ms exceeded"
+        },
+        {
+          "env": "RAPIDAPI_HOST_FREE_FOOTBALL",
+          "host": "free-api-live-football-data.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_GAELIC_GAMES",
+          "host": "gaelic-games-api.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_GET_FOOTBALL_MATCH",
+          "host": "get-football-match-api.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_HANDBALLAPI_ALT",
+          "host": "handballapi.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_HANDBALL_API",
+          "host": "handball-api.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_HOCKEY_API",
+          "host": "hockey.p.rapidapi.com",
+          "status": "warning",
+          "detail": "status 500"
+        },
+        {
+          "env": "RAPIDAPI_HOST_HOCKEY_HIGHLIGHTS",
+          "host": "hockey-highlights-api.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_ICE_HOCKEY",
+          "host": "icehockeyapi.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_LIVESCORE",
+          "host": "livescore6.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_LIVE_SPORTS_ODDS",
+          "host": "live-sports-odds.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_MLB_SCOREBOARD",
+          "host": "mlb-scoreboard.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_MMAAPI",
+          "host": "mmaapi.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_MMA_RANKINGS",
+          "host": "mma-rankings.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_MOTOR_SPORT",
+          "host": "motor-sport-api.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_NBA_API",
+          "host": "nba-api.p.rapidapi.com",
+          "status": "warning",
+          "detail": "status 500"
+        },
+        {
+          "env": "RAPIDAPI_HOST_NEWSNOW",
+          "host": "newsnow.p.rapidapi.com",
+          "status": "ok",
+          "detail": "status 200"
+        },
+        {
+          "env": "RAPIDAPI_HOST_NFL",
+          "host": "nfl-football-api.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_ODDSPEDIA",
+          "host": "oddspedia-pre-game-odds.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_OS_SPORTS_PERFORM",
+          "host": "os-sports-perform.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_PINNACLE_FOOTBALL_ODDS",
+          "host": "pinnacle-football-odds.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_PINNACLE_ODDS",
+          "host": "pinnalce-odds-fast-cheap-api.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_PROPSPORTS",
+          "host": "propsports.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_REEP_REGISTER",
+          "host": "the-reep-register.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_RIMBLE_RAW_DATA",
+          "host": "rimble-raw-data.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_RUGBY",
+          "host": "rugby-live-data.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_SCOREHUB",
+          "host": "scorehub-football-live-scores-api.p.rapidapi.com",
+          "status": "error",
+          "detail": "timeout of 9000ms exceeded"
+        },
+        {
+          "env": "RAPIDAPI_HOST_SOCCER_API",
+          "host": "soccer-api.p.rapidapi.com",
+          "status": "warning",
+          "detail": "status 500"
+        },
+        {
+          "env": "RAPIDAPI_HOST_SOFASCORE",
+          "host": "sofascore.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_SPORT",
+          "host": "sport-api1.p.rapidapi.com",
+          "status": "invalid",
+          "detail": "status 403"
+        },
+        {
+          "env": "RAPIDAPI_HOST_SPORT_DATA",
+          "host": "sport-data-api.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_SPORT_RADAR",
+          "host": "sport-radar-api.p.rapidapi.com",
+          "status": "error",
+          "detail": "timeout of 9000ms exceeded"
+        },
+        {
+          "env": "RAPIDAPI_HOST_SPORT_STREAMING",
+          "host": "sport-streaming-api.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_TANK01_MLB",
+          "host": "tank01-mlb-live-in-game-real-time-statistics.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_TANK01_WNBA",
+          "host": "tank01-wnba-live-in-game-real-time-statistics-wnba.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_TENNIS",
+          "host": "tennis-api-atp-wta-itf.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_TODAY_PREDICTION",
+          "host": "today-football-prediction.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_TOTALCORNER",
+          "host": "totalcorner-api.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_TRANSFERMARKT",
+          "host": "transfermarkt-football-data-api.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_UFC_FIGHTERS",
+          "host": "ufc-fighters-data-mma-records-attributes-fight-data.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_VOLLEYBALL_HIGHLIGHTS",
+          "host": "volleyball-highlights-api.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_WEATHER",
+          "host": "weatherapi-com.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        },
+        {
+          "env": "RAPIDAPI_HOST_WEC_NEWS",
+          "host": "wec-news.p.rapidapi.com",
+          "status": "reachable",
+          "detail": "status 404 (host reachable, endpoint unknown)"
+        }
+      ]
+    },
+    {
+      "name": "ADMIN_API_KEY",
+      "status": "set_unverified",
+      "detail": "set (no direct third-party endpoint in repo to validate this key by itself)"
+    },
+    {
+      "name": "CRON_SECRET",
+      "status": "set_unverified",
+      "detail": "set (no direct third-party endpoint in repo to validate this key by itself)"
+    },
+    {
+      "name": "SPORTS_ODDS_API_KEY",
+      "status": "set_unverified",
+      "detail": "set (no direct third-party endpoint in repo to validate this key by itself)"
+    }
+  ]
+}
