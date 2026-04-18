@@ -1236,10 +1236,15 @@
         greeting.style.display = 'none';
     }
 
-    async function fetchSubscriptionSummary(accessToken) {
+    async function fetchSubscriptionSummary(accessToken, requestedPlanId = '') {
         if (!accessToken) return null;
         try {
-            const response = await fetch(`${SKCS_BACKEND}/api/user/subscription-summary?_ts=${Date.now()}`, {
+            const params = new URLSearchParams();
+            params.set('_ts', String(Date.now()));
+            if (requestedPlanId) {
+                params.set('plan_id', requestedPlanId);
+            }
+            const response = await fetch(`${SKCS_BACKEND}/api/user/subscription-summary?${params.toString()}`, {
                 method: 'GET',
                 cache: 'no-store',
                 headers: {
@@ -1255,18 +1260,24 @@
         }
     }
 
-    async function updateSubscriptionGreeting(session) {
+    async function updateSubscriptionGreeting(session, requestedPlanId = '') {
         if (!session?.user) {
             setSubscriptionGreeting('');
             return;
         }
 
-        const summary = await fetchSubscriptionSummary(session.access_token);
-        const planId = String(
-            summary?.plan_id
-            || window.userPlanId
+        const requestedPlan = String(
+            requestedPlanId
             || window.currentUserPlanId
+            || window.userPlanId
             || getStoredPlanId()
+            || ''
+        ).trim();
+
+        const summary = await fetchSubscriptionSummary(session.access_token, requestedPlan);
+        const planId = String(
+            requestedPlan
+            || summary?.plan_id
             || ''
         ).trim();
         const planLabel = getPlanDisplayLabel(planId);
@@ -1352,7 +1363,9 @@
         select.onchange = () => {
             const selectedPlan = String(select.value || '').trim();
             if (!selectedPlan) return;
+            window.currentUserPlanId = selectedPlan;
             try { localStorage.setItem('skcs_plan_id', selectedPlan); } catch (e) { /* ignore */ }
+            updateSubscriptionGreeting(session, selectedPlan).catch(() => {});
             fetchPredictions(activeSport, selectedPlan).catch((err) => {
                 console.warn('[admin-tier-switch] fetch failed:', err?.message || err);
             });
@@ -2479,7 +2492,7 @@
         } catch (e) {
             storedPlan = '';
         }
-        return String(userPlanId || window.userPlanId || window.currentUserPlanId || storedPlan || 'elite_30day_deep_vip');
+        return String(userPlanId || window.currentUserPlanId || window.userPlanId || storedPlan || 'elite_30day_deep_vip');
     }
 
     async function fetchPredictions(sport, userPlanId = 'elite_30day_deep_vip') {
@@ -2487,6 +2500,7 @@
         if (!accessToken) return;
 
         const activePlanId = resolveUserPlanId(userPlanId);
+        window.currentUserPlanId = activePlanId;
         const isDirectMarketsTab = sport === 'direct-markets';
         const container = isDirectMarketsTab ? null : document.getElementById(sport + '-matches');
         const requestSport = (sport === 'accumulators' || isDirectMarketsTab) ? '' : sport;
