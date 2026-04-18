@@ -135,8 +135,9 @@ function endOfWeekSast(now = new Date()) {
 
 function riskLevelFromConfidence(avgConfidence) {
     if (avgConfidence >= 80) return 'safe';
-    if (avgConfidence >= 70) return 'medium';
-    return 'medium';
+    if (avgConfidence >= 70) return 'good';
+    if (avgConfidence >= 59) return 'fair';
+    return 'unsafe';
 }
 
 function toLeg(p) {

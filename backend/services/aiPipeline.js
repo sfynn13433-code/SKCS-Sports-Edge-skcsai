@@ -14,7 +14,6 @@ const {
 const pipelineLogger = require('../utils/pipelineLogger');
 const enrichFixtureWithContext = require('../src/services/contextIntelligence/aiPipeline');
 const adjustProbability = require('../src/services/contextIntelligence/adjustProbability');
-const { resolveDecision } = require('../src/services/marketRouter/waterfall');
 
 let isRunning = false;
 
@@ -60,6 +59,99 @@ function toConfidencePercent(probability) {
     const n = Number(probability);
     if (!Number.isFinite(n)) return 50;
     return Math.round(clamp(n, 0, 1) * 10000) / 100;
+}
+
+function normalizeMarketKey(value) {
+    return String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[\s-]+/g, '_');
+}
+
+function isPrimaryMatchOutcomeMarket(value) {
+    const key = normalizeMarketKey(value);
+    return key === 'home_win'
+        || key === 'away_win'
+        || key === 'draw'
+        || key === '1x2'
+        || key === 'match_winner'
+        || key === 'match_result';
+}
+
+function riskLevelFromConfidence(confidence) {
+    const n = Number(confidence);
+    if (!Number.isFinite(n)) return 'unsafe';
+    if (n >= 80) return 'safe';
+    if (n >= 70) return 'good';
+    if (n >= 59) return 'fair';
+    return 'unsafe';
+}
+
+function transparencyFlagsForRiskLevel(riskLevel) {
+    if (riskLevel === 'unsafe') {
+        return {
+            warning_banner: 'Primary match outcome is below our 58% safety threshold (Unsafe).',
+            action_advice: 'We advise moving to the Secondary Insights below for a safer position.'
+        };
+    }
+    if (riskLevel === 'fair') {
+        return {
+            warning_banner: 'Fair chance, but high volatility. Exercise caution.',
+            action_advice: 'Consider utilizing the Secondary Insights below for a safer position.'
+        };
+    }
+    if (riskLevel === 'good') {
+        return {
+            warning_banner: 'Higher probability of occurring, but standard sports volatility applies.',
+            action_advice: 'Play responsibly.'
+        };
+    }
+    return {
+        warning_banner: null,
+        action_advice: 'Premium Safe Insight. High confidence mathematical projection.'
+    };
+}
+
+function normalizeCandidateConfidencePercent(candidate) {
+    const confidence = Number(candidate?.confidence);
+    if (Number.isFinite(confidence)) {
+        if (confidence <= 1) {
+            return Math.round(clamp(confidence, 0, 1) * 10000) / 100;
+        }
+        return Math.round(clamp(confidence, 0, 100) * 100) / 100;
+    }
+    const probability = Number(candidate?.probability);
+    if (!Number.isFinite(probability)) return null;
+    if (probability <= 1) {
+        return Math.round(clamp(probability, 0, 1) * 10000) / 100;
+    }
+    return Math.round(clamp(probability, 0, 100) * 100) / 100;
+}
+
+function buildSecondaryInsights(candidates, selectedMarket) {
+    const selectedKey = normalizeMarketKey(selectedMarket);
+    return ensureArray(candidates)
+        .map((candidate) => {
+            const confidence = normalizeCandidateConfidencePercent(candidate);
+            return {
+                market: normalizeMarketKey(candidate?.market),
+                prediction: candidate?.prediction || null,
+                confidence,
+                probability: Number.isFinite(Number(candidate?.probability))
+                    ? Number(candidate.probability)
+                    : (Number.isFinite(confidence) ? confidence / 100 : null),
+                category: candidate?.category || null,
+                priority_tier: candidate?.priority_tier || null
+            };
+        })
+        .filter((candidate) => {
+            if (!candidate.market) return false;
+            if (candidate.market === selectedKey) return false;
+            if (candidate.market === 'over_0_5' || candidate.market === 'under_0_5') return false;
+            return Number.isFinite(candidate.confidence) && candidate.confidence >= 80;
+        })
+        .sort((a, b) => b.confidence - a.confidence)
+        .slice(0, 4);
 }
 
 function normalizeContextSignals(value) {
@@ -462,8 +554,6 @@ async function buildRawPredictionFromProviderItem(item) {
             metadata: { match_id }
         });
     }
-    const waterfallDecision = resolveDecision(waterfallProbabilities);
-
     if (marketIntelligence.risk_profile?.reject) {
         console.log('[aiPipeline] risk-rejection fixture skipped match_id=%s aggregate_risk=%s', match_id, marketIntelligence.risk_profile.aggregate_risk);
         pipelineLogger.rejectionAdd({
@@ -478,37 +568,24 @@ async function buildRawPredictionFromProviderItem(item) {
         return null;
     }
 
-    if (waterfallDecision.status === 'no_bet' && !marketSelections.direct) {
-        console.log('[aiPipeline] no-bet fixture skipped match_id=%s phase=%s', match_id, waterfallDecision.phase);
-        pipelineLogger.rejectionAdd({
-            run_id: telemetryRunId,
-            sport,
-            bucket: 'publish_skip',
-            metadata: {
-                match_id,
-                reason: 'waterfall_no_bet'
-            }
-        });
-        pipelineLogger.rejectionAdd({
-            run_id: telemetryRunId,
-            sport,
-            bucket: 'low_confidence',
-            metadata: { match_id }
-        });
-        return null;
-    }
-
     const selectedDirect = marketSelections.direct || null;
     const selectedSecondary = marketSelections.secondary || null;
-    const market = selectedDirect?.market || waterfallDecision.market || requestedMarket;
-    const routedPrediction = selectedDirect?.prediction || waterfallDecision.prediction || fallbackPredictionForMarket(market, prediction);
-    const confidenceProbabilityRaw = selectedDirect?.probability || waterfallDecision.confidence_probability || p_adj;
+    const market = selectedDirect?.market || requestedMarket;
+    const routedPrediction = selectedDirect?.prediction || prediction || fallbackPredictionForMarket(market, prediction);
+    const confidenceProbabilityRaw = selectedDirect?.probability || p_adj;
     const confidenceProbability = adjustProbability.applyMarketAdjustment(
         confidenceProbabilityRaw,
         market,
         contextSignals.market_adjustments
     );
-    const confidence = Math.max(60, toConfidencePercent(confidenceProbability));
+    const confidence = toConfidencePercent(confidenceProbability);
+    const riskLevel = isPrimaryMatchOutcomeMarket(market)
+        ? riskLevelFromConfidence(confidence)
+        : 'good';
+    const transparencyFlags = transparencyFlagsForRiskLevel(riskLevel);
+    const secondaryInsights = (riskLevel === 'fair' || riskLevel === 'unsafe')
+        ? buildSecondaryInsights(marketIntelligence.candidates, market)
+        : [];
     const volatility = item.volatility || scoring.volatility || volatilityFromRiskProfile(marketIntelligence.risk_profile, 'medium');
     const aiSource = scoring.source || null; // 'dolphin', 'fallback', 'odds', etc.
     const aiReasoning = scoring.reasoning || null;
@@ -562,6 +639,7 @@ async function buildRawPredictionFromProviderItem(item) {
                 secondary_market: selectedSecondary,
                 rule_of_4_markets: marketSelections.rule_of_4_markets || [],
                 same_match: marketSelections.same_match,
+                secondary_insights: secondaryInsights,
                 risk_profile: marketIntelligence.risk_profile,
                 ranked_markets: ensureArray(marketIntelligence.candidates)
                     .slice(0, 20)
@@ -576,16 +654,22 @@ async function buildRawPredictionFromProviderItem(item) {
                     }))
             },
             market_router: {
-                phase: selectedDirect ? 'market_intelligence_tiered' : waterfallDecision.phase,
-                status: selectedDirect ? 'locked' : waterfallDecision.status,
+                phase: selectedDirect ? 'market_intelligence_tiered' : 'primary_outcome_backbone',
+                status: 'locked',
                 final_recommendation: {
-                    market: selectedDirect ? toTitleCase(selectedDirect.market) : (waterfallDecision.display_market || toTitleCase(market)),
+                    market: toTitleCase(market),
                     confidence
                 },
-                engine_log: ensureArray(waterfallDecision.engine_log),
-                probabilities: waterfallDecision.probabilities || {},
+                engine_log: [
+                    `Primary outcome retained: ${toTitleCase(market)} at ${confidence}% confidence.`,
+                    'Defensive floor market mutation disabled for transparency.'
+                ],
+                probabilities: waterfallProbabilities || {},
                 insights: uiInsights
             },
+            risk_level: riskLevel,
+            secondary_insights: secondaryInsights,
+            transparency_flags: transparencyFlags,
             ai: predictionSource === 'ai_fallback'
                 ? {
                     winner: scoring.winner,

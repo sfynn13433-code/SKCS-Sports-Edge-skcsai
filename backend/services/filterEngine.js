@@ -99,6 +99,23 @@ function isVolatilityAllowed(allowedVolatility, volatility) {
     return allowedVolatility.includes(volatility);
 }
 
+function normalizeMarketKey(value) {
+    return String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[\s-]+/g, '_');
+}
+
+function isPrimaryMatchOutcomeMarket(value) {
+    const key = normalizeMarketKey(value);
+    return key === 'home_win'
+        || key === 'away_win'
+        || key === 'draw'
+        || key === '1x2'
+        || key === 'match_winner'
+        || key === 'match_result';
+}
+
 function buildRejectReason({ tier, reason, raw }) {
     return `[tier=${tier}] ${reason} (confidence=${raw.confidence}, market=${raw.market}, volatility=${raw.volatility})`;
 }
@@ -188,12 +205,13 @@ async function upsertFilteredRow({ rawId, tier, isValid, rejectReason }, client)
 
 function evaluateRawAgainstTier(raw, rules) {
     const tier = rules.tier;
+    const primaryMarket = isPrimaryMatchOutcomeMarket(raw.market);
 
     if (typeof raw.confidence !== 'number' || Number.isNaN(raw.confidence)) {
         return { is_valid: false, reject_reason: buildRejectReason({ tier, reason: 'Missing or non-numeric confidence', raw }) };
     }
 
-    if (raw.confidence < rules.min_confidence) {
+    if (!primaryMarket && raw.confidence < rules.min_confidence) {
         return { is_valid: false, reject_reason: buildRejectReason({ tier, reason: `Confidence below min_confidence (${rules.min_confidence})`, raw }) };
     }
 
