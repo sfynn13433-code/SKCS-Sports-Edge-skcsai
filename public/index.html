@@ -1663,17 +1663,22 @@
     function normalizeSportForFilter(value) {
         const key = String(value || '').trim().toLowerCase();
         if (!key) return '';
-        if (key.startsWith('soccer_')) return 'football';
-        if (key.startsWith('basketball_') || key === 'nba') return 'basketball';
-        if (key.startsWith('americanfootball_') || key === 'nfl') return 'nfl';
-        if (key.startsWith('icehockey_') || key === 'nhl') return 'hockey';
-        if (key.startsWith('baseball_') || key === 'mlb') return 'baseball';
-        if (key.startsWith('rugbyunion_')) return 'rugby';
-        if (key.startsWith('aussierules_')) return 'afl';
-        if (key.startsWith('mma_')) return 'mma';
+
+        // Catch "soccer", "football", and namespaced keys.
+        if (key === 'soccer' || key === 'football' || key.startsWith('soccer_') || key.startsWith('football_')) return 'football';
+
+        if (key.startsWith('basketball_') || key === 'nba' || key === 'basketball') return 'basketball';
+        if (key.startsWith('americanfootball_') || key === 'nfl' || key === 'american_football') return 'nfl';
+        if (key.startsWith('icehockey_') || key === 'nhl' || key === 'hockey' || key === 'ice_hockey') return 'hockey';
+        if (key.startsWith('baseball_') || key === 'mlb' || key === 'baseball') return 'baseball';
+        if (key.startsWith('rugbyunion_') || key === 'rugby') return 'rugby';
+        if (key.startsWith('aussierules_') || key === 'afl') return 'afl';
+        if (key.startsWith('mma_') || key === 'mma' || key === 'mixed_martial_arts') return 'mma';
         if (key.startsWith('formula1') || key === 'f1' || key === 'motorsport') return 'formula1';
-        if (key.startsWith('volleyball')) return 'volleyball';
-        if (key.startsWith('handball')) return 'handball';
+        if (key.startsWith('volleyball') || key === 'volleyball') return 'volleyball';
+        if (key.startsWith('handball') || key === 'handball') return 'handball';
+        if (key.startsWith('tennis') || key === 'tennis') return 'tennis';
+        if (key.startsWith('cricket') || key === 'cricket') return 'cricket';
         return key;
     }
 
