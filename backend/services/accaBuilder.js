@@ -315,16 +315,20 @@ function toFinalMatchPayload(p) {
     const matchInfo = matchContext && typeof matchContext.match_info === 'object'
         ? matchContext.match_info
         : {};
-    const kickoff = metadata.match_time || metadata.kickoff || metadata.kickoff_time || matchInfo.kickoff || null;
+    const kickoff = resolveKickoffFromPrediction(p, metadata, matchInfo);
     const normalizedSport = normalizeSportKey(p.sport || metadata.sport || metadata.sport_key || '');
     const sportType = getSportTypeLabel(normalizedSport);
+    const homeTeam = resolveTeamNameFromPrediction(p, 'home');
+    const awayTeam = resolveTeamNameFromPrediction(p, 'away');
     return {
         raw_id: p.raw_id,
         match_id: p.match_id,
         sport: normalizedSport,
         sport_type: sportType,
-        home_team: metadata.home_team || matchInfo.home_team || null,
-        away_team: metadata.away_team || matchInfo.away_team || null,
+        home_team: homeTeam || null,
+        away_team: awayTeam || null,
+        home_team_name: homeTeam || null,
+        away_team_name: awayTeam || null,
         match_date: kickoff,
         commence_time: kickoff,
         market: p.market,
@@ -334,6 +338,10 @@ function toFinalMatchPayload(p) {
         odds: p.odds,
         metadata: {
             ...metadata,
+            home_team: homeTeam || metadata.home_team || matchInfo.home_team || null,
+            away_team: awayTeam || metadata.away_team || matchInfo.away_team || null,
+            home_team_name: homeTeam || metadata.home_team_name || null,
+            away_team_name: awayTeam || metadata.away_team_name || null,
             sport_type: sportType,
             weekly_team_lock_applied: true,
             normalized_match_context: metadata.normalized_match_context === true || Boolean(matchContext)
@@ -350,11 +358,13 @@ function toScoringMatchPayload(prediction) {
         ? matchContext.match_info
         : {};
     const normalizedSport = normalizeSportKey(prediction.sport || metadata.sport || '');
+    const homeTeam = resolveTeamNameFromPrediction(prediction, 'home');
+    const awayTeam = resolveTeamNameFromPrediction(prediction, 'away');
     return {
         match_id: prediction.match_id,
         sport: normalizedSport,
-        home_team: metadata.home_team || matchInfo.home_team || null,
-        away_team: metadata.away_team || matchInfo.away_team || null,
+        home_team: homeTeam || null,
+        away_team: awayTeam || null,
         base_prediction: prediction.prediction || null,
         base_confidence: prediction.confidence,
         raw_provider_data: metadata.raw_provider_data || null,
@@ -431,6 +441,133 @@ function getMetadata(prediction) {
     return prediction && typeof prediction.metadata === 'object' && prediction.metadata !== null
         ? prediction.metadata
         : {};
+}
+
+function isPlaceholderTeamName(value) {
+    const key = String(value || '').trim().toLowerCase();
+    if (!key) return true;
+    return key === 'unknown'
+        || key === 'unknown home'
+        || key === 'unknown away'
+        || key === 'home team'
+        || key === 'away team'
+        || key === 'tbd'
+        || key === 'n/a';
+}
+
+function cleanTeamName(value) {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'string' || typeof value === 'number') {
+        const normalized = String(value).trim();
+        return isPlaceholderTeamName(normalized) ? '' : normalized;
+    }
+    if (typeof value !== 'object') return '';
+    const normalized = String(
+        value.name
+        || value.team_name
+        || value.team
+        || value.full_name
+        || value.display_name
+        || value.short_name
+        || value.title
+        || ''
+    ).trim();
+    return isPlaceholderTeamName(normalized) ? '' : normalized;
+}
+
+function readPath(source, path) {
+    if (!source || typeof source !== 'object') return undefined;
+    const parts = Array.isArray(path) ? path : String(path || '').split('.');
+    let current = source;
+    for (const part of parts) {
+        if (!current || typeof current !== 'object' || !(part in current)) return undefined;
+        current = current[part];
+    }
+    return current;
+}
+
+function firstValidTeamName(sources, paths) {
+    for (const source of sources) {
+        if (!source || typeof source !== 'object') continue;
+        for (const path of paths) {
+            const value = cleanTeamName(readPath(source, path));
+            if (value) return value;
+        }
+    }
+    return '';
+}
+
+function resolveTeamNameFromPrediction(prediction, side) {
+    const metadata = getMetadata(prediction);
+    const matchContext = metadata?.match_context && typeof metadata.match_context === 'object'
+        ? metadata.match_context
+        : null;
+    const matchInfo = matchContext?.match_info && typeof matchContext.match_info === 'object'
+        ? matchContext.match_info
+        : null;
+    const providerA = metadata?.raw_provider_data && typeof metadata.raw_provider_data === 'object'
+        ? metadata.raw_provider_data
+        : null;
+    const providerB = matchContext?.raw_provider_data && typeof matchContext.raw_provider_data === 'object'
+        ? matchContext.raw_provider_data
+        : null;
+
+    const rootPaths = side === 'home'
+        ? ['home_team', 'home_team_name', 'homeTeam', 'homeTeamName', 'home', 'home_name']
+        : ['away_team', 'away_team_name', 'awayTeam', 'awayTeamName', 'away', 'away_name'];
+    const providerPaths = side === 'home'
+        ? [
+            'teams.home.name',
+            'teams.home.team_name',
+            'homeTeam.name',
+            'homeTeam.team_name',
+            'homeTeam',
+            'home_team',
+            'home.name'
+        ]
+        : [
+            'teams.away.name',
+            'teams.away.team_name',
+            'awayTeam.name',
+            'awayTeam.team_name',
+            'awayTeam',
+            'away_team',
+            'away.name'
+        ];
+
+    const direct = firstValidTeamName(
+        [prediction, metadata, matchInfo, matchContext, providerA, providerB],
+        [...rootPaths, ...providerPaths]
+    );
+    if (direct) return direct;
+
+    for (const source of [providerA, providerB]) {
+        if (!source || typeof source !== 'object') continue;
+        const participants = Array.isArray(source.participants) ? source.participants : [];
+        for (const participant of participants) {
+            const location = String(participant?.meta?.location || participant?.location || '').trim().toLowerCase();
+            if (location !== side) continue;
+            const value = cleanTeamName(participant?.name || participant?.team?.name);
+            if (value) return value;
+        }
+    }
+
+    return '';
+}
+
+function resolveKickoffFromPrediction(prediction, metadata, matchInfo) {
+    return metadata?.match_time
+        || metadata?.kickoff
+        || metadata?.kickoff_time
+        || metadata?.commence_time
+        || metadata?.date
+        || matchInfo?.kickoff
+        || matchInfo?.match_time
+        || prediction?.match_date
+        || prediction?.commence_time
+        || prediction?.kickoff
+        || prediction?.date
+        || null;
 }
 
 function selectionMarketKey(prediction) {

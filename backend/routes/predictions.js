@@ -478,6 +478,38 @@ function resolveMatchTeamName(match, side) {
         : extractTeamNameValue(match?.metadata?.teams?.away || match?.metadata?.teams?.awayTeam || match?.metadata?.team_away);
     if (fromMetadataTeams) return fromMetadataTeams;
 
+    const providerPayloads = [
+        match?.raw_provider_data,
+        match?.metadata?.raw_provider_data,
+        match?.metadata?.match_context?.raw_provider_data,
+        match?.metadata?.match_context?.match?.raw_provider_data
+    ].filter((payload) => payload && typeof payload === 'object');
+
+    for (const payload of providerPayloads) {
+        const fromProvider = side === 'home'
+            ? extractTeamNameValue(
+                payload?.teams?.home
+                || payload?.homeTeam
+                || payload?.home_team
+                || payload?.home
+            )
+            : extractTeamNameValue(
+                payload?.teams?.away
+                || payload?.awayTeam
+                || payload?.away_team
+                || payload?.away
+            );
+        if (fromProvider) return fromProvider;
+
+        const participants = Array.isArray(payload?.participants) ? payload.participants : [];
+        for (const participant of participants) {
+            const location = String(participant?.meta?.location || participant?.location || '').trim().toLowerCase();
+            if (location !== side) continue;
+            const fromParticipant = extractTeamNameValue(participant?.name || participant?.team?.name);
+            if (fromParticipant) return fromParticipant;
+        }
+    }
+
     const fromMatchInfo = side === 'home'
         ? extractTeamNameValue(
             match?.match_info?.home_team
