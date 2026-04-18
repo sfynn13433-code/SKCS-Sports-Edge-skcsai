@@ -1095,18 +1095,27 @@ async function buildSameMatchCandidates(predictions, options = {}) {
 function buildMultiCandidates(predictions, maxRows = 16 * VOLUME_CAP_MULTIPLIER) {
     const direct = predictions.slice(0, 12 * VOLUME_CAP_MULTIPLIER);
     const combos = [];
+    const bySport = new Map();
 
-    for (let size = 2; size <= 3; size++) {
-        for (const combo of combinations(direct, size)) {
-            const ids = combo.map((row) => row.match_id);
-            if (new Set(ids).size !== ids.length) continue;
-            const legs = combo.map(toFinalMatchPayload);
-            combos.push({
-                match_id: ids.join('|'),
-                matches: legs,
-                total_confidence: computeTotalConfidence(legs),
-                risk_level: riskLevelFromConfidence(computeTotalConfidence(legs))
-            });
+    for (const candidate of direct) {
+        const sportKey = normalizeSportKey(candidate?.sport || candidate?.metadata?.sport || 'unknown');
+        if (!bySport.has(sportKey)) bySport.set(sportKey, []);
+        bySport.get(sportKey).push(candidate);
+    }
+
+    for (const sportCandidates of bySport.values()) {
+        for (let size = 2; size <= 3; size++) {
+            for (const combo of combinations(sportCandidates, size)) {
+                const ids = combo.map((row) => row.match_id);
+                if (new Set(ids).size !== ids.length) continue;
+                const legs = combo.map(toFinalMatchPayload);
+                combos.push({
+                    match_id: ids.join('|'),
+                    matches: legs,
+                    total_confidence: computeTotalConfidence(legs),
+                    risk_level: riskLevelFromConfidence(computeTotalConfidence(legs))
+                });
+            }
         }
     }
 
@@ -1731,7 +1740,17 @@ function buildAccumulatorRowForStep(step, candidatePool, usedFixtureIds, minConf
         );
     }
 
-    return buildMixedAccumulatorRow(
+    if (step?.profile === 'single_sport') {
+        return buildSingleSportAccumulatorRow(
+            candidatePool,
+            usedFixtureIds,
+            ACCA_SIZE,
+            minConfidenceFloor,
+            { isMega: false }
+        );
+    }
+
+    return buildSingleSportAccumulatorRow(
         candidatePool,
         usedFixtureIds,
         ACCA_SIZE,
@@ -1870,10 +1889,16 @@ function reserveCandidate(candidate, usedFixtureIds) {
 
 function finalizeAccumulatorRow(legs, options = {}) {
     const profile = String(options.profile || 'mixed_sport');
+    const targetSport = normalizeSportKey(options.targetSport || legs?.[0]?.sport || 'unknown');
     const minLegConfidenceFloor = Number(options.minLegConfidenceFloor || (MIN_CONFIDENCE || 80));
     const isMega = options.isMega === true;
     const legCount = Number(legs?.length || 0);
     const ticketLabel = legCount >= 12 ? '12 MATCH MEGA ACCA' : '6 MATCH ACCA';
+    const accaProfileLabel = profile === 'football_only'
+        ? 'Football ACCA'
+        : profile === 'single_sport'
+            ? `${getSportTypeLabel(targetSport)} ACCA`
+            : 'Mixed Sport ACCA';
 
     // SKCS LAW: Compute diversity breakdown
     const diversityBreakdown = {};
@@ -1891,7 +1916,7 @@ function finalizeAccumulatorRow(legs, options = {}) {
             ...(finalLeg.metadata || {}),
             sport_type: getSportTypeLabel(finalLeg.sport),
             acca_profile: profile,
-            acca_profile_label: profile === 'football_only' ? 'Football ACCA' : 'Mixed Sport ACCA',
+            acca_profile_label: accaProfileLabel,
             acca_ticket_label: ticketLabel,
             min_leg_confidence_floor: minLegConfidenceFloor,
             market_family: normalizeMarketFamily(leg?.market || leg?.metadata?.market || '') || 'other',
@@ -1975,8 +2000,70 @@ function buildFootballOnlyAccumulatorRow(pool, usedFixtureIds, size, minConfiden
     for (const id of localUsed) usedFixtureIds.add(id);
     return finalizeAccumulatorRow(selected, {
         profile: 'football_only',
+        targetSport: 'football',
         minLegConfidenceFloor: minConfidenceFloor
     });
+}
+
+function buildSingleSportAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor, options = {}) {
+    const targetSport = normalizeSportKey(options.targetSport || '');
+    const forMega = options.isMega === true;
+    const grouped = new Map();
+
+    for (const candidate of Array.isArray(pool) ? pool : []) {
+        const sport = normalizeSportKey(candidate?.sport || candidate?.metadata?.sport || '');
+        if (!sport || sport === 'unknown') continue;
+        if (targetSport && sport !== targetSport) continue;
+        if (!grouped.has(sport)) grouped.set(sport, []);
+        grouped.get(sport).push(candidate);
+    }
+
+    const sportPools = Array.from(grouped.entries())
+        .map(([sport, candidates]) => ({
+            sport,
+            candidates: candidates
+                .filter((candidate) => Number(candidate?.confidence) >= minConfidenceFloor)
+                .filter((candidate) => !isPredictionHighRisk(candidate, { forMega }))
+                .sort(compareAccaCandidatePreference)
+        }))
+        .sort((a, b) => b.candidates.length - a.candidates.length);
+
+    for (const sportPool of sportPools) {
+        let scopedPool = sportPool.candidates;
+        if (scopedPool.length < size) {
+            scopedPool = ensureCandidatePoolWithRetry(scopedPool, size, { forMega });
+        }
+        if (scopedPool.length < size) continue;
+
+        const fixtures = buildSelectableFixturePool(scopedPool, minConfidenceFloor);
+        if (fixtures.length < size) continue;
+
+        const selected = [];
+        const localUsed = new Set();
+        const stagedGlobalUsed = new Set([...usedFixtureIds]);
+        const selectedLegs = selectAccaLegs(fixtures, stagedGlobalUsed, size);
+
+        for (const leg of selectedLegs) {
+            if (selected.length >= size) break;
+            const candidate = resolveSelectedLegCandidate(leg, fixtures);
+            if (!candidate) continue;
+            if (isCandidateUsedGlobally(candidate, usedFixtureIds)) continue;
+            if (!canReserveCandidate(candidate, usedFixtureIds, localUsed)) continue;
+            selected.push(candidate);
+            reserveCandidate(candidate, localUsed);
+        }
+
+        if (selected.length < size) continue;
+        for (const id of localUsed) usedFixtureIds.add(id);
+        return finalizeAccumulatorRow(selected, {
+            profile: 'single_sport',
+            targetSport: sportPool.sport,
+            minLegConfidenceFloor: minConfidenceFloor,
+            isMega: forMega
+        });
+    }
+
+    return null;
 }
 
 function buildMixedAccumulatorRow(pool, usedFixtureIds, size, minConfidenceFloor, options = {}) {
@@ -2207,7 +2294,7 @@ function buildAcca6Candidates(predictions, maxRows = 6, options = {}) {
     const rows = [];
 
     while (rows.length < maxRows) {
-        const row = buildMixedAccumulatorRow(sorted, globalUsedFixtures, ACCA_SIZE, minConfidenceFloor, { isMega: false });
+        const row = buildSingleSportAccumulatorRow(sorted, globalUsedFixtures, ACCA_SIZE, minConfidenceFloor, { isMega: false });
         if (!row) break;
         rows.push(row);
     }
@@ -2315,7 +2402,7 @@ function buildMegaAcca12Candidates(predictions, options = {}) {
 
     const rows = [];
     while (rows.length < maxRows) {
-        const row = buildMixedAccumulatorRow(
+        const row = buildSingleSportAccumulatorRow(
             eligible,
             globalUsedFixtures,
             MEGA_ACCA_SIZE,
@@ -3199,7 +3286,32 @@ async function buildFinalForTier(tier, options = {}) {
         console.log('[accaBuilder] Cleaned stale rows for tier=%s', t);
 
         // ---------------------------------------------------------------------
-        // SKCS LAW: ACCA PUBLISH FLOW (uniqueness + team lock + pool rotation)
+        // 1. DIRECT LAYER (First Priority - singles reserve fixtures first)
+        // ---------------------------------------------------------------------
+        const directRows = [];
+        const directSelections = takeAvailablePredictions(
+            limitedCandidates.filter((candidate) => isDirectMarketSelection(candidate)),
+            globalUsedFixtures,
+            new Map(),
+            new Map(),
+            Infinity
+        );
+        for (const prediction of directSelections) {
+            const matches = [toFinalMatchPayload(prediction)];
+            const total = computeTotalConfidence(matches);
+            const row = await insertFinalRow({
+                publish_run_id: publishRunId,
+                tier: t,
+                type: 'direct',
+                matches,
+                total_confidence: total,
+                risk_level: riskLevelFromConfidence(total)
+            }, client);
+            directRows.push(row);
+        }
+
+        // ---------------------------------------------------------------------
+        // 2. SKCS LAW: ACCA PUBLISH FLOW (uniqueness + team lock + pool rotation)
         // ---------------------------------------------------------------------
         const accaRows = [];
         const megaAccaRows = [];
@@ -3217,8 +3329,8 @@ async function buildFinalForTier(tier, options = {}) {
 
         // Build plan: 4 x 6-leg + 1 x 12-leg
         const buildPlan = [
-            ...Array.from({ length: categoryBuildCaps.acca_6match }, () => ({ type: 'acca_6match', legCount: 6, profile: 'mixed_sport' })),
-            ...Array.from({ length: categoryBuildCaps.mega_acca_12 }, () => ({ type: 'mega_acca_12', legCount: 12, profile: 'mixed_sport' })),
+            ...Array.from({ length: categoryBuildCaps.acca_6match }, () => ({ type: 'acca_6match', legCount: 6, profile: 'single_sport' })),
+            ...Array.from({ length: categoryBuildCaps.mega_acca_12 }, () => ({ type: 'mega_acca_12', legCount: 12, profile: 'single_sport' })),
         ];
         const megaExpiryCutoff = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000));
 
@@ -3429,7 +3541,7 @@ async function buildFinalForTier(tier, options = {}) {
         }
 
         if (accaRows.length === 0) {
-            const fallbackStep = { type: 'acca_6match', legCount: 6, profile: 'mixed_sport' };
+            const fallbackStep = { type: 'acca_6match', legCount: 6, profile: 'single_sport' };
             const fallbackUsed = new Set(globalUsedFixtures);
             const fallbackPool = relaxFilters(accaMarketCandidates, { forMega: false });
             const fallbackCard = buildAccumulatorRowWithFallbackLadder(
@@ -3475,7 +3587,7 @@ async function buildFinalForTier(tier, options = {}) {
         }
 
         if (megaAccaRows.length === 0) {
-            const fallbackStep = { type: 'mega_acca_12', legCount: 12, profile: 'mixed_sport' };
+            const fallbackStep = { type: 'mega_acca_12', legCount: 12, profile: 'single_sport' };
             const fallbackUsed = new Set(globalUsedFixtures);
             const fallbackPool = relaxFilters(accaMarketCandidates, { forMega: true });
             const fallbackCard = buildAccumulatorRowWithFallbackLadder(
@@ -3542,32 +3654,7 @@ async function buildFinalForTier(tier, options = {}) {
         console.log('[accaBuilder DIAGNOSTICS] mega_zero_reason=%s', megaDiagnostics.mega_zero_reason || 'n/a');
 
         // ---------------------------------------------------------------------
-        // 3. DIRECT LAYER (Third Priority - reserve singles before combinators)
-        // ---------------------------------------------------------------------
-        const directRows = [];
-        const directSelections = takeAvailablePredictions(
-            limitedCandidates.filter((candidate) => isDirectMarketSelection(candidate)),
-            globalUsedFixtures,
-            new Map(),
-            new Map(),
-            Infinity
-        );
-        for (const prediction of directSelections) {
-            const matches = [toFinalMatchPayload(prediction)];
-            const total = computeTotalConfidence(matches);
-            const row = await insertFinalRow({
-                publish_run_id: publishRunId,
-                tier: t,
-                type: 'direct',
-                matches,
-                total_confidence: total,
-                risk_level: riskLevelFromConfidence(total)
-            }, client);
-            directRows.push(row);
-        }
-
-        // ---------------------------------------------------------------------
-        // 4. MULTI LAYER (Fourth Priority)
+        // 3. MULTI LAYER (Third Priority)
         // ---------------------------------------------------------------------
         const multiRows = [];
         const multiSelections = takeAvailablePredictions(
@@ -3590,7 +3677,7 @@ async function buildFinalForTier(tier, options = {}) {
         }
 
         // ---------------------------------------------------------------------
-        // 5. SAME MATCH LAYER (Fifth Priority)
+        // 4. SAME MATCH LAYER (Fourth Priority)
         // ---------------------------------------------------------------------
         const sameMatchRows = [];
         const sameMatchSelections = takeAvailablePredictions(
@@ -3615,7 +3702,7 @@ async function buildFinalForTier(tier, options = {}) {
         }
 
         // ---------------------------------------------------------------------
-        // 6. SECONDARY LAYER (Last Priority)
+        // 5. SECONDARY LAYER (Last Priority)
         // ---------------------------------------------------------------------
         const secondaryRows = [];
         const safeSinglesPool = (
