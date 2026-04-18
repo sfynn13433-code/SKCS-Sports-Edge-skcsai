@@ -55,6 +55,8 @@ h1 { text-align:center; color:#fff; margin-bottom:30px; font-weight: bold; }
   cursor:pointer;
   border-radius:6px;
   background:#1e293b;
+  border: none;
+  color: #ffffff;
   transition: all 0.3s ease;
   font-weight: bold;
 }
@@ -248,8 +250,8 @@ button:hover { opacity: 0.9; }
 </div>
 
 <div class="tabs">
-  <div id="tabCore" class="tab active-core" onclick="showCore()">🟢 SKCS Core</div>
-  <div id="tabElite" class="tab" onclick="showElite()">🔵 SKCS Elite</div>
+  <button id="tabCore" type="button" class="tab active-core" aria-pressed="true">🟢 SKCS Core</button>
+  <button id="tabElite" type="button" class="tab" aria-pressed="false">🔵 SKCS Elite</button>
 </div>
 
 <div id="billingBanner" class="status-banner">
@@ -572,17 +574,37 @@ function setPlanButtonsEnabled(enabled) {
 }
 
 function showCore(){
-  document.getElementById('corePlans').style.display='grid';
-  document.getElementById('elitePlans').style.display='none';
-  document.getElementById('tabCore').classList.add('active-core');
-  document.getElementById('tabElite').classList.remove('active-elite');
+  const corePlans = document.getElementById('corePlans');
+  const elitePlans = document.getElementById('elitePlans');
+  const tabCore = document.getElementById('tabCore');
+  const tabElite = document.getElementById('tabElite');
+  if (!corePlans || !elitePlans || !tabCore || !tabElite) return;
+
+  corePlans.style.display='grid';
+  elitePlans.style.display='none';
+  tabCore.classList.add('active-core');
+  tabCore.classList.remove('active-elite');
+  tabCore.setAttribute('aria-pressed', 'true');
+  tabElite.classList.remove('active-core');
+  tabElite.classList.remove('active-elite');
+  tabElite.setAttribute('aria-pressed', 'false');
 }
 
 function showElite(){
-  document.getElementById('corePlans').style.display='none';
-  document.getElementById('elitePlans').style.display='grid';
-  document.getElementById('tabCore').classList.remove('active-core');
-  document.getElementById('tabElite').classList.add('active-elite');
+  const corePlans = document.getElementById('corePlans');
+  const elitePlans = document.getElementById('elitePlans');
+  const tabCore = document.getElementById('tabCore');
+  const tabElite = document.getElementById('tabElite');
+  if (!corePlans || !elitePlans || !tabCore || !tabElite) return;
+
+  corePlans.style.display='none';
+  elitePlans.style.display='grid';
+  tabCore.classList.remove('active-core');
+  tabCore.classList.remove('active-elite');
+  tabCore.setAttribute('aria-pressed', 'false');
+  tabElite.classList.remove('active-core');
+  tabElite.classList.add('active-elite');
+  tabElite.setAttribute('aria-pressed', 'true');
 }
 
 async function loadBillingStatus() {
@@ -639,6 +661,11 @@ function goBack() {
 }
 
 async function initSubscriptionPage() {
+  const tabCore = document.getElementById('tabCore');
+  const tabElite = document.getElementById('tabElite');
+  if (tabCore) tabCore.addEventListener('click', showCore);
+  if (tabElite) tabElite.addEventListener('click', showElite);
+
   showPublicLockNotice();
   loadBillingStatus();
   setPlanButtonsEnabled(true);
