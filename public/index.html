@@ -740,7 +740,7 @@
             <div class="tabs-header">
                 <button class="tab-button active" data-tab="direct-markets"><span class="sport-icon">🎯</span> DIRECT MARKETS</button>
                 <button class="tab-button" data-tab="accumulators"><span class="sport-icon">🧮</span> ACCA</button>
-                <button class="tab-button" data-tab="football"><span class="sport-icon">⚽</span> SOCCER</button>
+                <button class="tab-button" data-tab="football"><span class="sport-icon">⚽</span> FOOTBALL</button>
                 <button class="tab-button" data-tab="tennis"><span class="sport-icon">🎾</span> TENNIS</button>
                 <button class="tab-button" data-tab="basketball"><span class="sport-icon">🏀</span> BASKETBALL</button>
                 <button class="tab-button" data-tab="rugby"><span class="sport-icon">🏉</span> RUGBY</button>
@@ -1626,12 +1626,15 @@
         const canonical = String(pred && pred.section || '').toLowerCase();
         if (canonical === 'mega') return 'mega_acca_12';
         if (canonical === 'acca') return 'acca_6match';
+
+        // FIX: Force any double chance/specials into the secondary tab
+        if (isDoubleChancePrediction(pred)) return 'secondary';
+
+        const rawType = String(pred && (pred.section_type || pred.type) || '').toLowerCase();
         if (canonical === 'direct') return 'direct';
-        if (canonical === 'singles') {
-            const rawSinglesType = String(pred && (pred.section_type || pred.type) || '').toLowerCase();
-            return rawSinglesType || 'secondary';
-        }
-        return String(pred && (pred.section_type || pred.type) || '').toLowerCase();
+        if (canonical === 'singles') return rawType || 'secondary';
+
+        return rawType;
     }
 
     const DIRECT_MARKET_SPORTS = [
@@ -2181,55 +2184,41 @@
         return recommendation === '1x' || recommendation === 'x2' || recommendation === '12';
     }
 
-    function calculateSportTotal(sportCode, insights) {
+    function calculateSportTotal(sportCode, insights, activePlanId) {
+        const enforceEliteFloor = !INCLUDE_ALL_MODE && planRequiresEliteConfidenceFloor(activePlanId);
+        const eliteConfidenceFloor = 75;
+
         const scoped = (insights || []).filter((pred) => {
             const firstMatch = getPrimaryMatch(pred);
             const sportKey = normalizeSportForFilter(
-                pred && pred.sport
-                || firstMatch && firstMatch.sport
-                || firstMatch && firstMatch.metadata && (firstMatch.metadata.sport || firstMatch.metadata.sport_type)
-                || ''
+                pred.sport || (firstMatch && firstMatch.sport) || (firstMatch && firstMatch.metadata && (firstMatch.metadata.sport || firstMatch.metadata.sport_type)) || ''
             );
-            return sportKey === sportCode;
+            if (sportKey !== sportCode) return false;
+
+            // FIX: Ensure menu counts apply the same 75% floor as the tabs!
+            if (enforceEliteFloor && getPredictionConfidenceScore(pred) < eliteConfidenceFloor) return false;
+
+            return true;
         });
+
         const singles = scoped.filter((pred) => getPredictionLegCount(pred) === 1);
         const directPreds = selectDirectInsights(singles).filter((pred) => !isDoubleChancePrediction(pred));
-        const directKeys = new Set(directPreds.map((pred) => buildPredictionDisplayKey(pred)));
-
-        const secondaryCount = singles.filter((pred) => {
-            const type = getSectionType(pred);
-            if (type === 'same_match') return false;
-            if (directKeys.has(buildPredictionDisplayKey(pred))) return false;
-            return type === 'secondary' || type === 'secondary_multi' || type === 'single' || type === 'direct';
-        }).length;
+        const doubleChanceCount = scoped.filter((pred) => isDoubleChancePrediction(pred)).length;
 
         const multiCount = scoped.filter((pred) => {
-            const type = getSectionType(pred);
             const legs = getPredictionLegCount(pred);
-            if (type === 'same_match') return false;
-            return type === 'multi' || (legs >= 2 && legs <= 3);
+            return legs >= 2 && legs <= 3 && getSectionType(pred) !== 'same_match';
         }).length;
-
-        const sameMatchCount = scoped.filter((pred) => {
-            const type = getSectionType(pred);
-            const legs = getPredictionLegCount(pred);
-            if (legs <= 1) return false;
-            return type === 'same_match' || new Set((pred.matches || []).map((m) => String(m && m.match_id || '').trim()).filter(Boolean)).size === 1;
-        }).length;
-
-        const doubleChanceCount = scoped.filter((pred) => isDoubleChancePrediction(pred)).length;
-        const totalMarriedCount = directPreds.length + secondaryCount + multiCount;
 
         return {
-            totalMarriedCount,
+            totalMarriedCount: directPreds.length + doubleChanceCount + multiCount,
             directCount: directPreds.length,
-            secondaryCount: secondaryCount + multiCount,
-            sameMatchCount,
-            doubleChanceCount
+            secondaryCount: doubleChanceCount,
+            multiCount: multiCount
         };
     }
 
-    function renderDirectMarkets(predictions) {
+    function renderDirectMarkets(predictions, activePlanId) {
         const source = Array.isArray(sharedInsightsState) && sharedInsightsState.length
             ? sharedInsightsState
             : (Array.isArray(predictions) ? predictions : []);
@@ -2238,7 +2227,7 @@
             DIRECT_MARKET_SPORTS.forEach((sportDef) => {
                 const countEl = document.getElementById(`direct-${sportDef.key}-count`);
                 if (!countEl) return;
-                const totals = calculateSportTotal(sportDef.key, source);
+                const totals = calculateSportTotal(sportDef.key, source, activePlanId);
                 countEl.textContent = `(${totals.totalMarriedCount || 0})`;
             });
         } catch (error) {
@@ -2526,11 +2515,9 @@
                     supabaseFallbackStatus = 'missing_supabase_config';
                     return [];
                 }
-                const now = new Date();
-                const utcStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-                const utcEnd = new Date(utcStart.getTime() + (24 * 60 * 60 * 1000));
-                const utcStartIso = utcStart.toISOString();
-                const utcEndIso = utcEnd.toISOString();
+                // Look back 7 days to catch all upcoming fixtures in the DB
+                const lookbackDate = new Date(Date.now() - (7 * 24 * 60 * 60 * 1000));
+                const utcStartIso = lookbackDate.toISOString();
                 const PAGE_SIZE = 500;
                 const MAX_ROWS = 5000;
 
@@ -2541,7 +2528,6 @@
                         params.set('select', '*');
                         params.set('order', 'created_at.desc');
                         params.append('created_at', `gte.${utcStartIso}`);
-                        params.append('created_at', `lt.${utcEndIso}`);
                         params.set('limit', String(PAGE_SIZE));
                         params.set('offset', String(offset));
 
@@ -2692,7 +2678,7 @@
             if (preds.length > 0) {
                 sharedInsightsState = Array.isArray(preds) ? preds.slice() : [];
                 if (sport === 'direct-markets') {
-                    renderDirectMarkets(preds);
+                    renderDirectMarkets(preds, activePlanId);
                     return;
                 }
                 if (sport === 'football') {
@@ -2712,7 +2698,7 @@
             if (supaPreds && supaPreds.length > 0) {
                 sharedInsightsState = Array.isArray(supaPreds) ? supaPreds.slice() : [];
                 if (sport === 'direct-markets') {
-                    renderDirectMarkets(supaPreds);
+                    renderDirectMarkets(supaPreds, activePlanId);
                     return;
                 }
                 if (sport === 'football') {
@@ -2732,7 +2718,7 @@
 
             // Nothing found - show friendly message
             if (sport === 'direct-markets') {
-                renderDirectMarkets([]);
+                renderDirectMarkets([], activePlanId);
                 return;
             }
             if (sport === 'football') {
@@ -2754,7 +2740,7 @@
             if (supaPreds && supaPreds.length > 0) {
                 sharedInsightsState = Array.isArray(supaPreds) ? supaPreds.slice() : [];
                 if (sport === 'direct-markets') {
-                    renderDirectMarkets(supaPreds);
+                    renderDirectMarkets(supaPreds, activePlanId);
                     return;
                 }
                 if (sport === 'football') {
@@ -2772,7 +2758,7 @@
                 console.warn('[Insights] Supabase fallback denied by RLS/auth policy after backend error.');
             }
             if (sport === 'direct-markets') {
-                renderDirectMarkets([]);
+                renderDirectMarkets([], activePlanId);
                 return;
             }
             if (sport === 'football') {
