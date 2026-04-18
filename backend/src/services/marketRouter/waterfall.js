@@ -44,14 +44,15 @@ function resolveDecision(probabilitiesInput = {}) {
     const probabilities = normalizeProbabilities(probabilitiesInput);
     const engine_log = [];
 
-    // Phase 1: 1x2 Apex Test
+    // Phase 1: 1x2 Apex Selection (0-100% accepted for Direct markets)
     const apex = [
         { market: '1X2', prediction: 'home_win', display_market: 'Home Win (1)', value: probabilities.home_win },
+        { market: '1X2', prediction: 'draw', display_market: 'Draw (X)', value: probabilities.draw },
         { market: '1X2', prediction: 'away_win', display_market: 'Away Win (2)', value: probabilities.away_win }
     ].sort((a, b) => b.value - a.value)[0];
 
-    if (apex.value >= 0.75) {
-        engine_log.push(`Phase 1: ${apex.display_market} locked at ${toPct(apex.value)}% (>= 75% threshold).`);
+    if (apex && Number.isFinite(apex.value)) {
+        engine_log.push(`Phase 1: ${apex.display_market} selected at ${toPct(apex.value)}% (Direct 1X2 accepts 0-100%).`);
         return {
             status: 'locked',
             phase: 'phase_1_apex',
@@ -64,7 +65,7 @@ function resolveDecision(probabilitiesInput = {}) {
             probabilities
         };
     }
-    engine_log.push(`Phase 1: ${apex.display_market} rejected (Calculated at ${toPct(apex.value)}% - Below 75% threshold).`);
+    engine_log.push('Phase 1: No valid 1X2 apex candidate found from probabilities.');
 
     // Phase 2: Core Safe Pivot
     const safePivot = [

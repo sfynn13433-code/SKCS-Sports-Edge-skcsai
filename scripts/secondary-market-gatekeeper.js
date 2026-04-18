@@ -130,10 +130,13 @@ function generateEdgeMindReport(baselineProb, contextAdjustments, volatilityAdju
     // Stage 4: Decision Engine
     report += `\n\n🎯 **Stage 4 (Decision Engine):** Final confidence score: **${confidence}%**`;
     
-    // Secondary Market Pivot (CRITICAL: 50-68% trigger)
-    if (confidence >= 50 && confidence <= 68) {
-        report += `\n\n⚠️ **ADVISORY:** The Direct 1X2 market at ${confidence}% is classified as HIGH RISK. The volatility is too high for a confident straight bet.`;
-        report += `\n\n💡 **RECOMMENDATION:** Consider the Secondary Insights below - these have been filtered for markets with 76%+ confidence and represent much safer betting opportunities.`;
+    // Direct 1X2 risk messaging (4-tier framework)
+    if (confidence >= 59 && confidence <= 69) {
+        report += `\n\n⚠️ **ADVISORY:** The Direct 1X2 market at ${confidence}% is classified as HIGH RISK and volatile.`;
+        report += `\n\n💡 **RECOMMENDATION:** Pivot to the Secondary Insights below for safer options.`;
+    } else if (confidence >= 0 && confidence <= 58) {
+        report += `\n\n🛑 **CRITICAL WARNING:** The Direct 1X2 market at ${confidence}% is EXTREME RISK.`;
+        report += `\n\n🚫 **ACTION REQUIRED:** Do NOT place a direct market bet on this fixture. Use the Secondary Insights instead.`;
     }
     
     return report;
@@ -141,16 +144,16 @@ function generateEdgeMindReport(baselineProb, contextAdjustments, volatilityAdju
 
 /**
  * Validate Direct Market (1X2) prediction
- * Must be between 50% and 75% confidence
+ * Accepts full 0-100 confidence range
  */
 function validateDirectMarket(prediction) {
     const confidence = parseFloat(prediction.confidence) || 0;
     const allowedOutcomes = ['home', 'away', 'draw', '1', 'x', '2', 'home win', 'away win', 'draw'];
     
-    if (confidence < 50 || confidence > 75) {
+    if (confidence < 0 || confidence > 100) {
         return {
             valid: false,
-            reason: `Direct market confidence ${confidence}% is outside allowed range (50-75%)`
+            reason: `Direct market confidence ${confidence}% is outside allowed range (0-100%)`
         };
     }
     

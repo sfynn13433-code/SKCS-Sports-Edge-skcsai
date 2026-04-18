@@ -282,7 +282,7 @@ const SAFE_MARKETS_ALLOWED = Object.freeze(new Set([
     'team_not_to_score'
 ]));
 
-const DIRECT_CONFIDENCE_MIN = 35;
+const DIRECT_CONFIDENCE_MIN = 0;
 const SAFE_CONFIDENCE_MIN = 45;
 const ACCA_CONFIDENCE_MIN = 55;
 

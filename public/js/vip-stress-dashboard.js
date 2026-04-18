@@ -93,7 +93,11 @@
             prediction?.ai_insight
             ?? parsedMeta.ai_insight
             ?? contextIntell.ai_insight
-            ?? (confidence >= 75 ? 'VERIFIED_EDGE' : 'PENDING')
+            ?? (
+                confidence >= 80
+                    ? 'VERIFIED_EDGE'
+                    : (confidence >= 70 ? 'MODERATE_RISK' : (confidence >= 59 ? 'HIGH_RISK' : 'EXTREME_RISK'))
+            )
         );
         const status = String(statusRaw || 'PENDING').trim().toUpperCase();
 
@@ -128,11 +132,25 @@
             `);
         }
 
-        if (badgeState.status === 'EXPECTED_VARIANCE' || confidence < 75) {
+        if (confidence >= 70 && confidence < 80) {
+            parts.push(`
+                <div class="intel-badge weather">
+                  <span class="intel-icon">📊</span>
+                  Moderate Risk: ${confidence.toFixed(1)}% (Review context before staking)
+                </div>
+            `);
+        } else if (badgeState.status === 'EXPECTED_VARIANCE' || (confidence >= 59 && confidence < 70)) {
             parts.push(`
                 <div class="intel-badge filtered">
-                  <span class="intel-icon">🛡️</span>
-                  Filtered: ${confidence.toFixed(1)}% (Failed 75% Gate)
+                  <span class="intel-icon">⚠️</span>
+                  High Risk: ${confidence.toFixed(1)}% (Pivot to Secondary Insights)
+                </div>
+            `);
+        } else if (confidence < 59) {
+            parts.push(`
+                <div class="intel-badge filtered">
+                  <span class="intel-icon">🛑</span>
+                  Extreme Risk: ${confidence.toFixed(1)}% (Do not bet direct 1X2)
                 </div>
             `);
         }

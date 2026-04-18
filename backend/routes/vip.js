@@ -342,7 +342,7 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
             const confidencePct = getPredictionConfidencePercent(row);
             const passesEliteFloor = confidencePct >= ELITE_CONFIDENCE_FLOOR;
 
-            if (row.section_type === 'direct' && (includeAll || passesEliteFloor)) buckets.direct.push(row);
+            if (row.section_type === 'direct') buckets.direct.push(row);
             else if (row.section_type === 'secondary' && (includeAll || passesEliteFloor)) buckets.analytical_insights.push(row);
             else if (row.section_type === 'multi' && passesEliteFloor) buckets.multi.push(row);
             else if (row.section_type === 'same_match' && passesEliteFloor && (includeAll || row.validation_matrix?.valid === true)) buckets.same_match.push(row);

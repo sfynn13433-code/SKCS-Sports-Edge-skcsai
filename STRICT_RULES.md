@@ -46,8 +46,12 @@ FAILURE TO FOLLOW THESE RULES WILL RESULT IN CASCADING SYSTEM FAILURES. READ, VE
 
 **2. Direct Market Rules (1X2):**
 * **Allowed:** Home Win (1), Away Win (2), Draw (X).
-* **Thresholds:** Must have a confidence score between 50% and 75%.
-* **Warning Logic:** If a Direct Market scores between 50% and 68%, the UI must flag it as "High Risk / Not a Safe Bet" and advise the user to select from the Secondary Insights instead.
+* **Confidence Range:** Direct 1X2 accepts the full range from **0% to 100%**.
+* **4-Tier Risk Framework (MANDATORY):**
+  * **80% - 100%:** ✅ High Confidence / Safe (Green)
+  * **70% - 79%:** 📊 Moderate Risk (Blue)
+  * **59% - 69%:** ⚠️ High Risk / Volatile (Orange) — UI and EdgeMind Bot MUST warn users to pivot to Secondary Insights.
+  * **0% - 58%:** 🛑 Extreme Risk / Danger (Red) — UI and EdgeMind Bot MUST explicitly instruct users NOT to bet the direct market and to use Secondary Insights.
 
 **3. Secondary Market Rules:**
 * **Thresholds:** MUST have a confidence score of 76% or higher.
@@ -70,4 +74,6 @@ FAILURE TO FOLLOW THESE RULES WILL RESULT IN CASCADING SYSTEM FAILURES. READ, VE
   2. **Stage 2 (Deep Context):** Explain adjustments based on team/player intelligence.
   3. **Stage 3 (Reality Check):** Explain adjustments based on external volatility (weather, news).
   4. **Stage 4 (Decision Engine):** State the final confidence percentage.
-* **The Secondary Market Pivot (CRITICAL):** If the final confidence score lands between 50% and 68%, the bot MUST conclude its report by conversationally advising the user that the Direct 1X2 market is too volatile and explicitly direct their attention to the safer Secondary Insights.
+* **Risk Messaging Rules (CRITICAL):**
+  * If final confidence is **59% - 69%**, the report MUST classify Direct 1X2 as high risk/volatile and advise a pivot to Secondary Insights.
+  * If final confidence is **0% - 58%**, the report MUST classify Direct 1X2 as extreme risk and explicitly instruct the user not to bet the direct market and to use Secondary Insights instead.

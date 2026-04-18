@@ -2130,7 +2130,11 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             && !isAdminAudit
             && planRequiresEliteConfidenceFloor(planId, planCapabilities);
         const eliteFloorPredictions = enforceEliteFloor
-            ? planFilteredPredictions.filter((prediction) => getPredictionConfidencePercent(prediction) >= ELITE_CONFIDENCE_FLOOR)
+            ? planFilteredPredictions.filter((prediction) => {
+                const sectionType = inferSectionType(prediction);
+                if (sectionType === 'direct') return true;
+                return getPredictionConfidencePercent(prediction) >= ELITE_CONFIDENCE_FLOOR;
+            })
             : planFilteredPredictions;
         stageCounts.elite_floor_rows = eliteFloorPredictions.length;
 

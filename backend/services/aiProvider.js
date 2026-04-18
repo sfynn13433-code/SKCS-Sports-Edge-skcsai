@@ -205,7 +205,11 @@ EDGEMIND REPORT RULES (CRITICAL):
 3. Stage 3 (Reality Check): Explain adjustments based on weather/news/form
 4. Stage 4 (Decision Engine): State the final confidence percentage
 
-IMPORTANT: If final confidence is between 50-68%, you MUST advise that Direct 1X2 is HIGH RISK and recommend Secondary Insights instead.
+IMPORTANT Direct 1X2 risk rules:
+- 80-100%: High Confidence / Safe.
+- 70-79%: Moderate Risk.
+- 59-69%: High Risk. Advise user to pivot to Secondary Insights.
+- 0-58%: Extreme Risk. Explicitly tell user NOT to bet direct 1X2 and to use Secondary Insights.
 
 Output ONLY valid JSON with this exact structure:
 {
