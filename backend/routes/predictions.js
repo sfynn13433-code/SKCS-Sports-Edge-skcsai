@@ -2192,7 +2192,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
 
         const scopedWithTiming = scopedPredictions.map((prediction) => decoratePredictionWithTiming(prediction, now));
 
-        const planFilteredPredictions = includeAll
+        const planFilteredPredictions = (includeAll || isAdminAudit)
             ? scopedWithTiming.slice(0, 2500)
             : filterPredictionsForPlan(
                 scopedWithTiming,

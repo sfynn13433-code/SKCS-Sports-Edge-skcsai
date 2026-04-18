@@ -1954,18 +1954,16 @@
                 .sort((a, b) => getPredictionConfidenceScore(b) - getPredictionConfidenceScore(a));
         }
         
-        const byMatchId = new Map();
-        candidates.forEach((pred) => {
-            const firstMatch = getPrimaryMatch(pred);
-            const matchId = String(firstMatch && firstMatch.match_id || '').trim();
-            const key = matchId || `no-match-${buildPredictionDisplayKey(pred)}`;
-            const existing = byMatchId.get(key);
-            if (!existing || getPredictionConfidenceScore(pred) > getPredictionConfidenceScore(existing)) {
-                byMatchId.set(key, pred);
-            }
+        const seen = new Set();
+        const shaped = [];
+        candidates.forEach((pred, idx) => {
+            const key = buildPredictionDisplayKey(pred) || `direct-fallback-${idx}`;
+            if (seen.has(key)) return;
+            seen.add(key);
+            shaped.push(pred);
         });
 
-        return Array.from(byMatchId.values()).sort((a, b) => getPredictionConfidenceScore(b) - getPredictionConfidenceScore(a));
+        return shaped.sort((a, b) => getPredictionConfidenceScore(b) - getPredictionConfidenceScore(a));
     }
 
     function getPredictionEngineLog(pred) {
@@ -2112,12 +2110,26 @@
 
     function buildPredictionDisplayKey(pred) {
         const matches = Array.isArray(pred && pred.matches) ? pred.matches : [];
+        const firstMatch = matches[0] || {};
+        const rowId = String(pred && (pred.id || pred.prediction_id || pred.uuid || pred.pk || '') || '').trim();
+        const matchId = String(firstMatch && (firstMatch.match_id || firstMatch.fixture_id || '') || '').trim();
+        const homeTeam = String(resolveMatchTeamName(firstMatch, 'home') || '').trim().toLowerCase();
+        const awayTeam = String(resolveMatchTeamName(firstMatch, 'away') || '').trim().toLowerCase();
+        const kickoff = String(
+            firstMatch && (
+                firstMatch.commence_time
+                || firstMatch.match_date
+                || (firstMatch.metadata && (firstMatch.metadata.match_time || firstMatch.metadata.kickoff || firstMatch.metadata.kickoff_time))
+                || ''
+            ) || ''
+        ).trim();
+        const createdAt = String(pred && pred.created_at || '').trim();
         const legs = matches.map((match) => [
             String(match && match.match_id || '').trim(),
             normalizeMarketKey(match && match.market),
             String(match && match.prediction || '').trim().toLowerCase()
         ].join(':')).join('|');
-        return `${String(pred && pred.tier || '').toLowerCase()}::${getSectionType(pred)}::${legs}`;
+        return `${rowId || 'no-row-id'}::${String(pred && pred.tier || '').toLowerCase()}::${getSectionType(pred)}::${matchId}::${homeTeam}::${awayTeam}::${kickoff}::${createdAt}::${legs}`;
     }
 
     function dedupePredictionFeed(predictions) {
@@ -2126,8 +2138,8 @@
         }
         const seen = new Set();
         const out = [];
-        (predictions || []).forEach((pred) => {
-            const key = buildPredictionDisplayKey(pred);
+        (predictions || []).forEach((pred, idx) => {
+            const key = buildPredictionDisplayKey(pred) || `prediction-fallback-${idx}`;
             if (!key || seen.has(key)) return;
             seen.add(key);
             out.push(pred);
@@ -2577,6 +2589,7 @@
         if (!accessToken) return;
 
         const activePlanId = resolveUserPlanId(userPlanId);
+        const useIncludeAllRequest = INCLUDE_ALL_MODE || window.SKCS_ADMIN_UNLOCKED === true;
         window.currentUserPlanId = activePlanId;
         const isDirectMarketsTab = sport === 'direct-markets';
         const container = isDirectMarketsTab ? null : document.getElementById(sport + '-matches');
@@ -2666,7 +2679,7 @@
                 const allowedTiers = getPredictionTiersForPlan(activePlanId);
                 const filtered = (rows || []).filter(r => {
                     const rowTier = String(r.tier || 'normal').toLowerCase();
-                    if (!INCLUDE_ALL_MODE) {
+                    if (!useIncludeAllRequest) {
                         if (!allowedTiers.includes(rowTier)) return false;
                         if (!predictionAllowsPlanAccess(r, activePlanId)) return false;
                         if (!predictionHasUpcomingKickoffs(r)) return false;
@@ -2697,7 +2710,7 @@
             if (requestSport) {
                 url += `&sport=${requestSport}`;
             }
-            if (INCLUDE_ALL_MODE) {
+            if (useIncludeAllRequest) {
                 url += '&include_all=1';
             }
 
@@ -2735,7 +2748,7 @@
                 if (requestSport) {
                     urlN += `&sport=${requestSport}`;
                 }
-                if (INCLUDE_ALL_MODE) {
+                if (useIncludeAllRequest) {
                     urlN += '&include_all=1';
                 }
                 const r2 = await fetch(urlN, {
@@ -2896,7 +2909,12 @@
         }
 
         items.forEach((item, idx) => {
-            section.appendChild(renderer(item, 'football', `${sectionId}-${idx}`));
+            try {
+                const card = renderer(item, 'football', `${sectionId}-${idx}`);
+                if (card) section.appendChild(card);
+            } catch (error) {
+                console.error(`[${sectionId}] Failed to render item at index ${idx}:`, error, item);
+            }
         });
     }
 
@@ -3025,8 +3043,12 @@
             directGrid.className = 'prediction-grid';
             
             directSingles.forEach((pred, idx) => {
-                const card = createPredictionCard(pred, sport, `direct-${idx}`);
-                directGrid.appendChild(card);
+                try {
+                    const card = createPredictionCard(pred, sport, `direct-${idx}`);
+                    if (card) directGrid.appendChild(card);
+                } catch (error) {
+                    console.error(`[renderSport:${sport}] Failed to render direct item at index ${idx}:`, error, pred);
+                }
             });
             
             directSection.appendChild(directGrid);
@@ -3050,8 +3072,12 @@
             multiGrid.className = 'prediction-grid';
             
             multiPreds.forEach((pred, idx) => {
-                const card = createMultiCard(pred, sport, `multi-${idx}`);
-                multiGrid.appendChild(card);
+                try {
+                    const card = createMultiCard(pred, sport, `multi-${idx}`);
+                    if (card) multiGrid.appendChild(card);
+                } catch (error) {
+                    console.error(`[renderSport:${sport}] Failed to render multi item at index ${idx}:`, error, pred);
+                }
             });
             
             multiSection.appendChild(multiGrid);
@@ -3072,8 +3098,12 @@
             sameMatchGrid.className = 'prediction-grid';
 
             sameMatchPreds.forEach((pred, idx) => {
-                const card = createMultiCard(pred, sport, `same-match-${idx}`);
-                sameMatchGrid.appendChild(card);
+                try {
+                    const card = createMultiCard(pred, sport, `same-match-${idx}`);
+                    if (card) sameMatchGrid.appendChild(card);
+                } catch (error) {
+                    console.error(`[renderSport:${sport}] Failed to render same-match item at index ${idx}:`, error, pred);
+                }
             });
 
             sameMatchSection.appendChild(sameMatchGrid);
@@ -3090,8 +3120,12 @@
             accaGrid.className = 'prediction-grid';
             
             accas.forEach((pred, idx) => {
-                const card = createAccaCard(pred, sport, `acca-${idx}`);
-                accaGrid.appendChild(card);
+                try {
+                    const card = createAccaCard(pred, sport, `acca-${idx}`);
+                    if (card) accaGrid.appendChild(card);
+                } catch (error) {
+                    console.error(`[renderSport:${sport}] Failed to render acca item at index ${idx}:`, error, pred);
+                }
             });
             
             accaSection.appendChild(accaGrid);
