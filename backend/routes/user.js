@@ -1,13 +1,38 @@
 'use strict';
 
 const express = require('express');
-const { getPredictionsByTier } = require('../database');
+const { getPredictionsByTier, getProfileById } = require('../database');
 const { requireSupabaseUser, requireActiveSubscription } = require('../middleware/supabaseJwt');
 const config = require('../config');
 const { getTierKeyForPlan } = require('../config/subscriptionPlans');
 const { filterPredictionsForSubscriptionAccess } = require('../services/subscriptionTiming');
 
 const router = express.Router();
+
+router.get('/subscription-summary', requireSupabaseUser, async (req, res) => {
+    try {
+        const profile = await getProfileById(req.user?.id);
+        const planId = req.user?.plan_id || profile?.plan_id || null;
+        const planTier = req.user?.plan_tier || profile?.plan_tier || null;
+        const planExpiresAt = req.user?.plan_expires_at || profile?.plan_expires_at || null;
+        const firstName =
+            req.user?.first_name
+            || profile?.first_name
+            || (typeof req.user?.email === 'string' ? req.user.email.split('@')[0] : null);
+
+        res.status(200).json({
+            first_name: firstName,
+            email: req.user?.email || null,
+            plan_id: planId,
+            plan_tier: planTier,
+            plan_expires_at: planExpiresAt,
+            subscription_status: req.user?.subscription_status || profile?.subscription_status || 'inactive'
+        });
+    } catch (error) {
+        console.error('SUBSCRIPTION SUMMARY ERROR:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 router.get('/predictions', requireSupabaseUser, requireActiveSubscription, async (req, res) => {
     try {
