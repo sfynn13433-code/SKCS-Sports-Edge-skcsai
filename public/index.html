@@ -1900,38 +1900,39 @@
         const type = getSectionType(pred);
         const legCount = getPredictionLegCount(pred);
         if (legCount !== 1) return false;
-        
+
         const firstMatch = getPrimaryMatch(pred);
         const market = firstMatch ? getMatchMarket(firstMatch) : '';
-        const normalizedMarket = normalizeMarketKey(market);
-        
-        const is1X2Market = normalizedMarket === '1x2' || 
-                            normalizedMarket === 'match_result' ||
-                            normalizedMarket === 'home_win' ||
-                            normalizedMarket === 'away_win' ||
-                            normalizedMarket === 'draw' ||
-                            normalizedMarket === '1x2' ||
-                            normalizedMarket === '1x2' ||
-                            normalizedMarket.includes('1x2') ||
-                            normalizedMarket === 'matchwinner' ||
-                            normalizedMarket === 'result';
-        
-        if (hasFinalRecommendation(pred)) return true;
-        if (type === 'direct' || type === 'single') return is1X2Market || true;
-        return !type;
+
+        if (is1X2Market(market)) return true;
+        if (type && type !== 'direct' && type !== 'single') return false;
+
+        const recommendation = String(getMatchRecommendation(firstMatch) || '').trim().toLowerCase();
+        return recommendation === 'home_win'
+            || recommendation === 'away_win'
+            || recommendation === 'draw'
+            || recommendation === 'home'
+            || recommendation === 'away'
+            || recommendation === 'x';
     }
 
     function is1X2Market(market) {
         const normalizedMarket = normalizeMarketKey(market);
-        return normalizedMarket === '1x2' || 
-               normalizedMarket === 'match_result' ||
-               normalizedMarket === 'home_win' ||
-               normalizedMarket === 'away_win' ||
-               normalizedMarket === 'draw' ||
-               normalizedMarket.includes('1x2') ||
-               normalizedMarket === 'matchwinner' ||
-               normalizedMarket === 'result' ||
-               normalizedMarket === 'full_time_result';
+        if (!normalizedMarket) return false;
+        if (normalizedMarket.includes('double_chance')) return false;
+        return normalizedMarket === '1x2'
+            || normalizedMarket === '1_x_2'
+            || normalizedMarket === 'match_result'
+            || normalizedMarket === 'full_time_result'
+            || normalizedMarket === 'fulltime_result'
+            || normalizedMarket === 'matchwinner'
+            || normalizedMarket === 'match_winner'
+            || normalizedMarket === 'winner'
+            || normalizedMarket === 'result'
+            || normalizedMarket === 'moneyline'
+            || normalizedMarket === 'h2h'
+            || normalizedMarket === 'three_way'
+            || normalizedMarket.includes('1x2');
     }
 
     function selectDirectInsights(predictions) {
@@ -2028,7 +2029,11 @@
     }
 
     function normalizeMarketKey(value) {
-        return String(value || '').trim().toLowerCase();
+        return String(value || '')
+            .trim()
+            .toLowerCase()
+            .replace(/[\s-]+/g, '_')
+            .replace(/_+/g, '_');
     }
 
     function formatMarketSelectionLabel(market, prediction) {
@@ -2517,6 +2522,46 @@
         return shaped;
     }
 
+    function buildClientDirectCountSnapshot(predictions) {
+        const bySport = {};
+        let total = 0;
+
+        (predictions || []).forEach((pred) => {
+            if (getPredictionLegCount(pred) !== 1) return;
+            if (!isDirectInsightCandidate(pred)) return;
+
+            const firstMatch = getPrimaryMatch(pred);
+            const sportKey = normalizeSportForFilter(
+                pred.sport
+                || (firstMatch && firstMatch.sport)
+                || (firstMatch && firstMatch.metadata && (firstMatch.metadata.sport || firstMatch.metadata.sport_type))
+                || ''
+            );
+            if (!sportKey) return;
+
+            bySport[sportKey] = Number(bySport[sportKey] || 0) + 1;
+            total += 1;
+        });
+
+        return { total, by_sport: bySport };
+    }
+
+    function syncDirectCountTargets(snapshot) {
+        if (!snapshot || typeof snapshot !== 'object') return;
+
+        window.__SKCS_DIRECT_COUNTS__ = snapshot;
+        const bySport = snapshot.by_sport && typeof snapshot.by_sport === 'object'
+            ? snapshot.by_sport
+            : {};
+        const footballCount = Number(bySport.football || 0);
+
+        const directMenu = document.getElementById('direct-football-count');
+        if (directMenu) directMenu.textContent = `(${footballCount})`;
+
+        const footballTabDirect = document.getElementById('football-direct-count');
+        if (footballTabDirect) footballTabDirect.textContent = String(footballCount);
+    }
+
     function resolveUserPlanId(userPlanId) {
         let storedPlan = '';
         try {
@@ -2681,6 +2726,9 @@
             console.log('[API] accessToken:', accessToken ? 'present' : 'missing');
 
             let preds = (response.ok && data && Array.isArray(data.predictions)) ? data.predictions : [];
+            let directCounterSnapshot = (data && data.direct_market_counts && typeof data.direct_market_counts === 'object')
+                ? data.direct_market_counts
+                : null;
 
             if (preds.length === 0 && activePlanId.includes('elite')) {
                 let urlN = `${SKCS_BACKEND}/api/predictions?plan_id=core_30day_limitless&history_days=0&window_days=14&_ts=${cacheBust}`;
@@ -2707,25 +2755,35 @@
                 console.log('[API] Fallback response status:', r2.status, 'predictions:', d2?.predictions?.length || 0);
                 if (r2.ok && d2 && Array.isArray(d2.predictions) && d2.predictions.length > 0) {
                     preds = d2.predictions;
+                    if (d2.direct_market_counts && typeof d2.direct_market_counts === 'object') {
+                        directCounterSnapshot = d2.direct_market_counts;
+                    }
                 }
             }
 
             // If backend returned predictions use them
             if (preds.length > 0) {
                 sharedInsightsState = Array.isArray(preds) ? preds.slice() : [];
+                if (!directCounterSnapshot) {
+                    directCounterSnapshot = buildClientDirectCountSnapshot(preds);
+                }
                 if (sport === 'direct-markets') {
                     renderDirectMarkets(preds, activePlanId);
+                    syncDirectCountTargets(directCounterSnapshot);
                     return;
                 }
                 if (sport === 'football') {
                     renderFootballInsights(preds, activePlanId);
+                    syncDirectCountTargets(directCounterSnapshot);
                     return;
                 }
                 if (sport === 'accumulators') {
                     renderAccumulatorInsights(preds, data && data.plan_meta ? data.plan_meta : null);
+                    syncDirectCountTargets(directCounterSnapshot);
                     return;
                 }
                 renderSport(sport, sport + '-matches', preds, activePlanId);
+                syncDirectCountTargets(directCounterSnapshot);
                 return;
             }
 
@@ -2733,19 +2791,24 @@
             const supaPreds = await fetchFromSupabase();
             if (supaPreds && supaPreds.length > 0) {
                 sharedInsightsState = Array.isArray(supaPreds) ? supaPreds.slice() : [];
+                const fallbackDirectCounts = buildClientDirectCountSnapshot(supaPreds);
                 if (sport === 'direct-markets') {
                     renderDirectMarkets(supaPreds, activePlanId);
+                    syncDirectCountTargets(fallbackDirectCounts);
                     return;
                 }
                 if (sport === 'football') {
                     renderFootballInsights(supaPreds, activePlanId);
+                    syncDirectCountTargets(fallbackDirectCounts);
                     return;
                 }
                 if (sport === 'accumulators') {
                     renderAccumulatorInsights(supaPreds, null);
+                    syncDirectCountTargets(fallbackDirectCounts);
                     return;
                 }
                 renderSport(sport, sport + '-matches', supaPreds, activePlanId);
+                syncDirectCountTargets(fallbackDirectCounts);
                 return;
             }
             if (supabaseFallbackStatus === 'rls_or_auth_denied') {
@@ -2755,14 +2818,17 @@
             // Nothing found - show friendly message
             if (sport === 'direct-markets') {
                 renderDirectMarkets([], activePlanId);
+                syncDirectCountTargets({ total: 0, by_sport: {} });
                 return;
             }
             if (sport === 'football') {
                 renderFootballInsights([]);
+                syncDirectCountTargets({ total: 0, by_sport: {} });
                 return;
             }
             if (sport === 'accumulators') {
                 renderAccumulatorInsights([], null);
+                syncDirectCountTargets({ total: 0, by_sport: {} });
                 return;
             }
             if (container) {
@@ -2775,19 +2841,24 @@
             const supaPreds = await fetchFromSupabase();
             if (supaPreds && supaPreds.length > 0) {
                 sharedInsightsState = Array.isArray(supaPreds) ? supaPreds.slice() : [];
+                const fallbackDirectCounts = buildClientDirectCountSnapshot(supaPreds);
                 if (sport === 'direct-markets') {
                     renderDirectMarkets(supaPreds, activePlanId);
+                    syncDirectCountTargets(fallbackDirectCounts);
                     return;
                 }
                 if (sport === 'football') {
                     renderFootballInsights(supaPreds, activePlanId);
+                    syncDirectCountTargets(fallbackDirectCounts);
                     return;
                 }
                 if (sport === 'accumulators') {
                     renderAccumulatorInsights(supaPreds, null);
+                    syncDirectCountTargets(fallbackDirectCounts);
                     return;
                 }
                 renderSport(sport, sport + '-matches', supaPreds, activePlanId);
+                syncDirectCountTargets(fallbackDirectCounts);
                 return;
             }
             if (supabaseFallbackStatus === 'rls_or_auth_denied') {
@@ -2795,14 +2866,17 @@
             }
             if (sport === 'direct-markets') {
                 renderDirectMarkets([], activePlanId);
+                syncDirectCountTargets({ total: 0, by_sport: {} });
                 return;
             }
             if (sport === 'football') {
                 renderFootballInsights([]);
+                syncDirectCountTargets({ total: 0, by_sport: {} });
                 return;
             }
             if (sport === 'accumulators') {
                 renderAccumulatorInsights([], null);
+                syncDirectCountTargets({ total: 0, by_sport: {} });
                 return;
             }
             if (container) {

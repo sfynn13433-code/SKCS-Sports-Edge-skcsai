@@ -360,22 +360,37 @@ BEGIN
         RETURN '';
     END IF;
 
-    IF v_market IN ('1x2', 'match_result', 'full_time_result', 'matchwinner', 'result') THEN
+    v_market := REGEXP_REPLACE(v_market, '[_\-\s]+', '_', 'g');
+
+    IF v_market IN (
+        '1x2', '1_x_2',
+        'match_result',
+        'full_time_result', 'fulltime_result',
+        'matchwinner', 'match_winner',
+        'winner', 'result',
+        'moneyline', 'h2h', 'three_way'
+    ) OR v_market LIKE '%1x2%' THEN
         RETURN '1x2';
     END IF;
-    IF v_market LIKE 'double_chance%' OR v_market IN ('1x', 'x2', '12') THEN
+    IF v_market LIKE 'double_chance%' OR v_market IN ('1x', 'x2', '12', 'dc_1x', 'dc_x2', 'dc_12') THEN
         RETURN 'double_chance';
     END IF;
     IF v_market LIKE 'btts%' OR v_market = 'both_teams_to_score' THEN
         RETURN 'btts';
     END IF;
-    IF v_market LIKE 'corners_%' THEN
+    IF v_market LIKE 'corners_%' OR v_market LIKE '%_corners' THEN
         RETURN 'corners_ou';
     END IF;
     IF v_market LIKE '%yellow%' OR v_market LIKE '%cards%' THEN
         RETURN 'yellow_cards_ou';
     END IF;
-    IF v_market LIKE 'over_%' OR v_market LIKE 'under_%' OR v_market = 'over_under' OR v_market = 'over_under_goals' THEN
+    IF v_market LIKE 'over_%'
+       OR v_market LIKE 'under_%'
+       OR v_market LIKE 'totals_%'
+       OR v_market = 'over_under'
+       OR v_market = 'over_under_goals'
+       OR v_market = 'goal_totals'
+    THEN
         RETURN 'over_under_goals';
     END IF;
 

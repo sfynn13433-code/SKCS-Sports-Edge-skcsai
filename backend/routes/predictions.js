@@ -25,6 +25,7 @@ const router = express.Router();
 const SPORT_FILTER_MAP = {
     football: [
         'football',
+        'soccer',
         'soccer_epl',
         'soccer_england_efl_cup',
         'soccer_uefa_champs_league',
@@ -98,6 +99,7 @@ function startOfWeekUtc(now = new Date()) {
 function normalizePredictionSportKey(value) {
     const key = String(value || '').trim().toLowerCase();
     if (!key) return 'unknown';
+    if (key === 'soccer' || key === 'football' || key.startsWith('football_')) return 'football';
     if (key.startsWith('soccer_')) return 'football';
     if (key.startsWith('icehockey_')) return 'hockey';
     if (key.startsWith('basketball_')) return 'basketball';
@@ -619,7 +621,83 @@ function parseLooseDateTime(value) {
 }
 
 function normalizeMarketKey(value) {
-    return String(value || '').trim().toLowerCase();
+    return String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[\s-]+/g, '_')
+        .replace(/_+/g, '_');
+}
+
+function isDirectOutcomeToken(value) {
+    const token = String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[\s-]+/g, '_');
+    return token === 'home' || token === 'home_win' || token === '1'
+        || token === 'draw' || token === 'x'
+        || token === 'away' || token === 'away_win' || token === '2';
+}
+
+function isDirect1X2Market(value) {
+    const key = normalizeMarketKey(value);
+    if (!key) return false;
+    if (key.includes('double_chance')) return false;
+    if (key === '1x2' || key === '1_x_2') return true;
+    if (key === 'match_result' || key === 'full_time_result' || key === 'fulltime_result') return true;
+    if (key === 'matchwinner' || key === 'match_winner' || key === 'winner') return true;
+    if (key === 'moneyline' || key === 'h2h' || key === 'three_way') return true;
+    if (key.includes('1x2')) return true;
+    return false;
+}
+
+function extractPrimaryMatch(prediction) {
+    return Array.isArray(prediction?.matches) && prediction.matches[0] ? prediction.matches[0] : null;
+}
+
+function shouldCountAsDirectMarket(prediction) {
+    const firstMatch = extractPrimaryMatch(prediction);
+    if (!firstMatch) return false;
+    if (Array.isArray(prediction?.matches) && prediction.matches.length !== 1) return false;
+
+    const market = firstMatch.market || firstMatch.market_type || firstMatch?.metadata?.market || firstMatch?.metadata?.market_type || '';
+    if (isDirect1X2Market(market)) return true;
+
+    const sectionType = inferSectionType(prediction);
+    if (sectionType !== 'direct' && sectionType !== 'single') return false;
+
+    const outcome = firstMatch.recommendation
+        || firstMatch.prediction
+        || firstMatch.pick
+        || firstMatch.selection
+        || firstMatch.outcome
+        || firstMatch?.metadata?.recommendation
+        || firstMatch?.metadata?.prediction
+        || firstMatch?.metadata?.pick
+        || firstMatch?.metadata?.selection
+        || firstMatch?.metadata?.predicted_outcome
+        || '';
+    return isDirectOutcomeToken(outcome);
+}
+
+function buildDirectMarketCountsSnapshot(predictions) {
+    const bySport = {};
+    let total = 0;
+
+    for (const prediction of Array.isArray(predictions) ? predictions : []) {
+        if (!shouldCountAsDirectMarket(prediction)) continue;
+        const firstMatch = extractPrimaryMatch(prediction) || {};
+        const sportKey = normalizePredictionSportKey(
+            firstMatch.sport
+            || firstMatch?.metadata?.sport
+            || firstMatch?.metadata?.sport_type
+            || prediction?.sport
+            || ''
+        );
+        bySport[sportKey] = Number(bySport[sportKey] || 0) + 1;
+        total += 1;
+    }
+
+    return { total, by_sport: bySport };
 }
 
 function humanizePredictionLabel(prediction, market) {
@@ -2091,6 +2169,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             return isDisplayFriendlySecondaryMarket(firstMatch?.market);
         });
         stageCounts.display_filtered_rows = displayFilteredPredictions.length;
+        const directMarketCountsSnapshot = buildDirectMarketCountsSnapshot(displayFilteredPredictions);
 
         let upcomingGatePredictions = displayFilteredPredictions;
         let staleGatePredictions = displayFilteredPredictions;
@@ -2164,6 +2243,10 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             subscription_tier_excluded: Math.max(0, stageCounts.elite_floor_rows - stageCounts.subscription_tier_filtered_rows)
         };
 
+        res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.set('Pragma', 'no-cache');
+        res.set('Expires', '0');
+
         res.status(200).json({
             plan_id: planId,
             sport: sport || 'all',
@@ -2186,6 +2269,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                 mega_acca_constraints: planCapabilities.capabilities?.mega_acca_constraints || null,
                 mega_acca_policy: planCapabilities.capabilities?.mega_acca_policy || null
             },
+            direct_market_counts: directMarketCountsSnapshot,
             read_path_diagnostics: {
                 server_now_utc: now.toISOString(),
                 server_now_sast: moment.tz(now, 'Africa/Johannesburg').format(),

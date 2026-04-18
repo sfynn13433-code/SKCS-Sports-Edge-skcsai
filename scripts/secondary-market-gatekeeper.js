@@ -274,7 +274,6 @@ function processPredictionWithGovernance(rawPrediction) {
             const topFour = filteredSecondary.slice(0, EXTREME_SECONDARY_COUNT);
             result.secondary_insights = topFour;
             if (topFour.length !== EXTREME_SECONDARY_COUNT) {
-                result.direct_market = null;
                 result.warnings.push(
                     `Extreme risk enforcement failed: exactly ${EXTREME_SECONDARY_COUNT} secondary markets (>=${SECONDARY_MIN_CONFIDENCE}% and allowlisted) are required.`
                 );

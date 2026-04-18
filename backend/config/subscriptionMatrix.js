@@ -490,6 +490,7 @@ function getBaselinePlan(family = 'elite') {
 function normalizeSportName(value) {
     const sport = String(value || '').trim().toLowerCase();
     if (!sport) return '';
+    if (sport === 'soccer' || sport === 'football' || sport.startsWith('football_')) return 'football';
     if (sport.startsWith('soccer_')) return 'football';
     if (sport.startsWith('icehockey_')) return 'hockey';
     if (sport.startsWith('basketball_')) return 'basketball';
@@ -502,7 +503,11 @@ function normalizeSportName(value) {
 }
 
 function normalizeMarketName(value) {
-    return String(value || '').trim().toLowerCase();
+    return String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[\s-]+/g, '_')
+        .replace(/_+/g, '_');
 }
 
 function getPlanAccessLevel(planId) {
