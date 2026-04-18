@@ -1175,6 +1175,16 @@
         elite_14: '14-Day Deep Pro',
         elite_30: '30-Day Deep VIP'
     });
+    const ADMIN_AUDIT_PLAN_IDS = Object.freeze([
+        'core_4day_sprint',
+        'core_9day_run',
+        'core_14day_pro',
+        'core_30day_limitless',
+        'elite_4day_deep_dive',
+        'elite_9day_deep_strike',
+        'elite_14day_deep_pro',
+        'elite_30day_deep_vip'
+    ]);
 
     function getStoredPlanId() {
         try {
@@ -1269,6 +1279,111 @@
         const dayText = daysLeft === 1 ? '1 day' : `${daysLeft !== null ? daysLeft : 0} days`;
         const firstName = getGreetingName(session, summary);
         setSubscriptionGreeting(`Hi ${firstName}, you are subscribed to the ${planLabel} - you have ${dayText} left`);
+    }
+
+    async function fetchAdminQuotaSnapshot(planId, accessToken) {
+        const response = await fetch(
+            `${SKCS_BACKEND}/api/predictions?plan_id=${encodeURIComponent(planId)}&history_days=0&window_days=14&_ts=${Date.now()}`,
+            {
+                method: 'GET',
+                cache: 'no-store',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            }
+        );
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        const payload = await response.json();
+        const daily = payload?.plan_meta?.daily_limits || {};
+        const plan = payload?.plan_meta?.plan || {};
+        return {
+            planId,
+            predictionCount: Array.isArray(payload?.predictions) ? payload.predictions.length : 0,
+            dailyLimits: daily,
+            megaDaily: Number(plan.mega_acca_daily_allocation || 0)
+        };
+    }
+
+    function formatAdminQuotaLine(snapshot) {
+        const limits = snapshot.dailyLimits || {};
+        const label = getPlanDisplayLabel(snapshot.planId) || snapshot.planId;
+        return `${label}: direct ${Number(limits.direct || 0)}, secondary ${Number(limits.secondary || 0)}, multi ${Number(limits.multi || 0)}, same-match ${Number(limits.same_match || 0)}, acca6 ${Number(limits.acca_6match || 0)}, mega12 ${Number(snapshot.megaDaily || 0)}, returned ${Number(snapshot.predictionCount || 0)}`;
+    }
+
+    async function runAdminTierQuotaAudit(accessToken) {
+        const lines = [];
+        for (const planId of ADMIN_AUDIT_PLAN_IDS) {
+            try {
+                const snapshot = await fetchAdminQuotaSnapshot(planId, accessToken);
+                lines.push(formatAdminQuotaLine(snapshot));
+            } catch (error) {
+                lines.push(`${getPlanDisplayLabel(planId)}: ERROR ${error?.message || error}`);
+            }
+        }
+        const report = `Tier Quota Audit (today):\n\n${lines.join('\n')}`;
+        console.log('[Admin Quota Audit]\n' + report);
+        alert(report);
+    }
+
+    function ensureAdminControls(session) {
+        const navLinks = document.querySelector('.nav-links');
+        if (!navLinks) return;
+        if (document.getElementById('adminTierControlWrap')) return;
+
+        const wrap = document.createElement('div');
+        wrap.id = 'adminTierControlWrap';
+        wrap.style.cssText = 'display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap;';
+
+        const select = document.createElement('select');
+        select.id = 'adminTierSelect';
+        select.style.cssText = 'background:#ffffff;color:#0d6efd;border:1px solid #cfe2ff;border-radius:6px;padding:0.35rem 0.45rem;font-weight:700;';
+
+        ADMIN_AUDIT_PLAN_IDS.forEach((planId) => {
+            const option = document.createElement('option');
+            option.value = planId;
+            option.textContent = getPlanDisplayLabel(planId);
+            select.appendChild(option);
+        });
+
+        const currentPlan = resolveUserPlanId();
+        select.value = ADMIN_AUDIT_PLAN_IDS.includes(currentPlan) ? currentPlan : 'elite_30day_deep_vip';
+        select.onchange = () => {
+            const selectedPlan = String(select.value || '').trim();
+            if (!selectedPlan) return;
+            try { localStorage.setItem('skcs_plan_id', selectedPlan); } catch (e) { /* ignore */ }
+            fetchPredictions(activeSport, selectedPlan).catch((err) => {
+                console.warn('[admin-tier-switch] fetch failed:', err?.message || err);
+            });
+        };
+
+        const quotaBtn = document.createElement('button');
+        quotaBtn.innerHTML = '📊 Quotas';
+        quotaBtn.style.cssText = 'background:#198754;color:white;border:none;padding:0.45rem 0.7rem;border-radius:6px;font-weight:700;cursor:pointer;';
+        quotaBtn.onclick = async () => {
+            const token = session?.access_token || await getAccessTokenOrRedirect();
+            if (!token) return;
+            quotaBtn.disabled = true;
+            const originalText = quotaBtn.innerHTML;
+            quotaBtn.innerHTML = 'Checking...';
+            try {
+                await runAdminTierQuotaAudit(token);
+            } finally {
+                quotaBtn.disabled = false;
+                quotaBtn.innerHTML = originalText;
+            }
+        };
+
+        const debugBtn = document.createElement('button');
+        debugBtn.innerHTML = '🔍 Debug';
+        debugBtn.style.cssText = 'background:#dc3545;color:white;border:none;padding:0.45rem 0.7rem;border-radius:6px;font-weight:700;cursor:pointer;';
+        debugBtn.onclick = showRawPrediction;
+
+        wrap.appendChild(select);
+        wrap.appendChild(quotaBtn);
+        wrap.appendChild(debugBtn);
+        navLinks.appendChild(wrap);
     }
 
     // ASYNC LOCKDOWN: Force wait for Supabase to fully resolve session
@@ -3434,16 +3549,7 @@
             showAdminToast();
             updateAuthLink(session);
             updateSubscriptionGreeting(session).catch(() => {});
-            
-            // Add admin debug button to nav
-            const navLinks = document.querySelector('.nav-links');
-            if (navLinks) {
-                const debugBtn = document.createElement('button');
-                debugBtn.innerHTML = '🔍 Debug';
-                debugBtn.style.cssText = 'background:#dc3545;color:white;border:none;padding:0.5rem 1rem;border-radius:6px;font-weight:700;cursor:pointer;margin-left:0.5rem;';
-                debugBtn.onclick = showRawPrediction;
-                navLinks.appendChild(debugBtn);
-            }
+            ensureAdminControls(session);
         } else {
             const experienceMode = (() => {
                 try { return localStorage.getItem('skcs_experience_mode') === '1'; } catch (_) { return false; }

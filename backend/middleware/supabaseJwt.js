@@ -123,19 +123,42 @@ async function requireSupabaseUser(req, res, next) {
         // ===== GOD MODE BYPASS - IMMEDIATE EXIT BEFORE ANY DB QUERIES =====
         if (String(supaUser?.email || '').toLowerCase().trim() === 'sfynn13433@gmail.com') {
             console.log('[API-AUTH] God Mode Admin bypass triggered for sfynn13433@gmail.com');
+            const requestedPlanId = normalizePlanId(req.query?.plan_id) || 'elite_30day_deep_vip';
+            const adminPlanIds = [
+                'core_4day_sprint',
+                'core_9day_run',
+                'core_14day_pro',
+                'core_30day_limitless',
+                'elite_4day_deep_dive',
+                'elite_9day_deep_strike',
+                'elite_14day_deep_pro',
+                'elite_30day_deep_vip',
+                'CORE_FREE',
+                'CORE_DAILY',
+                'CORE_WEEKLY',
+                'CORE_MONTHLY',
+                'ELITE_DAILY',
+                'ELITE_WEEKLY',
+                'ELITE_MONTHLY',
+                'VIP_30DAY'
+            ];
             req.user = {
                 id: supaUser.id,
                 email: supaUser.email,
+                first_name: String(supaUser?.user_metadata?.first_name || 'Stephen').trim(),
                 is_admin: true,
                 isAdmin: true,
                 role: 'admin',
                 subscription_status: 'active',
                 subscription_tiers: ['core', 'elite', 'vip'],
                 access_tiers: ['core', 'elite', 'vip'],
-                subscription_plan_ids: ['CORE_FREE', 'CORE_DAILY', 'CORE_WEEKLY', 'CORE_MONTHLY', 'ELITE_DAILY', 'ELITE_WEEKLY', 'ELITE_MONTHLY', 'VIP_30DAY'],
+                subscription_plan_ids: adminPlanIds,
+                plan_id: requestedPlanId,
+                plan_tier: requestedPlanId.startsWith('core_') ? 'core' : 'elite',
+                plan_expires_at: '2099-12-31T23:59:59.000Z',
                 active_subscriptions: []
             };
-            req.subscription = { plan_id: req.query.plan_id || 'elite_30day_deep_vip', status: 'active' };
+            req.subscription = { plan_id: requestedPlanId, status: 'active' };
             return next(); // INSTANTLY allow through
         }
         // ===== END GOD MODE BYPASS =====

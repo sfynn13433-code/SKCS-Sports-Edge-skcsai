@@ -1775,7 +1775,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
 
         let planId = resolveRequestedPlanId(req);
         if (!planId) {
-            planId = isHardcodedAdmin ? 'VIP_30DAY' : req.query.plan_id;
+            planId = isHardcodedAdmin ? 'elite_30day_deep_vip' : req.query.plan_id;
         }
         if (!planId) {
             return res.status(400).json({ error: 'Invalid plan ID' });
