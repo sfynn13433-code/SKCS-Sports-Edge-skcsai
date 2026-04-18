@@ -2185,20 +2185,14 @@
     }
 
     function calculateSportTotal(sportCode, insights, activePlanId) {
-        const enforceEliteFloor = !INCLUDE_ALL_MODE && planRequiresEliteConfidenceFloor(activePlanId);
-        const eliteConfidenceFloor = 75;
-
+        // We removed the enforceEliteFloor check here because SKCS rule dictates
+        // we MUST show bad 1X2 fixtures to warn the user and offer secondary markets.
         const scoped = (insights || []).filter((pred) => {
             const firstMatch = getPrimaryMatch(pred);
             const sportKey = normalizeSportForFilter(
                 pred.sport || (firstMatch && firstMatch.sport) || (firstMatch && firstMatch.metadata && (firstMatch.metadata.sport || firstMatch.metadata.sport_type)) || ''
             );
-            if (sportKey !== sportCode) return false;
-
-            // FIX: Ensure menu counts apply the same 75% floor as the tabs!
-            if (enforceEliteFloor && getPredictionConfidenceScore(pred) < eliteConfidenceFloor) return false;
-
-            return true;
+            return sportKey === sportCode;
         });
 
         const singles = scoped.filter((pred) => getPredictionLegCount(pred) === 1);
@@ -2800,7 +2794,9 @@
             const legs = getPredictionLegCount(p);
             return legs === 1 || type === 'direct' || type === 'secondary' || type === 'single';
         });
-        const directSingles = selectDirectInsights(singles).filter(passesEliteFloor);
+        // FIX: Do NOT filter direct insights by the Elite Floor.
+        // We want 0-100% here so the card renderer can trigger the High Risk warning!
+        const directSingles = selectDirectInsights(singles);
         const directByMatchId = new Map();
         directSingles.forEach((pred) => {
             const firstMatch = getPrimaryMatch(pred);
@@ -2900,7 +2896,8 @@
 
         container.innerHTML = '';
 
-        const directSingles = selectDirectInsights(singles).filter(passesEliteFloor);
+        // FIX: Let all 1X2 matches through to show the warning and secondary markets
+        const directSingles = selectDirectInsights(singles);
 
         // Section 1: Direct (1X2) — only true single-match rows (multi-leg lives under Multi)
         if (directSingles.length > 0) {
