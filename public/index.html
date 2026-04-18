@@ -2189,9 +2189,9 @@
         return recommendation === '1x' || recommendation === 'x2' || recommendation === '12';
     }
 
-    function calculateSportTotal(sportCode, insights, activePlanId) {
-        // We removed the enforceEliteFloor check here because SKCS rule dictates
-        // we MUST show bad 1X2 fixtures to warn the user and offer secondary markets.
+    function calculateSportTotal(sportCode, insights) {
+        // FIX: Removed enforceEliteFloor. The menu must count all fixtures
+        // so we can show them and warn the user.
         const scoped = (insights || []).filter((pred) => {
             const firstMatch = getPrimaryMatch(pred);
             const sportKey = normalizeSportForFilter(
@@ -2209,10 +2209,18 @@
             return legs >= 2 && legs <= 3 && getSectionType(pred) !== 'same_match';
         }).length;
 
+        const sameMatchCount = scoped.filter((pred) => {
+            const type = getSectionType(pred);
+            const legs = getPredictionLegCount(pred);
+            if (legs <= 1) return false;
+            return type === 'same_match' || new Set((pred.matches || []).map((m) => String(m && m.match_id || '').trim()).filter(Boolean)).size === 1;
+        }).length;
+
         return {
             totalMarriedCount: directPreds.length + doubleChanceCount + multiCount,
             directCount: directPreds.length,
             secondaryCount: doubleChanceCount,
+            sameMatchCount: sameMatchCount,
             multiCount: multiCount
         };
     }
