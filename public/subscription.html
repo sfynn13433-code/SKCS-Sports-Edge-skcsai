@@ -639,21 +639,32 @@ function showPaymentComingSoon(_method = '') {
 }
 
 async function selectPlan(tierId) {
+  const safeTierId = String(tierId || '').trim();
+  if (!safeTierId) return;
+
   try {
-    localStorage.setItem('skcs_plan_id', tierId);
+    localStorage.setItem('skcs_plan_id', safeTierId);
     localStorage.setItem('skcs_plan_selected_at', new Date().toISOString());
   } catch (e) { /* ignore */ }
-  
-  // If the user is already signed in, continue directly to payment.
-  if (window.supabaseClient) {
-    const { data: { session } } = await window.supabaseClient.auth.getSession();
-    if (session?.user) {
-      window.location.href = `payment.html?plan=${encodeURIComponent(tierId)}`;
-      return;
+
+  const paymentUrl = `payment.html?plan=${encodeURIComponent(safeTierId)}`;
+  const registerUrl = `login.html?action=register&plan=${encodeURIComponent(safeTierId)}&next=payment.html`;
+
+  // Always fallback to registration redirect if auth/session probing fails.
+  try {
+    const client = window.supabaseClient;
+    if (client?.auth && typeof client.auth.getSession === 'function') {
+      const { data, error } = await client.auth.getSession();
+      if (!error && data?.session?.user) {
+        window.location.href = paymentUrl;
+        return;
+      }
     }
+  } catch (_err) {
+    // Ignore and continue to register flow.
   }
-  
-  window.location.href = `login.html?action=register&plan=${encodeURIComponent(tierId)}&next=payment.html`;
+
+  window.location.href = registerUrl;
 }
 
 function goBack() {
