@@ -113,7 +113,7 @@ function resolveLeagueName(fixture) {
 
 function getLeagueDefaultBaseline(leagueName) {
     const key = String(leagueName || '').trim().toLowerCase();
-    if (!key) return null;
+    if (!key) return { home: 40, draw: 30, away: 30 };
 
     if (key.includes('premier') || key.includes('epl')) return { home: 45, draw: 27, away: 28 };
     if (key.includes('la liga') || key.includes('laliga')) return { home: 44, draw: 29, away: 27 };
@@ -495,7 +495,61 @@ async function buildAndStoreDirect1X2(fixture, confidence, prediction, additiona
         ? supabase.from('direct1x2_prediction_final').update(row).eq('id', existingId).select('*').single()
         : supabase.from('direct1x2_prediction_final').insert(row).select('*').single();
 
-    const { data, error } = await mutation;
+    let { data, error } = await mutation;
+    if (error && String(error.message || '').toLowerCase().includes('uq_predictions_final_live_direct_fixture_market')) {
+        let fallbackId = null;
+
+        if (row.fixture_id) {
+            try {
+                const lookup = await dbQuery(
+                    `
+                    SELECT id
+                    FROM direct1x2_prediction_final
+                    WHERE LOWER(COALESCE(sport, '')) = LOWER($1)
+                      AND LOWER(COALESCE(type, '')) = 'direct'
+                      AND LOWER(COALESCE(tier, '')) = 'normal'
+                      AND LOWER(COALESCE(market_type, '')) = '1x2'
+                      AND publish_run_id IS NULL
+                      AND NULLIF(BTRIM(matches->0->>'fixture_id'), '') = $2
+                    ORDER BY id DESC
+                    LIMIT 1
+                    `,
+                    [row.sport, row.fixture_id]
+                );
+                fallbackId = lookup?.rows?.[0]?.id || null;
+            } catch (lookupError) {
+                console.warn('[direct1x2Builder] conflict lookup by matches fixture_id failed:', lookupError.message);
+            }
+        }
+
+        if (!fallbackId) {
+            const byTeams = await supabase
+                .from('direct1x2_prediction_final')
+                .select('id')
+                .eq('sport', row.sport)
+                .eq('type', 'direct')
+                .eq('tier', 'normal')
+                .eq('market_type', '1X2')
+                .eq('home_team', row.home_team)
+                .eq('away_team', row.away_team)
+                .is('publish_run_id', null)
+                .order('id', { ascending: false })
+                .limit(1);
+            fallbackId = byTeams?.data?.[0]?.id || null;
+        }
+
+        if (fallbackId) {
+            const retry = await supabase
+                .from('direct1x2_prediction_final')
+                .update(row)
+                .eq('id', fallbackId)
+                .select('*')
+                .single();
+            data = retry.data;
+            error = retry.error;
+        }
+    }
+
     if (error) {
         console.error('[direct1x2Builder] write failed:', error.message);
         return { success: false, error };
