@@ -3395,6 +3395,76 @@
         return buildDynamicEdgeMindText(insight || {}, match || {}, finalRecommendation || {});
     }
 
+    function normalizeProbabilityPercent(value) {
+        const numeric = Number(value);
+        if (!Number.isFinite(numeric)) return null;
+        const pct = numeric > 0 && numeric <= 1 ? numeric * 100 : numeric;
+        const bounded = Math.max(0, Math.min(100, pct));
+        return Math.round(bounded);
+    }
+
+    function resolveOneX2ProbabilitySplit(prediction, firstMatch) {
+        const candidates = [
+            firstMatch && firstMatch.metadata && firstMatch.metadata.pipeline_data && firstMatch.metadata.pipeline_data.stage_1_baseline,
+            firstMatch && firstMatch.metadata && firstMatch.metadata.stage_1_baseline,
+            firstMatch && firstMatch.pipeline_data && firstMatch.pipeline_data.stage_1_baseline,
+            prediction && prediction.pipeline_data && prediction.pipeline_data.stage_1_baseline,
+            prediction && prediction.stage_1_baseline
+        ];
+
+        for (const baseline of candidates) {
+            if (!baseline || typeof baseline !== 'object') continue;
+            const home = normalizeProbabilityPercent(baseline.home);
+            const draw = normalizeProbabilityPercent(baseline.draw);
+            const away = normalizeProbabilityPercent(baseline.away);
+            if (home === null || draw === null || away === null) continue;
+            return { home, draw, away };
+        }
+
+        const fallbackConfidence = Math.max(0, Math.min(100, Math.round(getPredictionConfidenceScore(prediction))));
+        const rawOutcome = String(
+            (firstMatch && (
+                firstMatch.prediction
+                || firstMatch.recommendation
+                || firstMatch.pick
+                || firstMatch.selection
+            )) || prediction && prediction.recommendation || ''
+        ).trim().toLowerCase().replace(/\s+/g, '_');
+
+        let home = 33;
+        let draw = 34;
+        let away = 33;
+        if (rawOutcome === 'home' || rawOutcome === 'home_win' || rawOutcome === '1') {
+            home = fallbackConfidence;
+            const remainder = Math.max(0, 100 - home);
+            draw = Math.round(remainder * 0.55);
+            away = Math.max(0, remainder - draw);
+        } else if (rawOutcome === 'away' || rawOutcome === 'away_win' || rawOutcome === '2') {
+            away = fallbackConfidence;
+            const remainder = Math.max(0, 100 - away);
+            draw = Math.round(remainder * 0.55);
+            home = Math.max(0, remainder - draw);
+        } else if (rawOutcome === 'draw' || rawOutcome === 'x') {
+            draw = fallbackConfidence;
+            const remainder = Math.max(0, 100 - draw);
+            home = Math.round(remainder / 2);
+            away = Math.max(0, remainder - home);
+        } else {
+            return null;
+        }
+        return { home, draw, away };
+    }
+
+    function renderOneX2ProbabilitySplit(prediction, firstMatch) {
+        const split = resolveOneX2ProbabilitySplit(prediction, firstMatch);
+        if (!split) return '';
+        return `
+            <div style="margin-top:8px;font-size:0.8rem;color:#334155;font-weight:700;line-height:1.4;">
+                🏠 HOME ${split.home}% | 🤝 DRAW ${split.draw}% | ✈️ AWAY ${split.away}%
+            </div>
+        `;
+    }
+
     function createPredictionCard(pred, sport, cardId) {
         const card = document.createElement('div');
         card.className = 'prediction-card';
@@ -3453,6 +3523,7 @@
 
         const insightsHtml = renderInsightsPanel(pred);
         const edgeMindReportText = resolveEdgeMindText(pred, firstMatch, finalRecommendation, reasoning);
+        const oneX2ProbabilitySplit = renderOneX2ProbabilitySplit(pred, firstMatch);
 
         // Secondary Insights - Nested <details>/<summary> Dropdown Layout
         let secondaryInsightsHtml = '';
@@ -3503,6 +3574,7 @@
             <div class="match-info">
                 <div class="teams" style="font-weight:bold; color:#1a202c; font-size:1.1rem; line-height:1.4;">${matchInfo.teams}</div>
                 <div class="match-date" style="color:#4a5568; font-size:0.75rem; margin-top:8px; letter-spacing:1px;">${matchInfo.context}</div>
+                ${oneX2ProbabilitySplit}
             </div>
             <div style="margin-top:10px;font-size:0.8em;color:#6c757d;text-transform:uppercase;font-weight:600;">Direct Insight (1X2)</div>
             <div class="prediction-details" style="margin-top:4px;padding-top:8px;display:flex;justify-content:space-between;align-items:center;">

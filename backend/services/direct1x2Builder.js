@@ -53,6 +53,33 @@ function prettyPrediction(prediction) {
     return 'AWAY WIN';
 }
 
+function buildStage1Baseline(prediction, confidence) {
+    const score = clampConfidence(confidence);
+    const normalized = normalizePrediction(prediction);
+    let home = 33;
+    let draw = 34;
+    let away = 33;
+
+    if (normalized === 'home_win') {
+        home = score;
+        const remainder = Math.max(0, 100 - home);
+        draw = Math.round(remainder * 0.55);
+        away = Math.max(0, remainder - draw);
+    } else if (normalized === 'away_win') {
+        away = score;
+        const remainder = Math.max(0, 100 - away);
+        draw = Math.round(remainder * 0.55);
+        home = Math.max(0, remainder - draw);
+    } else {
+        draw = score;
+        const remainder = Math.max(0, 100 - draw);
+        home = Math.round(remainder / 2);
+        away = Math.max(0, remainder - home);
+    }
+
+    return { home, draw, away };
+}
+
 function generateEdgeMindReport(fixture, confidence, riskTier) {
     const score = clampConfidence(confidence);
     const predictionText = prettyPrediction(fixture?.prediction || fixture?.recommendation);
@@ -73,6 +100,7 @@ function generateEdgeMindReport(fixture, confidence, riskTier) {
 }
 
 function buildMatchesPayload(fixture, confidence, prediction, riskTier, secondaryMarkets) {
+    const stage1Baseline = buildStage1Baseline(prediction, confidence);
     return [{
         fixture_id: String(fixture?.fixture_id || fixture?.id || fixture?.match_id || ''),
         home_team: String(fixture?.home_team || ''),
@@ -83,7 +111,12 @@ function buildMatchesPayload(fixture, confidence, prediction, riskTier, secondar
         match_date: fixture?.match_date || fixture?.date || fixture?.commence_time || null,
         sport: String(fixture?.sport || 'football'),
         risk_tier: riskTier,
-        secondary_markets: secondaryMarkets
+        secondary_markets: secondaryMarkets,
+        metadata: {
+            pipeline_data: {
+                stage_1_baseline: stage1Baseline
+            }
+        }
     }];
 }
 

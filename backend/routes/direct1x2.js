@@ -38,6 +38,61 @@ function toArray(value) {
     return [];
 }
 
+function normalizeProbability(value) {
+    const raw = asNumber(value, NaN);
+    if (!Number.isFinite(raw)) return null;
+    const pct = raw > 0 && raw <= 1 ? raw * 100 : raw;
+    const bounded = Math.max(0, Math.min(100, pct));
+    return Math.round(bounded);
+}
+
+function extractStage1Baseline(row, firstMatch) {
+    const candidates = [
+        firstMatch?.metadata?.pipeline_data?.stage_1_baseline,
+        firstMatch?.metadata?.stage_1_baseline,
+        firstMatch?.pipeline_data?.stage_1_baseline,
+        row?.pipeline_data?.stage_1_baseline,
+        row?.stage_1_baseline
+    ];
+
+    for (const candidate of candidates) {
+        if (!candidate || typeof candidate !== 'object') continue;
+        const home = normalizeProbability(candidate.home);
+        const draw = normalizeProbability(candidate.draw);
+        const away = normalizeProbability(candidate.away);
+        if (home === null || draw === null || away === null) continue;
+        return { home, draw, away };
+    }
+    return null;
+}
+
+function inferStage1Baseline(prediction, confidence) {
+    const score = Math.max(0, Math.min(100, Math.round(asNumber(confidence, 0))));
+    const key = String(prediction || '').trim().toLowerCase().replace(/\s+/g, '_');
+    let home = 33;
+    let draw = 34;
+    let away = 33;
+
+    if (key === 'home_win' || key === 'home' || key === '1') {
+        home = score;
+        const remainder = Math.max(0, 100 - home);
+        draw = Math.round(remainder * 0.55);
+        away = Math.max(0, remainder - draw);
+    } else if (key === 'away_win' || key === 'away' || key === '2') {
+        away = score;
+        const remainder = Math.max(0, 100 - away);
+        draw = Math.round(remainder * 0.55);
+        home = Math.max(0, remainder - draw);
+    } else {
+        draw = score;
+        const remainder = Math.max(0, 100 - draw);
+        home = Math.round(remainder / 2);
+        away = Math.max(0, remainder - home);
+    }
+
+    return { home, draw, away };
+}
+
 function formatPredictionRow(row) {
     const firstMatch = Array.isArray(row?.matches) && row.matches.length ? row.matches[0] : {};
     const confidence = Math.max(
@@ -65,6 +120,7 @@ function formatPredictionRow(row) {
     ).slice(0, 4);
 
     const riskTier = String(row?.risk_tier || '').trim() || getRiskTier(confidence);
+    const oneX2Probabilities = extractStage1Baseline(row, firstMatch) || inferStage1Baseline(prediction, confidence);
 
     return {
         id: row?.id || null,
@@ -76,6 +132,7 @@ function formatPredictionRow(row) {
         prediction,
         confidence,
         risk_tier: riskTier,
+        one_x2_probabilities: oneX2Probabilities,
         secondary_markets: secondaryMarkets,
         edgemind_report: row?.edgemind_report || '',
         caution_label: riskTier === 'EXTREME_RISK' ? 'EXTREME CAUTION ADVISED' : riskTier.replace(/_/g, ' ')

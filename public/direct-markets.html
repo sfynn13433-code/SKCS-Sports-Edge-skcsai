@@ -216,6 +216,12 @@
             ? new Date(prediction.match_date).toLocaleString()
             : 'Date pending';
         const confidence = Number(prediction.confidence || 0);
+        const split = prediction && prediction.one_x2_probabilities && typeof prediction.one_x2_probabilities === 'object'
+            ? prediction.one_x2_probabilities
+            : null;
+        const splitHtml = split
+            ? `<div class="meta" style="margin-top:8px;font-weight:700;color:#334155;">🏠 HOME ${Number(split.home || 0)}% | 🤝 DRAW ${Number(split.draw || 0)}% | ✈️ AWAY ${Number(split.away || 0)}%</div>`
+            : '';
 
         const warningHtml = config.warning
             ? `<div class="notice" style="background:${config.color}12;border:1px solid ${config.color}40;color:${config.color};">
@@ -247,6 +253,7 @@
         card.innerHTML = `
             <h3 class="teams">${toText(prediction.home_team)} vs ${toText(prediction.away_team)}</h3>
             <div class="meta">${toText(prediction.sport, 'football')} | ${kickoff}</div>
+            ${splitHtml}
             <div class="row">
                 <div class="pick" style="color:${config.color};">${formatPredictionLabel(prediction.prediction)}</div>
                 <div class="confidence" style="color:${config.color};">${confidence}%</div>
