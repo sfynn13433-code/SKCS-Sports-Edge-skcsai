@@ -188,6 +188,10 @@ function normalizeFixture(f, date) {
         home_team: homeTeam,
         away_team: awayTeam,
         league: f.league?.name || null,
+        country: f.league?.country || null,
+        league_id: f.league?.id ? String(f.league.id) : null,
+        season: f.league?.season ? String(f.league.season) : null,
+        round: f.league?.round || null,
         date: f.fixture?.date || date,
         venue: f.fixture?.venue?.name || null,
         status: f.fixture?.status?.short || null
@@ -479,7 +483,9 @@ function buildRuleOfFourSecondaryInsights(outcome, confidence) {
 function buildEdgeMindFallbackReport(fixture, outcome, confidence) {
     const home = String(fixture.home_team || 'Home Team').trim();
     const away = String(fixture.away_team || 'Away Team').trim();
-    const league = String(fixture.league || 'League').trim();
+    const league = String(fixture.league || '').trim();
+    const country = String(fixture.country || '').trim();
+    const leagueContext = [country, league].filter(Boolean).join(' • ') || 'League';
     const market = outcomeLabel(outcome);
     const riskBand = confidence >= 80 ? 'low volatility'
         : confidence >= 70 ? 'moderate volatility'
@@ -489,7 +495,7 @@ function buildEdgeMindFallbackReport(fixture, outcome, confidence) {
         ? `Decision: keep ${market} as the direct angle with controlled stake sizing.`
         : 'Decision: direct 1X2 is fragile; pivot to the 4 secondary markets for coverage.';
 
-    return `Stage 1 Baseline: ${home} vs ${away} projects ${Math.round(confidence)}% on ${market}. Stage 2 Context: ${league} matchup profile indicates ${riskBand}. Stage 3 Reality Check: validate late team news and market movement before kickoff. Stage 4 ${action}`;
+    return `Stage 1 Baseline: ${home} vs ${away} projects ${Math.round(confidence)}% on ${market}. Stage 2 Context: ${leagueContext} matchup profile indicates ${riskBand}. Stage 3 Reality Check: validate late team news and market movement before kickoff. Stage 4 ${action}`;
 }
 
 function isGenericEdgeMindReport(value) {
@@ -500,6 +506,83 @@ function isGenericEdgeMindReport(value) {
         || text.includes('proceed with standard stake on 1x2')
         || text.includes('reality check indicates moderate volatility')
     );
+}
+
+const SOFA_CONTEXT_LIMIT = Math.max(0, Math.min(500, Math.floor(Number(process.env.EDGEMIND_SOFA_CONTEXT_LIMIT || 140))));
+
+function extractSofaEventId(fixtureId) {
+    const raw = String(fixtureId || '').trim();
+    if (!raw) return '';
+    const tail = raw.includes(':') ? raw.split(':').pop() : raw;
+    return /^\d+$/.test(tail) ? tail : '';
+}
+
+async function fetchSofaFixtureContext(fixtureId) {
+    const eventId = extractSofaEventId(fixtureId);
+    if (!eventId) return null;
+    const url = `https://www.sofascore.com/api/v1/event/${eventId}`;
+    try {
+        const response = await axios.get(url, {
+            timeout: 10000,
+            headers: {
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+                'accept': 'application/json'
+            }
+        });
+        const event = response?.data?.event || {};
+        const tournament = event?.tournament || {};
+        const category = tournament?.category || {};
+        const country = category?.country?.name || '';
+        const league = tournament?.name || tournament?.uniqueTournament?.name || '';
+        if (!country && !league) return null;
+        return {
+            country: String(country || '').trim() || null,
+            league: String(league || '').trim() || null
+        };
+    } catch (error) {
+        return null;
+    }
+}
+
+async function hydrateSofaContextForFixtures(fixtures) {
+    const list = Array.isArray(fixtures) ? fixtures : [];
+    if (!list.length || SOFA_CONTEXT_LIMIT <= 0) return;
+
+    const candidates = [];
+    const seen = new Set();
+    for (const fixture of list) {
+        const fixtureId = String(fixture && (fixture.match_id || fixture.fixture_id || fixture.id) || '').trim();
+        if (!fixtureId || !fixtureId.startsWith('sofa:')) continue;
+        const hasLeague = String(fixture.league || '').trim().length > 0;
+        const hasCountry = String(fixture.country || '').trim().length > 0;
+        if (hasLeague && hasCountry) continue;
+        if (seen.has(fixtureId)) continue;
+        seen.add(fixtureId);
+        candidates.push({ fixtureId, fixture });
+        if (candidates.length >= SOFA_CONTEXT_LIMIT) break;
+    }
+
+    if (!candidates.length) return;
+
+    const contextMap = new Map();
+    for (const candidate of candidates) {
+        const context = await fetchSofaFixtureContext(candidate.fixtureId);
+        if (context) contextMap.set(candidate.fixtureId, context);
+    }
+
+    let hydrated = 0;
+    for (const fixture of list) {
+        const fixtureId = String(fixture && (fixture.match_id || fixture.fixture_id || fixture.id) || '').trim();
+        const context = contextMap.get(fixtureId);
+        if (!context) continue;
+        if (!fixture.league && context.league) fixture.league = context.league;
+        if (!fixture.country && context.country) fixture.country = context.country;
+        hydrated += 1;
+    }
+
+    if (hydrated > 0) {
+        console.log(`[STEP 5] SofaScore context hydrated for ${hydrated} fixtures`);
+    }
 }
 
 // ============================================================
@@ -537,7 +620,16 @@ async function generateEdgeMindReports(fixtures, existingMap) {
                     NULLIF(TRIM(matches->0->>'match_date'), ''),
                     NULLIF(TRIM(matches->0->>'kickoff'), '')
                 ) AS commence_time,
-                COALESCE(NULLIF(TRIM(matches->0->>'sport'), ''), NULLIF(TRIM(sport), ''), 'football') AS sport_key
+                COALESCE(NULLIF(TRIM(matches->0->>'sport'), ''), NULLIF(TRIM(sport), ''), 'football') AS sport_key,
+                COALESCE(
+                    NULLIF(TRIM(matches->0->>'league'), ''),
+                    NULLIF(TRIM(matches->0->'metadata'->>'league'), '')
+                ) AS league,
+                COALESCE(
+                    NULLIF(TRIM(matches->0->>'country'), ''),
+                    NULLIF(TRIM(matches->0->'metadata'->>'country'), ''),
+                    NULLIF(TRIM(matches->0->'metadata'->>'league_country'), '')
+                ) AS country
             FROM direct1x2_prediction_final
             WHERE LOWER(COALESCE(type, '')) = 'direct'
               AND LOWER(COALESCE(sport, '')) = 'football'
@@ -554,8 +646,34 @@ async function generateEdgeMindReports(fixtures, existingMap) {
                         COALESCE(total_confidence, 0) <= 69
                         AND COALESCE(jsonb_array_length(secondary_insights), 0) < 4
                     )
+                    OR (
+                        COALESCE(
+                            NULLIF(TRIM(matches->0->>'league'), ''),
+                            NULLIF(TRIM(matches->0->'metadata'->>'league'), '')
+                        ) IS NULL
+                        OR COALESCE(
+                            NULLIF(TRIM(matches->0->>'country'), ''),
+                            NULLIF(TRIM(matches->0->'metadata'->>'country'), ''),
+                            NULLIF(TRIM(matches->0->'metadata'->>'league_country'), '')
+                        ) IS NULL
+                    )
               )
-            ORDER BY (matches->0->>'fixture_id'), created_at DESC, id DESC
+            ORDER BY
+                (matches->0->>'fixture_id'),
+                (
+                    CASE
+                        WHEN COALESCE(NULLIF(TRIM(matches->0->>'league'), ''), NULLIF(TRIM(matches->0->'metadata'->>'league'), '')) IS NOT NULL
+                          OR COALESCE(
+                            NULLIF(TRIM(matches->0->>'country'), ''),
+                            NULLIF(TRIM(matches->0->'metadata'->>'country'), ''),
+                            NULLIF(TRIM(matches->0->'metadata'->>'league_country'), '')
+                          ) IS NOT NULL
+                        THEN 1
+                        ELSE 0
+                    END
+                ) DESC,
+                created_at DESC,
+                id DESC
             LIMIT $1
         `, [staleRefreshLimit]);
         staleDirectFromDB = staleResult.rows;
@@ -585,6 +703,7 @@ async function generateEdgeMindReports(fixtures, existingMap) {
     // Keep stale refresh rows in scope while still bounding runtime.
     const processCap = Math.max(edgeReportLimit, staleDirectFromDB.length) + edgeReportLimit;
     const limitedFixtures = matchesToProcess.slice(0, Math.min(processCap, 1400));
+    await hydrateSofaContextForFixtures(limitedFixtures);
     
     for (const fixture of limitedFixtures) {
         // Handle both DB format (flat) and API format (nested)
@@ -613,6 +732,8 @@ async function generateEdgeMindReports(fixtures, existingMap) {
         fixture.prediction = primaryOutcome;
 
         const existingData = existingMap.get(normalizedFixtureId);
+        if (!fixture.league && existingData && existingData.league) fixture.league = existingData.league;
+        if (!fixture.country && existingData && existingData.country) fixture.country = existingData.country;
 
         if (existingData && existingData.edgemind_report && !isGenericEdgeMindReport(existingData.edgemind_report)) {
             const preservedConfidence = clampConfidence(existingData.confidence);
@@ -737,10 +858,18 @@ async function saveToSupabase(fixtures, existingMap) {
 
                 // Check if already exists with same data
                 const existing = existingMap.get(fixtureId);
+                const resolvedLeague = String(fixture.league || (existing && existing.league) || '').trim();
+                const resolvedCountry = String(fixture.country || (existing && existing.country) || '').trim();
                 const existingConfidence = Number(existing && existing.confidence);
                 const existingSecondaryCount = Number(existing && existing.secondary_count);
                 const incomingConfidence = clampConfidence(fixture.confidence ?? fixture.ai_confidence) || 62;
                 const incomingSecondaryCount = Array.isArray(fixture.secondary_insights) ? fixture.secondary_insights.length : 0;
+                const existingLeague = String(existing && existing.league || '').trim();
+                const existingCountry = String(existing && existing.country || '').trim();
+                const incomingLeague = resolvedLeague;
+                const incomingCountry = resolvedCountry;
+                const hasIncomingContext = Boolean(incomingLeague || incomingCountry);
+                const existingMissingContext = !existingLeague || !existingCountry;
                 const needsRefresh = Boolean(
                     existing
                     && existing.id
@@ -749,6 +878,7 @@ async function saveToSupabase(fixtures, existingMap) {
                         || isGenericEdgeMindReport(existing.edgemind_report)
                         || (existingConfidence === 65 && incomingConfidence !== 65)
                         || (incomingConfidence <= 69 && incomingSecondaryCount >= 4 && existingSecondaryCount < 4)
+                        || (hasIncomingContext && existingMissingContext)
                     )
                 );
 
@@ -771,7 +901,8 @@ async function saveToSupabase(fixtures, existingMap) {
                     home_team_name: fixture.home_team,
                     away_team_name: fixture.away_team,
                     sport: fixture.sport,
-                    league: fixture.league,
+                    league: resolvedLeague || null,
+                    country: resolvedCountry || null,
                     commence_time: kickoffValue,
                     match_date: kickoffValue,
                     market: fixture.market || '1X2',
@@ -779,7 +910,9 @@ async function saveToSupabase(fixtures, existingMap) {
                     confidence: fixture.confidence || fixture.ai_confidence || 65,
                     metadata: {
                         sport: fixture.sport,
-                        league: fixture.league,
+                        league: resolvedLeague || null,
+                        country: resolvedCountry || null,
+                        league_country: resolvedCountry || null,
                         home_team: fixture.home_team,
                         away_team: fixture.away_team,
                         match_time: kickoffValue,
@@ -898,14 +1031,38 @@ async function runLiveSync() {
                     (matches->0->>'fixture_id') as fixture_id,
                     edgemind_report,
                     total_confidence AS confidence,
-                    COALESCE(jsonb_array_length(secondary_insights), 0) AS secondary_count
+                    COALESCE(jsonb_array_length(secondary_insights), 0) AS secondary_count,
+                    COALESCE(
+                        NULLIF(TRIM(matches->0->>'league'), ''),
+                        NULLIF(TRIM(matches->0->'metadata'->>'league'), '')
+                    ) AS league,
+                    COALESCE(
+                        NULLIF(TRIM(matches->0->>'country'), ''),
+                        NULLIF(TRIM(matches->0->'metadata'->>'country'), ''),
+                        NULLIF(TRIM(matches->0->'metadata'->>'league_country'), '')
+                    ) AS country
                 FROM direct1x2_prediction_final 
                 WHERE matches IS NOT NULL
                 AND matches::text != '[]'
                 AND LOWER(COALESCE(tier, '')) = 'normal'
                 AND LOWER(COALESCE(type, '')) = 'direct'
                 AND NULLIF(TRIM(matches->0->>'fixture_id'), '') IS NOT NULL
-                ORDER BY (matches->0->>'fixture_id'), created_at DESC, id DESC
+                ORDER BY
+                    (matches->0->>'fixture_id'),
+                    (
+                        CASE
+                            WHEN COALESCE(NULLIF(TRIM(matches->0->>'league'), ''), NULLIF(TRIM(matches->0->'metadata'->>'league'), '')) IS NOT NULL
+                              OR COALESCE(
+                                NULLIF(TRIM(matches->0->>'country'), ''),
+                                NULLIF(TRIM(matches->0->'metadata'->>'country'), ''),
+                                NULLIF(TRIM(matches->0->'metadata'->>'league_country'), '')
+                              ) IS NOT NULL
+                            THEN 1
+                            ELSE 0
+                        END
+                    ) DESC,
+                    created_at DESC,
+                    id DESC
             `);
             
             existingMap = new Map(

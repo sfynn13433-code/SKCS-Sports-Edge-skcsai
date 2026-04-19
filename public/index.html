@@ -3371,10 +3371,12 @@
         const metadata = (match && match.metadata) ? match.metadata : {};
         const homeTeam = resolveMatchTeamName(match, 'home') || 'Home Team';
         const awayTeam = resolveMatchTeamName(match, 'away') || 'Away Team';
-        const league = String(metadata.league || metadata.competition || match.league || humanizeToken(match.sport || insight.sport || 'fixture')).trim();
+        const league = String(metadata.league || metadata.competition || match.league || '').trim();
+        const country = String(metadata.country || metadata.league_country || match.country || '').trim();
+        const leagueContext = [country, league].filter(Boolean).join(' • ') || humanizeToken(match.sport || insight.sport || 'fixture');
         const marketLabel = String(finalRecommendation && finalRecommendation.market || formatPrediction(match) || 'Primary Market').trim();
         const confidence = normalizeConfidencePercent(finalRecommendation && finalRecommendation.confidence, normalizeConfidencePercent(getPredictionConfidenceScore(insight), 0));
-        return `${homeTeam} vs ${awayTeam} (${league || 'Live Fixture'}): ${marketLabel} is currently rated ${Math.round(confidence)}% after live context checks.`;
+        return `${homeTeam} vs ${awayTeam} (${leagueContext || 'Live Fixture'}): ${marketLabel} is currently rated ${Math.round(confidence)}% after live context checks.`;
     }
 
     function resolveEdgeMindText(insight, match, finalRecommendation, reasoning) {
@@ -3706,6 +3708,9 @@
 
         const meta = match.metadata || {};
         let contextLabel = '';
+        const leagueName = String(meta.league || meta.competition || match.league || (homeInfo && homeInfo.league && homeInfo.league.name) || '').trim();
+        const countryName = String(meta.country || meta.league_country || match.country || (homeInfo && homeInfo.league && homeInfo.league.country) || '').trim();
+        const roundBits = `${meta.matchday ? ' • ' + meta.matchday : ''}${meta.week ? ' • ' + meta.week : ''}${meta.round ? ' • ' + meta.round : ''}${meta.division ? ' • ' + meta.division : ''}${meta.conference ? ' • ' + meta.conference : ''}`;
 
         if (meta.header_info) {
             contextLabel = meta.header_info;
@@ -3717,10 +3722,10 @@
             contextLabel = `${meta.event}${meta.weight_class ? ' • ' + meta.weight_class : ''}${meta.venue ? ' • ' + meta.venue : ''}`;
         } else if (meta.series) {
             contextLabel = `${meta.series}${meta.format ? ' • ' + meta.format : ''}`;
-        } else if (meta.league) {
-            contextLabel = `${meta.league}${meta.matchday ? ' • ' + meta.matchday : ''}${meta.week ? ' • ' + meta.week : ''}${meta.round ? ' • ' + meta.round : ''}${meta.division ? ' • ' + meta.division : ''}${meta.conference ? ' • ' + meta.conference : ''}`;
-        } else if (homeInfo && homeInfo.league && homeInfo.league.name) {
-            contextLabel = homeInfo.league.name;
+        } else if (leagueName) {
+            contextLabel = `${countryName ? countryName + ' • ' : ''}${leagueName}${roundBits}`;
+        } else if (countryName) {
+            contextLabel = countryName;
         } else if (match.sport) {
             contextLabel = humanizeSportKey(match.sport);
         }
