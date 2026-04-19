@@ -222,6 +222,14 @@
         const splitHtml = split
             ? `<div class="meta" style="margin-top:8px;font-weight:700;color:#334155;">🏠 HOME ${Number(split.home || 0)}% | 🤝 DRAW ${Number(split.draw || 0)}% | ✈️ AWAY ${Number(split.away || 0)}%</div>`
             : '';
+        const leagueLabel = toText(prediction.league, '');
+        const dataLimited = prediction && prediction.data_sufficient === false;
+        const dataLimitedHtml = dataLimited
+            ? `<div class="notice" style="background:#fff7ed;border:1px solid #fdba74;color:#9a3412;">
+                    <strong>⚠️ Limited data available for this match.</strong><br>
+                    ${toText(prediction.data_note, 'Probability split and secondary markets are based on league averages only.')}
+               </div>`
+            : '';
 
         const warningHtml = config.warning
             ? `<div class="notice" style="background:${config.color}12;border:1px solid ${config.color}40;color:${config.color};">
@@ -236,6 +244,7 @@
             : '';
 
         const secondary = Array.isArray(prediction.secondary_markets) ? prediction.secondary_markets.slice(0, 4) : [];
+        const secondaryNote = toText(prediction.secondary_markets_note, '');
         const secondaryHtml = secondary.length
             ? `<details>
                     <summary>View Secondary Insights (${secondary.length})</summary>
@@ -247,13 +256,17 @@
                             return `<li><strong>${line}</strong> - ${conf}%${desc ? `<br><span style="color:#475569;">${desc}</span>` : ''}</li>`;
                         }).join('')}
                     </ul>
+                    ${secondaryNote ? `<div style="margin-top:6px;font-size:0.8rem;color:#1d4ed8;font-weight:700;">${secondaryNote}</div>` : ''}
                 </details>`
-            : '';
+            : (secondaryNote
+                ? `<div class="notice" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;">${secondaryNote}</div>`
+                : '');
 
         card.innerHTML = `
             <h3 class="teams">${toText(prediction.home_team)} vs ${toText(prediction.away_team)}</h3>
-            <div class="meta">${toText(prediction.sport, 'football')} | ${kickoff}</div>
+            <div class="meta">${toText(prediction.sport, 'football')}${leagueLabel ? ` • ${leagueLabel}` : ''} | ${kickoff}</div>
             ${splitHtml}
+            ${dataLimitedHtml}
             <div class="row">
                 <div class="pick" style="color:${config.color};">${formatPredictionLabel(prediction.prediction)}</div>
                 <div class="confidence" style="color:${config.color};">${confidence}%</div>

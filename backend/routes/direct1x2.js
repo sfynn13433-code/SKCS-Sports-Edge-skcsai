@@ -38,6 +38,14 @@ function toArray(value) {
     return [];
 }
 
+function extractPipelineData(row, firstMatch) {
+    const candidates = [
+        firstMatch?.metadata?.pipeline_data,
+        row?.pipeline_data
+    ];
+    return candidates.find((candidate) => candidate && typeof candidate === 'object') || {};
+}
+
 function normalizeProbability(value) {
     const raw = asNumber(value, NaN);
     if (!Number.isFinite(raw)) return null;
@@ -120,7 +128,16 @@ function formatPredictionRow(row) {
     ).slice(0, 4);
 
     const riskTier = String(row?.risk_tier || '').trim() || getRiskTier(confidence);
-    const oneX2Probabilities = extractStage1Baseline(row, firstMatch) || inferStage1Baseline(prediction, confidence);
+    const pipelineData = extractPipelineData(row, firstMatch);
+    const dataSufficient = typeof pipelineData?.data_sufficient === 'boolean' ? pipelineData.data_sufficient : true;
+    const oneX2Probabilities = extractStage1Baseline(row, firstMatch)
+        || (dataSufficient ? inferStage1Baseline(prediction, confidence) : null);
+    const league = String(
+        firstMatch?.metadata?.league
+        || row?.league
+        || row?.competition
+        || ''
+    ).trim();
 
     return {
         id: row?.id || null,
@@ -133,6 +150,11 @@ function formatPredictionRow(row) {
         confidence,
         risk_tier: riskTier,
         one_x2_probabilities: oneX2Probabilities,
+        data_sufficient: dataSufficient,
+        data_note: String(pipelineData?.data_note || '').trim() || null,
+        secondary_markets_note: String(pipelineData?.secondary_markets_note || '').trim() || null,
+        baseline_source: String(pipelineData?.baseline_source || '').trim() || null,
+        league: league || null,
         secondary_markets: secondaryMarkets,
         edgemind_report: row?.edgemind_report || '',
         caution_label: riskTier === 'EXTREME_RISK' ? 'EXTREME CAUTION ADVISED' : riskTier.replace(/_/g, ' ')

@@ -645,6 +645,22 @@ async function persistDirect1x2Predictions(fixtures) {
         attempted += 1;
 
         const inferred = inferDirectPredictionAndConfidence(fixture);
+        const weatherSummary = asNonEmptyString(
+            fixture?.weather
+            || fixture?.raw_provider_data?.weather?.description
+            || fixture?.raw_provider_data?.weather?.main
+        );
+        const contextNotes = asNonEmptyString(
+            fixture?.contextNotes
+            || fixture?.context
+            || (fixture?.league ? `${fixture.league} fixture context profile.` : '')
+        );
+        const oddsSnapshot = fixture?.odds && typeof fixture.odds === 'object'
+            ? fixture.odds
+            : (fixture?.raw_provider_data?.odds && typeof fixture.raw_provider_data.odds === 'object'
+                ? fixture.raw_provider_data.odds
+                : null);
+
         const result = await buildAndStoreDirect1X2(
             {
                 id: fixture.match_id,
@@ -653,9 +669,13 @@ async function persistDirect1x2Predictions(fixtures) {
                 home_team: fixture.home_team,
                 away_team: fixture.away_team,
                 match_date: fixture.date,
+                league: fixture.league || null,
                 prediction: inferred.prediction,
                 volatility: fixture.volatility || 'medium',
-                context: `League: ${fixture.league || 'football'}`
+                context: `League: ${fixture.league || 'football'}`,
+                contextNotes,
+                weather: weatherSummary || null,
+                odds: oddsSnapshot
             },
             inferred.confidence,
             inferred.prediction,

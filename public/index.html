@@ -3403,7 +3403,22 @@
         return Math.round(bounded);
     }
 
+    function resolveDataSufficiencyState(prediction, firstMatch) {
+        const pipelineData = (firstMatch && firstMatch.metadata && firstMatch.metadata.pipeline_data && typeof firstMatch.metadata.pipeline_data === 'object')
+            ? firstMatch.metadata.pipeline_data
+            : ((prediction && prediction.pipeline_data && typeof prediction.pipeline_data === 'object') ? prediction.pipeline_data : {});
+        const dataSufficient = typeof pipelineData.data_sufficient === 'boolean' ? pipelineData.data_sufficient : true;
+        const dataNote = String(pipelineData.data_note || '').trim();
+        const secondaryNote = String(pipelineData.secondary_markets_note || '').trim();
+        return {
+            dataSufficient,
+            dataNote,
+            secondaryNote
+        };
+    }
+
     function resolveOneX2ProbabilitySplit(prediction, firstMatch) {
+        const dataState = resolveDataSufficiencyState(prediction, firstMatch);
         const candidates = [
             firstMatch && firstMatch.metadata && firstMatch.metadata.pipeline_data && firstMatch.metadata.pipeline_data.stage_1_baseline,
             firstMatch && firstMatch.metadata && firstMatch.metadata.stage_1_baseline,
@@ -3420,6 +3435,8 @@
             if (home === null || draw === null || away === null) continue;
             return { home, draw, away };
         }
+
+        if (dataState.dataSufficient === false) return null;
 
         const fallbackConfidence = Math.max(0, Math.min(100, Math.round(getPredictionConfidenceScore(prediction))));
         const rawOutcome = String(
@@ -3461,6 +3478,17 @@
         return `
             <div style="margin-top:8px;font-size:0.8rem;color:#334155;font-weight:700;line-height:1.4;">
                 🏠 HOME ${split.home}% | 🤝 DRAW ${split.draw}% | ✈️ AWAY ${split.away}%
+            </div>
+        `;
+    }
+
+    function renderDataSufficiencyWarning(prediction, firstMatch) {
+        const dataState = resolveDataSufficiencyState(prediction, firstMatch);
+        if (dataState.dataSufficient !== false) return '';
+        const message = dataState.dataNote || 'Probability split and secondary markets are based on league averages only.';
+        return `
+            <div style="margin-top:8px;padding:8px 10px;border-left:4px solid #f97316;background:#fff7ed;color:#9a3412;border-radius:4px;font-size:0.8rem;line-height:1.45;">
+                <strong>⚠️ Limited data available for this match.</strong><br>${message}
             </div>
         `;
     }
@@ -3524,6 +3552,8 @@
         const insightsHtml = renderInsightsPanel(pred);
         const edgeMindReportText = resolveEdgeMindText(pred, firstMatch, finalRecommendation, reasoning);
         const oneX2ProbabilitySplit = renderOneX2ProbabilitySplit(pred, firstMatch);
+        const dataSufficiencyWarning = renderDataSufficiencyWarning(pred, firstMatch);
+        const dataState = resolveDataSufficiencyState(pred, firstMatch);
 
         // Secondary Insights - Nested <details>/<summary> Dropdown Layout
         let secondaryInsightsHtml = '';
@@ -3555,6 +3585,7 @@
                     <ul style="padding-left:0;margin-top:10px;margin-bottom:0;list-style:none;">
                         ${listItems}
                     </ul>
+                    ${dataState.secondaryNote ? `<div style="margin-top:8px;font-size:0.8rem;color:#1d4ed8;font-weight:700;">${dataState.secondaryNote}</div>` : ''}
                 </details>
             `;
         } else {
@@ -3565,6 +3596,7 @@
                         : (isHighRiskPrimary
                         ? 'High-risk alert: 4 compliant secondary markets are required. No valid secondary set is currently available.'
                         : 'No secondary insights available for this fixture.')}
+                    ${dataState.secondaryNote ? `<div style="margin-top:8px;font-size:0.8rem;color:#1d4ed8;font-weight:700;">${dataState.secondaryNote}</div>` : ''}
                 </div>
             `;
         }
@@ -3575,6 +3607,7 @@
                 <div class="teams" style="font-weight:bold; color:#1a202c; font-size:1.1rem; line-height:1.4;">${matchInfo.teams}</div>
                 <div class="match-date" style="color:#4a5568; font-size:0.75rem; margin-top:8px; letter-spacing:1px;">${matchInfo.context}</div>
                 ${oneX2ProbabilitySplit}
+                ${dataSufficiencyWarning}
             </div>
             <div style="margin-top:10px;font-size:0.8em;color:#6c757d;text-transform:uppercase;font-weight:600;">Direct Insight (1X2)</div>
             <div class="prediction-details" style="margin-top:4px;padding-top:8px;display:flex;justify-content:space-between;align-items:center;">
