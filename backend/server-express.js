@@ -103,6 +103,7 @@ const userRouter        = require('./routes/user');
 const chatRouter        = require('./routes/chat');
 const accuracyRouter    = require('./routes/accuracy');
 const vipRouter         = require('./routes/vip');
+const direct1x2Router   = require('./routes/direct1x2');
 
 const app = express();
 
@@ -350,6 +351,7 @@ app.use('/api/chat', chatRouter);
 app.use('/api/edgemind', chatRouter);
 app.use('/api/accuracy', accuracyRouter);
 app.use('/api/vip', vipRouter);
+app.use('/api/direct-1x2', direct1x2Router);
 
 // --- Cloud Scheduler endpoints -------------------------------------------------
 // These match the URLs documented in docs/google-cloud-soccer-refresh.md

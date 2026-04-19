@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKCS Direct 1X2 Markets</title>
+    <style>
+        :root {
+            --bg: #f3f6fb;
+            --card: #ffffff;
+            --text: #0f172a;
+            --muted: #475569;
+            --border: #d9e1ee;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+        .wrap {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 20px 14px 40px;
+        }
+        h1 {
+            font-size: 1.6rem;
+            margin: 0 0 14px;
+        }
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+        .toolbar select, .toolbar button {
+            height: 36px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0 10px;
+            font-size: 0.9rem;
+            background: #fff;
+            color: #0f172a;
+        }
+        .toolbar button {
+            cursor: pointer;
+            font-weight: 700;
+            background: #2563eb;
+            color: #fff;
+            border-color: #1d4ed8;
+        }
+        .state {
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 0.92rem;
+        }
+        .state.error {
+            color: #7f1d1d;
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 12px;
+        }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-left: 4px solid #94a3b8;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+            padding: 14px;
+        }
+        .teams {
+            margin: 0;
+            font-size: 1rem;
+        }
+        .meta {
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 12px;
+            align-items: center;
+        }
+        .pick {
+            font-weight: 700;
+            font-size: 1.04rem;
+        }
+        .confidence {
+            font-weight: 700;
+            font-size: 0.88rem;
+            border-radius: 999px;
+            padding: 5px 10px;
+            background: #eef2ff;
+        }
+        .notice {
+            margin-top: 10px;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+        .report {
+            margin-top: 10px;
+            background: #f8fafc;
+            border-radius: 6px;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+            line-height: 1.45;
+            color: #334155;
+        }
+        details {
+            margin-top: 10px;
+            border: 1px solid #dbeafe;
+            background: #eff6ff;
+            border-radius: 6px;
+            padding: 8px 10px;
+        }
+        summary {
+            font-weight: 700;
+            cursor: pointer;
+            color: #1e40af;
+            font-size: 0.9rem;
+        }
+        ul {
+            margin: 8px 0 0;
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 7px;
+            font-size: 0.85rem;
+            color: #1e293b;
+        }
+    </style>
+</head>
+<body>
+<main class="wrap">
+    <h1>Direct 1X2 Markets</h1>
+    <div class="toolbar">
+        <select id="riskTier">
+            <option value="">All Caution Tiers</option>
+            <option value="HIGH_CONFIDENCE">High Confidence</option>
+            <option value="MODERATE_RISK">Moderate Caution</option>
+            <option value="HIGH_RISK">High Caution</option>
+            <option value="EXTREME_RISK">Extreme Caution Advised</option>
+        </select>
+        <button id="refreshBtn" type="button">Refresh</button>
+    </div>
+    <div id="state"></div>
+    <section id="cards" class="grid"></section>
+</main>
+
+<script>
+    const riskConfig = {
+        HIGH_CONFIDENCE: {
+            color: '#10b981',
+            badge: 'High Confidence',
+            warning: null
+        },
+        MODERATE_RISK: {
+            color: '#3b82f6',
+            badge: 'Moderate Caution',
+            warning: null
+        },
+        HIGH_RISK: {
+            color: '#f97316',
+            badge: 'High Caution',
+            warning: 'This direct market has elevated variance. We recommend selecting a safer option from Secondary Insights.'
+        },
+        EXTREME_RISK: {
+            color: '#ef4444',
+            badge: 'Extreme Caution Advised',
+            warning: 'This direct market is highly fragile. Please pivot to Secondary Insights for safer coverage.'
+        }
+    };
+
+    function toText(value, fallback = '-') {
+        const text = String(value ?? '').trim();
+        return text ? text : fallback;
+    }
+
+    function formatPredictionLabel(value) {
+        const key = String(value || '').trim().toLowerCase();
+        if (key === 'home_win' || key === 'home') return 'HOME WIN';
+        if (key === 'away_win' || key === 'away') return 'AWAY WIN';
+        if (key === 'draw' || key === 'x') return 'DRAW';
+        return toText(value, 'SELECTION').replace(/_/g, ' ').toUpperCase();
+    }
+
+    function renderState(message, type = 'error') {
+        const stateEl = document.getElementById('state');
+        if (!message) {
+            stateEl.innerHTML = '';
+            return;
+        }
+        stateEl.innerHTML = `<div class="state ${type}">${message}</div>`;
+    }
+
+    function createCard(prediction) {
+        const config = riskConfig[prediction.risk_tier] || riskConfig.MODERATE_RISK;
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.style.borderLeftColor = config.color;
+
+        const kickoff = prediction.match_date
+            ? new Date(prediction.match_date).toLocaleString()
+            : 'Date pending';
+        const confidence = Number(prediction.confidence || 0);
+
+        const warningHtml = config.warning
+            ? `<div class="notice" style="background:${config.color}12;border:1px solid ${config.color}40;color:${config.color};">
+                    <strong>${config.badge} (${confidence}%):</strong> ${config.warning}
+               </div>`
+            : '';
+
+        const extremeHtml = prediction.risk_tier === 'EXTREME_RISK'
+            ? `<div class="notice" style="background:#fff1f2;border:1px solid #fecdd3;color:#9f1239;">
+                   <strong>Extreme Caution Advised:</strong> Select one of the Secondary Insights below instead of the direct market.
+               </div>`
+            : '';
+
+        const secondary = Array.isArray(prediction.secondary_markets) ? prediction.secondary_markets.slice(0, 4) : [];
+        const secondaryHtml = secondary.length
+            ? `<details>
+                    <summary>View Secondary Insights (${secondary.length})</summary>
+                    <ul>
+                        ${secondary.map((market) => {
+                            const line = toText(market.prediction || market.market, 'Secondary Insight').replace(/_/g, ' ').toUpperCase();
+                            const conf = Number(market.confidence || 0);
+                            const desc = toText(market.description, '');
+                            return `<li><strong>${line}</strong> - ${conf}%${desc ? `<br><span style="color:#475569;">${desc}</span>` : ''}</li>`;
+                        }).join('')}
+                    </ul>
+                </details>`
+            : '';
+
+        card.innerHTML = `
+            <h3 class="teams">${toText(prediction.home_team)} vs ${toText(prediction.away_team)}</h3>
+            <div class="meta">${toText(prediction.sport, 'football')} | ${kickoff}</div>
+            <div class="row">
+                <div class="pick" style="color:${config.color};">${formatPredictionLabel(prediction.prediction)}</div>
+                <div class="confidence" style="color:${config.color};">${confidence}%</div>
+            </div>
+            ${warningHtml}
+            ${extremeHtml}
+            <div class="report"><strong>EdgeMind Report:</strong> ${toText(prediction.edgemind_report, 'No report yet.')}</div>
+            ${secondaryHtml}
+        `;
+        return card;
+    }
+
+    async function loadPredictions() {
+        const cards = document.getElementById('cards');
+        const riskTier = document.getElementById('riskTier').value;
+        const params = new URLSearchParams({ sport: 'football', limit: '100' });
+        if (riskTier) params.set('risk_tier', riskTier);
+
+        renderState('');
+        cards.innerHTML = '';
+
+        try {
+            const response = await fetch(`/api/direct-1x2?${params.toString()}`);
+            if (!response.ok) {
+                throw new Error(`Request failed (${response.status})`);
+            }
+
+            const payload = await response.json();
+            const rows = Array.isArray(payload.predictions) ? payload.predictions : [];
+
+            if (!rows.length) {
+                renderState('No Direct 1X2 rows returned for this filter.');
+                return;
+            }
+
+            rows.forEach((row) => cards.appendChild(createCard(row)));
+        } catch (error) {
+            renderState(error.message || 'Unable to load direct markets.');
+        }
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click', loadPredictions);
+    document.getElementById('riskTier').addEventListener('change', loadPredictions);
+    loadPredictions();
+</script>
+</body>
+</html>

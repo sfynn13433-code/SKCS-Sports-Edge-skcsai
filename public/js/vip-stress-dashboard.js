@@ -136,21 +136,21 @@
             parts.push(`
                 <div class="intel-badge weather">
                   <span class="intel-icon">📊</span>
-                  Moderate Risk: ${confidence.toFixed(1)}% (Review context before staking)
+                  Moderate Caution: ${confidence.toFixed(1)}% (Review context before selection)
                 </div>
             `);
         } else if (badgeState.status === 'EXPECTED_VARIANCE' || (confidence >= 59 && confidence < 70)) {
             parts.push(`
                 <div class="intel-badge filtered">
                   <span class="intel-icon">⚠️</span>
-                  High Risk: ${confidence.toFixed(1)}% (Pivot to Secondary Insights)
+                  High Caution: ${confidence.toFixed(1)}% (Pivot to Secondary Insights)
                 </div>
             `);
         } else if (confidence < 59) {
             parts.push(`
                 <div class="intel-badge filtered">
                   <span class="intel-icon">🛑</span>
-                  Extreme Risk: ${confidence.toFixed(1)}% (Do not bet direct 1X2)
+                  Extreme Caution Advised: ${confidence.toFixed(1)}% (Pivot to Secondary Insights)
                 </div>
             `);
         }
@@ -308,7 +308,7 @@
             ? `
             <div style="margin-top:10px;padding:${isExtremeRiskDirect ? '12px' : '10px'};border:${isExtremeRiskDirect ? '2px solid #dc2626' : '1px solid #f97316'};background:${isExtremeRiskDirect ? '#fee2e2' : '#fff7ed'};color:${isExtremeRiskDirect ? '#7f1d1d' : '#9a3412'};border-radius:8px;">
               <div style="font-weight:800;font-size:${isExtremeRiskDirect ? '0.95rem' : '0.88rem'};line-height:1.4;">
-                ${isExtremeRiskDirect ? 'DO NOT BET DIRECT 1X2. USE SECONDARY MARKETS.' : 'HIGH RISK: PIVOT TO SECONDARY MARKETS.'}
+                ${isExtremeRiskDirect ? 'EXTREME CAUTION ADVISED: SELECT SECONDARY INSIGHTS.' : 'HIGH CAUTION: PIVOT TO SECONDARY INSIGHTS.'}
               </div>
               <div style="margin-top:6px;font-size:0.8rem;font-weight:700;">
                 ${isExtremeRiskDirect ? `Secondary set: ${secondaryInsights.length}/4` : `Secondary set available: ${secondaryInsights.length}`}

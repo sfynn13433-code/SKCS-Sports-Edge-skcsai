@@ -139,8 +139,90 @@ async function bootstrap() {
         `);
 
         await query(`
+            DO $$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1
+                    FROM pg_type
+                    WHERE typname = 'risk_tier_enum'
+                ) THEN
+                    CREATE TYPE risk_tier_enum AS ENUM (
+                        'HIGH_CONFIDENCE',
+                        'MODERATE_RISK',
+                        'HIGH_RISK',
+                        'EXTREME_RISK'
+                    );
+                END IF;
+            END
+            $$;
+        `);
+
+        await query(`
+            ALTER TABLE direct1x2_prediction_final
+            ADD COLUMN IF NOT EXISTS fixture_id text,
+            ADD COLUMN IF NOT EXISTS home_team text,
+            ADD COLUMN IF NOT EXISTS away_team text,
+            ADD COLUMN IF NOT EXISTS prediction text,
+            ADD COLUMN IF NOT EXISTS confidence numeric,
+            ADD COLUMN IF NOT EXISTS match_date timestamptz,
+            ADD COLUMN IF NOT EXISTS risk_tier risk_tier_enum,
+            ADD COLUMN IF NOT EXISTS secondary_markets jsonb NOT NULL DEFAULT '[]'::jsonb;
+        `);
+
+        await query(`
+            UPDATE direct1x2_prediction_final
+            SET confidence = total_confidence
+            WHERE confidence IS NULL
+              AND total_confidence IS NOT NULL;
+        `);
+
+        await query(`
+            DO $$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1
+                    FROM pg_constraint
+                    WHERE conname = 'confidence_range'
+                      AND conrelid = 'direct1x2_prediction_final'::regclass
+                ) THEN
+                    ALTER TABLE direct1x2_prediction_final
+                    ADD CONSTRAINT confidence_range
+                    CHECK (confidence BETWEEN 0 AND 100);
+                END IF;
+            END
+            $$;
+        `);
+
+        await query(`
+            DO $$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1
+                    FROM pg_constraint
+                    WHERE conname = 'secondary_markets_length'
+                      AND conrelid = 'direct1x2_prediction_final'::regclass
+                ) THEN
+                    ALTER TABLE direct1x2_prediction_final
+                    ADD CONSTRAINT secondary_markets_length
+                    CHECK (jsonb_array_length(secondary_markets) <= 4);
+                END IF;
+            END
+            $$;
+        `);
+
+        await query(`
             CREATE INDEX IF NOT EXISTS idx_predictions_final_publish_run_id
             ON direct1x2_prediction_final(publish_run_id);
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_direct1x2_match_date
+            ON direct1x2_prediction_final(match_date);
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_direct1x2_risk_tier
+            ON direct1x2_prediction_final(risk_tier);
         `);
 
         await query(`
