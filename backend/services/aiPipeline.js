@@ -128,9 +128,63 @@ function normalizeCandidateConfidencePercent(candidate) {
     return Math.round(clamp(probability, 0, 100) * 100) / 100;
 }
 
+const SECONDARY_PIVOT_MARKETS = Object.freeze(new Set([
+    'double_chance_1x',
+    'double_chance_x2',
+    'double_chance_12',
+    'draw_no_bet_home',
+    'draw_no_bet_away',
+    'over_1_5',
+    'over_2_5',
+    'over_3_5',
+    'over_4_5',
+    'over_5_5',
+    'over_6_5',
+    'under_2_5',
+    'under_3_5',
+    'under_4_5',
+    'under_5_5',
+    'under_6_5',
+    'home_over_0_5',
+    'away_over_0_5',
+    'home_over_1_5',
+    'away_over_1_5',
+    'btts_yes',
+    'btts_no',
+    'btts_over_2_5',
+    'btts_under_3_5',
+    'home_win_btts_yes',
+    'away_win_btts_yes',
+    'home_win_btts_no',
+    'away_win_btts_no',
+    'over_0_5_first_half',
+    'under_1_5_first_half',
+    'first_half_draw',
+    'home_win_either_half',
+    'away_win_either_half',
+    'win_either_half'
+]));
+
+function isAllowedSecondaryPivotMarket(marketKey) {
+    const key = normalizeMarketKey(marketKey);
+    if (!key) return false;
+    if (key === 'over_0_5' || key === 'under_0_5') return false;
+    if (key.includes('red_cards')) return false;
+    if (SECONDARY_PIVOT_MARKETS.has(key)) return true;
+
+    if (/^corners_(over|under)_(6|7|8|9|10|11|12)_5$/.test(key)) return true;
+    if (/^yellow_cards_(over|under)_(1|2|3|4|5|6)_5$/.test(key)) return true;
+    if (/^cards_(over|under)_(1|2|3|4|5|6)_5$/.test(key)) return true;
+
+    return false;
+}
+
 function buildSecondaryInsights(candidates, selectedMarket) {
     const selectedKey = normalizeMarketKey(selectedMarket);
-    return ensureArray(candidates)
+    const deduped = new Map();
+    const minSecondaryConfidence = 76;
+
+    ensureArray(candidates)
         .map((candidate) => {
             const confidence = normalizeCandidateConfidencePercent(candidate);
             return {
@@ -147,10 +201,22 @@ function buildSecondaryInsights(candidates, selectedMarket) {
         .filter((candidate) => {
             if (!candidate.market) return false;
             if (candidate.market === selectedKey) return false;
-            if (candidate.market === 'over_0_5' || candidate.market === 'under_0_5') return false;
-            return Number.isFinite(candidate.confidence) && candidate.confidence >= 80;
+            if (!isAllowedSecondaryPivotMarket(candidate.market)) return false;
+            return Number.isFinite(candidate.confidence) && candidate.confidence >= minSecondaryConfidence;
         })
-        .sort((a, b) => b.confidence - a.confidence)
+        .forEach((candidate) => {
+            const existing = deduped.get(candidate.market);
+            if (!existing || Number(candidate.confidence || 0) > Number(existing.confidence || 0)) {
+                deduped.set(candidate.market, candidate);
+            }
+        });
+
+    return Array.from(deduped.values())
+        .sort((a, b) => {
+            const confidenceDiff = Number(b.confidence || 0) - Number(a.confidence || 0);
+            if (confidenceDiff !== 0) return confidenceDiff;
+            return Number(a.priority_tier || 99) - Number(b.priority_tier || 99);
+        })
         .slice(0, 4);
 }
 

@@ -2310,7 +2310,52 @@
     function isDisplayFriendlySecondaryMarket(market) {
         const marketKey = normalizeMarketKey(market);
         const is1X2 = is1X2Market(market);
-        return !is1X2 && marketKey !== '1x2' && marketKey !== 'match_result';
+        if (!marketKey || is1X2 || marketKey === '1x2' || marketKey === 'match_result') return false;
+        if (marketKey === 'over_0_5' || marketKey === 'under_0_5') return false;
+        if (marketKey.includes('red_cards')) return false;
+
+        const strictAllowed = new Set([
+            'double_chance_1x',
+            'double_chance_x2',
+            'double_chance_12',
+            'draw_no_bet_home',
+            'draw_no_bet_away',
+            'over_1_5',
+            'over_2_5',
+            'over_3_5',
+            'over_4_5',
+            'over_5_5',
+            'over_6_5',
+            'under_2_5',
+            'under_3_5',
+            'under_4_5',
+            'under_5_5',
+            'under_6_5',
+            'home_over_0_5',
+            'away_over_0_5',
+            'home_over_1_5',
+            'away_over_1_5',
+            'btts_yes',
+            'btts_no',
+            'btts_over_2_5',
+            'btts_under_3_5',
+            'home_win_btts_yes',
+            'away_win_btts_yes',
+            'home_win_btts_no',
+            'away_win_btts_no',
+            'over_0_5_first_half',
+            'under_1_5_first_half',
+            'first_half_draw',
+            'home_win_either_half',
+            'away_win_either_half',
+            'win_either_half'
+        ]);
+
+        if (strictAllowed.has(marketKey)) return true;
+        if (/^corners_(over|under)_(6|7|8|9|10|11|12)_5$/.test(marketKey)) return true;
+        if (/^yellow_cards_(over|under)_(1|2|3|4|5|6)_5$/.test(marketKey)) return true;
+        if (/^cards_(over|under)_(1|2|3|4|5|6)_5$/.test(marketKey)) return true;
+        return false;
     }
 
     function dedupeSecondaryDisplayItems(items) {
@@ -2654,7 +2699,7 @@
                     return { status: 'ok', rows };
                 }
 
-                const tablesToTry = ['predictions_final', 'prediction_final'];
+                const tablesToTry = ['direct1x2_prediction_final', 'predictions_final', 'prediction_final'];
                 let rows = [];
                 let tableStatus = 'table_not_found';
                 for (const tableName of tablesToTry) {

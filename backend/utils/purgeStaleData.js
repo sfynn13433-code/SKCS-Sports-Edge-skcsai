@@ -3,7 +3,7 @@
 /**
  * purgeStaleData.js
  * One-off script to delete all stale rows (kickoff > 15 minutes in the past)
- * from predictions_final, predictions_raw, and predictions_filtered (cascades).
+ * from direct1x2_prediction_final, predictions_raw, and predictions_filtered (cascades).
  *
  * Usage: node backend/utils/purgeStaleData.js
  */
@@ -30,16 +30,16 @@ async function purgeStaleData() {
 
         await client.query('BEGIN');
 
-        // ── 1. predictions_final ──────────────────────────────────────────────
+        // ── 1. direct1x2_prediction_final ──────────────────────────────────────────────
         // Delete rows where every leg's kickoff is older than the grace cutoff.
         // Kickoff is stored inside the JSONB matches array under each element's
         // metadata.match_time / metadata.kickoff / metadata.kickoff_time field,
         // plus top-level match_date / commence_time fallbacks.
         const finalResult = await client.query(`
-            DELETE FROM predictions_final
+            DELETE FROM direct1x2_prediction_final
             WHERE id IN (
                 SELECT pf.id
-                FROM predictions_final pf
+                FROM direct1x2_prediction_final pf
                 WHERE jsonb_array_length(pf.matches) > 0
                   AND (
                     SELECT BOOL_AND(
@@ -59,7 +59,7 @@ async function purgeStaleData() {
         `, [GRACE_MINUTES]);
 
         const finalDeleted = finalResult.rowCount ?? 0;
-        console.log(`✅ predictions_final  — deleted ${finalDeleted} stale row(s)`);
+        console.log(`✅ direct1x2_prediction_final  — deleted ${finalDeleted} stale row(s)`);
 
         // ── 2. predictions_raw (cascades to predictions_filtered) ─────────────
         // Kickoff is stored in metadata->>'match_time', ->>'kickoff', ->>'kickoff_time'
@@ -92,7 +92,7 @@ async function purgeStaleData() {
         await client.query('COMMIT');
 
         console.log(`\n📊 Purge summary:`);
-        console.log(`   predictions_final   : ${finalDeleted} row(s) deleted`);
+        console.log(`   direct1x2_prediction_final   : ${finalDeleted} row(s) deleted`);
         console.log(`   predictions_raw     : ${rawDeleted} row(s) deleted`);
         console.log(`   predictions_filtered: cascade-deleted with predictions_raw\n`);
         console.log('✅ Purge complete.\n');

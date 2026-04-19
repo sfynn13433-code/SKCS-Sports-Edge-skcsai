@@ -392,7 +392,7 @@ async function fetchPredictionRows(queryTiers, isAdmin) {
     if (latestRunId && isAdmin) {
         const rowsRes = await query(
             `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
-             FROM predictions_final
+             FROM direct1x2_prediction_final
              WHERE publish_run_id = $1
              ORDER BY created_at DESC
              LIMIT $2`,
@@ -404,7 +404,7 @@ async function fetchPredictionRows(queryTiers, isAdmin) {
     if (latestRunId) {
         const rowsRes = await query(
             `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
-             FROM predictions_final
+             FROM direct1x2_prediction_final
              WHERE publish_run_id = $1
                AND LOWER(COALESCE(tier, 'normal')) = ANY($2::text[])
              ORDER BY created_at DESC
@@ -416,7 +416,7 @@ async function fetchPredictionRows(queryTiers, isAdmin) {
 
     const fallbackRes = await query(
         `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
-         FROM predictions_final
+         FROM direct1x2_prediction_final
          WHERE LOWER(COALESCE(tier, 'normal')) = ANY($1::text[])
          ORDER BY created_at DESC
          LIMIT $2`,

@@ -16,9 +16,55 @@ const axios = require('axios');
 const { pool } = require('../backend/database');
 const { enrichWithWeather } = require('../backend/utils/weather');
 const { fetchWithWaterfall } = require('../backend/utils/rapidApiWaterfall');
+const { getApiSportsKeyPool, maskKey } = require('../backend/utils/keyPool');
 
 const RAPIDAPI_KEY = process.env.X_RAPIDAPI_KEY || process.env.RAPIDAPI_KEY;
-const APISPORTS_KEY = process.env.X_APISPORTS_KEY;
+const APISPORTS_KEYS = getApiSportsKeyPool({ sport: 'football' });
+
+function hasApiSportsQuotaPayload(data) {
+    const errors = data && typeof data === 'object' ? data.errors : null;
+    if (!errors || typeof errors !== 'object') return false;
+    return Boolean(errors.requests || errors.token);
+}
+
+async function requestApiFootballWithRotation(url) {
+    if (!APISPORTS_KEYS.length) {
+        throw new Error('No API-Sports keys configured for football');
+    }
+
+    let lastError = null;
+    for (let idx = 0; idx < APISPORTS_KEYS.length; idx += 1) {
+        const key = APISPORTS_KEYS[idx];
+        try {
+            const response = await axios.get(url, {
+                headers: {
+                    'x-apisports-key': key,
+                    'x-rapidapi-key': key,
+                    'x-rapidapi-host': 'v3.football.api-sports.io'
+                },
+                timeout: 30000
+            });
+
+            if (hasApiSportsQuotaPayload(response.data)) {
+                console.warn(`[API-Sports] key ${idx + 1}/${APISPORTS_KEYS.length} (${maskKey(key)}) quota exhausted. Rotating...`);
+                lastError = new Error('API-Sports quota exhausted');
+                continue;
+            }
+
+            return response;
+        } catch (error) {
+            lastError = error;
+            const status = Number(error?.response?.status || 0);
+            if (status === 401 || status === 403 || status === 429 || hasApiSportsQuotaPayload(error?.response?.data)) {
+                console.warn(`[API-Sports] key ${idx + 1}/${APISPORTS_KEYS.length} (${maskKey(key)}) failed (${status || 'network'}). Rotating...`);
+                continue;
+            }
+            throw error;
+        }
+    }
+
+    throw new Error(`All API-Sports keys failed: ${lastError ? lastError.message : 'unknown error'}`);
+}
 
 // ============================================================
 // FIXTURE NORMALIZER (MISSING FUNCTION!)
@@ -87,7 +133,7 @@ const MASTER_LEAGUES = new Set([
 
 console.log('=== SKCS INCREMENTAL DATA PIPELINE ===');
 console.log(`Master Leagues: ${MASTER_LEAGUES.size}`);
-console.log(`API-Sports Key: ${APISPORTS_KEY ? '✓ Set' : '✗ Missing'}`);
+console.log(`API-Sports Key Pool: ${APISPORTS_KEYS.length > 0 ? `✓ ${APISPORTS_KEYS.length} keys` : '✗ Missing'}`);
 console.log(`RapidAPI Key: ${RAPIDAPI_KEY ? '✓ Set' : '✗ Missing'}`);
 console.log('');
 
@@ -116,10 +162,7 @@ async function fetchAllLeaguesFixtures() {
             const url = `https://v3.football.api-sports.io/fixtures?date=${date}`;
             console.log(`[API-Sports] Calling: ${url}`);
             
-            const response = await axios.get(url, {
-                headers: { 'x-apisports-key': APISPORTS_KEY },
-                timeout: 30000
-            });
+            const response = await requestApiFootballWithRotation(url);
             
             const fixtures = response.data?.response || [];
             console.log(`[API-Sports] ${date}: ${fixtures.length} fixtures`);
@@ -162,10 +205,7 @@ async function fetchFixturesSingleAPI() {
             const url = `https://v3.football.api-sports.io/fixtures?date=${date}`;
             console.log(`[API-Sports] Calling: ${url}`);
             
-            const response = await axios.get(url, {
-                headers: { 'x-apisports-key': APISPORTS_KEY },
-                timeout: 30000
-            });
+            const response = await requestApiFootballWithRotation(url);
             
             const fixtures = response.data?.response || [];
             console.log(`[API-Sports] Total received: ${fixtures.length} fixtures`);
@@ -484,7 +524,7 @@ async function saveToSupabase(fixtures, existingMap) {
                 
                 // Insert only for unseen fixture IDs to keep sync idempotent.
                 const sql = `
-                    INSERT INTO predictions_final (
+                    INSERT INTO direct1x2_prediction_final (
                         tier, type, matches, total_confidence, risk_level, sport, market_type, recommendation,
                         edgemind_report, secondary_insights, created_at
                     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
@@ -553,7 +593,7 @@ async function runLiveSync() {
                     (matches->0->>'fixture_id') as fixture_id,
                     edgemind_report,
                     total_confidence AS confidence
-                FROM predictions_final 
+                FROM direct1x2_prediction_final 
                 WHERE matches IS NOT NULL
                 AND matches::text != '[]'
                 AND LOWER(COALESCE(tier, '')) = 'normal'

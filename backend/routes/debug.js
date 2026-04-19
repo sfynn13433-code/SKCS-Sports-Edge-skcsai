@@ -139,7 +139,7 @@ router.get('/predictions-count', async (_req, res) => {
                 COUNT(*)::int as total,
                 COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '24 hours')::int as last_24h,
                 COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '1 hour')::int as last_hour
-            FROM predictions_final
+            FROM direct1x2_prediction_final
         `);
         const counts = result.rows[0] || { total: 0, last_24h: 0, last_hour: 0 };
         res.status(200).json({ ok: true, ...counts });
@@ -162,7 +162,7 @@ router.get('/pipeline-status', async (req, res) => {
     try {
         const publishRes = await query(`
             SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
-            FROM predictions_final
+            FROM direct1x2_prediction_final
             ORDER BY created_at DESC
             LIMIT 500;
         `);

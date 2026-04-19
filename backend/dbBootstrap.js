@@ -88,7 +88,7 @@ async function bootstrap() {
         `);
 
         await query(`
-            CREATE TABLE IF NOT EXISTS predictions_final (
+            CREATE TABLE IF NOT EXISTS direct1x2_prediction_final (
                 id bigserial PRIMARY KEY,
                 publish_run_id bigint REFERENCES prediction_publish_runs(id) ON DELETE CASCADE,
                 tier text NOT NULL CHECK (tier IN ('normal', 'deep')),
@@ -108,14 +108,14 @@ async function bootstrap() {
                     FROM pg_constraint
                     WHERE conname = 'predictions_final_type_check'
                 ) THEN
-                    ALTER TABLE predictions_final DROP CONSTRAINT predictions_final_type_check;
+                    ALTER TABLE direct1x2_prediction_final DROP CONSTRAINT predictions_final_type_check;
                 END IF;
             END
             $$;
         `);
 
         await query(`
-            ALTER TABLE predictions_final
+            ALTER TABLE direct1x2_prediction_final
             ADD CONSTRAINT predictions_final_type_check
             CHECK (type IN ('single', 'acca', 'direct', 'secondary', 'multi', 'same_match', 'acca_6match', 'mega_acca_12'));
         `).catch((err) => {
@@ -123,18 +123,29 @@ async function bootstrap() {
         });
 
         await query(`
-            ALTER TABLE predictions_final
+            ALTER TABLE direct1x2_prediction_final
             ADD COLUMN IF NOT EXISTS publish_run_id bigint REFERENCES prediction_publish_runs(id) ON DELETE CASCADE;
         `);
 
         await query(`
+            ALTER TABLE direct1x2_prediction_final
+            ADD COLUMN IF NOT EXISTS plan_visibility jsonb NOT NULL DEFAULT '[]'::jsonb,
+            ADD COLUMN IF NOT EXISTS sport text,
+            ADD COLUMN IF NOT EXISTS market_type text,
+            ADD COLUMN IF NOT EXISTS recommendation text,
+            ADD COLUMN IF NOT EXISTS expires_at timestamptz,
+            ADD COLUMN IF NOT EXISTS edgemind_report text,
+            ADD COLUMN IF NOT EXISTS secondary_insights jsonb NOT NULL DEFAULT '[]'::jsonb;
+        `);
+
+        await query(`
             CREATE INDEX IF NOT EXISTS idx_predictions_final_publish_run_id
-            ON predictions_final(publish_run_id);
+            ON direct1x2_prediction_final(publish_run_id);
         `);
 
         await query(`
             CREATE UNIQUE INDEX IF NOT EXISTS uq_predictions_final_live_direct_fixture_market
-            ON predictions_final (
+            ON direct1x2_prediction_final (
                 LOWER(COALESCE(sport, '')),
                 LOWER(COALESCE(market_type, '')),
                 (CASE

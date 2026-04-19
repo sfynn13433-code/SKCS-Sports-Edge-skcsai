@@ -380,7 +380,7 @@ router.get('/overall', async (req, res) => {
                 COUNT(*) as total,
                 COUNT(CASE WHEN tier = 'normal' THEN 1 END) as normal_total,
                 COUNT(CASE WHEN tier = 'deep' THEN 1 END) as deep_total
-            FROM predictions_final
+            FROM direct1x2_prediction_final
             WHERE created_at >= NOW() - INTERVAL '30 days'
         `);
 
@@ -408,7 +408,7 @@ router.get('/by-sport', async (req, res) => {
             SELECT 
                 LOWER(TRIM(matches->0->>'sport')) as sport,
                 COUNT(*) as total
-            FROM predictions_final
+            FROM direct1x2_prediction_final
             WHERE matches IS NOT NULL 
               AND jsonb_array_length(matches) > 0
               AND created_at >= NOW() - INTERVAL '30 days'
@@ -439,7 +439,7 @@ router.get('/weekly-performance', async (req, res) => {
                 created_at,
                 tier,
                 type
-            FROM predictions_final
+            FROM direct1x2_prediction_final
             WHERE created_at >= NOW() - INTERVAL '4 weeks'
             ORDER BY created_at DESC
         `);
@@ -484,7 +484,7 @@ router.get('/dashboard', async (req, res) => {
                 COUNT(CASE WHEN tier = 'deep' THEN 1 END) as deep_total,
                 COUNT(CASE WHEN type = 'same_match' THEN 1 END) as same_match_total,
                 COUNT(CASE WHEN type LIKE '%acca%' THEN 1 END) as acca_total
-            FROM predictions_final
+            FROM direct1x2_prediction_final
             WHERE created_at >= NOW() - INTERVAL '30 days'
         `);
 

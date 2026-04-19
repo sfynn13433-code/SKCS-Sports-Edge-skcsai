@@ -1631,7 +1631,7 @@ async function getLatestPublishRunIdFromFinalTable() {
     const fallbackRunRes = await query(
         `
         SELECT publish_run_id
-        FROM predictions_final
+        FROM direct1x2_prediction_final
         WHERE publish_run_id IS NOT NULL
         ORDER BY publish_run_id DESC, created_at DESC
         LIMIT 1
@@ -1677,7 +1677,7 @@ async function loadReadPathDbCounts(now = new Date()) {
                     WHERE f.is_valid = true
                       AND rk.kickoff_utc > $1::timestamptz
                 ) AS predictions_filtered_future_count,
-                (SELECT COUNT(*)::int FROM predictions_final) AS predictions_final_count
+                (SELECT COUNT(*)::int FROM direct1x2_prediction_final) AS predictions_final_count
             `,
             [now.toISOString()]
         );
@@ -1910,7 +1910,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                 latestPublishRunId = await getLatestPublishRunIdFromFinalTable();
                 if (latestPublishRunId) {
                     publishRunSource = 'predictions_final_fallback';
-                    console.warn('[predictions] No completed publish run found; using latest predictions_final publish_run_id:', latestPublishRunId);
+                    console.warn('[predictions] No completed publish run found; using latest direct1x2_prediction_final publish_run_id:', latestPublishRunId);
                 }
             }
         }
@@ -1927,8 +1927,10 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                     // Filter by sport - use OR condition to match any of the allowed sport values
                     const sportPlaceholders = sportFilterValues.map((_, i) => `$${i + 1}`).join(', ');
                     queryStr = `
-                        SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at
-                        FROM predictions_final pf
+                        SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at,
+                               pf.plan_visibility, pf.sport, pf.market_type, pf.recommendation, pf.expires_at,
+                               pf.edgemind_report, pf.secondary_insights
+                        FROM direct1x2_prediction_final pf
                         WHERE LOWER(COALESCE(pf.sport, 'football')) IN (${sportPlaceholders})
                         ORDER BY created_at DESC
                         LIMIT 2500;
@@ -1937,8 +1939,10 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                 } else {
                     // No sport filter - return all
                     queryStr = `
-                        SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at
-                        FROM predictions_final pf
+                        SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at,
+                               pf.plan_visibility, pf.sport, pf.market_type, pf.recommendation, pf.expires_at,
+                               pf.edgemind_report, pf.secondary_insights
+                        FROM direct1x2_prediction_final pf
                         ORDER BY created_at DESC
                         LIMIT 2500;
                     `;
@@ -1947,8 +1951,10 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                 // Query ALL predictions with matching tier (don't restrict by publish_run_id).
                 // The date windowing and subscription filtering below handles what the user sees.
                 queryStr = `
-                    SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at
-                    FROM predictions_final pf
+                    SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at,
+                           pf.plan_visibility, pf.sport, pf.market_type, pf.recommendation, pf.expires_at,
+                           pf.edgemind_report, pf.secondary_insights
+                    FROM direct1x2_prediction_final pf
                     WHERE LOWER(COALESCE(pf.tier, 'normal')) = ANY($1::text[])
                     ORDER BY created_at DESC
                     LIMIT 2000;
@@ -1971,7 +1977,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                 
                 if (includeAll) {
                     let query = sb
-                        .from('predictions_final')
+                        .from('direct1x2_prediction_final')
                         .select('*')
                         .order('created_at', { ascending: false })
                         .limit(2500);
@@ -2006,19 +2012,19 @@ router.get('/', requireSupabaseUser, async (req, res) => {
 
                     const { data, error } = latestSupabaseRun
                         ? await sb
-                            .from('predictions_final')
+                            .from('direct1x2_prediction_final')
                             .select('*')
                             .eq('publish_run_id', latestSupabaseRun.id)
                             .order('created_at', { ascending: false })
                             .limit(2000)
                         : await sb
-                            .from('predictions_final')
+                            .from('direct1x2_prediction_final')
                             .select('*')
                             .order('created_at', { ascending: false })
                             .limit(2000);
 
                     if (!latestSupabaseRun) {
-                        console.warn('[predictions] Supabase has no completed publish run; using latest predictions_final rows');
+                        console.warn('[predictions] Supabase has no completed publish run; using latest direct1x2_prediction_final rows');
                     }
 
                     if (!error && Array.isArray(data) && data.length > 0) {
@@ -2314,7 +2320,7 @@ router.post('/clear-all', requireRole('admin'), async (_req, res) => {
         // Clear PostgreSQL
         await query(`DELETE FROM predictions_filtered`);
         await query(`DELETE FROM predictions_raw`);
-        const finalResult = await query(`DELETE FROM predictions_final`);
+        const finalResult = await query(`DELETE FROM direct1x2_prediction_final`);
         await query(`DELETE FROM prediction_publish_runs`);
         await query(`DELETE FROM rapidapi_cache`);
         await query(`DELETE FROM context_intelligence_cache`);
@@ -2327,7 +2333,7 @@ router.post('/clear-all', requireRole('admin'), async (_req, res) => {
                 const sb = createClient(config.supabase.url, config.supabase.anonKey);
                 await sb.from('predictions_filtered').delete().neq('id', 0);
                 await sb.from('predictions_raw').delete().neq('id', 0);
-                await sb.from('predictions_final').delete().neq('id', 0);
+                await sb.from('direct1x2_prediction_final').delete().neq('id', 0);
                 await sb.from('prediction_publish_runs').delete().neq('id', 0);
                 await sb.from('rapidapi_cache').delete().neq('cache_key', 'x');
                 await sb.from('context_intelligence_cache').delete().neq('cache_key', 'x');
@@ -2359,8 +2365,8 @@ router.post('/clear-test', requireRole('admin'), async (_req, res) => {
         await query(`DELETE FROM predictions_filtered WHERE raw_id IN (SELECT id FROM predictions_raw WHERE metadata->>'data_mode' = 'test')`);
         // Delete test data from predictions_raw
         const rawResult = await query(`DELETE FROM predictions_raw WHERE metadata->>'data_mode' = 'test'`);
-        // Clear predictions_final (will be rebuilt)
-        await query(`DELETE FROM predictions_final`);
+        // Clear direct1x2_prediction_final (will be rebuilt)
+        await query(`DELETE FROM direct1x2_prediction_final`);
         res.status(200).json({ 
             ok: true, 
             message: "Test data cleared. Run /rebuild to regenerate final outputs.",

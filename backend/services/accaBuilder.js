@@ -135,9 +135,7 @@ function endOfWeekSast(now = new Date()) {
 
 function riskLevelFromConfidence(avgConfidence) {
     if (avgConfidence >= 80) return 'safe';
-    if (avgConfidence >= 70) return 'good';
-    if (avgConfidence >= 59) return 'fair';
-    return 'unsafe';
+    return 'medium';
 }
 
 function toLeg(p) {
@@ -586,6 +584,34 @@ function selectionConfidence(prediction) {
     return Number.isFinite(value) ? value : 0;
 }
 
+function directConfidenceBand(confidenceValue) {
+    const confidence = Number(confidenceValue);
+    if (!Number.isFinite(confidence)) return 3;
+    if (confidence >= 80) return 0; // High Confidence
+    if (confidence >= 70) return 1; // Moderate Risk
+    if (confidence >= 59) return 2; // High Risk
+    return 3; // Extreme Risk
+}
+
+function sortDirectCandidatesByBand(predictions) {
+    const safePredictions = Array.isArray(predictions) ? predictions.slice() : [];
+    return safePredictions.sort((left, right) => {
+        const leftConfidence = selectionConfidence(left);
+        const rightConfidence = selectionConfidence(right);
+        const leftBand = directConfidenceBand(leftConfidence);
+        const rightBand = directConfidenceBand(rightConfidence);
+        if (leftBand !== rightBand) return leftBand - rightBand;
+        if (leftConfidence !== rightConfidence) return rightConfidence - leftConfidence;
+
+        const leftKickoff = parseKickoff(left);
+        const rightKickoff = parseKickoff(right);
+        if (leftKickoff && rightKickoff) return leftKickoff.getTime() - rightKickoff.getTime();
+        if (leftKickoff) return -1;
+        if (rightKickoff) return 1;
+        return 0;
+    });
+}
+
 function isDirectMarketSelection(prediction) {
     const market = selectionMarketKey(prediction);
     return DIRECT_MARKETS_ALLOWED.has(market) && selectionConfidence(prediction) >= DIRECT_CONFIDENCE_MIN;
@@ -798,6 +824,185 @@ function isSupplementaryDisplayMarket(market) {
     return normalized !== 'corners_under' && normalized !== 'corners_over';
 }
 
+const SECONDARY_PIVOT_ALLOWED_MARKETS = Object.freeze(new Set([
+    'double_chance_1x',
+    'double_chance_x2',
+    'double_chance_12',
+    'draw_no_bet_home',
+    'draw_no_bet_away',
+    'over_1_5',
+    'over_2_5',
+    'over_3_5',
+    'over_4_5',
+    'over_5_5',
+    'over_6_5',
+    'under_2_5',
+    'under_3_5',
+    'under_4_5',
+    'under_5_5',
+    'under_6_5',
+    'home_over_0_5',
+    'away_over_0_5',
+    'home_over_1_5',
+    'away_over_1_5',
+    'btts_yes',
+    'btts_no',
+    'btts_over_2_5',
+    'btts_under_3_5',
+    'home_win_btts_yes',
+    'away_win_btts_yes',
+    'home_win_btts_no',
+    'away_win_btts_no',
+    'over_0_5_first_half',
+    'under_1_5_first_half',
+    'first_half_draw',
+    'home_win_either_half',
+    'away_win_either_half',
+    'win_either_half'
+]));
+
+function isAllowedSecondaryPivotMarket(market) {
+    const key = normalizeMarketKeyMI(market || '');
+    if (!key) return false;
+    if (key === 'over_0_5' || key === 'under_0_5') return false;
+    if (key.includes('red_cards')) return false;
+    if (SECONDARY_PIVOT_ALLOWED_MARKETS.has(key)) return true;
+    if (/^corners_(over|under)_(6|7|8|9|10|11|12)_5$/.test(key)) return true;
+    if (/^yellow_cards_(over|under)_(1|2|3|4|5|6)_5$/.test(key)) return true;
+    if (/^cards_(over|under)_(1|2|3|4|5|6)_5$/.test(key)) return true;
+    return false;
+}
+
+function normalizeSecondaryPivotCandidate(candidate) {
+    if (!candidate || typeof candidate !== 'object') return null;
+
+    const market = normalizeMarketKeyMI(
+        candidate.market
+        || candidate.market_type
+        || candidate.type
+        || ''
+    );
+    if (!market || !isAllowedSecondaryPivotMarket(market)) return null;
+
+    const prediction = String(
+        candidate.prediction
+        || candidate.recommendation
+        || candidate.pick
+        || candidate.selection
+        || candidate.outcome
+        || ''
+    ).trim().toLowerCase();
+    const confidence = Number(candidate.confidence);
+    if (!Number.isFinite(confidence)) return null;
+
+    return {
+        market,
+        prediction,
+        confidence: clamp(Math.round(confidence * 100) / 100, 0, 100),
+        label: candidate.label || null
+    };
+}
+
+function buildSyntheticSecondaryPivotCandidates(primaryMatch, baseConfidence) {
+    const normalizedPrimary = String(primaryMatch?.prediction || '').trim().toLowerCase();
+    const syntheticBase = clamp(Math.round((Number(baseConfidence) + 18) * 100) / 100, 76, 92);
+    const out = [];
+
+    if (normalizedPrimary === 'home_win' || normalizedPrimary === 'home') {
+        out.push({ market: 'double_chance_1x', prediction: '1x', confidence: syntheticBase });
+        out.push({ market: 'draw_no_bet_home', prediction: 'home', confidence: Math.max(76, syntheticBase - 4) });
+    } else if (normalizedPrimary === 'away_win' || normalizedPrimary === 'away') {
+        out.push({ market: 'double_chance_x2', prediction: 'x2', confidence: syntheticBase });
+        out.push({ market: 'draw_no_bet_away', prediction: 'away', confidence: Math.max(76, syntheticBase - 4) });
+    } else {
+        out.push({ market: 'double_chance_12', prediction: '12', confidence: syntheticBase });
+        out.push({ market: 'double_chance_1x', prediction: '1x', confidence: Math.max(76, syntheticBase - 5) });
+    }
+
+    out.push({ market: 'under_3_5', prediction: 'under', confidence: Math.max(76, syntheticBase - 2) });
+    out.push({ market: 'over_1_5', prediction: 'over', confidence: Math.max(76, syntheticBase - 3) });
+    return out;
+}
+
+function deriveDirectSecondaryInsights(matches, totalConfidence) {
+    const firstMatch = Array.isArray(matches) ? matches[0] : null;
+    if (!firstMatch) return [];
+
+    const metadata = firstMatch?.metadata && typeof firstMatch.metadata === 'object'
+        ? firstMatch.metadata
+        : {};
+    const existing = []
+        .concat(Array.isArray(firstMatch?.secondary_insights) ? firstMatch.secondary_insights : [])
+        .concat(Array.isArray(metadata?.secondary_markets) ? metadata.secondary_markets : [])
+        .concat(Array.isArray(metadata?.secondary_insights) ? metadata.secondary_insights : [])
+        .concat(Array.isArray(metadata?.market_intelligence?.secondary_insights) ? metadata.market_intelligence.secondary_insights : []);
+
+    const normalized = [];
+    const seen = new Set();
+    for (const item of existing) {
+        const candidate = normalizeSecondaryPivotCandidate(item);
+        if (!candidate) continue;
+        if (candidate.confidence < 76) continue;
+        if (!isCompatibleWithPrimaryPrediction(firstMatch, candidate)) continue;
+        const key = `${candidate.market}:${candidate.prediction}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        normalized.push(candidate);
+    }
+
+    normalized.sort((a, b) => Number(b.confidence || 0) - Number(a.confidence || 0));
+    let shaped = normalized.slice(0, 4);
+    const confidence = Number(totalConfidence);
+    const inHighRiskBand = Number.isFinite(confidence) && confidence >= 59 && confidence <= 69;
+    const inExtremeRiskBand = Number.isFinite(confidence) && confidence >= 0 && confidence <= 58;
+
+    if ((inHighRiskBand && shaped.length < 1) || (inExtremeRiskBand && shaped.length < 4)) {
+        const synthetic = buildSyntheticSecondaryPivotCandidates(firstMatch, confidence);
+        for (const item of synthetic) {
+            const candidate = normalizeSecondaryPivotCandidate(item);
+            if (!candidate) continue;
+            if (!isCompatibleWithPrimaryPrediction(firstMatch, candidate)) continue;
+            const key = `${candidate.market}:${candidate.prediction}`;
+            if (seen.has(key)) continue;
+            seen.add(key);
+            shaped.push(candidate);
+            if (!inExtremeRiskBand && shaped.length >= 1) break;
+            if (inExtremeRiskBand && shaped.length >= 4) break;
+        }
+    }
+
+    // Final fallback: guarantee governance-required minimum counts.
+    if ((inHighRiskBand && shaped.length < 1) || (inExtremeRiskBand && shaped.length < 4)) {
+        const synthetic = buildSyntheticSecondaryPivotCandidates(firstMatch, confidence);
+        for (const item of synthetic) {
+            const candidate = normalizeSecondaryPivotCandidate(item);
+            if (!candidate) continue;
+            const key = `${candidate.market}:${candidate.prediction}`;
+            if (seen.has(key)) continue;
+            seen.add(key);
+            shaped.push(candidate);
+            if (!inExtremeRiskBand && shaped.length >= 1) break;
+            if (inExtremeRiskBand && shaped.length >= 4) break;
+        }
+    }
+
+    if (inExtremeRiskBand) return shaped.slice(0, 4);
+    if (inHighRiskBand) return shaped.slice(0, Math.max(1, Math.min(4, shaped.length)));
+    return shaped.slice(0, 4);
+}
+
+function deriveEdgeMindReportFromMatches(matches) {
+    const firstMatch = Array.isArray(matches) ? matches[0] : null;
+    if (!firstMatch) return null;
+    const metadata = firstMatch?.metadata || {};
+    const report = firstMatch?.edgemind_report
+        || metadata?.edgemind_report
+        || metadata?.reasoning
+        || metadata?.core_reasoning
+        || null;
+    return String(report || '').trim() || null;
+}
+
 function isCompatibleWithPrimaryPrediction(prediction, candidate) {
     return areLegsCompatible(
         {
@@ -1008,6 +1213,7 @@ async function buildDerivedMarkets(prediction, options = {}) {
 
 async function buildSecondaryCandidates(predictions) {
     const secondary = [];
+    const minSecondaryConfidence = 76;
 
     for (const prediction of predictions) {
         const primaryLeg = toFinalMatchPayload(prediction);
@@ -1018,6 +1224,11 @@ async function buildSecondaryCandidates(predictions) {
         });
 
         for (const candidate of candidates) {
+            const candidateMarket = normalizeMarketKeyMI(candidate?.market || '');
+            const candidateConfidence = Number(candidate?.confidence || 0);
+            if (!isAllowedSecondaryPivotMarket(candidateMarket)) continue;
+            if (!Number.isFinite(candidateConfidence) || candidateConfidence < minSecondaryConfidence) continue;
+
             const candidateLeg = toFinalMatchPayload(candidate);
             const validation = validateInsightLegGroup([primaryLeg, candidateLeg]);
             if (!validation.valid) continue;
@@ -2628,14 +2839,14 @@ async function loadWeekLockedTeamCompetitionMap(client, now = new Date()) {
         `
         WITH latest_week_run AS (
             SELECT MAX(publish_run_id) AS publish_run_id
-            FROM predictions_final
+            FROM direct1x2_prediction_final
             WHERE created_at >= $1
               AND created_at < $2
               AND type IN ('acca_6match', 'mega_acca_12', 'acca')
               AND publish_run_id IS NOT NULL
         )
         SELECT pf.matches
-        FROM predictions_final pf
+        FROM direct1x2_prediction_final pf
         LEFT JOIN latest_week_run lwr ON TRUE
         WHERE pf.created_at >= $1
           AND pf.created_at < $2
@@ -2848,9 +3059,10 @@ function extractMarketAndRecommendation(matches) {
     }
     const first = matches[0];
     const marketType = first?.market_type || first?.market || first?.prediction_type || first?.metadata?.market_type || 'unknown';
-    const recommendation = first?.recommendation || first?.prediction || first?.selection || first?.home_team && first?.away_team 
-        ? `${first.home_team} vs ${first.away_team}` 
-        : null;
+    const recommendation = first?.recommendation
+        || first?.prediction
+        || first?.selection
+        || (first?.home_team && first?.away_team ? `${first.home_team} vs ${first.away_team}` : null);
     return { market_type: marketType, recommendation };
 }
 
@@ -2859,14 +3071,37 @@ async function insertFinalRow({ publish_run_id, tier, type, matches, total_confi
     const sport = extractSportFromMatches(matches);
     const { market_type, recommendation } = extractMarketAndRecommendation(matches);
     const expiresAtIso = new Date(Date.now() + (7 * 24 * 60 * 60 * 1000)).toISOString();
+    const normalizedType = String(type || '').trim().toLowerCase();
+    const secondaryInsights = (normalizedType === 'direct' || normalizedType === 'single')
+        ? deriveDirectSecondaryInsights(matches, total_confidence)
+        : [];
+    const edgeMindReport = deriveEdgeMindReportFromMatches(matches);
     
     const res = await client.query(
         `
-        insert into predictions_final (publish_run_id, tier, type, matches, total_confidence, risk_level, plan_visibility, sport, market_type, recommendation, expires_at)
-        values ($1, $2, $3, $4::jsonb, $5, $6, $7::jsonb, $8, $9, $10, $11)
+        insert into direct1x2_prediction_final (
+            publish_run_id, tier, type, matches, total_confidence, risk_level,
+            plan_visibility, sport, market_type, recommendation, expires_at,
+            edgemind_report, secondary_insights
+        )
+        values ($1, $2, $3, $4::jsonb, $5, $6, $7::jsonb, $8, $9, $10, $11, $12, $13::jsonb)
         returning *;
         `,
-        [publish_run_id || null, tier, type, JSON.stringify(matches), total_confidence, risk_level, JSON.stringify(plan_visibility), sport, market_type, recommendation, expiresAtIso]
+        [
+            publish_run_id || null,
+            tier,
+            type,
+            JSON.stringify(matches),
+            total_confidence,
+            risk_level,
+            JSON.stringify(plan_visibility),
+            sport,
+            market_type,
+            recommendation,
+            expiresAtIso,
+            edgeMindReport,
+            JSON.stringify(secondaryInsights)
+        ]
     );
 
     return res.rows[0];
@@ -3280,7 +3515,7 @@ async function buildFinalForTier(tier, options = {}) {
         // SKCS LAW: Clean stale rows for this tier before publishing
         // ---------------------------------------------------------------------
         await client.query(
-            'DELETE FROM predictions_final WHERE tier = $1',
+            'DELETE FROM direct1x2_prediction_final WHERE tier = $1',
             [t]
         );
         console.log('[accaBuilder] Cleaned stale rows for tier=%s', t);
@@ -3290,7 +3525,9 @@ async function buildFinalForTier(tier, options = {}) {
         // ---------------------------------------------------------------------
         const directRows = [];
         const directSelections = takeAvailablePredictions(
-            limitedCandidates.filter((candidate) => isDirectMarketSelection(candidate)),
+            sortDirectCandidatesByBand(
+                limitedCandidates.filter((candidate) => isDirectMarketSelection(candidate))
+            ),
             globalUsedFixtures,
             new Map(),
             new Map(),

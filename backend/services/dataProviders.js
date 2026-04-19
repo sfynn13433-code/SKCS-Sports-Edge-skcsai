@@ -1,6 +1,7 @@
 'use strict';
 
 const { fetchWithCache, isCacheWallReady } = require('./apiCacheService');
+const { getRapidApiKeyPool, maskKey } = require('../utils/keyPool');
 
 const PROVIDER_CONFIG = Object.freeze({
     football_api: { hostEnv: 'RAPIDAPI_HOST_FOOTBALL_API', cacheDurationMinutes: 10 },
@@ -54,7 +55,8 @@ const FOOTBALL_NEWS_FALLBACK_LEAGUE = String(
 ).trim();
 
 function getRapidApiKey() {
-    return String(process.env.X_RAPIDAPI_KEY || process.env.RAPIDAPI_KEY || '').trim();
+    const keys = getRapidApiKeyPool();
+    return keys[0] || '';
 }
 
 function toEndpointUrl(host, endpointPath) {
@@ -93,23 +95,35 @@ function getRapidApiProviderForSport(sport) {
 async function fetchRapidApiProvider(providerName, endpointPath, params = {}, options = {}) {
     const provider = getProviderConfig(providerName);
     const host = getProviderHost(providerName);
-    const rapidApiKey = getRapidApiKey();
+    const rapidApiKeys = getRapidApiKeyPool();
 
-    if (!rapidApiKey) {
+    if (!rapidApiKeys.length) {
         console.warn(`[dataProviders] RapidAPI key missing. Skipping provider ${providerName}.`);
         return null;
     }
 
     const endpointUrl = toEndpointUrl(host, endpointPath);
-    const headers = {
-        'x-rapidapi-key': rapidApiKey,
-        'x-rapidapi-host': host
-    };
     const cacheDurationMinutes = Number.isFinite(options.cacheDurationMinutes)
         ? options.cacheDurationMinutes
         : provider.cacheDurationMinutes;
 
-    return fetchWithCache(providerName, endpointUrl, headers, params, cacheDurationMinutes);
+    for (let i = 0; i < rapidApiKeys.length; i += 1) {
+        const key = rapidApiKeys[i];
+        const payload = await fetchWithCache(
+            providerName,
+            endpointUrl,
+            {
+                'x-rapidapi-key': key,
+                'x-rapidapi-host': host
+            },
+            params,
+            cacheDurationMinutes
+        );
+        if (payload) return payload;
+        console.warn(`[dataProviders] ${providerName}: RapidAPI key ${i + 1}/${rapidApiKeys.length} (${maskKey(key)}) returned empty payload. Rotating...`);
+    }
+
+    return null;
 }
 
 async function fetchRapidApiCustom(options = {}) {
@@ -125,8 +139,8 @@ async function fetchRapidApiCustom(options = {}) {
         throw new Error('fetchRapidApiCustom requires endpointUrl and host');
     }
 
-    const rapidApiKey = getRapidApiKey();
-    if (!rapidApiKey) {
+    const rapidApiKeys = getRapidApiKeyPool();
+    if (!rapidApiKeys.length) {
         console.warn(`[dataProviders] RapidAPI key missing. Skipping provider ${providerName}.`);
         return null;
     }
@@ -136,16 +150,23 @@ async function fetchRapidApiCustom(options = {}) {
         ? options.cacheDurationMinutes
         : (provider ? provider.cacheDurationMinutes : 1440);
 
-    return fetchWithCache(
-        providerName,
-        endpointUrl,
-        {
-            'x-rapidapi-key': rapidApiKey,
-            'x-rapidapi-host': host
-        },
-        params,
-        cacheDurationMinutes
-    );
+    for (let i = 0; i < rapidApiKeys.length; i += 1) {
+        const key = rapidApiKeys[i];
+        const payload = await fetchWithCache(
+            providerName,
+            endpointUrl,
+            {
+                'x-rapidapi-key': key,
+                'x-rapidapi-host': host
+            },
+            params,
+            cacheDurationMinutes
+        );
+        if (payload) return payload;
+        console.warn(`[dataProviders] ${providerName}: RapidAPI key ${i + 1}/${rapidApiKeys.length} (${maskKey(key)}) returned empty payload. Rotating...`);
+    }
+
+    return null;
 }
 
 async function fetchRapidApiBySport(sport, endpointPath, params = {}, options = {}) {
@@ -177,7 +198,7 @@ async function fetchFootballNewsLeagueFallback(params = {}, endpointPath = '/new
 
 function assertRapidApiCacheWallReady() {
     const hasCacheWall = isCacheWallReady();
-    const hasRapidApiKey = Boolean(getRapidApiKey());
+    const hasRapidApiKey = getRapidApiKeyPool().length > 0;
 
     if (!hasCacheWall) {
         console.warn('[dataProviders] Supabase cache wall not configured. RapidAPI requests will be blocked.');

@@ -1,11 +1,11 @@
 const axios = require('axios');
 const config = require('./config');
 const { fetchRapidApiCustom, getRapidApiProviderForSport } = require('./services/dataProviders');
+const { getApiSportsKeyPool, maskKey } = require('./utils/keyPool');
 
 class APISportsClient {
     constructor() {
         this.apiKey = config.apiSportsKey;
-        this.maxKeySlots = 10;
     }
 
     getBaseUrl(sport) {
@@ -53,21 +53,10 @@ class APISportsClient {
     }
 
     getKeysForSport(sport) {
-        const prefix = this.getEnvPrefixForSport(sport);
-        const keys = [];
-
-        for (let i = 1; i <= this.maxKeySlots; i += 1) {
-            const value = process.env[`${prefix}_${i}`];
-            if (value && String(value).trim()) {
-                keys.push(String(value).trim());
-            }
-        }
-
-        if (this.apiKey && String(this.apiKey).trim()) {
-            keys.push(String(this.apiKey).trim());
-        }
-
-        return [...new Set(keys)];
+        return getApiSportsKeyPool({
+            sport,
+            fallbackKeys: [this.apiKey]
+        });
     }
 
     hasQuotaErrorPayload(data) {
@@ -89,6 +78,7 @@ class APISportsClient {
             const key = keys[i];
             const headers = {
                 'x-apisports-key': key,
+                'x-rapidapi-key': key,
                 'x-rapidapi-host': this.getHostForSport(sport)
             };
 
@@ -99,16 +89,22 @@ class APISportsClient {
                 });
 
                 if (this.hasQuotaErrorPayload(response.data)) {
-                    console.warn(`[API-Sports] ${sport} key ${i + 1} exhausted. Rotating...`);
+                    console.warn(`[API-Sports] ${sport} key ${i + 1}/${keys.length} (${maskKey(key)}) exhausted. Rotating...`);
                     lastError = new Error(`Quota/token exhausted for key index ${i + 1}`);
                     continue;
                 }
 
                 return response.data;
             } catch (error) {
+                const status = Number(error?.response?.status || 0);
                 const payload = error.response && error.response.data ? error.response.data : null;
                 if (this.hasQuotaErrorPayload(payload)) {
-                    console.warn(`[API-Sports] ${sport} key ${i + 1} exhausted via error payload. Rotating...`);
+                    console.warn(`[API-Sports] ${sport} key ${i + 1}/${keys.length} (${maskKey(key)}) exhausted via payload. Rotating...`);
+                    lastError = error;
+                    continue;
+                }
+                if (status === 401 || status === 403 || status === 429) {
+                    console.warn(`[API-Sports] ${sport} key ${i + 1}/${keys.length} (${maskKey(key)}) failed with HTTP ${status}. Rotating...`);
                     lastError = error;
                     continue;
                 }

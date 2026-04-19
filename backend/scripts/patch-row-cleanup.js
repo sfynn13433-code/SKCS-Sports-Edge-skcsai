@@ -20,9 +20,9 @@ if (buildPlanIdx === -1) {
 console.log(`Found build plan at line ${buildPlanIdx + 1}`);
 
 const cleanupBlock = `        // SKCS LAW: Clean stale rows for this tier before publishing new ones
-        // This prevents old duplicates from accumulating in predictions_final
+        // This prevents old duplicates from accumulating in direct1x2_prediction_final
         await client.query(
-            'DELETE FROM predictions_final WHERE tier = $1',
+            'DELETE FROM direct1x2_prediction_final WHERE tier = $1',
             [t]
         );
         console.log('[accaBuilder] Cleaned stale rows for tier=%s', t);

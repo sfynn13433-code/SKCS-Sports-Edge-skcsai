@@ -7,8 +7,9 @@ const { query } = require('../backend/db');
 const { upsertCanonicalEvents } = require('../backend/services/canonicalEvents');
 const { buildMatchContext } = require('../backend/services/normalizerService');
 const { runPipelineForMatches, rebuildFinalOutputs } = require('../backend/services/aiPipeline');
+const { getApiSportsKeyPool, maskKey } = require('../backend/utils/keyPool');
 
-const APISPORTS_KEY = String(process.env.X_APISPORTS_KEY || '').trim();
+const APISPORTS_KEYS = getApiSportsKeyPool();
 const CRICKETDATA_API_KEY = String(process.env.CRICKETDATA_API_KEY || '').trim();
 const TODAY = new Date().toISOString().slice(0, 10);
 const SPORT_STAGGER_MS = 900;
@@ -192,17 +193,65 @@ function mapApiSportsRowToFixture(raw, sport) {
     };
 }
 
+function hasApiSportsQuotaPayload(data) {
+    const errors = data && typeof data === 'object' ? data.errors : null;
+    if (!errors || typeof errors !== 'object') return false;
+    return Boolean(errors.requests || errors.token);
+}
+
+function isRetryableApiSportsError(error) {
+    const status = Number(error?.response?.status || 0);
+    if (status === 401 || status === 403 || status === 429) return true;
+    return hasApiSportsQuotaPayload(error?.response?.data);
+}
+
+async function requestApiSportsWithRotation(spec, params) {
+    const keyPool = getApiSportsKeyPool({ sport: spec.sport, fallbackKeys: APISPORTS_KEYS });
+    if (!keyPool.length) {
+        throw new Error(`No API-Sports keys configured for ${spec.sport}`);
+    }
+
+    const url = `${spec.baseUrl}/${spec.endpoint}`;
+    const host = spec.baseUrl.replace(/^https?:\/\//, '');
+    let lastError = null;
+
+    for (let idx = 0; idx < keyPool.length; idx += 1) {
+        const key = keyPool[idx];
+        try {
+            const response = await axios.get(url, {
+                headers: {
+                    'x-apisports-key': key,
+                    'x-rapidapi-key': key,
+                    'x-rapidapi-host': host
+                },
+                params,
+                timeout: 30000
+            });
+
+            if (hasApiSportsQuotaPayload(response.data)) {
+                console.warn(`[snapshot-import] ${spec.sport} key ${idx + 1}/${keyPool.length} (${maskKey(key)}) quota exhausted. Rotating...`);
+                lastError = new Error('API-Sports quota exhausted');
+                continue;
+            }
+
+            return response;
+        } catch (error) {
+            lastError = error;
+            if (isRetryableApiSportsError(error)) {
+                const status = Number(error?.response?.status || 0) || 'network';
+                console.warn(`[snapshot-import] ${spec.sport} key ${idx + 1}/${keyPool.length} (${maskKey(key)}) failed (${status}). Rotating...`);
+                continue;
+            }
+            throw error;
+        }
+    }
+
+    throw new Error(`[snapshot-import] ${spec.sport}: all API-Sports keys failed (${lastError ? lastError.message : 'unknown'})`);
+}
+
 async function fetchApiSportsByDate(spec) {
     const out = [];
-    const url = `${spec.baseUrl}/${spec.endpoint}`;
-    const firstResponse = await axios.get(url, {
-        headers: {
-            'x-apisports-key': APISPORTS_KEY,
-            'x-rapidapi-host': spec.baseUrl.replace(/^https?:\/\//, '')
-        },
-        params: { date: TODAY },
-        timeout: 30000
-    });
+    const firstResponse = await requestApiSportsWithRotation(spec, { date: TODAY });
 
     const firstPayload = firstResponse.data || {};
     const firstRows = Array.isArray(firstPayload.response) ? firstPayload.response : [];
@@ -212,14 +261,7 @@ async function fetchApiSportsByDate(spec) {
     const totalPages = Number(paging?.total || 1);
     if (Number.isFinite(totalPages) && totalPages > 1) {
         for (let page = 2; page <= totalPages; page += 1) {
-            const pageResponse = await axios.get(url, {
-                headers: {
-                    'x-apisports-key': APISPORTS_KEY,
-                    'x-rapidapi-host': spec.baseUrl.replace(/^https?:\/\//, '')
-                },
-                params: { date: TODAY, page },
-                timeout: 30000
-            });
+            const pageResponse = await requestApiSportsWithRotation(spec, { date: TODAY, page });
             const pagePayload = pageResponse.data || {};
             const pageRows = Array.isArray(pagePayload.response) ? pagePayload.response : [];
             out.push(...pageRows.map((row) => mapApiSportsRowToFixture(row, spec.sport)).filter(Boolean));
@@ -376,6 +418,11 @@ function parseMaxMatchesArg(argv) {
     return Math.floor(rawValue);
 }
 
+function hasFlag(argv, flag) {
+    const safeArgv = Array.isArray(argv) ? argv : [];
+    return safeArgv.some((item) => String(item || '').trim().toLowerCase() === String(flag || '').trim().toLowerCase());
+}
+
 function selectRoundRobinMatches(matches, maxMatches) {
     const safeMatches = Array.isArray(matches) ? matches : [];
     if (!Number.isFinite(maxMatches) || maxMatches <= 0 || maxMatches >= safeMatches.length) {
@@ -417,9 +464,10 @@ function isWithinPipelineWindow(fixture) {
 }
 
 async function main() {
-    if (!APISPORTS_KEY) {
-        throw new Error('X_APISPORTS_KEY is missing');
+    if (!APISPORTS_KEYS.length) {
+        throw new Error('No API-Sports keys found in environment (expected X_APISPORTS_KEY and/or *_KEY_* variants)');
     }
+    console.log(`[snapshot-import] API-Sports key pool size: ${APISPORTS_KEYS.length}`);
 
     const importReport = [];
     const importedFixtures = [];
@@ -468,7 +516,8 @@ async function main() {
         }
     }
     const dedupedFixtures = Array.from(uniqueBySportId.values());
-    const dryRun = process.argv.includes('--dry-run');
+    const dryRun = hasFlag(process.argv, '--dry-run');
+    const fixturesOnly = hasFlag(process.argv, '--fixtures-only');
 
     if (dryRun) {
         const bySport = {};
@@ -491,6 +540,23 @@ async function main() {
     console.log('[snapshot-import] upserting canonical_events...');
     await upsertCanonicalEvents(dedupedFixtures);
     console.log('[snapshot-import] canonical_events upsert complete');
+
+    if (fixturesOnly) {
+        const bySport = {};
+        for (const row of dedupedFixtures) {
+            bySport[row.sport] = (bySport[row.sport] || 0) + 1;
+        }
+        console.log(JSON.stringify({
+            date: TODAY,
+            fixtures_only: true,
+            imported_fixture_count: dedupedFixtures.length,
+            events_upserted: eventsUpserted,
+            by_sport: bySport,
+            import_report: importReport,
+            skipped_api_sports: skippedSports
+        }, null, 2));
+        return;
+    }
 
     const normalizedMatches = [];
     const pipelineCandidates = [];
@@ -527,7 +593,7 @@ async function main() {
     const finalCountsBySport = await query(
         `
         SELECT COALESCE(LOWER(sport), 'unknown') AS sport, COUNT(*)::int AS rows
-        FROM predictions_final
+        FROM direct1x2_prediction_final
         GROUP BY 1
         ORDER BY 2 DESC, 1 ASC
         `
@@ -536,7 +602,7 @@ async function main() {
     const finalCountsByTypeTier = await query(
         `
         SELECT COALESCE(LOWER(tier), 'unknown') AS tier, COALESCE(LOWER(type), 'unknown') AS type, COUNT(*)::int AS rows
-        FROM predictions_final
+        FROM direct1x2_prediction_final
         GROUP BY 1, 2
         ORDER BY 1 ASC, 2 ASC
         `

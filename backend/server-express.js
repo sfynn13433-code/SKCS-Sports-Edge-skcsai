@@ -617,7 +617,7 @@ app.get('/api/cron/sync-standard', verifyCronSecret, async (req, res) => {
                     const matchId = String(f.id || f.fixture?.id || '');
                     if (matchId) {
                         await client.query(`
-                            INSERT INTO predictions_final (tier, type, matches, sport, market_type, recommendation, created_at)
+                            INSERT INTO direct1x2_prediction_final (tier, type, matches, sport, market_type, recommendation, created_at)
                             VALUES ('standard', 'direct', $1::jsonb, 'football', '1X2', $2, NOW())
                             ON CONFLICT DO UPDATE SET
                                 matches = EXCLUDED.matches
@@ -670,7 +670,7 @@ app.get('/api/cron/sync-deep', verifyCronSecret, async (req, res) => {
                     
                     if (title) {
                         await client.query(`
-                            INSERT INTO predictions_final (tier, type, matches, sport, market_type, recommendation, edgemind_report, created_at)
+                            INSERT INTO direct1x2_prediction_final (tier, type, matches, sport, market_type, recommendation, edgemind_report, created_at)
                             VALUES ('deep', 'context', '[]'::jsonb, 'football', 'news', $1, $2, NOW())
                             ON CONFLICT DO NOTHING
                         `, [title, summary.substring(0, 500)]);

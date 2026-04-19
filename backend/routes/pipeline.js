@@ -193,8 +193,13 @@ router.get('/status', requireRole('admin'), async (_req, res) => {
             process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY
         );
         const { count: rawCount } = await supabase.from('predictions_raw').select('*', { count: 'exact', head: true });
-        const { count: finalCount } = await supabase.from('predictions_final').select('*', { count: 'exact', head: true });
-        res.json({ ok: true, predictions_raw: rawCount, predictions_final: finalCount });
+        const { count: finalCount } = await supabase.from('direct1x2_prediction_final').select('*', { count: 'exact', head: true });
+        res.json({
+            ok: true,
+            predictions_raw: rawCount,
+            predictions_final: finalCount,
+            direct1x2_prediction_final: finalCount
+        });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -248,7 +253,7 @@ router.post('/mode', requireRole('admin'), async (req, res) => {
     }
 });
 
-// Force a rebuild of the website outputs (predictions_final table)
+// Force a rebuild of the website outputs (direct1x2_prediction_final table)
 router.post('/rebuild', requireRole('admin'), async (_req, res) => {
     try {
         console.log('[pipeline] Manual rebuild of final outputs requested...');

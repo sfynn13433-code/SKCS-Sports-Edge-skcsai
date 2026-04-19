@@ -268,7 +268,7 @@ async function initializeTables() {
         )`);
 
         // Insights Final
-        await client.query(`CREATE TABLE IF NOT EXISTS predictions_final (
+        await client.query(`CREATE TABLE IF NOT EXISTS direct1x2_prediction_final (
             id BIGSERIAL PRIMARY KEY,
             publish_run_id BIGINT REFERENCES prediction_publish_runs(id) ON DELETE CASCADE,
             tier TEXT NOT NULL CHECK (tier IN ('normal', 'deep')),
@@ -280,18 +280,29 @@ async function initializeTables() {
         )`);
 
         await client.query(`
-            ALTER TABLE predictions_final
+            ALTER TABLE direct1x2_prediction_final
             ADD COLUMN IF NOT EXISTS publish_run_id BIGINT REFERENCES prediction_publish_runs(id) ON DELETE CASCADE
         `);
 
         await client.query(`
+            ALTER TABLE direct1x2_prediction_final
+            ADD COLUMN IF NOT EXISTS plan_visibility JSONB NOT NULL DEFAULT '[]'::JSONB,
+            ADD COLUMN IF NOT EXISTS sport TEXT,
+            ADD COLUMN IF NOT EXISTS market_type TEXT,
+            ADD COLUMN IF NOT EXISTS recommendation TEXT,
+            ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ,
+            ADD COLUMN IF NOT EXISTS edgemind_report TEXT,
+            ADD COLUMN IF NOT EXISTS secondary_insights JSONB NOT NULL DEFAULT '[]'::JSONB
+        `);
+
+        await client.query(`
             CREATE INDEX IF NOT EXISTS idx_predictions_final_publish_run_id
-            ON predictions_final(publish_run_id)
+            ON direct1x2_prediction_final(publish_run_id)
         `);
 
         await client.query(`
             CREATE UNIQUE INDEX IF NOT EXISTS uq_predictions_final_live_direct_fixture_market
-            ON predictions_final (
+            ON direct1x2_prediction_final (
                 LOWER(COALESCE(sport, '')),
                 LOWER(COALESCE(market_type, '')),
                 (CASE
@@ -318,14 +329,14 @@ async function initializeTables() {
                     FROM pg_constraint
                     WHERE conname = 'predictions_final_type_check'
                 ) THEN
-                    ALTER TABLE predictions_final DROP CONSTRAINT predictions_final_type_check;
+                    ALTER TABLE direct1x2_prediction_final DROP CONSTRAINT predictions_final_type_check;
                 END IF;
             END
             $$;
         `);
 
         await client.query(`
-            ALTER TABLE predictions_final
+            ALTER TABLE direct1x2_prediction_final
             ADD CONSTRAINT predictions_final_type_check
             CHECK (type IN ('single', 'acca', 'direct', 'secondary', 'multi', 'same_match', 'acca_6match', 'mega_acca_12'))
         `);
@@ -556,7 +567,7 @@ async function getAllUpcomingMatches(days = 7, sport = null) {
 
 // Save a generated prediction (now includes safer_pick)
 // NOTE: This function is deprecated — the active pipeline uses aiPipeline.js + accaBuilder.js
-// which write to predictions_raw → predictions_filtered → predictions_final.
+// which write to predictions_raw → predictions_filtered → direct1x2_prediction_final.
 async function savePrediction(prediction) {
     console.warn('[database] savePrediction is deprecated — use aiPipeline instead');
     return { id: null };
@@ -577,7 +588,7 @@ async function getPredictionsByTier(tier, date) {
             (p.matches->0->'metadata'->>'away_team')::text as away_team_name,
             (p.matches->0->>'sport')::text as sport,
             NULL::timestamp as match_date
-        FROM predictions_final p
+        FROM direct1x2_prediction_final p
         WHERE p.tier = $1
           AND (
             COALESCE(

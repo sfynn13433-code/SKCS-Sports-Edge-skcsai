@@ -429,7 +429,7 @@ async function syncSports(options = {}) {
 
         if (totalMatchesProcessed > 0) {
             console.log('[syncService] Sync successful. Rebuilding final outputs for the website...');
-            // This moves the AI results into the 'predictions_final' table the website sees.
+            // This moves the AI results into the 'direct1x2_prediction_final' table the website sees.
             const rebuild = await rebuildFinalOutputs({
                 triggerSource: 'sync_service',
                 requestedSports: requestedSports.length ? requestedSports : ['all'],

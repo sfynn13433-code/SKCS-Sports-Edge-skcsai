@@ -288,17 +288,17 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
         // include_all bypass: query wide set for UI stress testing without plan/tier gating.
         const queryText = includeAll
             ? `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
-               FROM predictions_final
+               FROM direct1x2_prediction_final
                ORDER BY created_at DESC
                LIMIT 2500`
             : latestPublishRunId
                 ? `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
-                   FROM predictions_final
+                   FROM direct1x2_prediction_final
                    WHERE publish_run_id = $1
                    ORDER BY total_confidence DESC, created_at DESC
                    LIMIT 3000`
                 : `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
-                   FROM predictions_final
+                   FROM direct1x2_prediction_final
                    WHERE LOWER(COALESCE(tier, 'normal')) = ANY($1::text[])
                    ORDER BY total_confidence DESC, created_at DESC
                    LIMIT 3000`;
