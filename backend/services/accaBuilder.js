@@ -956,7 +956,7 @@ function deriveDirectSecondaryInsights(matches, totalConfidence) {
     const inHighRiskBand = Number.isFinite(confidence) && confidence >= 59 && confidence <= 69;
     const inExtremeRiskBand = Number.isFinite(confidence) && confidence >= 0 && confidence <= 58;
 
-    if ((inHighRiskBand && shaped.length < 1) || (inExtremeRiskBand && shaped.length < 4)) {
+    if ((inHighRiskBand && shaped.length < 4) || (inExtremeRiskBand && shaped.length < 4)) {
         const synthetic = buildSyntheticSecondaryPivotCandidates(firstMatch, confidence);
         for (const item of synthetic) {
             const candidate = normalizeSecondaryPivotCandidate(item);
@@ -966,13 +966,13 @@ function deriveDirectSecondaryInsights(matches, totalConfidence) {
             if (seen.has(key)) continue;
             seen.add(key);
             shaped.push(candidate);
-            if (!inExtremeRiskBand && shaped.length >= 1) break;
+            if (inHighRiskBand && shaped.length >= 4) break;
             if (inExtremeRiskBand && shaped.length >= 4) break;
         }
     }
 
     // Final fallback: guarantee governance-required minimum counts.
-    if ((inHighRiskBand && shaped.length < 1) || (inExtremeRiskBand && shaped.length < 4)) {
+    if ((inHighRiskBand && shaped.length < 4) || (inExtremeRiskBand && shaped.length < 4)) {
         const synthetic = buildSyntheticSecondaryPivotCandidates(firstMatch, confidence);
         for (const item of synthetic) {
             const candidate = normalizeSecondaryPivotCandidate(item);
@@ -981,13 +981,13 @@ function deriveDirectSecondaryInsights(matches, totalConfidence) {
             if (seen.has(key)) continue;
             seen.add(key);
             shaped.push(candidate);
-            if (!inExtremeRiskBand && shaped.length >= 1) break;
+            if (inHighRiskBand && shaped.length >= 4) break;
             if (inExtremeRiskBand && shaped.length >= 4) break;
         }
     }
 
     if (inExtremeRiskBand) return shaped.slice(0, 4);
-    if (inHighRiskBand) return shaped.slice(0, Math.max(1, Math.min(4, shaped.length)));
+    if (inHighRiskBand) return shaped.slice(0, 4);
     return shaped.slice(0, 4);
 }
 

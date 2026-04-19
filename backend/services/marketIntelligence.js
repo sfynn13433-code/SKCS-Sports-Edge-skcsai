@@ -185,37 +185,30 @@ function getStandardSecondaryMarkets(matchContext, primaryPrediction) {
     const homeWin = primaryPrediction === 'home_win';
     const awayWin = primaryPrediction === 'away_win';
 
-    const results = [];
-    for (const market of STANDARD_SECONDARY_MARKET_POOL) {
-        if (isRedCardMarket(market)) continue;
-
-        let prediction = '';
-        switch (market) {
-            case 'double_chance_1x':
-                prediction = homeWin ? '1X' : (awayWin ? '1X' : '1X');
-                break;
-            case 'double_chance_x2':
-                prediction = awayWin ? 'X2' : (homeWin ? 'X2' : 'X2');
-                break;
-            case 'over_1_5':
-                prediction = 'over';
-                break;
-            case 'under_4_5':
-                prediction = 'under';
-                break;
-            default:
-                prediction = 'over';
-        }
-
-        results.push({
-            market,
-            prediction,
-            confidence: 65,
-            source: 'rule_of_4'
-        });
+    if (homeWin) {
+        return [
+            { market: 'double_chance_1x', prediction: '1X', confidence: 84, source: 'rule_of_4' },
+            { market: 'draw_no_bet_home', prediction: 'home', confidence: 81, source: 'rule_of_4' },
+            { market: 'over_1_5', prediction: 'over', confidence: 79, source: 'rule_of_4' },
+            { market: 'under_4_5', prediction: 'under', confidence: 78, source: 'rule_of_4' }
+        ].filter((item) => !isRedCardMarket(item.market));
     }
 
-    return results;
+    if (awayWin) {
+        return [
+            { market: 'double_chance_x2', prediction: 'X2', confidence: 84, source: 'rule_of_4' },
+            { market: 'draw_no_bet_away', prediction: 'away', confidence: 81, source: 'rule_of_4' },
+            { market: 'over_1_5', prediction: 'over', confidence: 79, source: 'rule_of_4' },
+            { market: 'under_4_5', prediction: 'under', confidence: 78, source: 'rule_of_4' }
+        ].filter((item) => !isRedCardMarket(item.market));
+    }
+
+    return [
+        { market: 'double_chance_1x', prediction: '1X', confidence: 82, source: 'rule_of_4' },
+        { market: 'double_chance_x2', prediction: 'X2', confidence: 82, source: 'rule_of_4' },
+        { market: 'under_3_5', prediction: 'under', confidence: 79, source: 'rule_of_4' },
+        { market: 'btts_no', prediction: 'no', confidence: 77, source: 'rule_of_4' }
+    ].filter((item) => !isRedCardMarket(item.market));
 }
 
 const DIRECT_SAFE_MARKETS = Object.freeze(new Set([

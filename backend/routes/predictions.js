@@ -57,7 +57,10 @@ const EDGE_MIND_PLACEHOLDER_PATTERNS = [
     'passed stages 1-4',
     'suitable for multi construction',
     'full elite pipeline and low-volatility kill-switch',
-    'processing data for this fixture'
+    'processing data for this fixture',
+    'baseline probability against',
+    'reality check indicates moderate volatility',
+    'proceed with standard stake on 1x2'
 ];
 
 function parseBoundedInt(value, fallback, min, max) {

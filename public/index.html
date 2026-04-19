@@ -1676,7 +1676,10 @@
         'passed stages 1-4',
         'suitable for multi construction',
         'full elite pipeline and low-volatility kill-switch',
-        'edgemind analysis is processing data for this fixture'
+        'edgemind analysis is processing data for this fixture',
+        'baseline probability against',
+        'reality check indicates moderate volatility',
+        'proceed with standard stake on 1x2'
     ];
 
     function normalizeSportForFilter(value) {
@@ -2384,6 +2387,39 @@
         };
     }
 
+    function buildDerivedSecondaryPrediction(basePred, firstMatch, marketItem, index) {
+        const matchId = String(firstMatch && firstMatch.match_id || '').trim();
+        if (!matchId || !marketItem) return null;
+
+        const market = String(marketItem.market || '').trim();
+        const prediction = String(marketItem.prediction || '').trim();
+        if (!market || !prediction) return null;
+
+        const confidence = Math.max(0, Math.min(100, Math.round(Number(marketItem.confidence || basePred.total_confidence || 0))));
+        return {
+            id: `${String(basePred.id || matchId)}-derived-secondary-${index}`,
+            type: 'secondary',
+            section_type: 'secondary',
+            tier: basePred.tier,
+            sport: basePred.sport || (firstMatch && firstMatch.sport) || 'football',
+            total_confidence: confidence,
+            recommendation: marketItem.label || formatMarketSelectionLabel(market, prediction),
+            matches: [
+                {
+                    ...firstMatch,
+                    market,
+                    prediction,
+                    confidence,
+                    metadata: {
+                        ...(firstMatch.metadata || {}),
+                        market_description: marketItem.description || '',
+                        source: 'derived_secondary_from_direct'
+                    }
+                }
+            ]
+        };
+    }
+
     function normalizeSecondaryCandidate(item) {
         if (!item) return null;
 
@@ -2496,8 +2532,10 @@
         const fromRanked = buildSecondaryCandidatesFromRankedMarkets(firstMatch);
 
         const confidenceScore = Number(finalRecommendation?.confidence || 0);
+        const isHighRiskPrimary = confidenceScore >= 59 && confidenceScore <= 69;
         const isExtremeRiskPrimary = confidenceScore >= 0 && confidenceScore <= 58;
         const requiresPivot = confidenceScore < 70;
+        const requiredCount = (isHighRiskPrimary || isExtremeRiskPrimary) ? 4 : 0;
         let candidates = dedupeSecondaryCandidates([
             ...fromPrediction,
             ...fromMetadata,
@@ -2515,12 +2553,13 @@
             .sort((a, b) => Number(b.confidence || 0) - Number(a.confidence || 0))
             .slice(0, 4);
 
-        if (isExtremeRiskPrimary && shaped.length < 4) {
+        if (requiredCount > 0 && shaped.length < requiredCount) {
             const synthetic = dedupeSecondaryCandidates(buildSyntheticBackupMarkets(firstMatch, finalRecommendation.confidence || 0))
                 .filter((item) => Number(item.confidence || 0) >= 76);
-            shaped = dedupeSecondaryCandidates([...shaped, ...synthetic]).slice(0, 4);
+            shaped = dedupeSecondaryCandidates([...shaped, ...synthetic]).slice(0, requiredCount);
         }
 
+        if (requiredCount > 0) return shaped.slice(0, requiredCount);
         return shaped;
     }
 
@@ -3012,6 +3051,18 @@
         const directWithLinkedSecondary = INCLUDE_ALL_MODE
             ? directSingles
             : directSingles.map((pred) => attachSecondaryMarkets(pred, secondaryByMatchId));
+        const derivedSecondarySingles = secondarySingles.length ? [] : directWithLinkedSecondary
+            .map((pred, idx) => {
+                const firstMatch = getPrimaryMatch(pred);
+                const fallbackLabel = getMatchRecommendation(firstMatch) || 'HOME WIN';
+                const fallbackConfidence = Math.max(0, Math.min(100, Math.round(getPredictionConfidenceScore(pred))));
+                const finalRecommendation = getFinalRecommendation(pred, fallbackLabel, fallbackConfidence);
+                const secondaryMarkets = resolveSecondaryMarketsForCard(pred, firstMatch, finalRecommendation);
+                if (!Array.isArray(secondaryMarkets) || !secondaryMarkets.length) return null;
+                return buildDerivedSecondaryPrediction(pred, firstMatch, secondaryMarkets[0], idx);
+            })
+            .filter(Boolean);
+        const secondaryDisplay = secondarySingles.length ? secondarySingles : derivedSecondarySingles;
         const multiPreds = normalizedPredictions.filter((p) => {
             const legs = getPredictionLegCount(p);
             const type = getSectionType(p);
@@ -3030,13 +3081,13 @@
         if (tierSummary) tierSummary.style.display = 'block';
 
         setFootballSection('football-direct-matches', directWithLinkedSecondary, createPredictionCard, 'No direct football insights available.');
-        setFootballSection('football-secondary-matches', secondarySingles, createPredictionCard, 'No football double chance or special insights available.');
+        setFootballSection('football-secondary-matches', secondaryDisplay, createPredictionCard, 'No football double chance or special insights available.');
         setFootballSection('football-multi-matches', multiPreds, createMultiCard, 'No football multi-leg insights available.');
         setFootballSection('football-same-matches', sameMatchPreds, createMultiCard, 'No same-match football bet builders available.');
 
         const counts = {
             'football-direct-count': directWithLinkedSecondary.length,
-            'football-secondary-count': secondarySingles.length,
+            'football-secondary-count': secondaryDisplay.length,
             'football-multi-count': multiPreds.length,
             'football-same-count': sameMatchPreds.length
         };
@@ -3379,7 +3430,7 @@
             riskBadge = '⚠️ HIGH CAUTION ADVISED';
             warningHtml = `
                 <div class="risk-warning" style="margin-top: 10px; padding: 10px; border-left: 4px solid #f97316; background: #fff7ed; color: #9a3412; border-radius: 4px; font-size: 0.85em;">
-                    <strong>${riskBadge} (${confidenceScore}%):</strong> This direct market is volatile. Please use a safer option from the Secondary Insights below.
+                    <strong>${riskBadge} (${confidenceScore}%):</strong> This direct market is volatile. Use the 4 Secondary Markets below.
                 </div>
             `;
         } else {
@@ -3413,12 +3464,14 @@
                 return `<li style="padding:8px 0;border-bottom:1px solid #eee;list-style:none;">${label} - ${confDisplay}${description}</li>`;
             }).join('');
 
-            const detailsOpen = isExtremeRiskPrimary ? 'open' : '';
-            const summaryLabel = isExtremeRiskPrimary
+            const detailsOpen = (isExtremeRiskPrimary || isHighRiskPrimary) ? 'open' : '';
+            const summaryLabel = (isExtremeRiskPrimary || isHighRiskPrimary)
                 ? `🚨 MANDATORY SECONDARY REVIEW (${Math.min(secondaryMarkets.length, 4)}/4)`
                 : `📊 View Secondary Insights (${Math.min(secondaryMarkets.length, 4)} Available)`;
             const detailsStyle = isExtremeRiskPrimary
                 ? 'margin-top:15px;background:#fff1f2;padding:12px;border-radius:6px;border:2px solid #ef4444;'
+                : isHighRiskPrimary
+                    ? 'margin-top:15px;background:#fff7ed;padding:12px;border-radius:6px;border:2px solid #f97316;'
                 : 'margin-top:15px;background:#f8f9fa;padding:10px;border-radius:6px;border:1px solid #dee2e6;';
             secondaryInsightsHtml = `
                 <details ${detailsOpen} class="secondary-insights-dropdown" style="${detailsStyle}">
@@ -3436,7 +3489,7 @@
                     ${isExtremeRiskPrimary
                         ? 'Extreme caution alert: 4 compliant secondary markets are required. No valid secondary set is currently available.'
                         : (isHighRiskPrimary
-                        ? 'No backup secondary markets are currently available at the required 76%+ threshold.'
+                        ? 'High-risk alert: 4 compliant secondary markets are required. No valid secondary set is currently available.'
                         : 'No secondary insights available for this fixture.')}
                 </div>
             `;
