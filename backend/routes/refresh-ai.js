@@ -25,7 +25,7 @@ router.post('/refresh-ai-insights', requireAdmin, async (req, res) => {
 
         // Get predictions with template insights using PostgreSQL
         const result = await pool.query(`
-            SELECT id, fixture_id, home_team, away_team, league, match_date, prediction, confidence, edgemind_report, created_at
+            SELECT id, fixture_id, home_team, away_team, match_date, prediction, confidence, edgemind_report, created_at
             FROM direct1x2_prediction_final
             ORDER BY created_at DESC
             LIMIT $1
@@ -61,7 +61,7 @@ router.post('/refresh-ai-insights', requireAdmin, async (req, res) => {
                 const aiInsight = await generateInsight({
                     home: p.home_team,
                     away: p.away_team,
-                    league: p.league,
+                    league: null,
                     kickoff: p.match_date,
                     market: marketName,
                     confidence: p.confidence,
