@@ -5,7 +5,10 @@
 
 const express = require('express');
 const router = express.Router();
-const { requireAdmin } = require('../middleware/auth');
+const { requireRole } = require('../utils/auth');
+
+// Create admin middleware
+const requireAdmin = requireRole('admin');
 const { createClient } = require('@supabase/supabase-js');
 const { generateInsight, isGroqAvailable } = require('../services/aiProvider');
 
