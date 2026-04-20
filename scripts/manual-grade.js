@@ -22,12 +22,38 @@ async function manualGrade() {
     const match = matchResult.rows[0];
     console.log('Grading match:', match.home_team, 'vs', match.away_team);
     
-    // Find predictions for this match
+    // Find predictions for this match from both tables
     const predResult = await client.query(`
-        SELECT id, matches, recommendation
+        SELECT 
+            id, 
+            matches, 
+            recommendation,
+            total_confidence,
+            tier,
+            type,
+            publish_run_id,
+            home_team,
+            away_team,
+            match_date
+        FROM direct1x2_prediction_final
+        WHERE matches::text LIKE '%' || $1 || '%'
+           OR fixture_id = $1
+        UNION ALL
+        SELECT 
+            id, 
+            matches, 
+            recommendation,
+            total_confidence,
+            tier,
+            type,
+            publish_run_id,
+            home_team,
+            away_team,
+            match_date
         FROM predictions_final
-        WHERE matches::text LIKE '%${match.id}%'
-    `);
+        WHERE matches::text LIKE '%' || $1 || '%'
+           OR fixture_id = $1
+    `, [match.id]);
     
     console.log('Found', predResult.rows.length, 'predictions');
     
@@ -51,26 +77,87 @@ async function manualGrade() {
         
         // Get market from matches JSON
         let market = '1X2';
+        let fixtureDate = null;
         try {
             const matches = typeof pred.matches === 'string' ? JSON.parse(pred.matches) : pred.matches;
-            if (matches && matches[0] && matches[0].market) {
-                market = matches[0].market;
+            if (matches && matches[0]) {
+                if (matches[0].market) market = matches[0].market;
+                if (matches[0].date) fixtureDate = matches[0].date;
             }
         } catch (e) {}
+        
+        // Use match_date from prediction if available
+        if (!fixtureDate && pred.match_date) {
+            fixtureDate = new Date(pred.match_date).toISOString().slice(0, 10);
+        }
+
+        // Determine prediction type
+        let predictionType = 'direct';
+        if (pred.type) {
+            const type = pred.type.toLowerCase();
+            if (type === 'same_match') predictionType = 'same_match';
+            else if (type === 'secondary') predictionType = 'secondary';
+            else if (type === 'multi' || type === 'acca') predictionType = 'multi';
+            else if (type.includes('acca')) predictionType = 'acca';
+        }
+
+        const confidence = pred.total_confidence || 50;
+        const resolutionStatus = result === 'WON' ? 'won' : (result === 'LOST' ? 'lost' : 'void');
         
         // Insert with all required fields
         await client.query(`
             INSERT INTO predictions_accuracy (
-                prediction_final_id, prediction_match_index, event_id,
-                predicted_outcome, actual_result, is_correct,
-                actual_home_score, actual_away_score, event_status, sport,
-                market, prediction_type
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+                prediction_final_id, 
+                prediction_match_index, 
+                event_id,
+                sport,
+                prediction_tier,
+                prediction_type,
+                publish_run_id,
+                home_team,
+                away_team,
+                fixture_date,
+                predicted_outcome, 
+                actual_result, 
+                is_correct,
+                actual_home_score, 
+                actual_away_score, 
+                event_status,
+                resolution_status,
+                market, 
+                confidence,
+                evaluated_at
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
+            ON CONFLICT (prediction_final_id, prediction_match_index) 
+            DO UPDATE SET
+                resolution_status = EXCLUDED.resolution_status,
+                is_correct = EXCLUDED.is_correct,
+                actual_result = EXCLUDED.actual_result,
+                actual_home_score = EXCLUDED.actual_home_score,
+                actual_away_score = EXCLUDED.actual_away_score,
+                event_status = EXCLUDED.event_status,
+                evaluated_at = EXCLUDED.evaluated_at
         `, [
-            pred.id, 0, match.id, pred.recommendation, 
-            `${match.home_score}-${match.away_score}`, result === 'WON',
-            match.home_score, match.away_score, match.status, 'football',
-            market, 'direct'
+            pred.id, 
+            0, 
+            match.id, 
+            'football',
+            pred.tier || 'normal',
+            predictionType,
+            pred.publish_run_id,
+            pred.home_team || match.home_team,
+            pred.away_team || match.away_team,
+            fixtureDate,
+            pred.recommendation, 
+            `${match.home_score}-${match.away_score}`, 
+            result === 'WON',
+            match.home_score, 
+            match.away_score, 
+            match.status,
+            resolutionStatus,
+            market, 
+            confidence,
+            new Date().toISOString()
         ]);
         
         console.log('Inserted accuracy record!');

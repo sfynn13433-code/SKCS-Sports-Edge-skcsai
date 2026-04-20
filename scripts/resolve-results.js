@@ -73,7 +73,7 @@ async function resolveResults() {
                 
                 // STEP 4: Grade predictions
                 if (homeScore !== null && awayScore !== null) {
-                    await gradePrediction(client, match.id, homeScore, awayScore, status);
+                    await gradePrediction(client, match.id, homeScore, awayScore, status, match.commence_time, match.home_team, match.away_team);
                     gradedCount++;
                 }
                 
@@ -114,13 +114,39 @@ function classifyAIInsight(result, confidence, weatherRisk = null) {
     return 'UNKNOWN';
 }
 
-async function gradePrediction(client, fixtureId, homeScore, awayScore, status) {
-    // Find predictions for this fixture
+async function gradePrediction(client, fixtureId, homeScore, awayScore, status, matchDate, homeTeam, awayTeam) {
+    // Find predictions for this fixture (from both old and new tables)
     const predResult = await client.query(`
-        SELECT id, matches, recommendation, total_confidence
+        SELECT 
+            id, 
+            matches, 
+            recommendation, 
+            total_confidence,
+            COALESCE(tier, 'normal') as tier,
+            COALESCE(type, 'direct') as type,
+            publish_run_id,
+            COALESCE(home_team, $2) as home_team,
+            COALESCE(away_team, $3) as away_team,
+            COALESCE(match_date, $4::timestamptz) as match_date
+        FROM direct1x2_prediction_final
+        WHERE matches::text LIKE '%' || $1 || '%'
+           OR fixture_id = $1
+        UNION ALL
+        SELECT 
+            id, 
+            matches, 
+            recommendation, 
+            total_confidence,
+            COALESCE(tier, 'normal') as tier,
+            COALESCE(type, 'direct') as type,
+            publish_run_id,
+            COALESCE(home_team, $2) as home_team,
+            COALESCE(away_team, $3) as away_team,
+            COALESCE(match_date, $4::timestamptz) as match_date
         FROM predictions_final
-        WHERE matches::text LIKE '%${fixtureId}%'
-    `);
+        WHERE matches::text LIKE '%' || $1 || '%'
+           OR fixture_id = $1
+    `, [fixtureId, homeTeam, awayTeam, matchDate]);
     
     if (predResult.rows.length === 0) {
         return;
@@ -165,31 +191,85 @@ async function gradePrediction(client, fixtureId, homeScore, awayScore, status) 
                 }
             } catch (e) {}
             
-            // Insert into predictions_accuracy with AI insight
+            // Determine fixture_date from match data
+            let fixtureDate = matchDate ? new Date(matchDate).toISOString().slice(0, 10) : null;
+            try {
+                const matches = typeof pred.matches === 'string' ? JSON.parse(pred.matches) : pred.matches;
+                if (matches && matches[0] && matches[0].date) {
+                    fixtureDate = matches[0].date;
+                }
+            } catch (e) {}
+
+            // Determine prediction type
+            let predictionType = 'direct';
+            if (pred.type) {
+                const type = pred.type.toLowerCase();
+                if (type === 'same_match') predictionType = 'same_match';
+                else if (type === 'secondary') predictionType = 'secondary';
+                else if (type === 'multi' || type === 'acca') predictionType = 'multi';
+                else if (type.includes('acca')) predictionType = 'acca';
+            }
+
+            // Determine resolution_status
+            const resolutionStatus = result === 'WON' ? 'won' : (result === 'LOST' ? 'lost' : 'void');
+
+            // Insert into predictions_accuracy with all required fields
             await client.query(`
                 INSERT INTO predictions_accuracy (
                     prediction_final_id, 
                     prediction_match_index,
                     event_id, 
+                    sport,
+                    prediction_tier,
+                    prediction_type,
+                    publish_run_id,
+                    home_team,
+                    away_team,
+                    fixture_date,
                     predicted_outcome, 
                     actual_result, 
                     is_correct, 
                     actual_home_score, 
                     actual_away_score, 
                     event_status,
-                    sport,
+                    resolution_status,
                     market,
-                    prediction_type,
                     confidence,
-                    evaluation_notes
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+                    evaluation_notes,
+                    evaluated_at
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
+                ON CONFLICT (prediction_final_id, prediction_match_index) 
+                DO UPDATE SET
+                    resolution_status = EXCLUDED.resolution_status,
+                    is_correct = EXCLUDED.is_correct,
+                    actual_result = EXCLUDED.actual_result,
+                    actual_home_score = EXCLUDED.actual_home_score,
+                    actual_away_score = EXCLUDED.actual_away_score,
+                    event_status = EXCLUDED.event_status,
+                    evaluation_notes = EXCLUDED.evaluation_notes,
+                    evaluated_at = EXCLUDED.evaluated_at
             `, [
-                pred.id, 0, fixtureId, pred.recommendation, 
-                `${homeScore}-${awayScore}`, result === 'WON',
-                homeScore, awayScore, status, 'football',
-                market, 'direct',
+                pred.id, 
+                0, 
+                fixtureId, 
+                'football',
+                pred.tier,
+                predictionType,
+                pred.publish_run_id,
+                pred.home_team || homeTeam,
+                pred.away_team || awayTeam,
+                fixtureDate,
+                pred.recommendation, 
+                `${homeScore}-${awayScore}`, 
+                result === 'WON',
+                homeScore, 
+                awayScore, 
+                status,
+                resolutionStatus,
+                market, 
                 confidence,
-                aiInsight
+                aiInsight,
+                new Date().toISOString()
             ]);
             
             console.log(`[GRADED] ${pred.id}: ${result} | ${aiInsight} | conf=${confidence}% | ${pred.recommendation} vs ${homeScore}-${awayScore}`);

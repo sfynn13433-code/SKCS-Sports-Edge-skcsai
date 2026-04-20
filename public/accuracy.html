@@ -618,7 +618,8 @@
 
         async function loadAccuracyStats() {
             const params = new URLSearchParams(window.location.search);
-            const date = params.get('date') || '2026-04-05';
+            const today = new Date().toISOString().slice(0, 10);
+            const date = params.get('date') || today;
             const sport = params.get('sport') || 'football';
             const runId = params.get('run_id') || '';
 
@@ -814,21 +815,24 @@
 
         document.getElementById('applyFiltersBtn').addEventListener('click', () => {
             const sport = document.getElementById('sportSelect').value || 'football';
-            const date = document.getElementById('dateInput').value || '2026-04-05';
+            const today = new Date().toISOString().slice(0, 10);
+            const date = document.getElementById('dateInput').value || today;
             updateQueryString(date, sport);
             loadAccuracyStats();
         });
 
         document.getElementById('prevDateBtn').addEventListener('click', () => {
             const dateInput = document.getElementById('dateInput');
-            dateInput.value = shiftIsoDate(dateInput.value || '2026-04-05', -1);
+            const today = new Date().toISOString().slice(0, 10);
+            dateInput.value = shiftIsoDate(dateInput.value || today, -1);
             document.getElementById('runSelect').value = '';
             document.getElementById('applyFiltersBtn').click();
         });
 
         document.getElementById('nextDateBtn').addEventListener('click', () => {
             const dateInput = document.getElementById('dateInput');
-            dateInput.value = shiftIsoDate(dateInput.value || '2026-04-05', 1);
+            const today = new Date().toISOString().slice(0, 10);
+            dateInput.value = shiftIsoDate(dateInput.value || today, 1);
             document.getElementById('runSelect').value = '';
             document.getElementById('applyFiltersBtn').click();
         });
