@@ -3,7 +3,7 @@
 const { createClient } = require('@supabase/supabase-js');
 const { query: dbQuery } = require('../db');
 const { selectSecondaryMarkets } = require('../utils/secondaryMarketSelector');
-const { generateInsight, isDolphinAvailable } = require('./aiProvider');
+const { generateInsight, isDolphinAvailable, isGroqAvailable } = require('./aiProvider');
 
 const SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
 const SUPABASE_KEY = String(
@@ -450,13 +450,17 @@ async function buildAndStoreDirect1X2(fixture, confidence, prediction, additiona
     const secondaryNote = secondarySelection?.note || null;
 
     // Generate insight - use AI if available, otherwise template
+    // Priority: 1) Groq API (fast/cheap), 2) Local Dolphin, 3) Template fallback
     let edgemindReport;
     let marketName = prettyPrediction(normalizedPrediction);
+    let aiSource = 'template';
     
     try {
-        const dolphinReady = await isDolphinAvailable();
-        if (dolphinReady) {
-            console.log(`[direct1x2Builder] Generating AI insight for ${fixture?.home_team} vs ${fixture?.away_team}...`);
+        const groqReady = await isGroqAvailable();
+        const dolphinReady = groqReady ? false : await isDolphinAvailable(); // Skip Dolphin if Groq ready
+        
+        if (groqReady || dolphinReady) {
+            console.log(`[direct1x2Builder] Generating AI insight for ${fixture?.home_team} vs ${fixture?.away_team} via ${groqReady ? 'Groq' : 'Dolphin'}...`);
             const aiInsight = await generateInsight({
                 home: fixture?.home_team,
                 away: fixture?.away_team,
@@ -473,7 +477,8 @@ async function buildAndStoreDirect1X2(fixture, confidence, prediction, additiona
             if (aiInsight && aiInsight.edgemind_report) {
                 edgemindReport = aiInsight.edgemind_report;
                 marketName = aiInsight.market_name || marketName;
-                console.log(`[direct1x2Builder] AI insight generated successfully`);
+                aiSource = groqReady ? 'groq' : 'dolphin';
+                console.log(`[direct1x2Builder] AI insight generated successfully via ${aiSource}`);
             } else {
                 console.log(`[direct1x2Builder] AI insight failed, using template fallback`);
                 edgemindReport = generateEdgeMindReport(

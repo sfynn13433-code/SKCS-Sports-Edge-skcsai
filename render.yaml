@@ -63,12 +63,9 @@ services:
         sync: false
       - key: DATA_MODE
         value: live
-      - key: DOLPHIN_URL
-        fromService:
-          name: dolphin-ai-server
-          type: web
-          property: host
-        # Will be like: https://dolphin-ai-server-xxx.onrender.com
+      - key: GROQ_KEY
+        sync: false
+        # Groq API for AI insights (cheaper/faster than running Dolphin on Render)
   - type: cron
     name: skcs-weekly-global-scrape
     env: node
@@ -82,18 +79,3 @@ services:
         sync: false
       - key: ADMIN_API_KEY
         sync: false
-
-  - type: web
-    name: dolphin-ai-server
-    env: docker
-    region: frankfurt
-    plan: starter  # Needs at least starter for 2GB RAM
-    dockerfilePath: ./dolphin-server/Dockerfile
-    dockerContext: ./dolphin-server
-    healthCheckPath: /health
-    autoDeploy: true
-    envVars:
-      - key: LLAMA_THREADS
-        value: "4"
-      - key: LLAMA_CONTEXT_SIZE
-        value: "4096"

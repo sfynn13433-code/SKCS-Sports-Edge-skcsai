@@ -22,7 +22,13 @@ module.exports = {
     sportsDataOrgToken: process.env.X_AUTH_TOKEN,
     cricketDataApiKey: process.env.CRICKETDATA_API_KEY,
     
-    // Local Dolphin/Llama AI server for EdgeMind insights
+    // AI Providers for EdgeMind insights (priority: Groq > Dolphin > Template)
+    groq: {
+        apiKey: process.env.GROQ_API_KEY || process.env.GROQ_KEY,
+        model: process.env.GROQ_MODEL || 'llama-3.2-3b-preview',
+        timeout: 30000,
+    },
+    // Local Dolphin/Llama AI server (fallback when Groq unavailable)
     dolphin: {
         url: process.env.DOLPHIN_URL || 'http://127.0.0.1:8080',
         timeout: Number(process.env.DOLPHIN_TIMEOUT) || 120000,

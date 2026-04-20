@@ -11,6 +11,11 @@ const DOLPHIN_TIMEOUT = Number(process.env.DOLPHIN_TIMEOUT) || 120000; // 2 minu
 const DOLPHIN_MAX_TOKENS = Number(process.env.DOLPHIN_MAX_TOKENS) || 512;
 const DOLPHIN_TEMPERATURE = Number(process.env.DOLPHIN_TEMPERATURE) || 0.3;
 
+// Groq API configuration (faster, cheaper alternative to local Dolphin)
+const GROQ_API_KEY = process.env.GROQ_API_KEY || process.env.GROQ_KEY || null;
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.2-3b-preview'; // Fast, cheap model
+
 function extractAndParseJSON(rawResponse) {
     try {
         // 1. Strip markdown code blocks if the AI included them
@@ -247,10 +252,118 @@ ${userPrompt}<|im_end|>
 }
 
 /**
+ * Generate insight using Groq API (fast, cheap, cloud-based).
+ * Preferred over local Dolphin when available.
+ */
+async function generateInsightWithGroq(params) {
+    if (!GROQ_API_KEY) {
+        throw new Error('Groq API key not configured');
+    }
+    
+    const systemPrompt = `You are the SKCS EdgeMind Bot. Generate a football match prediction insight.
+
+EDGEMIND REPORT RULES (CRITICAL):
+1. Stage 1 (Baseline): State the initial probability "On paper"
+2. Stage 2 (Deep Context): Explain adjustments based on team/player intelligence  
+3. Stage 3 (Reality Check): Explain adjustments based on weather/news/form
+4. Stage 4 (Decision Engine): State the final confidence percentage
+
+IMPORTANT Direct 1X2 risk rules:
+- 80-100%: High Confidence / Safe.
+- 70-79%: Moderate Risk.
+- 59-69%: High Risk. Advise user to pivot to Secondary Insights.
+- 0-58%: Extreme Risk. Explicitly tell user NOT to bet direct 1X2.
+
+Output ONLY valid JSON with this exact structure:
+{
+  "market_name": "Home Win",
+  "confidence": 72,
+  "edgemind_report": "On paper, [Team] has a 60% baseline probability... [Continue narrative following the 4 stages above]"
+}`;
+
+    const userPrompt = `Generate prediction for:
+Home: ${params.home || 'TBD'}
+Away: ${params.away || 'TBD'}
+League: ${params.league || 'Unknown'}
+Kickoff: ${params.kickoff || 'TBD'}
+Market: ${params.market || '1X2'}
+Baseline probability: ${params.confidence || 70}%
+
+Context Data:
+${params.formData || 'No recent form data'}
+${params.h2h ? 'Head-to-head: ' + params.h2h : ''}
+${params.weather ? 'Weather: ' + params.weather : ''}
+${params.absences ? 'Absences/Injuries: ' + params.absences : ''}
+
+Follow the EDGEMIND REPORT RULES from your system prompt. Max 3 sentences for edgemind_report.`;
+
+    const response = await axios.post(GROQ_URL, {
+        model: GROQ_MODEL,
+        messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 300,
+        response_format: { type: 'json_object' }
+    }, {
+        headers: {
+            'Authorization': `Bearer ${GROQ_API_KEY}`,
+            'Content-Type': 'application/json'
+        },
+        timeout: 30000 // 30 seconds - Groq is fast
+    });
+    
+    const content = response.data?.choices?.[0]?.message?.content || '';
+    const parsed = extractAndParseJSON(content);
+    
+    if (!parsed || !parsed.edgemind_report) {
+        throw new Error('Groq response missing edgemind_report');
+    }
+    
+    return {
+        market_name: parsed.market_name || params.market || '1X2',
+        confidence: Math.max(50, Math.min(95, parsed.confidence || params.confidence || 70)),
+        edgemind_report: parsed.edgemind_report,
+        secondary_insights: parsed.secondary_insights || null
+    };
+}
+
+/**
+ * Check if Groq API is available.
+ */
+async function isGroqAvailable() {
+    if (!GROQ_API_KEY) return false;
+    try {
+        const response = await axios.get('https://api.groq.com/openai/v1/models', {
+            headers: { 'Authorization': `Bearer ${GROQ_API_KEY}` },
+            timeout: 5000
+        });
+        return response.status === 200;
+    } catch {
+        return false;
+    }
+}
+
+/**
  * Generate AI insight text for a prediction.
+ * Priority: 1) Groq API (fast/cheap), 2) Local Dolphin, 3) Fallback template
  * Returns structured JSON with market_name, confidence, and edgemind_report.
  */
 async function generateInsight(params) {
+    // Try Groq first (preferred - fast and cheap)
+    if (GROQ_API_KEY) {
+        try {
+            console.log(`[AI Insight] Using Groq API for ${params.home} vs ${params.away}...`);
+            const groqResult = await generateInsightWithGroq(params);
+            console.log(`[AI Insight] Groq generated insight successfully`);
+            return groqResult;
+        } catch (groqErr) {
+            console.warn(`[AI Insight] Groq failed: ${groqErr.message}, falling back to Dolphin...`);
+        }
+    }
+    
+    // Fallback to local Dolphin server
     const prompt = buildInsightPrompt(params);
     
     try {
@@ -348,6 +461,7 @@ async function isDolphinAvailable() {
 module.exports = {
     analyzeWithDolphin,
     isDolphinAvailable,
+    isGroqAvailable,
     buildMatchAnalysisPrompt,
     buildInsightPrompt,
     generateInsight,
