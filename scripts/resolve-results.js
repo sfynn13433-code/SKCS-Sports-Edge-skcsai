@@ -116,8 +116,9 @@ function classifyAIInsight(result, confidence, weatherRisk = null) {
 
 async function gradePrediction(client, fixtureId, homeScore, awayScore, status, matchDate, homeTeam, awayTeam) {
     // Find predictions for this fixture (from both old and new tables)
+    // Match by fixture_id OR by team names (fuzzy match)
     const predResult = await client.query(`
-        SELECT 
+        SELECT DISTINCT ON (id)
             id, 
             matches, 
             recommendation, 
@@ -125,14 +126,17 @@ async function gradePrediction(client, fixtureId, homeScore, awayScore, status, 
             COALESCE(tier, 'normal') as tier,
             COALESCE(type, 'direct') as type,
             publish_run_id,
-            COALESCE(home_team, $2) as home_team,
-            COALESCE(away_team, $3) as away_team,
+            COALESCE(home_team, $5) as home_team,
+            COALESCE(away_team, $6) as away_team,
             COALESCE(match_date, $4::timestamptz) as match_date
         FROM direct1x2_prediction_final
-        WHERE matches::text LIKE '%' || $1 || '%'
-           OR fixture_id = $1
+        WHERE fixture_id = $1
+           OR (home_team IS NOT NULL AND away_team IS NOT NULL 
+               AND (LOWER(home_team) = LOWER($5) OR LOWER($5) LIKE '%' || LOWER(home_team) || '%')
+               AND (LOWER(away_team) = LOWER($6) OR LOWER($6) LIKE '%' || LOWER(away_team) || '%'))
+           OR matches::text LIKE '%' || $1 || '%'
         UNION ALL
-        SELECT 
+        SELECT DISTINCT ON (id)
             id, 
             matches, 
             recommendation, 
@@ -140,13 +144,14 @@ async function gradePrediction(client, fixtureId, homeScore, awayScore, status, 
             COALESCE(tier, 'normal') as tier,
             COALESCE(type, 'direct') as type,
             publish_run_id,
-            COALESCE(home_team, $2) as home_team,
-            COALESCE(away_team, $3) as away_team,
-            COALESCE(match_date, $4::timestamptz) as match_date
+            $5 as home_team,
+            $6 as away_team,
+            NULL as match_date
         FROM predictions_final
         WHERE matches::text LIKE '%' || $1 || '%'
-           OR fixture_id = $1
-    `, [fixtureId, homeTeam, awayTeam, matchDate]);
+           OR matches::text LIKE '%' || $5 || '%'
+           OR matches::text LIKE '%' || $6 || '%'
+    `, [fixtureId, homeTeam, awayTeam, matchDate, homeTeam, awayTeam]);
     
     if (predResult.rows.length === 0) {
         return;

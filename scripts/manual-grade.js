@@ -23,8 +23,9 @@ async function manualGrade() {
     console.log('Grading match:', match.home_team, 'vs', match.away_team);
     
     // Find predictions for this match from both tables
+    // Match by fixture_id OR by team names (fuzzy match)
     const predResult = await client.query(`
-        SELECT 
+        SELECT DISTINCT ON (id)
             id, 
             matches, 
             recommendation,
@@ -36,10 +37,13 @@ async function manualGrade() {
             away_team,
             match_date
         FROM direct1x2_prediction_final
-        WHERE matches::text LIKE '%' || $1 || '%'
-           OR fixture_id = $1
+        WHERE fixture_id = $1
+           OR (home_team IS NOT NULL AND away_team IS NOT NULL 
+               AND (LOWER(home_team) = LOWER($2) OR LOWER($2) LIKE '%' || LOWER(home_team) || '%')
+               AND (LOWER(away_team) = LOWER($3) OR LOWER($3) LIKE '%' || LOWER(away_team) || '%'))
+           OR matches::text LIKE '%' || $1 || '%'
         UNION ALL
-        SELECT 
+        SELECT DISTINCT ON (id)
             id, 
             matches, 
             recommendation,
@@ -47,13 +51,14 @@ async function manualGrade() {
             tier,
             type,
             publish_run_id,
-            home_team,
-            away_team,
-            match_date
+            NULL as home_team,
+            NULL as away_team,
+            NULL as match_date
         FROM predictions_final
         WHERE matches::text LIKE '%' || $1 || '%'
-           OR fixture_id = $1
-    `, [match.id]);
+           OR matches::text LIKE '%' || $2 || '%'
+           OR matches::text LIKE '%' || $3 || '%'
+    `, [match.id, match.home_team, match.away_team]);
     
     console.log('Found', predResult.rows.length, 'predictions');
     

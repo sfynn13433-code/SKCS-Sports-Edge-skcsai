@@ -96,8 +96,9 @@ async function gradePredictionsForDate(sport, date) {
         for (const event of eventsResult.rows) {
             try {
                 // Find predictions for this event from both tables
+                // Match by fixture_id OR by team names (fuzzy match)
                 const predResult = await client.query(`
-                    SELECT 
+                    SELECT DISTINCT ON (id)
                         id, 
                         matches, 
                         recommendation, 
@@ -109,10 +110,13 @@ async function gradePredictionsForDate(sport, date) {
                         away_team,
                         match_date
                     FROM direct1x2_prediction_final
-                    WHERE matches::text LIKE '%' || $1 || '%'
-                       OR fixture_id = $1
+                    WHERE fixture_id = $1
+                       OR (home_team IS NOT NULL AND away_team IS NOT NULL 
+                           AND (LOWER(home_team) = LOWER($2) OR LOWER($2) LIKE '%' || LOWER(home_team) || '%')
+                           AND (LOWER(away_team) = LOWER($3) OR LOWER($3) LIKE '%' || LOWER(away_team) || '%'))
+                       OR matches::text LIKE '%' || $1 || '%'
                     UNION ALL
-                    SELECT 
+                    SELECT DISTINCT ON (id)
                         id, 
                         matches, 
                         recommendation, 
@@ -120,13 +124,14 @@ async function gradePredictionsForDate(sport, date) {
                         tier,
                         type,
                         publish_run_id,
-                        home_team,
-                        away_team,
-                        match_date
+                        NULL as home_team,
+                        NULL as away_team,
+                        NULL as match_date
                     FROM predictions_final
                     WHERE matches::text LIKE '%' || $1 || '%'
-                       OR fixture_id = $1
-                `, [event.id]);
+                       OR matches::text LIKE '%' || $2 || '%'
+                       OR matches::text LIKE '%' || $3 || '%'
+                `, [event.id, event.home_team, event.away_team]);
 
                 if (predResult.rows.length === 0) {
                     continue;
