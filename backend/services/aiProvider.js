@@ -2,7 +2,11 @@
 
 const axios = require('axios');
 
-const DOLPHIN_URL = process.env.DOLPHIN_URL || 'http://localhost:8080';
+// Support both local server (http://localhost:8080) and Render service (hostname only)
+const rawDolphinUrl = process.env.DOLPHIN_URL || 'http://localhost:8080';
+const DOLPHIN_URL = rawDolphinUrl.startsWith('http') 
+    ? rawDolphinUrl 
+    : `https://${rawDolphinUrl}`;
 const DOLPHIN_TIMEOUT = Number(process.env.DOLPHIN_TIMEOUT) || 120000; // 2 minutes for slower local models
 const DOLPHIN_MAX_TOKENS = Number(process.env.DOLPHIN_MAX_TOKENS) || 512;
 const DOLPHIN_TEMPERATURE = Number(process.env.DOLPHIN_TEMPERATURE) || 0.3;
