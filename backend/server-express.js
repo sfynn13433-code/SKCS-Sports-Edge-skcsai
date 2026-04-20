@@ -104,6 +104,7 @@ const chatRouter        = require('./routes/chat');
 const accuracyRouter    = require('./routes/accuracy');
 const vipRouter         = require('./routes/vip');
 const direct1x2Router   = require('./routes/direct1x2');
+const refreshAIRouter   = require('./routes/refresh-ai');
 
 const app = express();
 
@@ -347,6 +348,7 @@ app.use('/api/predictions', predictionsRouter);
 app.use('/api/pipeline', pipelineRouter);
 app.use('/api/debug', debugRouter);
 app.use('/api/user', userRouter);
+app.use('/api/admin', refreshAIRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/edgemind', chatRouter);
 app.use('/api/accuracy', accuracyRouter);
