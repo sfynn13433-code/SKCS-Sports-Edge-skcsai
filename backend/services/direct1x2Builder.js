@@ -3,6 +3,7 @@
 const { createClient } = require('@supabase/supabase-js');
 const { query: dbQuery } = require('../db');
 const { selectSecondaryMarkets } = require('../utils/secondaryMarketSelector');
+const { generateInsight, isDolphinAvailable } = require('./aiProvider');
 
 const SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
 const SUPABASE_KEY = String(
@@ -448,12 +449,57 @@ async function buildAndStoreDirect1X2(fixture, confidence, prediction, additiona
     const secondaryMarkets = Array.isArray(secondarySelection?.markets) ? secondarySelection.markets : [];
     const secondaryNote = secondarySelection?.note || null;
 
-    const edgemindReport = generateEdgeMindReport(
-        { ...fixture, prediction: normalizedPrediction },
-        score,
-        riskTier,
-        contextual
-    );
+    // Generate insight - use AI if available, otherwise template
+    let edgemindReport;
+    let marketName = prettyPrediction(normalizedPrediction);
+    
+    try {
+        const dolphinReady = await isDolphinAvailable();
+        if (dolphinReady) {
+            console.log(`[direct1x2Builder] Generating AI insight for ${fixture?.home_team} vs ${fixture?.away_team}...`);
+            const aiInsight = await generateInsight({
+                home: fixture?.home_team,
+                away: fixture?.away_team,
+                league: resolveLeagueName(fixture),
+                kickoff: fixture?.match_date || fixture?.commence_time,
+                market: marketName,
+                confidence: score,
+                formData: contextual?.leagueStats ? `League: ${contextual.leagueStats.matches} matches, Home win rate: ${(contextual.leagueStats.homeWinRate * 100).toFixed(1)}%` : null,
+                h2h: null,
+                weather: fixture?.weather || fixture?.weatherSummary,
+                absences: null
+            });
+            
+            if (aiInsight && aiInsight.edgemind_report) {
+                edgemindReport = aiInsight.edgemind_report;
+                marketName = aiInsight.market_name || marketName;
+                console.log(`[direct1x2Builder] AI insight generated successfully`);
+            } else {
+                console.log(`[direct1x2Builder] AI insight failed, using template fallback`);
+                edgemindReport = generateEdgeMindReport(
+                    { ...fixture, prediction: normalizedPrediction },
+                    score,
+                    riskTier,
+                    contextual
+                );
+            }
+        } else {
+            edgemindReport = generateEdgeMindReport(
+                { ...fixture, prediction: normalizedPrediction },
+                score,
+                riskTier,
+                contextual
+            );
+        }
+    } catch (err) {
+        console.error(`[direct1x2Builder] Error generating insight: ${err.message}`);
+        edgemindReport = generateEdgeMindReport(
+            { ...fixture, prediction: normalizedPrediction },
+            score,
+            riskTier,
+            contextual
+        );
+    }
 
     const row = {
         fixture_id: fixtureId,

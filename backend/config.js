@@ -21,6 +21,15 @@ module.exports = {
     sportsDbKey: process.env.SPORTS_DB_KEY,
     sportsDataOrgToken: process.env.X_AUTH_TOKEN,
     cricketDataApiKey: process.env.CRICKETDATA_API_KEY,
+    
+    // Local Dolphin/Llama AI server for EdgeMind insights
+    dolphin: {
+        url: process.env.DOLPHIN_URL || 'http://127.0.0.1:8080',
+        timeout: Number(process.env.DOLPHIN_TIMEOUT) || 120000,
+        maxTokens: Number(process.env.DOLPHIN_MAX_TOKENS) || 512,
+        temperature: Number(process.env.DOLPHIN_TEMPERATURE) || 0.3,
+    },
+    
     maxPredictionsPerDay: 500,
     deepTierConfidenceThreshold: 75,
     jwtSecret: process.env.JWT_SECRET,
