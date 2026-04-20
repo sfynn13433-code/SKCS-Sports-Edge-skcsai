@@ -10,7 +10,7 @@ const { requireRole } = require('../utils/auth');
 // Create admin middleware
 const requireAdmin = requireRole('admin');
 const { generateInsight, isGroqAvailable } = require('../services/aiProvider');
-const db = require('../database');
+const { pool } = require('../database');
 
 // POST /api/admin/refresh-ai-insights
 router.post('/refresh-ai-insights', requireAdmin, async (req, res) => {
@@ -24,7 +24,7 @@ router.post('/refresh-ai-insights', requireAdmin, async (req, res) => {
         console.log(`[Admin] Groq available: ${groqReady}`);
 
         // Get predictions with template insights using PostgreSQL
-        const result = await db.query(`
+        const result = await pool.query(`
             SELECT id, fixture_id, home_team, away_team, league, match_date, prediction, confidence, edgemind_report, created_at
             FROM direct1x2_prediction_final
             ORDER BY created_at DESC
@@ -79,7 +79,7 @@ router.post('/refresh-ai-insights', requireAdmin, async (req, res) => {
                 if (isAI) {
                     // Update in database using PostgreSQL
                     try {
-                        await db.query(`
+                        await pool.query(`
                             UPDATE direct1x2_prediction_final 
                             SET edgemind_report = $1, updated_at = NOW()
                             WHERE id = $2
