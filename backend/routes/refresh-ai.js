@@ -9,20 +9,12 @@ const { requireRole } = require('../utils/auth');
 
 // Create admin middleware
 const requireAdmin = requireRole('admin');
-const { createClient } = require('@supabase/supabase-js');
 const { generateInsight, isGroqAvailable } = require('../services/aiProvider');
-
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY;
+const db = require('../database');
 
 // POST /api/admin/refresh-ai-insights
 router.post('/refresh-ai-insights', requireAdmin, async (req, res) => {
     try {
-        if (!SUPABASE_URL || !SUPABASE_KEY) {
-            return res.status(500).json({ error: 'Missing Supabase credentials' });
-        }
-
-        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         const limit = Math.min(parseInt(req.query.limit) || 20, 50); // Max 50 at a time
         
         console.log('[Admin] Starting AI insight refresh...');
@@ -31,17 +23,15 @@ router.post('/refresh-ai-insights', requireAdmin, async (req, res) => {
         const groqReady = await isGroqAvailable();
         console.log(`[Admin] Groq available: ${groqReady}`);
 
-        // Get predictions with template insights
-        const { data: predictions, error } = await supabase
-            .from('direct1x2_prediction_final')
-            .select('id, fixture_id, home_team, away_team, league, match_date, prediction, confidence, edgemind_report, created_at')
-            .order('created_at', { ascending: false })
-            .limit(limit);
-
-        if (error) {
-            console.error('[Admin] Database error:', error);
-            return res.status(500).json({ error: 'Database error', details: error.message });
-        }
+        // Get predictions with template insights using PostgreSQL
+        const result = await db.query(`
+            SELECT id, fixture_id, home_team, away_team, league, match_date, prediction, confidence, edgemind_report, created_at
+            FROM direct1x2_prediction_final
+            ORDER BY created_at DESC
+            LIMIT $1
+        `, [limit]);
+        
+        const predictions = result.rows;
 
         let updated = 0;
         let skipped = 0;
@@ -87,20 +77,14 @@ router.post('/refresh-ai-insights', requireAdmin, async (req, res) => {
                             aiInsight.edgemind_report.length > 150;
 
                 if (isAI) {
-                    // Update in database
-                    const { error: updateError } = await supabase
-                        .from('direct1x2_prediction_final')
-                        .update({ 
-                            edgemind_report: aiInsight.edgemind_report,
-                            updated_at: new Date().toISOString()
-                        })
-                        .eq('id', p.id);
-
-                    if (updateError) {
-                        console.error(`[Admin] Update failed for ${p.id}:`, updateError);
-                        failed++;
-                        results.push({ id: p.id, status: 'error', error: updateError.message });
-                    } else {
+                    // Update in database using PostgreSQL
+                    try {
+                        await db.query(`
+                            UPDATE direct1x2_prediction_final 
+                            SET edgemind_report = $1, updated_at = NOW()
+                            WHERE id = $2
+                        `, [aiInsight.edgemind_report, p.id]);
+                        
                         updated++;
                         results.push({ 
                             id: p.id, 
@@ -108,6 +92,10 @@ router.post('/refresh-ai-insights', requireAdmin, async (req, res) => {
                             teams: `${p.home_team} vs ${p.away_team}`,
                             preview: aiInsight.edgemind_report.substring(0, 80)
                         });
+                    } catch (updateError) {
+                        console.error(`[Admin] Update failed for ${p.id}:`, updateError);
+                        failed++;
+                        results.push({ id: p.id, status: 'error', error: updateError.message });
                     }
                 } else {
                     failed++;
