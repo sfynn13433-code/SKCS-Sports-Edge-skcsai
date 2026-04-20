@@ -14,7 +14,7 @@ const DOLPHIN_TEMPERATURE = Number(process.env.DOLPHIN_TEMPERATURE) || 0.3;
 // Groq API configuration (faster, cheaper alternative to local Dolphin)
 const GROQ_API_KEY = process.env.GROQ_API_KEY || process.env.GROQ_KEY || null;
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.2-3b-preview'; // Fast, cheap model
+const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.1-8b-instant'; // Production model on Groq
 
 function extractAndParseJSON(rawResponse) {
     try {

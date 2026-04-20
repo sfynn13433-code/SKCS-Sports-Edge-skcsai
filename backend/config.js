@@ -25,7 +25,7 @@ module.exports = {
     // AI Providers for EdgeMind insights (priority: Groq > Dolphin > Template)
     groq: {
         apiKey: process.env.GROQ_API_KEY || process.env.GROQ_KEY,
-        model: process.env.GROQ_MODEL || 'llama-3.2-3b-preview',
+        model: process.env.GROQ_MODEL || 'llama-3.1-8b-instant',
         timeout: 30000,
     },
     // Local Dolphin/Llama AI server (fallback when Groq unavailable)
