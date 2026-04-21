@@ -796,10 +796,15 @@ async function saveFixturesToEvents(fixtures) {
     try {
         await client.query('BEGIN');
         
-        // Map fixtures to events table schema - limit to 100 for speed
-        const mappedEvents = fixtures.slice(0, 100).map(f => ({
+        const maxEventsUpsert = Math.max(
+            100,
+            Math.min(5000, Math.floor(Number(process.env.EVENTS_UPSERT_LIMIT || 2000)))
+        );
+
+        // Map fixtures to events table schema
+        const mappedEvents = fixtures.slice(0, maxEventsUpsert).map(f => ({
             id: f.match_id || String(f.fixture?.id || ''),
-            sport_key: 'football',
+            sport_key: String(f.sport || f.sport_key || 'football').trim().toLowerCase(),
             commence_time: f.date || new Date().toISOString(),
             home_team: f.home_team,
             away_team: f.away_team

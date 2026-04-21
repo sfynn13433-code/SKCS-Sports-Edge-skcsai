@@ -2,6 +2,9 @@
 
 const { fetchWithCache, isCacheWallReady } = require('./apiCacheService');
 const { getRapidApiKeyPool, maskKey } = require('../utils/keyPool');
+const RAPIDAPI_BYPASS_CACHE_WALL = ['1', 'true', 'yes'].includes(
+    String(process.env.RAPIDAPI_BYPASS_CACHE_WALL || '').trim().toLowerCase()
+);
 
 const PROVIDER_CONFIG = Object.freeze({
     football_api: { hostEnv: 'RAPIDAPI_HOST_FOOTBALL_API', cacheDurationMinutes: 10 },
@@ -242,6 +245,10 @@ async function fetchRapidApiProvider(providerName, endpointPath, params = {}, op
         console.warn(`[dataProviders] RapidAPI key missing. Skipping provider ${providerName}.`);
         return null;
     }
+    if (!isCacheWallReady() && !RAPIDAPI_BYPASS_CACHE_WALL) {
+        console.warn(`[dataProviders] Cache wall unavailable for ${providerName}. Set RAPIDAPI_BYPASS_CACHE_WALL=true to allow uncached fallback.`);
+        return null;
+    }
 
     const cacheDurationMinutes = Number.isFinite(options.cacheDurationMinutes)
         ? options.cacheDurationMinutes
@@ -296,6 +303,10 @@ async function fetchRapidApiCustom(options = {}) {
     const rapidApiKeys = getRapidApiKeyPool();
     if (!rapidApiKeys.length) {
         console.warn(`[dataProviders] RapidAPI key missing. Skipping provider ${providerName}.`);
+        return null;
+    }
+    if (!isCacheWallReady() && !RAPIDAPI_BYPASS_CACHE_WALL) {
+        console.warn(`[dataProviders] Cache wall unavailable for ${providerName}. Set RAPIDAPI_BYPASS_CACHE_WALL=true to allow uncached fallback.`);
         return null;
     }
 

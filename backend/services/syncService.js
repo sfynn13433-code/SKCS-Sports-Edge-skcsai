@@ -465,16 +465,26 @@ async function syncSports(options = {}) {
                 if (normalizedMatches.length > 0) {
                     await upsertCanonicalEvents(normalizedMatches);
                     console.log(`[syncService] Found ${normalizedMatches.length} REAL matches for ${item.sport}. Running AI Analysis...`);
-                    await runPipelineForMatches({
+                    const pipelineResult = await runPipelineForMatches({
                         matches: normalizedMatches,
                         telemetry: {
                             run_id: telemetryRunId,
                             sport: item.sport
                         }
                     });
-                    totalMatchesProcessed += normalizedMatches.length;
-                    perSport.set(item.sport, (perSport.get(item.sport) || 0) + normalizedMatches.length);
-                    console.log(`[syncService] ${item.sport}: pipeline complete for ${normalizedMatches.length} matches`);
+                    if (pipelineResult?.error) {
+                        const errorMsg = `${item.sport}: ${pipelineResult.error}`;
+                        perSportErrors.set(item.sport, errorMsg);
+                        console.warn(`[syncService] ${item.sport}: pipeline skipped (${pipelineResult.error})`);
+                        if (!perSport.has(item.sport)) perSport.set(item.sport, 0);
+                    } else {
+                        const insertedCount = Array.isArray(pipelineResult?.inserted)
+                            ? pipelineResult.inserted.length
+                            : normalizedMatches.length;
+                        totalMatchesProcessed += insertedCount;
+                        perSport.set(item.sport, (perSport.get(item.sport) || 0) + insertedCount);
+                        console.log(`[syncService] ${item.sport}: pipeline complete (normalized=${normalizedMatches.length}, inserted=${insertedCount})`);
+                    }
                 } else {
                     console.warn(`[syncService] No upcoming REAL matches found for ${item.sport}. This could mean:`);
                     console.warn(`  - Season is over or hasn't started yet`);

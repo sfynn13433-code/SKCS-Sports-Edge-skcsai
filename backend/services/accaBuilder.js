@@ -468,6 +468,50 @@ function firstNonEmptyValue(sources, paths) {
     return '';
 }
 
+const LEAGUE_COUNTRY_FALLBACKS = new Map([
+    ['premier league', 'England'],
+    ['championship', 'England'],
+    ['league one', 'England'],
+    ['league two', 'England'],
+    ['primera division', 'Spain'],
+    ['la liga', 'Spain'],
+    ['segunda division', 'Spain'],
+    ['bundesliga', 'Germany'],
+    ['2. bundesliga', 'Germany'],
+    ['serie a', 'Italy'],
+    ['serie b', 'Italy'],
+    ['ligue 1', 'France'],
+    ['ligue 2', 'France'],
+    ['eredivisie', 'Netherlands'],
+    ['uefa champions league', 'Europe'],
+    ['uefa europa league', 'Europe'],
+    ['uefa europa conference league', 'Europe'],
+    ['euroleague', 'Europe'],
+    ['nba', 'United States'],
+    ['nhl', 'United States'],
+    ['mlb', 'United States'],
+    ['nfl', 'United States']
+]);
+
+function normalizeLeagueToken(value) {
+    return String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, ' ');
+}
+
+function inferCountryFromLeagueName(league) {
+    const token = normalizeLeagueToken(league);
+    if (!token) return '';
+    if (LEAGUE_COUNTRY_FALLBACKS.has(token)) {
+        return LEAGUE_COUNTRY_FALLBACKS.get(token) || '';
+    }
+    for (const [key, country] of LEAGUE_COUNTRY_FALLBACKS.entries()) {
+        if (token.includes(key)) return country;
+    }
+    return '';
+}
+
 function resolveLeagueCountryFromPrediction(prediction, metadata, matchInfo, matchContext) {
     const providerPayloads = [
         metadata?.raw_provider_data,
@@ -518,7 +562,8 @@ function resolveLeagueCountryFromPrediction(prediction, metadata, matchInfo, mat
         'competition.country'
     ]);
 
-    return { league, country };
+    const inferredCountry = country || inferCountryFromLeagueName(league);
+    return { league, country: inferredCountry };
 }
 
 function isPlaceholderTeamName(value) {

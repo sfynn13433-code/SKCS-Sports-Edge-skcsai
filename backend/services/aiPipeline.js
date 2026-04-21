@@ -768,6 +768,64 @@ async function buildRawPredictionFromProviderItem(item) {
 }
 
 async function insertRawPrediction(pred, client) {
+    const metadata = pred && typeof pred.metadata === 'object' && pred.metadata !== null
+        ? pred.metadata
+        : {};
+    const kickoff = String(
+        metadata.match_time
+        || metadata.kickoff
+        || metadata.kickoff_time
+        || ''
+    ).trim();
+
+    if (kickoff) {
+        const existingRes = await client.query(
+            `
+            select *
+            from predictions_raw
+            where match_id = $1
+              and sport = $2
+              and market = $3
+              and coalesce(metadata->>'match_time', metadata->>'kickoff', metadata->>'kickoff_time', '') = $4
+              and created_at >= now() - interval '21 days'
+            order by created_at desc
+            limit 1;
+            `,
+            [
+                pred.match_id,
+                pred.sport,
+                pred.market,
+                kickoff
+            ]
+        );
+
+        if (existingRes.rows.length) {
+            const existing = existingRes.rows[0];
+            const refreshed = await client.query(
+                `
+                update predictions_raw
+                set prediction = $2,
+                    confidence = $3,
+                    volatility = $4,
+                    odds = $5,
+                    metadata = $6::jsonb,
+                    created_at = now()
+                where id = $1
+                returning *;
+                `,
+                [
+                    existing.id,
+                    pred.prediction,
+                    pred.confidence,
+                    pred.volatility,
+                    pred.odds,
+                    JSON.stringify(metadata)
+                ]
+            );
+            return refreshed.rows[0];
+        }
+    }
+
     const res = await client.query(
         `
         insert into predictions_raw
@@ -791,6 +849,25 @@ async function insertRawPrediction(pred, client) {
     return res.rows[0];
 }
 
+function rawDedupeKey(raw) {
+    const metadata = raw && typeof raw.metadata === 'object' && raw.metadata !== null
+        ? raw.metadata
+        : {};
+    const kickoff = String(
+        metadata.match_time
+        || metadata.kickoff
+        || metadata.kickoff_time
+        || raw?.date
+        || ''
+    ).trim();
+    return [
+        String(raw?.sport || '').trim().toLowerCase(),
+        String(raw?.match_id || '').trim(),
+        String(raw?.market || '').trim().toLowerCase(),
+        kickoff
+    ].join('|');
+}
+
 async function runPipelineForMatches({ matches, telemetry = {} }) {
     if (!Array.isArray(matches) || matches.length === 0) {
         throw new Error('matches must be a non-empty array');
@@ -806,6 +883,7 @@ async function runPipelineForMatches({ matches, telemetry = {} }) {
     try {
         return await withTransaction(async (client) => {
             const inserted = [];
+            const seenRawKeys = new Set();
             let normalValid = 0;
             let normalInvalid = 0;
 
@@ -818,6 +896,9 @@ async function runPipelineForMatches({ matches, telemetry = {} }) {
                 telemetry
             });
             if (!raw) continue;
+            const dedupeKey = rawDedupeKey(raw);
+            if (seenRawKeys.has(dedupeKey)) continue;
+            seenRawKeys.add(dedupeKey);
             const row = await insertRawPrediction(raw, client);
             inserted.push(row);
         }
@@ -891,6 +972,7 @@ async function runPipelineFromConfiguredDataMode() {
     try {
         return await withTransaction(async (client) => {
             const inserted = [];
+            const seenRawKeys = new Set();
 
         console.log('[aiPipeline] DATA_MODE=%s provider_items=%s', mode, predictions.length);
 
@@ -900,6 +982,9 @@ async function runPipelineFromConfiguredDataMode() {
                 data_mode: mode
             });
             if (!raw) continue;
+            const dedupeKey = rawDedupeKey(raw);
+            if (seenRawKeys.has(dedupeKey)) continue;
+            seenRawKeys.add(dedupeKey);
 
             const row = await insertRawPrediction(raw, client);
             inserted.push(row);

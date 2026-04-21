@@ -16,6 +16,7 @@ const LEAGUE_SPORT_MAP = {
     '4380': 'hockey',            // NHL
     '4391': 'american_football'  // NFL
 };
+const THESPORTSDB_SUPPORTED_SPORTS = new Set(Object.values(LEAGUE_SPORT_MAP));
 
 const THESPORTSDB_BASE_URL = 'https://www.thesportsdb.com/api/v1/json';
 const THESPORTSDB_DELAY_MS = 500;
@@ -86,6 +87,13 @@ function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function parsePositiveInt(value, fallback, min, max) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return fallback;
+    const rounded = Math.floor(n);
+    return Math.max(min, Math.min(max, rounded));
+}
+
 function normalizeRequestedSport(sport) {
     const key = String(sport || '').trim().toLowerCase();
     if (!key) return null;
@@ -97,6 +105,23 @@ function normalizeRequestedSport(sport) {
     if (key === 'formula-1' || key === 'formula_1') return 'formula1';
     if (key === 'american-football') return 'american_football';
     return key;
+}
+
+function dedupePredictionInputs(rows) {
+    const out = [];
+    const seen = new Set();
+    for (const row of Array.isArray(rows) ? rows : []) {
+        if (!row) continue;
+        const sport = normalizeRequestedSport(row.sport) || String(row.sport || '').trim().toLowerCase();
+        const matchId = String(row.match_id || '').trim();
+        const kickoff = String(row.date || row.commence_time || row.kickoff || row.match_time || '').trim();
+        if (!sport || !matchId) continue;
+        const key = `${sport}|${matchId}|${kickoff}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push(row);
+    }
+    return out;
 }
 
 function normalizeTheSportsDbStartTime(event) {
@@ -433,18 +458,26 @@ async function buildLiveData(options = {}) {
     const today = todayStr();
     const requestedWindowDays = Number(options.windowDays ?? process.env.LIVE_FETCH_WINDOW_DAYS ?? 3);
     const windowDays = Number.isFinite(requestedWindowDays)
-        ? Math.max(2, Math.min(3, Math.round(requestedWindowDays)))
+        ? parsePositiveInt(requestedWindowDays, 3, 1, 14)
         : 3;
     const windowEnd = futureStr(windowDays);
-    const maxFixturesPerSource = 80;
+    const maxFixturesPerSource = parsePositiveInt(
+        process.env.LIVE_MAX_FIXTURES_PER_SOURCE,
+        600,
+        80,
+        2000
+    );
     const requestedLeagueId = leagueId ? String(leagueId).trim() : null;
     const isSupportedLeagueId = requestedLeagueId ? SUPPORTED_LEAGUES.includes(requestedLeagueId) : false;
-    const shouldFetchAllLeagues = !requestedLeagueId || String(sport || '').toLowerCase() === 'all';
-    const leagueIdsForSportsDb = shouldFetchAllLeagues
-        ? SUPPORTED_LEAGUES
-        : (isSupportedLeagueId ? [requestedLeagueId] : []);
     const requestedSport = normalizeRequestedSport(sport);
     const includeAllSports = String(sport || '').toLowerCase() === 'all';
+    const shouldFetchAllLeagues = !requestedLeagueId || String(sport || '').toLowerCase() === 'all';
+    const useTheSportsDbForSport = includeAllSports
+        || !requestedSport
+        || THESPORTSDB_SUPPORTED_SPORTS.has(requestedSport);
+    const leagueIdsForSportsDb = useTheSportsDbForSport && shouldFetchAllLeagues
+        ? SUPPORTED_LEAGUES
+        : (useTheSportsDbForSport && isSupportedLeagueId ? [requestedLeagueId] : []);
 
     const client = new APISportsClient();
 
@@ -458,9 +491,9 @@ async function buildLiveData(options = {}) {
             ));
 
             if (filteredFixtures.length > 0) {
-                const out = filteredFixtures
+                const out = dedupePredictionInputs(filteredFixtures
                     .slice(0, maxFixturesPerSource)
-                    .map(toPredictionInputFromSportsDbFixture);
+                    .map(toPredictionInputFromSportsDbFixture));
                 console.log(`[dataProvider] ${sport}: TheSportsDB fetched=${filteredFixtures.length} returned=${out.length}`);
                 return out;
             }
@@ -487,7 +520,12 @@ async function buildLiveData(options = {}) {
         }
 
         if (fixtures.length > 0) {
-            const out = fixtures.slice(0, maxFixturesPerSource).map(f => normalizeFixture(f, sport)).filter(Boolean);
+            const out = dedupePredictionInputs(
+                fixtures
+                    .slice(0, maxFixturesPerSource)
+                    .map(f => normalizeFixture(f, sport))
+                    .filter(Boolean)
+            );
             console.log(`[dataProvider] ${sport}: API-Sports fetched=${fixtures.length} returned=${out.length}`);
             return out;
         }
@@ -504,8 +542,9 @@ async function buildLiveData(options = {}) {
             console.log(`[dataProvider] ${sport}: trying Odds API fallback (${oddsKey})`);
             const oddsData = await fetchOddsData(oddsKey);
             if (oddsData.length > 0) {
-                console.log(`[dataProvider] ${sport}: Odds API returned ${oddsData.length} events`);
-                return oddsData;
+                const out = dedupePredictionInputs(oddsData);
+                console.log(`[dataProvider] ${sport}: Odds API returned ${out.length} events`);
+                return out;
             }
         } catch (oddsErr) {
             console.error(`[dataProvider] ${sport}: Odds API fallback failed:`, oddsErr.message);
@@ -513,15 +552,18 @@ async function buildLiveData(options = {}) {
     }
 
     // --- Source 3: FootballData.org (fallback) ---
-    try {
-        console.log(`[dataProvider] ${sport}: trying FootballData.org fallback`);
-        const sdoData = await fetchSportsDataOrg(sport, leagueId);
-        if (sdoData.length > 0) {
-            console.log(`[dataProvider] ${sport}: FootballData.org returned ${sdoData.length} events`);
-            return sdoData;
+    if (normalizeRequestedSport(sport) === 'football') {
+        try {
+            console.log(`[dataProvider] ${sport}: trying FootballData.org fallback`);
+            const sdoData = await fetchSportsDataOrg(sport, leagueId);
+            if (sdoData.length > 0) {
+                const out = dedupePredictionInputs(sdoData);
+                console.log(`[dataProvider] ${sport}: FootballData.org returned ${out.length} events`);
+                return out;
+            }
+        } catch (sdoErr) {
+            console.error(`[dataProvider] ${sport}: FootballData.org fallback failed:`, sdoErr.message);
         }
-    } catch (sdoErr) {
-        console.error(`[dataProvider] ${sport}: FootballData.org fallback failed:`, sdoErr.message);
     }
 
     // --- Source 4: SportsData.io (fallback) ---
@@ -529,8 +571,9 @@ async function buildLiveData(options = {}) {
         console.log(`[dataProvider] ${sport}: trying SportsData.io fallback`);
         const sdiData = await fetchSportsDataIO(sport);
         if (sdiData.length > 0) {
-            console.log(`[dataProvider] ${sport}: SportsData.io returned ${sdiData.length} events`);
-            return sdiData;
+            const out = dedupePredictionInputs(sdiData);
+            console.log(`[dataProvider] ${sport}: SportsData.io returned ${out.length} events`);
+            return out;
         }
     } catch (sdiErr) {
         console.error(`[dataProvider] ${sport}: SportsData.io fallback failed:`, sdiErr.message);
@@ -541,8 +584,9 @@ async function buildLiveData(options = {}) {
         console.log(`[dataProvider] ${sport}: trying RapidAPI fallback`);
         const rapidData = await fetchRapidAPI(sport, leagueId, season);
         if (rapidData.length > 0) {
-            console.log(`[dataProvider] ${sport}: RapidAPI returned ${rapidData.length} events`);
-            return rapidData;
+            const out = dedupePredictionInputs(rapidData);
+            console.log(`[dataProvider] ${sport}: RapidAPI returned ${out.length} events`);
+            return out;
         }
     } catch (rapidErr) {
         console.error(`[dataProvider] ${sport}: RapidAPI fallback failed:`, rapidErr.message);
@@ -554,8 +598,9 @@ async function buildLiveData(options = {}) {
             console.log(`[dataProvider] cricket: trying CricketData API fallback`);
             const cricketData = await fetchCricketData();
             if (cricketData.length > 0) {
-                console.log(`[dataProvider] cricket: CricketData API returned ${cricketData.length} events`);
-                return cricketData;
+                const out = dedupePredictionInputs(cricketData);
+                console.log(`[dataProvider] cricket: CricketData API returned ${out.length} events`);
+                return out;
             }
         } catch (cricketErr) {
             console.error(`[dataProvider] cricket: CricketData API fallback failed:`, cricketErr.message);

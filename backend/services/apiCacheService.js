@@ -17,6 +17,9 @@ const supabase = SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
         }
     })
     : null;
+const RAPIDAPI_BYPASS_CACHE_WALL = ['1', 'true', 'yes'].includes(
+    String(process.env.RAPIDAPI_BYPASS_CACHE_WALL || '').trim().toLowerCase()
+);
 
 function normalizeForHash(value) {
     if (Array.isArray(value)) {
@@ -115,8 +118,23 @@ async function fetchWithCache(
     if (!safeEndpoint) throw new Error('endpointUrl is required');
 
     if (!supabase) {
-        console.error(`[Cache Wall] Supabase is not configured. Blocking uncached RapidAPI request for ${safeProvider}.`);
-        return null;
+        if (!RAPIDAPI_BYPASS_CACHE_WALL) {
+            console.error(`[Cache Wall] Supabase is not configured. Blocking uncached RapidAPI request for ${safeProvider}.`);
+            return null;
+        }
+
+        try {
+            console.warn(`[Cache Wall] Bypass enabled. Making uncached RapidAPI request for ${safeProvider}.`);
+            const response = await axios.get(safeEndpoint, {
+                headers,
+                params,
+                timeout: 15000
+            });
+            return response.data;
+        } catch (error) {
+            console.error(`[Cache Wall] Bypass fetch failed for ${safeProvider}:`, error.message);
+            return null;
+        }
     }
 
     const cacheKey = buildCacheKey(safeProvider, safeEndpoint, params);

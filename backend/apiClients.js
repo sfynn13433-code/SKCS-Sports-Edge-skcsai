@@ -254,7 +254,7 @@ class SportsDataOrgClient {
             '848': 'BSA',
             '1': 'WC',
         };
-        return codes[leagueCode] || 'PL';
+        return codes[leagueCode] || null;
     }
 
     async getFixtures(sport, leagueCode) {
@@ -262,7 +262,17 @@ class SportsDataOrgClient {
             throw new Error('FootballData.org: X-Auth-Token not configured');
         }
 
+        const normalizedSport = String(sport || '').trim().toLowerCase();
+        if (normalizedSport !== 'football') {
+            console.log(`[FootballData.org] ${sport}: skipped (football-only provider)`);
+            return [];
+        }
+
         const code = this.getCompetitionCode(sport, leagueCode);
+        if (!code) {
+            console.log(`[FootballData.org] ${sport}: skipped (unsupported league code ${leagueCode || 'n/a'})`);
+            return [];
+        }
         const url = `${this.baseUrl}/competitions/${code}/matches`;
         const today = new Date().toISOString().slice(0, 10);
         const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
@@ -348,7 +358,11 @@ class SportsDataIOClient {
             hockey: 'hockey',
         };
 
-        const sportEndpoint = sportMap[sport] || 'soccer';
+        const sportEndpoint = sportMap[sport];
+        if (!sportEndpoint) {
+            console.log(`[SportsData.io] ${sport}: skipped (unsupported sport mapping)`);
+            return [];
+        }
         const today = new Date().toISOString().slice(0, 10);
         const url = `${this.baseUrl}/${sportEndpoint}/scores/json/SchedulesByDate`;
 

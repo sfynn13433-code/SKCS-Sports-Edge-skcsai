@@ -236,6 +236,9 @@ const DIRECT_SAFE_MARKETS = Object.freeze(new Set([
 ]));
 
 const DIRECT_MARKETS_ALLOWED = Object.freeze(new Set([
+    '1x2',
+    'match_winner',
+    'match_result',
     'home_win',
     'draw',
     'away_win'
