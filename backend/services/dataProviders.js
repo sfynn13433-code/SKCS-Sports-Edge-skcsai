@@ -54,6 +54,89 @@ const FOOTBALL_NEWS_FALLBACK_LEAGUE = String(
     process.env.FOOTBALL_NEWS_HIGH_VALUE_LEAGUE || '39'
 ).trim();
 
+const SPORT_HOST_KEY_HINTS = Object.freeze({
+    football: ['FOOTBALL', 'SOCCER', 'LIVESCORE', 'FLASHSCORE', 'SCORE', 'ODDSPEDIA', 'ALLSPORTS', 'ALLSCORES', 'SPORT_RADAR'],
+    basketball: ['BASKETBALL', 'NBA', 'WNBA'],
+    nba: ['BASKETBALL', 'NBA', 'WNBA'],
+    baseball: ['BASEBALL', 'MLB'],
+    hockey: ['HOCKEY', 'ICE_HOCKEY', 'NHL'],
+    rugby: ['RUGBY'],
+    american_football: ['NFL', 'AMERICAN_FOOTBALL', 'AMERICANFOOTBALL'],
+    nfl: ['NFL', 'AMERICAN_FOOTBALL', 'AMERICANFOOTBALL'],
+    volleyball: ['VOLLEYBALL'],
+    handball: ['HANDBALL'],
+    afl: ['AUSSIE', 'AFL'],
+    mma: ['MMA', 'UFC'],
+    formula1: ['F1', 'FORMULA', 'MOTOR'],
+    cricket: ['CRICKET'],
+    tennis: ['TENNIS']
+});
+
+function normalizeHost(value) {
+    const raw = String(value || '').split('#')[0].trim();
+    if (!raw) return '';
+    return raw
+        .replace(/^https?:\/\//i, '')
+        .replace(/\/+$/, '')
+        .trim();
+}
+
+function uniqueHosts(values) {
+    const out = [];
+    const seen = new Set();
+    for (const raw of Array.isArray(values) ? values : []) {
+        const host = normalizeHost(raw);
+        if (!host) continue;
+        const key = host.toLowerCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push(host);
+    }
+    return out;
+}
+
+function parseCsvHosts(value) {
+    return String(value || '')
+        .split(',')
+        .map((part) => normalizeHost(part))
+        .filter(Boolean);
+}
+
+function getAllRapidApiHostEntries() {
+    const out = [];
+    for (const [key, value] of Object.entries(process.env)) {
+        if (!/^RAPIDAPI_HOST_/i.test(String(key || ''))) continue;
+        const host = normalizeHost(value);
+        if (!host) continue;
+        out.push({ key: String(key || '').toUpperCase(), host });
+    }
+    return out;
+}
+
+function normalizeSportToken(sport) {
+    const key = String(sport || '').trim().toLowerCase();
+    if (!key) return '';
+    if (key === 'nfl') return 'american_football';
+    if (key === 'nba') return 'basketball';
+    if (key === 'soccer') return 'football';
+    return key;
+}
+
+function hostKeyMatchesSport(hostKey, sport) {
+    const token = normalizeSportToken(sport);
+    if (!token) return false;
+    const hints = SPORT_HOST_KEY_HINTS[token] || [];
+    if (!hints.length) return false;
+    const normalizedKey = String(hostKey || '').toUpperCase();
+    return hints.some((hint) => normalizedKey.includes(hint));
+}
+
+function parseHostFallbackLimit() {
+    const raw = Number(process.env.RAPIDAPI_HOST_FALLBACK_LIMIT || 40);
+    if (!Number.isFinite(raw)) return 40;
+    return Math.max(1, Math.min(200, Math.floor(raw)));
+}
+
 function getRapidApiKey() {
     const keys = getRapidApiKeyPool();
     return keys[0] || '';
@@ -80,11 +163,7 @@ function getProviderConfig(providerName) {
 
 function getProviderHost(providerName) {
     const provider = getProviderConfig(providerName);
-    const host = String(process.env[provider.hostEnv] || '').trim();
-    if (!host) {
-        throw new Error(`Missing host env for provider ${providerName}: ${provider.hostEnv}`);
-    }
-    return host;
+    return normalizeHost(process.env[provider.hostEnv]);
 }
 
 function getRapidApiProviderForSport(sport) {
@@ -92,9 +171,71 @@ function getRapidApiProviderForSport(sport) {
     return SPORT_PROVIDER_MAP[key] || 'football_api';
 }
 
+function getRapidApiHostCandidates(options = {}) {
+    const providerName = String(options.providerName || '').trim();
+    const sport = normalizeSportToken(options.sport || options.sportKey || '');
+    const explicitHosts = Array.isArray(options.hosts) ? options.hosts : [];
+    const defaultHost = normalizeHost(options.defaultHost || '');
+
+    const provider = PROVIDER_CONFIG[providerName] || null;
+    const providerHost = provider ? normalizeHost(process.env[provider.hostEnv]) : '';
+
+    const sportUpper = String(sport || '').toUpperCase();
+    const envPinnedHosts = [
+        ...parseCsvHosts(process.env.RAPIDAPI_HOSTS_ACTIVE),
+        ...parseCsvHosts(process.env.RAPIDAPI_HOSTS_ACTIVE_ALL),
+        ...(sportUpper ? parseCsvHosts(process.env[`RAPIDAPI_HOSTS_ACTIVE_${sportUpper}`]) : []),
+        ...(sportUpper ? parseCsvHosts(process.env[`RAPIDAPI_${sportUpper}_HOSTS`]) : [])
+    ];
+
+    const allHostEntries = getAllRapidApiHostEntries();
+    const sportMatchedHosts = sport
+        ? allHostEntries
+            .filter((entry) => hostKeyMatchesSport(entry.key, sport))
+            .map((entry) => entry.host)
+        : [];
+    const allConfiguredHosts = allHostEntries.map((entry) => entry.host);
+
+    const ordered = uniqueHosts([
+        ...explicitHosts,
+        ...envPinnedHosts,
+        defaultHost,
+        providerHost,
+        ...sportMatchedHosts,
+        ...allConfiguredHosts
+    ]);
+
+    return ordered.slice(0, parseHostFallbackLimit());
+}
+
+function endpointPathFromUrl(endpointUrl) {
+    const text = String(endpointUrl || '').trim();
+    if (!text) return '/';
+    if (!/^https?:\/\//i.test(text)) {
+        return text.startsWith('/') ? text : `/${text}`;
+    }
+    try {
+        const parsed = new URL(text);
+        const path = `${parsed.pathname || ''}${parsed.search || ''}`;
+        if (!path) return '/';
+        return path.startsWith('/') ? path : `/${path}`;
+    } catch (_error) {
+        return '/';
+    }
+}
+
+function hostFromEndpointUrl(endpointUrl) {
+    const text = String(endpointUrl || '').trim();
+    if (!text || !/^https?:\/\//i.test(text)) return '';
+    try {
+        return normalizeHost(new URL(text).host);
+    } catch (_error) {
+        return '';
+    }
+}
+
 async function fetchRapidApiProvider(providerName, endpointPath, params = {}, options = {}) {
     const provider = getProviderConfig(providerName);
-    const host = getProviderHost(providerName);
     const rapidApiKeys = getRapidApiKeyPool();
 
     if (!rapidApiKeys.length) {
@@ -102,25 +243,38 @@ async function fetchRapidApiProvider(providerName, endpointPath, params = {}, op
         return null;
     }
 
-    const endpointUrl = toEndpointUrl(host, endpointPath);
     const cacheDurationMinutes = Number.isFinite(options.cacheDurationMinutes)
         ? options.cacheDurationMinutes
         : provider.cacheDurationMinutes;
+    const hosts = getRapidApiHostCandidates({
+        providerName,
+        sport: options.sport,
+        defaultHost: getProviderHost(providerName),
+        hosts: options.hosts
+    });
 
-    for (let i = 0; i < rapidApiKeys.length; i += 1) {
-        const key = rapidApiKeys[i];
-        const payload = await fetchWithCache(
-            providerName,
-            endpointUrl,
-            {
-                'x-rapidapi-key': key,
-                'x-rapidapi-host': host
-            },
-            params,
-            cacheDurationMinutes
-        );
-        if (payload) return payload;
-        console.warn(`[dataProviders] ${providerName}: RapidAPI key ${i + 1}/${rapidApiKeys.length} (${maskKey(key)}) returned empty payload. Rotating...`);
+    if (!hosts.length) {
+        throw new Error(`Missing RapidAPI host candidates for provider ${providerName}`);
+    }
+
+    for (let hostIdx = 0; hostIdx < hosts.length; hostIdx += 1) {
+        const host = hosts[hostIdx];
+        const endpointUrl = toEndpointUrl(host, endpointPath);
+        for (let i = 0; i < rapidApiKeys.length; i += 1) {
+            const key = rapidApiKeys[i];
+            const payload = await fetchWithCache(
+                providerName,
+                endpointUrl,
+                {
+                    'x-rapidapi-key': key,
+                    'x-rapidapi-host': host
+                },
+                params,
+                cacheDurationMinutes
+            );
+            if (payload) return payload;
+            console.warn(`[dataProviders] ${providerName}: host ${hostIdx + 1}/${hosts.length} key ${i + 1}/${rapidApiKeys.length} (${maskKey(key)}) returned empty payload. Rotating...`);
+        }
     }
 
     return null;
@@ -129,14 +283,14 @@ async function fetchRapidApiProvider(providerName, endpointPath, params = {}, op
 async function fetchRapidApiCustom(options = {}) {
     const providerName = String(options.providerName || '').trim();
     const endpointUrl = String(options.endpointUrl || '').trim();
-    const host = String(options.host || '').trim();
+    const host = normalizeHost(options.host || '');
     const params = options.params && typeof options.params === 'object' ? options.params : {};
 
     if (!providerName) {
         throw new Error('fetchRapidApiCustom requires providerName');
     }
-    if (!endpointUrl || !host) {
-        throw new Error('fetchRapidApiCustom requires endpointUrl and host');
+    if (!endpointUrl && !host) {
+        throw new Error('fetchRapidApiCustom requires endpointUrl and/or host');
     }
 
     const rapidApiKeys = getRapidApiKeyPool();
@@ -149,21 +303,38 @@ async function fetchRapidApiCustom(options = {}) {
     const cacheDurationMinutes = Number.isFinite(options.cacheDurationMinutes)
         ? options.cacheDurationMinutes
         : (provider ? provider.cacheDurationMinutes : 1440);
+    const endpointPath = endpointPathFromUrl(endpointUrl);
+    const defaultHost = host || hostFromEndpointUrl(endpointUrl);
+    const hosts = getRapidApiHostCandidates({
+        providerName,
+        sport: options.sport,
+        defaultHost,
+        hosts: options.hosts
+    });
 
-    for (let i = 0; i < rapidApiKeys.length; i += 1) {
-        const key = rapidApiKeys[i];
-        const payload = await fetchWithCache(
-            providerName,
-            endpointUrl,
-            {
-                'x-rapidapi-key': key,
-                'x-rapidapi-host': host
-            },
-            params,
-            cacheDurationMinutes
-        );
-        if (payload) return payload;
-        console.warn(`[dataProviders] ${providerName}: RapidAPI key ${i + 1}/${rapidApiKeys.length} (${maskKey(key)}) returned empty payload. Rotating...`);
+    if (!hosts.length) {
+        console.warn(`[dataProviders] ${providerName}: no host candidates available. Skipping request.`);
+        return null;
+    }
+
+    for (let hostIdx = 0; hostIdx < hosts.length; hostIdx += 1) {
+        const candidateHost = hosts[hostIdx];
+        const candidateEndpointUrl = toEndpointUrl(candidateHost, endpointPath);
+        for (let i = 0; i < rapidApiKeys.length; i += 1) {
+            const key = rapidApiKeys[i];
+            const payload = await fetchWithCache(
+                providerName,
+                candidateEndpointUrl,
+                {
+                    'x-rapidapi-key': key,
+                    'x-rapidapi-host': candidateHost
+                },
+                params,
+                cacheDurationMinutes
+            );
+            if (payload) return payload;
+            console.warn(`[dataProviders] ${providerName}: host ${hostIdx + 1}/${hosts.length} key ${i + 1}/${rapidApiKeys.length} (${maskKey(key)}) returned empty payload. Rotating...`);
+        }
     }
 
     return null;
@@ -171,7 +342,7 @@ async function fetchRapidApiCustom(options = {}) {
 
 async function fetchRapidApiBySport(sport, endpointPath, params = {}, options = {}) {
     const providerName = getRapidApiProviderForSport(sport);
-    return fetchRapidApiProvider(providerName, endpointPath, params, options);
+    return fetchRapidApiProvider(providerName, endpointPath, params, { ...options, sport });
 }
 
 /**
@@ -219,5 +390,6 @@ module.exports = {
     fetchRapidApiBySport,
     fetchFootballNewsLeagueFallback,
     getRapidApiProviderForSport,
+    getRapidApiHostCandidates,
     assertRapidApiCacheWallReady
 };

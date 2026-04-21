@@ -3368,13 +3368,89 @@
         return EDGE_MIND_PLACEHOLDER_PATTERNS.some((pattern) => text.includes(pattern));
     }
 
+    function resolveLeagueCountryContext(match, fallbackSport) {
+        const safeMatch = (match && typeof match === 'object') ? match : {};
+        const metadata = (safeMatch.metadata && typeof safeMatch.metadata === 'object') ? safeMatch.metadata : {};
+        const matchInfo = (safeMatch.match_info && typeof safeMatch.match_info === 'object')
+            ? safeMatch.match_info
+            : ((metadata.match_info && typeof metadata.match_info === 'object') ? metadata.match_info : {});
+        const contextMatchInfo = (metadata.match_context && metadata.match_context.match_info && typeof metadata.match_context.match_info === 'object')
+            ? metadata.match_context.match_info
+            : {};
+        const providerPayloads = [
+            safeMatch.raw_provider_data,
+            metadata.raw_provider_data,
+            metadata.match_context && metadata.match_context.raw_provider_data,
+            metadata.match_context && metadata.match_context.match && metadata.match_context.match.raw_provider_data
+        ].filter((value) => value && typeof value === 'object');
+
+        const readPath = (source, path) => {
+            if (!source || typeof source !== 'object') return undefined;
+            const parts = Array.isArray(path) ? path : String(path || '').split('.');
+            let current = source;
+            for (const part of parts) {
+                if (!current || typeof current !== 'object' || !(part in current)) return undefined;
+                current = current[part];
+            }
+            return current;
+        };
+
+        const pick = (paths) => {
+            const sources = [safeMatch, metadata, matchInfo, contextMatchInfo, ...providerPayloads];
+            for (const source of sources) {
+                if (!source || typeof source !== 'object') continue;
+                for (const path of paths) {
+                    const raw = readPath(source, path);
+                    const text = String(raw === undefined || raw === null ? '' : raw).trim();
+                    if (text) return text;
+                }
+            }
+            return '';
+        };
+
+        const league = pick([
+            'league',
+            'league_name',
+            'competition',
+            'tournament',
+            'match_info.league',
+            'metadata.league',
+            'metadata.competition',
+            'metadata.match_info.league',
+            'metadata.match_context.match_info.league',
+            'raw_provider_data.league.name',
+            'raw_provider_data.competition.name',
+            'raw_provider_data.tournament.name',
+            'league.name',
+            'competition.name',
+            'tournament.name'
+        ]);
+
+        const country = pick([
+            'country',
+            'league_country',
+            'match_info.country',
+            'metadata.country',
+            'metadata.league_country',
+            'metadata.match_info.country',
+            'metadata.match_context.match_info.country',
+            'raw_provider_data.league.country',
+            'raw_provider_data.country',
+            'league.country',
+            'competition.country'
+        ]);
+
+        const leagueContext = [country, league].filter(Boolean).join(' • ')
+            || humanizeToken(safeMatch.sport || fallbackSport || metadata.sport || metadata.sport_type || 'fixture');
+
+        return { league, country, leagueContext };
+    }
+
     function buildDynamicEdgeMindText(insight, match, finalRecommendation) {
-        const metadata = (match && match.metadata) ? match.metadata : {};
         const homeTeam = resolveMatchTeamName(match, 'home') || 'Home Team';
         const awayTeam = resolveMatchTeamName(match, 'away') || 'Away Team';
-        const league = String(metadata.league || metadata.competition || match.league || '').trim();
-        const country = String(metadata.country || metadata.league_country || match.country || '').trim();
-        const leagueContext = [country, league].filter(Boolean).join(' • ') || humanizeToken(match.sport || insight.sport || 'fixture');
+        const leagueDetails = resolveLeagueCountryContext(match, insight.sport);
+        const leagueContext = leagueDetails.leagueContext || humanizeToken(match.sport || insight.sport || 'fixture');
         const marketLabel = String(finalRecommendation && finalRecommendation.market || formatPrediction(match) || 'Primary Market').trim();
         const confidence = normalizeConfidencePercent(finalRecommendation && finalRecommendation.confidence, normalizeConfidencePercent(getPredictionConfidenceScore(insight), 0));
         return `${homeTeam} vs ${awayTeam} (${leagueContext || 'Live Fixture'}): ${marketLabel} is currently rated ${Math.round(confidence)}% after live context checks.`;
@@ -3814,8 +3890,9 @@
 
         const meta = match.metadata || {};
         let contextLabel = '';
-        const leagueName = String(meta.league || meta.competition || match.league || (homeInfo && homeInfo.league && homeInfo.league.name) || '').trim();
-        const countryName = String(meta.country || meta.league_country || match.country || (homeInfo && homeInfo.league && homeInfo.league.country) || '').trim();
+        const leagueDetails = resolveLeagueCountryContext(match, sport || match.sport || meta.sport_type || meta.sport);
+        const leagueName = String(leagueDetails.league || (homeInfo && homeInfo.league && homeInfo.league.name) || '').trim();
+        const countryName = String(leagueDetails.country || (homeInfo && homeInfo.league && homeInfo.league.country) || '').trim();
         const roundBits = `${meta.matchday ? ' • ' + meta.matchday : ''}${meta.week ? ' • ' + meta.week : ''}${meta.round ? ' • ' + meta.round : ''}${meta.division ? ' • ' + meta.division : ''}${meta.conference ? ' • ' + meta.conference : ''}`;
 
         if (meta.header_info) {

@@ -45,6 +45,17 @@ function uniqueNonEmpty(values) {
     return out;
 }
 
+function collectAllRapidApiHostsFromEnv() {
+    const out = [];
+    for (const [key, value] of Object.entries(process.env)) {
+        if (!/^RAPIDAPI_HOST_/i.test(String(key || ''))) continue;
+        const host = sanitizeHost(value);
+        if (!host) continue;
+        out.push(host);
+    }
+    return uniqueNonEmpty(out);
+}
+
 const ACTIVE_KEY_LIMIT = (() => {
     const n = Number(process.env.RAPIDAPI_ACTIVE_KEY_COUNT || 5);
     if (!Number.isFinite(n)) return 5;
@@ -69,13 +80,17 @@ const DEFAULT_FOOTBALL_HOST_CANDIDATES = [
     'v3.football.api-sports.io'
 ];
 
+const ENV_ALL_RAPID_HOST_CANDIDATES = collectAllRapidApiHostsFromEnv();
+
 const PINNED_FOOTBALL_HOSTS = uniqueNonEmpty([
     ...parseCsvEnv('RAPIDAPI_FOOTBALL_HOSTS'),
     ...parseCsvEnv('RAPIDAPI_HOSTS_ACTIVE_FOOTBALL'),
     ...parseCsvEnv('RAPIDAPI_HOSTS_ACTIVE')
 ].map(sanitizeHost));
 const FOOTBALL_HOST_CANDIDATES = uniqueNonEmpty(
-    PINNED_FOOTBALL_HOSTS.length ? PINNED_FOOTBALL_HOSTS : DEFAULT_FOOTBALL_HOST_CANDIDATES
+    PINNED_FOOTBALL_HOSTS.length
+        ? PINNED_FOOTBALL_HOSTS
+        : [...DEFAULT_FOOTBALL_HOST_CANDIDATES, ...ENV_ALL_RAPID_HOST_CANDIDATES]
 );
 
 const FOOTBALL_ENDPOINTS = (() => {

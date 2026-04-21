@@ -134,8 +134,25 @@ function formatPredictionRow(row) {
         || (dataSufficient ? inferStage1Baseline(prediction, confidence) : null);
     const league = String(
         firstMatch?.metadata?.league
+        || firstMatch?.metadata?.competition
+        || firstMatch?.league
+        || firstMatch?.metadata?.match_info?.league
+        || firstMatch?.metadata?.match_context?.match_info?.league
+        || firstMatch?.metadata?.raw_provider_data?.league?.name
+        || firstMatch?.metadata?.raw_provider_data?.competition?.name
         || row?.league
         || row?.competition
+        || ''
+    ).trim();
+    const country = String(
+        firstMatch?.metadata?.country
+        || firstMatch?.metadata?.league_country
+        || firstMatch?.country
+        || firstMatch?.metadata?.match_info?.country
+        || firstMatch?.metadata?.match_context?.match_info?.country
+        || firstMatch?.metadata?.raw_provider_data?.league?.country
+        || firstMatch?.metadata?.raw_provider_data?.country
+        || row?.country
         || ''
     ).trim();
 
@@ -155,6 +172,7 @@ function formatPredictionRow(row) {
         secondary_markets_note: String(pipelineData?.secondary_markets_note || '').trim() || null,
         baseline_source: String(pipelineData?.baseline_source || '').trim() || null,
         league: league || null,
+        country: country || null,
         secondary_markets: secondaryMarkets,
         edgemind_report: row?.edgemind_report || '',
         caution_label: riskTier === 'EXTREME_RISK' ? 'EXTREME CAUTION ADVISED' : riskTier.replace(/_/g, ' ')

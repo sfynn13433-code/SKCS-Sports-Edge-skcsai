@@ -148,6 +148,7 @@ function mapTheSportsDbFixture(event, fallbackLeagueId) {
         start_time: normalizeTheSportsDbStartTime(event),
         status: 'NS',
         league_name: event?.strLeague || event?.strLeagueAlternate || null,
+        country: event?.strCountry || null,
         home_logo: event?.strHomeTeamBadge || event?.strHomeBadge || event?.strHomeLogo || null,
         away_logo: event?.strAwayTeamBadge || event?.strAwayBadge || event?.strAwayLogo || null,
         sport: LEAGUE_SPORT_MAP[leagueId] || 'football',
@@ -171,6 +172,7 @@ function toPredictionInputFromSportsDbFixture(fixture) {
         provider: 'the-sports-db',
         provider_name: 'TheSportsDB',
         league: fixture.league_name || null,
+        country: fixture.country || null,
         league_id: fixture.league_id,
         home_logo: fixture.home_logo || null,
         away_logo: fixture.away_logo || null,
@@ -394,6 +396,7 @@ function normalizeFixture(f, sport) {
     const date = f.date || f.game?.date || f.fight?.date || f.race?.date || null;
     const status = f.status?.short || f.game?.status?.short || null;
     const league = f.league?.name || f.competition?.name || f.tournament?.name || humanizeCompetitionLabel(sport);
+    const country = f.league?.country || f.country || f.competition?.country || null;
     const venue = f.venue?.name || f.game?.venue?.name || f.race?.circuit?.name || null;
 
     if (!home || !away) {
@@ -416,6 +419,7 @@ function normalizeFixture(f, sport) {
         provider: 'api-sports',
         provider_name: 'api-sports',
         league,
+        country,
         venue,
         stage: f.stage || f.competition?.stage || f.tournament?.stage || null,
         raw_provider_data: f

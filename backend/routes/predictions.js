@@ -565,6 +565,84 @@ function normalizeTeamSignaturePart(value) {
         .replace(/[^a-z0-9]/g, '');
 }
 
+function normalizeTextValue(value) {
+    const text = String(value === undefined || value === null ? '' : value).trim();
+    return text.length ? text : '';
+}
+
+function readObjectPath(source, path) {
+    if (!source || typeof source !== 'object') return undefined;
+    const parts = Array.isArray(path) ? path : String(path || '').split('.');
+    let current = source;
+    for (const part of parts) {
+        if (!current || typeof current !== 'object' || !(part in current)) return undefined;
+        current = current[part];
+    }
+    return current;
+}
+
+function firstNonEmptyString(sources, paths) {
+    for (const source of sources) {
+        if (!source || typeof source !== 'object') continue;
+        for (const path of paths) {
+            const value = normalizeTextValue(readObjectPath(source, path));
+            if (value) return value;
+        }
+    }
+    return '';
+}
+
+function resolveLeagueCountryForMatch(match = {}, prediction = {}) {
+    const metadata = match?.metadata && typeof match.metadata === 'object' ? match.metadata : {};
+    const providerPayloads = [
+        match?.raw_provider_data,
+        metadata?.raw_provider_data,
+        metadata?.match_context?.raw_provider_data,
+        metadata?.match_context?.match?.raw_provider_data
+    ].filter((value) => value && typeof value === 'object');
+
+    const sources = [
+        match,
+        metadata,
+        match?.match_info || {},
+        metadata?.match_info || {},
+        metadata?.match_context || {},
+        metadata?.match_context?.match_info || {},
+        prediction,
+        ...providerPayloads
+    ];
+
+    const league = firstNonEmptyString(sources, [
+        'league',
+        'league_name',
+        'competition',
+        'tournament',
+        'metadata.league',
+        'metadata.competition',
+        'match_info.league',
+        'raw_provider_data.league.name',
+        'raw_provider_data.competition.name',
+        'raw_provider_data.tournament.name',
+        'league.name',
+        'competition.name',
+        'tournament.name'
+    ]);
+
+    const country = firstNonEmptyString(sources, [
+        'country',
+        'league_country',
+        'metadata.country',
+        'metadata.league_country',
+        'match_info.country',
+        'raw_provider_data.league.country',
+        'raw_provider_data.country',
+        'league.country',
+        'competition.country'
+    ]);
+
+    return { league, country };
+}
+
 function parseLooseDateTime(value) {
     if (!value) return null;
     if (value instanceof Date) {
@@ -853,10 +931,11 @@ function buildSameMatchBuilder(prediction) {
 function buildFallbackReasoning(prediction, relatedSecondaryMarkets = []) {
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
     const firstMatch = matches[0] || {};
-    const metadata = firstMatch?.metadata || {};
+    const leagueCountry = resolveLeagueCountryForMatch(firstMatch, prediction);
     const homeTeam = resolveMatchTeamName(firstMatch, 'home') || 'Home Team';
     const awayTeam = resolveMatchTeamName(firstMatch, 'away') || 'Away Team';
-    const league = metadata?.league || humanizeToken(firstMatch?.sport || '');
+    const leagueLabel = [leagueCountry.country, leagueCountry.league].filter(Boolean).join(' • ')
+        || humanizeToken(firstMatch?.sport || '');
     const outcome = humanizePredictionLabel(firstMatch?.prediction, firstMatch?.market);
     const confidence = normalizeConfidence(firstMatch?.confidence ?? prediction?.total_confidence ?? 0);
     const backupSummary = relatedSecondaryMarkets
@@ -865,19 +944,20 @@ function buildFallbackReasoning(prediction, relatedSecondaryMarkets = []) {
         .join(', ');
 
     if (backupSummary) {
-        return `${homeTeam} vs ${awayTeam} leans ${outcome} at ${confidence}% confidence in ${league}. Secondary coverage currently favours ${backupSummary}.`;
+        return `${homeTeam} vs ${awayTeam} leans ${outcome} at ${confidence}% confidence in ${leagueLabel}. Secondary coverage currently favours ${backupSummary}.`;
     }
 
-    return `${homeTeam} vs ${awayTeam} leans ${outcome} at ${confidence}% confidence in ${league}.`;
+    return `${homeTeam} vs ${awayTeam} leans ${outcome} at ${confidence}% confidence in ${leagueLabel}.`;
 }
 
 function buildFallbackPipelineData(prediction, relatedSecondaryMarkets = []) {
     const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
     const firstMatch = matches[0] || {};
-    const metadata = firstMatch?.metadata || {};
+    const leagueCountry = resolveLeagueCountryForMatch(firstMatch, prediction);
     const homeTeam = resolveMatchTeamName(firstMatch, 'home') || 'Home Team';
     const awayTeam = resolveMatchTeamName(firstMatch, 'away') || 'Away Team';
-    const competition = metadata?.league || humanizeToken(firstMatch?.sport || '');
+    const competition = [leagueCountry.country, leagueCountry.league].filter(Boolean).join(' • ')
+        || humanizeToken(firstMatch?.sport || '');
     const outcome = humanizePredictionLabel(firstMatch?.prediction, firstMatch?.market);
     const confidence = normalizeConfidence(firstMatch?.confidence ?? prediction?.total_confidence ?? 0);
     const volatility = humanizeToken(firstMatch?.volatility || prediction?.risk_level || 'medium');
@@ -1074,6 +1154,17 @@ function enrichMatchMetadata(match, prediction) {
         market: humanizePredictionLabel(match?.prediction, match?.market),
         confidence: matchConfidence
     };
+    const leagueCountry = resolveLeagueCountryForMatch(match, prediction);
+    const metadata = match?.metadata && typeof match.metadata === 'object' ? match.metadata : {};
+    const leagueName = leagueCountry.league || null;
+    const countryName = leagueCountry.country || null;
+    const enrichedMetadata = {
+        ...metadata,
+        league: leagueName || metadata.league || metadata.competition || null,
+        competition: leagueName || metadata.competition || metadata.league || null,
+        country: countryName || metadata.country || metadata.league_country || null,
+        league_country: countryName || metadata.league_country || metadata.country || null
+    };
     const insights = routerMeta?.insights || {
         weather: contextInsights?.chips?.weather || 'Unavailable',
         availability: contextInsights?.chips?.injuries_bans || 'No major absences',
@@ -1082,6 +1173,9 @@ function enrichMatchMetadata(match, prediction) {
 
     return {
         ...match,
+        league: leagueName,
+        country: countryName,
+        metadata: enrichedMetadata,
         context_insights: contextInsights,
         final_recommendation: finalRecommendation,
         engine_log: engineLog,

@@ -320,6 +320,9 @@ function toFinalMatchPayload(p) {
     const sportType = getSportTypeLabel(normalizedSport);
     const homeTeam = resolveTeamNameFromPrediction(p, 'home');
     const awayTeam = resolveTeamNameFromPrediction(p, 'away');
+    const leagueCountry = resolveLeagueCountryFromPrediction(p, metadata, matchInfo, matchContext);
+    const leagueName = leagueCountry.league || null;
+    const countryName = leagueCountry.country || null;
     return {
         raw_id: p.raw_id,
         match_id: p.match_id,
@@ -336,12 +339,18 @@ function toFinalMatchPayload(p) {
         confidence: p.confidence,
         volatility: p.volatility,
         odds: p.odds,
+        league: leagueName,
+        country: countryName,
         metadata: {
             ...metadata,
             home_team: homeTeam || metadata.home_team || matchInfo.home_team || null,
             away_team: awayTeam || metadata.away_team || matchInfo.away_team || null,
             home_team_name: homeTeam || metadata.home_team_name || null,
             away_team_name: awayTeam || metadata.away_team_name || null,
+            league: leagueName || metadata.league || metadata.competition || null,
+            competition: leagueName || metadata.competition || metadata.league || null,
+            country: countryName || metadata.country || metadata.league_country || null,
+            league_country: countryName || metadata.league_country || metadata.country || null,
             sport_type: sportType,
             weekly_team_lock_applied: true,
             normalized_match_context: metadata.normalized_match_context === true || Boolean(matchContext)
@@ -441,6 +450,75 @@ function getMetadata(prediction) {
     return prediction && typeof prediction.metadata === 'object' && prediction.metadata !== null
         ? prediction.metadata
         : {};
+}
+
+function normalizeTextValue(value) {
+    const text = String(value === undefined || value === null ? '' : value).trim();
+    return text.length ? text : '';
+}
+
+function firstNonEmptyValue(sources, paths) {
+    for (const source of sources) {
+        if (!source || typeof source !== 'object') continue;
+        for (const path of paths) {
+            const value = normalizeTextValue(readPath(source, path));
+            if (value) return value;
+        }
+    }
+    return '';
+}
+
+function resolveLeagueCountryFromPrediction(prediction, metadata, matchInfo, matchContext) {
+    const providerPayloads = [
+        metadata?.raw_provider_data,
+        matchContext?.raw_provider_data,
+        matchContext?.match?.raw_provider_data,
+        prediction?.raw_provider_data
+    ].filter((value) => value && typeof value === 'object');
+
+    const sources = [
+        prediction,
+        metadata,
+        matchInfo || {},
+        metadata?.match_info || {},
+        matchContext || {},
+        metadata?.match_context || {},
+        ...providerPayloads
+    ];
+
+    const league = firstNonEmptyValue(sources, [
+        'league',
+        'league_name',
+        'competition',
+        'tournament',
+        'match_info.league',
+        'metadata.league',
+        'metadata.competition',
+        'metadata.match_info.league',
+        'metadata.match_context.match_info.league',
+        'raw_provider_data.league.name',
+        'raw_provider_data.competition.name',
+        'raw_provider_data.tournament.name',
+        'league.name',
+        'competition.name',
+        'tournament.name'
+    ]);
+
+    const country = firstNonEmptyValue(sources, [
+        'country',
+        'league_country',
+        'match_info.country',
+        'metadata.country',
+        'metadata.league_country',
+        'metadata.match_info.country',
+        'metadata.match_context.match_info.country',
+        'raw_provider_data.league.country',
+        'raw_provider_data.country',
+        'league.country',
+        'competition.country'
+    ]);
+
+    return { league, country };
 }
 
 function isPlaceholderTeamName(value) {

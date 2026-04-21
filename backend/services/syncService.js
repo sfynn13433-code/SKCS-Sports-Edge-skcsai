@@ -130,7 +130,7 @@ const SEASON_RANGE = `${SEASON_START_YEAR}-${SEASON_START_YEAR + 1}`;
  * Supported sports and their configurations
  * These are the REAL leagues the AI will now look for.
  */
-const SPORTS_CONFIG = [
+const BASE_SPORTS_CONFIG = [
     // Soccer - England
     { sport: 'football', leagueId: '39', season: SEASON_YEAR, oddsKey: 'soccer_epl' },
     { sport: 'football', leagueId: '40', season: SEASON_YEAR, oddsKey: null },
@@ -200,6 +200,65 @@ const SPORTS_CONFIG = [
     { sport: 'tennis', leagueId: null, season: SEASON_YEAR, oddsKey: null },
     { sport: 'cricket', leagueId: null, season: SEASON_YEAR, oddsKey: null },
 ];
+
+const FOOTBALL_TIER_1_LEAGUES = new Set(['39', '140', '78', '135', '61', '2', '3']);
+const FOOTBALL_TIER_2_LEAGUES = new Set(['40', '141', '79', '136', '62']);
+const BASKETBALL_TIER_1_LEAGUES = new Set(['12', '120']);
+const BASKETBALL_TIER_2_LEAGUES = new Set(['20', '117', '85']);
+const RUGBY_TIER_1_LEAGUES = new Set(['13', '14', '44']);
+const RUGBY_TIER_2_LEAGUES = new Set(['1', '45', '7']);
+const AMERICAN_FOOTBALL_TIER_1_LEAGUES = new Set(['1']);
+const AMERICAN_FOOTBALL_TIER_2_LEAGUES = new Set(['2']);
+const BASEBALL_TIER_1_LEAGUES = new Set(['1']);
+const BASEBALL_TIER_2_LEAGUES = new Set(['2', '3', '96', '97']);
+const HOCKEY_TIER_1_LEAGUES = new Set(['57']);
+const HOCKEY_TIER_2_LEAGUES = new Set(['58', '69', '70']);
+
+function resolveLeagueTier(item) {
+    const sport = String(item?.sport || '').trim().toLowerCase();
+    const leagueId = item?.leagueId === null || item?.leagueId === undefined
+        ? null
+        : String(item.leagueId).trim();
+
+    if (!leagueId) return 3;
+
+    if (sport === 'football') {
+        if (FOOTBALL_TIER_1_LEAGUES.has(leagueId)) return 1;
+        if (FOOTBALL_TIER_2_LEAGUES.has(leagueId)) return 2;
+        return 3;
+    }
+    if (sport === 'basketball' || sport === 'nba') {
+        if (BASKETBALL_TIER_1_LEAGUES.has(leagueId)) return 1;
+        if (BASKETBALL_TIER_2_LEAGUES.has(leagueId)) return 2;
+        return 3;
+    }
+    if (sport === 'rugby') {
+        if (RUGBY_TIER_1_LEAGUES.has(leagueId)) return 1;
+        if (RUGBY_TIER_2_LEAGUES.has(leagueId)) return 2;
+        return 3;
+    }
+    if (sport === 'american_football') {
+        if (AMERICAN_FOOTBALL_TIER_1_LEAGUES.has(leagueId)) return 1;
+        if (AMERICAN_FOOTBALL_TIER_2_LEAGUES.has(leagueId)) return 2;
+        return 3;
+    }
+    if (sport === 'baseball') {
+        if (BASEBALL_TIER_1_LEAGUES.has(leagueId)) return 1;
+        if (BASEBALL_TIER_2_LEAGUES.has(leagueId)) return 2;
+        return 3;
+    }
+    if (sport === 'hockey') {
+        if (HOCKEY_TIER_1_LEAGUES.has(leagueId)) return 1;
+        if (HOCKEY_TIER_2_LEAGUES.has(leagueId)) return 2;
+        return 3;
+    }
+    return 2;
+}
+
+const SPORTS_CONFIG = BASE_SPORTS_CONFIG.map((item) => ({
+    ...item,
+    leagueTier: resolveLeagueTier(item)
+}));
 
 function normalizeSportToken(value) {
     const token = String(value || '').trim().toLowerCase();
@@ -304,10 +363,22 @@ async function syncSports(options = {}) {
             };
         }
 
-        for (let index = 0; index < configs.length; index += 1) {
-            const item = configs[index];
+        const prioritizedConfigs = configs
+            .slice()
+            .sort((a, b) => {
+                const tierA = Number(a?.leagueTier || 9);
+                const tierB = Number(b?.leagueTier || 9);
+                if (tierA !== tierB) return tierA - tierB;
+                const sportA = String(a?.sport || '');
+                const sportB = String(b?.sport || '');
+                if (sportA !== sportB) return sportA.localeCompare(sportB);
+                return String(a?.leagueId || '').localeCompare(String(b?.leagueId || ''));
+            });
+
+        for (let index = 0; index < prioritizedConfigs.length; index += 1) {
+            const item = prioritizedConfigs[index];
             try {
-                console.log(`[syncService] Fetching REAL matches for: ${item.sport} (league: ${item.leagueId || 'all'}, season: ${item.season})...`);
+                console.log(`[syncService] Fetching REAL matches for: ${item.sport} (tier: ${item.leagueTier || 3}, league: ${item.leagueId || 'all'}, season: ${item.season})...`);
 
                 const rawMatches = await buildLiveData({
                     ...item,
@@ -420,7 +491,7 @@ async function syncSports(options = {}) {
                 perSportErrors.set(item.sport, errorMsg);
                 // Continue with next sport instead of failing completely
             } finally {
-                if (index < configs.length - 1 && SPORT_FETCH_STAGGER_MS > 0) {
+                if (index < prioritizedConfigs.length - 1 && SPORT_FETCH_STAGGER_MS > 0) {
                     console.log(`[syncService] Stagger delay ${SPORT_FETCH_STAGGER_MS}ms before next sport fetch...`);
                     await sleep(SPORT_FETCH_STAGGER_MS);
                 }

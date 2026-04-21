@@ -1,6 +1,6 @@
 const axios = require('axios');
 const config = require('./config');
-const { fetchRapidApiCustom, getRapidApiProviderForSport } = require('./services/dataProviders');
+const { fetchRapidApiCustom, getRapidApiProviderForSport, getRapidApiHostCandidates } = require('./services/dataProviders');
 const { getApiSportsKeyPool, maskKey } = require('./utils/keyPool');
 
 class APISportsClient {
@@ -299,6 +299,7 @@ class SportsDataOrgClient {
         const date = match.utcDate || null;
         const status = match.status || null;
         const competition = match.competition?.name || match.competition?.code || null;
+        const country = match.area?.name || match.competition?.area?.name || null;
         const venue = null;
         const id = match.id || null;
 
@@ -317,6 +318,7 @@ class SportsDataOrgClient {
             provider: 'football-data-org',
             provider_name: 'FootballData.org',
             league: competition,
+            country,
             venue,
             raw_provider_data: match,
         };
@@ -380,6 +382,7 @@ class SportsDataIOClient {
         const date = game.DateTime || game.Date || null;
         const status = game.Status || null;
         const league = game.League || null;
+        const country = game.Country || game.LeagueName || null;
         const venue = game.StadiumDetails?.Name || null;
         const id = game.GameID || null;
 
@@ -398,6 +401,7 @@ class SportsDataIOClient {
             provider: 'sportsdata-io',
             provider_name: 'SportsData.io',
             league,
+            country,
             venue,
             raw_provider_data: game,
         };
@@ -458,6 +462,11 @@ class RapidAPIClient {
         const host = this.getHostForSport(sport);
         const endpoint = this.getEndpointForSport(sport);
         const providerName = getRapidApiProviderForSport(sport);
+        const hosts = getRapidApiHostCandidates({
+            providerName,
+            sport,
+            defaultHost: host
+        });
         const params = {};
 
         if (leagueId) params.league = leagueId;
@@ -468,6 +477,8 @@ class RapidAPIClient {
                 providerName,
                 endpointUrl: `${baseUrl}/${endpoint}`,
                 host,
+                hosts,
+                sport,
                 params
             });
 
@@ -496,6 +507,7 @@ class RapidAPIClient {
         const date = f.fixture?.date || f.date || null;
         const status = f.fixture?.status?.short || f.status || null;
         const league = f.league?.name || f.league || null;
+        const country = f.league?.country || f.country || null;
         const venue = f.fixture?.venue?.name || null;
 
         return {
@@ -513,6 +525,7 @@ class RapidAPIClient {
             provider: 'rapidapi',
             provider_name: 'RapidAPI',
             league,
+            country,
             venue,
             raw_provider_data: f,
         };
