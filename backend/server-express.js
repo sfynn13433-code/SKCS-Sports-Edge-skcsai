@@ -20,7 +20,9 @@ const {
 } = require('./database');
 const { getPlan }           = require('./config/subscriptionPlans');
 const { requireSupabaseUser } = require('./middleware/supabaseJwt');
-const cron         = require('node-cron');
+// AI-DISABLED: node-cron removed to prevent race conditions on scaled/sleeping Render instances.
+// Rely exclusively on external triggers hitting the /api/cron/* routes.
+// const cron         = require('node-cron');
 const { syncAllSports, syncSports }      = require('./services/syncService');
 const { bootstrap }          = require('./dbBootstrap');
 const { runLiveSync }       = require('../scripts/fetch-live-fixtures');
@@ -44,10 +46,11 @@ const ROLLING_CUTOFF_MINUTE = 59;
 
 let rollingSyncInProgress = false;
 
-cron.schedule(WEEKLY_ROLLING_SCRAPE_CRON, () => {
-    console.log('[cron] Triggering weekly global 7-day rolling scrape (04:00 SAST / 02:00 UTC)');
-    void syncAllSports().catch(err => console.error('[cron] Weekly rolling scrape failed:', err));
-}, { timezone: 'UTC' });
+// AI-DISABLED: Weekly rolling scrape scheduler
+// cron.schedule(WEEKLY_ROLLING_SCRAPE_CRON, () => {
+//     console.log('[cron] Triggering weekly global 7-day rolling scrape (04:00 SAST / 02:00 UTC)');
+//     void syncAllSports().catch(err => console.error('[cron] Weekly rolling scrape failed:', err));
+// }, { timezone: 'UTC' });
 
 function isWithinRollingWindow(nowMoment = moment.tz(ROLLING_SYNC_TIMEZONE)) {
     const hour = nowMoment.hour();
@@ -78,13 +81,14 @@ async function runRollingSync(label) {
     }
 }
 
-cron.schedule(ACCA_ROLLING_SYNC_CRON, () => {
-    void runRollingSync('ACCA-4h');
-}, { timezone: ROLLING_SYNC_TIMEZONE });
-
-cron.schedule(CORE_MARKET_ROLLING_SYNC_CRON, () => {
-    void runRollingSync('DIRECT-SAME-DOUBLECHANCE-2h');
-}, { timezone: ROLLING_SYNC_TIMEZONE });
+// AI-DISABLED: Internal interval schedulers
+// cron.schedule(ACCA_ROLLING_SYNC_CRON, () => {
+//     void runRollingSync('ACCA-4h');
+// }, { timezone: ROLLING_SYNC_TIMEZONE });
+// 
+// cron.schedule(CORE_MARKET_ROLLING_SYNC_CRON, () => {
+//     void runRollingSync('DIRECT-SAME-DOUBLECHANCE-2h');
+// }, { timezone: ROLLING_SYNC_TIMEZONE });
 
 function warnEnv(name) {
     if (!process.env[name] || String(process.env[name]).trim().length === 0) {
@@ -182,7 +186,13 @@ const globalLimiter = rateLimit({
   message: { error: 'Too many requests, please slow down.' }
 });
 
-app.use(globalLimiter);
+// Apply rate limiter conditionally to avoid blocking external cron-jobs and admin triggers
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/cron') || req.path.startsWith('/api/admin') || req.path.startsWith('/api/refresh-predictions')) {
+    return next();
+  }
+  globalLimiter(req, res, next);
+});
 
 app.use(helmet({
   contentSecurityPolicy: {
@@ -228,7 +238,7 @@ app.get('/api/billing-status', (_req, res) => {
         subscription_open,
         currency: 'GBP',
         policy: {
-            pro_rata: 'Join after 11:59 AM SAST and receive 50% of today\'s Direct 1x2 matches free. Full paid cycle starts at 00:00 midnight.',
+            pro_rata: 'Join after 11:00 AM SAST and receive a complimentary Day Zero Pass for evening fixtures. Full paid cycle starts at 00:00 midnight.',
             refunds: 'All sales are final. No refunds are processed after activation.'
         }
     });

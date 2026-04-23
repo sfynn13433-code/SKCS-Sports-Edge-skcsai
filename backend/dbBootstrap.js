@@ -210,6 +210,99 @@ async function bootstrap() {
             $$;
         `);
 
+        // Enforce Secondary Market Allowlist via DB Schema and Triggers
+        await query(`
+            CREATE TABLE IF NOT EXISTS secondary_market_allowlist (
+                market_key TEXT PRIMARY KEY,
+                category TEXT NOT NULL,
+                is_active BOOLEAN DEFAULT TRUE
+            );
+        `);
+
+        await query(`
+            INSERT INTO secondary_market_allowlist (market_key, category) VALUES
+                ('double_chance_1x', 'Double Chance'),
+                ('double_chance_x2', 'Double Chance'),
+                ('double_chance_12', 'Double Chance'),
+                ('draw_no_bet_home', 'Draw No Bet'),
+                ('draw_no_bet_away', 'Draw No Bet'),
+                ('over_0_5', 'Goals Totals'),
+                ('over_1_5', 'Goals Totals'),
+                ('over_2_5', 'Goals Totals'),
+                ('over_3_5', 'Goals Totals'),
+                ('under_2_5', 'Goals Totals'),
+                ('under_3_5', 'Goals Totals'),
+                ('under_4_5', 'Defensive'),
+                ('home_over_0_5', 'Team Totals'),
+                ('home_over_1_5', 'Team Totals'),
+                ('away_over_0_5', 'Team Totals'),
+                ('away_over_1_5', 'Team Totals'),
+                ('btts_yes', 'BTTS'),
+                ('btts_no', 'BTTS'),
+                ('btts_over_2_5', 'BTTS'),
+                ('btts_under_3_5', 'BTTS'),
+                ('home_win_btts_yes', 'BTTS'),
+                ('away_win_btts_yes', 'BTTS'),
+                ('home_win_btts_no', 'BTTS'),
+                ('away_win_btts_no', 'BTTS'),
+                ('double_chance_over_1_5', 'Defensive'),
+                ('double_chance_under_3_5', 'Defensive'),
+                ('over_0_5_first_half', 'Half Markets'),
+                ('under_1_5_first_half', 'Half Markets'),
+                ('first_half_draw', 'Half Markets'),
+                ('home_win_either_half', 'Half Markets'),
+                ('away_win_either_half', 'Half Markets'),
+                ('win_either_half', 'Half Markets')
+            ON CONFLICT (market_key) DO NOTHING;
+        `);
+
+        await query(`
+            CREATE OR REPLACE FUNCTION check_secondary_markets_allowlist()
+            RETURNS TRIGGER AS $func$
+            DECLARE
+                market_element jsonb;
+                market_str text;
+                is_allowed boolean;
+            BEGIN
+                -- Only validate if secondary_markets is not empty
+                IF jsonb_array_length(NEW.secondary_markets) > 0 THEN
+                    FOR market_element IN SELECT * FROM jsonb_array_elements(NEW.secondary_markets)
+                    LOOP
+                        market_str := market_element->>'market';
+                        
+                        -- Dynamic pattern matching for allowed ranges (corners and cards)
+                        IF market_str ~ '^corners_(over|under)_([6-9]|1[0-2])_5$' THEN
+                            CONTINUE;
+                        END IF;
+                        IF market_str ~ '^(yellow_)?cards_(over|under)_[1-6]_5$' THEN
+                            CONTINUE;
+                        END IF;
+
+                        -- Strict lookup in the allowlist table
+                        SELECT EXISTS (
+                            SELECT 1 FROM secondary_market_allowlist 
+                            WHERE market_key = market_str AND is_active = true
+                        ) INTO is_allowed;
+
+                        IF NOT is_allowed THEN
+                            RAISE EXCEPTION 'Secondary market "%" is not in the approved allowlist.', market_str;
+                        END IF;
+                    END LOOP;
+                END IF;
+                
+                RETURN NEW;
+            END;
+            $func$ LANGUAGE plpgsql;
+        `);
+
+        await query(`
+            DROP TRIGGER IF EXISTS enforce_secondary_allowlist ON direct1x2_prediction_final;
+            CREATE TRIGGER enforce_secondary_allowlist
+            BEFORE INSERT OR UPDATE ON direct1x2_prediction_final
+            FOR EACH ROW
+            EXECUTE FUNCTION check_secondary_markets_allowlist();
+        `);
+
         await query(`
             CREATE INDEX IF NOT EXISTS idx_predictions_final_publish_run_id
             ON direct1x2_prediction_final(publish_run_id);

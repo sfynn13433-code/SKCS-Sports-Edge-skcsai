@@ -129,6 +129,7 @@ function normalizeCandidateConfidencePercent(candidate) {
 }
 
 const SECONDARY_PIVOT_MARKETS = Object.freeze(new Set([
+    'over_0_5',
     'double_chance_1x',
     'double_chance_x2',
     'double_chance_12',
@@ -168,7 +169,9 @@ const SECONDARY_PIVOT_MARKETS = Object.freeze(new Set([
 function isAllowedSecondaryPivotMarket(marketKey) {
     const key = normalizeMarketKey(marketKey);
     if (!key) return false;
-    if (key === 'over_0_5' || key === 'under_0_5') return false;
+    // AI-DISABLED: Strict rules explicitly allow 'over_0_5' in Goals Totals
+    // if (key === 'over_0_5' || key === 'under_0_5') return false;
+    if (key === 'under_0_5') return false;
     if (key.includes('red_cards')) return false;
     if (SECONDARY_PIVOT_MARKETS.has(key)) return true;
 

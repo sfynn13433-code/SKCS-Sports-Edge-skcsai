@@ -463,10 +463,20 @@ router.get('/weekly-performance', async (req, res) => {
 // GET /api/accuracy/missed-reasons
 router.get('/missed-reasons', async (req, res) => {
     try {
-        // Would need outcome tracking - return empty for now
+        const result = await query(`
+            SELECT evaluation_notes as reason, COUNT(*) as count
+            FROM predictions_accuracy
+            WHERE resolution_status = 'lost'
+              AND evaluation_notes IS NOT NULL
+              AND evaluated_at >= NOW() - INTERVAL '30 days'
+            GROUP BY evaluation_notes
+            ORDER BY count DESC
+            LIMIT 10
+        `);
+        const reasons = result.rows.map(r => ({ reason: r.reason, count: parseInt(r.count) }));
         res.json({
-            total_losses: 0,
-            reasons: []
+            total_losses: reasons.reduce((sum, r) => sum + r.count, 0),
+            reasons
         });
     } catch (error) {
         console.error('[accuracy] Error fetching missed reasons:', error);

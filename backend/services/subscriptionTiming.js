@@ -4,7 +4,8 @@ const moment = require('moment-timezone');
 const { getPlan } = require('../config/subscriptionPlans');
 
 const TIMEZONE = 'Africa/Johannesburg';
-const DAY_ZERO_CUTOFF_MINUTE_OF_DAY = (11 * 60) + 59; // 11:59 AM SAST
+// AI-CORRECTION: Aligned with TERMS_OF_SERVICE.md which specifies a cutoff of 11:00 AM SAST.
+const DAY_ZERO_CUTOFF_MINUTE_OF_DAY = 11 * 60; // 11:00 AM SAST
 const DAY_ZERO_LITE_HOUR = 17;
 const SAFE_BETTING_LEAD_MINUTES = 60;
 

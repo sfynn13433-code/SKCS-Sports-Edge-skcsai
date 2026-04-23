@@ -49,7 +49,7 @@ const PLAN_ALIASES = {
     // Elite aliases
     elite_daily: 'elite_4day_deep_dive',
     elite_weekly: 'elite_9day_deep_strike',
-    elite_monthly: 'elite_14day_deep_pro',
+    elite_monthly: 'elite_30day_deep_vip',
 
     // VIP alias
     vip_30day: 'elite_30day_deep_vip'
@@ -89,4 +89,3 @@ module.exports = {
     getPlan,
     getTierKeyForPlan
 };
-

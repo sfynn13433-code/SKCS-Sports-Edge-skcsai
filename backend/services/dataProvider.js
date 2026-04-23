@@ -333,8 +333,7 @@ async function fetchOddsData(sportKey) {
         provider: 'odds-api',
         provider_name: 'odds-api',
         league: event.sport_title || humanizeCompetitionLabel(sportKey),
-        bookmaker: marketView?.bookmaker || null
-        ,
+        bookmaker: marketView?.bookmaker || null,
         raw_provider_data: event
         });
     }
@@ -495,7 +494,7 @@ async function buildLiveData(options = {}) {
                     .slice(0, maxFixturesPerSource)
                     .map(toPredictionInputFromSportsDbFixture));
                 console.log(`[dataProvider] ${sport}: TheSportsDB fetched=${filteredFixtures.length} returned=${out.length}`);
-                return out;
+                if (out.length > 0) return out;
             }
 
             console.warn(`[dataProvider] ${sport}: 0 fixtures from TheSportsDB`);
@@ -527,7 +526,7 @@ async function buildLiveData(options = {}) {
                     .filter(Boolean)
             );
             console.log(`[dataProvider] ${sport}: API-Sports fetched=${fixtures.length} returned=${out.length}`);
-            return out;
+            if (out.length > 0) return out;
         }
 
         console.warn(`[dataProvider] ${sport}: 0 fixtures from API-Sports`);
@@ -544,7 +543,7 @@ async function buildLiveData(options = {}) {
             if (oddsData.length > 0) {
                 const out = dedupePredictionInputs(oddsData);
                 console.log(`[dataProvider] ${sport}: Odds API returned ${out.length} events`);
-                return out;
+                if (out.length > 0) return out;
             }
         } catch (oddsErr) {
             console.error(`[dataProvider] ${sport}: Odds API fallback failed:`, oddsErr.message);
@@ -559,7 +558,7 @@ async function buildLiveData(options = {}) {
             if (sdoData.length > 0) {
                 const out = dedupePredictionInputs(sdoData);
                 console.log(`[dataProvider] ${sport}: FootballData.org returned ${out.length} events`);
-                return out;
+                if (out.length > 0) return out;
             }
         } catch (sdoErr) {
             console.error(`[dataProvider] ${sport}: FootballData.org fallback failed:`, sdoErr.message);
@@ -573,7 +572,7 @@ async function buildLiveData(options = {}) {
         if (sdiData.length > 0) {
             const out = dedupePredictionInputs(sdiData);
             console.log(`[dataProvider] ${sport}: SportsData.io returned ${out.length} events`);
-            return out;
+            if (out.length > 0) return out;
         }
     } catch (sdiErr) {
         console.error(`[dataProvider] ${sport}: SportsData.io fallback failed:`, sdiErr.message);
@@ -586,7 +585,7 @@ async function buildLiveData(options = {}) {
         if (rapidData.length > 0) {
             const out = dedupePredictionInputs(rapidData);
             console.log(`[dataProvider] ${sport}: RapidAPI returned ${out.length} events`);
-            return out;
+            if (out.length > 0) return out;
         }
     } catch (rapidErr) {
         console.error(`[dataProvider] ${sport}: RapidAPI fallback failed:`, rapidErr.message);
@@ -600,7 +599,7 @@ async function buildLiveData(options = {}) {
             if (cricketData.length > 0) {
                 const out = dedupePredictionInputs(cricketData);
                 console.log(`[dataProvider] cricket: CricketData API returned ${out.length} events`);
-                return out;
+                if (out.length > 0) return out;
             }
         } catch (cricketErr) {
             console.error(`[dataProvider] cricket: CricketData API fallback failed:`, cricketErr.message);

@@ -1,5 +1,9 @@
 // Default to the live Render API, but allow an earlier override for migration tests.
-window.API_BASE_URL = window.API_BASE_URL || "https://skcs-sports-edge-skcsai.onrender.com";
+window.API_BASE_URL = window.API_BASE_URL || (
+    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+        ? "http://localhost:3000" 
+        : "https://skcs-sports-edge-skcsai.onrender.com"
+);
 
 // Safety check: ensure no trailing slash
 if (window.API_BASE_URL.endsWith('/')) {

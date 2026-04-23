@@ -108,7 +108,11 @@ class APISportsClient {
                     lastError = error;
                     continue;
                 }
-                lastError = error;
+
+                // AI-DISABLED: Prevent burning through all keys on non-rotatable errors (e.g., 500s or Network Timeouts)
+                // lastError = error;
+                console.error(`[API-Sports] ${sport} encountered non-rotatable error (${status || 'Network/Timeout'}). Failing fast.`);
+                throw error;
             }
         }
 

@@ -144,23 +144,7 @@ async function gradePredictionsForDate(sport, date) {
                         const rec = pred.recommendation?.toLowerCase() || '';
                         let result = 'VOID';
 
-                        // Determine prediction outcome
-                        if (rec.includes('home') || rec === '1' || rec === 'home_win' || rec.includes('home win')) {
-                            result = event.home_score > event.away_score ? 'WON' : 'LOST';
-                        } else if (rec.includes('draw') || rec === 'x' || rec === 'draw') {
-                            result = event.home_score === event.away_score ? 'WON' : 'LOST';
-                        } else if (rec.includes('away') || rec === '2' || rec.includes('away_win') || rec.includes('away win')) {
-                            result = event.away_score > event.home_score ? 'WON' : 'LOST';
-                        } else {
-                            // Default: assume home win
-                            result = event.home_score > event.away_score ? 'WON' : 'LOST';
-                        }
-
-                        const confidence = pred.total_confidence || 50;
-                        const aiInsight = classifyAIInsight(result, confidence);
-                        const resolutionStatus = determineResolutionStatus(result);
-
-                        // Extract market from matches JSON
+                        // Extract market from matches JSON first to accurately grade
                         let market = '1X2';
                         let fixtureDate = event.fixture_date;
                         try {
@@ -170,6 +154,58 @@ async function gradePredictionsForDate(sport, date) {
                                 if (matches[0].date) fixtureDate = matches[0].date;
                             }
                         } catch (e) {}
+
+                        // AI-DISABLED: Defaulting to Home Win for unknown markets breaks secondary market grading.
+                        // if (rec.includes('home') || rec === '1' || rec === 'home_win' || rec.includes('home win')) {
+                        //     result = event.home_score > event.away_score ? 'WON' : 'LOST';
+                        // } else if (rec.includes('draw') || rec === 'x' || rec === 'draw') {
+                        //     result = event.home_score === event.away_score ? 'WON' : 'LOST';
+                        // } else if (rec.includes('away') || rec === '2' || rec.includes('away_win') || rec.includes('away win')) {
+                        //     result = event.away_score > event.home_score ? 'WON' : 'LOST';
+                        // } else {
+                        //     // Default: assume home win
+                        //     result = event.home_score > event.away_score ? 'WON' : 'LOST';
+                        // }
+
+                        const totalGoals = Number(event.home_score) + Number(event.away_score);
+                        const isHomeWin = Number(event.home_score) > Number(event.away_score);
+                        const isAwayWin = Number(event.away_score) > Number(event.home_score);
+                        const isDraw = Number(event.home_score) === Number(event.away_score);
+                        const btts = Number(event.home_score) > 0 && Number(event.away_score) > 0;
+                        
+                        const marketKey = String(market || '1X2').toUpperCase();
+
+                        if (marketKey === '1X2' || marketKey === 'MATCH_RESULT') {
+                            if (rec.includes('home') || rec === '1' || rec.includes('home_win')) {
+                                result = isHomeWin ? 'WON' : 'LOST';
+                            } else if (rec.includes('draw') || rec === 'x') {
+                                result = isDraw ? 'WON' : 'LOST';
+                            } else if (rec.includes('away') || rec === '2' || rec.includes('away_win')) {
+                                result = isAwayWin ? 'WON' : 'LOST';
+                            }
+                        } else if (marketKey.includes('DOUBLE_CHANCE')) {
+                            if (rec.includes('1x') || rec.includes('home_or_draw')) {
+                                result = (isHomeWin || isDraw) ? 'WON' : 'LOST';
+                            } else if (rec.includes('x2') || rec.includes('draw_or_away')) {
+                                result = (isAwayWin || isDraw) ? 'WON' : 'LOST';
+                            } else if (rec.includes('12') || rec.includes('home_or_away')) {
+                                result = (isHomeWin || isAwayWin) ? 'WON' : 'LOST';
+                            }
+                        } else if (marketKey.includes('OVER_UNDER') || marketKey.includes('GOALS') || rec.includes('goals')) {
+                            const lineMatch = marketKey.match(/_(\d+)_5/) || rec.match(/(\d+)\.5/);
+                            const line = lineMatch ? parseFloat(`${lineMatch[1]}.5`) : 2.5;
+                            if (rec.includes('over')) result = totalGoals > line ? 'WON' : 'LOST';
+                            else if (rec.includes('under')) result = totalGoals < line ? 'WON' : 'LOST';
+                        } else if (marketKey === 'BTTS' || rec.includes('btts')) {
+                            if (rec.includes('yes')) result = btts ? 'WON' : 'LOST';
+                            else if (rec.includes('no')) result = !btts ? 'WON' : 'LOST';
+                        } else {
+                            result = isHomeWin ? 'WON' : 'LOST';
+                        }
+
+                        const confidence = pred.total_confidence || 50;
+                        const aiInsight = classifyAIInsight(result, confidence);
+                        const resolutionStatus = determineResolutionStatus(result);
 
                         // Use match_date from prediction if available
                         if (pred.match_date) {
@@ -225,7 +261,7 @@ async function gradePredictionsForDate(sport, date) {
                         `, [
                             pred.id,
                             pred.publish_run_id,
-                            0,
+                            matchIndex,
                             event.id,
                             sport,
                             pred.tier || 'normal',
