@@ -562,6 +562,18 @@ def normalize_ai_payload(payload):
         if len(secondary_markets) == 4:
             break
 
+    if confidence <= 58 and len(secondary_markets) < 4:
+        used = {m["prediction"] for m in secondary_markets}
+        for market_key, outcome, prob in DIRECT_SECONDARY_POOL:
+            if outcome not in used:
+                secondary_markets.append({
+                    "market": market_key,
+                    "prediction": outcome,
+                    "confidence": max(76, int(prob * 100))
+                })
+            if len(secondary_markets) == 4:
+                break
+
     same_match_builder = []
     for item in payload.get("same_match_builder") or []:
         if not isinstance(item, dict):
@@ -923,7 +935,8 @@ def build_direct_payload(event, index, quotas):
             filtered_pool = [m for m in filtered_pool if m[0] != "double_chance_12"]
 
         nested_secondary = []
-        for market, outcome, market_probability in rng.sample(filtered_pool, min(3, len(filtered_pool))):
+        required_count = 4 if confidence <= 69 else 2
+        for market, outcome, market_probability in rng.sample(filtered_pool, min(required_count, len(filtered_pool))):
             nested_secondary.append(
                 {
                     "market": market,
