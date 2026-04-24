@@ -5,6 +5,7 @@
  * Usage: node scripts/render-api-deploy.js
  */
 
+require('dotenv').config();
 const https = require('https');
 const { execSync } = require('child_process');
 
@@ -18,7 +19,7 @@ function triggerRenderDeploy() {
     const commitHash = execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim();
     
     const postData = JSON.stringify({
-      clearCache: true
+      clearCache: 'clear'
     });
 
     const options = {
