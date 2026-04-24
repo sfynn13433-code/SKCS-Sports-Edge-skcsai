@@ -56,7 +56,7 @@ function ensureMatchContextShape(fixture) {
       suspensions: toArray(fixture?.teamData?.suspensions),
       expected_lineups: toArray(fixture?.teamData?.expectedLineups),
       confirmed_lineups: toArray(fixture?.teamData?.confirmedLineups),
-      lineup_confirmed: false,
+      lineup_confirmed: toBoolean(fixture?.teamData?.lineup_confirmed) || toArray(fixture?.teamData?.confirmedLineups).length > 0,
       morale: fixture?.teamContext?.morale || null,
       coach_conflict: Boolean(fixture?.teamContext?.coachConflict),
       boardroom_instability: Boolean(fixture?.teamContext?.execInstability),

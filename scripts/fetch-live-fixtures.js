@@ -580,9 +580,13 @@ async function hydrateSofaContextForFixtures(fixtures) {
     if (!candidates.length) return;
 
     const contextMap = new Map();
-    for (const candidate of candidates) {
-        const context = await fetchSofaFixtureContext(candidate.fixtureId);
-        if (context) contextMap.set(candidate.fixtureId, context);
+    const concurrencyLimit = 10;
+    for (let i = 0; i < candidates.length; i += concurrencyLimit) {
+        const chunk = candidates.slice(i, i + concurrencyLimit);
+        await Promise.all(chunk.map(async (candidate) => {
+            const context = await fetchSofaFixtureContext(candidate.fixtureId);
+            if (context) contextMap.set(candidate.fixtureId, context);
+        }));
     }
 
     let hydrated = 0;
@@ -999,7 +1003,7 @@ async function saveToSupabase(fixtures, existingMap) {
                         fixture.market || '1X2',
                         prediction,
                         fixture.edgemind_report || null,
-                        fixture.secondary_insights ? JSON.stringify(fixture.secondary_insights) : null
+                        fixture.secondary_insights ? JSON.stringify(fixture.secondary_insights) : '[]'
                     ]);
                     
                     if (result.rows.length > 0) {

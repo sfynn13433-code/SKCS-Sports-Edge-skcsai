@@ -4,7 +4,7 @@ services:
     env: node
     region: frankfurt
     plan: free
-    buildCommand: npm install
+    buildCommand: npm install && npm run build:supabase
     startCommand: npm start
     healthCheckPath: /api/health
     autoDeploy: true

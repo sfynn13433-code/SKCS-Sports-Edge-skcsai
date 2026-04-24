@@ -7,6 +7,7 @@
     "build:supabase": "esbuild js/supabase-client-src.js --bundle --outfile=public/js/supabase-bundle.js --format=iife --global-name=supabase",
     "start": "node backend/server-express.js",
     "dev": "nodemon backend/server-express.js",
+    "sync:live": "node backend/services/syncService.js",
     "test": "node scripts/smoke-test.js",
     "test:smoke": "node scripts/smoke-test.js",
     "refresh:trigger": "node scripts/trigger-refresh.js",
