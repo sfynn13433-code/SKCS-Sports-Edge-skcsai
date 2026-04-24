@@ -9,6 +9,16 @@ async function masterQA() {
     
     // PHASE 1 & 2: INGESTION & AI FLOW
     console.log('=== PHASE 1 & 2: INGESTION & AI FLOW ===\n');
+
+    const finalTableLookup = await pool.query(`
+        SELECT
+            CASE
+                WHEN to_regclass('public.direct1x2_prediction_final') IS NOT NULL THEN 'direct1x2_prediction_final'
+                WHEN to_regclass('public.predictions_final') IS NOT NULL THEN 'predictions_final'
+                ELSE NULL
+            END AS table_name
+    `);
+    const finalTable = finalTableLookup.rows?.[0]?.table_name || null;
     
     // Check events
     const events = await pool.query(`
@@ -24,18 +34,21 @@ async function masterQA() {
     });
     
     // Check predictions_final (singles)
-    const singles = await pool.query(`
-        SELECT id, tier, type, recommendation
-        FROM predictions_final 
-        WHERE type = 'direct'
-        ORDER BY id DESC 
-        LIMIT 3
-    `);
+    let singles = { rows: [] };
+    if (finalTable) {
+        singles = await pool.query(`
+            SELECT id, tier, type, recommendation
+            FROM ${finalTable}
+            WHERE type = 'direct'
+            ORDER BY id DESC
+            LIMIT 3
+        `);
+    }
     console.log('\n🎯 Predictions (direct/singles):');
     if (singles.rows.length > 0) {
         singles.rows.forEach(s => console.log(`  - ID ${s.id} | tier: ${s.tier} | type: ${s.type}`));
     } else {
-        console.log('  (no single predictions yet)');
+        console.log(finalTable ? '  (no single predictions yet)' : '  (final predictions table missing)');
     }
     
     // Check predictions_accuracy
@@ -62,14 +75,17 @@ async function masterQA() {
     // PHASE 3B: MONETIZATION ENGINE
     console.log('\n\n=== PHASE 3B: MONETIZATION (ACCAS) ===\n');
     
-    const accas = await pool.query(`
-        SELECT id, tier, recommendation, 
-               jsonb_array_length(matches) as legs
-        FROM predictions_final 
-        WHERE type = 'acca'
-        ORDER BY created_at DESC 
-        LIMIT 10
-    `);
+    let accas = { rows: [] };
+    if (finalTable) {
+        accas = await pool.query(`
+            SELECT id, tier, recommendation,
+                   jsonb_array_length(matches) as legs
+            FROM ${finalTable}
+            WHERE type = 'acca'
+            ORDER BY created_at DESC
+            LIMIT 10
+        `);
+    }
     console.log('💰 Accumulators:');
     if (accas.rows.length === 0) {
         console.log('  ⚠️  No accas found!');
@@ -124,16 +140,23 @@ async function masterQA() {
     // PHASE 6: RLS
     console.log('\n\n=== PHASE 6: SECURITY (RLS) ===\n');
     
-    const rlsCheck = await pool.query(`
-        SELECT relname, relrowsecurity 
-        FROM pg_class 
-        WHERE relname = 'predictions_final'
-    `);
-    console.log(`🔐 RLS enabled: ${rlsCheck.rows[0]?.relrowsecurity ? 'YES ✅' : 'NO ❌'}`);
-    
+    let rlsEnabled = false;
+    if (finalTable) {
+        const rlsCheck = await pool.query(`
+            SELECT relrowsecurity
+            FROM pg_class
+            WHERE relname = $1
+            LIMIT 1
+        `, [finalTable]);
+        rlsEnabled = Boolean(rlsCheck.rows[0]?.relrowsecurity);
+    }
+    console.log(`🔐 RLS enabled (${finalTable || 'missing_final_table'}): ${rlsEnabled ? 'YES ✅' : 'NO ❌'}`);
+
     const policies = await pool.query(`
-        SELECT policyname, cmd FROM pg_policies WHERE tablename = 'predictions_final'
-    `);
+        SELECT policyname, cmd
+        FROM pg_policies
+        WHERE tablename = COALESCE($1, '')
+    `, [finalTable]);
     console.log('Policies:', policies.rows.map(p => p.policyname).join(', '));
     
     // PHASE 7: ARCHIVING
@@ -163,7 +186,7 @@ async function masterQA() {
     const hasAccas = accas.rows.length > 0;
     const hasCache = cache.rows.length > 0;
     const hasSuccessLogs = logs.rows.some(l => l.status === 'success');
-    const hasRls = rlsCheck.rows[0]?.relrowsecurity;
+    const hasRls = rlsEnabled;
     const hasIndexes = indexes.rows.length >= 9;
     const hasAccuracy = accuracyResult && accuracyResult.rows.length > 0;
     

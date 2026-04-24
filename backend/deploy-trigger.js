@@ -7,13 +7,20 @@ function normalizeHost(value) {
     return String(value).trim().replace(/\/+$/, '');
 }
 
+function parseTimeoutMs(value, fallbackMs = 20000) {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || parsed <= 0) return fallbackMs;
+    return Math.floor(parsed);
+}
+
 async function main() {
     const host = normalizeHost(
         process.env.SKCS_TRIGGER_HOST ||
         process.env.SKCS_REFRESH_HOST ||
-        process.env.RENDER_EXTERNAL_URL
+        process.env.RENDER_EXTERNAL_URL ||
+        'https://skcsai.onrender.com'
     );
-    const apiKey = process.env.ADMIN_API_KEY || process.env.SKCS_REFRESH_KEY;
+    const apiKey = process.env.ADMIN_API_KEY || process.env.SKCS_REFRESH_KEY || process.env.CRON_SECRET;
 
     if (!host) {
         throw new Error('Missing backend host. Set SKCS_TRIGGER_HOST, SKCS_REFRESH_HOST, or RENDER_EXTERNAL_URL.');
@@ -23,16 +30,25 @@ async function main() {
     }
 
     const url = new URL('/api/pipeline/run-full', host);
-    const response = await fetch(url.toString(), {
-        method: 'POST',
-        headers: {
-            'x-api-key': apiKey,
-            'content-type': 'application/json'
-        },
-        body: JSON.stringify({
-            source: 'weekly_rolling_scrape'
-        })
-    });
+    const timeoutMs = parseTimeoutMs(process.env.TRIGGER_TIMEOUT_MS, 20000);
+    const abort = new AbortController();
+    const timer = setTimeout(() => abort.abort(), timeoutMs);
+    let response;
+    try {
+        response = await fetch(url.toString(), {
+            method: 'POST',
+            headers: {
+                'x-api-key': apiKey,
+                'content-type': 'application/json'
+            },
+            signal: abort.signal,
+            body: JSON.stringify({
+                source: 'weekly_rolling_scrape'
+            })
+        });
+    } finally {
+        clearTimeout(timer);
+    }
 
     const text = await response.text();
     let payload = null;
@@ -55,9 +71,12 @@ async function main() {
 }
 
 main().catch((error) => {
+    const isAbort = error?.name === 'AbortError' || String(error?.message || '').toLowerCase().includes('aborted');
     console.error(JSON.stringify({
         ok: false,
-        error: error.message
+        error: isAbort
+            ? `Upstream timeout after ${parseTimeoutMs(process.env.TRIGGER_TIMEOUT_MS, 20000)}ms`
+            : error.message
     }));
     process.exit(1);
 });

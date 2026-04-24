@@ -39,6 +39,57 @@ async function cleanupLegacyFixtureRows() {
     console.log('[dbBootstrap] Legacy fixture cleanup deleted %s row(s).', Number(deleteRes.rowCount || 0));
 }
 
+async function ensureFinalPredictionsCompatibility() {
+    await query(`
+        CREATE TABLE IF NOT EXISTS direct1x2_prediction_final (
+            id bigserial PRIMARY KEY,
+            publish_run_id bigint REFERENCES prediction_publish_runs(id) ON DELETE CASCADE,
+            tier text NOT NULL CHECK (tier IN ('normal', 'deep')),
+            type text NOT NULL CHECK (type IN ('single', 'acca', 'direct', 'secondary', 'multi', 'same_match', 'acca_6match', 'mega_acca_12')),
+            matches jsonb NOT NULL,
+            total_confidence numeric NOT NULL,
+            risk_level text NOT NULL CHECK (risk_level IN ('safe', 'medium')),
+            created_at timestamptz NOT NULL DEFAULT now()
+        );
+    `);
+
+    await query(`
+        DROP VIEW IF EXISTS public.predictions_final;
+    `);
+
+    await query(`
+        CREATE OR REPLACE VIEW public.predictions_final AS
+        SELECT *
+        FROM public.direct1x2_prediction_final;
+    `);
+}
+
+async function markStalePublishRuns() {
+    const staleWindowHours = Number(process.env.SKCS_STALE_RUN_HOURS || 2);
+    const staleRuns = await query(
+        `
+        UPDATE prediction_publish_runs
+        SET
+            status = 'failed',
+            completed_at = COALESCE(completed_at, NOW()),
+            error_message = CASE
+                WHEN COALESCE(error_message, '') = '' THEN
+                    CONCAT('Auto-closed stale running publish run by bootstrap (> ', $1::text, 'h).')
+                ELSE
+                    error_message
+            END
+        WHERE status = 'running'
+          AND started_at < NOW() - make_interval(hours => $1::int)
+        RETURNING id;
+        `,
+        [staleWindowHours]
+    );
+
+    if (Number(staleRuns.rowCount || 0) > 0) {
+        console.log('[dbBootstrap] Auto-closed %s stale running publish run(s).', Number(staleRuns.rowCount || 0));
+    }
+}
+
 async function bootstrap() {
     console.log('[dbBootstrap] Ensuring tables and seed data exist...');
 
@@ -87,18 +138,7 @@ async function bootstrap() {
             );
         `);
 
-        await query(`
-            CREATE TABLE IF NOT EXISTS direct1x2_prediction_final (
-                id bigserial PRIMARY KEY,
-                publish_run_id bigint REFERENCES prediction_publish_runs(id) ON DELETE CASCADE,
-                tier text NOT NULL CHECK (tier IN ('normal', 'deep')),
-                type text NOT NULL CHECK (type IN ('single', 'acca', 'direct', 'secondary', 'multi', 'same_match', 'acca_6match', 'mega_acca_12')),
-                matches jsonb NOT NULL,
-                total_confidence numeric NOT NULL,
-                risk_level text NOT NULL CHECK (risk_level IN ('safe', 'medium')),
-                created_at timestamptz NOT NULL DEFAULT now()
-            );
-        `);
+        await ensureFinalPredictionsCompatibility();
 
         await query(`
             DO $$
@@ -527,6 +567,7 @@ async function bootstrap() {
         `);
 
         await cleanupLegacyFixtureRows();
+        await markStalePublishRuns();
 
         console.log('[dbBootstrap] All tables and seed data verified.');
     } catch (err) {

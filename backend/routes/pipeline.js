@@ -12,6 +12,25 @@ const { requireRole } = require('../utils/auth');
 
 const router = express.Router();
 
+function requirePipelineTriggerKey(req, res, next) {
+    const key = req.headers['x-api-key'];
+    if (!key) {
+        return res.status(401).json({ error: 'Missing API key' });
+    }
+
+    const allowedKeys = new Set(
+        [process.env.ADMIN_API_KEY, process.env.SKCS_REFRESH_KEY, process.env.CRON_SECRET]
+            .map((value) => String(value || '').trim())
+            .filter(Boolean)
+    );
+
+    if (!allowedKeys.has(String(key).trim())) {
+        return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    return next();
+}
+
 async function handleSyncRequest(res, options = {}) {
     const requestedSport = options.requestedSport ? String(options.requestedSport).toLowerCase() : null;
     const waitForCompletion = options.waitForCompletion === true;
@@ -103,8 +122,8 @@ const runFullHandler = async (req, res) => {
     });
 };
 
-router.post('/run-full', requireRole('admin'), runFullHandler);
-router.get('/run-full', requireRole('admin'), runFullHandler);
+router.post('/run-full', requirePipelineTriggerKey, runFullHandler);
+router.get('/run-full', requirePipelineTriggerKey, runFullHandler);
 
 /**
  * SYNC WITH DETAILED PROGRESS

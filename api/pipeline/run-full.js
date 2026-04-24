@@ -5,6 +5,19 @@ function normalizeHost(value) {
     return String(value).trim().replace(/\/+$/, '');
 }
 
+function extractBearerToken(req) {
+    const headerValue = req.headers?.authorization || req.headers?.Authorization;
+    if (!headerValue) return null;
+    const match = String(headerValue).match(/^Bearer\s+(.+)$/i);
+    return match?.[1]?.trim() || null;
+}
+
+function parseTimeoutMs(value, fallbackMs = 20000) {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || parsed <= 0) return fallbackMs;
+    return Math.floor(parsed);
+}
+
 module.exports = async function handler(req, res) {
     if (req.method !== 'GET' && req.method !== 'POST') {
         res.status(405).json({ ok: false, error: 'Method not allowed' });
@@ -14,19 +27,29 @@ module.exports = async function handler(req, res) {
     const host = normalizeHost(
         process.env.SCHEDULE_TARGET_HOST ||
         process.env.SKCS_TRIGGER_HOST ||
-        process.env.RENDER_EXTERNAL_URL
+        process.env.RENDER_EXTERNAL_URL ||
+        'https://skcsai.onrender.com'
     );
-    const apiKey = process.env.ADMIN_API_KEY || process.env.SKCS_REFRESH_KEY;
+    const apiKey = (
+        process.env.ADMIN_API_KEY ||
+        process.env.SKCS_REFRESH_KEY ||
+        extractBearerToken(req) ||
+        req.headers?.['x-api-key'] ||
+        req.headers?.['X-API-KEY']
+    );
 
     if (!host || !apiKey) {
         res.status(500).json({
             ok: false,
-            error: 'Missing scheduler target host or API key'
+            error: 'Missing scheduler API key'
         });
         return;
     }
 
     const target = new URL('/api/pipeline/run-full', host);
+    const timeoutMs = parseTimeoutMs(process.env.TRIGGER_TIMEOUT_MS, 20000);
+    const abort = new AbortController();
+    const timer = setTimeout(() => abort.abort(), timeoutMs);
 
     try {
         const upstream = await fetch(target.toString(), {
@@ -35,10 +58,12 @@ module.exports = async function handler(req, res) {
                 'x-api-key': apiKey,
                 'content-type': 'application/json'
             },
+            signal: abort.signal,
             body: JSON.stringify({
                 source: 'vercel_cron'
             })
         });
+        clearTimeout(timer);
 
         const text = await upstream.text();
         let payload;
@@ -55,9 +80,13 @@ module.exports = async function handler(req, res) {
             payload
         });
     } catch (error) {
+        clearTimeout(timer);
+        const timedOut = error?.name === 'AbortError';
         res.status(502).json({
             ok: false,
-            error: error.message
+            error: timedOut
+                ? `Upstream timeout after ${timeoutMs}ms`
+                : error.message
         });
     }
 };
