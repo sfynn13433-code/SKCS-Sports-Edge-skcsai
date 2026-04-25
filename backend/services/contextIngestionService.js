@@ -6,6 +6,7 @@ const API_SPORTS_BASE_URL = 'https://v3.football.api-sports.io';
 const OPEN_WEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
 
 function buildApiSportsHeaders() {
+    const apiSportsKey = String(process.env.X_APISPORTS_KEY || '').trim();
     const rapidApiKey = String(
         process.env.X_RAPIDAPI_KEY
         || process.env.RAPIDAPI_KEY
@@ -13,6 +14,7 @@ function buildApiSportsHeaders() {
     ).trim();
 
     const headers = {};
+    if (apiSportsKey) headers['x-apisports-key'] = apiSportsKey;
     if (rapidApiKey) headers['x-rapidapi-key'] = rapidApiKey;
     return headers;
 }
@@ -69,4 +71,3 @@ module.exports = {
     getH2H,
     getWeather
 };
-
