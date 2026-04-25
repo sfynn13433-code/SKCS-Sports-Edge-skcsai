@@ -12,7 +12,9 @@ const {
     buildCandidateMarkets,
     selectDirectSecondarySameMatch
 } = require('./marketIntelligence');
+const { getInjuries, getH2H, getWeather } = require('./contextIngestionService');
 const { evaluateDirect1x2 } = require('./direct1x2Engine');
+const { saveContextData } = require('./saveContextData');
 const { saveDirectInsight } = require('./saveDirectInsights');
 const pipelineLogger = require('../utils/pipelineLogger');
 const enrichFixtureWithContext = require('../src/services/contextIntelligence/aiPipeline');
@@ -285,6 +287,164 @@ function normalizeContextSignals(value) {
         lineup_uncertainty_risk: read('lineup_uncertainty_risk'),
         market_adjustments: marketAdjustments
     };
+}
+
+function firstNonEmptyString(values = []) {
+    for (const value of values) {
+        const text = String(value || '').trim();
+        if (text) return text;
+    }
+    return null;
+}
+
+function resolveContextIngestionCity(matchInfo = {}, item = {}) {
+    const venue = String(matchInfo?.venue || item?.venue || '').trim();
+    const venueParts = venue.includes(',')
+        ? venue.split(',').map((part) => String(part || '').trim()).filter(Boolean)
+        : [];
+
+    return firstNonEmptyString([
+        matchInfo?.city,
+        item?.city,
+        venueParts[1] || null,
+        venueParts[0] || null,
+        matchInfo?.country,
+        item?.country
+    ]);
+}
+
+function normalizeInjuriesFromProvider(rawInjuries, homeTeamId, awayTeamId) {
+    const records = ensureArray(rawInjuries);
+    if (!records.length) return [];
+
+    const homeId = String(homeTeamId || '').trim();
+    const awayId = String(awayTeamId || '').trim();
+    return records.map((entry) => {
+        const teamId = String(entry?.team?.id || '').trim();
+        const side = teamId && homeId && teamId === homeId
+            ? 'home'
+            : (teamId && awayId && teamId === awayId ? 'away' : null);
+
+        return {
+            side,
+            team_id: teamId || null,
+            team_name: entry?.team?.name || null,
+            player_id: entry?.player?.id || null,
+            player_name: entry?.player?.name || null,
+            reason: entry?.player?.reason || null,
+            type: entry?.player?.type || null,
+            isKeyPlayer: true
+        };
+    });
+}
+
+function normalizeH2HFromProvider(rawH2H) {
+    const fixtures = ensureArray(rawH2H);
+    if (!fixtures.length) return null;
+
+    const matches = fixtures.map((fixture) => {
+        const homeGoals = Number(fixture?.goals?.home ?? fixture?.score?.fulltime?.home ?? 0);
+        const awayGoals = Number(fixture?.goals?.away ?? fixture?.score?.fulltime?.away ?? 0);
+        return {
+            fixture_id: fixture?.fixture?.id || null,
+            date: fixture?.fixture?.date || null,
+            home_team_id: fixture?.teams?.home?.id || null,
+            away_team_id: fixture?.teams?.away?.id || null,
+            home_goals: Number.isFinite(homeGoals) ? homeGoals : null,
+            away_goals: Number.isFinite(awayGoals) ? awayGoals : null
+        };
+    });
+
+    let goalsTotal = 0;
+    let goalsCount = 0;
+    let under25 = 0;
+
+    for (const match of matches) {
+        if (!Number.isFinite(match.home_goals) || !Number.isFinite(match.away_goals)) continue;
+        const totalGoals = match.home_goals + match.away_goals;
+        goalsTotal += totalGoals;
+        goalsCount += 1;
+        if (totalGoals <= 2) under25 += 1;
+    }
+
+    const avgGoals = goalsCount > 0 ? goalsTotal / goalsCount : null;
+    const under25Rate = goalsCount > 0 ? under25 / goalsCount : null;
+
+    return {
+        sampleSize: matches.length,
+        avgGoals,
+        under25Rate,
+        lowScoringTrend: Number.isFinite(under25Rate) ? under25Rate >= 0.6 : false,
+        matches
+    };
+}
+
+function normalizeWeatherFromProvider(rawWeather) {
+    if (!rawWeather || typeof rawWeather !== 'object') return null;
+
+    const weatherMain = Array.isArray(rawWeather.weather) && rawWeather.weather.length
+        ? rawWeather.weather[0]
+        : {};
+    const condition = String(weatherMain.main || weatherMain.description || '').trim();
+    const key = condition.toLowerCase();
+    const rain = key.includes('rain')
+        || key.includes('drizzle')
+        || key.includes('storm')
+        || typeof rawWeather.rain === 'object';
+
+    return {
+        city: rawWeather.name || null,
+        rain,
+        condition: condition || null,
+        summary: condition || null,
+        temperature_c: Number.isFinite(Number(rawWeather?.main?.temp))
+            ? Math.round((Number(rawWeather.main.temp) - 273.15) * 100) / 100
+            : null,
+        wind_speed: Number.isFinite(Number(rawWeather?.wind?.speed))
+            ? Number(rawWeather.wind.speed)
+            : null
+    };
+}
+
+function mergeIngestedContextIntoMatchContext(effectiveMatchContext, ingestedContextData) {
+    const source = isObject(effectiveMatchContext) ? effectiveMatchContext : {};
+    const ingested = isObject(ingestedContextData) ? ingestedContextData : {};
+    const merged = { ...source };
+
+    const contextual = isObject(source.contextual_intelligence)
+        ? { ...source.contextual_intelligence }
+        : {};
+
+    const ingestedInjuries = ensureArray(ingested.injuries);
+    if (ingestedInjuries.length && !ensureArray(contextual.injuries).length) {
+        contextual.injuries = ingestedInjuries;
+    }
+    if (ingested.weather && !contextual.weather) {
+        contextual.weather = ingested.weather;
+    }
+    if (Object.keys(contextual).length) {
+        merged.contextual_intelligence = contextual;
+    }
+
+    if (ingested.h2h && !isObject(merged.h2h)) {
+        merged.h2h = ingested.h2h;
+    }
+
+    const rawProvider = isObject(source.raw_provider_data) ? { ...source.raw_provider_data } : {};
+    if (ingested.h2h && !isObject(rawProvider.h2h)) {
+        rawProvider.h2h = ingested.h2h;
+    }
+    if (ingested.weather && !rawProvider.weather) {
+        rawProvider.weather = ingested.weather;
+    }
+    if (ingestedInjuries.length && !ensureArray(rawProvider.injuries).length) {
+        rawProvider.injuries = ingestedInjuries;
+    }
+    if (Object.keys(rawProvider).length) {
+        merged.raw_provider_data = rawProvider;
+    }
+
+    return merged;
 }
 
 function normalizeTeamTokenForSide(value) {
@@ -852,9 +1012,43 @@ async function buildRawPredictionFromProviderItem(item) {
         });
     }
 
+    let ingestedContextData = { injuries: null, h2h: null, weather: null };
+    try {
+        const fixtureIdForIngestion = matchInfo.match_id || match_id;
+        const homeTeamIdForIngestion = matchInfo.home_team_id || item.home_team_id || null;
+        const awayTeamIdForIngestion = matchInfo.away_team_id || item.away_team_id || null;
+        const cityForWeather = resolveContextIngestionCity(matchInfo, item);
+
+        const [injuriesRaw, h2hRaw, weatherRaw] = await Promise.all([
+            getInjuries(fixtureIdForIngestion),
+            getH2H(homeTeamIdForIngestion, awayTeamIdForIngestion),
+            getWeather(cityForWeather)
+        ]);
+
+        ingestedContextData = {
+            injuries: normalizeInjuriesFromProvider(injuriesRaw, homeTeamIdForIngestion, awayTeamIdForIngestion),
+            h2h: normalizeH2HFromProvider(h2hRaw),
+            weather: normalizeWeatherFromProvider(weatherRaw)
+        };
+
+        const hasIngestedPayload = Boolean(
+            (Array.isArray(ingestedContextData.injuries) && ingestedContextData.injuries.length)
+            || ingestedContextData.h2h
+            || ingestedContextData.weather
+        );
+        if (hasIngestedPayload) {
+            await saveContextData(directInsightsSupabase, match_id, ingestedContextData);
+        }
+    } catch (contextIngestionErr) {
+        console.warn('[aiPipeline] context ingestion failed for match_id=%s: %s', match_id, contextIngestionErr.message);
+    }
+
     const contextSignals = normalizeContextSignals(contextEnriched?.contextSignals);
     const p_adj = adjustProbability(p_base, contextSignals);
-    const effectiveMatchContext = contextEnriched || contextFixture;
+    const effectiveMatchContext = mergeIngestedContextIntoMatchContext(
+        contextEnriched || contextFixture,
+        ingestedContextData
+    );
     const storableMatchContext = sanitizeMatchContextForStorage(effectiveMatchContext);
     const waterfallProbabilities = deriveWaterfallProbabilities(prediction, p_adj, effectiveMatchContext);
     const direct1x2Evaluation = evaluateDirect1x2(
