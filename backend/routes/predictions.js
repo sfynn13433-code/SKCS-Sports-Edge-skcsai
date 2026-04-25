@@ -72,11 +72,11 @@ const PLACEHOLDER_TEAM_LABELS = new Set([
     'n/a'
 ]);
 const PREDICTION_ROW_QUALITY_SQL = `
-    COALESCE(NULLIF(TRIM(pf.home_team), ''), NULLIF(TRIM(pf.matches->0->>'home_team'), ''), NULLIF(TRIM(pf.matches->0->>'home_team_name'), '')) IS NOT NULL
-    AND COALESCE(NULLIF(TRIM(pf.away_team), ''), NULLIF(TRIM(pf.matches->0->>'away_team'), ''), NULLIF(TRIM(pf.matches->0->>'away_team_name'), '')) IS NOT NULL
-    AND LOWER(COALESCE(NULLIF(TRIM(pf.home_team), ''), NULLIF(TRIM(pf.matches->0->>'home_team'), ''), NULLIF(TRIM(pf.matches->0->>'home_team_name'), ''))) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
-    AND LOWER(COALESCE(NULLIF(TRIM(pf.away_team), ''), NULLIF(TRIM(pf.matches->0->>'away_team'), ''), NULLIF(TRIM(pf.matches->0->>'away_team_name'), ''))) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
-    AND LOWER(COALESCE(NULLIF(TRIM(pf.sport), ''), NULLIF(TRIM(pf.matches->0->>'sport'), ''))) <> 'unknown'
+    pf.home_team IS NOT NULL
+    AND pf.away_team IS NOT NULL
+    AND LOWER(pf.home_team) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+    AND LOWER(pf.away_team) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+    AND LOWER(COALESCE(pf.sport, 'football')) <> 'unknown'
 `;
 
 function parseBoundedInt(value, fallback, min, max) {
@@ -1768,13 +1768,13 @@ async function getLatestPublishRunIdFromFinalTable() {
     const fallbackRunRes = await query(
         `
         SELECT publish_run_id
-        FROM direct1x2_prediction_final
+        FROM direct1x2_prediction_final pf
         WHERE publish_run_id IS NOT NULL
-          AND COALESCE(NULLIF(TRIM(home_team), ''), NULLIF(TRIM(matches->0->>'home_team'), ''), NULLIF(TRIM(matches->0->>'home_team_name'), '')) IS NOT NULL
-          AND COALESCE(NULLIF(TRIM(away_team), ''), NULLIF(TRIM(matches->0->>'away_team'), ''), NULLIF(TRIM(matches->0->>'away_team_name'), '')) IS NOT NULL
-          AND LOWER(COALESCE(NULLIF(TRIM(home_team), ''), NULLIF(TRIM(matches->0->>'home_team'), ''), NULLIF(TRIM(matches->0->>'home_team_name'), ''))) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
-          AND LOWER(COALESCE(NULLIF(TRIM(away_team), ''), NULLIF(TRIM(matches->0->>'away_team'), ''), NULLIF(TRIM(matches->0->>'away_team_name'), ''))) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
-          AND LOWER(COALESCE(NULLIF(TRIM(sport), ''), NULLIF(TRIM(matches->0->>'sport'), ''))) <> 'unknown'
+          AND pf.home_team IS NOT NULL
+          AND pf.away_team IS NOT NULL
+          AND LOWER(pf.home_team) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+          AND LOWER(pf.away_team) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+          AND LOWER(COALESCE(pf.sport, 'football')) <> 'unknown'
         ORDER BY publish_run_id DESC, created_at DESC
         LIMIT 1
         `
@@ -2073,7 +2073,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                                pf.plan_visibility, pf.sport, pf.market_type, pf.recommendation, pf.expires_at,
                                pf.edgemind_report, pf.secondary_insights
                         FROM direct1x2_prediction_final pf
-                        WHERE LOWER(COALESCE(NULLIF(TRIM(pf.sport), ''), NULLIF(TRIM(pf.matches->0->>'sport'), ''))) IN (${sportPlaceholders})
+                        WHERE LOWER(COALESCE(pf.sport, 'football')) IN (${sportPlaceholders})
                           AND ${PREDICTION_ROW_QUALITY_SQL}
                         ORDER BY created_at DESC
                         LIMIT 2500;
@@ -2212,12 +2212,11 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                         l.name AS league_name,
                         NULL::text AS league_country,
                         NULL::text AS league_season,
-                        s.sport_key AS sport_id,
-                        s.sport_key AS sport_slug,
-                        s.title AS sport_name
+                        l.sport AS sport_id,
+                        l.sport AS sport_slug,
+                        INITCAP(l.sport) AS sport_name
                     FROM teams t
                     LEFT JOIN leagues l ON l.id = t.league_id
-                    LEFT JOIN sports s ON s.sport_key = l.sport
                     WHERE LOWER(t.name) = ANY($1::text[])
                     `,
                     [teamNames]

@@ -398,7 +398,7 @@ async function fetchPredictionRows(queryTiers, isAdmin) {
 
     if (latestRunId && isAdmin) {
         const rowsRes = await query(
-            `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
+            `SELECT *
              FROM direct1x2_prediction_final
              WHERE publish_run_id = $1
              ORDER BY created_at DESC
@@ -410,7 +410,7 @@ async function fetchPredictionRows(queryTiers, isAdmin) {
 
     if (latestRunId) {
         const rowsRes = await query(
-            `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
+            `SELECT *
              FROM direct1x2_prediction_final
              WHERE publish_run_id = $1
                AND LOWER(COALESCE(tier, 'normal')) = ANY($2::text[])
@@ -422,7 +422,7 @@ async function fetchPredictionRows(queryTiers, isAdmin) {
     }
 
     const fallbackRes = await query(
-        `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
+        `SELECT *
          FROM direct1x2_prediction_final
          WHERE LOWER(COALESCE(tier, 'normal')) = ANY($1::text[])
          ORDER BY created_at DESC
@@ -462,10 +462,70 @@ async function buildDatasetForUser(user) {
         const sectionType = inferSectionType(row);
         const section = normalizeSectionOutput(sectionType);
         const tier = normalizeInsightTierLabel(row?.tier) || 'core';
-        const matches = Array.isArray(row?.matches) ? row.matches : [];
+        
+        // Handle single matches natively using top-level columns if present
+        if (row.type !== 'multi' && row.type !== 'acca' && row.type !== 'acca_6match' && row.type !== 'mega_acca_12' && row.type !== 'same_match') {
+            const matchId = String(row.fixture_id || row.matches?.[0]?.fixture_id || row.matches?.[0]?.match_id || '').trim();
+            if (!matchId) continue;
+            
+            const kickoff = parseKickoff(row.matches?.[0] || row);
+            const rowCreatedAt = row?.created_at ? new Date(row.created_at) : null;
+            const availabilityTime = kickoff || (row.match_date ? new Date(row.match_date) : rowCreatedAt);
+            if (!isKickoffInVisibleWindow(availabilityTime, nowTz)) continue;
+            
+            const sport = normalizeSport(row.sport || row.matches?.[0]?.sport || 'football');
+            const market = normalizeMarketKey(row.market_type || row.matches?.[0]?.market || '');
+            if (!market) continue;
+            
+            const confidenceRaw = Number(row.confidence || row.matches?.[0]?.confidence);
+            const totalRaw = Number(row.total_confidence);
+            const confidence = Number.isFinite(confidenceRaw) ? confidenceRaw : (Number.isFinite(totalRaw) ? totalRaw : 0);
+            
+            const homeTeam = normalizeText(row.home_team || row.matches?.[0]?.home_team || 'Unknown Home');
+            const awayTeam = normalizeText(row.away_team || row.matches?.[0]?.away_team || 'Unknown Away');
+            
+            const candidate = {
+                tier,
+                section,
+                sport,
+                confidence,
+                match_id: matchId,
+                market,
+                prediction: normalizeText(row.prediction || row.matches?.[0]?.prediction || ''),
+                home_team: homeTeam,
+                away_team: awayTeam,
+                kickoff_time: availabilityTime ? availabilityTime.toISOString() : null
+            };
 
+            candidates.push(candidate);
+            availableSports.add(sport);
+            availableMarkets.add(market);
+            confidenceScores[matchId] = Math.max(Number(confidenceScores[matchId] || 0), Number(confidence || 0));
+
+            if (!availableMatchesById.has(matchId)) {
+                availableMatchesById.set(matchId, {
+                    match_id: matchId,
+                    sport,
+                    home_team: homeTeam,
+                    away_team: awayTeam,
+                    kickoff_time: availabilityTime ? availabilityTime.toISOString() : null
+                });
+            }
+
+            visibleSelections.push({
+                tier,
+                section,
+                sport,
+                confidence,
+                match_id: matchId,
+                market
+            });
+            continue;
+        }
+
+        const matches = Array.isArray(row?.matches) ? row.matches : [];
         for (const match of matches) {
-            const matchId = String(match?.match_id || '').trim();
+            const matchId = String(match?.match_id || match?.fixture_id || row?.fixture_id || '').trim();
             if (!matchId) continue;
 
             const kickoff = parseKickoff(match);
@@ -475,11 +535,12 @@ async function buildDatasetForUser(user) {
 
             const sport = normalizeSport(
                 match?.sport ||
+                row?.sport ||
                 match?.metadata?.sport ||
                 match?.metadata?.sport_type ||
-                ''
+                'football'
             );
-            const market = normalizeMarketKey(match?.market || '');
+            const market = normalizeMarketKey(match?.market || row?.market_type || '');
             if (!market) continue;
 
             const confidenceRaw = Number(match?.confidence);
@@ -488,8 +549,8 @@ async function buildDatasetForUser(user) {
                 ? confidenceRaw
                 : (Number.isFinite(totalRaw) ? totalRaw : 0);
 
-            const homeTeam = normalizeText(match?.home_team || match?.metadata?.home_team || 'Unknown Home');
-            const awayTeam = normalizeText(match?.away_team || match?.metadata?.away_team || 'Unknown Away');
+            const homeTeam = normalizeText(match?.home_team || match?.metadata?.home_team || row?.home_team || 'Unknown Home');
+            const awayTeam = normalizeText(match?.away_team || match?.metadata?.away_team || row?.away_team || 'Unknown Away');
 
             const candidate = {
                 tier,
@@ -498,7 +559,7 @@ async function buildDatasetForUser(user) {
                 confidence,
                 match_id: matchId,
                 market,
-                prediction: normalizeText(match?.prediction || ''),
+                prediction: normalizeText(match?.prediction || row?.prediction || ''),
                 home_team: homeTeam,
                 away_team: awayTeam,
                 kickoff_time: availabilityTime ? availabilityTime.toISOString() : null

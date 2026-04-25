@@ -62,6 +62,12 @@ function stripWrappingQuotes(value) {
     return text;
 }
 
+function isLikelyRapidApiKey(value) {
+    const text = toNonEmptyString(value);
+    // RapidAPI keys are long opaque tokens; filter obvious placeholders like "123".
+    return /^[A-Za-z0-9_.-]{20,}$/.test(text);
+}
+
 function parseDotenvLine(line) {
     const raw = String(line || '');
     const trimmed = raw.trim();
@@ -208,7 +214,7 @@ function getRapidApiKeyPool(options = {}) {
         ...fallbackKeys
     ];
 
-    return uniqueNonEmpty(values);
+    return uniqueNonEmpty(values).filter(isLikelyRapidApiKey);
 }
 
 function maskKey(value) {

@@ -13,11 +13,11 @@ const ACCURACY_ROW_QUALITY_SQL = `
     AND LOWER(TRIM(pa.away_team)) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
 `;
 const PUBLISHED_ROW_QUALITY_SQL = `
-    COALESCE(NULLIF(TRIM(pf.home_team), ''), NULLIF(TRIM(pf.matches->0->>'home_team'), ''), NULLIF(TRIM(pf.matches->0->>'home_team_name'), '')) IS NOT NULL
-    AND COALESCE(NULLIF(TRIM(pf.away_team), ''), NULLIF(TRIM(pf.matches->0->>'away_team'), ''), NULLIF(TRIM(pf.matches->0->>'away_team_name'), '')) IS NOT NULL
-    AND LOWER(COALESCE(NULLIF(TRIM(pf.home_team), ''), NULLIF(TRIM(pf.matches->0->>'home_team'), ''), NULLIF(TRIM(pf.matches->0->>'home_team_name'), ''))) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
-    AND LOWER(COALESCE(NULLIF(TRIM(pf.away_team), ''), NULLIF(TRIM(pf.matches->0->>'away_team'), ''), NULLIF(TRIM(pf.matches->0->>'away_team_name'), ''))) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
-    AND LOWER(COALESCE(NULLIF(TRIM(pf.sport), ''), NULLIF(TRIM(pf.matches->0->>'sport'), ''))) <> 'unknown'
+    pf.home_team IS NOT NULL
+    AND pf.away_team IS NOT NULL
+    AND LOWER(pf.home_team) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+    AND LOWER(pf.away_team) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+    AND LOWER(COALESCE(pf.sport, 'football')) <> 'unknown'
 `;
 
 function startOfWeekUtc(now = new Date()) {
@@ -324,7 +324,7 @@ router.get('/', async (req, res) => {
                 UNION
                 SELECT DATE(COALESCE(match_date, created_at) AT TIME ZONE 'Africa/Johannesburg') AS date
                 FROM direct1x2_prediction_final pf
-                WHERE LOWER(COALESCE(NULLIF(TRIM(pf.sport), ''), NULLIF(TRIM(pf.matches->0->>'sport'), '')))= LOWER($1)
+                WHERE LOWER(COALESCE(pf.sport, 'football')) = LOWER($1)
                   AND ${PUBLISHED_ROW_QUALITY_SQL}
             ) d
             WHERE date IS NOT NULL
@@ -376,7 +376,7 @@ router.get('/', async (req, res) => {
                     END
                 ), 0)::int AS legs
             FROM direct1x2_prediction_final pf
-            WHERE LOWER(COALESCE(NULLIF(TRIM(pf.sport), ''), NULLIF(TRIM(pf.matches->0->>'sport'), ''))) = LOWER($1)
+            WHERE LOWER(COALESCE(pf.sport, 'football')) = LOWER($1)
               AND DATE(COALESCE(pf.match_date, pf.created_at) AT TIME ZONE 'Africa/Johannesburg') = $2::date
               AND ($3::bigint IS NULL OR pf.publish_run_id = $3::bigint)
               AND ${PUBLISHED_ROW_QUALITY_SQL}
