@@ -10,6 +10,7 @@ const morgan       = require('morgan');
 const { spawn }    = require('child_process');
 const moment       = require('moment-timezone');
 const path         = require('path');
+const { createClient } = require('@supabase/supabase-js');
 const config       = require('./config');
 const { query }            = require('./db');
 const { requireRole }        = require('./utils/auth');
@@ -110,6 +111,19 @@ const accuracyRouter    = require('./routes/accuracy');
 const vipRouter         = require('./routes/vip');
 const direct1x2Router   = require('./routes/direct1x2');
 const refreshAIRouter   = require('./routes/refresh-ai');
+
+const DIRECT_INSIGHTS_SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
+const DIRECT_INSIGHTS_SUPABASE_KEY = String(
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+    || process.env.SUPABASE_KEY
+    || process.env.SUPABASE_ANON_KEY
+    || ''
+).trim();
+const directInsightsSupabase = DIRECT_INSIGHTS_SUPABASE_URL && DIRECT_INSIGHTS_SUPABASE_KEY
+    ? createClient(DIRECT_INSIGHTS_SUPABASE_URL, DIRECT_INSIGHTS_SUPABASE_KEY, {
+        auth: { persistSession: false, autoRefreshToken: false }
+    })
+    : null;
 
 const app = express();
 
@@ -683,6 +697,25 @@ app.get('/api/cron/sync-live', verifyCronSecret, async (req, res) => {
         });
         res.json({ status: 'error', message: err.message });
     }
+});
+
+app.get('/api/direct-insights', async (_req, res) => {
+    if (!directInsightsSupabase) {
+        return res.status(503).json({ error: 'Supabase is not configured' });
+    }
+
+    const { data, error } = await directInsightsSupabase
+        .from('direct_1x2_insights')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+    if (error) {
+        console.error('[api/direct-insights] query failed:', error.message);
+        return res.status(500).json({ error: 'Failed to load direct insights' });
+    }
+
+    return res.json(data || []);
 });
 
 // TIER 2: STANDARD SYNC (Hits Tier 2 APIs) -> Run every 60 minutes

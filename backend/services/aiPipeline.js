@@ -1,5 +1,6 @@
 'use strict';
 
+const { createClient } = require('@supabase/supabase-js');
 const { query, withTransaction } = require('../db');
 const { validateRawPredictionInput } = require('../utils/validation');
 const { filterRawPrediction } = require('./filterEngine');
@@ -12,12 +13,25 @@ const {
     selectDirectSecondarySameMatch
 } = require('./marketIntelligence');
 const { evaluateDirect1x2 } = require('./direct1x2Engine');
+const { saveDirectInsight } = require('./saveDirectInsights');
 const pipelineLogger = require('../utils/pipelineLogger');
 const enrichFixtureWithContext = require('../src/services/contextIntelligence/aiPipeline');
 const adjustProbability = require('../src/services/contextIntelligence/adjustProbability');
 
 let isRunning = false;
 const ACTIVE_DEPLOYMENT_SPORT = 'football';
+const DIRECT_INSIGHTS_SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
+const DIRECT_INSIGHTS_SUPABASE_KEY = String(
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+    || process.env.SUPABASE_KEY
+    || process.env.SUPABASE_ANON_KEY
+    || ''
+).trim();
+const directInsightsSupabase = DIRECT_INSIGHTS_SUPABASE_URL && DIRECT_INSIGHTS_SUPABASE_KEY
+    ? createClient(DIRECT_INSIGHTS_SUPABASE_URL, DIRECT_INSIGHTS_SUPABASE_KEY, {
+        auth: { persistSession: false, autoRefreshToken: false }
+    })
+    : null;
 
 function normalizeSport(sport) {
     if (typeof sport !== 'string' || sport.trim().length === 0) throw new Error('sport must be a non-empty string');
@@ -671,6 +685,11 @@ async function buildRawPredictionFromProviderItem(item) {
             }
         });
         return { rejected: true, reason: 'low_confidence' };
+    }
+    try {
+        await saveDirectInsight(directInsightsSupabase, match_id, direct1x2Evaluation);
+    } catch (saveErr) {
+        console.warn('[aiPipeline] direct_1x2_insights save failed match_id=%s: %s', match_id, saveErr.message);
     }
     const marketIntelligence = buildCandidateMarkets(
         waterfallProbabilities,
