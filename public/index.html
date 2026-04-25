@@ -839,7 +839,7 @@
                     </div>
 
                     <div class="allocation-row">
-                        <span class="allocation-label">🔀 Double Chance &amp; Specials:</span>
+                        <span class="allocation-label">🔀 Double Chance &amp; Specials (Linked + Standalone):</span>
                         <span class="allocation-value"><span id="football-secondary-count">0</span> available</span>
                     </div>
 
@@ -857,7 +857,7 @@
                     <div id="football-direct-matches" class="prediction-grid"><p>Loading...</p></div>
                 </div>
                 <div id="football-secondary" class="prediction-category">
-                    <h4 style="color:#c084fc;margin-bottom:1rem;">🔀 Double Chance &amp; Specials</h4>
+                    <h4 style="color:#c084fc;margin-bottom:1rem;">🔀 Standalone Secondary Insights</h4>
                     <div id="football-secondary-matches" class="prediction-grid"><p>Loading...</p></div>
                 </div>
                 <div id="football-multi" class="prediction-category">
@@ -2308,7 +2308,9 @@
         });
 
         const singles = scoped.filter((pred) => getPredictionLegCount(pred) === 1);
-        const directPreds = selectDirectInsights(singles).filter((pred) => !isDoubleChancePrediction(pred));
+        const directPreds = selectDirectInsights(singles)
+            .filter((pred) => !isDoubleChancePrediction(pred))
+            .filter((pred) => getPredictionConfidenceScore(pred) >= 45);
         const doubleChanceCount = scoped.filter((pred) => isDoubleChancePrediction(pred)).length;
 
         const multiCount = scoped.filter((pred) => {
@@ -2523,7 +2525,7 @@
                 if (/\b1x\b/.test(looseText)) market = 'double_chance_1x';
                 else if (/\bx2\b/.test(looseText)) market = 'double_chance_x2';
                 else if (/\b12\b/.test(looseText)) market = 'double_chance_12';
-            } else if (/\bdraw\s*no\s*bet\b/.test(looseText) || /stake protection if match finishes level/.test(looseText)) {
+            } else if (/\bdraw\s*no\s*bet\b/.test(looseText) || /\bdraw-cover alternative\b/.test(looseText)) {
                 if (/\baway\b/.test(looseText)) market = 'draw_no_bet_away';
                 else if (/\bhome\b/.test(looseText)) market = 'draw_no_bet_home';
             } else if (overMatch) {
@@ -2619,21 +2621,26 @@
         if (primary === 'home_win' || primary === 'home') {
             out.push({ market: 'double_chance_1x', prediction: '1x', confidence: conservative });
             out.push({ market: 'draw_no_bet_home', prediction: 'home', confidence: Math.max(76, conservative - 4) });
+            out.push({ market: 'over_1_5', prediction: 'over', confidence: Math.max(76, conservative - 5) });
+            out.push({ market: 'under_4_5', prediction: 'under', confidence: Math.max(76, conservative - 6) });
         } else if (primary === 'away_win' || primary === 'away') {
             out.push({ market: 'double_chance_x2', prediction: 'x2', confidence: conservative });
             out.push({ market: 'draw_no_bet_away', prediction: 'away', confidence: Math.max(76, conservative - 4) });
+            out.push({ market: 'over_1_5', prediction: 'over', confidence: Math.max(76, conservative - 5) });
+            out.push({ market: 'under_4_5', prediction: 'under', confidence: Math.max(76, conservative - 6) });
         } else {
-            out.push({ market: 'double_chance_12', prediction: '12', confidence: conservative });
-            out.push({ market: 'double_chance_1x', prediction: '1x', confidence: Math.max(76, conservative - 5) });
+            out.push({ market: 'double_chance_1x', prediction: '1x', confidence: conservative });
+            out.push({ market: 'double_chance_x2', prediction: 'x2', confidence: Math.max(76, conservative - 1) });
+            out.push({ market: 'under_3_5', prediction: 'under', confidence: Math.max(76, conservative - 3) });
+            out.push({ market: 'btts_no', prediction: 'no', confidence: Math.max(76, conservative - 5) });
         }
-
-        out.push({ market: 'under_3_5', prediction: 'under', confidence: Math.max(76, conservative - 2) });
-        out.push({ market: 'over_1_5', prediction: 'over', confidence: Math.max(76, conservative - 3) });
 
         return out.map((item) => ({
             ...item,
             label: formatMarketSelectionLabel(item.market, item.prediction),
-            description: 'Backup generated from primary risk profile'
+            description: item.market.includes('double_chance') || item.market.startsWith('draw_no_bet')
+                ? 'draw-cover alternative'
+                : 'lower-variance alternative'
         }));
     }
 
@@ -2644,10 +2651,10 @@
         const fromRanked = buildSecondaryCandidatesFromRankedMarkets(firstMatch);
 
         const confidenceScore = Number(finalRecommendation?.confidence || 0);
-        const isHighRiskPrimary = confidenceScore >= 59 && confidenceScore <= 69;
-        const isExtremeRiskPrimary = confidenceScore >= 0 && confidenceScore <= 58;
-        const requiresPivot = confidenceScore < 70;
-        const requiredCount = (isHighRiskPrimary || isExtremeRiskPrimary) ? 4 : 0;
+        const market = normalizeMarketKey(getMatchMarket(firstMatch));
+        const isDirect1x2Card = is1X2Market(market) || getSectionType(pred) === 'direct';
+        const requiresPivot = isDirect1x2Card;
+        const requiredCount = isDirect1x2Card ? 4 : 0;
         let candidates = dedupeSecondaryCandidates([
             ...fromPrediction,
             ...fromMetadata,
@@ -2669,6 +2676,11 @@
             const synthetic = dedupeSecondaryCandidates(buildSyntheticBackupMarkets(firstMatch, finalRecommendation.confidence || 0))
                 .filter((item) => Number(item.confidence || 0) >= 76);
             shaped = dedupeSecondaryCandidates([...shaped, ...synthetic]).slice(0, requiredCount);
+        }
+
+        if (requiredCount > 0 && shaped.length < requiredCount) {
+            const forcedFallback = dedupeSecondaryCandidates(buildSyntheticBackupMarkets(firstMatch, finalRecommendation.confidence || 0));
+            shaped = dedupeSecondaryCandidates([...shaped, ...forcedFallback]).slice(0, requiredCount);
         }
 
         if (requiredCount > 0) return shaped.slice(0, requiredCount);
@@ -3103,7 +3115,8 @@
         });
         // FIX: Do NOT filter direct insights by the Elite Floor.
         // We want 0-100% here so the card renderer can trigger the High Risk warning!
-        const directSingles = selectDirectInsights(singles);
+        const directSingles = selectDirectInsights(singles)
+            .filter((pred) => getPredictionConfidenceScore(pred) >= 45);
         const directByMatchId = new Map();
         directSingles.forEach((pred) => {
             const firstMatch = getPrimaryMatch(pred);
@@ -3143,6 +3156,15 @@
         const sortedDirectWithLinkedSecondary = directWithLinkedSecondary
             .slice()
             .sort(compareByKickoffThenConfidence);
+        const linkedSecondaryCount = sortedDirectWithLinkedSecondary.reduce((sum, pred) => {
+            const firstMatch = getPrimaryMatch(pred);
+            const fallbackLabel = getMatchRecommendation(firstMatch) || 'HOME WIN';
+            const fallbackConfidence = Math.max(0, Math.min(100, Math.round(getPredictionConfidenceScore(pred))));
+            const finalRecommendation = getFinalRecommendation(pred, fallbackLabel, fallbackConfidence);
+            const linked = resolveSecondaryMarketsForCard(pred, firstMatch, finalRecommendation);
+            return sum + Math.min(Array.isArray(linked) ? linked.length : 0, 4);
+        }, 0);
+        const standaloneSecondaryCount = secondarySingles.length;
         const derivedSecondarySingles = secondarySingles.length ? [] : directWithLinkedSecondary
             .map((pred, idx) => {
                 const firstMatch = getPrimaryMatch(pred);
@@ -3179,7 +3201,7 @@
 
         const counts = {
             'football-direct-count': sortedDirectWithLinkedSecondary.length,
-            'football-secondary-count': secondaryDisplay.length,
+            'football-secondary-count': standaloneSecondaryCount + linkedSecondaryCount,
             'football-multi-count': multiPreds.length,
             'football-same-count': sameMatchPreds.length
         };
@@ -3547,7 +3569,130 @@
         return `${homeTeam} vs ${awayTeam} (${leagueContext || 'Live Fixture'}): ${marketLabel} is currently rated ${Math.round(confidence)}% after live context checks.`;
     }
 
+    const LIMITED_CONTEXT_EDGE_TEXT = 'Limited contextual data available. This insight is mainly based on baseline probability and market/statistical structure.';
+
+    function directTierLabelFromConfidence(confidence) {
+        const score = Number(confidence);
+        if (!Number.isFinite(score)) return 'UNKNOWN';
+        if (score >= 80) return 'STRONG';
+        if (score >= 60) return 'MODERATE / HIGH CAUTION';
+        if (score >= 45) return 'EXTREME CAUTION';
+        return 'REJECT';
+    }
+
+    function findStage(stages, stageNumber) {
+        const list = Array.isArray(stages) ? stages : [];
+        return list.find((stage) => Number(stage && stage.stage) === Number(stageNumber)) || null;
+    }
+
+    function toProbabilityStagePercent(value) {
+        const n = Number(value);
+        if (!Number.isFinite(n)) return null;
+        const pct = n > 0 && n <= 1 ? n * 100 : n;
+        return Math.max(0, Math.min(100, Math.round(pct)));
+    }
+
+    function formatStageProbabilities(probabilities) {
+        if (!probabilities || typeof probabilities !== 'object') return null;
+        const home = toProbabilityStagePercent(probabilities.home);
+        const draw = toProbabilityStagePercent(probabilities.draw);
+        const away = toProbabilityStagePercent(probabilities.away);
+        if (home === null || draw === null || away === null) return null;
+        return `HOME ${home}% | DRAW ${draw}% | AWAY ${away}%`;
+    }
+
+    function resolveDirectEnginePayload(insight, match) {
+        const fromMatch = match && match.metadata && match.metadata.direct_1x2_engine;
+        if (fromMatch && typeof fromMatch === 'object') return fromMatch;
+        const fromPrediction = insight && insight.direct_1x2_engine;
+        if (fromPrediction && typeof fromPrediction === 'object') return fromPrediction;
+        return null;
+    }
+
+    function buildEdgeMindSixStageText(insight, match, finalRecommendation) {
+        const engine = resolveDirectEnginePayload(insight, match);
+        if (!engine || typeof engine !== 'object') return null;
+        if (engine.limitedContext === true || engine.limited_context === true) return LIMITED_CONTEXT_EDGE_TEXT;
+
+        const stages = Array.isArray(engine.stages) ? engine.stages : [];
+        if (stages.length === 0) return null;
+
+        const stage1 = findStage(stages, 1);
+        const stage2 = findStage(stages, 2);
+        const stage3 = findStage(stages, 3);
+        const stage4 = findStage(stages, 4);
+        const stage5 = findStage(stages, 5);
+        const stage6 = findStage(stages, 6);
+
+        const stage1Probabilities = (stage1 && (stage1.updatedProbabilities || stage1.probabilities)) || null;
+        const stage1Inline = formatStageProbabilities(stage1Probabilities);
+        const finalConfidence = normalizeConfidencePercent(
+            engine.confidence,
+            normalizeConfidencePercent(finalRecommendation && finalRecommendation.confidence, normalizeConfidencePercent(getPredictionConfidenceScore(insight), 0))
+        );
+        const finalTier = directTierLabelFromConfidence(finalConfidence);
+        const finalSecondaryAdvice = 'Secondary recommendation: review all 4 lower-variance alternatives.';
+
+        const lines = [
+            'Stage 1:',
+            stage1Inline ? `Baseline probabilities: ${stage1Inline}` : 'Baseline probabilities: unavailable from stage payload.',
+            'Stage 2:',
+            String((stage2 && stage2.reason) || 'No weather/context adjustment applied.').trim(),
+            'Stage 3:',
+            String((stage3 && stage3.reason) || 'No injuries/suspensions adjustment applied.').trim(),
+            'Stage 4:',
+            String((stage4 && stage4.reason) || 'No H2H/form adjustment applied.').trim(),
+            'Stage 5:',
+            String((stage5 && stage5.reason) || `Volatility check complete (score ${Number(engine.volatilityScore || engine.volatility_score || 0).toFixed(2)}).`).trim(),
+            'Stage 6:',
+            `${String((stage6 && stage6.reason) || `Final confidence tier: ${finalTier} (${finalConfidence}%).`).trim()} ${finalSecondaryAdvice}`.trim()
+        ];
+
+        return lines.join('\n');
+    }
+
+    function buildFallbackSixStageText(insight, finalRecommendation) {
+        const confidence = normalizeConfidencePercent(finalRecommendation && finalRecommendation.confidence, normalizeConfidencePercent(getPredictionConfidenceScore(insight), 0));
+        const tier = directTierLabelFromConfidence(confidence);
+        const marketLabel = String(finalRecommendation && finalRecommendation.market || 'Direct 1X2').trim();
+        return [
+            'Stage 1:',
+            'Baseline probabilities: unavailable from stage payload.',
+            'Stage 2:',
+            'No weather/context adjustment applied.',
+            'Stage 3:',
+            'No injuries/suspensions adjustment applied.',
+            'Stage 4:',
+            'No H2H/form adjustment applied.',
+            'Stage 5:',
+            'Volatility check complete.',
+            'Stage 6:',
+            `Final confidence tier: ${tier} (${confidence}%). ${marketLabel}. Secondary recommendation: review all 4 lower-variance alternatives.`
+        ].join('\n');
+    }
+
     function resolveEdgeMindText(insight, match, finalRecommendation, reasoning) {
+        const market = normalizeMarketKey(getMatchMarket(match));
+        const isDirectCard = is1X2Market(market) || getSectionType(insight) === 'direct';
+        if (isDirectCard) {
+            const sixStage = buildEdgeMindSixStageText(insight, match, finalRecommendation);
+            if (sixStage) return sixStage;
+            const directCandidates = [
+                insight && insight.edgeMindAnalysis,
+                insight && insight.edgemind_report,
+                reasoning,
+                match && match.metadata && match.metadata.reasoning
+            ];
+            for (const candidate of directCandidates) {
+                const text = String(candidate || '').trim();
+                if (!text) continue;
+                if (/stage\s*1/i.test(text) && /stage\s*6/i.test(text)) return text;
+            }
+            const dataState = resolveDataSufficiencyState(insight, match);
+            if (dataState.dataSufficient === false) return LIMITED_CONTEXT_EDGE_TEXT;
+            return buildFallbackSixStageText(insight, finalRecommendation);
+        }
+
         const candidates = [
             insight && insight.edgeMindAnalysis,
             insight && insight.edgemind_report,
@@ -3677,44 +3822,50 @@
         const reasoning = meta.reasoning || '';
 
         const confidenceScore = Number(finalRecommendation.confidence || 0);
-        
-        // ==========================================
-        // SKCS 4-TIER RISK FRAMEWORK
-        // ==========================================
         let riskColor = '';
         let riskBadge = '';
-        
+
         if (confidenceScore >= 80) {
-            // 80% - 100%: Safe / High Confidence
-            riskColor = '#10b981'; // Emerald Green
-            riskBadge = '✅ HIGH CONFIDENCE';
-        } else if (confidenceScore >= 70) {
-            // 70% - 79%: Standard / Moderate Risk
-            riskColor = '#3b82f6'; // Blue
-            riskBadge = '📊 CAUTION ADVISED';
-        } else if (confidenceScore >= 59) {
-            // 59% - 69%: High Risk (Orange Warning)
-            riskColor = '#f97316'; // Orange
-            riskBadge = '⚠️ HIGH CAUTION ADVISED';
+            riskColor = '#15803d';
+            riskBadge = 'STRONG';
             warningHtml = `
-                <div class="risk-warning" style="margin-top: 10px; padding: 10px; border-left: 4px solid #f97316; background: #fff7ed; color: #9a3412; border-radius: 4px; font-size: 0.85em;">
-                    <strong>${riskBadge} (${confidenceScore}%):</strong> This direct market is volatile. Use the 4 Secondary Markets below.
+                <div class="risk-warning" style="margin-top: 10px; padding: 10px; border-left: 4px solid #15803d; background: #f0fdf4; color: #166534; border-radius: 4px; font-size: 0.85em;">
+                    <strong>STRONG (${confidenceScore}%):</strong> Still review all 4 lower-variance alternatives below.
+                </div>
+            `;
+        } else if (confidenceScore >= 60) {
+            riskColor = '#c2410c';
+            riskBadge = 'MODERATE / HIGH CAUTION';
+            warningHtml = `
+                <div class="risk-warning" style="margin-top: 10px; padding: 10px; border-left: 4px solid #c2410c; background: #fff7ed; color: #9a3412; border-radius: 4px; font-size: 0.85em;">
+                    <strong>${riskBadge} (${confidenceScore}%):</strong> Use draw-cover and lower-variance alternatives below. Avoid treating this as a safe direct insight.
+                </div>
+            `;
+        } else if (confidenceScore >= 45) {
+            riskColor = '#b91c1c';
+            riskBadge = 'EXTREME CAUTION';
+            warningHtml = `
+                <div class="risk-warning" style="margin-top: 10px; padding: 10px; border-left: 4px solid #b91c1c; background: #fef2f2; color: #991b1b; border-radius: 4px; font-size: 0.85em;">
+                    <strong>${riskBadge} (${confidenceScore}%):</strong> Use all 4 draw-cover and lower-variance alternatives below.
                 </div>
             `;
         } else {
-            // 0% - 58%: Extreme Risk (Red Warning)
-            riskColor = '#ef4444'; // Red
-            riskBadge = '🛑 EXTREME CAUTION ADVISED';
+            riskColor = '#7f1d1d';
+            riskBadge = 'REJECT';
             warningHtml = `
-                <div class="risk-warning" style="margin-top: 10px; padding: 10px; border-left: 4px solid #ef4444; background: #fef2f2; color: #991b1b; border-radius: 4px; font-size: 0.85em;">
-                    <strong>${riskBadge} (${confidenceScore}%):</strong> This direct 1X2 market needs extreme caution. Use the 4 Secondary Markets below.
+                <div class="risk-warning" style="margin-top: 10px; padding: 10px; border-left: 4px solid #7f1d1d; background: #fef2f2; color: #7f1d1d; border-radius: 4px; font-size: 0.85em;">
+                    <strong>REJECT (${confidenceScore}%):</strong> Below the 45% direct-display threshold.
                 </div>
             `;
         }
 
-        const secondaryMarkets = resolveSecondaryMarketsForCard(pred, firstMatch, finalRecommendation);
-        const isHighRiskPrimary = confidenceScore >= 59 && confidenceScore <= 69;
-        const isExtremeRiskPrimary = confidenceScore >= 0 && confidenceScore <= 58;
+        let secondaryMarkets = resolveSecondaryMarketsForCard(pred, firstMatch, finalRecommendation);
+        if (!Array.isArray(secondaryMarkets) || secondaryMarkets.length < 4) {
+            const fallbackSecondary = dedupeSecondaryCandidates(buildSyntheticBackupMarkets(firstMatch, confidenceScore)).slice(0, 4);
+            secondaryMarkets = dedupeSecondaryCandidates([...(secondaryMarkets || []), ...fallbackSecondary]).slice(0, 4);
+        }
+        const isModerateCautionPrimary = confidenceScore >= 60 && confidenceScore <= 79;
+        const isExtremeCautionPrimary = confidenceScore >= 45 && confidenceScore <= 59;
 
         const insightsHtml = renderInsightsPanel(pred);
         const edgeMindReportText = resolveEdgeMindText(pred, firstMatch, finalRecommendation, reasoning);
@@ -3735,15 +3886,15 @@
                 return `<li style="padding:8px 0;border-bottom:1px solid #eee;list-style:none;">${label} - ${confDisplay}${description}</li>`;
             }).join('');
 
-            const detailsOpen = (isExtremeRiskPrimary || isHighRiskPrimary) ? 'open' : '';
-            const summaryLabel = (isExtremeRiskPrimary || isHighRiskPrimary)
-                ? `🚨 MANDATORY SECONDARY REVIEW (${Math.min(secondaryMarkets.length, 4)}/4)`
-                : `📊 View Secondary Insights (${Math.min(secondaryMarkets.length, 4)} Available)`;
-            const detailsStyle = isExtremeRiskPrimary
+            const detailsOpen = (isExtremeCautionPrimary || isModerateCautionPrimary) ? 'open' : '';
+            const summaryLabel = (isExtremeCautionPrimary || isModerateCautionPrimary)
+                ? `MANDATORY SECONDARY REVIEW (${Math.min(secondaryMarkets.length, 4)}/4)`
+                : `View Secondary Alternatives (${Math.min(secondaryMarkets.length, 4)}/4)`;
+            const detailsStyle = isExtremeCautionPrimary
                 ? 'margin-top:15px;background:#fff1f2;padding:12px;border-radius:6px;border:2px solid #ef4444;'
-                : isHighRiskPrimary
+                : isModerateCautionPrimary
                     ? 'margin-top:15px;background:#fff7ed;padding:12px;border-radius:6px;border:2px solid #f97316;'
-                : 'margin-top:15px;background:#f8f9fa;padding:10px;border-radius:6px;border:1px solid #dee2e6;';
+                    : 'margin-top:15px;background:#f8f9fa;padding:10px;border-radius:6px;border:1px solid #dee2e6;';
             secondaryInsightsHtml = `
                 <details ${detailsOpen} class="secondary-insights-dropdown" style="${detailsStyle}">
                     <summary style="cursor:pointer;font-weight:bold;color:#0d6efd;user-select:none;">
@@ -3757,12 +3908,8 @@
             `;
         } else {
             secondaryInsightsHtml = `
-                <div style="margin-top:15px;padding:10px;font-size:0.9em;color:#6c757d;background:${isExtremeRiskPrimary ? '#fff1f2' : '#f8f9fa'};border-radius:6px;text-align:center;border:${isExtremeRiskPrimary ? '2px solid #ef4444' : '1px solid transparent'};">
-                    ${isExtremeRiskPrimary
-                        ? 'Extreme caution alert: 4 compliant secondary markets are required. No valid secondary set is currently available.'
-                        : (isHighRiskPrimary
-                        ? 'High-risk alert: 4 compliant secondary markets are required. No valid secondary set is currently available.'
-                        : 'No secondary insights available for this fixture.')}
+                <div style="margin-top:15px;padding:10px;font-size:0.9em;color:#6c757d;background:${isExtremeCautionPrimary ? '#fff1f2' : '#f8f9fa'};border-radius:6px;text-align:center;border:${isExtremeCautionPrimary ? '2px solid #ef4444' : '1px solid transparent'};">
+                    Secondary alternatives are being refreshed for this fixture.
                     ${dataState.secondaryNote ? `<div style="margin-top:8px;font-size:0.8rem;color:#1d4ed8;font-weight:700;">${dataState.secondaryNote}</div>` : ''}
                 </div>
             `;
@@ -3782,15 +3929,15 @@
                 <div class="confidence" style="background-color:${riskColor}15; color:${riskColor}; padding:0.3rem 0.8rem; border-radius:20px; font-size:0.9em; font-weight:600;">${confidenceScore}%</div>
             </div>
             ${warningHtml}
-            ${isExtremeRiskPrimary ? `
+            ${isExtremeCautionPrimary ? `
             <div style="margin-top:12px;padding:14px;border:2px solid #dc2626;background:#fee2e2;color:#7f1d1d;border-radius:8px;text-align:center;">
-                <div style="font-size:1.05rem;font-weight:800;line-height:1.4;">EXTREME CAUTION ADVISED FOR THIS DIRECT 1X2 MARKET.</div>
-                <div style="font-size:0.9rem;font-weight:700;margin-top:6px;">Use the 4 Secondary Markets below.</div>
+                <div style="font-size:1.05rem;font-weight:800;line-height:1.4;">EXTREME CAUTION FOR THIS DIRECT 1X2 MARKET.</div>
+                <div style="font-size:0.9rem;font-weight:700;margin-top:6px;">Use all 4 lower-variance alternatives below.</div>
             </div>
             ` : ''}
             <div style="margin-top:12px;padding:10px;background:#e9ecef;border-radius:6px;border-left:4px solid #6c757d;">
                 <div style="font-size:0.85em;font-weight:bold;color:#495057;margin-bottom:6px;">🤖 EdgeMind Bot</div>
-                <p style="font-size:0.85em;line-height:1.4;color:#495057;margin:0;font-style:italic;">"${edgeMindReportText}"</p>
+                <p style="font-size:0.85em;line-height:1.4;color:#495057;margin:0;font-style:italic;white-space:pre-line;">"${edgeMindReportText}"</p>
             </div>
             ${insightsHtml}
             ${secondaryInsightsHtml}

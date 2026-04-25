@@ -10,7 +10,8 @@ const { scoreMatch } = require('./aiScoring');
 const { buildMatchContext } = require('./normalizerService');
 const {
     buildCandidateMarkets,
-    selectDirectSecondarySameMatch
+    selectDirectSecondarySameMatch,
+    getStandardSecondaryMarkets
 } = require('./marketIntelligence');
 const { getInjuries, getH2H, getWeather } = require('./contextIngestionService');
 const { evaluateDirect1x2 } = require('./direct1x2Engine');
@@ -115,33 +116,33 @@ function riskLevelFromConfidence(confidence) {
     const n = Number(confidence);
     if (!Number.isFinite(n)) return 'unsafe';
     if (n >= 80) return 'safe';
-    if (n >= 70) return 'good';
-    if (n >= 59) return 'fair';
+    if (n >= 60) return 'good';
+    if (n >= 45) return 'fair';
     return 'unsafe';
 }
 
 function transparencyFlagsForRiskLevel(riskLevel) {
     if (riskLevel === 'unsafe') {
         return {
-            warning_banner: 'Primary match outcome is below our 58% safety threshold (Unsafe).',
-            action_advice: 'We advise moving to the Secondary Insights below for a safer position.'
+            warning_banner: 'Primary match outcome is below the 45% direct-display threshold.',
+            action_advice: 'Avoid treating this as a safe direct insight.'
         };
     }
     if (riskLevel === 'fair') {
         return {
-            warning_banner: 'Fair chance, but high volatility. Exercise caution.',
-            action_advice: 'Consider utilizing the Secondary Insights below for a safer position.'
+            warning_banner: 'EXTREME CAUTION: 45–59 confidence band.',
+            action_advice: 'Use the draw-cover alternative and lower-variance alternatives below.'
         };
     }
     if (riskLevel === 'good') {
         return {
-            warning_banner: 'Higher probability of occurring, but standard sports volatility applies.',
-            action_advice: 'Play responsibly.'
+            warning_banner: 'MODERATE / HIGH CAUTION: 60–79 confidence band.',
+            action_advice: 'Use lower-variance alternatives below and avoid treating this as a safe direct insight.'
         };
     }
     return {
-        warning_banner: null,
-        action_advice: 'Premium Safe Insight. High confidence mathematical projection.'
+        warning_banner: 'STRONG SIGNAL: 80+ confidence band.',
+        action_advice: 'Still review the 4 lower-variance alternatives below.'
     };
 }
 
@@ -254,6 +255,102 @@ function buildSecondaryInsights(candidates, selectedMarket) {
             return Number(a.priority_tier || 99) - Number(b.priority_tier || 99);
         })
         .slice(0, 4);
+}
+
+function normalizeSecondaryPredictionToken(market, prediction) {
+    const key = normalizeMarketKey(market);
+    const value = String(prediction || '').trim().toLowerCase();
+    if (value) return value;
+    if (key.startsWith('double_chance_')) return key.replace('double_chance_', '');
+    if (key === 'draw_no_bet_home') return 'home';
+    if (key === 'draw_no_bet_away') return 'away';
+    if (key.startsWith('over_')) return 'over';
+    if (key.startsWith('under_')) return 'under';
+    if (key === 'btts_yes') return 'yes';
+    if (key === 'btts_no') return 'no';
+    return '';
+}
+
+function secondaryFallbackDefaultsForOutcome(primaryOutcome, fallbackConfidence = 78) {
+    const baseConfidence = clamp(Number(fallbackConfidence) || 78, 65, 95);
+    const normalizedOutcome = normalizePrediction(primaryOutcome) || 'home_win';
+
+    const homeWinDefaults = [
+        { market: 'double_chance_1x', prediction: '1x', confidence: Math.max(76, baseConfidence) },
+        { market: 'draw_no_bet_home', prediction: 'home', confidence: Math.max(76, baseConfidence - 2) },
+        { market: 'over_1_5', prediction: 'over', confidence: Math.max(75, baseConfidence - 3) },
+        { market: 'under_4_5', prediction: 'under', confidence: Math.max(75, baseConfidence - 4) }
+    ];
+    const awayWinDefaults = [
+        { market: 'double_chance_x2', prediction: 'x2', confidence: Math.max(76, baseConfidence) },
+        { market: 'draw_no_bet_away', prediction: 'away', confidence: Math.max(76, baseConfidence - 2) },
+        { market: 'over_1_5', prediction: 'over', confidence: Math.max(75, baseConfidence - 3) },
+        { market: 'under_4_5', prediction: 'under', confidence: Math.max(75, baseConfidence - 4) }
+    ];
+    const drawDefaults = [
+        { market: 'double_chance_1x', prediction: '1x', confidence: Math.max(76, baseConfidence - 1) },
+        { market: 'double_chance_x2', prediction: 'x2', confidence: Math.max(76, baseConfidence - 1) },
+        { market: 'under_3_5', prediction: 'under', confidence: Math.max(75, baseConfidence - 2) },
+        { market: 'btts_no', prediction: 'no', confidence: Math.max(75, baseConfidence - 3) }
+    ];
+
+    if (normalizedOutcome === 'away_win') return awayWinDefaults;
+    if (normalizedOutcome === 'draw') return drawDefaults;
+    return homeWinDefaults;
+}
+
+function buildMandatorySecondaryInsights({
+    candidates,
+    selectedMarket,
+    primaryOutcome,
+    primaryConfidence,
+    ruleOf4
+}) {
+    const selectedKey = normalizeMarketKey(selectedMarket);
+    const picked = [];
+    const seen = new Set();
+    const pushUnique = (item, sourceLabel) => {
+        if (!item || typeof item !== 'object') return;
+        const market = normalizeMarketKey(item.market);
+        if (!market) return;
+        if (market === selectedKey) return;
+        if (!isAllowedSecondaryPivotMarket(market)) return;
+
+        const prediction = normalizeSecondaryPredictionToken(market, item.prediction);
+        const confidence = normalizeCandidateConfidencePercent(item);
+        const key = `${market}:${prediction}`;
+        if (!prediction || seen.has(key)) return;
+        seen.add(key);
+        picked.push({
+            market,
+            prediction,
+            confidence: Number.isFinite(confidence) ? confidence : clamp(Number(primaryConfidence) - 3, 70, 95),
+            probability: Number.isFinite(Number(item.probability))
+                ? Number(item.probability)
+                : (Number.isFinite(confidence) ? confidence / 100 : null),
+            category: item.category || null,
+            priority_tier: item.priority_tier || null,
+            source: sourceLabel
+        });
+    };
+
+    buildSecondaryInsights(candidates, selectedMarket).forEach((item) => pushUnique(item, 'ranked'));
+    ensureArray(ruleOf4).forEach((item) => pushUnique(item, 'rule_of_4'));
+    secondaryFallbackDefaultsForOutcome(primaryOutcome, primaryConfidence).forEach((item) => pushUnique(item, 'fallback_defaults'));
+    getStandardSecondaryMarkets({}, normalizePrediction(primaryOutcome)).forEach((item) => pushUnique(item, 'standard_defaults'));
+
+    return picked
+        .sort((a, b) => Number(b.confidence || 0) - Number(a.confidence || 0))
+        .slice(0, 4);
+}
+
+function directConfidenceTierWarning(confidence) {
+    const score = Number(confidence);
+    if (!Number.isFinite(score)) return 'UNKNOWN';
+    if (score >= 80) return 'STRONG';
+    if (score >= 60) return 'MODERATE_HIGH_CAUTION';
+    if (score >= 45) return 'EXTREME_CAUTION';
+    return 'REJECT';
 }
 
 function normalizeContextSignals(value) {
@@ -1151,9 +1248,13 @@ async function buildRawPredictionFromProviderItem(item) {
         ? riskLevelFromConfidence(confidence)
         : 'good';
     const transparencyFlags = transparencyFlagsForRiskLevel(riskLevel);
-    const secondaryInsights = (direct1x2Evaluation.secondaryRequired || riskLevel === 'fair' || riskLevel === 'unsafe')
-        ? buildSecondaryInsights(marketIntelligence.candidates, market)
-        : [];
+    const secondaryInsights = buildMandatorySecondaryInsights({
+        candidates: marketIntelligence.candidates,
+        selectedMarket: market,
+        primaryOutcome: routedPrediction,
+        primaryConfidence: confidence,
+        ruleOf4: marketSelections.rule_of_4_markets || []
+    });
     const volatility = item.volatility || scoring.volatility || volatilityFromRiskProfile(marketIntelligence.risk_profile, 'medium');
     const aiSource = scoring.source || null; // 'dolphin', 'fallback', 'odds', etc.
     const aiReasoning = scoring.reasoning || null;
@@ -1207,6 +1308,7 @@ async function buildRawPredictionFromProviderItem(item) {
                 outcome: direct1x2Evaluation.outcome,
                 confidence: direct1x2Evaluation.confidence,
                 tier: direct1x2Evaluation.tier,
+                confidence_tier_warning: directConfidenceTierWarning(direct1x2Evaluation.confidence),
                 secondary_required: direct1x2Evaluation.secondaryRequired,
                 acca_eligible: direct1x2Evaluation.accaEligible,
                 volatility_score: direct1x2Evaluation.volatilityScore,
@@ -1217,7 +1319,8 @@ async function buildRawPredictionFromProviderItem(item) {
                 direct_1x2: {
                     outcome: direct1x2Evaluation.outcome,
                     confidence: direct1x2Evaluation.confidence,
-                    tier: direct1x2Evaluation.tier
+                    tier: direct1x2Evaluation.tier,
+                    confidence_tier_warning: directConfidenceTierWarning(direct1x2Evaluation.confidence)
                 },
                 direct_market: selectedDirect,
                 secondary_market: selectedSecondary,

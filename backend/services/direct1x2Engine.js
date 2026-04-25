@@ -206,26 +206,26 @@ function evaluateDirect1x2(matchContext = {}) {
     let accaEligible = false;
 
     if (confidence >= 45 && confidence <= 59) {
-        tier = 'LOW';
+        tier = 'EXTREME_CAUTION';
         secondaryRequired = true;
     } else if (confidence >= 60 && confidence <= 79) {
-        tier = 'MODERATE';
+        tier = 'MODERATE_HIGH_CAUTION';
         secondaryRequired = true;
     } else if (confidence >= 80) {
-        tier = 'HIGH';
-        secondaryRequired = false;
+        tier = 'STRONG';
+        secondaryRequired = true;
         accaEligible = true;
     }
 
     if (volatilityScore > 0.7) {
-        tier = 'LOW';
+        tier = 'EXTREME_CAUTION';
         secondaryRequired = true;
         accaEligible = false;
     }
 
     let stage5Reason = `Volatility score ${volatilityScore.toFixed(2)} — no override applied.`;
     if (volatilityScore > 0.7) {
-        stage5Reason = `Volatility score ${volatilityScore.toFixed(2)} — high volatility override applied (tier forced to LOW).`;
+        stage5Reason = `Volatility score ${volatilityScore.toFixed(2)} — high volatility override applied (tier forced to EXTREME CAUTION).`;
     }
     stages.push(stagePayload(5, 'Volatility Check', stage5Reason, probabilities));
 

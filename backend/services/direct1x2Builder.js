@@ -386,7 +386,7 @@ function generateEdgeMindReport(fixture, confidence, riskTier, contextual) {
     if (confidence < 70 || riskTier === 'HIGH_RISK' || riskTier === 'EXTREME_RISK') {
         parts.push('Stage 4 Decision: 1X2 is fragile - see secondary markets.');
     } else {
-        parts.push('Stage 4 Decision: Maintain 1X2 with controlled stake.');
+        parts.push('Stage 4 Decision: Maintain 1X2 only with lower-variance alternatives in view.');
     }
 
     if (!contextual?.data_sufficient) {

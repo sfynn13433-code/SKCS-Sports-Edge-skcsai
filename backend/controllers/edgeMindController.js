@@ -24,7 +24,7 @@ const ACCA_DEFAULT_SIZE = 6;
 const ACCA_MEGA_SIZE = 12;
 const ACTIVE_DEPLOYMENT_SPORT = 'football';
 const DISABLED_SPORT_REPLY = 'That sport is currently being prepared and will be available soon.';
-const LIMITED_CONTEXT_REPLY = 'Limited contextual data available — insight based primarily on statistical baseline';
+const LIMITED_CONTEXT_REPLY = 'Limited contextual data available. This insight is mainly based on baseline probability and market/statistical structure.';
 const BOT_ACCA_CONFIDENCE_MIN = Math.max(ACCA_CONFIDENCE_MIN, Number(process.env.BOT_ACCA_CONFIDENCE_MIN || 70));
 const VISIBLE_WINDOW_HOURS = (() => {
     const raw = Number(process.env.EDGEMIND_VISIBLE_WINDOW_HOURS || 72);
@@ -505,6 +505,15 @@ function getStageByNumber(stages, stageNumber) {
     return (Array.isArray(stages) ? stages : []).find((stage) => Number(stage?.stage) === Number(stageNumber)) || null;
 }
 
+function directTierLabelForConfidence(confidence) {
+    const score = Number(confidence);
+    if (!Number.isFinite(score)) return 'UNKNOWN';
+    if (score >= 80) return 'STRONG';
+    if (score >= 60) return 'MODERATE / HIGH CAUTION';
+    if (score >= 45) return 'EXTREME CAUTION';
+    return 'REJECT';
+}
+
 function buildStageBlockForPick(pick) {
     const metadata = isObject(pick?.metadata) ? pick.metadata : {};
     const storedEngine = isObject(metadata?.direct_1x2_engine) ? metadata.direct_1x2_engine : null;
@@ -530,6 +539,10 @@ function buildStageBlockForPick(pick) {
     const stage5 = getStageByNumber(evaluation.stages, 5);
     const stage6 = getStageByNumber(evaluation.stages, 6);
     const stage1Probabilities = stage1?.updatedProbabilities || stage1?.probabilities || parseStageOneBaseline(metadata, pick);
+    const finalConfidence = Math.round(Number(evaluation?.confidence || pick?.confidence || 0));
+    const finalTier = directTierLabelForConfidence(finalConfidence);
+    const stage6Secondary = 'Secondary recommendation: review all 4 lower-variance alternatives.';
+    const stage6Default = `Final confidence tier: ${finalTier} (${finalConfidence}%). ${stage6Secondary}`;
 
     const lines = [
         'Stage 1:',
@@ -543,7 +556,9 @@ function buildStageBlockForPick(pick) {
         'Stage 5:',
         stage5?.reason || `Volatility check complete (score ${Number(evaluation?.volatilityScore || 0).toFixed(2)}).`,
         'Stage 6:',
-        stage6?.reason || `Final insight: ${String(evaluation?.outcome || pick?.prediction || '').toUpperCase()} at ${Math.round(Number(evaluation?.confidence || pick?.confidence || 0))}% confidence.`
+        stage6?.reason
+            ? `${stage6.reason} ${stage6Secondary}`.trim()
+            : stage6Default
     ];
     return lines.join('\n');
 }
