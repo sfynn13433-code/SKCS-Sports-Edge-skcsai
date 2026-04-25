@@ -1089,6 +1089,7 @@ async function buildRawPredictionFromProviderItem(item) {
             weather: normalizeWeatherFromProvider(weatherRaw)
         };
 
+        console.log('ATTEMPTING INSERT:', fixtureIdForIngestion);
         const saveResult = await saveContextData(directInsightsSupabase, match_id, ingestedContextData);
         if (saveResult?.saved === true) {
             console.log('Context inserted:', match_id);
@@ -1498,6 +1499,7 @@ function rawDedupeKey(raw) {
 }
 
 async function runPipelineForMatches({ matches, telemetry = {} }) {
+    console.log('PIPELINE STARTED');
     if (!Array.isArray(matches) || matches.length === 0) {
         throw new Error('matches must be a non-empty array');
     }
@@ -1541,6 +1543,8 @@ async function runPipelineForMatches({ matches, telemetry = {} }) {
         console.log('[aiPipeline] manual matches input count=%s eligible_football=%s', matches.length, eligibleMatches.length);
 
         for (const item of eligibleMatches) {
+            const fixtureId = String(item?.id || item?.match_id || item?.match_info?.match_id || '').trim();
+            console.log('LOOP RUNNING:', fixtureId || 'unknown_fixture');
             const raw = await buildRawPredictionFromProviderItem({
                 ...item,
                 data_mode: 'manual',
@@ -1613,6 +1617,7 @@ async function runPipelineForMatches({ matches, telemetry = {} }) {
 }
 
 async function runPipelineFromConfiguredDataMode() {
+    console.log('PIPELINE STARTED');
     const { mode, predictions } = await getPredictionInputs();
     const eligiblePredictions = (Array.isArray(predictions) ? predictions : []).filter((item) =>
         isDeploymentSportEnabled(
@@ -1639,6 +1644,8 @@ async function runPipelineFromConfiguredDataMode() {
         console.log('[aiPipeline] DATA_MODE=%s provider_items=%s eligible_football=%s', mode, predictions.length, eligiblePredictions.length);
 
         for (const item of eligiblePredictions) {
+            const fixtureId = String(item?.id || item?.match_id || item?.match_info?.match_id || '').trim();
+            console.log('LOOP RUNNING:', fixtureId || 'unknown_fixture');
             const raw = await buildRawPredictionFromProviderItem({
                 ...item,
                 data_mode: mode
