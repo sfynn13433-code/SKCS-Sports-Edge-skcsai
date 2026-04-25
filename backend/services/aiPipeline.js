@@ -13,7 +13,7 @@ const {
     selectDirectSecondarySameMatch,
     getStandardSecondaryMarkets
 } = require('./marketIntelligence');
-const { getInjuries, getH2H, getWeather } = require('./contextIngestionService');
+const { safeFetch, getInjuries, getH2H, getWeather } = require('./contextIngestionService');
 const { evaluateDirect1x2 } = require('./direct1x2Engine');
 const { saveContextData } = require('./saveContextData');
 const { saveDirectInsight } = require('./saveDirectInsights');
@@ -1062,18 +1062,26 @@ async function buildRawPredictionFromProviderItem(item) {
     });
 
     // Always ingest context for football fixtures before downstream pipeline filtering.
-    let ingestedContextData = { injuries: null, h2h: null, weather: null };
+    let ingestedContextData = { injuries: {}, h2h: {}, weather: {} };
     try {
+        console.log('Processing fixture:', match_id);
         const fixtureIdForIngestion = matchInfo.match_id || match_id;
         const homeTeamIdForIngestion = matchInfo.home_team_id || item.home_team_id || null;
         const awayTeamIdForIngestion = matchInfo.away_team_id || item.away_team_id || null;
         const cityForWeather = resolveContextIngestionCity(matchInfo, item);
 
-        const [injuriesRaw, h2hRaw, weatherRaw] = await Promise.all([
-            getInjuries(fixtureIdForIngestion),
-            getH2H(homeTeamIdForIngestion, awayTeamIdForIngestion),
-            getWeather(cityForWeather)
-        ]);
+        const injuriesRaw = await safeFetch(
+            () => getInjuries(fixtureIdForIngestion),
+            'Injuries'
+        );
+        const h2hRaw = await safeFetch(
+            () => getH2H(homeTeamIdForIngestion, awayTeamIdForIngestion),
+            'H2H'
+        );
+        const weatherRaw = await safeFetch(
+            () => getWeather(cityForWeather),
+            'Weather'
+        );
 
         ingestedContextData = {
             injuries: normalizeInjuriesFromProvider(injuriesRaw, homeTeamIdForIngestion, awayTeamIdForIngestion),
@@ -1081,7 +1089,12 @@ async function buildRawPredictionFromProviderItem(item) {
             weather: normalizeWeatherFromProvider(weatherRaw)
         };
 
-        await saveContextData(directInsightsSupabase, match_id, ingestedContextData);
+        const saveResult = await saveContextData(directInsightsSupabase, match_id, ingestedContextData);
+        if (saveResult?.saved === true) {
+            console.log('Context inserted:', match_id);
+        } else if (saveResult?.reason === 'already_exists') {
+            console.log('Context already exists:', match_id);
+        }
     } catch (contextIngestionErr) {
         console.warn('[aiPipeline] context ingestion failed for match_id=%s: %s', match_id, contextIngestionErr.message);
     }

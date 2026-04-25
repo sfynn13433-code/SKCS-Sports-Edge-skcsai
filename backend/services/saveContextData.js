@@ -35,18 +35,48 @@ async function saveContextData(supabase, matchId, data) {
     console.log('Saving context for match:', safeMatchId);
 
     const payload = data && typeof data === 'object' ? data : {};
-    const { error } = await supabase.from('match_context_data').insert({
+    const safePayload = {
         match_id: safeMatchId,
-        injuries: payload.injuries ?? null,
-        h2h: payload.h2h ?? null,
-        weather: payload.weather ?? null
-    });
+        injuries: payload.injuries ?? {},
+        h2h: payload.h2h ?? {},
+        weather: payload.weather ?? {}
+    };
 
-    if (error) {
-        throw new Error(`saveContextData insert failed: ${error.message}`);
+    const existingRes = await supabase
+        .from('match_context_data')
+        .select('match_id')
+        .eq('match_id', safeMatchId)
+        .limit(1);
+
+    if (existingRes.error) {
+        throw new Error(`saveContextData precheck failed: ${existingRes.error.message}`);
     }
 
-    return { saved: true };
+    if (Array.isArray(existingRes.data) && existingRes.data.length > 0) {
+        return { saved: false, reason: 'already_exists' };
+    }
+
+    const primaryInsert = await supabase.from('match_context_data').insert(safePayload);
+    if (!primaryInsert.error) {
+        return { saved: true };
+    }
+
+    if (isDuplicateKeyError(primaryInsert.error)) {
+        return { saved: false, reason: 'already_exists' };
+    }
+
+    const fallbackInsert = await supabase.from('match_context_data').insert({
+        match_id: safeMatchId,
+        injuries: {},
+        h2h: {},
+        weather: {}
+    });
+
+    if (!fallbackInsert.error || isDuplicateKeyError(fallbackInsert.error)) {
+        return { saved: !fallbackInsert.error };
+    }
+
+    throw new Error(`saveContextData insert failed: ${fallbackInsert.error.message}`);
 }
 
 module.exports = {

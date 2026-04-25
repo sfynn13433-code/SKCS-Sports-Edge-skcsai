@@ -69,7 +69,18 @@ async function getWeather(city) {
     }
 }
 
+async function safeFetch(fn, label) {
+    try {
+        const result = await fn();
+        return result || {};
+    } catch (err) {
+        console.error(`${label} FAILED:`, err.message);
+        return {};
+    }
+}
+
 module.exports = {
+    safeFetch,
     getInjuries,
     getH2H,
     getWeather
