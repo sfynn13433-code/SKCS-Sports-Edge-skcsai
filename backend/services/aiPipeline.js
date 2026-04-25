@@ -11,6 +11,7 @@ const {
     buildCandidateMarkets,
     selectDirectSecondarySameMatch
 } = require('./marketIntelligence');
+const { evaluateDirect1x2 } = require('./direct1x2Engine');
 const pipelineLogger = require('../utils/pipelineLogger');
 const enrichFixtureWithContext = require('../src/services/contextIntelligence/aiPipeline');
 const adjustProbability = require('../src/services/contextIntelligence/adjustProbability');
@@ -270,6 +271,47 @@ function normalizeContextSignals(value) {
         lineup_uncertainty_risk: read('lineup_uncertainty_risk'),
         market_adjustments: marketAdjustments
     };
+}
+
+function buildDirect1x2ContextAdjustments(contextSignals) {
+    const source = isObject(contextSignals) ? contextSignals : {};
+    const riskToAdjustment = (riskValue) => {
+        const risk = clamp(Number(riskValue) || 0, 0, 1);
+        const drawShift = risk * 0.04;
+        const sideShift = drawShift / 2;
+        return {
+            home: -sideShift,
+            draw: drawShift,
+            away: -sideShift
+        };
+    };
+
+    return {
+        weather: riskToAdjustment(source.weather_risk),
+        availability: riskToAdjustment(source.availability_risk),
+        discipline: riskToAdjustment(source.discipline_risk),
+        stability: riskToAdjustment(source.stability_risk)
+    };
+}
+
+function computeDirect1x2VolatilityScore(contextSignals) {
+    const source = isObject(contextSignals) ? contextSignals : {};
+    const volatilitySignals = [
+        source.weather_risk,
+        source.availability_risk,
+        source.discipline_risk,
+        source.stability_risk,
+        source.travel_fatigue_risk,
+        source.fixture_congestion_risk,
+        source.derby_risk,
+        source.rotation_risk,
+        source.market_movement_risk,
+        source.lineup_uncertainty_risk
+    ].map((value) => clamp(Number(value) || 0, 0, 1));
+
+    if (!volatilitySignals.length) return 0;
+    const average = volatilitySignals.reduce((sum, value) => sum + value, 0) / volatilitySignals.length;
+    return clamp(average, 0, 1);
 }
 
 function toTitleCase(text) {
@@ -607,6 +649,29 @@ async function buildRawPredictionFromProviderItem(item) {
     const effectiveMatchContext = contextEnriched || contextFixture;
     const storableMatchContext = sanitizeMatchContextForStorage(effectiveMatchContext);
     const waterfallProbabilities = deriveWaterfallProbabilities(prediction, p_adj, effectiveMatchContext);
+    const direct1x2Evaluation = evaluateDirect1x2({
+        baseProb: {
+            home: waterfallProbabilities.home_win,
+            draw: waterfallProbabilities.draw,
+            away: waterfallProbabilities.away_win
+        },
+        contextAdjustments: buildDirect1x2ContextAdjustments(contextSignals),
+        volatilityScore: computeDirect1x2VolatilityScore(contextSignals)
+    });
+    if (direct1x2Evaluation.confidence < 45) {
+        pipelineLogger.rejectionAdd({
+            run_id: telemetryRunId,
+            sport,
+            bucket: 'validation_reject',
+            reason: 'low_confidence',
+            metadata: {
+                match_id,
+                confidence: direct1x2Evaluation.confidence,
+                tier: direct1x2Evaluation.tier
+            }
+        });
+        return { rejected: true, reason: 'low_confidence' };
+    }
     const marketIntelligence = buildCandidateMarkets(
         waterfallProbabilities,
         effectiveMatchContext,
@@ -668,8 +733,8 @@ async function buildRawPredictionFromProviderItem(item) {
     const selectedDirect = marketSelections.direct || null;
     const selectedSecondary = marketSelections.secondary || null;
     const market = selectedDirect?.market || requestedMarket;
-    const routedPrediction = selectedDirect?.prediction || prediction || fallbackPredictionForMarket(market, prediction);
-    const confidenceProbabilityRaw = selectedDirect?.probability || p_adj;
+    const routedPrediction = selectedDirect?.prediction || direct1x2Evaluation.outcome || prediction || fallbackPredictionForMarket(market, prediction);
+    const confidenceProbabilityRaw = selectedDirect?.probability || (direct1x2Evaluation.confidence / 100) || p_adj;
     const confidenceProbability = adjustProbability.applyMarketAdjustment(
         confidenceProbabilityRaw,
         market,
@@ -680,7 +745,7 @@ async function buildRawPredictionFromProviderItem(item) {
         ? riskLevelFromConfidence(confidence)
         : 'good';
     const transparencyFlags = transparencyFlagsForRiskLevel(riskLevel);
-    const secondaryInsights = (riskLevel === 'fair' || riskLevel === 'unsafe')
+    const secondaryInsights = (direct1x2Evaluation.secondaryRequired || riskLevel === 'fair' || riskLevel === 'unsafe')
         ? buildSecondaryInsights(marketIntelligence.candidates, market)
         : [];
     const volatility = item.volatility || scoring.volatility || volatilityFromRiskProfile(marketIntelligence.risk_profile, 'medium');
@@ -731,7 +796,22 @@ async function buildRawPredictionFromProviderItem(item) {
                 confidence_base_pct: Math.round(toProbability(baselineConfidence) * 10000) / 100,
                 confidence_adj_pct: confidence
             },
+            direct_1x2_engine: {
+                market: direct1x2Evaluation.market,
+                outcome: direct1x2Evaluation.outcome,
+                confidence: direct1x2Evaluation.confidence,
+                tier: direct1x2Evaluation.tier,
+                secondary_required: direct1x2Evaluation.secondaryRequired,
+                acca_eligible: direct1x2Evaluation.accaEligible,
+                volatility_score: direct1x2Evaluation.volatilityScore,
+                stages: direct1x2Evaluation.stages
+            },
             market_intelligence: {
+                direct_1x2: {
+                    outcome: direct1x2Evaluation.outcome,
+                    confidence: direct1x2Evaluation.confidence,
+                    tier: direct1x2Evaluation.tier
+                },
                 direct_market: selectedDirect,
                 secondary_market: selectedSecondary,
                 rule_of_4_markets: marketSelections.rule_of_4_markets || [],
@@ -759,6 +839,7 @@ async function buildRawPredictionFromProviderItem(item) {
                 },
                 engine_log: [
                     `Primary outcome retained: ${toTitleCase(market)} at ${confidence}% confidence.`,
+                    `Direct 1X2 tier: ${direct1x2Evaluation.tier} (${direct1x2Evaluation.confidence}%).`,
                     'Defensive floor market mutation disabled for transparency.'
                 ],
                 probabilities: waterfallProbabilities || {},
@@ -948,7 +1029,7 @@ async function runPipelineForMatches({ matches, telemetry = {} }) {
                 data_mode: 'manual',
                 telemetry
             });
-            if (!raw) continue;
+            if (!raw || raw.rejected) continue;
             if (!isDeploymentSportEnabled(raw.sport)) continue;
             const dedupeKey = rawDedupeKey(raw);
             if (seenRawKeys.has(dedupeKey)) continue;
@@ -1045,7 +1126,7 @@ async function runPipelineFromConfiguredDataMode() {
                 ...item,
                 data_mode: mode
             });
-            if (!raw) continue;
+            if (!raw || raw.rejected) continue;
             if (!isDeploymentSportEnabled(raw.sport)) continue;
             const dedupeKey = rawDedupeKey(raw);
             if (seenRawKeys.has(dedupeKey)) continue;
