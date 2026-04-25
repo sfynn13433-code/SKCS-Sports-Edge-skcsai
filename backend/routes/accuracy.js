@@ -304,7 +304,7 @@ router.get('/', async (req, res) => {
                 WHERE fixture_date IS NOT NULL
                   AND LOWER(sport) = LOWER($1)
                 UNION
-                SELECT DATE(COALESCE(match_date, created_at)) AS date
+                SELECT DATE(COALESCE(match_date, created_at) AT TIME ZONE 'Africa/Johannesburg') AS date
                 FROM direct1x2_prediction_final
                 WHERE LOWER(COALESCE(sport, matches->0->>'sport', '')) = LOWER($1)
             ) d
@@ -356,7 +356,7 @@ router.get('/', async (req, res) => {
                 ), 0)::int AS legs
             FROM direct1x2_prediction_final
             WHERE LOWER(COALESCE(sport, matches->0->>'sport', '')) = LOWER($1)
-              AND DATE(COALESCE(match_date, created_at)) = $2::date
+              AND DATE(COALESCE(match_date, created_at) AT TIME ZONE 'Africa/Johannesburg') = $2::date
               AND ($3::bigint IS NULL OR publish_run_id = $3::bigint)
         `, [filterSport, effectiveDate, filterRunId || null]);
         const publishedSummary = publishedSummaryRes.rows?.[0] || { products: 0, legs: 0 };

@@ -9,12 +9,13 @@ const jobLogger = {
     // Start a job - returns log ID for updating later
     async start(jobName, metadata = {}) {
         try {
+            const now = new Date().toISOString();
             const result = await pool.query(`
                 INSERT INTO scheduling_logs (
                     schedule_type, status, started_at, window_start, window_end, metadata
                 ) VALUES ($1, 'running', NOW(), NOW(), NOW(), $2)
                 RETURNING id
-            `, [jobName, JSON.stringify(metadata)]);
+            `, [jobName, JSON.stringify({ started_at: now, ...metadata })]);
             
             console.log(`CRON: Started ${jobName}`);
             return result.rows[0].id;
@@ -29,10 +30,12 @@ const jobLogger = {
     async success(jobName, logId, stats = {}) {
         try {
             const durationMs = stats.durationMs || 0;
+            const finalLogId = logId || null;
+            if (!finalLogId) return;
             
             await pool.query(`
                 UPDATE scheduling_logs SET
-                    status = 'success',
+                    status = 'completed',
                     completed_at = NOW(),
                     duration_ms = $1,
                     fixtures_imported = $2,
@@ -45,11 +48,11 @@ const jobLogger = {
                 stats.fixturesImported || 0,
                 stats.predictionsGenerated || 0,
                 stats.predictionsFiltered || 0,
-                JSON.stringify(stats),
-                logId
+                JSON.stringify({ ...stats, finished_at: new Date().toISOString(), status: 'completed' }),
+                finalLogId
             ]);
             
-            console.log(`CRON: Finished ${jobName} - Status: success (${durationMs}ms)`);
+            console.log(`CRON: Finished ${jobName} - Status: completed (${durationMs}ms)`);
             
         } catch (err) {
             console.error(`[LOGGER ERROR] Failed to log success for ${jobName}:`, err.message);
@@ -60,6 +63,8 @@ const jobLogger = {
     async fail(jobName, logId, errorMessage, stats = {}) {
         try {
             const durationMs = stats.durationMs || 0;
+            const finalLogId = logId || null;
+            if (!finalLogId) return;
             
             await pool.query(`
                 UPDATE scheduling_logs SET
@@ -76,8 +81,8 @@ const jobLogger = {
                 errorMessage,
                 stats.fixturesImported || 0,
                 stats.predictionsGenerated || 0,
-                JSON.stringify(stats),
-                logId
+                JSON.stringify({ ...stats, finished_at: new Date().toISOString(), status: 'failed' }),
+                finalLogId
             ]);
             
             console.log(`CRON: Finished ${jobName} - Status: failed - ${errorMessage}`);

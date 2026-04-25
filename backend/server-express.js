@@ -26,6 +26,7 @@ const { requireSupabaseUser } = require('./middleware/supabaseJwt');
 const { syncAllSports, syncSports }      = require('./services/syncService');
 const { bootstrap }          = require('./dbBootstrap');
 const { runLiveSync }       = require('../scripts/fetch-live-fixtures');
+const { jobLogger } = require('./utils/jobLogger');
 const {
     calculateExpirationTime,
     calculateSubscriptionStart,
@@ -557,6 +558,63 @@ function verifyCronSecret(req, res, next) {
     next();
 }
 
+async function runCronWithLog(jobName, req, fn) {
+    const startedAtMs = Date.now();
+    const logId = await jobLogger.start(jobName, {
+        path: req.path,
+        method: req.method,
+        query: req.query || {}
+    });
+    try {
+        const result = await fn();
+        await jobLogger.success(jobName, logId, {
+            durationMs: Date.now() - startedAtMs,
+            ...(result && typeof result === 'object' ? result : { result })
+        });
+        return result;
+    } catch (error) {
+        await jobLogger.fail(jobName, logId, error.message, {
+            durationMs: Date.now() - startedAtMs
+        });
+        throw error;
+    }
+}
+
+async function startPublishRun(triggerSource, requestedSports, runScope, notes, metadata = {}) {
+    const res = await query(`
+        INSERT INTO prediction_publish_runs (
+            trigger_source, requested_sports, run_scope, status, notes, metadata
+        )
+        VALUES ($1, $2::text[], $3, 'running', $4, $5::jsonb)
+        RETURNING id
+    `, [
+        triggerSource,
+        Array.isArray(requestedSports) ? requestedSports : [],
+        runScope,
+        notes || null,
+        JSON.stringify({ started_at: new Date().toISOString(), ...(metadata || {}) })
+    ]);
+    return res.rows?.[0]?.id || null;
+}
+
+async function finalizePublishRun(runId, status, errorMessage, metadata = {}) {
+    if (!runId) return;
+    await query(`
+        UPDATE prediction_publish_runs
+        SET
+            status = $2,
+            completed_at = NOW(),
+            error_message = $3,
+            metadata = COALESCE(metadata, '{}'::jsonb) || $4::jsonb
+        WHERE id = $1
+    `, [
+        runId,
+        status === 'completed' ? 'completed' : 'failed',
+        errorMessage || null,
+        JSON.stringify({ finished_at: new Date().toISOString(), ...(metadata || {}) })
+    ]);
+}
+
 // ADMIN: Force reset tier rules to minimal (accept ALL)
 app.get('/api/admin/reset-tier-rules', async (_req, res) => {
     try {
@@ -581,6 +639,12 @@ app.get('/api/admin/reset-tier-rules', async (_req, res) => {
 // Uses the main pipeline from fetch-live-fixtures.js with Master League filtering
 app.get('/api/cron/sync-live', verifyCronSecret, async (req, res) => {
     console.log('[cron/sync-live] Starting tier-1 live sync...');
+    const logId = await jobLogger.start('cron_sync_live', {
+        path: req.path,
+        method: req.method,
+        query: req.query || {}
+    });
+    const startedAtMs = Date.now();
     
     const debugInfo = {
         hasApiKey: !!process.env.X_APISPORTS_KEY,
@@ -598,14 +662,25 @@ app.get('/api/cron/sync-live', verifyCronSecret, async (req, res) => {
             fixtures: result.fixtures || 0,
             upserted: result.upserted || 0,
             eventsUpserted: result.eventsUpserted || 0,
-            aiTokensSaved: result.aiTokensSaved || 0
+            aiTokensSaved: result.aiTokensSaved || 0,
+            publishRunId: result.publishRunId || null
         };
         
         console.log('[cron/sync-live] Result:', JSON.stringify(summary));
+        await jobLogger.success('cron_sync_live', logId, {
+            durationMs: Date.now() - startedAtMs,
+            fixturesImported: Number(summary.fixtures || 0),
+            predictionsGenerated: Number(summary.upserted || 0),
+            predictionsFiltered: 0,
+            summary
+        });
         res.json(summary);
         
     } catch (err) {
         console.error('[cron/sync-live] Failed:', err.message, err.stack);
+        await jobLogger.fail('cron_sync_live', logId, err.message, {
+            durationMs: Date.now() - startedAtMs
+        });
         res.json({ status: 'error', message: err.message });
     }
 });
@@ -617,43 +692,80 @@ app.get('/api/cron/sync-standard', verifyCronSecret, async (req, res) => {
     console.log('[cron/sync-standard] Starting tier-2 standard sync...');
     
     try {
-        const fixtures = await fetchWithWaterfall('/v1/fixtures', { sport: 'soccer' }, 'TIER_2', 10000);
-        
-        if (fixtures && fixtures.data) {
-            const data = Array.isArray(fixtures.data) ? fixtures.data : fixtures.data.response || [];
-            console.log(`[cron/sync-standard] Fetched ${data.length} fixtures via ${fixtures.host}`);
-            
-            const client = await pool.connect();
+        const result = await runCronWithLog('cron_sync_standard', req, async () => {
             let upserted = 0;
-            
+            let publishRunId = null;
             try {
-                for (const f of data.slice(0, 100)) {
-                    const matchId = String(f.id || f.fixture?.id || '');
-                    if (matchId) {
-                        await client.query(`
-                            INSERT INTO direct1x2_prediction_final (tier, type, matches, sport, market_type, recommendation, created_at)
-                            VALUES ('standard', 'direct', $1::jsonb, 'football', '1X2', $2, NOW())
-                            ON CONFLICT DO UPDATE SET
-                                matches = EXCLUDED.matches
-                        `, [{
-                            fixture_id: matchId,
-                            home_team: f.home_team || f.teams?.home?.name,
-                            away_team: f.away_team || f.teams?.away?.name,
-                            date: f.date || f.fixture?.date,
-                            metadata: { source: fixtures.host }
-                        }, `vs`]);
-                        
-                        upserted++;
+                const fixtures = await fetchWithWaterfall('/v1/fixtures', { sport: 'soccer' }, 'TIER_2', 10000);
+
+                if (fixtures && fixtures.data) {
+                    const data = Array.isArray(fixtures.data) ? fixtures.data : fixtures.data.response || [];
+                    console.log(`[cron/sync-standard] Fetched ${data.length} fixtures via ${fixtures.host}`);
+
+                    publishRunId = await startPublishRun(
+                        'cron_sync_standard',
+                        ['football'],
+                        'football_standard',
+                        'Tier 2 standard sync fallback publish',
+                        { provider_host: fixtures.host || null }
+                    );
+
+                    const client = await pool.connect();
+                    try {
+                        for (const f of data.slice(0, 100)) {
+                            const matchId = String(f.id || f.fixture?.id || '').trim();
+                            const homeTeam = f.home_team || f.teams?.home?.name || null;
+                            const awayTeam = f.away_team || f.teams?.away?.name || null;
+                            const kickoffRaw = f.date || f.fixture?.date || null;
+                            const kickoff = kickoffRaw ? new Date(kickoffRaw).toISOString() : null;
+                            if (!matchId || !homeTeam || !awayTeam) continue;
+
+                            await client.query(`
+                            INSERT INTO direct1x2_prediction_final (
+                                publish_run_id, tier, type, matches, total_confidence, risk_level,
+                                sport, market_type, recommendation, fixture_id, home_team, away_team,
+                                prediction, confidence, match_date, created_at
+                            )
+                            VALUES ($1, 'normal', 'direct', $2::jsonb, 62, 'medium', 'football', '1X2', $3, $4, $5, $6, $7, 62, $8::timestamptz, NOW())
+                            ON CONFLICT DO NOTHING
+                        `, [
+                            publishRunId,
+                            JSON.stringify([{
+                                fixture_id: matchId,
+                                home_team: homeTeam,
+                                away_team: awayTeam,
+                                match_date: kickoff,
+                                commence_time: kickoff,
+                                market: '1X2',
+                                prediction: 'home_win',
+                                metadata: { source: fixtures.host || null }
+                            }]),
+                            `${homeTeam} vs ${awayTeam}`,
+                            matchId,
+                            homeTeam,
+                            awayTeam,
+                            'home_win',
+                            kickoff
+                        ]);
+
+                            upserted += 1;
+                        }
+                    } finally {
+                        client.release();
                     }
+
+                    await finalizePublishRun(publishRunId, 'completed', null, { upserted });
+                    console.log(`[cron/sync-standard] Completed: ${upserted} fixtures upserted`);
                 }
-            } finally {
-                client.release();
+
+                return { fixturesImported: upserted, predictionsGenerated: upserted, publishRunId };
+            } catch (error) {
+                await finalizePublishRun(publishRunId, 'failed', error.message, { upserted });
+                throw error;
             }
-            
-            console.log(`[cron/sync-standard] Completed: ${upserted} fixtures upserted`);
-        }
-        
-        res.json({ message: 'Standard sync complete', status: 'ok' });
+        });
+
+        res.json({ message: 'Standard sync complete', status: 'ok', ...result });
         
     } catch (err) {
         console.error('[cron/sync-standard] Failed:', err.message);
@@ -668,39 +780,35 @@ app.get('/api/cron/sync-deep', verifyCronSecret, async (req, res) => {
     console.log('[cron/sync-deep] Starting tier-3 deep sync...');
     
     try {
-        const newsData = await fetchWithWaterfall('/v1/news', { query: 'football match analysis' }, 'TIER_3', 15000);
-        
-        if (newsData && newsData.data) {
-            const articles = Array.isArray(newsData.data) ? newsData.data : newsData.data.results || [];
-            console.log(`[cron/sync-deep] Fetched ${articles.length} news articles via ${newsData.host}`);
-            
-            const client = await pool.connect();
+        const result = await runCronWithLog('cron_sync_deep', req, async () => {
+            const newsData = await fetchWithWaterfall('/v1/news', { query: 'football match analysis' }, 'TIER_3', 15000);
             let saved = 0;
-            
-            try {
-                for (const article of articles.slice(0, 20)) {
-                    const title = article.title || article.headline || '';
-                    const summary = article.description || article.summary || '';
-                    
-                    if (title) {
-                        await client.query(`
-                            INSERT INTO direct1x2_prediction_final (tier, type, matches, sport, market_type, recommendation, edgemind_report, created_at)
-                            VALUES ('deep', 'context', '[]'::jsonb, 'football', 'news', $1, $2, NOW())
-                            ON CONFLICT DO NOTHING
-                        `, [title, summary.substring(0, 500)]);
-                        
-                        saved++;
-                    }
-                }
-            } finally {
-                client.release();
+            if (newsData && newsData.data) {
+                const articles = Array.isArray(newsData.data) ? newsData.data : newsData.data.results || [];
+                console.log(`[cron/sync-deep] Fetched ${articles.length} news articles via ${newsData.host}`);
+
+                const cacheKey = `cron_deep_news_${new Date().toISOString().slice(0, 10)}`;
+                await query(`
+                    INSERT INTO rapidapi_cache (cache_key, provider_name, payload, updated_at)
+                    VALUES ($1, $2, $3::jsonb, NOW())
+                    ON CONFLICT (cache_key) DO UPDATE SET
+                        provider_name = EXCLUDED.provider_name,
+                        payload = EXCLUDED.payload,
+                        updated_at = NOW()
+                `, [
+                    cacheKey,
+                    'football_news_api',
+                    JSON.stringify({
+                        source_host: newsData.host || null,
+                        articles: articles.slice(0, 50)
+                    })
+                ]);
+                saved = Math.min(50, articles.length);
             }
-            
-            console.log(`[cron/sync-deep] Completed: ${saved} articles saved`);
-        }
-        
-        // Return simple summary (fixes Cron-job.org 64KB limit)
-        res.json({ status: 'ok', articlesSaved: saved });
+            return { fixturesImported: 0, predictionsGenerated: 0, articlesSaved: saved };
+        });
+
+        res.json({ status: 'ok', articlesSaved: result.articlesSaved || 0 });
         
     } catch (err) {
         console.error('[cron/sync-deep] Failed:', err.message);
@@ -715,24 +823,27 @@ app.get('/api/cron/sync-simple', verifyCronSecret, async (req, res) => {
     const scriptPath = path.join(__dirname, '..', 'scripts', 'simple-sync.js');
     
     try {
-        await new Promise((resolve, reject) => {
-            const child = spawn(process.execPath, [scriptPath], {
-                env: { ...process.env },
-                stdio: ['ignore', 'pipe', 'pipe'],
-                timeout: 10 * 60 * 1000
+        await runCronWithLog('cron_sync_simple', req, async () => {
+            await new Promise((resolve, reject) => {
+                const child = spawn(process.execPath, [scriptPath], {
+                    env: { ...process.env },
+                    stdio: ['ignore', 'pipe', 'pipe'],
+                    timeout: 10 * 60 * 1000
+                });
+                
+                let stdout = '';
+                let stderr = '';
+                child.stdout.on('data', (chunk) => { stdout += chunk; });
+                child.stderr.on('data', (chunk) => { stderr += chunk; });
+                
+                child.on('close', (code) => {
+                    if (code === 0) resolve();
+                    else reject(new Error(`Script exited with code ${code}: ${stderr || stdout}`));
+                });
+                
+                child.on('error', reject);
             });
-            
-            let stdout = '';
-            let stderr = '';
-            child.stdout.on('data', (chunk) => { stdout += chunk; });
-            child.stderr.on('data', (chunk) => { stderr += chunk; });
-            
-            child.on('close', (code) => {
-                if (code === 0) resolve();
-                else reject(new Error(`Script exited with code ${code}: ${stderr || stdout}`));
-            });
-            
-            child.on('error', reject);
+            return { fixturesImported: 0, predictionsGenerated: 0 };
         });
         
         console.log('[cron/sync-simple] Completed');
@@ -751,22 +862,25 @@ app.get('/api/cron/sync-full', verifyCronSecret, async (req, res) => {
     try {
         const scriptPath = path.join(__dirname, '..', 'scripts', 'fetch-live-fixtures.js');
         
-        await new Promise((resolve, reject) => {
-            const child = spawn(process.execPath, [scriptPath], {
-                env: { ...process.env },
-                stdio: ['ignore', 'pipe', 'pipe'],
-                timeout: 15 * 60 * 1000
+        await runCronWithLog('cron_sync_full', req, async () => {
+            await new Promise((resolve, reject) => {
+                const child = spawn(process.execPath, [scriptPath], {
+                    env: { ...process.env },
+                    stdio: ['ignore', 'pipe', 'pipe'],
+                    timeout: 15 * 60 * 1000
+                });
+                
+                child.stdout.on('data', (chunk) => { process.stdout.write(chunk); });
+                child.stderr.on('data', (chunk) => { process.stderr.write(chunk); });
+                
+                child.on('close', (code) => {
+                    if (code === 0) resolve();
+                    else reject(new Error(`Script exited with code ${code}`));
+                });
+                
+                child.on('error', reject);
             });
-            
-            child.stdout.on('data', (chunk) => { process.stdout.write(chunk); });
-            child.stderr.on('data', (chunk) => { process.stderr.write(chunk); });
-            
-            child.on('close', (code) => {
-                if (code === 0) resolve();
-                else reject(new Error(`Script exited with code ${code}`));
-            });
-            
-            child.on('error', reject);
+            return { fixturesImported: 0, predictionsGenerated: 0 };
         });
         
         console.log('[cron/sync-full] Completed');

@@ -17,9 +17,22 @@ const { pool } = require('../backend/database');
 const { enrichWithWeather } = require('../backend/utils/weather');
 const { fetchWithWaterfall } = require('../backend/utils/rapidApiWaterfall');
 const { getApiSportsKeyPool, getRapidApiKeyPool, maskKey } = require('../backend/utils/keyPool');
+const {
+    fetchWithCache,
+    resetCacheMetrics,
+    getCacheMetricsSnapshot
+} = require('../backend/services/apiCacheService');
+const {
+    shouldAllow: circuitShouldAllow,
+    recordFailure: circuitRecordFailure,
+    recordSuccess: circuitRecordSuccess,
+    snapshot: circuitSnapshot
+} = require('../backend/utils/providerCircuitBreaker');
 
 const RAPIDAPI_KEY = process.env.X_RAPIDAPI_KEY || process.env.RAPIDAPI_KEY;
 const APISPORTS_KEYS = getApiSportsKeyPool({ sport: 'football' });
+const RAPIDAPI_CACHE_TTL_MINUTES = Math.max(1, Number(process.env.RAPIDAPI_FIXTURES_TTL_MINUTES || 20));
+const LIVE_RUN_STALE_HOURS = Math.max(1, Number(process.env.SKCS_STALE_RUN_HOURS || 2));
 
 function sanitizeHost(value) {
     const raw = String(value || '').split('#')[0].trim();
@@ -121,17 +134,101 @@ function hasApiSportsQuotaPayload(data) {
     return Boolean(errors.requests || errors.token);
 }
 
+function normalizeUtcDateTime(value) {
+    if (!value) return null;
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return null;
+    return parsed.toISOString();
+}
+
+async function createLivePublishRun() {
+    const result = await pool.query(`
+        INSERT INTO prediction_publish_runs (
+            trigger_source,
+            requested_sports,
+            run_scope,
+            status,
+            notes,
+            metadata
+        )
+        VALUES ($1, $2::text[], $3, 'running', $4, $5::jsonb)
+        RETURNING id
+    `, [
+        'cron_sync_live',
+        ['football'],
+        'football_live',
+        'Incremental sync-live upsert run',
+        JSON.stringify({
+            started_at: new Date().toISOString(),
+            stale_run_hours: LIVE_RUN_STALE_HOURS
+        })
+    ]);
+    return result.rows?.[0]?.id || null;
+}
+
+async function closeStaleRunningPublishRuns() {
+    const result = await pool.query(`
+        UPDATE prediction_publish_runs
+        SET
+            status = 'failed',
+            completed_at = COALESCE(completed_at, NOW()),
+            error_message = CASE
+                WHEN COALESCE(error_message, '') = '' THEN
+                    CONCAT('Auto-closed stale running publish run by sync-live (> ', $1::text, 'h).')
+                ELSE error_message
+            END,
+            metadata = COALESCE(metadata, '{}'::jsonb) || jsonb_build_object(
+                'stale_auto_closed_at', NOW(),
+                'stale_threshold_hours', $1::int
+            )
+        WHERE status = 'running'
+          AND started_at < NOW() - make_interval(hours => $1::int)
+          AND trigger_source IN ('cron_sync_live', 'cron_sync_full', 'manual_sync_live')
+    `, [LIVE_RUN_STALE_HOURS]);
+    return Number(result.rowCount || 0);
+}
+
+async function finalizeLivePublishRun(publishRunId, status, payload = {}) {
+    if (!publishRunId) return;
+    const normalizedStatus = status === 'completed' ? 'completed' : 'failed';
+    const metadata = JSON.stringify({
+        ...(payload.metadata || {}),
+        finished_at: new Date().toISOString(),
+        cache_metrics: getCacheMetricsSnapshot()
+    });
+    await pool.query(`
+        UPDATE prediction_publish_runs
+        SET
+            status = $2,
+            completed_at = NOW(),
+            error_message = $3,
+            metadata = COALESCE(metadata, '{}'::jsonb) || $4::jsonb
+        WHERE id = $1
+    `, [
+        publishRunId,
+        normalizedStatus,
+        payload.errorMessage || null,
+        metadata
+    ]);
+}
+
 async function requestApiFootballWithRotation(params) {
     if (!REQUEST_KEY_POOL.length) {
         throw new Error('No RapidAPI/API-Sports keys configured for football');
     }
 
     let lastError = null;
+    let attempts = 0;
+    const maxAttempts = Math.max(5, Number(process.env.RAPIDAPI_MAX_ROTATION_ATTEMPTS || 40));
     for (let endpointIdx = 0; endpointIdx < FOOTBALL_ENDPOINTS.length; endpointIdx += 1) {
         const endpointPath = FOOTBALL_ENDPOINTS[endpointIdx];
         for (let hostIdx = 0; hostIdx < FOOTBALL_HOST_CANDIDATES.length; hostIdx += 1) {
             const host = FOOTBALL_HOST_CANDIDATES[hostIdx];
             for (let keyIdx = 0; keyIdx < REQUEST_KEY_POOL.length; keyIdx += 1) {
+                attempts += 1;
+                if (attempts > maxAttempts) {
+                    throw new Error(`RapidAPI rotation attempt cap reached (${maxAttempts})`);
+                }
                 const key = REQUEST_KEY_POOL[keyIdx];
                 const headers = {
                     'x-rapidapi-key': key,
@@ -142,24 +239,40 @@ async function requestApiFootballWithRotation(params) {
                 }
 
                 try {
-                    const response = await axios.get(`https://${host}${endpointPath}`, {
+                    const signature = `sync-live|${host}|${endpointPath}|key-${keyIdx + 1}`;
+                    if (!circuitShouldAllow(signature)) {
+                        console.warn(`[RapidAPI/API-Sports] endpoint ${endpointPath} host ${host} key ${keyIdx + 1}/${REQUEST_KEY_POOL.length} (${maskKey(key)}) circuit-open. Skipping...`);
+                        continue;
+                    }
+
+                    const payload = await fetchWithCache(
+                        'football_api',
+                        `https://${host}${endpointPath}`,
                         headers,
                         params,
-                        timeout: 30000
-                    });
+                        RAPIDAPI_CACHE_TTL_MINUTES
+                    );
 
-                    if (hasApiSportsQuotaPayload(response.data)) {
+                    if (!payload) {
+                        continue;
+                    }
+
+                    if (hasApiSportsQuotaPayload(payload)) {
                         console.warn(`[RapidAPI/API-Sports] endpoint ${endpointPath} host ${host} key ${keyIdx + 1}/${REQUEST_KEY_POOL.length} (${maskKey(key)}) quota exhausted. Rotating...`);
+                        circuitRecordFailure(signature, 429);
                         lastError = new Error('API-Sports quota exhausted');
                         continue;
                     }
 
-                    return response;
+                    circuitRecordSuccess(signature);
+                    return { data: payload };
                 } catch (error) {
                     lastError = error;
                     const status = Number(error?.response?.status || 0);
                     if (status === 401 || status === 403 || status === 429 || hasApiSportsQuotaPayload(error?.response?.data)) {
                         console.warn(`[RapidAPI/API-Sports] endpoint ${endpointPath} host ${host} key ${keyIdx + 1}/${REQUEST_KEY_POOL.length} (${maskKey(key)}) failed (${status || 'network'}). Rotating...`);
+                        const signature = `sync-live|${host}|${endpointPath}|key-${keyIdx + 1}`;
+                        circuitRecordFailure(signature, status || 'network');
                         continue;
                     }
                     if (status === 404 || status === 405 || status === 400) {
@@ -801,13 +914,14 @@ async function generateEdgeMindReports(fixtures, existingMap) {
         uniqueMatchSignatures.add(matchSignature);
         dbUsedMatches.add(matchSignature);
 
-        const kickoffValue =
+        const kickoffValueRaw =
             fixture.commence_time ||
             fixture.date ||
             fixture.match_date ||
             fixture.kickoff ||
             fixture.start_time ||
             null;
+        const kickoffValue = normalizeUtcDateTime(kickoffValueRaw) || kickoffValueRaw;
 
         fixture.match_id = normalizedFixtureId;
         fixture.fixture_id = normalizedFixtureId;
@@ -922,7 +1036,7 @@ async function saveFixturesToEvents(fixtures) {
 // ============================================================
 // STEP 6: INCREMENTAL UPSERT TO SUPABASE (NO WIPE)
 // ============================================================
-async function saveToSupabase(fixtures, existingMap) {
+async function saveToSupabase(fixtures, existingMap, publishRunId) {
     console.log('\n[STEP 6] Incremental sync to Supabase (upsert mode)...');
     
     const client = await pool.connect();
@@ -938,13 +1052,14 @@ async function saveToSupabase(fixtures, existingMap) {
             
             try {
                 const fixtureId = String(fixture.match_id || fixture.fixture_id || '').trim();
-                const kickoffValue =
+                const kickoffValueRaw =
                     fixture.commence_time ||
                     fixture.date ||
                     fixture.match_date ||
                     fixture.kickoff ||
                     fixture.start_time ||
                     null;
+                const kickoffValue = normalizeUtcDateTime(kickoffValueRaw);
 
                 if (!fixtureId) {
                     skipped++;
@@ -1027,22 +1142,31 @@ async function saveToSupabase(fixtures, existingMap) {
                 const confidence = clampConfidence(fixture.confidence ?? fixture.ai_confidence) || 62;
                 const riskLevel = confidence >= 72 ? 'safe' : 'medium';
                 const prediction = fixture.market_name || fixture.prediction || 'Home Win';
+                const predictionToken = String(fixture.prediction || '').trim() || null;
 
                 if (existing && existing.id && needsRefresh) {
                     await client.query(`
                         UPDATE direct1x2_prediction_final
-                        SET matches = $2::jsonb,
-                            total_confidence = $3,
-                            risk_level = $4,
-                            sport = $5,
-                            market_type = $6,
-                            recommendation = $7,
-                            edgemind_report = $8,
-                            secondary_insights = $9::jsonb,
+                        SET publish_run_id = $2,
+                            matches = $3::jsonb,
+                            total_confidence = $4,
+                            risk_level = $5,
+                            sport = $6,
+                            market_type = $7,
+                            recommendation = $8,
+                            edgemind_report = $9,
+                            secondary_insights = $10::jsonb,
+                            fixture_id = $11,
+                            home_team = $12,
+                            away_team = $13,
+                            prediction = $14,
+                            confidence = $15,
+                            match_date = $16::timestamptz,
                             created_at = NOW()
                         WHERE id = $1
                     `, [
                         existing.id,
+                        publishRunId || null,
                         JSON.stringify(matchesJson),
                         confidence,
                         riskLevel,
@@ -1050,21 +1174,28 @@ async function saveToSupabase(fixtures, existingMap) {
                         fixture.market || '1X2',
                         prediction,
                         fixture.edgemind_report || null,
-                        fixture.secondary_insights ? JSON.stringify(fixture.secondary_insights) : '[]'
+                        fixture.secondary_insights ? JSON.stringify(fixture.secondary_insights) : '[]',
+                        fixtureId,
+                        fixture.home_team || null,
+                        fixture.away_team || null,
+                        predictionToken,
+                        confidence,
+                        kickoffValue
                     ]);
                     upserted++;
                 } else {
                     // Insert only for unseen fixture IDs to keep sync idempotent.
                     const sql = `
                         INSERT INTO direct1x2_prediction_final (
-                            tier, type, matches, total_confidence, risk_level, sport, market_type, recommendation,
-                            edgemind_report, secondary_insights, created_at
-                        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
+                            publish_run_id, tier, type, matches, total_confidence, risk_level, sport, market_type, recommendation,
+                            edgemind_report, secondary_insights, fixture_id, home_team, away_team, prediction, confidence, match_date, created_at
+                        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17::timestamptz, NOW())
                         ON CONFLICT DO NOTHING
                         RETURNING id
                     `;
                     
                     const result = await client.query(sql, [
+                        publishRunId || null,
                         'normal',
                         'direct',
                         JSON.stringify(matchesJson),
@@ -1074,7 +1205,13 @@ async function saveToSupabase(fixtures, existingMap) {
                         fixture.market || '1X2',
                         prediction,
                         fixture.edgemind_report || null,
-                        fixture.secondary_insights ? JSON.stringify(fixture.secondary_insights) : '[]'
+                        fixture.secondary_insights ? JSON.stringify(fixture.secondary_insights) : '[]',
+                        fixtureId,
+                        fixture.home_team || null,
+                        fixture.away_team || null,
+                        predictionToken,
+                        confidence,
+                        kickoffValue
                     ]);
                     
                     if (result.rows.length > 0) {
@@ -1112,8 +1249,19 @@ async function runLiveSync() {
     
     let fixturesProcessed = 0;
     let predictionsUpserted = 0;
+    let eventsUpserted = 0;
+    let publishRunId = null;
+
+    resetCacheMetrics();
     
     try {
+        const staleClosed = await closeStaleRunningPublishRuns();
+        if (staleClosed > 0) {
+            console.log(`[STEP -1] Auto-closed ${staleClosed} stale running publish run(s)`);
+        }
+        publishRunId = await createLivePublishRun();
+        console.log(`[STEP -1] Opened publish run ${publishRunId}`);
+
         // STEP 0: Load existing records for incremental sync
         console.log('[STEP 0] Loading existing predictions for incremental sync...');
         const client = await pool.connect();
@@ -1182,6 +1330,14 @@ async function runLiveSync() {
         
         if (fixtures.length === 0) {
             console.log('[ERROR] No fixtures available!');
+            await finalizeLivePublishRun(publishRunId, 'failed', {
+                errorMessage: 'No fixtures available from providers',
+                metadata: {
+                    fixtures_processed: 0,
+                    predictions_upserted: 0,
+                    events_upserted: 0
+                }
+            });
             return { success: false, fixtures: 0, upserted: 0 };
         }
         
@@ -1191,7 +1347,7 @@ async function runLiveSync() {
         // ============================================================
         // PHASE 1: Save raw fixtures to events table
         // ============================================================
-        const eventsUpserted = await saveFixturesToEvents(fixtures);
+        eventsUpserted = await saveFixturesToEvents(fixtures);
         
         // STEP 2: Weather
         fixtures = await fetchWeatherForFixtures(fixtures);
@@ -1206,7 +1362,7 @@ async function runLiveSync() {
         fixtures = await generateEdgeMindReports(fixtures, existingMap);
         
         // STEP 6: Incremental Upsert (no wipe)
-        predictionsUpserted = await saveToSupabase(fixtures, existingMap);
+        predictionsUpserted = await saveToSupabase(fixtures, existingMap, publishRunId);
         
         console.log('\n========================================');
         console.log('  PIPELINE COMPLETE');
@@ -1214,19 +1370,41 @@ async function runLiveSync() {
         console.log(`Fixtures processed: ${fixtures.length}`);
         console.log(`Predictions upserted: ${predictionsUpserted}`);
         console.log(`AI tokens saved: ${existingMap.size} (skipped)`);
+        console.log(`[CACHE] ${JSON.stringify(getCacheMetricsSnapshot())}`);
         console.log('');
         console.log('Incremental sync complete - no data wiped!');
+
+        await finalizeLivePublishRun(publishRunId, 'completed', {
+            metadata: {
+                fixtures_processed: fixturesProcessed,
+                predictions_upserted: predictionsUpserted,
+                events_upserted: eventsUpserted,
+                ai_tokens_saved: existingMap.size,
+                circuit_snapshot: circuitSnapshot().filter((entry) => entry.blocked).slice(0, 20)
+            }
+        });
         
         return { 
             success: true, 
             fixtures: fixturesProcessed, 
             upserted: predictionsUpserted,
             eventsUpserted,
-            aiTokensSaved: existingMap.size
+            aiTokensSaved: existingMap.size,
+            publishRunId,
+            cacheMetrics: getCacheMetricsSnapshot()
         };
         
     } catch (err) {
         console.error('\n[ERROR] Pipeline failed:', err.message);
+        await finalizeLivePublishRun(publishRunId, 'failed', {
+            errorMessage: err.message,
+            metadata: {
+                fixtures_processed: fixturesProcessed,
+                predictions_upserted: predictionsUpserted,
+                events_upserted: eventsUpserted,
+                circuit_snapshot: circuitSnapshot().filter((entry) => entry.blocked).slice(0, 20)
+            }
+        });
         return { success: false, error: err.message };
     }
 }

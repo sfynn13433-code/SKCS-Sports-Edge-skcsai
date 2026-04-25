@@ -6,7 +6,10 @@ const { createClient } = require('@supabase/supabase-js');
 const config = require('../config');
 
 function normalizeTier(tier) {
-    if (tier === 'normal' || tier === 'deep' || tier === 'ultra') return tier;
+    const normalized = String(tier || '').trim().toLowerCase();
+    const allowUltra = ['1', 'true', 'yes'].includes(String(process.env.ENABLE_ULTRA_TIER_RULES || '').trim().toLowerCase());
+    if (normalized === 'normal' || normalized === 'deep') return normalized;
+    if (allowUltra && normalized === 'ultra') return normalized;
     throw new Error(`Invalid tier: ${tier}`);
 }
 
@@ -59,8 +62,12 @@ async function fetchTierRulesMap() {
     if (rulesError || !tierRules) throw new Error('CRITICAL: Failed to fetch tier_rules from database.');
 
     const rulesMap = tierRules.reduce((acc, rule) => {
-        const mapped = mapRuleRow(rule);
-        acc[mapped.tier] = mapped;
+        try {
+            const mapped = mapRuleRow(rule);
+            acc[mapped.tier] = mapped;
+        } catch (_error) {
+            console.warn(`[filterEngine] Ignoring unsupported tier_rules row: ${String(rule?.tier || '')}`);
+        }
         return acc;
     }, {});
 

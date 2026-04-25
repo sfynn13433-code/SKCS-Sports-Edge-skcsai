@@ -6,6 +6,7 @@ const moment = require('moment-timezone');
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const APISPORTS_KEY = process.env.X_APISPORTS_KEY;
+const SAST_TZ = 'Africa/Johannesburg';
 
 function parseArgs() {
     const args = process.argv.slice(2);
@@ -43,6 +44,50 @@ function determineResolutionStatus(result) {
     return 'void';
 }
 
+function toSastDate(value) {
+    if (!value) return null;
+    const m = moment(value);
+    if (!m.isValid()) return null;
+    return m.tz(SAST_TZ).format('YYYY-MM-DD');
+}
+
+function parseMatches(matchesValue) {
+    if (Array.isArray(matchesValue)) return matchesValue;
+    if (typeof matchesValue === 'string') {
+        try {
+            const parsed = JSON.parse(matchesValue);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (_error) {
+            return [];
+        }
+    }
+    return [];
+}
+
+function normalizeTeamToken(value) {
+    return String(value || '').trim().toLowerCase();
+}
+
+function resolvePredictionMatchIndex(matches, event) {
+    const eventId = String(event?.id || '').trim();
+    if (!Array.isArray(matches) || matches.length === 0) return 0;
+    if (eventId) {
+        const byFixture = matches.findIndex((leg) => String(leg?.fixture_id || leg?.match_id || '').trim() === eventId);
+        if (byFixture >= 0) return byFixture;
+    }
+    const home = normalizeTeamToken(event?.home_team);
+    const away = normalizeTeamToken(event?.away_team);
+    if (home && away) {
+        const byTeams = matches.findIndex((leg) => {
+            const legHome = normalizeTeamToken(leg?.home_team || leg?.home_team_name || leg?.home);
+            const legAway = normalizeTeamToken(leg?.away_team || leg?.away_team_name || leg?.away);
+            return legHome === home && legAway === away;
+        });
+        if (byTeams >= 0) return byTeams;
+    }
+    return 0;
+}
+
 async function fetchFixtureFromAPI(fixtureId) {
     try {
         const response = await axios.get('https://v3.football.api-sports.io/fixtures', {
@@ -66,6 +111,15 @@ async function gradePredictionsForDate(sport, date) {
     const stats = { won: 0, lost: 0, void: 0, verified_edge: 0, lucky_win: 0, critical_fail: 0, expected_variance: 0 };
 
     try {
+        const latestCompletedRunRes = await client.query(`
+            SELECT id
+            FROM prediction_publish_runs
+            WHERE status = 'completed'
+            ORDER BY completed_at DESC NULLS LAST, id DESC
+            LIMIT 1
+        `);
+        const defaultPublishRunId = latestCompletedRunRes.rows?.[0]?.id || null;
+
         // Find events from the target date that are finished
         const eventsResult = await client.query(`
             SELECT 
@@ -143,17 +197,17 @@ async function gradePredictionsForDate(sport, date) {
                     try {
                         const rec = pred.recommendation?.toLowerCase() || '';
                         let result = 'VOID';
+                        const matches = parseMatches(pred.matches);
+                        const matchIndex = resolvePredictionMatchIndex(matches, event);
+                        const selectedLeg = matches[matchIndex] || matches[0] || {};
 
                         // Extract market from matches JSON first to accurately grade
                         let market = '1X2';
                         let fixtureDate = event.fixture_date;
-                        try {
-                            const matches = typeof pred.matches === 'string' ? JSON.parse(pred.matches) : pred.matches;
-                            if (matches && matches[0]) {
-                                if (matches[0].market) market = matches[0].market;
-                                if (matches[0].date) fixtureDate = matches[0].date;
-                            }
-                        } catch (e) {}
+                        if (selectedLeg.market) market = selectedLeg.market;
+                        if (selectedLeg.date || selectedLeg.match_date || selectedLeg.commence_time) {
+                            fixtureDate = selectedLeg.date || selectedLeg.match_date || selectedLeg.commence_time;
+                        }
 
                         // AI-DISABLED: Defaulting to Home Win for unknown markets breaks secondary market grading.
                         // if (rec.includes('home') || rec === '1' || rec === 'home_win' || rec.includes('home win')) {
@@ -200,7 +254,7 @@ async function gradePredictionsForDate(sport, date) {
                             if (rec.includes('yes')) result = btts ? 'WON' : 'LOST';
                             else if (rec.includes('no')) result = !btts ? 'WON' : 'LOST';
                         } else {
-                            result = isHomeWin ? 'WON' : 'LOST';
+                            result = 'VOID';
                         }
 
                         const confidence = pred.total_confidence || 50;
@@ -208,9 +262,9 @@ async function gradePredictionsForDate(sport, date) {
                         const resolutionStatus = determineResolutionStatus(result);
 
                         // Use match_date from prediction if available
-                        if (pred.match_date) {
-                            fixtureDate = new Date(pred.match_date).toISOString().slice(0, 10);
-                        }
+                        if (pred.match_date) fixtureDate = pred.match_date;
+                        fixtureDate = toSastDate(fixtureDate) || toSastDate(event.commence_time) || event.fixture_date || date;
+                        const publishRunId = pred.publish_run_id || defaultPublishRunId;
 
                         // Determine prediction type
                         let predictionType = 'direct';
@@ -249,6 +303,16 @@ async function gradePredictionsForDate(sport, date) {
                             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
                             ON CONFLICT (prediction_final_id, prediction_match_index) 
                             DO UPDATE SET
+                                publish_run_id = COALESCE(EXCLUDED.publish_run_id, predictions_accuracy.publish_run_id),
+                                event_id = EXCLUDED.event_id,
+                                sport = EXCLUDED.sport,
+                                prediction_tier = EXCLUDED.prediction_tier,
+                                prediction_type = EXCLUDED.prediction_type,
+                                confidence = EXCLUDED.confidence,
+                                market = EXCLUDED.market,
+                                predicted_outcome = EXCLUDED.predicted_outcome,
+                                home_team = EXCLUDED.home_team,
+                                away_team = EXCLUDED.away_team,
                                 resolution_status = EXCLUDED.resolution_status,
                                 is_correct = EXCLUDED.is_correct,
                                 actual_result = EXCLUDED.actual_result,
@@ -260,7 +324,7 @@ async function gradePredictionsForDate(sport, date) {
                                 fixture_date = EXCLUDED.fixture_date
                         `, [
                             pred.id,
-                            pred.publish_run_id,
+                            publishRunId,
                             matchIndex,
                             event.id,
                             sport,

@@ -2,6 +2,11 @@ const axios = require('axios');
 const config = require('./config');
 const { fetchRapidApiCustom, getRapidApiProviderForSport, getRapidApiHostCandidates } = require('./services/dataProviders');
 const { getApiSportsKeyPool, maskKey } = require('./utils/keyPool');
+const {
+    shouldAllow: circuitShouldAllow,
+    recordFailure: circuitRecordFailure,
+    recordSuccess: circuitRecordSuccess
+} = require('./utils/providerCircuitBreaker');
 
 class APISportsClient {
     constructor() {
@@ -76,10 +81,16 @@ class APISportsClient {
         let lastError = null;
         for (let i = 0; i < keys.length; i += 1) {
             const key = keys[i];
+            const host = this.getHostForSport(sport);
+            const signature = `api-sports|${sport}|${host}|${endpoint}|${i + 1}`;
+            if (!circuitShouldAllow(signature)) {
+                console.warn(`[API-Sports] ${sport} key ${i + 1}/${keys.length} (${maskKey(key)}) circuit-open; skipping.`);
+                continue;
+            }
             const headers = {
                 'x-apisports-key': key,
                 'x-rapidapi-key': key,
-                'x-rapidapi-host': this.getHostForSport(sport)
+                'x-rapidapi-host': host
             };
 
             try {
@@ -90,21 +101,25 @@ class APISportsClient {
 
                 if (this.hasQuotaErrorPayload(response.data)) {
                     console.warn(`[API-Sports] ${sport} key ${i + 1}/${keys.length} (${maskKey(key)}) exhausted. Rotating...`);
+                    circuitRecordFailure(signature, 429);
                     lastError = new Error(`Quota/token exhausted for key index ${i + 1}`);
                     continue;
                 }
 
+                circuitRecordSuccess(signature);
                 return response.data;
             } catch (error) {
                 const status = Number(error?.response?.status || 0);
                 const payload = error.response && error.response.data ? error.response.data : null;
                 if (this.hasQuotaErrorPayload(payload)) {
                     console.warn(`[API-Sports] ${sport} key ${i + 1}/${keys.length} (${maskKey(key)}) exhausted via payload. Rotating...`);
+                    circuitRecordFailure(signature, 429);
                     lastError = error;
                     continue;
                 }
                 if (status === 401 || status === 403 || status === 429) {
                     console.warn(`[API-Sports] ${sport} key ${i + 1}/${keys.length} (${maskKey(key)}) failed with HTTP ${status}. Rotating...`);
+                    circuitRecordFailure(signature, status);
                     lastError = error;
                     continue;
                 }

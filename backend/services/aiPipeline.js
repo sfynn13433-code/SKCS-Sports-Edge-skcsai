@@ -1029,6 +1029,28 @@ async function rebuildFinalOutputs(options = {}) {
         : (options.requestedSports ? [options.requestedSports] : []);
     const triggerSource = String(options.triggerSource || 'manual');
     const runScope = requestedSports.length ? requestedSports.join(',') : 'all';
+    const staleRunHours = Math.max(1, Number(process.env.SKCS_STALE_RUN_HOURS || 2));
+
+    await query(
+        `
+        UPDATE prediction_publish_runs
+        SET
+            status = 'failed',
+            completed_at = COALESCE(completed_at, NOW()),
+            error_message = CASE
+                WHEN COALESCE(error_message, '') = '' THEN
+                    CONCAT('Auto-closed stale running publish run by rebuild (> ', $1::text, 'h).')
+                ELSE error_message
+            END,
+            metadata = COALESCE(metadata, '{}'::jsonb) || jsonb_build_object(
+                'stale_auto_closed_at', NOW(),
+                'stale_threshold_hours', $1::int
+            )
+        WHERE status = 'running'
+          AND started_at < NOW() - make_interval(hours => $1::int)
+        `,
+        [staleRunHours]
+    );
 
     const runRes = await query(
         `
@@ -1048,7 +1070,11 @@ async function rebuildFinalOutputs(options = {}) {
             requestedSports,
             runScope,
             options.notes || null,
-            JSON.stringify(options.metadata || {})
+            JSON.stringify({
+                ...(options.metadata || {}),
+                rebuild_started_at: new Date().toISOString(),
+                stale_run_hours: staleRunHours
+            })
         ]
     );
 
@@ -1086,12 +1112,16 @@ async function rebuildFinalOutputs(options = {}) {
             UPDATE prediction_publish_runs
             SET status = 'completed',
                 completed_at = NOW(),
+                error_message = NULL,
                 metadata = COALESCE(metadata, '{}'::jsonb) || $2::jsonb
             WHERE id = $1
             `,
             [
                 publishRun.id,
-                JSON.stringify({ summary })
+                JSON.stringify({
+                    summary,
+                    rebuild_completed_at: new Date().toISOString()
+                })
             ]
         );
 
@@ -1111,10 +1141,18 @@ async function rebuildFinalOutputs(options = {}) {
             UPDATE prediction_publish_runs
             SET status = 'failed',
                 completed_at = NOW(),
-                error_message = $2
+                error_message = $2,
+                metadata = COALESCE(metadata, '{}'::jsonb) || $3::jsonb
             WHERE id = $1
             `,
-            [publishRun.id, error.message]
+            [
+                publishRun.id,
+                error.message,
+                JSON.stringify({
+                    rebuild_failed_at: new Date().toISOString(),
+                    failure_name: error?.name || 'Error'
+                })
+            ]
         );
         throw error;
     }

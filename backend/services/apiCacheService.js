@@ -3,6 +3,12 @@
 const axios = require('axios');
 const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
+const { Pool } = require('pg');
+const {
+    shouldAllow: circuitShouldAllow,
+    recordFailure: circuitRecordFailure,
+    recordSuccess: circuitRecordSuccess
+} = require('../utils/providerCircuitBreaker');
 
 const SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
 const SUPABASE_SERVICE_ROLE_KEY = String(
@@ -17,9 +23,25 @@ const supabase = SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
         }
     })
     : null;
+
+const DATABASE_URL = String(process.env.DATABASE_URL || '').trim();
+const pgPool = !supabase && DATABASE_URL
+    ? new Pool({
+        connectionString: DATABASE_URL,
+        ssl: { rejectUnauthorized: false }
+    })
+    : null;
 const RAPIDAPI_BYPASS_CACHE_WALL = ['1', 'true', 'yes'].includes(
     String(process.env.RAPIDAPI_BYPASS_CACHE_WALL || '').trim().toLowerCase()
 );
+const cacheMetrics = {
+    hits: 0,
+    misses: 0,
+    writes: 0,
+    errors: 0,
+    bypasses: 0,
+    circuitBlocked: 0
+};
 
 function normalizeForHash(value) {
     if (Array.isArray(value)) {
@@ -58,40 +80,83 @@ function isNoRowsError(error) {
 }
 
 function isCacheWallReady() {
-    return Boolean(supabase);
+    return Boolean(supabase || pgPool);
+}
+
+function buildCircuitSignature(providerName, endpointUrl, headers) {
+    const provider = String(providerName || '').trim() || 'unknown_provider';
+    const endpoint = String(endpointUrl || '').trim() || 'unknown_endpoint';
+    const host = String(headers?.['x-rapidapi-host'] || headers?.['X-RapidAPI-Host'] || '').trim() || 'unknown_host';
+    return `${provider}|${host}|${endpoint}`;
 }
 
 async function readCache(cacheKey) {
-    if (!supabase) return null;
+    if (!supabase && !pgPool) return null;
 
-    const { data, error } = await supabase
-        .from('rapidapi_cache')
-        .select('payload, updated_at')
-        .eq('cache_key', cacheKey)
-        .maybeSingle();
+    if (supabase) {
+        const { data, error } = await supabase
+            .from('rapidapi_cache')
+            .select('payload, updated_at')
+            .eq('cache_key', cacheKey)
+            .maybeSingle();
 
-    if (error && !isNoRowsError(error)) {
+        if (error && !isNoRowsError(error)) {
+            console.warn('[Cache Wall] Cache read failed:', error.message);
+            return null;
+        }
+
+        return data || null;
+    }
+
+    try {
+        const result = await pgPool.query(`
+            SELECT payload, updated_at
+            FROM rapidapi_cache
+            WHERE cache_key = $1
+            LIMIT 1
+        `, [cacheKey]);
+        return result.rows?.[0] || null;
+    } catch (error) {
         console.warn('[Cache Wall] Cache read failed:', error.message);
         return null;
     }
-
-    return data || null;
 }
 
 async function writeCache(cacheKey, providerName, payload) {
-    if (!supabase) return;
+    if (!supabase && !pgPool) return;
 
-    const { error } = await supabase
-        .from('rapidapi_cache')
-        .upsert({
-            cache_key: cacheKey,
-            provider_name: providerName,
-            payload,
-            updated_at: new Date().toISOString()
-        }, { onConflict: 'cache_key' });
+    if (supabase) {
+        const { error } = await supabase
+            .from('rapidapi_cache')
+            .upsert({
+                cache_key: cacheKey,
+                provider_name: providerName,
+                payload,
+                updated_at: new Date().toISOString()
+            }, { onConflict: 'cache_key' });
 
-    if (error) {
+        if (error) {
+            console.warn('[Cache Wall] Cache upsert failed:', error.message);
+            cacheMetrics.errors += 1;
+        } else {
+            cacheMetrics.writes += 1;
+        }
+        return;
+    }
+
+    try {
+        await pgPool.query(`
+            INSERT INTO rapidapi_cache (cache_key, provider_name, payload, updated_at)
+            VALUES ($1, $2, $3::jsonb, NOW())
+            ON CONFLICT (cache_key) DO UPDATE SET
+                provider_name = EXCLUDED.provider_name,
+                payload = EXCLUDED.payload,
+                updated_at = NOW()
+        `, [cacheKey, providerName, JSON.stringify(payload)]);
+        cacheMetrics.writes += 1;
+    } catch (error) {
         console.warn('[Cache Wall] Cache upsert failed:', error.message);
+        cacheMetrics.errors += 1;
     }
 }
 
@@ -117,22 +182,37 @@ async function fetchWithCache(
     if (!safeProvider) throw new Error('providerName is required');
     if (!safeEndpoint) throw new Error('endpointUrl is required');
 
-    if (!supabase) {
+    const circuitSignature = buildCircuitSignature(safeProvider, safeEndpoint, headers);
+    if (!circuitShouldAllow(circuitSignature)) {
+        cacheMetrics.circuitBlocked += 1;
+        console.warn(`[Cache Wall] Circuit breaker blocked call for ${safeProvider} (${circuitSignature})`);
+        return null;
+    }
+
+    if (!supabase && !pgPool) {
         if (!RAPIDAPI_BYPASS_CACHE_WALL) {
             console.error(`[Cache Wall] Supabase is not configured. Blocking uncached RapidAPI request for ${safeProvider}.`);
+            cacheMetrics.errors += 1;
             return null;
         }
 
         try {
             console.warn(`[Cache Wall] Bypass enabled. Making uncached RapidAPI request for ${safeProvider}.`);
+            cacheMetrics.bypasses += 1;
             const response = await axios.get(safeEndpoint, {
                 headers,
                 params,
                 timeout: 15000
             });
+            circuitRecordSuccess(circuitSignature);
             return response.data;
         } catch (error) {
             console.error(`[Cache Wall] Bypass fetch failed for ${safeProvider}:`, error.message);
+            cacheMetrics.errors += 1;
+            const status = Number(error?.response?.status || 0);
+            if (status === 403 || status === 429) {
+                circuitRecordFailure(circuitSignature, status);
+            }
             return null;
         }
     }
@@ -145,11 +225,13 @@ async function fetchWithCache(
             const cacheAgeMinutes = (Date.now() - new Date(cachedData.updated_at).getTime()) / (1000 * 60);
             if (cacheAgeMinutes < cacheDurationMinutes) {
                 console.log(`[Cache Wall] quota saved via cache: ${safeProvider}`);
+                cacheMetrics.hits += 1;
                 return cachedData.payload;
             }
         }
 
         console.log(`[Cache Wall] cache miss/expired: ${safeProvider}. consuming 1 RapidAPI call.`);
+        cacheMetrics.misses += 1;
         const response = await axios.get(safeEndpoint, {
             headers,
             params,
@@ -158,15 +240,36 @@ async function fetchWithCache(
         const payload = response.data;
 
         await writeCache(cacheKey, safeProvider, payload);
+        circuitRecordSuccess(circuitSignature);
 
         return payload;
     } catch (error) {
         console.error(`[Cache Wall] Fetch failed for ${safeProvider}:`, error.message);
+        cacheMetrics.errors += 1;
+        const status = Number(error?.response?.status || 0);
+        if (status === 403 || status === 429) {
+            circuitRecordFailure(circuitSignature, status);
+        }
         return null;
     }
 }
 
+function resetCacheMetrics() {
+    cacheMetrics.hits = 0;
+    cacheMetrics.misses = 0;
+    cacheMetrics.writes = 0;
+    cacheMetrics.errors = 0;
+    cacheMetrics.bypasses = 0;
+    cacheMetrics.circuitBlocked = 0;
+}
+
+function getCacheMetricsSnapshot() {
+    return { ...cacheMetrics };
+}
+
 module.exports = {
     fetchWithCache,
-    isCacheWallReady
+    isCacheWallReady,
+    resetCacheMetrics,
+    getCacheMetricsSnapshot
 };

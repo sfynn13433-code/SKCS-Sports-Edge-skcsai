@@ -3199,15 +3199,31 @@ async function insertFinalRow({ publish_run_id, tier, type, matches, total_confi
         ? deriveDirectSecondaryInsights(matches, total_confidence)
         : [];
     const edgeMindReport = deriveEdgeMindReportFromMatches(matches);
+    const firstLeg = Array.isArray(matches) && matches.length > 0 ? (matches[0] || {}) : {};
+    const fixtureId = String(firstLeg?.fixture_id || firstLeg?.match_id || '').trim() || null;
+    const homeTeam = String(firstLeg?.home_team || firstLeg?.home_team_name || '').trim() || null;
+    const awayTeam = String(firstLeg?.away_team || firstLeg?.away_team_name || '').trim() || null;
+    const prediction = String(firstLeg?.prediction || recommendation || '').trim() || null;
+    const confidence = Number.isFinite(Number(firstLeg?.confidence))
+        ? Number(firstLeg.confidence)
+        : Number(total_confidence || 0);
+    const primaryKickoffRaw = firstLeg?.match_date || firstLeg?.commence_time || firstLeg?.date || null;
+    const primaryKickoff = (() => {
+        if (!primaryKickoffRaw) return null;
+        const parsed = new Date(primaryKickoffRaw);
+        if (Number.isNaN(parsed.getTime())) return null;
+        return parsed.toISOString();
+    })();
     
     const res = await client.query(
         `
         insert into direct1x2_prediction_final (
             publish_run_id, tier, type, matches, total_confidence, risk_level,
             plan_visibility, sport, market_type, recommendation, expires_at,
-            edgemind_report, secondary_insights
+            edgemind_report, secondary_insights, fixture_id, home_team, away_team,
+            prediction, confidence, match_date
         )
-        values ($1, $2, $3, $4::jsonb, $5, $6, $7::jsonb, $8, $9, $10, $11, $12, $13::jsonb)
+        values ($1, $2, $3, $4::jsonb, $5, $6, $7::jsonb, $8, $9, $10, $11, $12, $13::jsonb, $14, $15, $16, $17, $18, $19::timestamptz)
         returning *;
         `,
         [
@@ -3223,7 +3239,13 @@ async function insertFinalRow({ publish_run_id, tier, type, matches, total_confi
             recommendation,
             expiresAtIso,
             edgeMindReport,
-            JSON.stringify(secondaryInsights)
+            JSON.stringify(secondaryInsights),
+            fixtureId,
+            homeTeam,
+            awayTeam,
+            prediction,
+            confidence,
+            primaryKickoff
         ]
     );
 

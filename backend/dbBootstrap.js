@@ -217,6 +217,61 @@ async function bootstrap() {
         `);
 
         await query(`
+            UPDATE direct1x2_prediction_final
+            SET
+                fixture_id = COALESCE(
+                    NULLIF(BTRIM(fixture_id), ''),
+                    NULLIF(BTRIM(matches->0->>'fixture_id'), ''),
+                    NULLIF(BTRIM(matches->0->>'match_id'), '')
+                ),
+                home_team = COALESCE(
+                    NULLIF(BTRIM(home_team), ''),
+                    NULLIF(BTRIM(matches->0->>'home_team'), ''),
+                    NULLIF(BTRIM(matches->0->'metadata'->>'home_team'), ''),
+                    NULLIF(BTRIM(matches->0->>'home_team_name'), '')
+                ),
+                away_team = COALESCE(
+                    NULLIF(BTRIM(away_team), ''),
+                    NULLIF(BTRIM(matches->0->>'away_team'), ''),
+                    NULLIF(BTRIM(matches->0->'metadata'->>'away_team'), ''),
+                    NULLIF(BTRIM(matches->0->>'away_team_name'), '')
+                ),
+                prediction = COALESCE(
+                    NULLIF(BTRIM(prediction), ''),
+                    NULLIF(BTRIM(matches->0->>'prediction'), ''),
+                    NULLIF(BTRIM(recommendation), '')
+                ),
+                match_date = COALESCE(
+                    match_date,
+                    NULLIF(BTRIM(matches->0->>'match_date'), '')::timestamptz,
+                    NULLIF(BTRIM(matches->0->>'commence_time'), '')::timestamptz,
+                    NULLIF(BTRIM(matches->0->>'date'), '')::timestamptz,
+                    created_at
+                )
+            WHERE
+                fixture_id IS NULL
+                OR home_team IS NULL
+                OR away_team IS NULL
+                OR prediction IS NULL
+                OR match_date IS NULL;
+        `);
+
+        await query(`
+            WITH latest_run AS (
+                SELECT id
+                FROM prediction_publish_runs
+                WHERE status = 'completed'
+                ORDER BY completed_at DESC NULLS LAST, id DESC
+                LIMIT 1
+            )
+            UPDATE direct1x2_prediction_final pf
+            SET publish_run_id = lr.id
+            FROM latest_run lr
+            WHERE pf.publish_run_id IS NULL
+              AND lr.id IS NOT NULL;
+        `);
+
+        await query(`
             DO $$
             BEGIN
                 IF NOT EXISTS (
@@ -390,6 +445,11 @@ async function bootstrap() {
         `);
 
         await query(`
+            DELETE FROM tier_rules
+            WHERE tier NOT IN ('normal', 'deep');
+        `);
+
+        await query(`
             CREATE TABLE IF NOT EXISTS acca_rules (
                 id bigserial PRIMARY KEY,
                 rule_name text NOT NULL UNIQUE,
@@ -471,6 +531,44 @@ async function bootstrap() {
         await query(`
             CREATE INDEX IF NOT EXISTS idx_predictions_accuracy_sport_date
             ON predictions_accuracy(sport, fixture_date)
+        `);
+
+        await query(`
+            WITH latest_run AS (
+                SELECT id
+                FROM prediction_publish_runs
+                WHERE status = 'completed'
+                ORDER BY completed_at DESC NULLS LAST, id DESC
+                LIMIT 1
+            )
+            UPDATE predictions_accuracy pa
+            SET
+                publish_run_id = COALESCE(pa.publish_run_id, lr.id),
+                fixture_date = COALESCE(
+                    pa.fixture_date,
+                    (
+                        COALESCE(
+                            pa.evaluated_at,
+                            NOW()
+                        ) AT TIME ZONE 'Africa/Johannesburg'
+                    )::date
+                ),
+                resolution_status = COALESCE(
+                    pa.resolution_status,
+                    CASE
+                        WHEN pa.is_correct = TRUE THEN 'won'
+                        WHEN pa.is_correct = FALSE THEN 'lost'
+                        WHEN pa.actual_result IS NOT NULL THEN 'void'
+                        ELSE 'pending'
+                    END
+                ),
+                evaluated_at = COALESCE(pa.evaluated_at, NOW())
+            FROM latest_run lr
+            WHERE
+                pa.publish_run_id IS NULL
+                OR pa.fixture_date IS NULL
+                OR pa.resolution_status IS NULL
+                OR pa.evaluated_at IS NULL;
         `);
 
         await query(`
@@ -564,6 +662,38 @@ async function bootstrap() {
         await query(`
             CREATE INDEX IF NOT EXISTS idx_debug_published_sport
             ON debug_published(sport);
+        `);
+
+        await query(`
+            CREATE TABLE IF NOT EXISTS table_lifecycle_registry (
+                table_name text PRIMARY KEY,
+                lifecycle_state text NOT NULL CHECK (lifecycle_state IN ('active', 'compatibility', 'legacy', 'archived')),
+                is_active boolean NOT NULL DEFAULT true,
+                owner_component text,
+                notes text,
+                updated_at timestamptz NOT NULL DEFAULT now()
+            );
+        `);
+
+        await query(`
+            INSERT INTO table_lifecycle_registry (table_name, lifecycle_state, is_active, owner_component, notes)
+            VALUES
+                ('predictions_raw', 'active', true, 'pipeline', 'Primary raw prediction ingest table.'),
+                ('predictions_filtered', 'active', true, 'pipeline', 'Tier validation output table.'),
+                ('direct1x2_prediction_final', 'active', true, 'publish', 'Live published insights table.'),
+                ('prediction_publish_runs', 'active', true, 'publish', 'Run tracking table for all publish flows.'),
+                ('predictions_accuracy', 'active', true, 'grading', 'Prediction grading and outcomes table.'),
+                ('rapidapi_cache', 'active', true, 'ingest', 'RapidAPI payload cache wall table.'),
+                ('scheduling_logs', 'active', true, 'scheduler', 'Scheduler telemetry table.'),
+                ('predictions_final', 'compatibility', true, 'compatibility', 'Compatibility view that mirrors direct1x2_prediction_final.'),
+                ('prediction_results', 'legacy', false, 'legacy', 'Legacy accuracy table replaced by predictions_accuracy.'),
+                ('scheduler_run_locks', 'legacy', false, 'legacy', 'Legacy scheduler lock table not used by active cron routes.')
+            ON CONFLICT (table_name) DO UPDATE SET
+                lifecycle_state = EXCLUDED.lifecycle_state,
+                is_active = EXCLUDED.is_active,
+                owner_component = EXCLUDED.owner_component,
+                notes = EXCLUDED.notes,
+                updated_at = NOW();
         `);
 
         await cleanupLegacyFixtureRows();

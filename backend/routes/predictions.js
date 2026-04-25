@@ -2157,16 +2157,17 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                         t.id,
                         t.name,
                         NULL::text AS logo,
-                        t.location AS country,
-                        NULL::int AS league_id,
-                        NULL::text AS league_name,
+                        t.country AS country,
+                        l.id AS league_id,
+                        l.name AS league_name,
                         NULL::text AS league_country,
                         NULL::text AS league_season,
                         s.sport_key AS sport_id,
                         s.sport_key AS sport_slug,
                         s.title AS sport_name
                     FROM teams t
-                    LEFT JOIN sports s ON s.sport_key = t.sport_key
+                    LEFT JOIN leagues l ON l.id = t.league_id
+                    LEFT JOIN sports s ON s.sport_key = l.sport
                     WHERE LOWER(t.name) = ANY($1::text[])
                     `,
                     [teamNames]

@@ -432,6 +432,11 @@ async function initializeTables() {
             allowed_volatility JSONB NOT NULL
         )`);
 
+        await client.query(`
+            DELETE FROM tier_rules
+            WHERE tier NOT IN ('normal', 'deep')
+        `);
+
         // Acca Rules
         await client.query(`CREATE TABLE IF NOT EXISTS acca_rules (
             id BIGSERIAL PRIMARY KEY,
@@ -461,6 +466,38 @@ async function initializeTables() {
                 ('allow_high_volatility', 'true'::JSONB)
             ON CONFLICT (rule_name) DO UPDATE SET
                 rule_value = EXCLUDED.rule_value;
+        `);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS table_lifecycle_registry (
+                table_name TEXT PRIMARY KEY,
+                lifecycle_state TEXT NOT NULL CHECK (lifecycle_state IN ('active', 'compatibility', 'legacy', 'archived')),
+                is_active BOOLEAN NOT NULL DEFAULT TRUE,
+                owner_component TEXT,
+                notes TEXT,
+                updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            )
+        `);
+
+        await client.query(`
+            INSERT INTO table_lifecycle_registry (table_name, lifecycle_state, is_active, owner_component, notes)
+            VALUES
+                ('predictions_raw', 'active', TRUE, 'pipeline', 'Primary raw prediction ingest table.'),
+                ('predictions_filtered', 'active', TRUE, 'pipeline', 'Tier validation output table.'),
+                ('direct1x2_prediction_final', 'active', TRUE, 'publish', 'Live published insights table.'),
+                ('prediction_publish_runs', 'active', TRUE, 'publish', 'Run tracking table for all publish flows.'),
+                ('predictions_accuracy', 'active', TRUE, 'grading', 'Prediction grading and outcomes table.'),
+                ('rapidapi_cache', 'active', TRUE, 'ingest', 'RapidAPI payload cache wall table.'),
+                ('scheduling_logs', 'active', TRUE, 'scheduler', 'Scheduler telemetry table.'),
+                ('predictions_final', 'compatibility', TRUE, 'compatibility', 'Compatibility view that mirrors direct1x2_prediction_final.'),
+                ('prediction_results', 'legacy', FALSE, 'legacy', 'Legacy accuracy table replaced by predictions_accuracy.'),
+                ('scheduler_run_locks', 'legacy', FALSE, 'legacy', 'Legacy scheduler lock table not used by active cron routes.')
+            ON CONFLICT (table_name) DO UPDATE SET
+                lifecycle_state = EXCLUDED.lifecycle_state,
+                is_active = EXCLUDED.is_active,
+                owner_component = EXCLUDED.owner_component,
+                notes = EXCLUDED.notes,
+                updated_at = NOW()
         `);
 
         // Scheduler Run Locks (for idempotency)
