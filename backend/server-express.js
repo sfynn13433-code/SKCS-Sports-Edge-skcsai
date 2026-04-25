@@ -125,6 +125,20 @@ const directInsightsSupabase = DIRECT_INSIGHTS_SUPABASE_URL && DIRECT_INSIGHTS_S
     })
     : null;
 
+void (async () => {
+    if (!directInsightsSupabase) return;
+    const { error } = await directInsightsSupabase.from('match_context_data').insert({
+        match_id: 'FORCE_BOOT_TEST',
+        injuries: { forced: true }
+    });
+
+    if (error) {
+        console.error('[boot-force-insert] failed:', error.message);
+    } else {
+        console.log('[boot-force-insert] inserted FORCE_BOOT_TEST');
+    }
+})();
+
 const app = express();
 
 app.disable('x-powered-by');
