@@ -152,6 +152,58 @@ function normalizeTheSportsDbStartTime(event) {
     return null;
 }
 
+function deriveSeasonLabel(referenceDate = new Date()) {
+    const year = referenceDate.getUTCFullYear();
+    const month = referenceDate.getUTCMonth() + 1;
+    if (month >= 7) {
+        return `${year}-${year + 1}`;
+    }
+    return `${year - 1}-${year}`;
+}
+
+function buildUtcWindow(fromDate, toDate) {
+    const startRaw = String(fromDate || '').trim() || todayStr();
+    const endRaw = String(toDate || '').trim() || startRaw;
+    const start = new Date(`${startRaw}T00:00:00Z`);
+    const endInclusive = new Date(`${endRaw}T00:00:00Z`);
+    endInclusive.setUTCDate(endInclusive.getUTCDate() + 1);
+    return {
+        start,
+        endExclusive: endInclusive
+    };
+}
+
+function isFixtureInsideUtcWindow(startTime, windowStart, windowEndExclusive) {
+    if (!startTime) return false;
+    const parsed = new Date(startTime);
+    if (Number.isNaN(parsed.getTime())) return false;
+    return parsed >= windowStart && parsed < windowEndExclusive;
+}
+
+function isFixtureFinished(event) {
+    const status = String(event?.strStatus || '').trim().toLowerCase();
+    if (!status) return false;
+    return status.includes('match finished')
+        || status.includes('finished')
+        || status.includes('full time')
+        || status === 'ft';
+}
+
+function enumerateDateRange(fromDate, toDate, maxDays = 31) {
+    const start = new Date(`${String(fromDate || todayStr()).trim()}T00:00:00Z`);
+    const end = new Date(`${String(toDate || todayStr()).trim()}T00:00:00Z`);
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end < start) {
+        return [todayStr()];
+    }
+    const out = [];
+    const cursor = new Date(start);
+    while (cursor <= end && out.length < maxDays) {
+        out.push(cursor.toISOString().slice(0, 10));
+        cursor.setUTCDate(cursor.getUTCDate() + 1);
+    }
+    return out;
+}
+
 function mapTheSportsDbFixture(event, fallbackLeagueId) {
     const leagueId = String(event?.idLeague || fallbackLeagueId || '').trim();
     const fixtureId = String(event?.idEvent || '').trim();
@@ -171,7 +223,7 @@ function mapTheSportsDbFixture(event, fallbackLeagueId) {
         home_team: homeTeam,
         away_team: awayTeam,
         start_time: normalizeTheSportsDbStartTime(event),
-        status: 'NS',
+        status: String(event?.strStatus || 'NS').trim() || 'NS',
         league_name: event?.strLeague || event?.strLeagueAlternate || null,
         country: event?.strCountry || null,
         home_logo: event?.strHomeTeamBadge || event?.strHomeBadge || event?.strHomeLogo || null,
@@ -215,11 +267,70 @@ async function fetchUpcomingFixtures(options = {}) {
         ? options.leagueIds.map((id) => String(id || '').trim()).filter(Boolean)
         : SUPPORTED_LEAGUES;
     const uniqueLeagueIds = [...new Set(requestedLeagueIds)];
+    const requestedWindowDays = parsePositiveInt(options.windowDays, 3, 1, 21);
+    const toDate = options.toDate || futureStr(requestedWindowDays);
+    const fromDate = options.fromDate || todayStr();
+    const maxFixturesPerLeague = parsePositiveInt(
+        options.maxFixturesPerLeague ?? process.env.THESPORTSDB_MAX_FIXTURES_PER_LEAGUE,
+        60,
+        5,
+        300
+    );
+    const includeSeasonBackfill = String(options.includeSeasonBackfill ?? process.env.THESPORTSDB_SEASON_BACKFILL ?? 'true').toLowerCase() !== 'false';
+    const includeDaySweep = String(options.includeDaySweep ?? process.env.THESPORTSDB_DAY_SWEEP ?? 'true').toLowerCase() !== 'false';
+    const seasonLabel = String(options.seasonLabel || deriveSeasonLabel(new Date())).trim();
+    const { start: windowStart, endExclusive: windowEndExclusive } = buildUtcWindow(fromDate, toDate);
+    const requestedSport = normalizeRequestedSport(options.requestedSport || 'football');
+    const daySweepSportLabel = ({
+        football: 'Soccer',
+        basketball: 'Basketball',
+        baseball: 'Baseball',
+        hockey: 'Ice Hockey',
+        american_football: 'American Football',
+        rugby: 'Rugby',
+        cricket: 'Cricket',
+        tennis: 'Tennis'
+    })[requestedSport] || null;
+    const daySweepByLeague = new Map();
+
+    if (includeDaySweep && daySweepSportLabel) {
+        const dateList = enumerateDateRange(fromDate, toDate, 21);
+        const leagueFilter = new Set(uniqueLeagueIds);
+        for (let i = 0; i < dateList.length; i += 1) {
+            const date = dateList[i];
+            try {
+                const dayResponse = await sportsClient.get(`/${sportsDbKey}/eventsday.php`, {
+                    params: { d: date, s: daySweepSportLabel }
+                });
+                const events = Array.isArray(dayResponse.data?.events) ? dayResponse.data.events : [];
+                for (const event of events) {
+                    const mapped = mapTheSportsDbFixture(event, event?.idLeague);
+                    if (!mapped) continue;
+                    if (!leagueFilter.has(String(mapped.league_id || '').trim())) continue;
+                    if (isFixtureFinished(event)) continue;
+                    if (!isFixtureInsideUtcWindow(mapped.start_time, windowStart, windowEndExclusive)) continue;
+                    const key = String(mapped.league_id);
+                    if (!daySweepByLeague.has(key)) daySweepByLeague.set(key, []);
+                    daySweepByLeague.get(key).push(mapped);
+                }
+            } catch (error) {
+                console.error(`[dataProvider] TheSportsDB eventsday ${date} failed:`, error.message);
+            }
+
+            if (i < dateList.length - 1) {
+                await sleep(THESPORTSDB_DELAY_MS);
+            }
+        }
+    }
 
     const out = [];
 
     for (let i = 0; i < uniqueLeagueIds.length; i++) {
         const leagueId = uniqueLeagueIds[i];
+        const leagueRows = [];
+        if (daySweepByLeague.has(leagueId)) {
+            leagueRows.push(...daySweepByLeague.get(leagueId));
+        }
         try {
             const response = await sportsClient.get(`/${sportsDbKey}/eventsnextleague.php`, {
                 params: { id: leagueId }
@@ -229,11 +340,49 @@ async function fetchUpcomingFixtures(options = {}) {
                 .map((event) => mapTheSportsDbFixture(event, leagueId))
                 .filter(Boolean);
 
-            out.push(...mapped);
-            console.log(`[dataProvider] TheSportsDB league=${leagueId} fixtures=${mapped.length}`);
+            leagueRows.push(...mapped.filter((fixture) => (
+                isFixtureInsideUtcWindow(fixture.start_time, windowStart, windowEndExclusive)
+            )));
         } catch (error) {
-            console.error(`[dataProvider] TheSportsDB league=${leagueId} failed:`, error.message);
+            console.error(`[dataProvider] TheSportsDB league=${leagueId} next failed:`, error.message);
         }
+
+        if (includeSeasonBackfill && seasonLabel) {
+            try {
+                const seasonResponse = await sportsClient.get(`/${sportsDbKey}/eventsseason.php`, {
+                    params: { id: leagueId, s: seasonLabel }
+                });
+                const seasonEvents = Array.isArray(seasonResponse.data?.events) ? seasonResponse.data.events : [];
+                const seasonMapped = seasonEvents
+                    .filter((event) => !isFixtureFinished(event))
+                    .map((event) => mapTheSportsDbFixture(event, leagueId))
+                    .filter((fixture) => fixture && isFixtureInsideUtcWindow(fixture.start_time, windowStart, windowEndExclusive));
+                leagueRows.push(...seasonMapped);
+            } catch (error) {
+                console.error(`[dataProvider] TheSportsDB league=${leagueId} season failed:`, error.message);
+            }
+        }
+
+        const dedupedLeagueRows = [];
+        const seenFixtureIds = new Set();
+        for (const row of leagueRows) {
+            const fixtureId = String(row?.fixture_id || '').trim();
+            if (!fixtureId || seenFixtureIds.has(fixtureId)) continue;
+            seenFixtureIds.add(fixtureId);
+            dedupedLeagueRows.push(row);
+        }
+
+        dedupedLeagueRows.sort((a, b) => {
+            const aTime = new Date(a?.start_time || 0).getTime();
+            const bTime = new Date(b?.start_time || 0).getTime();
+            return aTime - bTime;
+        });
+
+        const trimmed = dedupedLeagueRows.slice(0, maxFixturesPerLeague);
+        out.push(...trimmed);
+        console.log(
+            `[dataProvider] TheSportsDB league=${leagueId} next+season=${dedupedLeagueRows.length} kept=${trimmed.length} window=${fromDate}->${toDate}`
+        );
 
         if (i < uniqueLeagueIds.length - 1) {
             await sleep(THESPORTSDB_DELAY_MS);
@@ -466,6 +615,12 @@ async function buildLiveData(options = {}) {
         80,
         2000
     );
+    const minFixturesTarget = parsePositiveInt(
+        process.env.LIVE_MIN_FIXTURES_TARGET,
+        60,
+        5,
+        2000
+    );
     const requestedLeagueId = leagueId ? String(leagueId).trim() : null;
     const isSupportedLeagueId = requestedLeagueId ? SUPPORTED_LEAGUES.includes(requestedLeagueId) : false;
     const requestedSport = normalizeRequestedSport(sport);
@@ -475,16 +630,36 @@ async function buildLiveData(options = {}) {
         || !requestedSport
         || THESPORTSDB_SUPPORTED_SPORTS.has(requestedSport);
     const leagueIdsForSportsDb = useTheSportsDbForSport && shouldFetchAllLeagues
-        ? SUPPORTED_LEAGUES
+        ? SUPPORTED_LEAGUES.filter((id) => (
+            includeAllSports
+            || !requestedSport
+            || normalizeRequestedSport(LEAGUE_SPORT_MAP[id]) === requestedSport
+        ))
         : (useTheSportsDbForSport && isSupportedLeagueId ? [requestedLeagueId] : []);
 
     const client = new APISportsClient();
+    let aggregated = [];
+    const appendAggregated = (rows, sourceLabel) => {
+        const next = dedupePredictionInputs([...(aggregated || []), ...(Array.isArray(rows) ? rows : [])]);
+        aggregated = next.slice(0, maxFixturesPerSource);
+        console.log(`[dataProvider] ${sport}: aggregate after ${sourceLabel} -> ${aggregated.length}`);
+        return aggregated.length >= minFixturesTarget;
+    };
 
     // --- Source 0: TheSportsDB (primary for supported multi-league ingestion) ---
     if (leagueIdsForSportsDb.length > 0) {
         try {
             console.log(`[dataProvider] ${sport}: fetching TheSportsDB leagues=${leagueIdsForSportsDb.join(',')}`);
-            const fixtures = await fetchUpcomingFixtures({ leagueIds: leagueIdsForSportsDb });
+            const fixtures = await fetchUpcomingFixtures({
+                leagueIds: leagueIdsForSportsDb,
+                fromDate: today,
+                toDate: windowEnd,
+                windowDays,
+                maxFixturesPerLeague: parsePositiveInt(process.env.THESPORTSDB_MAX_FIXTURES_PER_LEAGUE, 60, 5, 300),
+                includeSeasonBackfill: true,
+                includeDaySweep: true,
+                requestedSport: requestedSport || sport
+            });
             const filteredFixtures = fixtures.filter((fixture) => (
                 includeAllSports || !requestedSport || normalizeRequestedSport(fixture.sport) === requestedSport
             ));
@@ -494,7 +669,9 @@ async function buildLiveData(options = {}) {
                     .slice(0, maxFixturesPerSource)
                     .map(toPredictionInputFromSportsDbFixture));
                 console.log(`[dataProvider] ${sport}: TheSportsDB fetched=${filteredFixtures.length} returned=${out.length}`);
-                if (out.length > 0) return out;
+                if (out.length > 0 && appendAggregated(out, 'TheSportsDB')) {
+                    return aggregated;
+                }
             }
 
             console.warn(`[dataProvider] ${sport}: 0 fixtures from TheSportsDB`);
@@ -526,7 +703,9 @@ async function buildLiveData(options = {}) {
                     .filter(Boolean)
             );
             console.log(`[dataProvider] ${sport}: API-Sports fetched=${fixtures.length} returned=${out.length}`);
-            if (out.length > 0) return out;
+            if (out.length > 0 && appendAggregated(out, 'API-Sports')) {
+                return aggregated;
+            }
         }
 
         console.warn(`[dataProvider] ${sport}: 0 fixtures from API-Sports`);
@@ -543,7 +722,9 @@ async function buildLiveData(options = {}) {
             if (oddsData.length > 0) {
                 const out = dedupePredictionInputs(oddsData);
                 console.log(`[dataProvider] ${sport}: Odds API returned ${out.length} events`);
-                if (out.length > 0) return out;
+                if (out.length > 0 && appendAggregated(out, 'Odds API')) {
+                    return aggregated;
+                }
             }
         } catch (oddsErr) {
             console.error(`[dataProvider] ${sport}: Odds API fallback failed:`, oddsErr.message);
@@ -558,7 +739,9 @@ async function buildLiveData(options = {}) {
             if (sdoData.length > 0) {
                 const out = dedupePredictionInputs(sdoData);
                 console.log(`[dataProvider] ${sport}: FootballData.org returned ${out.length} events`);
-                if (out.length > 0) return out;
+                if (out.length > 0 && appendAggregated(out, 'FootballData.org')) {
+                    return aggregated;
+                }
             }
         } catch (sdoErr) {
             console.error(`[dataProvider] ${sport}: FootballData.org fallback failed:`, sdoErr.message);
@@ -572,7 +755,9 @@ async function buildLiveData(options = {}) {
         if (sdiData.length > 0) {
             const out = dedupePredictionInputs(sdiData);
             console.log(`[dataProvider] ${sport}: SportsData.io returned ${out.length} events`);
-            if (out.length > 0) return out;
+            if (out.length > 0 && appendAggregated(out, 'SportsData.io')) {
+                return aggregated;
+            }
         }
     } catch (sdiErr) {
         console.error(`[dataProvider] ${sport}: SportsData.io fallback failed:`, sdiErr.message);
@@ -585,7 +770,9 @@ async function buildLiveData(options = {}) {
         if (rapidData.length > 0) {
             const out = dedupePredictionInputs(rapidData);
             console.log(`[dataProvider] ${sport}: RapidAPI returned ${out.length} events`);
-            if (out.length > 0) return out;
+            if (out.length > 0 && appendAggregated(out, 'RapidAPI')) {
+                return aggregated;
+            }
         }
     } catch (rapidErr) {
         console.error(`[dataProvider] ${sport}: RapidAPI fallback failed:`, rapidErr.message);
@@ -599,11 +786,18 @@ async function buildLiveData(options = {}) {
             if (cricketData.length > 0) {
                 const out = dedupePredictionInputs(cricketData);
                 console.log(`[dataProvider] cricket: CricketData API returned ${out.length} events`);
-                if (out.length > 0) return out;
+                if (out.length > 0 && appendAggregated(out, 'CricketData')) {
+                    return aggregated;
+                }
             }
         } catch (cricketErr) {
             console.error(`[dataProvider] cricket: CricketData API fallback failed:`, cricketErr.message);
         }
+    }
+
+    if (aggregated.length > 0) {
+        console.log(`[dataProvider] ${sport}: all sources complete, returning aggregated ${aggregated.length} fixtures`);
+        return aggregated;
     }
 
     console.warn(`[dataProvider] ${sport}: All data sources exhausted, returning empty`);

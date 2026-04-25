@@ -21,6 +21,11 @@ const MAX_DB_ROWS = 4000;
 const DEFAULT_SINGLE_COUNT = 6;
 const ACCA_DEFAULT_SIZE = 6;
 const ACCA_MEGA_SIZE = 12;
+const VISIBLE_WINDOW_HOURS = (() => {
+    const raw = Number(process.env.EDGEMIND_VISIBLE_WINDOW_HOURS || 72);
+    if (!Number.isFinite(raw)) return 72;
+    return Math.max(24, Math.min(168, Math.floor(raw)));
+})();
 
 const ACCA_SPORTS = new Set([
     'football',
@@ -157,10 +162,12 @@ function parseKickoff(match) {
     return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
-function isKickoffToday(kickoff, nowTz) {
+function isKickoffInVisibleWindow(kickoff, nowTz) {
     if (!(kickoff instanceof Date) || Number.isNaN(kickoff.getTime())) return false;
     const kickoffTz = moment(kickoff).tz(TZ);
-    return kickoffTz.format('YYYY-MM-DD') === nowTz.format('YYYY-MM-DD');
+    const windowStart = nowTz.clone().startOf('day');
+    const windowEnd = windowStart.clone().add(VISIBLE_WINDOW_HOURS, 'hours');
+    return kickoffTz.isSameOrAfter(windowStart) && kickoffTz.isBefore(windowEnd);
 }
 
 function inferSectionType(prediction) {
@@ -464,7 +471,7 @@ async function buildDatasetForUser(user) {
             const kickoff = parseKickoff(match);
             const rowCreatedAt = row?.created_at ? new Date(row.created_at) : null;
             const availabilityTime = kickoff || rowCreatedAt;
-            if (!isKickoffToday(availabilityTime, nowTz)) continue;
+            if (!isKickoffInVisibleWindow(availabilityTime, nowTz)) continue;
 
             const sport = normalizeSport(
                 match?.sport ||
@@ -647,8 +654,8 @@ function buildSummaryResponse(dataset) {
         'EDGE MIND DATA SNAPSHOT',
         '',
         `Subscription Tier: ${String(dataset.UserSubscriptionTier || 'core').toUpperCase()}`,
-        `Available Matches Today: ${dataset.AvailableMatchesToday.length}`,
-        `Available Sports Today: ${dataset.AvailableSportsToday.join(', ') || 'none'}`,
+        `Available Matches (Next ${VISIBLE_WINDOW_HOURS}h): ${dataset.AvailableMatchesToday.length}`,
+        `Available Sports (Next ${VISIBLE_WINDOW_HOURS}h): ${dataset.AvailableSportsToday.join(', ') || 'none'}`,
         `Available Markets: ${dataset.AvailableMarkets.slice(0, 30).map(displayMarket).join(', ') || 'none'}`,
         `Daily Limits: ${formatDailyLimits(dataset.DailyLimits)}`
     ];
@@ -657,9 +664,9 @@ function buildSummaryResponse(dataset) {
 
 function responseNoData(dataset) {
     return [
-        'No visible matches are available today in your dataset.',
+        `No visible matches are available in the next ${VISIBLE_WINDOW_HOURS} hours in your dataset.`,
         `Subscription Tier: ${String(dataset.UserSubscriptionTier || 'core').toUpperCase()}`,
-        `Available Sports Today: ${dataset.AvailableSportsToday.join(', ') || 'none'}`
+        `Available Sports (Next ${VISIBLE_WINDOW_HOURS}h): ${dataset.AvailableSportsToday.join(', ') || 'none'}`
     ].join('\n');
 }
 
@@ -701,7 +708,7 @@ async function generateBotResponse(req, res) {
             const accaPool = buildAccaPool(dataset, intent, requestedTeams, preferredSports);
             notes.push(...accaPool.notes);
             if (accaPool.missingTeams.length > 0) {
-                notes.push('Some teams are not available today. I will use available matches.');
+                notes.push(`Some teams are not available in the next ${VISIBLE_WINDOW_HOURS}h window. I will use available matches.`);
             }
 
             let targetSize = intent.mega ? ACCA_MEGA_SIZE : ACCA_DEFAULT_SIZE;
@@ -713,7 +720,7 @@ async function generateBotResponse(req, res) {
                 targetSize = uniqueMatchCount;
             }
             if (targetSize <= 0) {
-                const reply = 'No ACCA-eligible picks are available today in your visible dataset.';
+                const reply = `No ACCA-eligible picks are available in the next ${VISIBLE_WINDOW_HOURS} hours in your visible dataset.`;
                 return res.status(200).json({ success: true, reply, response: reply });
             }
 
@@ -722,7 +729,7 @@ async function generateBotResponse(req, res) {
             selected = multiSport.selections;
 
             if (selected.length < 2 || !multiSport.ok) {
-                const reply = 'Multi-sport ACCA cannot be built from today\'s visible matches. Not enough cross-sport legs.';
+                const reply = `Multi-sport ACCA cannot be built from the next ${VISIBLE_WINDOW_HOURS} hours of visible matches. Not enough cross-sport legs.`;
                 return res.status(200).json({ success: true, reply, response: reply });
             }
 
@@ -744,7 +751,7 @@ async function generateBotResponse(req, res) {
 
         const poolResult = buildCandidatePool(dataset, intent, requestedTeams, preferredSports);
         if (poolResult.missingTeams.length > 0) {
-            notes.push('Some teams are not available today. I will use available matches.');
+            notes.push(`Some teams are not available in the next ${VISIBLE_WINDOW_HOURS}h window. I will use available matches.`);
         }
         if (intent.safer) {
             notes.push('Safer mode applied: lower-risk markets prioritized.');
@@ -757,7 +764,7 @@ async function generateBotResponse(req, res) {
         const selected = selectOnePickPerMatch(poolResult.pool, count);
 
         if (!selected.length) {
-            const reply = 'No eligible picks are available today in your visible dataset.';
+            const reply = `No eligible picks are available in the next ${VISIBLE_WINDOW_HOURS} hours in your visible dataset.`;
             return res.status(200).json({ success: true, reply, response: reply });
         }
 
@@ -779,7 +786,7 @@ async function generateBotResponse(req, res) {
         console.error('[edgemind] deterministic engine error:', error);
         return res.status(500).json({
             success: false,
-            error: 'Failed to build Edge Mind response from today\'s dataset.'
+            error: `Failed to build Edge Mind response from the next ${VISIBLE_WINDOW_HOURS}h dataset window.`
         });
     }
 }
