@@ -18,6 +18,7 @@ const SYNC_GRACE_MINUTES = 15;
 const SYNC_FUTURE_DAYS = 7;
 const SPORT_FETCH_STAGGER_MS = Math.max(0, Number(process.env.SPORT_FETCH_STAGGER_MS || 1200));
 const DEFAULT_SYNC_WINDOW_DAYS = Math.max(2, Math.min(3, Number(process.env.LIVE_FETCH_WINDOW_DAYS || 3)));
+const ACTIVE_DEPLOYMENT_SPORT = 'football';
 
 function isObject(value) {
     return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -285,29 +286,37 @@ function normalizeRequestedSports(input) {
         .filter(Boolean);
 }
 
+function isActiveDeploymentSport(value) {
+    return normalizeSportToken(value) === ACTIVE_DEPLOYMENT_SPORT;
+}
+
 function getSportsConfigForRequest(input) {
     const requestedSports = normalizeRequestedSports(input);
+    const footballConfigs = SPORTS_CONFIG.filter((item) => isActiveDeploymentSport(item.sport));
+
     if (!requestedSports.length) {
         return {
-            configs: SPORTS_CONFIG,
-            requestedSports: []
+            configs: footballConfigs,
+            requestedSports: [ACTIVE_DEPLOYMENT_SPORT],
+            blockedSports: []
         };
     }
 
     const requestedSet = new Set(requestedSports);
     if (requestedSet.has('all')) {
         return {
-            configs: SPORTS_CONFIG,
-            requestedSports: ['all']
+            configs: footballConfigs,
+            requestedSports: [ACTIVE_DEPLOYMENT_SPORT],
+            blockedSports: requestedSports.filter((sport) => !isActiveDeploymentSport(sport) && sport !== 'all')
         };
     }
 
+    const hasFootballRequest = requestedSports.some((sport) => isActiveDeploymentSport(sport));
+
     return {
-        configs: SPORTS_CONFIG.filter((item) => {
-            const itemSport = normalizeSportToken(item.sport);
-            return requestedSet.has(itemSport);
-        }),
-        requestedSports
+        configs: hasFootballRequest ? footballConfigs : [],
+        requestedSports: hasFootballRequest ? [ACTIVE_DEPLOYMENT_SPORT] : requestedSports,
+        blockedSports: requestedSports.filter((sport) => !isActiveDeploymentSport(sport))
     };
 }
 
@@ -322,9 +331,12 @@ async function syncSports(options = {}) {
         console.warn('[syncService] RapidAPI cache wall is not fully configured. RapidAPI fallbacks may be blocked.');
     }
 
-    const { configs, requestedSports } = getSportsConfigForRequest(options.sports);
+    const { configs, requestedSports, blockedSports } = getSportsConfigForRequest(options.sports);
     const scopeLabel = requestedSports.length ? requestedSports.join(', ') : 'all sports';
     console.log(`[syncService] Starting sports data sync for REAL matches (${scopeLabel})...`);
+    if (blockedSports.length > 0) {
+        console.log('[syncService] Phase-1 football-only gate blocked requested sports: %s', blockedSports.join(', '));
+    }
     console.log(`[syncService] Using season config: SEASON_YEAR=${SEASON_YEAR}, SEASON_RANGE=${SEASON_RANGE}`);
     const telemetryRunId = `sync_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     pipelineLogger.startRun({
@@ -332,6 +344,7 @@ async function syncSports(options = {}) {
         metadata: {
             scope: scopeLabel,
             requested_sports: requestedSports.length ? requestedSports : ['all'],
+            blocked_sports: blockedSports,
             season_year: SEASON_YEAR,
             season_range: SEASON_RANGE
         }
@@ -350,7 +363,8 @@ async function syncSports(options = {}) {
                 status: 'completed',
                 metadata: {
                     total_matches_processed: 0,
-                    note: 'no_matching_sports_config'
+                    note: 'no_matching_sports_config',
+                    blocked_sports: blockedSports
                 }
             });
             console.log('[syncService][pipeline_telemetry] %s', JSON.stringify(report, null, 2));
@@ -359,7 +373,7 @@ async function syncSports(options = {}) {
                 totalMatchesProcessed: 0,
                 rebuiltFinalOutputs: false,
                 perSport: [],
-                errors: []
+                errors: blockedSports.map((sport) => `${sport}: disabled_in_phase_1_football_only`)
             };
         }
 
@@ -378,6 +392,10 @@ async function syncSports(options = {}) {
         for (let index = 0; index < prioritizedConfigs.length; index += 1) {
             const item = prioritizedConfigs[index];
             try {
+                if (!isActiveDeploymentSport(item.sport)) {
+                    console.log('[syncService] Skipping disabled sport in phase-1 deployment: %s', item.sport);
+                    continue;
+                }
                 console.log(`[syncService] Fetching REAL matches for: ${item.sport} (tier: ${item.leagueTier || 3}, league: ${item.leagueId || 'all'}, season: ${item.season})...`);
 
                 const rawMatches = await buildLiveData({
@@ -427,6 +445,17 @@ async function syncSports(options = {}) {
                             provider_sport: rawMatch?.sport || rawMatch?.raw_provider_data?.sport || normalizationInput?.match?.sport || 'unknown',
                             canonical_sport: normalized?.sport || item.sport
                         });
+                        if (!isActiveDeploymentSport(normalized?.sport || item.sport)) {
+                            pipelineLogger.rejectionAdd({
+                                run_id: telemetryRunId,
+                                sport: normalizeSportToken(normalized?.sport || item.sport) || 'unknown',
+                                bucket: 'sport_phase_block',
+                                metadata: {
+                                    reason: 'phase_1_football_only'
+                                }
+                            });
+                            continue;
+                        }
                         if (!hasAnySharpOdds(normalized)) {
                             pipelineLogger.rejectionAdd({
                                 run_id: telemetryRunId,
@@ -539,7 +568,10 @@ async function syncSports(options = {}) {
                 totalMatchesProcessed,
                 rebuiltFinalOutputs: true,
                 perSport: Array.from(perSport.entries()).map(([sport, matchesProcessed]) => ({ sport, matchesProcessed })),
-                errors: Array.from(perSportErrors.entries()).map(([sport, error]) => ({ sport, error })),
+                errors: [
+                    ...Array.from(perSportErrors.entries()).map(([sport, error]) => ({ sport, error })),
+                    ...blockedSports.map((sport) => ({ sport, error: 'disabled_in_phase_1_football_only' }))
+                ],
                 publishRun: rebuild?.publish_run || null
             };
         } else {
@@ -559,7 +591,10 @@ async function syncSports(options = {}) {
                 totalMatchesProcessed: 0,
                 rebuiltFinalOutputs: false,
                 perSport: Array.from(perSport.entries()).map(([sport, matchesProcessed]) => ({ sport, matchesProcessed })),
-                errors: Array.from(perSportErrors.entries()).map(([sport, error]) => ({ sport, error }))
+                errors: [
+                    ...Array.from(perSportErrors.entries()).map(([sport, error]) => ({ sport, error })),
+                    ...blockedSports.map((sport) => ({ sport, error: 'disabled_in_phase_1_football_only' }))
+                ]
             };
         }
 

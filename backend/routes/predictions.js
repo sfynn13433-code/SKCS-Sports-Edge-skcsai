@@ -21,6 +21,7 @@ const { enrichWithAvailability } = require('../utils/availability');
 const { filterPredictionsByUsagePolicy, markFixtureUsed } = require('../utils/insightUsage');
 
 const router = express.Router();
+const ACTIVE_DEPLOYMENT_SPORT = 'football';
 
 const SPORT_FILTER_MAP = {
     football: [
@@ -163,9 +164,9 @@ function normalizeTierLabel(value) {
 }
 
 function getSportFilterValues(sport) {
-    const key = String(sport || '').trim().toLowerCase();
-    if (!key) return [];
-    return SPORT_FILTER_MAP[key] || [key];
+    const key = normalizePredictionSportKey(String(sport || ACTIVE_DEPLOYMENT_SPORT).trim().toLowerCase());
+    if (key !== ACTIVE_DEPLOYMENT_SPORT) return SPORT_FILTER_MAP[ACTIVE_DEPLOYMENT_SPORT] || [ACTIVE_DEPLOYMENT_SPORT];
+    return SPORT_FILTER_MAP[ACTIVE_DEPLOYMENT_SPORT] || [ACTIVE_DEPLOYMENT_SPORT];
 }
 
 function normalizeInsightTierLabel(value) {
@@ -2008,7 +2009,8 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             planId = fallbackPlanId;
         }
 
-        const sport = req.query.sport;
+        const requestedSport = req.query.sport;
+        const sport = ACTIVE_DEPLOYMENT_SPORT;
         const isAdminAudit = req.user?.is_admin === true || req.user?.isAdmin === true || isHardcodedAdmin;
         const subscriptionViewTier = resolveRequestedSubscriptionViewTier(req, req.user);
         if (!isHardcodedAdmin && !canAccessSubscriptionViewTier(req.user, subscriptionViewTier)) {
@@ -2018,7 +2020,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         const includeAllRequested = ['1', 'true'].includes(String(req.query.include_all || '').trim().toLowerCase());
         // Require explicit include_all request; do not auto-enable full-history mode for admins.
         const includeAll = includeAllRequested && (isAdminAudit || req.user?.is_test_user === true);
-        const sportFilterValues = isAdminAudit ? [] : getSportFilterValues(sport);
+        const sportFilterValues = getSportFilterValues(sport);
         
         let historyWindowDays = Number(req.query.history_days);
         if (isNaN(historyWindowDays)) {
@@ -2034,6 +2036,9 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             `[PREDICTIONS] Request for Plan: ${planId}, Sport: ${sport || 'all'}, include_all=${includeAll ? '1' : '0'}, ` +
             `view_tier=${subscriptionViewTier}, admin_audit=${isAdminAudit ? '1' : '0'}`
         );
+        if (requestedSport && normalizePredictionSportKey(requestedSport) !== ACTIVE_DEPLOYMENT_SPORT) {
+            console.log('[predictions] blocked non-football sport request: %s', requestedSport);
+        }
 
         // Get plan capabilities from subscription matrix
         const planCapabilities = getPlanCapabilities(planId);
@@ -2047,7 +2052,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         let latestPublishRunId = null;
         let publishRunSource = includeAll ? 'include_all_bypass' : 'completed_publish_run';
         if (!includeAll) {
-            latestPublishRunId = await getLatestRelevantPublishRunId(sport);
+            latestPublishRunId = await getLatestRelevantPublishRunId(ACTIVE_DEPLOYMENT_SPORT);
             if (!latestPublishRunId) {
                 latestPublishRunId = await getLatestPublishRunIdFromFinalTable();
                 if (latestPublishRunId) {
@@ -2402,7 +2407,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
 
         res.status(200).json({
             plan_id: planId,
-            sport: sport || 'all',
+            sport: ACTIVE_DEPLOYMENT_SPORT,
             publish_run_source: publishRunSource,
             include_all: includeAll,
             admin_audit: isAdminAudit,

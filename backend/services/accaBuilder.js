@@ -71,8 +71,10 @@ const {
 const MEGA_ACCA_SIZE = 12;
 const ACCA_SIZE = 6;
 const SAME_MATCH_INSIGHT_TARGET = 6;
-const ACCA_MIN_LEG_CONFIDENCE = ACCA_CONFIDENCE_MIN;
+const PHASE_ONE_ACCA_MIN_CONFIDENCE = Math.max(60, Number(process.env.PHASE_ONE_ACCA_MIN_CONFIDENCE || 70));
+const ACCA_MIN_LEG_CONFIDENCE = Math.max(ACCA_CONFIDENCE_MIN, PHASE_ONE_ACCA_MIN_CONFIDENCE);
 const VOLUME_CAP_MULTIPLIER = 5;
+const ACTIVE_DEPLOYMENT_SPORT = 'football';
 const MIXED_SPORT_TARGETS = new Set([
     'football',
     'tennis',
@@ -89,10 +91,10 @@ const MIXED_SPORT_TARGETS = new Set([
 ]);
 const SAFE_TIER3_ACCA_MARKETS = new Set(['btts_no', 'under_3_5', 'first_half_draw']);
 const ACCA_FALLBACK_LADDER = Object.freeze([
-    { pass: 'elite', minConfidence: 75, tiers: [1], safeTier3Only: false, directSafeOnly: false },
-    { pass: 'strong', minConfidence: 65, tiers: [1, 2], safeTier3Only: false, directSafeOnly: false },
-    { pass: 'safe', minConfidence: 55, tiers: [1, 2, 3], safeTier3Only: true, directSafeOnly: false },
-    { pass: 'fallback', minConfidence: 45, tiers: [1, 2, 3, 4], safeTier3Only: true, directSafeOnly: true }
+    { pass: 'elite', minConfidence: 80, tiers: [1], safeTier3Only: false, directSafeOnly: false },
+    { pass: 'strong', minConfidence: 75, tiers: [1, 2], safeTier3Only: false, directSafeOnly: false },
+    { pass: 'safe', minConfidence: ACCA_MIN_LEG_CONFIDENCE, tiers: [1, 2, 3], safeTier3Only: true, directSafeOnly: false },
+    { pass: 'fallback', minConfidence: ACCA_MIN_LEG_CONFIDENCE, tiers: [1, 2, 3, 4], safeTier3Only: true, directSafeOnly: true }
 ]);
 
 function normalizeTier(tier) {
@@ -781,6 +783,10 @@ function normalizeSportKey(value) {
     return sport;
 }
 
+function isDeploymentSportEnabled(value) {
+    return normalizeSportKey(value) === ACTIVE_DEPLOYMENT_SPORT;
+}
+
 function resolveTelemetryRunId(options = {}) {
     return options?.telemetryRunId || options?.telemetry_run_id || null;
 }
@@ -848,6 +854,8 @@ function getSportTypeLabel(sportKey) {
 
 function isPublishablePrediction(prediction, tier, now = new Date()) {
     const metadata = getMetadata(prediction);
+    const sportKey = normalizeSportKey(prediction?.sport || metadata?.sport || metadata?.sport_key || '');
+    if (!isDeploymentSportEnabled(sportKey)) return false;
 
     // Allow test data through
     if (metadata.data_mode === 'test') return true;
@@ -2506,6 +2514,9 @@ async function buildAccaLegCandidatePool(predictions, options = {}) {
 
         const baseMetadata = getMetadata(prediction);
         const normalizedSport = normalizeSportKey(prediction?.sport || baseMetadata?.sport || '');
+        if (!isDeploymentSportEnabled(normalizedSport)) {
+            continue;
+        }
         const sportType = getSportTypeLabel(normalizedSport);
 
         const fixtureIds = getAccaCandidateFixtureIds(prediction);
@@ -2753,9 +2764,12 @@ function buildMegaAcca12Candidates(predictions, options = {}) {
 
 function normalizeRequestedSports(requestedSports = []) {
     const values = Array.isArray(requestedSports) ? requestedSports : [requestedSports];
-    return values
+    const normalized = values
         .map((value) => normalizeSportKey(value))
         .filter((value) => value && value !== 'all');
+    if (!normalized.length) return [ACTIVE_DEPLOYMENT_SPORT];
+    const filtered = normalized.filter((sport) => isDeploymentSportEnabled(sport));
+    return filtered.length ? filtered : [ACTIVE_DEPLOYMENT_SPORT];
 }
 
 function getPerSportCandidateLimit(requestedSports = []) {
@@ -2875,6 +2889,15 @@ async function loadValidFilteredPredictions(tier, client, options = {}) {
     const sportFiltered = [];
     for (const row of futureRows) {
         const sport = normalizeSportKey(row?.sport || 'unknown');
+        if (!isDeploymentSportEnabled(sport)) {
+            pipelineLogger.rejectionAdd({
+                run_id: telemetryRunId,
+                sport,
+                bucket: 'sport_phase_block',
+                metadata: { stage: 'loadValidFilteredPredictions', reason: 'phase_1_football_only' }
+            });
+            continue;
+        }
         const allowed = requestedSports.length === 0 || requestedSports.includes(sport);
         if (!allowed) {
             pipelineLogger.rejectionAdd({
@@ -3214,6 +3237,11 @@ async function insertFinalRow({ publish_run_id, tier, type, matches, total_confi
         if (Number.isNaN(parsed.getTime())) return null;
         return parsed.toISOString();
     })();
+
+    if (!isDeploymentSportEnabled(sport)) {
+        console.warn('[accaBuilder] Skipping publish row type=%s due to phase-1 football-only gate (sport=%s)', normalizedType || 'unknown', sport || 'unknown');
+        return null;
+    }
 
     if (!fixtureId || !homeTeam || !awayTeam || isPlaceholderTeamName(homeTeam) || isPlaceholderTeamName(awayTeam) || sport === 'unknown') {
         console.warn(
@@ -3723,8 +3751,8 @@ async function buildFinalForTier(tier, options = {}) {
 
         // Build plan: 4 x 6-leg + 1 x 12-leg
         const buildPlan = [
-            ...Array.from({ length: categoryBuildCaps.acca_6match }, () => ({ type: 'acca_6match', legCount: 6, profile: 'single_sport' })),
-            ...Array.from({ length: categoryBuildCaps.mega_acca_12 }, () => ({ type: 'mega_acca_12', legCount: 12, profile: 'single_sport' })),
+            ...Array.from({ length: categoryBuildCaps.acca_6match }, () => ({ type: 'acca_6match', legCount: 6, profile: 'football_only' })),
+            ...Array.from({ length: categoryBuildCaps.mega_acca_12 }, () => ({ type: 'mega_acca_12', legCount: 12, profile: 'football_only' })),
         ];
         const megaExpiryCutoff = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000));
 
@@ -3939,7 +3967,7 @@ async function buildFinalForTier(tier, options = {}) {
         }
 
         if (accaRows.length === 0) {
-            const fallbackStep = { type: 'acca_6match', legCount: 6, profile: 'single_sport' };
+            const fallbackStep = { type: 'acca_6match', legCount: 6, profile: 'football_only' };
             const fallbackUsed = new Set(globalUsedFixtures);
             const fallbackPool = relaxFilters(accaMarketCandidates, { forMega: false });
             const fallbackCard = buildAccumulatorRowWithFallbackLadder(
@@ -3985,7 +4013,7 @@ async function buildFinalForTier(tier, options = {}) {
         }
 
         if (megaAccaRows.length === 0) {
-            const fallbackStep = { type: 'mega_acca_12', legCount: 12, profile: 'single_sport' };
+            const fallbackStep = { type: 'mega_acca_12', legCount: 12, profile: 'football_only' };
             const fallbackUsed = new Set(globalUsedFixtures);
             const fallbackPool = relaxFilters(accaMarketCandidates, { forMega: true });
             const fallbackCard = buildAccumulatorRowWithFallbackLadder(

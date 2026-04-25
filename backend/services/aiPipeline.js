@@ -16,10 +16,26 @@ const enrichFixtureWithContext = require('../src/services/contextIntelligence/ai
 const adjustProbability = require('../src/services/contextIntelligence/adjustProbability');
 
 let isRunning = false;
+const ACTIVE_DEPLOYMENT_SPORT = 'football';
 
 function normalizeSport(sport) {
     if (typeof sport !== 'string' || sport.trim().length === 0) throw new Error('sport must be a non-empty string');
     return sport.trim().toLowerCase();
+}
+
+function normalizeSportForDeployment(value) {
+    const key = String(value || '').trim().toLowerCase();
+    if (!key) return 'unknown';
+    if (key === 'soccer' || key === 'football' || key.startsWith('soccer_') || key.startsWith('football_')) return 'football';
+    if (key.startsWith('americanfootball_')) return 'american_football';
+    if (key === 'nba' || key.startsWith('basketball_')) return 'basketball';
+    if (key === 'nhl' || key.startsWith('icehockey_')) return 'hockey';
+    if (key.startsWith('rugbyunion_')) return 'rugby';
+    return key;
+}
+
+function isDeploymentSportEnabled(value) {
+    return normalizeSportForDeployment(value) === ACTIVE_DEPLOYMENT_SPORT;
 }
 
 function normalizePrediction(prediction) {
@@ -517,7 +533,19 @@ async function buildRawPredictionFromProviderItem(item) {
     const match_id = String(matchInfo.match_id || item.match_id || item.id || '').trim();
     if (!match_id) throw new Error('match_id missing in provider item');
 
-    const sport = normalizeSport(matchContext?.sport || item.sport || 'football');
+    const sport = normalizeSportForDeployment(matchContext?.sport || item.sport || 'football');
+    if (!isDeploymentSportEnabled(sport)) {
+        pipelineLogger.rejectionAdd({
+            run_id: telemetryRunId,
+            sport: sport || 'unknown',
+            bucket: 'sport_phase_block',
+            metadata: {
+                match_id,
+                reason: 'phase_1_football_only'
+            }
+        });
+        return null;
+    }
     const requestedMarket = String(item.market || '1X2').trim();
     pipelineLogger.stageAdd({
         run_id: telemetryRunId,
@@ -876,6 +904,28 @@ async function runPipelineForMatches({ matches, telemetry = {} }) {
         throw new Error('matches must be a non-empty array');
     }
 
+    const eligibleMatches = matches.filter((item) =>
+        isDeploymentSportEnabled(
+            item?.sport
+            || item?.match_info?.sport
+            || item?.match?.sport
+            || item?.raw_provider_data?.sport
+            || ACTIVE_DEPLOYMENT_SPORT
+        )
+    );
+
+    if (!eligibleMatches.length) {
+        console.log('[aiPipeline] all input matches were skipped by phase-1 football-only sport gate');
+        return {
+            mode: 'manual',
+            inserted: [],
+            filtered: [],
+            filtered_valid: 0,
+            filtered_invalid: 0,
+            skipped_non_football: matches.length
+        };
+    }
+
     if (isRunning) {
         console.warn('[aiPipeline] blocked: pipeline already running');
         return { mode: 'manual', inserted: [], filtered: [], filtered_valid: 0, filtered_invalid: 0, error: 'Pipeline already running' };
@@ -890,15 +940,16 @@ async function runPipelineForMatches({ matches, telemetry = {} }) {
             let normalValid = 0;
             let normalInvalid = 0;
 
-        console.log('[aiPipeline] manual matches input count=%s', matches.length);
+        console.log('[aiPipeline] manual matches input count=%s eligible_football=%s', matches.length, eligibleMatches.length);
 
-        for (const item of matches) {
+        for (const item of eligibleMatches) {
             const raw = await buildRawPredictionFromProviderItem({
                 ...item,
                 data_mode: 'manual',
                 telemetry
             });
             if (!raw) continue;
+            if (!isDeploymentSportEnabled(raw.sport)) continue;
             const dedupeKey = rawDedupeKey(raw);
             if (seenRawKeys.has(dedupeKey)) continue;
             seenRawKeys.add(dedupeKey);
@@ -951,6 +1002,7 @@ async function runPipelineForMatches({ matches, telemetry = {} }) {
                 filtered,
                 filtered_valid: filteredValid,
                 filtered_invalid: filteredInvalid,
+                skipped_non_football: Math.max(0, matches.length - eligibleMatches.length),
                 telemetry: {
                     normal_valid: normalValid,
                     normal_invalid: normalInvalid
@@ -964,6 +1016,15 @@ async function runPipelineForMatches({ matches, telemetry = {} }) {
 
 async function runPipelineFromConfiguredDataMode() {
     const { mode, predictions } = await getPredictionInputs();
+    const eligiblePredictions = (Array.isArray(predictions) ? predictions : []).filter((item) =>
+        isDeploymentSportEnabled(
+            item?.sport
+            || item?.match_info?.sport
+            || item?.match?.sport
+            || item?.raw_provider_data?.sport
+            || ACTIVE_DEPLOYMENT_SPORT
+        )
+    );
 
     if (isRunning) {
         console.warn('[aiPipeline] blocked: pipeline already running');
@@ -977,14 +1038,15 @@ async function runPipelineFromConfiguredDataMode() {
             const inserted = [];
             const seenRawKeys = new Set();
 
-        console.log('[aiPipeline] DATA_MODE=%s provider_items=%s', mode, predictions.length);
+        console.log('[aiPipeline] DATA_MODE=%s provider_items=%s eligible_football=%s', mode, predictions.length, eligiblePredictions.length);
 
-        for (const item of predictions) {
+        for (const item of eligiblePredictions) {
             const raw = await buildRawPredictionFromProviderItem({
                 ...item,
                 data_mode: mode
             });
             if (!raw) continue;
+            if (!isDeploymentSportEnabled(raw.sport)) continue;
             const dedupeKey = rawDedupeKey(raw);
             if (seenRawKeys.has(dedupeKey)) continue;
             seenRawKeys.add(dedupeKey);
@@ -1015,7 +1077,8 @@ async function runPipelineFromConfiguredDataMode() {
                 inserted,
                 filtered,
                 filtered_valid: filteredValid,
-                filtered_invalid: filteredInvalid
+                filtered_invalid: filteredInvalid,
+                skipped_non_football: Math.max(0, predictions.length - eligiblePredictions.length)
             };
         });
     } finally {

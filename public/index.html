@@ -31,6 +31,17 @@
         .feature h3 { color: #0d6efd; margin-bottom: 0.5rem; }
         .section-title { text-align: center; color: #0d6efd; margin-bottom: 2rem; font-size: 2.2rem; }
         .section-description { text-align: center; color: #666; font-size: 1.2rem; max-width: 800px; margin: 0 auto 3rem auto; }
+        .platform-update-notice {
+            max-width: 960px;
+            margin: 0 auto 1.5rem auto;
+            padding: 0.9rem 1.1rem;
+            border-radius: 8px;
+            background: #fff4e5;
+            border: 1px solid #ffd8a8;
+            color: #7a4f01;
+            font-weight: 600;
+            text-align: center;
+        }
         #contact .form-input, #contact .form-textarea { width: 100%; padding: 12px 15px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; font-family: 'Segoe UI', Arial, sans-serif; box-sizing: border-box; }
         #contact .form-input:focus, #contact .form-textarea:focus { border-color: #0d6efd; outline: none; box-shadow: 0 0 5px rgba(13, 110, 253, 0.3); }
         #contact .form-textarea { min-height: 150px; resize: vertical; }
@@ -736,27 +747,15 @@
         <h2 class="section-title">Latest Insights</h2>
         <p style="text-align:center;"><span class="policy-badge">SKCS Rule: Single-use per team per week</span></p>
         <p class="policy-note">Once a team or athlete is used in an insight, the same match is blocked from other insight formats for the rest of that calendar week unless they appear in a different event.</p>
+        <div class="platform-update-notice">Platform Update Notice: Phase 1 is active. Football and ACCA insights are available; other sports are temporarily disabled.</div>
         <p class="section-description" id="planDescription"></p>
         <div class="tabs-container">
             <div class="tabs-header">
-                <button class="tab-button active" data-tab="direct-markets"><span class="sport-icon">🎯</span> DIRECT MARKETS</button>
+                <button class="tab-button active" data-tab="football"><span class="sport-icon">⚽</span> FOOTBALL</button>
                 <button class="tab-button" data-tab="accumulators"><span class="sport-icon">🧮</span> ACCA</button>
-                <button class="tab-button" data-tab="football"><span class="sport-icon">⚽</span> FOOTBALL</button>
-                <button class="tab-button" data-tab="tennis"><span class="sport-icon">🎾</span> TENNIS</button>
-                <button class="tab-button" data-tab="basketball"><span class="sport-icon">🏀</span> BASKETBALL</button>
-                <button class="tab-button" data-tab="rugby"><span class="sport-icon">🏉</span> RUGBY</button>
-                <button class="tab-button" data-tab="cricket"><span class="sport-icon">🏏</span> CRICKET</button>
-                <button class="tab-button" data-tab="baseball"><span class="sport-icon">⚾</span> BASEBALL</button>
-                <button class="tab-button" data-tab="hockey"><span class="sport-icon">🏒</span> HOCKEY</button>
-                <button class="tab-button" data-tab="formula1"><span class="sport-icon">🏎️</span> MOTORSPORT</button>
-                <button class="tab-button" data-tab="mma"><span class="sport-icon">🥊</span> MMA</button>
-                <button class="tab-button" data-tab="afl"><span class="sport-icon">🦘</span> AFL</button>
-                <button class="tab-button" data-tab="volleyball"><span class="sport-icon">🏐</span> VOLLEYBALL</button>
-                <button class="tab-button" data-tab="handball"><span class="sport-icon">🤾</span> HANDBALL</button>
-                <button class="tab-button" data-tab="nfl"><span class="sport-icon">🏈</span> NFL</button>
             </div>
             <!-- All tab contents -->
-            <div id="direct-markets" class="tab-content active">
+            <div id="direct-markets" class="tab-content">
                 <h3 class="tab-title"><span class="sport-icon">🎯</span> Direct Markets</h3>
                 <p class="policy-note">Select a sport below to view predictions. Click any sport to see all available insights.</p>
                 <div class="direct-markets-menu">
@@ -827,7 +826,7 @@
                     </div>
                 </div>
             </div>
-            <div id="football" class="tab-content">
+            <div id="football" class="tab-content active">
                 <h3 class="tab-title"><span class="sport-icon">⚽</span> Football Insights</h3>
                 <div id="football-tier-summary" class="tier-allocation-summary" style="display:none;">
                     <h4>Your Daily Insight Allocation</h4>
@@ -888,7 +887,7 @@
                     <div id="accumulator-acca-matches" class="prediction-grid"><p>Loading...</p></div>
                 </div>
                 <div id="accumulator-mega" class="prediction-category">
-                    <h4 style="color:#7c3aed;margin-bottom:1rem;">🌐 Multi-Sport Mega ACCAs (12 Legs)</h4>
+                    <h4 style="color:#7c3aed;margin-bottom:1rem;">🌐 Mega ACCAs (12 Legs)</h4>
                     <div id="accumulator-mega-matches" class="prediction-grid"><p>Loading...</p></div>
                     <div id="mega-acca-disclosure" class="mega-acca-disclosure" style="background-color: #1a1a1a; border-left: 4px solid #ff4444; padding: 16px; margin-top: 24px; border-radius: 4px; font-size: 0.85rem; color: #a0a0a0;">
                         <div style="display: flex; align-items: center; margin-bottom: 8px;">
@@ -898,7 +897,7 @@
                             <strong style="color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">High-Risk Structural Asset</strong>
                         </div>
                         <p style="margin: 0; line-height: 1.5;">
-                            <strong>Capital Allocation Warning:</strong> Mega ACCAs (12-Leg Series) are engineered as high-variance, low-probability structural plays. While the SKCS intelligence engine enforces a strict &ge; 80% confidence floor on every individual leg across all sporting codes, the compounded mathematical variance of a 12-event sequence carries extreme risk. Never allocate your primary capital to these insights. Treat them strictly as high-yield, speculative positions.
+                            <strong>Capital Allocation Warning:</strong> Mega ACCAs (12-Leg Series) are engineered as high-variance, low-probability structural plays. While the SKCS intelligence engine enforces a strict &ge; 80% confidence floor on every individual leg, the compounded mathematical variance of a 12-event sequence carries extreme risk. Never allocate your primary capital to these insights. Treat them strictly as high-yield, speculative positions.
                         </p>
                     </div>
                 </div>
@@ -1162,7 +1161,7 @@
     const supabaseClient = window.supabaseClient || null;
     const ADMIN_EMAIL = 'sfynn13433@gmail.com';
     let authSession = null;
-    let activeSport = 'direct-markets';
+    let activeSport = 'football';
     let sharedInsightsState = [];
     let isInitialLoadComplete = false;
     const includeAllParam = new URLSearchParams(window.location.search).get('include_all');
@@ -1655,6 +1654,52 @@
         if (canonical === 'singles') return rawType || 'secondary';
 
         return rawType;
+    }
+
+    const ENABLED_INSIGHT_TABS = new Set(['football', 'accumulators']);
+    const DISABLED_SPORT_MESSAGE = 'Sport coming soon — currently in development';
+
+    function isEnabledInsightTab(tabKey) {
+        return ENABLED_INSIGHT_TABS.has(String(tabKey || '').trim().toLowerCase());
+    }
+
+    function showDisabledSportTab(tabKey) {
+        const normalizedTab = String(tabKey || '').trim().toLowerCase();
+        if (!normalizedTab) return;
+
+        document.querySelectorAll('.tab-content').forEach((c) => c.classList.remove('active'));
+        document.querySelectorAll('.tab-button').forEach((b) => b.classList.remove('active'));
+
+        const content = document.getElementById(normalizedTab);
+        if (!content) return;
+
+        const grid = content.querySelector('.prediction-grid');
+        const messageHtml = `<p style="text-align:center;color:#4a5568;padding:20px;">${DISABLED_SPORT_MESSAGE}</p>`;
+        if (grid) {
+            grid.innerHTML = messageHtml;
+        } else {
+            content.innerHTML = `<h3 class="tab-title">${humanizeToken(normalizedTab)}</h3>${messageHtml}`;
+        }
+
+        content.classList.add('active');
+    }
+
+    function enforcePhaseOneTabVisibility() {
+        document.querySelectorAll('.tab-button').forEach((btn) => {
+            const tabKey = String(btn.getAttribute('data-tab') || '').trim().toLowerCase();
+            btn.style.display = isEnabledInsightTab(tabKey) ? '' : 'none';
+        });
+
+        const activeButton = document.querySelector('.tab-button.active');
+        const activeKey = String(activeButton?.getAttribute('data-tab') || '').trim().toLowerCase();
+        if (!isEnabledInsightTab(activeKey)) {
+            document.querySelectorAll('.tab-button').forEach((b) => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach((c) => c.classList.remove('active'));
+            const footballButton = document.querySelector('.tab-button[data-tab="football"]');
+            const footballContent = document.getElementById('football');
+            if (footballButton) footballButton.classList.add('active');
+            if (footballContent) footballContent.classList.add('active');
+        }
     }
 
     const DIRECT_MARKET_SPORTS = [
@@ -2742,13 +2787,15 @@
         const activePlanId = resolveUserPlanId(userPlanId);
         const useIncludeAllRequest = INCLUDE_ALL_MODE || window.SKCS_ADMIN_UNLOCKED === true;
         window.currentUserPlanId = activePlanId;
-        const isDirectMarketsTab = sport === 'direct-markets';
-        const container = isDirectMarketsTab ? null : document.getElementById(sport + '-matches');
-        const requestSport = (sport === 'accumulators' || isDirectMarketsTab) ? '' : sport;
+        if (!isEnabledInsightTab(sport)) {
+            showDisabledSportTab(sport);
+            return;
+        }
+
+        const container = document.getElementById(sport + '-matches');
+        const requestSport = sport === 'accumulators' ? '' : sport;
         let supabaseFallbackStatus = 'not_attempted';
-        if (isDirectMarketsTab) {
-            // Direct Markets tab uses clean menu - no loading states needed
-        } else if (container) {
+        if (container) {
             container.innerHTML = '<p style="text-align:center;color:#4a5568;padding:20px;">Updating SKCS Insights...</p>';
         }
 
@@ -2931,11 +2978,6 @@
                 if (!directCounterSnapshot) {
                     directCounterSnapshot = buildClientDirectCountSnapshot(preds);
                 }
-                if (sport === 'direct-markets') {
-                    renderDirectMarkets(preds, activePlanId);
-                    syncDirectCountTargets(directCounterSnapshot);
-                    return;
-                }
                 if (sport === 'football') {
                     renderFootballInsights(preds, activePlanId);
                     syncDirectCountTargets(directCounterSnapshot);
@@ -2956,11 +2998,6 @@
             if (supaPreds && supaPreds.length > 0) {
                 sharedInsightsState = Array.isArray(supaPreds) ? supaPreds.slice() : [];
                 const fallbackDirectCounts = buildClientDirectCountSnapshot(supaPreds);
-                if (sport === 'direct-markets') {
-                    renderDirectMarkets(supaPreds, activePlanId);
-                    syncDirectCountTargets(fallbackDirectCounts);
-                    return;
-                }
                 if (sport === 'football') {
                     renderFootballInsights(supaPreds, activePlanId);
                     syncDirectCountTargets(fallbackDirectCounts);
@@ -2980,11 +3017,6 @@
             }
 
             // Nothing found - show friendly message
-            if (sport === 'direct-markets') {
-                renderDirectMarkets([], activePlanId);
-                syncDirectCountTargets({ total: 0, by_sport: {} });
-                return;
-            }
             if (sport === 'football') {
                 renderFootballInsights([]);
                 syncDirectCountTargets({ total: 0, by_sport: {} });
@@ -3006,11 +3038,6 @@
             if (supaPreds && supaPreds.length > 0) {
                 sharedInsightsState = Array.isArray(supaPreds) ? supaPreds.slice() : [];
                 const fallbackDirectCounts = buildClientDirectCountSnapshot(supaPreds);
-                if (sport === 'direct-markets') {
-                    renderDirectMarkets(supaPreds, activePlanId);
-                    syncDirectCountTargets(fallbackDirectCounts);
-                    return;
-                }
                 if (sport === 'football') {
                     renderFootballInsights(supaPreds, activePlanId);
                     syncDirectCountTargets(fallbackDirectCounts);
@@ -3027,11 +3054,6 @@
             }
             if (supabaseFallbackStatus === 'rls_or_auth_denied') {
                 console.warn('[Insights] Supabase fallback denied by RLS/auth policy after backend error.');
-            }
-            if (sport === 'direct-markets') {
-                renderDirectMarkets([], activePlanId);
-                syncDirectCountTargets({ total: 0, by_sport: {} });
-                return;
             }
             if (sport === 'football') {
                 renderFootballInsights([]);
@@ -4114,9 +4136,15 @@
             updateSubscriptionGreeting(session).catch(() => {});
         }
 
+        enforcePhaseOneTabVisibility();
+
         document.querySelectorAll('.tab-button').forEach(btn => {
             btn.addEventListener('click', function() {
                 const tid = this.getAttribute('data-tab');
+                if (!isEnabledInsightTab(tid)) {
+                    showDisabledSportTab(tid);
+                    return;
+                }
                 activeSport = tid;
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                 document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
@@ -4139,12 +4167,16 @@
         });
         
         if (!isInitialLoadComplete) {
-            fetchPredictions('direct-markets');
+            fetchPredictions('football');
             isInitialLoadComplete = true;
         }
 
         // Sport tab switcher for Direct Markets links
         window.switchSportTab = function(sportKey) {
+            if (!isEnabledInsightTab(sportKey)) {
+                showDisabledSportTab(sportKey);
+                return;
+            }
             const tabBtn = document.querySelector(`.tab-button[data-tab="${sportKey}"]`);
             if (tabBtn) {
                 tabBtn.click();

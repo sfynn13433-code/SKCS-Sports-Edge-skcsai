@@ -289,17 +289,20 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
         const queryText = includeAll
             ? `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
                FROM direct1x2_prediction_final
+               WHERE LOWER(COALESCE(sport, 'football')) = 'football'
                ORDER BY created_at DESC
                LIMIT 2500`
             : latestPublishRunId
                 ? `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
                    FROM direct1x2_prediction_final
                    WHERE publish_run_id = $1
+                     AND LOWER(COALESCE(sport, 'football')) = 'football'
                    ORDER BY total_confidence DESC, created_at DESC
                    LIMIT 3000`
                 : `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
                    FROM direct1x2_prediction_final
                    WHERE LOWER(COALESCE(tier, 'normal')) = ANY($1::text[])
+                     AND LOWER(COALESCE(sport, 'football')) = 'football'
                    ORDER BY total_confidence DESC, created_at DESC
                    LIMIT 3000`;
         const queryParams = includeAll

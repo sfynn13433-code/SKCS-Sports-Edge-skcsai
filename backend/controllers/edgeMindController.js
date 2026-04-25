@@ -21,6 +21,9 @@ const MAX_DB_ROWS = 4000;
 const DEFAULT_SINGLE_COUNT = 6;
 const ACCA_DEFAULT_SIZE = 6;
 const ACCA_MEGA_SIZE = 12;
+const ACTIVE_DEPLOYMENT_SPORT = 'football';
+const DISABLED_SPORT_REPLY = 'That sport is currently being prepared and will be available soon.';
+const BOT_ACCA_CONFIDENCE_MIN = Math.max(ACCA_CONFIDENCE_MIN, Number(process.env.BOT_ACCA_CONFIDENCE_MIN || 70));
 const VISIBLE_WINDOW_HOURS = (() => {
     const raw = Number(process.env.EDGEMIND_VISIBLE_WINDOW_HOURS || 72);
     if (!Number.isFinite(raw)) return 72;
@@ -28,13 +31,7 @@ const VISIBLE_WINDOW_HOURS = (() => {
 })();
 
 const ACCA_SPORTS = new Set([
-    'football',
-    'tennis',
-    'basketball',
-    'rugby',
-    'cricket',
-    'baseball',
-    'hockey'
+    'football'
 ]);
 
 const SAFE_MARKET_PATTERNS = Object.freeze([
@@ -47,6 +44,12 @@ const SAFE_MARKET_PATTERNS = Object.freeze([
 const SPORT_ALIASES = Object.freeze({
     soccer: 'football',
     football: 'football',
+    nba: 'basketball',
+    nfl: 'american_football',
+    'american football': 'american_football',
+    'formula 1': 'formula1',
+    f1: 'formula1',
+    motorsport: 'formula1',
     tennis: 'tennis',
     basketball: 'basketball',
     rugby: 'rugby',
@@ -74,6 +77,10 @@ function normalizeSport(value) {
     if (raw === 'nba') return 'basketball';
     if (raw === 'nfl') return 'american_football';
     return SPORT_ALIASES[raw] || raw;
+}
+
+function isDeploymentSportEnabled(value) {
+    return normalizeSport(value) === ACTIVE_DEPLOYMENT_SPORT;
 }
 
 function normalizeInsightTierLabel(value) {
@@ -264,6 +271,38 @@ function parseSportPreference(message) {
     return Array.from(new Set(out));
 }
 
+function asksForDisabledSport(message, preferredSports = []) {
+    const text = String(message || '').toLowerCase();
+    if (text.includes('all sports') || text.includes('multi-sport') || text.includes('multisport')) {
+        return true;
+    }
+
+    if (preferredSports.some((sport) => !isDeploymentSportEnabled(sport))) {
+        return true;
+    }
+
+    const disabledTokens = [
+        'tennis',
+        'basketball',
+        'nba',
+        'rugby',
+        'cricket',
+        'baseball',
+        'hockey',
+        'nfl',
+        'american football',
+        'mma',
+        'afl',
+        'volleyball',
+        'handball',
+        'formula 1',
+        'motorsport',
+        'f1'
+    ];
+
+    return disabledTokens.some((token) => text.includes(token));
+}
+
 function detectIntent(message) {
     const text = String(message || '').toLowerCase();
     const asksAcca = text.includes('acca');
@@ -334,25 +373,6 @@ function selectOnePickPerMatch(candidates, limit) {
     }
 
     return out;
-}
-
-function ensureMultiSportAcca(selected, pool) {
-    if (!selected.length) return { selections: selected, ok: false };
-
-    const sports = new Set(selected.map((row) => row.sport));
-    if (sports.size >= 2) return { selections: selected, ok: true };
-
-    const currentSport = selected[0]?.sport || null;
-    const replacement = pool.find((candidate) =>
-        candidate.sport !== currentSport &&
-        !selected.some((picked) => picked.match_id === candidate.match_id)
-    );
-    if (!replacement) return { selections: selected, ok: false };
-
-    const updated = selected.slice();
-    updated[updated.length - 1] = replacement;
-    const updatedSports = new Set(updated.map((row) => row.sport));
-    return { selections: updated, ok: updatedSports.size >= 2 };
 }
 
 function formatSelections(title, selections, notes = []) {
@@ -474,6 +494,7 @@ async function buildDatasetForUser(user) {
             if (!isKickoffInVisibleWindow(availabilityTime, nowTz)) continue;
             
             const sport = normalizeSport(row.sport || row.matches?.[0]?.sport || 'football');
+            if (!isDeploymentSportEnabled(sport)) continue;
             const market = normalizeMarketKey(row.market_type || row.matches?.[0]?.market || '');
             if (!market) continue;
             
@@ -540,6 +561,7 @@ async function buildDatasetForUser(user) {
                 match?.metadata?.sport_type ||
                 'football'
             );
+            if (!isDeploymentSportEnabled(sport)) continue;
             const market = normalizeMarketKey(match?.market || row?.market_type || '');
             if (!market) continue;
 
@@ -679,20 +701,15 @@ function buildCandidatePool(dataset, intent, requestedTeams, preferredSports) {
 function buildAccaPool(dataset, intent, requestedTeams, preferredSports) {
     let sportFilter = preferredSports.slice();
     const notes = [];
-
-    if (
-        sportFilter.length === 1 &&
-        (sportFilter[0] === 'football' || sportFilter[0] === 'soccer')
-    ) {
-        notes.push('ACCA is multi-sport only. Using all available sports.');
-        sportFilter = [];
+    if (!sportFilter.length) {
+        sportFilter = [ACTIVE_DEPLOYMENT_SPORT];
     }
 
     let pool = dataset.candidates
         .filter((row) => ACCA_SPORTS.has(normalizeSport(row.sport)))
         .filter((row) =>
             isAccaMarketAllowed(row.market) &&
-            Number(row.confidence || 0) >= ACCA_CONFIDENCE_MIN
+            Number(row.confidence || 0) >= BOT_ACCA_CONFIDENCE_MIN
         );
 
     if (intent.safer) {
@@ -756,6 +773,14 @@ async function generateBotResponse(req, res) {
         const preferredSports = parseSportPreference(message);
         const notes = [];
 
+        if (asksForDisabledSport(message, preferredSports)) {
+            return res.status(200).json({
+                success: true,
+                reply: DISABLED_SPORT_REPLY,
+                response: DISABLED_SPORT_REPLY
+            });
+        }
+
         if (intent.mode === 'summary') {
             const reply = buildSummaryResponse(dataset);
             return res.status(200).json({
@@ -785,12 +810,10 @@ async function generateBotResponse(req, res) {
                 return res.status(200).json({ success: true, reply, response: reply });
             }
 
-            let selected = selectOnePickPerMatch(accaPool.pool, targetSize);
-            const multiSport = ensureMultiSportAcca(selected, accaPool.pool);
-            selected = multiSport.selections;
+            const selected = selectOnePickPerMatch(accaPool.pool, targetSize);
 
-            if (selected.length < 2 || !multiSport.ok) {
-                const reply = `Multi-sport ACCA cannot be built from the next ${VISIBLE_WINDOW_HOURS} hours of visible matches. Not enough cross-sport legs.`;
+            if (selected.length < 2) {
+                const reply = `No ACCA-eligible picks are available in the next ${VISIBLE_WINDOW_HOURS} hours in your visible dataset.`;
                 return res.status(200).json({ success: true, reply, response: reply });
             }
 

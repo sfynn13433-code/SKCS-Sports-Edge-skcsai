@@ -35,6 +35,17 @@ async function handleSyncRequest(res, options = {}) {
     const requestedSport = options.requestedSport ? String(options.requestedSport).toLowerCase() : null;
     const waitForCompletion = options.waitForCompletion === true;
     const triggerLabel = options.triggerLabel || 'manual sync';
+    const footballOnlyPhase = 'football';
+
+    if (requestedSport && requestedSport !== footballOnlyPhase) {
+        return res.status(200).json({
+            ok: true,
+            message: 'Sport disabled in current deployment phase',
+            requestedSport,
+            activeSport: footballOnlyPhase,
+            note: 'Phase 1 is football + ACCA only'
+        });
+    }
 
     console.log(`[pipeline] Starting ${triggerLabel}${requestedSport ? ` for ${requestedSport}` : ''}...`);
 
