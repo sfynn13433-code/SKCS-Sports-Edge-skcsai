@@ -305,6 +305,8 @@ function describeRuntimeConfig() {
 function normalizeFixture(f, date) {
     const homeTeam = f.teams?.home?.name;
     const awayTeam = f.teams?.away?.name;
+    const homeTeamId = f.teams?.home?.id;
+    const awayTeamId = f.teams?.away?.id;
     
     if (!homeTeam || !awayTeam) {
         console.log(`[normalizeFixture] Skipping fixture with missing team: home=${homeTeam}, away=${awayTeam}`);
@@ -315,6 +317,8 @@ function normalizeFixture(f, date) {
         match_id: String(f.fixture?.id || ''),
         home_team: homeTeam,
         away_team: awayTeam,
+        home_team_id: homeTeamId ? String(homeTeamId) : null,
+        away_team_id: awayTeamId ? String(awayTeamId) : null,
         league: f.league?.name || null,
         country: f.league?.country || null,
         league_id: f.league?.id ? String(f.league.id) : null,
@@ -327,49 +331,70 @@ function normalizeFixture(f, date) {
 }
 
 // ============================================================
-// MASTER LEAGUES LIST (API-Sports IDs)
+// TARGET LEAGUES LIST (API-Sports IDs)
 // ============================================================
-const MASTER_LEAGUES = new Set([
-    // EUROPE: TOP TIERS
-    39, 140, 135, 78, 61,       // Big 5
-    88, 94, 179, 203,           // Additional Europe
-    144, 207, 218, 197,         // Belgium, Switzerland, Austria, Greece
-    106, 345, 113, 103, 119,   // Poland, Czech, Sweden, Norway, Denmark
-    172, 318, 224, 118,         // Bulgaria, Cyprus, Finland, Iceland
-    
-    // EUROPE: LOWER TIERS
-    40, 41, 42,                  // England 2-4
-    141,                          // Spain Segunda
-    79, 80,                      // Germany 2-3
-    136, 137,                    // Italy B-C
-    62, 63,                      // France 2-3
-    95, 89, 180, 204,           // Portugal, Netherlands, Scotland, Turkey 2nd
-    114, 104, 120, 107,         // Sweden2, Norway2, Denmark2, Poland2
-    
-    // AMERICAS
-    253, 254,                    // USA MLS, USL
-    262,                         // Mexico
-    71, 72,                      // Brazil A-B
-    128,                         // Argentina
-    239, 265, 268, 130,         // Colombia, Chile, Uruguay, Costa Rica
-    
+const TARGET_LEAGUES = [
+    // ==========================================
+    // EUROPE: TOP, 2ND, & 3RD TIERS
+    // ==========================================
+    39, 40, 41, 42,      // England (Premier League, Championship, L1, L2)
+    140, 141,            // Spain (La Liga, Segunda)
+    78, 79, 80,          // Germany (Bundesliga, 2. Bundesliga, 3. Liga)
+    135, 136, 137,       // Italy (Serie A, Serie B, Serie C)
+    61, 62, 63,          // France (Ligue 1, Ligue 2, National 1)
+    94, 95,              // Portugal (Primeira, Liga 2)
+    88, 89,              // Netherlands (Eredivisie, Eerste Divisie)
+    144, 145,            // Belgium (Pro League, Challenger)
+    179, 180,            // Scotland (Premiership, Championship)
+    203, 204,            // Turkey (Super Lig, 1. Lig)
+    207, 208,            // Switzerland (Super League, Challenge)
+    218, 219,            // Austria (Bundesliga, 2. Liga)
+    197,                 // Greece (Super League 1)
+    113, 114,            // Sweden (Allsvenskan, Superettan)
+    103, 104,            // Norway (Eliteserien, OBOS)
+    119, 120,            // Denmark (Superliga, 1st Div)
+    106, 107,            // Poland (Ekstraklasa, I Liga)
+    345,                 // Czech Republic (First League)
+    172,                 // Bulgaria (First League)
+    318,                 // Cyprus (First Division)
+    224,                 // Finland (Veikkausliiga)
+    118,                 // Iceland (Urvalsdeild)
+
+    // ==========================================
+    // AMERICAS (NORTH & SOUTH)
+    // ==========================================
+    253, 254,            // USA (MLS, USL Championship)
+    262,                 // Mexico (Liga MX)
+    71, 72,              // Brazil (Serie A, Serie B)
+    128,                 // Argentina (Liga Profesional)
+    239,                 // Colombia (Primera A)
+    265,                 // Chile (Primera Division)
+    268,                 // Uruguay (Primera Division)
+    130,                 // Costa Rica (Primera)
+
+    // ==========================================
     // ASIA & OCEANIA
-    98, 99,                      // Japan J1-J2
-    169,                          // China
-    292,                          // South Korea
-    307, 301,                     // Saudi, UAE
-    188,                          // Australia
-    
-    // AFRICA
-    288, 289,                    // South Africa
-    233,                          // Egypt
-    195,                          // Algeria
-    315,                          // Ghana
-    326                           // Kenya
-]);
+    // ==========================================
+    98, 99,              // Japan (J1, J2 League)
+    169,                 // China (Super League)
+    292,                 // South Korea (K League 1)
+    307,                 // Saudi Arabia (Pro League)
+    301,                 // UAE (Pro League)
+    188,                 // Australia (A-League)
+
+    // ==========================================
+    // AFRICA: MAJOR LEAGUES
+    // ==========================================
+    288, 289,            // South Africa (DStv Premiership, Motsepe Foundation)
+    233,                 // Egypt (Premier League)
+    195,                 // Algeria (Ligue 1)
+    315,                 // Ghana (Premier League)
+    326                  // Kenya (Premier League)
+];
+const TARGET_LEAGUE_SET = new Set(TARGET_LEAGUES);
 
 console.log('=== SKCS INCREMENTAL DATA PIPELINE ===');
-console.log(`Master Leagues: ${MASTER_LEAGUES.size}`);
+console.log(`Target Leagues: ${TARGET_LEAGUES.length}`);
 console.log(`Rapid/API key pool: ${REQUEST_KEY_POOL.length > 0 ? `✓ ${REQUEST_KEY_POOL.length} keys` : '✗ Missing'}`);
 console.log(`Football host candidates: ${FOOTBALL_HOST_CANDIDATES.length}`);
 console.log(`RapidAPI Key: ${RAPIDAPI_KEY ? '✓ Set' : '✗ Missing'}`);
@@ -377,131 +402,185 @@ describeRuntimeConfig();
 console.log('');
 
 // ============================================================
-// STEP 1: SINGLE API CALL WITH LOCAL FILTERING
+// STEP 1: TARGET LEAGUE SWEEP (NEXT 10 FIXTURES PER LEAGUE)
 // ============================================================
-// NEW: Fetch ALL leagues (no filtering)
 async function fetchAllLeaguesFixtures() {
-    const today = new Date();
-    const dates = [];
-    
-    // Fetch for today + next 14 days to cover all upcoming matches
-    for (let i = 0; i <= 14; i++) {
-        const d = new Date(today);
-        d.setDate(today.getDate() + i);
-        dates.push(d.toISOString().split('T')[0]);
-    }
-    
-    console.log(`[ALL LEAGUES] Fetching fixtures for dates: ${dates.join(', ')}`);
-    console.log('[ALL LEAGUES] Fetching ALL leagues (no filtering)...');
-    
+    console.log(`[STEP 1] Fetching next=10 fixtures for ${TARGET_LEAGUES.length} target leagues (season 2025)...`);
     const allFixtures = [];
-    
-    for (const date of dates) {
+    const seenFixtureIds = new Set();
+
+    for (const leagueId of TARGET_LEAGUES) {
         try {
-            console.log(`[RapidAPI/API-Sports] Calling football fixtures for ${date}`);
-            
-            const response = await requestApiFootballWithRotation({ date });
-            
+            const url = `https://v3.football.api-sports.io/fixtures?league=${leagueId}&season=2025&next=10`;
+            console.log(`[RapidAPI/API-Sports] Calling ${url}`);
+
+            const response = await requestApiFootballWithRotation({
+                league: leagueId,
+                season: 2025,
+                next: 10
+            });
+
             const fixtures = response.data?.response || [];
-            console.log(`[RapidAPI/API-Sports] ${date}: ${fixtures.length} fixtures`);
-            
-            // Add ALL fixtures (no filtering!)
+            console.log(`[RapidAPI/API-Sports] League ${leagueId}: ${fixtures.length} fixtures`);
+
             for (const f of fixtures) {
-                const fixture = normalizeFixture(f, date);
-                if (fixture) {
-                    allFixtures.push(fixture);
-                }
+                const fixture = normalizeFixture(f, null);
+                if (!fixture || !fixture.match_id || seenFixtureIds.has(fixture.match_id)) continue;
+                seenFixtureIds.add(fixture.match_id);
+                allFixtures.push(fixture);
             }
+
+            await new Promise((r) => setTimeout(r, 300));
         } catch (err) {
-            console.error(`[RapidAPI/API-Sports] Error for ${date}:`, err.message);
+            console.error(`[RapidAPI/API-Sports] Error for league ${leagueId}:`, err.message);
+            if (err.response?.status === 429) {
+                console.log('[RapidAPI/API-Sports] Rate limited, waiting...');
+                await new Promise((r) => setTimeout(r, 10000));
+            }
         }
     }
-    
-    console.log(`[ALL LEAGUES] Total fixtures: ${allFixtures.length}`);
+
+    console.log(`[STEP 1] Total fixtures across target leagues: ${allFixtures.length}`);
     return allFixtures;
 }
 
 async function fetchFixturesSingleAPI() {
-    const today = new Date();
-    const dates = [];
-    
-    // Fetch for today + next 7 days to cover all upcoming matches
-    for (let i = 0; i <= 7; i++) {
-        const d = new Date(today);
-        d.setDate(today.getDate() + i);
-        dates.push(d.toISOString().split('T')[0]);
-    }
-    
-    console.log(`[STEP 1] Fetching fixtures for: ${dates.join(', ')}`);
-    console.log('[STEP 1] Using single API call with local master league filtering...');
-    
+    // Kept for backwards compatibility with older callers.
+    console.log('[STEP 1] Legacy fetchFixturesSingleAPI invoked, routing to target league sweep.');
+    const filteredLeagueSet = TARGET_LEAGUE_SET;
     const allFixtures = [];
-    
-    for (const date of dates) {
-        try {
-            // Single API call - NO league looping
-            console.log(`[RapidAPI/API-Sports] Calling football fixtures for ${date}`);
-            
-            const response = await requestApiFootballWithRotation({ date });
-            
-            const fixtures = response.data?.response || [];
-            console.log(`[RapidAPI/API-Sports] Total received: ${fixtures.length} fixtures`);
-            
-            // Filter locally by master leagues
-            for (const f of fixtures) {
-                const leagueId = f.league?.id;
-                
-                if (MASTER_LEAGUES.has(leagueId)) {
-                    allFixtures.push({
-                        match_id: String(f.fixture.id),
-                        sport: 'football',
-                        home_team: f.teams?.home?.name || null,
-                        away_team: f.teams?.away?.name || null,
-                        date: f.fixture.date || null,
-                        status: f.fixture.status?.short || 'NS',
-                        market: '1X2',
-                        prediction: null,
-                        confidence: null,
-                        volatility: null,
-                        odds: null,
-                        provider: 'api-sports',
-                        provider_name: 'API-Football',
-                        league: f.league?.name || 'Unknown',
-                        league_id: String(leagueId),
-                        home_logo: f.teams?.home?.logo || null,
-                        away_logo: f.teams?.away?.logo || null,
-                        venue: f.fixture.venue?.name || null,
-                        city: f.fixture.venue?.city || null,
-                        country: f.league?.country || null,
-                        round: f.league?.round || null,
-                        raw_provider_data: f
-                    });
-                }
-            }
-            
-            console.log(`[RapidAPI/API-Sports] Filtered to ${allFixtures.length} master league fixtures`);
-            
-            // Small delay to avoid rate limits
-            await new Promise(r => setTimeout(r, 300));
-            
-        } catch (err) {
-            console.warn(`[RapidAPI/API-Sports] ${date} failed:`, err.message);
-            if (err.response?.status === 429) {
-                console.log('[RapidAPI/API-Sports] Rate limited, waiting...');
-                await new Promise(r => setTimeout(r, 10000));
-            }
-        }
+    const fixtures = await fetchAllLeaguesFixtures();
+
+    for (const f of fixtures) {
+        if (!filteredLeagueSet.has(Number(f.league_id))) continue;
+        allFixtures.push({
+            match_id: String(f.match_id || ''),
+            sport: 'football',
+            home_team: f.home_team || null,
+            away_team: f.away_team || null,
+            home_team_id: f.home_team_id || null,
+            away_team_id: f.away_team_id || null,
+            date: f.date || null,
+            status: f.status || 'NS',
+            market: '1X2',
+            prediction: null,
+            confidence: null,
+            volatility: null,
+            odds: null,
+            provider: 'api-sports',
+            provider_name: 'API-Football',
+            league: f.league || 'Unknown',
+            league_id: String(f.league_id || ''),
+            home_logo: null,
+            away_logo: null,
+            venue: f.venue || null,
+            city: null,
+            country: f.country || null,
+            round: f.round || null,
+            raw_provider_data: null
+        });
     }
-    
-    console.log(`[STEP 1] Total fixtures: ${allFixtures.length}`);
+
     return allFixtures;
 }
 
-// STEP 2: WEATHER (SKIP FOR NOW)
 // ============================================================
+// STEP 2: WEATHER 
+// ============================================================
+const { enrichWithAvailability } = require('../backend/utils/availability');
+
 async function fetchWeatherForFixtures(fixtures) {
-    console.log('\n[STEP 2] Skipping weather fetch');
-    return fixtures;
+    console.log('\n[STEP 2] Enriching weather and availability data...');
+    try {
+        const withWeather = await enrichWithWeather(fixtures);
+        return await enrichWithAvailability(withWeather);
+    } catch (e) {
+        console.warn('[STEP 2] Fallback: Weather/Availability enrichment failed', e.message);
+        return fixtures;
+    }
+}
+
+// ============================================================
+// STEP 2B: FETCH HEAD-TO-HEAD DATA
+// ============================================================
+const { APISportsClient } = require('../backend/apiClients');
+const apiSports = new APISportsClient();
+
+const h2hCache = new Map();
+const H2H_CACHE_TTL = 60 * 60 * 1000;
+
+async function fetchH2HForFixtures(fixtures, limit = 30) {
+    console.log('\n[STEP 2B] Fetching head-to-head data...');
+    
+    const candidates = fixtures.slice(0, limit).filter(f => 
+        f.home_team_id && f.away_team_id && 
+        !f.metadata?.h2h_fetched
+    );
+    
+    if (!candidates.length) {
+        console.log('[STEP 2B] No fixtures need H2H data');
+        return fixtures;
+    }
+    
+    console.log(`[STEP 2B] Fetching H2H for ${candidates.length} fixtures...`);
+    
+    const enrichedFixtures = [...fixtures];
+    let fetched = 0;
+    
+    for (const fx of candidates) {
+        const homeId = fx.home_team_id;
+        const awayId = fx.away_team_id;
+        const cacheKey = `${homeId}-${awayId}`;
+        
+        if (h2hCache.has(cacheKey)) {
+            const cached = h2hCache.get(cacheKey);
+            if (Date.now() - cached.timestamp < H2H_CACHE_TTL) {
+                fx.h2h = cached.data;
+                fx.metadata = fx.metadata || {};
+                fx.metadata.h2h_fetched = true;
+                continue;
+            }
+        }
+        
+        try {
+            const result = await apiSports.getHeadToHead(homeId, awayId);
+            const matches = result?.response?.slice(0, 5) || [];
+            
+            let summary = '';
+            if (matches.length > 0) {
+                const homeWins = matches.filter(m => 
+                    m.teams?.home?.winner || m.fixture?.status?.short === 'FT'
+                ).filter(m => {
+                    const score = m.goals;
+                    return score?.home > score?.away;
+                }).length;
+                const awayWins = matches.filter(m => {
+                    const score = m.goals;
+                    return score?.away > score?.home;
+                }).length;
+                const draws = matches.length - homeWins - awayWins;
+                summary = `Last ${matches.length}: ${homeWins}W ${draws}D ${awayWins}A`;
+            } else {
+                summary = 'No recent meetings';
+            }
+            
+            fx.h2h = summary;
+            fx.metadata = fx.metadata || {};
+            fx.metadata.h2h_fetched = true;
+            h2hCache.set(cacheKey, { data: summary, timestamp: Date.now() });
+            fetched++;
+            
+            await new Promise(r => setTimeout(r, 300));
+        } catch (err) {
+            console.warn(`[H2H] Failed for ${homeId} vs ${awayId}:`, err.message);
+            fx.h2h = 'H2H data unavailable';
+            fx.metadata = fx.metadata || {};
+            fx.metadata.h2h_fetched = true;
+        }
+    }
+    
+    console.log(`[STEP 2B] Fetched H2H for ${fetched} fixtures`);
+    return enrichedFixtures;
 }
 
 // STEP 3: FETCH NEWS (SKIP - NOT CRITICAL)
@@ -635,16 +714,46 @@ function buildEdgeMindFallbackReport(fixture, outcome, confidence) {
         action = `Final confidence score: **${Math.round(confidence)}%**. 🛑 CRITICAL WARNING: The Direct 1X2 market is EXTREME RISK. 🚫 ACTION REQUIRED: Do NOT place a direct market bet on this fixture. Use the 4 Secondary Insights instead.`;
     }
 
-    const conditions = ['rain', 'clear', 'windy', 'overcast'];
-    const weather = fixture.weather || conditions[Math.floor(Math.random() * conditions.length)];
-    const absent = Math.floor(Math.random() * 3) + 1;
-    const initialProb = Math.round(confidence + (Math.random() * 6 - 3));
+    let weatherStr = fixture.weather?.description || fixture.metadata?.weather_summary;
+    if (!weatherStr || typeof weatherStr !== 'string' || weatherStr === 'Unknown' || weatherStr === 'Unavailable') {
+        weatherStr = null;
+    }
     
-    return `📊 **Stage 1 (Baseline):** On paper, the baseline metrics project an initial probability of ${initialProb}% for ${market}.
+    let absentStr = '';
+    const availabilityInfo = fixture.availability || fixture.metadata?.availability;
+    if (availabilityInfo && availabilityInfo !== 'Injury data unavailable' && availabilityInfo !== 'Data updating...') {
+        absentStr = availabilityInfo;
+    } else {
+        absentStr = 'availability data pending verification';
+    }
 
-🧠 **Stage 2 (Deep Context):** Analyzing team intelligence, ${home} is showing strong underlying metrics, though missing ${absent} key rotational players could impact their transition play in this ${leagueContext} clash.
+    let h2hText = '';
+    const h2hData = fixture.h2h || fixture.metadata?.h2h;
+    if (h2hData && typeof h2hData === 'string' && !h2hData.includes('unavailable')) {
+        h2hText = `\n\n⚔️ **Head-to-Head:** ${h2hData}`;
+    }
+    
+    let formText = '';
+    if (fixture.home_form && fixture.away_form) {
+        formText = `\n\n📈 **Recent Form:** ${fixture.home_team} [H]: ${fixture.home_form} • ${fixture.away_team} [A]: ${fixture.away_form}`;
+    }
+    
+    let injuryText = '';
+    if (absentStr && absentStr !== 'availability data pending verification' && absentStr !== 'Injury data unavailable') {
+        injuryText = `\n\n🏥 **Squad Availability:** ${absentStr}`;
+    }
+    
+    let weatherText = '';
+    if (weatherStr) {
+        const temp = fixture.weather?.temp ? ` (${fixture.weather.temp}°C)` : '';
+        weatherText = `\n\n🌦️ **Weather:** ${weatherStr}${temp}`;
+    }
+    
+    return `📊 **Stage 1 (Baseline):** Baseline metrics project a probability of ${Math.round(confidence)}% for ${market}.${h2hText}${formText}${injuryText}${weatherText}
 
-🌦️ **Stage 3 (Reality Check):** External volatility is a factor here; ${weather} conditions may disrupt passing lanes, increasing variance.
+🧠 **Stage 2 (Deep Context):** This match analysis is based on market odds and historical performance data. Specific team intelligence (lineups, tactics, injuries) requires live matchday verification.
+
+🌐 **Stage 3 (External Factors):** Weather and venue conditions may introduce variance to expected performance.${weatherStr ? '' : ' Weather data pending confirmation.'}
 
 🎯 **Stage 4 (Decision Engine):** ${action}`;
 }
@@ -1351,6 +1460,9 @@ async function runLiveSync() {
         
         // STEP 2: Weather
         fixtures = await fetchWeatherForFixtures(fixtures);
+        
+        // STEP 2B: Head-to-head
+        fixtures = await fetchH2HForFixtures(fixtures, 40);
         
         // STEP 3: News (RapidAPI Waterfall)
         await fetchFootballNews();

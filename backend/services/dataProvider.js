@@ -107,6 +107,883 @@ function normalizeRequestedSport(sport) {
     return key;
 }
 
+function normalizeCompetitionText(value) {
+    return String(value || '')
+        .trim()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+}
+
+const FOOTBALL_TARGET_LEAGUE_IDS = Object.freeze(new Set([
+    '39', '40', '41', '42',
+    '140', '141',
+    '78', '79', '80',
+    '135', '136', '137',
+    '61', '62', '63',
+    '94', '95',
+    '88', '89',
+    '144', '145',
+    '179', '180',
+    '203', '204',
+    '207', '208',
+    '218', '219',
+    '197',
+    '113', '114',
+    '103', '104',
+    '119', '120',
+    '106', '107',
+    '345',
+    '172',
+    '318',
+    '224',
+    '118',
+    '253', '254',
+    '262',
+    '71', '72',
+    '128',
+    '239',
+    '265',
+    '268',
+    '130',
+    '98', '99',
+    '169',
+    '292',
+    '307',
+    '301',
+    '188',
+    '288', '289',
+    '233',
+    '195',
+    '315',
+    '326'
+]));
+const FOOTBALL_TARGET_COMPETITION_ALIASES = Object.freeze([
+    'premier league',
+    'championship',
+    'league one',
+    'league two',
+    'la liga',
+    'segunda',
+    'bundesliga',
+    '2 bundesliga',
+    '3 liga',
+    'serie a',
+    'serie b',
+    'serie c',
+    'ligue 1',
+    'ligue 2',
+    'national 1',
+    'primeira liga',
+    'liga portugal 2',
+    'eredivisie',
+    'eerste divisie',
+    'pro league',
+    'challenger pro league',
+    'scottish premiership',
+    'scottish championship',
+    'super lig',
+    '1 lig',
+    'super league',
+    'challenge league',
+    'allsvenskan',
+    'superettan',
+    'eliteserien',
+    'obos',
+    'superliga',
+    'ekstraklasa',
+    'i liga',
+    'first league',
+    'first division',
+    'veikkausliiga',
+    'urvalsdeild',
+    'major league soccer',
+    'mls',
+    'usl championship',
+    'liga mx',
+    'brasileirao',
+    'liga profesional',
+    'primera a',
+    'primera division',
+    'j1 league',
+    'j2 league',
+    'chinese super league',
+    'k league 1',
+    'saudi pro league',
+    'uae pro league',
+    'a league',
+    'dstv premiership',
+    'motsepe',
+    'egyptian premier league',
+    'ghana premier league',
+    'kenyan premier league'
+]);
+const FOOTBALL_TARGET_COMPETITION_ALIAS_SET = new Set(
+    FOOTBALL_TARGET_COMPETITION_ALIASES.map(normalizeCompetitionText).filter(Boolean)
+);
+
+const TENNIS_TARGET_TOURNAMENT_ALIASES = Object.freeze([
+    'us open',
+    'bnp paribas open',
+    'indian wells open',
+    'indian wells',
+    'miami open',
+    'miami open presented by itau',
+    'cincinnati open',
+    'internazionali bnl d italia',
+    'italian open',
+    'rome masters',
+    'nitto atp finals',
+    'atp finals turin',
+    'atp finals',
+    'roland garros',
+    'french open',
+    'rolex paris masters',
+    'paris masters',
+    'mutua madrid open',
+    'madrid open',
+    'barcelona open banc sabadell',
+    'trofeo conde de godo',
+    'barcelona open',
+    'the championships wimbledon',
+    'wimbledon',
+    'hsbc championships',
+    'queens club',
+    'australian open',
+    'brisbane international',
+    'adelaide international',
+    'china open',
+    'rolex shanghai masters',
+    'shanghai masters',
+    'ieb argentina open',
+    'argentina open',
+    'buenos aires',
+    'porsche tennis grand prix',
+    'boss open',
+    'stuttgart open',
+    'terra wortmann open',
+    'halle open',
+    'tata open maharashtra',
+    'rio open presented by claro',
+    'rio open',
+    'abierto mexicano telcel presentado por hsbc',
+    'acapulco',
+    'mifel tennis open by telcel oppo',
+    'mifel tennis open',
+    'los cabos',
+    'dubai duty free tennis championships',
+    'dubai tennis championships',
+    'mubadala abu dhabi open',
+    'abu dhabi open',
+    'kinoshita group japan open tennis championships',
+    'japan open tennis championships',
+    'toray pan pacific open tennis',
+    'pan pacific open',
+    'swiss indoors basel',
+    'basel open',
+    'erste bank open',
+    'vienna open'
+]);
+const TENNIS_TARGET_TOURNAMENT_ALIAS_SET = new Set(
+    TENNIS_TARGET_TOURNAMENT_ALIASES.map(normalizeCompetitionText).filter(Boolean)
+);
+const BASKETBALL_TARGET_COMPETITION_ALIASES = Object.freeze([
+    'national basketball association',
+    'nba',
+    'nba cup',
+    'nba playoffs',
+    'liga endesa',
+    'liga acb',
+    'copa del rey',
+    'supercopa endesa',
+    'easycredit bbl',
+    'basketball bundesliga',
+    'bbl pokal',
+    'lnb pro a',
+    'ligue nationale de basket pro a',
+    'leaders cup',
+    'french cup',
+    'lega basket serie a',
+    'lba',
+    'coppa italia',
+    'supercoppa italiana',
+    'stoiximan greek basketball league',
+    'greek basketball league',
+    'gbl',
+    'greek cup',
+    'turkiye sigorta basketball super league',
+    'turkish basketball super league',
+    'bsl',
+    'turkish cup',
+    'vtb united league',
+    'edinaya liga vtb',
+    'vtb united league cup',
+    'national basketball league',
+    'nbl',
+    'nbl cup',
+    'chinese basketball association',
+    'cba',
+    'cba cup',
+    'liga nacional de basquetbol',
+    'liga nacional de basquet',
+    'supercopa de la liga',
+    'super 20 cup',
+    'novo basquete brasil',
+    'nbb',
+    'supercopa do brasil de basquete',
+    'canadian elite basketball league',
+    'cebl',
+    'cebl championship weekend',
+    'b league',
+    'b league b1',
+    'emperors cup',
+    'korean basketball league',
+    'kbl',
+    'kbl cup',
+    'super league basketball',
+    'slb',
+    'slb cup',
+    'slb trophy',
+    'turkish airlines euroleague',
+    'euroleague',
+    'euroleague final four',
+    'bkt eurocup',
+    'eurocup',
+    'eurocup finals'
+]);
+const BASKETBALL_TARGET_COMPETITION_ALIAS_SET = new Set(
+    BASKETBALL_TARGET_COMPETITION_ALIASES.map(normalizeCompetitionText).filter(Boolean)
+);
+const RUGBY_TARGET_COMPETITION_ALIASES = Object.freeze([
+    // Rugby Union
+    'gallagher premiership rugby',
+    'premiership rugby',
+    'premiership rugby cup',
+    'top 14',
+    'vodacom united rugby championship',
+    'united rugby championship',
+    'urc',
+    'dhl super rugby pacific',
+    'super rugby pacific',
+    'carling currie cup premier division',
+    'currie cup premier division',
+    'currie cup',
+    'ntt japan rugby league one',
+    'japan rugby league one',
+    'league one division 1',
+    'bunnings npc',
+    'npc',
+    'major league rugby',
+    'mlr',
+    // Rugby League
+    'nrl telstra premiership',
+    'nrl premiership',
+    'nrl',
+    'state of origin',
+    'nrl womens premiership',
+    'nrlw',
+    'betfred super league',
+    'super league',
+    'betfred challenge cup',
+    'challenge cup',
+    'betfred championship',
+    'rugby championship'
+]);
+const RUGBY_TARGET_COMPETITION_ALIAS_SET = new Set(
+    RUGBY_TARGET_COMPETITION_ALIASES.map(normalizeCompetitionText).filter(Boolean)
+);
+const CRICKET_TARGET_COMPETITION_ALIASES = Object.freeze([
+    // ICC international events
+    'icc mens t20 world cup',
+    'icc women s t20 world cup',
+    'icc womens t20 world cup',
+    'icc world test championship',
+    'world test championship',
+    'wtc',
+    'icc mens cricket world cup',
+    'icc men s cricket world cup',
+    'icc men s cricket world cup qualifier',
+    'icc mens cricket world cup qualifier',
+    'icc women s championship',
+    'icc womens championship',
+    // Major T20 leagues
+    'indian premier league',
+    'ipl',
+    'women s premier league',
+    'womens premier league',
+    'wpl',
+    'big bash league',
+    'bbl',
+    'vitality blast',
+    'caribbean premier league',
+    'cpl',
+    'pakistan super league',
+    'psl',
+    'sa20',
+    'betway sa20',
+    'super smash',
+    'bangladesh premier league',
+    'bpl',
+    'lanka premier league',
+    'lpl',
+    'major league cricket',
+    'mlc',
+    'csa t20 challenge',
+    'csa t20 knock out competition',
+    'provincial t20 cup',
+    // First-class / domestic long-form
+    'sheffield shield',
+    'county championship',
+    'rothesay county championship',
+    'ranji trophy',
+    'plunket shield',
+    'csa 4 day domestic series',
+    'csa 3 day provincial cup',
+    // List A / one-day domestic
+    'metro bank one day cup',
+    'marsh one day cup',
+    'vijay hazare trophy',
+    'the ford trophy',
+    'ford trophy',
+    'pakistan cup',
+    'csa provincial one day challenge',
+    'csa one day cup',
+    'csa provincial one day challenge div 2',
+    // Other naming variants seen in feeds
+    'cricket world cup qualifier',
+    'world cup qualifier'
+]);
+const CRICKET_TARGET_COMPETITION_ALIAS_SET = new Set(
+    CRICKET_TARGET_COMPETITION_ALIASES.map(normalizeCompetitionText).filter(Boolean)
+);
+const BASEBALL_TARGET_COMPETITION_ALIASES = Object.freeze([
+    'world baseball classic',
+    'wbsc premier12',
+    'premier12',
+    'caribbean series',
+    'serie del caribe',
+    'major league baseball',
+    'mlb',
+    'world series',
+    'nippon professional baseball',
+    'npb',
+    'japan series',
+    'climax series',
+    'kbo league',
+    'korean series',
+    'chinese professional baseball league',
+    'cpbl',
+    'taiwan series',
+    'liga mexicana de beisbol',
+    'lmb',
+    'serie del rey',
+    'liga mexicana del pacifico',
+    'lmp',
+    'dominican professional baseball league',
+    'lidom',
+    'venezuelan professional baseball league',
+    'lvbp',
+    'cuban national series',
+    'serie nacional',
+    'serie a gold',
+    'italian baseball league',
+    'honkbal hoofdklasse',
+    'holland series',
+    'australian baseball league',
+    'abl',
+    'baseball united',
+    'united series',
+    'frontier league',
+    'puerto rican winter league',
+    'lbprc'
+]);
+const BASEBALL_TARGET_COMPETITION_ALIAS_SET = new Set(
+    BASEBALL_TARGET_COMPETITION_ALIASES.map(normalizeCompetitionText).filter(Boolean)
+);
+const HOCKEY_TARGET_COMPETITION_ALIASES = Object.freeze([
+    // Field hockey
+    'fih hockey world cup',
+    'men s fih pro league',
+    'women s fih pro league',
+    'fih pro league',
+    'euro hockey league',
+    'hockey india league',
+    'pan american junior field hockey cup',
+    'tulp hoofdklasse',
+    'hoofdklasse',
+    'men s belgian hockey league',
+    'belgian hockey league',
+    'feldhockey bundesliga',
+    'hockey one league',
+    // Ice hockey
+    'iihf ice hockey world championship',
+    'iihf world junior championship',
+    'winter olympics',
+    'national hockey league',
+    'nhl',
+    'stanley cup',
+    'kontinental hockey league',
+    'khl',
+    'gagarin cup',
+    'swedish hockey league',
+    'shl',
+    'deutsche eishockey liga',
+    'del',
+    'swiss national league',
+    'czech extraliga',
+    'liiga',
+    'american hockey league',
+    'ahl',
+    'echl',
+    'asia league ice hockey',
+    'alih',
+    'australian ice hockey league',
+    'aihl',
+    'calder cup',
+    'kelly cup'
+]);
+const HOCKEY_TARGET_COMPETITION_ALIAS_SET = new Set(
+    HOCKEY_TARGET_COMPETITION_ALIASES.map(normalizeCompetitionText).filter(Boolean)
+);
+const MMA_TARGET_COMPETITION_ALIASES = Object.freeze([
+    // Global promotions
+    'ultimate fighting championship',
+    'ufc',
+    'ufc fight night',
+    'the ultimate fighter',
+    'professional fighters league',
+    'pfl',
+    'one championship',
+    'one fight night',
+    'one friday fights',
+    'brave combat federation',
+    'brave cf',
+    // Regional / domestic
+    'rizin fighting federation',
+    'rizin',
+    'super rizin',
+    'rizin landmark',
+    'xtb ksw',
+    'ksw',
+    'konfrontacja sztuk walki',
+    'cage warriors',
+    'cw',
+    'legacy fighting alliance',
+    'lfa',
+    'invicta fighting championships',
+    'invicta fc',
+    'uae warriors',
+    // Amateur / governance comps frequently surfaced in feeds
+    'immaf',
+    'international mixed martial arts federation',
+    'amma',
+    'asian mma association',
+    'gamma',
+    'global association of mixed martial arts',
+    'asian games mma'
+]);
+const MMA_TARGET_COMPETITION_ALIAS_SET = new Set(
+    MMA_TARGET_COMPETITION_ALIASES.map(normalizeCompetitionText).filter(Boolean)
+);
+const AFL_TARGET_COMPETITION_ALIASES = Object.freeze([
+    'afl',
+    'australian football league',
+    'afl finals',
+    'afl wildcard round',
+    'afl elimination finals',
+    'afl semi finals',
+    'afl preliminary finals',
+    'afl grand final',
+    'nab afl women s competition',
+    'nab aflw',
+    'aflw',
+    'aflw finals',
+    'aflw grand final',
+    'w awards',
+    'state of origin',
+    'afl international cup',
+    'australian rules',
+    'aussie rules'
+]);
+const AFL_TARGET_COMPETITION_ALIAS_SET = new Set(
+    AFL_TARGET_COMPETITION_ALIASES.map(normalizeCompetitionText).filter(Boolean)
+);
+const VOLLEYBALL_TARGET_COMPETITION_ALIASES = Object.freeze([
+    // International / major
+    'fivb volleyball men s world championship',
+    'fivb volleyball women s world championship',
+    'volleyball men s world championship',
+    'volleyball women s world championship',
+    'volleyball nations league',
+    'vnl',
+    'men s cev champions league volley',
+    'women s cev champions league volley',
+    'cev champions league volley',
+    'fivb volleyball world cup',
+    'sitting volleyball world championships',
+    'world paravolley world championships',
+    'fivb beach volleyball world championship',
+    'beach volleyball world championship',
+    'beach pro tour',
+    'beach world series',
+    'olympic qualifying',
+    // Domestic professional
+    'superlega credem banca',
+    'serie a1',
+    'plusliga',
+    'tauron liga',
+    'superliga masculina de volei',
+    'superliga feminina',
+    'russian volleyball super league',
+    'efeler ligi',
+    'sultanlar ligi',
+    'v league',
+    'sv league',
+    'german bundesliga volleyball',
+    '1 bundesliga volleyball',
+    'deutsche volleyball bundesliga',
+    'french lnv ligue a',
+    'marmara spikeligue',
+    // NCAA
+    'national collegiate men s volleyball championship',
+    'ncaa men s volleyball championship',
+    'national collegiate women s volleyball championship',
+    'ncaa women s volleyball championship'
+]);
+const VOLLEYBALL_TARGET_COMPETITION_ALIAS_SET = new Set(
+    VOLLEYBALL_TARGET_COMPETITION_ALIASES.map(normalizeCompetitionText).filter(Boolean)
+);
+const HANDBALL_TARGET_COMPETITION_ALIASES = Object.freeze([
+    // International / major competitions
+    'ihf world men s handball championship',
+    'ihf world women s handball championship',
+    'ihf world championship',
+    'ehf european men s handball championship',
+    'ehf euro',
+    'asian men s handball championship',
+    'asian women s handball championship',
+    'ihf men s beach handball world championships',
+    'ihf women s beach handball world championships',
+    'beach handball world championships',
+    'ihf men s u 20 world championship',
+    'ihf women s u 16 world championship',
+    'fisu world university handball championship',
+    'mediterranean games handball',
+    // European club competitions
+    'ehf champions league men',
+    'ehf champions league women',
+    'ehf european league men',
+    'ehf european league women',
+    'ehf champions league',
+    'ehf european league',
+    'ehf final4',
+    // Domestic men
+    'daikin handball bundesliga',
+    'handball bundesliga',
+    'liga nexus energia asobal',
+    'asobal',
+    'liqui moly starligue',
+    'lnh division 1',
+    'herreligaen',
+    'nemzeti bajnoksag i',
+    'nb i',
+    'pgnig superliga',
+    'polish superliga',
+    'super liga srbije',
+    'liga nationala',
+    'mol liga',
+    'bundesliga austria handball',
+    'swiss handball league',
+    'nla handball',
+    'superliga croatia handball',
+    'eredvisie handball',
+    'eredivisie handball',
+    'liga a belgium handball',
+    // Domestic women
+    'bundesliga women hbf',
+    'liga guerreras iberdrola',
+    'ligue butagaz energie',
+    'lfh division 1',
+    'damehandboldligaen',
+    'nemzeti bajnoksag i women',
+    'orlen superliga women',
+    'rema 1000 ligaen women',
+    'she women s league',
+    'super liga zene',
+    'liga nationala women',
+    'eredivisie women handball',
+    // Governance names that can appear as event labels
+    'international handball federation',
+    'european handball federation',
+    'asian handball federation',
+    'african handball confederation',
+    'oceania continent handball federation',
+    'pan american team handball federation'
+]);
+const HANDBALL_TARGET_COMPETITION_ALIAS_SET = new Set(
+    HANDBALL_TARGET_COMPETITION_ALIASES.map(normalizeCompetitionText).filter(Boolean)
+);
+const AMERICAN_FOOTBALL_TARGET_COMPETITION_ALIASES = Object.freeze([
+    'national football league',
+    'nfl',
+    'nfl regular season',
+    'nfl preseason',
+    'nfl postseason',
+    'wild card weekend',
+    'divisional playoffs',
+    'conference championships',
+    'afc championship',
+    'nfc championship',
+    'super bowl',
+    'super bowl lx',
+    'super bowl lxi',
+    'pro bowl',
+    'pro bowl games',
+    'nfl scouting combine',
+    'nfl draft',
+    'nfl free agency',
+    'nfl international series',
+    'afc',
+    'nfc'
+]);
+const AMERICAN_FOOTBALL_TARGET_COMPETITION_ALIAS_SET = new Set(
+    AMERICAN_FOOTBALL_TARGET_COMPETITION_ALIASES.map(normalizeCompetitionText).filter(Boolean)
+);
+
+function collectTennisCompetitionCandidates(row) {
+    const raw = row && typeof row.raw_provider_data === 'object' ? row.raw_provider_data : {};
+    const tournament = raw && typeof raw.tournament === 'object' ? raw.tournament : {};
+    const uniqueTournament = tournament && typeof tournament.uniqueTournament === 'object'
+        ? tournament.uniqueTournament
+        : {};
+    const competition = raw && typeof raw.competition === 'object' ? raw.competition : {};
+    const league = raw && typeof raw.league === 'object' ? raw.league : {};
+    const values = [
+        row?.league,
+        row?.tournament,
+        row?.competition,
+        raw?.name,
+        raw?.event_name,
+        tournament?.name,
+        uniqueTournament?.name,
+        competition?.name,
+        league?.name,
+        league?.title,
+        raw?.category?.name
+    ];
+    return values
+        .map((value) => String(value || '').trim())
+        .filter(Boolean);
+}
+
+function isAllowedTennisCompetition(row) {
+    const candidates = collectTennisCompetitionCandidates(row);
+    if (!candidates.length) return false;
+    return candidates.some((candidate) => {
+        const normalized = normalizeCompetitionText(candidate);
+        if (!normalized) return false;
+        for (const alias of TENNIS_TARGET_TOURNAMENT_ALIAS_SET) {
+            if (normalized.includes(alias)) return true;
+        }
+        return false;
+    });
+}
+
+function isAllowedFootballCompetition(row) {
+    const raw = row && typeof row.raw_provider_data === 'object' ? row.raw_provider_data : {};
+    const leagueId = String(
+        row?.league_id
+        || raw?.league?.id
+        || raw?.competition?.id
+        || raw?.tournament?.id
+        || ''
+    ).trim();
+    if (leagueId && FOOTBALL_TARGET_LEAGUE_IDS.has(leagueId)) return true;
+
+    const candidates = collectTennisCompetitionCandidates(row);
+    if (!candidates.length) return false;
+    return candidates.some((candidate) => {
+        const normalized = normalizeCompetitionText(candidate);
+        if (!normalized) return false;
+        for (const alias of FOOTBALL_TARGET_COMPETITION_ALIAS_SET) {
+            if (normalized.includes(alias)) return true;
+        }
+        return false;
+    });
+}
+
+function isAllowedBasketballCompetition(row) {
+    const candidates = collectTennisCompetitionCandidates(row);
+    if (!candidates.length) return false;
+    return candidates.some((candidate) => {
+        const normalized = normalizeCompetitionText(candidate);
+        if (!normalized) return false;
+        for (const alias of BASKETBALL_TARGET_COMPETITION_ALIAS_SET) {
+            if (normalized.includes(alias)) return true;
+        }
+        return false;
+    });
+}
+
+function isAllowedRugbyCompetition(row) {
+    const candidates = collectTennisCompetitionCandidates(row);
+    if (!candidates.length) return false;
+    return candidates.some((candidate) => {
+        const normalized = normalizeCompetitionText(candidate);
+        if (!normalized) return false;
+        for (const alias of RUGBY_TARGET_COMPETITION_ALIAS_SET) {
+            if (normalized.includes(alias)) return true;
+        }
+        return false;
+    });
+}
+
+function isAllowedCricketCompetition(row) {
+    const candidates = collectTennisCompetitionCandidates(row);
+    if (!candidates.length) return false;
+    return candidates.some((candidate) => {
+        const normalized = normalizeCompetitionText(candidate);
+        if (!normalized) return false;
+        for (const alias of CRICKET_TARGET_COMPETITION_ALIAS_SET) {
+            if (normalized.includes(alias)) return true;
+        }
+        return false;
+    });
+}
+
+function isAllowedBaseballCompetition(row) {
+    const candidates = collectTennisCompetitionCandidates(row);
+    if (!candidates.length) return false;
+    return candidates.some((candidate) => {
+        const normalized = normalizeCompetitionText(candidate);
+        if (!normalized) return false;
+        for (const alias of BASEBALL_TARGET_COMPETITION_ALIAS_SET) {
+            if (normalized.includes(alias)) return true;
+        }
+        return false;
+    });
+}
+
+function isAllowedHockeyCompetition(row) {
+    const candidates = collectTennisCompetitionCandidates(row);
+    if (!candidates.length) return false;
+    return candidates.some((candidate) => {
+        const normalized = normalizeCompetitionText(candidate);
+        if (!normalized) return false;
+        for (const alias of HOCKEY_TARGET_COMPETITION_ALIAS_SET) {
+            if (normalized.includes(alias)) return true;
+        }
+        return false;
+    });
+}
+
+function isAllowedMmaCompetition(row) {
+    const candidates = collectTennisCompetitionCandidates(row);
+    if (!candidates.length) return false;
+    return candidates.some((candidate) => {
+        const normalized = normalizeCompetitionText(candidate);
+        if (!normalized) return false;
+        for (const alias of MMA_TARGET_COMPETITION_ALIAS_SET) {
+            if (normalized.includes(alias)) return true;
+        }
+        return false;
+    });
+}
+
+function isAllowedAflCompetition(row) {
+    const candidates = collectTennisCompetitionCandidates(row);
+    if (!candidates.length) return false;
+    return candidates.some((candidate) => {
+        const normalized = normalizeCompetitionText(candidate);
+        if (!normalized) return false;
+        for (const alias of AFL_TARGET_COMPETITION_ALIAS_SET) {
+            if (normalized.includes(alias)) return true;
+        }
+        return false;
+    });
+}
+
+function isAllowedVolleyballCompetition(row) {
+    const candidates = collectTennisCompetitionCandidates(row);
+    if (!candidates.length) return false;
+    return candidates.some((candidate) => {
+        const normalized = normalizeCompetitionText(candidate);
+        if (!normalized) return false;
+        for (const alias of VOLLEYBALL_TARGET_COMPETITION_ALIAS_SET) {
+            if (normalized.includes(alias)) return true;
+        }
+        return false;
+    });
+}
+
+function isAllowedHandballCompetition(row) {
+    const candidates = collectTennisCompetitionCandidates(row);
+    if (!candidates.length) return false;
+    return candidates.some((candidate) => {
+        const normalized = normalizeCompetitionText(candidate);
+        if (!normalized) return false;
+        for (const alias of HANDBALL_TARGET_COMPETITION_ALIAS_SET) {
+            if (normalized.includes(alias)) return true;
+        }
+        return false;
+    });
+}
+
+function isAllowedAmericanFootballCompetition(row) {
+    const candidates = collectTennisCompetitionCandidates(row);
+    if (!candidates.length) return false;
+    return candidates.some((candidate) => {
+        const normalized = normalizeCompetitionText(candidate);
+        if (!normalized) return false;
+        for (const alias of AMERICAN_FOOTBALL_TARGET_COMPETITION_ALIAS_SET) {
+            if (normalized.includes(alias)) return true;
+        }
+        return false;
+    });
+}
+
+const COMPETITION_ALLOWLIST_SPORTS = Object.freeze(new Set([
+    'football',
+    'tennis',
+    'basketball',
+    'rugby',
+    'cricket',
+    'baseball',
+    'hockey',
+    'mma',
+    'afl',
+    'volleyball',
+    'handball',
+    'american_football'
+]));
+
+function isCompetitionAllowedForSport(sport, row) {
+    const rowSport = normalizeRequestedSport(sport || row?.sport || '');
+    if (!rowSport || !COMPETITION_ALLOWLIST_SPORTS.has(rowSport)) return true;
+
+    if (rowSport === 'football') return isAllowedFootballCompetition(row);
+    if (rowSport === 'tennis') return isAllowedTennisCompetition(row);
+    if (rowSport === 'basketball') return isAllowedBasketballCompetition(row);
+    if (rowSport === 'rugby') return isAllowedRugbyCompetition(row);
+    if (rowSport === 'cricket') return isAllowedCricketCompetition(row);
+    if (rowSport === 'baseball') return isAllowedBaseballCompetition(row);
+    if (rowSport === 'hockey') return isAllowedHockeyCompetition(row);
+    if (rowSport === 'mma') return isAllowedMmaCompetition(row);
+    if (rowSport === 'afl') return isAllowedAflCompetition(row);
+    if (rowSport === 'volleyball') return isAllowedVolleyballCompetition(row);
+    if (rowSport === 'handball') return isAllowedHandballCompetition(row);
+    if (rowSport === 'american_football') return isAllowedAmericanFootballCompetition(row);
+
+    return true;
+}
+
+function applyCompetitionAllowlist(rows, requestedSport) {
+    const sourceRows = Array.isArray(rows) ? rows : [];
+    return sourceRows.filter((row) => isCompetitionAllowedForSport(requestedSport, row));
+}
+
 function dedupePredictionInputs(rows) {
     const out = [];
     const seen = new Set();
@@ -665,9 +1542,12 @@ async function buildLiveData(options = {}) {
             ));
 
             if (filteredFixtures.length > 0) {
-                const out = dedupePredictionInputs(filteredFixtures
+                const out = applyCompetitionAllowlist(
+                    dedupePredictionInputs(filteredFixtures
                     .slice(0, maxFixturesPerSource)
-                    .map(toPredictionInputFromSportsDbFixture));
+                    .map(toPredictionInputFromSportsDbFixture)),
+                    requestedSport || sport
+                );
                 console.log(`[dataProvider] ${sport}: TheSportsDB fetched=${filteredFixtures.length} returned=${out.length}`);
                 if (out.length > 0 && appendAggregated(out, 'TheSportsDB')) {
                     return aggregated;
@@ -696,12 +1576,12 @@ async function buildLiveData(options = {}) {
         }
 
         if (fixtures.length > 0) {
-            const out = dedupePredictionInputs(
+            const out = applyCompetitionAllowlist(dedupePredictionInputs(
                 fixtures
                     .slice(0, maxFixturesPerSource)
                     .map(f => normalizeFixture(f, sport))
                     .filter(Boolean)
-            );
+            ), requestedSport || sport);
             console.log(`[dataProvider] ${sport}: API-Sports fetched=${fixtures.length} returned=${out.length}`);
             if (out.length > 0 && appendAggregated(out, 'API-Sports')) {
                 return aggregated;
@@ -720,7 +1600,10 @@ async function buildLiveData(options = {}) {
             console.log(`[dataProvider] ${sport}: trying Odds API fallback (${oddsKey})`);
             const oddsData = await fetchOddsData(oddsKey);
             if (oddsData.length > 0) {
-                const out = dedupePredictionInputs(oddsData);
+                const out = applyCompetitionAllowlist(
+                    dedupePredictionInputs(oddsData),
+                    requestedSport || sport
+                );
                 console.log(`[dataProvider] ${sport}: Odds API returned ${out.length} events`);
                 if (out.length > 0 && appendAggregated(out, 'Odds API')) {
                     return aggregated;
@@ -737,7 +1620,10 @@ async function buildLiveData(options = {}) {
             console.log(`[dataProvider] ${sport}: trying FootballData.org fallback`);
             const sdoData = await fetchSportsDataOrg(sport, leagueId);
             if (sdoData.length > 0) {
-                const out = dedupePredictionInputs(sdoData);
+                const out = applyCompetitionAllowlist(
+                    dedupePredictionInputs(sdoData),
+                    requestedSport || sport
+                );
                 console.log(`[dataProvider] ${sport}: FootballData.org returned ${out.length} events`);
                 if (out.length > 0 && appendAggregated(out, 'FootballData.org')) {
                     return aggregated;
@@ -753,7 +1639,10 @@ async function buildLiveData(options = {}) {
         console.log(`[dataProvider] ${sport}: trying SportsData.io fallback`);
         const sdiData = await fetchSportsDataIO(sport);
         if (sdiData.length > 0) {
-            const out = dedupePredictionInputs(sdiData);
+            const out = applyCompetitionAllowlist(
+                dedupePredictionInputs(sdiData),
+                requestedSport || sport
+            );
             console.log(`[dataProvider] ${sport}: SportsData.io returned ${out.length} events`);
             if (out.length > 0 && appendAggregated(out, 'SportsData.io')) {
                 return aggregated;
@@ -768,7 +1657,10 @@ async function buildLiveData(options = {}) {
         console.log(`[dataProvider] ${sport}: trying RapidAPI fallback`);
         const rapidData = await fetchRapidAPI(sport, leagueId, season);
         if (rapidData.length > 0) {
-            const out = dedupePredictionInputs(rapidData);
+            const out = applyCompetitionAllowlist(
+                dedupePredictionInputs(rapidData),
+                requestedSport || sport
+            );
             console.log(`[dataProvider] ${sport}: RapidAPI returned ${out.length} events`);
             if (out.length > 0 && appendAggregated(out, 'RapidAPI')) {
                 return aggregated;
@@ -784,7 +1676,10 @@ async function buildLiveData(options = {}) {
             console.log(`[dataProvider] cricket: trying CricketData API fallback`);
             const cricketData = await fetchCricketData();
             if (cricketData.length > 0) {
-                const out = dedupePredictionInputs(cricketData);
+                const out = applyCompetitionAllowlist(
+                    dedupePredictionInputs(cricketData),
+                    requestedSport || sport
+                );
                 console.log(`[dataProvider] cricket: CricketData API returned ${out.length} events`);
                 if (out.length > 0 && appendAggregated(out, 'CricketData')) {
                     return aggregated;
@@ -821,5 +1716,10 @@ module.exports = {
     SUPPORTED_LEAGUES,
     fetchUpcomingFixtures,
     getPredictionInputs,
-    buildLiveData
+    buildLiveData,
+    applyCompetitionAllowlist,
+    isCompetitionAllowedForSport,
+    normalizeRequestedSport,
+    normalizeCompetitionText,
+    COMPETITION_ALLOWLIST_SPORTS
 };
