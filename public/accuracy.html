@@ -465,6 +465,7 @@
                 <button id="applyFiltersBtn" class="control-btn primary" type="button">Load Window</button>
             </div>
         </div>
+        <p id="windowNotice" class="note"></p>
     </section>
 
     <section class="section">
@@ -685,6 +686,12 @@
                     </option>
                 `).join('')
                 : '<option value="">Latest available run</option>';
+            const windowNoticeEl = document.getElementById('windowNotice');
+            if (data.window?.fallbackApplied && data.window?.requestedDate && data.window?.date) {
+                windowNoticeEl.textContent = `No graded results were available for ${data.window.requestedDate}. Showing latest graded window: ${data.window.date}.`;
+            } else {
+                windowNoticeEl.textContent = '';
+            }
 
             document.getElementById('heroCopy').textContent = `${(data.window?.sport || sport).toUpperCase()} for ${data.window?.date || date} is live in the accuracy engine. Football is the first fully enriched code, with the same reporting model ready for the remaining 12 sport codes as their context pipelines are upgraded.`;
 

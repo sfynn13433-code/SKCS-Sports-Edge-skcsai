@@ -86,27 +86,52 @@ function determineProductStatus(rows) {
 router.get('/', async (req, res) => {
     try {
         const { date, sport, run_id } = req.query;
-        const filterDate = date || new Date().toISOString().slice(0, 10);
+        const requestedDate = date || new Date().toISOString().slice(0, 10);
         const filterSport = sport || 'football';
         const filterRunId = run_id || null;
 
-        console.log(`[accuracy] Fetching accuracy for date=${filterDate}, sport=${filterSport}, run_id=${filterRunId || 'latest'}`);
+        console.log(`[accuracy] Fetching accuracy for requested_date=${requestedDate}, sport=${filterSport}, run_id=${filterRunId || 'latest'}`);
 
-        let accuracyQuery = `
+        let effectiveDate = requestedDate;
+        let fallbackApplied = false;
+
+        const fetchAccuracyRows = async (targetDate) => {
+            let accuracyQuery = `
             SELECT *
             FROM predictions_accuracy
-            WHERE LEFT(COALESCE(fixture_date::text, ''), 10) = $1
+            WHERE fixture_date = $1::date
               AND LOWER(sport) = LOWER($2)
         `;
-        const accuracyParams = [filterDate, filterSport];
-        if (filterRunId) {
-            accuracyQuery += ' AND publish_run_id = $3';
-            accuracyParams.push(filterRunId);
-        }
-        accuracyQuery += ' ORDER BY evaluated_at DESC, prediction_final_id DESC, prediction_match_index ASC';
+            const accuracyParams = [targetDate, filterSport];
+            if (filterRunId) {
+                accuracyQuery += ' AND publish_run_id = $3';
+                accuracyParams.push(filterRunId);
+            }
+            accuracyQuery += ' ORDER BY evaluated_at DESC, prediction_final_id DESC, prediction_match_index ASC';
+            const accuracyRes = await query(accuracyQuery, accuracyParams);
+            return accuracyRes.rows || [];
+        };
 
-        const accuracyRes = await query(accuracyQuery, accuracyParams);
-        const accuracyRows = accuracyRes.rows || [];
+        let accuracyRows = await fetchAccuracyRows(requestedDate);
+        if (accuracyRows.length === 0 && !filterRunId) {
+            const latestDateRes = await query(`
+                SELECT fixture_date::text AS date
+                FROM predictions_accuracy
+                WHERE fixture_date IS NOT NULL
+                  AND LOWER(sport) = LOWER($1)
+                GROUP BY fixture_date
+                ORDER BY fixture_date DESC
+                LIMIT 1
+            `, [filterSport]);
+
+            const latestDate = latestDateRes.rows?.[0]?.date?.slice(0, 10) || null;
+            if (latestDate && latestDate !== requestedDate) {
+                effectiveDate = latestDate;
+                fallbackApplied = true;
+                accuracyRows = await fetchAccuracyRows(effectiveDate);
+                console.log(`[accuracy] Requested date ${requestedDate} had no graded rows; fallback to latest graded date ${effectiveDate}`);
+            }
+        }
 
         const overall = {
             winRate: 0,
@@ -272,11 +297,20 @@ router.get('/', async (req, res) => {
             .sort((a, b) => a.weekStart.localeCompare(b.weekStart));
 
         const availableDatesRes = await query(`
-            SELECT DISTINCT LEFT(COALESCE(fixture_date::text, ''), 10) as date
-            FROM predictions_accuracy
-            WHERE evaluated_at >= NOW() - INTERVAL '30 days'
+            SELECT DISTINCT date::text AS date
+            FROM (
+                SELECT fixture_date::date AS date
+                FROM predictions_accuracy
+                WHERE fixture_date IS NOT NULL
+                  AND LOWER(sport) = LOWER($1)
+                UNION
+                SELECT DATE(COALESCE(match_date, created_at)) AS date
+                FROM direct1x2_prediction_final
+                WHERE LOWER(COALESCE(sport, matches->0->>'sport', '')) = LOWER($1)
+            ) d
+            WHERE date IS NOT NULL
             ORDER BY date DESC
-        `);
+        `, [filterSport]);
         const availableDates = availableDatesRes.rows.map((row) => row.date).filter(Boolean);
 
         const availableSportsRes = await query(`
@@ -290,11 +324,11 @@ router.get('/', async (req, res) => {
         const availableRunsRes = await query(`
             SELECT DISTINCT publish_run_id as "runId"
             FROM predictions_accuracy
-            WHERE LEFT(COALESCE(fixture_date::text, ''), 10) = $1
+            WHERE fixture_date = $1::date
               AND LOWER(sport) = LOWER($2)
               AND publish_run_id IS NOT NULL
             ORDER BY "runId" DESC
-        `, [filterDate, filterSport]);
+        `, [effectiveDate, filterSport]);
 
         const runIds = availableRunsRes.rows.map((row) => row.runId).filter(Boolean);
         const runMetaMap = new Map();
@@ -310,6 +344,22 @@ router.get('/', async (req, res) => {
             }
         }
         const availableRuns = availableRunsRes.rows.map((row) => runMetaMap.get(String(row.runId)) || row);
+
+        const publishedSummaryRes = await query(`
+            SELECT
+                COUNT(*)::int AS products,
+                COALESCE(SUM(
+                    CASE
+                        WHEN jsonb_typeof(matches) = 'array' THEN jsonb_array_length(matches)
+                        ELSE 1
+                    END
+                ), 0)::int AS legs
+            FROM direct1x2_prediction_final
+            WHERE LOWER(COALESCE(sport, matches->0->>'sport', '')) = LOWER($1)
+              AND DATE(COALESCE(match_date, created_at)) = $2::date
+              AND ($3::bigint IS NULL OR publish_run_id = $3::bigint)
+        `, [filterSport, effectiveDate, filterRunId || null]);
+        const publishedSummary = publishedSummaryRes.rows?.[0] || { products: 0, legs: 0 };
 
         const eventIds = Array.from(new Set(accuracyRows.map((row) => row.event_id).filter(Boolean)));
         let contextCoverage = { injuryRows: 0, weatherRows: 0, newsRows: 0 };
@@ -346,12 +396,14 @@ router.get('/', async (req, res) => {
                 availableRuns
             },
             window: {
-                date: filterDate,
+                requestedDate,
+                date: effectiveDate,
                 sport: filterSport,
                 runId: filterRunId,
+                fallbackApplied,
                 publishSummary: {
-                    products: products.size,
-                    legs: accuracyRows.length
+                    products: Number(publishedSummary.products || 0),
+                    legs: Number(publishedSummary.legs || 0)
                 },
                 reasonCapabilities: {
                     verified,
