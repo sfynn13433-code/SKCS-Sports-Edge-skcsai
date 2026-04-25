@@ -3214,6 +3214,18 @@ async function insertFinalRow({ publish_run_id, tier, type, matches, total_confi
         if (Number.isNaN(parsed.getTime())) return null;
         return parsed.toISOString();
     })();
+
+    if (!fixtureId || !homeTeam || !awayTeam || isPlaceholderTeamName(homeTeam) || isPlaceholderTeamName(awayTeam) || sport === 'unknown') {
+        console.warn(
+            '[accaBuilder] Skipping publish row type=%s due to invalid identity (fixture_id=%s, sport=%s, home=%s, away=%s)',
+            normalizedType || 'unknown',
+            fixtureId || 'null',
+            sport || 'unknown',
+            homeTeam || 'null',
+            awayTeam || 'null'
+        );
+        return null;
+    }
     
     const res = await client.query(
         `
@@ -3689,7 +3701,7 @@ async function buildFinalForTier(tier, options = {}) {
                 total_confidence: total,
                 risk_level: riskLevelFromConfidence(total)
             }, client);
-            directRows.push(row);
+            if (row) directRows.push(row);
         }
 
         // ---------------------------------------------------------------------
@@ -3904,6 +3916,10 @@ async function buildFinalForTier(tier, options = {}) {
                 risk_level: candidateRow.risk_level,
             }, client);
 
+            if (!inserted) {
+                continue;
+            }
+
             if (step.legCount === 12) {
                 megaAccaRows.push(inserted);
                 megaDiagnostics.mega_final_cards_built += 1;
@@ -3951,7 +3967,7 @@ async function buildFinalForTier(tier, options = {}) {
                     total_confidence: fallbackCard.total_confidence,
                     risk_level: fallbackCard.risk_level,
                 }, client);
-                accaRows.push(inserted);
+                if (inserted) accaRows.push(inserted);
                 candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, new Map());
                 console.log('[accaBuilder] fallback acca_6match published.');
             } else {
@@ -3997,8 +4013,10 @@ async function buildFinalForTier(tier, options = {}) {
                     total_confidence: fallbackCard.total_confidence,
                     risk_level: fallbackCard.risk_level,
                 }, client);
-                megaAccaRows.push(inserted);
-                megaDiagnostics.mega_final_cards_built += 1;
+                if (inserted) {
+                    megaAccaRows.push(inserted);
+                    megaDiagnostics.mega_final_cards_built += 1;
+                }
                 candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, new Map());
                 console.log('[accaBuilder] fallback mega_acca_12 published.');
             } else {
@@ -4055,7 +4073,7 @@ async function buildFinalForTier(tier, options = {}) {
                 total_confidence: row.total_confidence,
                 risk_level: row.risk_level
             }, client);
-            multiRows.push(inserted);
+            if (inserted) multiRows.push(inserted);
         }
 
         // ---------------------------------------------------------------------
@@ -4080,7 +4098,7 @@ async function buildFinalForTier(tier, options = {}) {
                 total_confidence: row.total_confidence,
                 risk_level: row.risk_level
             }, client);
-            sameMatchRows.push(inserted);
+            if (inserted) sameMatchRows.push(inserted);
         }
 
         // ---------------------------------------------------------------------
@@ -4108,7 +4126,7 @@ async function buildFinalForTier(tier, options = {}) {
                 total_confidence: total,
                 risk_level: riskLevelFromConfidence(total)
             }, client);
-            secondaryRows.push(row);
+            if (row) secondaryRows.push(row);
         }
 
         const insightRowsInserted = directRows.length + secondaryRows.length + sameMatchRows.length + multiRows.length;

@@ -90,6 +90,40 @@ async function markStalePublishRuns() {
     }
 }
 
+async function cleanupInvalidPublishedRows() {
+    const directCleanupRes = await query(`
+        DELETE FROM direct1x2_prediction_final pf
+        WHERE COALESCE(NULLIF(TRIM(pf.home_team), ''), NULLIF(TRIM(pf.matches->0->>'home_team'), ''), NULLIF(TRIM(pf.matches->0->>'home_team_name'), '')) IS NULL
+           OR COALESCE(NULLIF(TRIM(pf.away_team), ''), NULLIF(TRIM(pf.matches->0->>'away_team'), ''), NULLIF(TRIM(pf.matches->0->>'away_team_name'), '')) IS NULL
+           OR LOWER(COALESCE(NULLIF(TRIM(pf.home_team), ''), NULLIF(TRIM(pf.matches->0->>'home_team'), ''), NULLIF(TRIM(pf.matches->0->>'home_team_name'), ''))) IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+           OR LOWER(COALESCE(NULLIF(TRIM(pf.away_team), ''), NULLIF(TRIM(pf.matches->0->>'away_team'), ''), NULLIF(TRIM(pf.matches->0->>'away_team_name'), ''))) IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+           OR LOWER(COALESCE(NULLIF(TRIM(pf.sport), ''), NULLIF(TRIM(pf.matches->0->>'sport'), ''))) IN ('', 'unknown');
+    `);
+
+    const accuracyCleanupRes = await query(`
+        DELETE FROM predictions_accuracy pa
+        WHERE pa.prediction_final_id IS NULL
+           OR NOT EXISTS (
+                SELECT 1
+                FROM direct1x2_prediction_final pf
+                WHERE pf.id = pa.prediction_final_id
+           )
+           OR NULLIF(TRIM(pa.home_team), '') IS NULL
+           OR NULLIF(TRIM(pa.away_team), '') IS NULL
+           OR LOWER(TRIM(pa.home_team)) IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+           OR LOWER(TRIM(pa.away_team)) IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+           OR LOWER(COALESCE(NULLIF(TRIM(pa.predicted_outcome), ''), '')) IN ('1x2', 'standard 6-fold');
+    `);
+
+    if (Number(directCleanupRes.rowCount || 0) > 0 || Number(accuracyCleanupRes.rowCount || 0) > 0) {
+        console.log(
+            '[dbBootstrap] Invalid published row cleanup removed direct=%s, accuracy=%s.',
+            Number(directCleanupRes.rowCount || 0),
+            Number(accuracyCleanupRes.rowCount || 0)
+        );
+    }
+}
+
 async function bootstrap() {
     console.log('[dbBootstrap] Ensuring tables and seed data exist...');
 
@@ -698,6 +732,7 @@ async function bootstrap() {
 
         await cleanupLegacyFixtureRows();
         await markStalePublishRuns();
+        await cleanupInvalidPublishedRows();
 
         console.log('[dbBootstrap] All tables and seed data verified.');
     } catch (err) {

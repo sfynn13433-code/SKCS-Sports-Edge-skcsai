@@ -62,11 +62,51 @@ const EDGE_MIND_PLACEHOLDER_PATTERNS = [
     'reality check indicates moderate volatility',
     'proceed with standard stake on 1x2'
 ];
+const PLACEHOLDER_TEAM_LABELS = new Set([
+    'unknown',
+    'unknown home',
+    'unknown away',
+    'home team',
+    'away team',
+    'tbd',
+    'n/a'
+]);
+const PREDICTION_ROW_QUALITY_SQL = `
+    COALESCE(NULLIF(TRIM(pf.home_team), ''), NULLIF(TRIM(pf.matches->0->>'home_team'), ''), NULLIF(TRIM(pf.matches->0->>'home_team_name'), '')) IS NOT NULL
+    AND COALESCE(NULLIF(TRIM(pf.away_team), ''), NULLIF(TRIM(pf.matches->0->>'away_team'), ''), NULLIF(TRIM(pf.matches->0->>'away_team_name'), '')) IS NOT NULL
+    AND LOWER(COALESCE(NULLIF(TRIM(pf.home_team), ''), NULLIF(TRIM(pf.matches->0->>'home_team'), ''), NULLIF(TRIM(pf.matches->0->>'home_team_name'), ''))) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+    AND LOWER(COALESCE(NULLIF(TRIM(pf.away_team), ''), NULLIF(TRIM(pf.matches->0->>'away_team'), ''), NULLIF(TRIM(pf.matches->0->>'away_team_name'), ''))) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+    AND LOWER(COALESCE(NULLIF(TRIM(pf.sport), ''), NULLIF(TRIM(pf.matches->0->>'sport'), ''))) <> 'unknown'
+`;
 
 function parseBoundedInt(value, fallback, min, max) {
     const parsed = Number.parseInt(value, 10);
     if (!Number.isFinite(parsed)) return fallback;
     return Math.max(min, Math.min(max, parsed));
+}
+
+function isPlaceholderTeamLabel(value) {
+    const key = String(value || '').trim().toLowerCase();
+    if (!key) return true;
+    return PLACEHOLDER_TEAM_LABELS.has(key);
+}
+
+function isPredictionIdentityValid(prediction) {
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    const firstMatch = matches[0] || {};
+    const homeTeam = resolveMatchTeamName(firstMatch, 'home') || extractTeamNameValue(prediction?.home_team);
+    const awayTeam = resolveMatchTeamName(firstMatch, 'away') || extractTeamNameValue(prediction?.away_team);
+    const sportKey = normalizePredictionSportKey(
+        prediction?.sport
+        || firstMatch?.sport
+        || firstMatch?.metadata?.sport
+        || firstMatch?.metadata?.sport_type
+        || ''
+    );
+
+    if (!homeTeam || !awayTeam) return false;
+    if (isPlaceholderTeamLabel(homeTeam) || isPlaceholderTeamLabel(awayTeam)) return false;
+    return Boolean(sportKey && sportKey !== 'unknown');
 }
 
 const UPCOMING_GRACE_MINUTES = parseBoundedInt(
@@ -1730,6 +1770,11 @@ async function getLatestPublishRunIdFromFinalTable() {
         SELECT publish_run_id
         FROM direct1x2_prediction_final
         WHERE publish_run_id IS NOT NULL
+          AND COALESCE(NULLIF(TRIM(home_team), ''), NULLIF(TRIM(matches->0->>'home_team'), ''), NULLIF(TRIM(matches->0->>'home_team_name'), '')) IS NOT NULL
+          AND COALESCE(NULLIF(TRIM(away_team), ''), NULLIF(TRIM(matches->0->>'away_team'), ''), NULLIF(TRIM(matches->0->>'away_team_name'), '')) IS NOT NULL
+          AND LOWER(COALESCE(NULLIF(TRIM(home_team), ''), NULLIF(TRIM(matches->0->>'home_team'), ''), NULLIF(TRIM(matches->0->>'home_team_name'), ''))) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+          AND LOWER(COALESCE(NULLIF(TRIM(away_team), ''), NULLIF(TRIM(matches->0->>'away_team'), ''), NULLIF(TRIM(matches->0->>'away_team_name'), ''))) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+          AND LOWER(COALESCE(NULLIF(TRIM(sport), ''), NULLIF(TRIM(matches->0->>'sport'), ''))) <> 'unknown'
         ORDER BY publish_run_id DESC, created_at DESC
         LIMIT 1
         `
@@ -2028,7 +2073,8 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                                pf.plan_visibility, pf.sport, pf.market_type, pf.recommendation, pf.expires_at,
                                pf.edgemind_report, pf.secondary_insights
                         FROM direct1x2_prediction_final pf
-                        WHERE LOWER(COALESCE(pf.sport, 'football')) IN (${sportPlaceholders})
+                        WHERE LOWER(COALESCE(NULLIF(TRIM(pf.sport), ''), NULLIF(TRIM(pf.matches->0->>'sport'), ''))) IN (${sportPlaceholders})
+                          AND ${PREDICTION_ROW_QUALITY_SQL}
                         ORDER BY created_at DESC
                         LIMIT 2500;
                     `;
@@ -2040,6 +2086,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                                pf.plan_visibility, pf.sport, pf.market_type, pf.recommendation, pf.expires_at,
                                pf.edgemind_report, pf.secondary_insights
                         FROM direct1x2_prediction_final pf
+                        WHERE ${PREDICTION_ROW_QUALITY_SQL}
                         ORDER BY created_at DESC
                         LIMIT 2500;
                     `;
@@ -2053,6 +2100,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                            pf.edgemind_report, pf.secondary_insights
                     FROM direct1x2_prediction_final pf
                     WHERE LOWER(COALESCE(pf.tier, 'normal')) = ANY($1::text[])
+                      AND ${PREDICTION_ROW_QUALITY_SQL}
                     ORDER BY created_at DESC
                     LIMIT 2000;
                 `;
@@ -2087,7 +2135,8 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                     const { data, error } = await query;
 
                     if (!error && Array.isArray(data) && data.length > 0) {
-                        predictions = filterByVisibility(data, planId, includeAll);
+                        const qualityRows = data.filter(isPredictionIdentityValid);
+                        predictions = filterByVisibility(qualityRows, planId, includeAll);
                     } else if (error) {
                         console.warn('[predictions] Supabase include_all fallback error:', error.message || error);
                     }
@@ -2125,9 +2174,10 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                     }
 
                     if (!error && Array.isArray(data) && data.length > 0) {
+                        const qualityRows = data.filter(isPredictionIdentityValid);
                         // Filter Supabase rows by plan capabilities.
                         const allowedTiers = new Set(queryTiers);
-                        const filtered = data.filter((r) => {
+                        const filtered = qualityRows.filter((r) => {
                             try {
                                 const rowTier = normalizeTierLabel(r.tier);
                                 if (!allowedTiers.has(rowTier)) return false;

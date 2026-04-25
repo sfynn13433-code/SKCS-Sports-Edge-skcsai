@@ -4,6 +4,21 @@ const express = require('express');
 const { query } = require('../db');
 
 const router = express.Router();
+const ACCURACY_ROW_QUALITY_SQL = `
+    pa.prediction_final_id IS NOT NULL
+    AND EXISTS (SELECT 1 FROM direct1x2_prediction_final pf0 WHERE pf0.id = pa.prediction_final_id)
+    AND NULLIF(TRIM(pa.home_team), '') IS NOT NULL
+    AND NULLIF(TRIM(pa.away_team), '') IS NOT NULL
+    AND LOWER(TRIM(pa.home_team)) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+    AND LOWER(TRIM(pa.away_team)) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+`;
+const PUBLISHED_ROW_QUALITY_SQL = `
+    COALESCE(NULLIF(TRIM(pf.home_team), ''), NULLIF(TRIM(pf.matches->0->>'home_team'), ''), NULLIF(TRIM(pf.matches->0->>'home_team_name'), '')) IS NOT NULL
+    AND COALESCE(NULLIF(TRIM(pf.away_team), ''), NULLIF(TRIM(pf.matches->0->>'away_team'), ''), NULLIF(TRIM(pf.matches->0->>'away_team_name'), '')) IS NOT NULL
+    AND LOWER(COALESCE(NULLIF(TRIM(pf.home_team), ''), NULLIF(TRIM(pf.matches->0->>'home_team'), ''), NULLIF(TRIM(pf.matches->0->>'home_team_name'), ''))) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+    AND LOWER(COALESCE(NULLIF(TRIM(pf.away_team), ''), NULLIF(TRIM(pf.matches->0->>'away_team'), ''), NULLIF(TRIM(pf.matches->0->>'away_team_name'), ''))) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+    AND LOWER(COALESCE(NULLIF(TRIM(pf.sport), ''), NULLIF(TRIM(pf.matches->0->>'sport'), ''))) <> 'unknown'
+`;
 
 function startOfWeekUtc(now = new Date()) {
     const current = new Date(now);
@@ -97,17 +112,18 @@ router.get('/', async (req, res) => {
 
         const fetchAccuracyRows = async (targetDate) => {
             let accuracyQuery = `
-            SELECT *
-            FROM predictions_accuracy
-            WHERE fixture_date = $1::date
-              AND LOWER(sport) = LOWER($2)
+            SELECT pa.*
+            FROM predictions_accuracy pa
+            WHERE pa.fixture_date = $1::date
+              AND LOWER(pa.sport) = LOWER($2)
+              AND ${ACCURACY_ROW_QUALITY_SQL}
         `;
             const accuracyParams = [targetDate, filterSport];
             if (filterRunId) {
-                accuracyQuery += ' AND publish_run_id = $3';
+                accuracyQuery += ' AND pa.publish_run_id = $3';
                 accuracyParams.push(filterRunId);
             }
-            accuracyQuery += ' ORDER BY evaluated_at DESC, prediction_final_id DESC, prediction_match_index ASC';
+            accuracyQuery += ' ORDER BY pa.evaluated_at DESC, pa.prediction_final_id DESC, pa.prediction_match_index ASC';
             const accuracyRes = await query(accuracyQuery, accuracyParams);
             return accuracyRes.rows || [];
         };
@@ -116,9 +132,10 @@ router.get('/', async (req, res) => {
         if (accuracyRows.length === 0 && !filterRunId) {
             const latestDateRes = await query(`
                 SELECT fixture_date::text AS date
-                FROM predictions_accuracy
-                WHERE fixture_date IS NOT NULL
-                  AND LOWER(sport) = LOWER($1)
+                FROM predictions_accuracy pa
+                WHERE pa.fixture_date IS NOT NULL
+                  AND LOWER(pa.sport) = LOWER($1)
+                  AND ${ACCURACY_ROW_QUALITY_SQL}
                 GROUP BY fixture_date
                 ORDER BY fixture_date DESC
                 LIMIT 1
@@ -300,13 +317,15 @@ router.get('/', async (req, res) => {
             SELECT DISTINCT date::text AS date
             FROM (
                 SELECT fixture_date::date AS date
-                FROM predictions_accuracy
-                WHERE fixture_date IS NOT NULL
-                  AND LOWER(sport) = LOWER($1)
+                FROM predictions_accuracy pa
+                WHERE pa.fixture_date IS NOT NULL
+                  AND LOWER(pa.sport) = LOWER($1)
+                  AND ${ACCURACY_ROW_QUALITY_SQL}
                 UNION
                 SELECT DATE(COALESCE(match_date, created_at) AT TIME ZONE 'Africa/Johannesburg') AS date
-                FROM direct1x2_prediction_final
-                WHERE LOWER(COALESCE(sport, matches->0->>'sport', '')) = LOWER($1)
+                FROM direct1x2_prediction_final pf
+                WHERE LOWER(COALESCE(NULLIF(TRIM(pf.sport), ''), NULLIF(TRIM(pf.matches->0->>'sport'), '')))= LOWER($1)
+                  AND ${PUBLISHED_ROW_QUALITY_SQL}
             ) d
             WHERE date IS NOT NULL
             ORDER BY date DESC
@@ -314,19 +333,21 @@ router.get('/', async (req, res) => {
         const availableDates = availableDatesRes.rows.map((row) => row.date).filter(Boolean);
 
         const availableSportsRes = await query(`
-            SELECT DISTINCT LOWER(sport) as sport
-            FROM predictions_accuracy
-            WHERE evaluated_at >= NOW() - INTERVAL '30 days'
+            SELECT DISTINCT LOWER(pa.sport) as sport
+            FROM predictions_accuracy pa
+            WHERE pa.evaluated_at >= NOW() - INTERVAL '30 days'
+              AND ${ACCURACY_ROW_QUALITY_SQL}
             ORDER BY sport ASC
         `);
         const availableSports = availableSportsRes.rows.map((row) => row.sport).filter(Boolean);
 
         const availableRunsRes = await query(`
             SELECT DISTINCT publish_run_id as "runId"
-            FROM predictions_accuracy
-            WHERE fixture_date = $1::date
-              AND LOWER(sport) = LOWER($2)
-              AND publish_run_id IS NOT NULL
+            FROM predictions_accuracy pa
+            WHERE pa.fixture_date = $1::date
+              AND LOWER(pa.sport) = LOWER($2)
+              AND pa.publish_run_id IS NOT NULL
+              AND ${ACCURACY_ROW_QUALITY_SQL}
             ORDER BY "runId" DESC
         `, [effectiveDate, filterSport]);
 
@@ -354,10 +375,11 @@ router.get('/', async (req, res) => {
                         ELSE 1
                     END
                 ), 0)::int AS legs
-            FROM direct1x2_prediction_final
-            WHERE LOWER(COALESCE(sport, matches->0->>'sport', '')) = LOWER($1)
-              AND DATE(COALESCE(match_date, created_at) AT TIME ZONE 'Africa/Johannesburg') = $2::date
-              AND ($3::bigint IS NULL OR publish_run_id = $3::bigint)
+            FROM direct1x2_prediction_final pf
+            WHERE LOWER(COALESCE(NULLIF(TRIM(pf.sport), ''), NULLIF(TRIM(pf.matches->0->>'sport'), ''))) = LOWER($1)
+              AND DATE(COALESCE(pf.match_date, pf.created_at) AT TIME ZONE 'Africa/Johannesburg') = $2::date
+              AND ($3::bigint IS NULL OR pf.publish_run_id = $3::bigint)
+              AND ${PUBLISHED_ROW_QUALITY_SQL}
         `, [filterSport, effectiveDate, filterRunId || null]);
         const publishedSummary = publishedSummaryRes.rows?.[0] || { products: 0, legs: 0 };
 

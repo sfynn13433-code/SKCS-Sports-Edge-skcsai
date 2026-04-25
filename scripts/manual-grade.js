@@ -68,7 +68,7 @@ async function manualGrade() {
     const match = matchResult.rows[0];
     console.log('Grading match:', match.home_team, 'vs', match.away_team);
     
-    // Find predictions for this match from both tables
+    // Find predictions for this match from the live publish table only
     // Match by fixture_id OR by team names (fuzzy match)
     const predResult = await client.query(`
         SELECT DISTINCT ON (id)
@@ -88,22 +88,11 @@ async function manualGrade() {
                AND (LOWER(home_team) = LOWER($2) OR LOWER($2) LIKE '%' || LOWER(home_team) || '%')
                AND (LOWER(away_team) = LOWER($3) OR LOWER($3) LIKE '%' || LOWER(away_team) || '%'))
            OR matches::text LIKE '%' || $1 || '%'
-        UNION ALL
-        SELECT DISTINCT ON (id)
-            id, 
-            matches, 
-            recommendation,
-            total_confidence,
-            tier,
-            type,
-            publish_run_id,
-            NULL as home_team,
-            NULL as away_team,
-            NULL as match_date
-        FROM predictions_final
-        WHERE matches::text LIKE '%' || $1 || '%'
-           OR matches::text LIKE '%' || $2 || '%'
-           OR matches::text LIKE '%' || $3 || '%'
+          AND COALESCE(NULLIF(TRIM(home_team), ''), NULLIF(TRIM(matches->0->>'home_team'), ''), NULLIF(TRIM(matches->0->>'home_team_name'), '')) IS NOT NULL
+          AND COALESCE(NULLIF(TRIM(away_team), ''), NULLIF(TRIM(matches->0->>'away_team'), ''), NULLIF(TRIM(matches->0->>'away_team_name'), '')) IS NOT NULL
+          AND LOWER(COALESCE(NULLIF(TRIM(home_team), ''), NULLIF(TRIM(matches->0->>'home_team'), ''), NULLIF(TRIM(matches->0->>'home_team_name'), ''))) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+          AND LOWER(COALESCE(NULLIF(TRIM(away_team), ''), NULLIF(TRIM(matches->0->>'away_team'), ''), NULLIF(TRIM(matches->0->>'away_team_name'), ''))) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+          AND LOWER(COALESCE(NULLIF(TRIM(sport), ''), NULLIF(TRIM(matches->0->>'sport'), ''))) <> 'unknown'
     `, [match.id, match.home_team, match.away_team]);
     
     console.log('Found', predResult.rows.length, 'predictions');
