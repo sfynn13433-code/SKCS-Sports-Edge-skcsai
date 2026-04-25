@@ -197,6 +197,21 @@
         return toText(value, 'SELECTION').replace(/_/g, ' ').toUpperCase();
     }
 
+    function formatKickoff(value) {
+        if (!value) return 'Date pending';
+        const parsed = new Date(value);
+        if (Number.isNaN(parsed.getTime())) return toText(value, 'Date pending');
+        return parsed.toLocaleString('en-ZA', {
+            timeZone: 'Africa/Johannesburg',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        });
+    }
+
     function renderState(message, type = 'error') {
         const stateEl = document.getElementById('state');
         if (!message) {
@@ -212,9 +227,7 @@
         card.className = 'card';
         card.style.borderLeftColor = config.color;
 
-        const kickoff = prediction.match_date
-            ? new Date(prediction.match_date).toLocaleString()
-            : 'Date pending';
+        const kickoff = formatKickoff(prediction.match_date);
         const confidence = Number(prediction.confidence || 0);
         const split = prediction && prediction.one_x2_probabilities && typeof prediction.one_x2_probabilities === 'object'
             ? prediction.one_x2_probabilities

@@ -46,6 +46,33 @@ function extractPipelineData(row, firstMatch) {
     return candidates.find((candidate) => candidate && typeof candidate === 'object') || {};
 }
 
+const INVALID_TEAM_TOKENS = new Set([
+    'unknown',
+    'unknown home',
+    'unknown away',
+    'home team',
+    'away team',
+    'tbd',
+    'n/a'
+]);
+
+function isValidIdentityText(value) {
+    const text = String(value || '').trim();
+    if (!text) return false;
+    return !INVALID_TEAM_TOKENS.has(text.toLowerCase());
+}
+
+function isPredictionRowIdentityValid(row) {
+    const firstMatch = Array.isArray(row?.matches) && row.matches.length ? row.matches[0] : {};
+    const home = String(row?.home_team || firstMatch?.home_team || firstMatch?.home_team_name || '').trim();
+    const away = String(row?.away_team || firstMatch?.away_team || firstMatch?.away_team_name || '').trim();
+    const sport = String(row?.sport || firstMatch?.sport || '').trim().toLowerCase();
+
+    if (!isValidIdentityText(home) || !isValidIdentityText(away)) return false;
+    if (!sport || sport === 'unknown') return false;
+    return true;
+}
+
 function normalizeProbability(value) {
     const raw = asNumber(value, NaN);
     if (!Number.isFinite(raw)) return null;
@@ -189,17 +216,44 @@ router.get('/', async (req, res) => {
         const sport = String(req.query?.sport || 'football').trim().toLowerCase();
         const riskTier = String(req.query?.risk_tier || '').trim().toUpperCase();
         const limit = Math.min(500, Math.max(1, Number.parseInt(String(req.query?.limit || '100'), 10) || 100));
+        const historyDays = Math.max(0, Math.min(7, Number.parseInt(String(req.query?.history_days || '1'), 10) || 1));
+        const windowDays = Math.max(1, Math.min(14, Number.parseInt(String(req.query?.window_days || '14'), 10) || 14));
+        const latestRunOnly = !['0', 'false'].includes(String(req.query?.latest_run || '1').trim().toLowerCase());
+        const now = new Date();
+        const windowStartIso = new Date(now.getTime() - historyDays * 24 * 60 * 60 * 1000).toISOString();
+        const windowEndIso = new Date(now.getTime() + windowDays * 24 * 60 * 60 * 1000).toISOString();
+
+        let latestRunId = null;
+        if (latestRunOnly) {
+            const { data: latestRows, error: latestError } = await supabase
+                .from('direct1x2_prediction_final')
+                .select('publish_run_id')
+                .eq('sport', sport)
+                .in('type', ['direct', 'single'])
+                .not('publish_run_id', 'is', null)
+                .order('publish_run_id', { ascending: false })
+                .limit(1);
+
+            if (latestError) throw latestError;
+            latestRunId = Array.isArray(latestRows) && latestRows.length ? latestRows[0].publish_run_id : null;
+        }
 
         let query = supabase
             .from('direct1x2_prediction_final')
             .select('*')
             .eq('sport', sport)
             .in('type', ['direct', 'single'])
+            .not('match_date', 'is', null)
+            .gte('match_date', windowStartIso)
+            .lte('match_date', windowEndIso)
             .order('match_date', { ascending: true, nullsFirst: false })
             .limit(limit);
 
         if (riskTier) {
             query = query.eq('risk_tier', riskTier);
+        }
+        if (latestRunId !== null && latestRunId !== undefined) {
+            query = query.eq('publish_run_id', latestRunId);
         }
 
         const { data, error } = await query;
@@ -207,7 +261,9 @@ router.get('/', async (req, res) => {
             throw error;
         }
 
-        const predictions = (Array.isArray(data) ? data : []).map(formatPredictionRow);
+        const predictions = (Array.isArray(data) ? data : [])
+            .filter(isPredictionRowIdentityValid)
+            .map(formatPredictionRow);
         return res.json({ predictions });
     } catch (err) {
         return res.status(500).json({ error: err.message });
