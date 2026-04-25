@@ -1061,6 +1061,31 @@ async function buildRawPredictionFromProviderItem(item) {
         count: 1
     });
 
+    // Always ingest context for football fixtures before downstream pipeline filtering.
+    let ingestedContextData = { injuries: null, h2h: null, weather: null };
+    try {
+        const fixtureIdForIngestion = matchInfo.match_id || match_id;
+        const homeTeamIdForIngestion = matchInfo.home_team_id || item.home_team_id || null;
+        const awayTeamIdForIngestion = matchInfo.away_team_id || item.away_team_id || null;
+        const cityForWeather = resolveContextIngestionCity(matchInfo, item);
+
+        const [injuriesRaw, h2hRaw, weatherRaw] = await Promise.all([
+            getInjuries(fixtureIdForIngestion),
+            getH2H(homeTeamIdForIngestion, awayTeamIdForIngestion),
+            getWeather(cityForWeather)
+        ]);
+
+        ingestedContextData = {
+            injuries: normalizeInjuriesFromProvider(injuriesRaw, homeTeamIdForIngestion, awayTeamIdForIngestion),
+            h2h: normalizeH2HFromProvider(h2hRaw),
+            weather: normalizeWeatherFromProvider(weatherRaw)
+        };
+
+        await saveContextData(directInsightsSupabase, match_id, ingestedContextData);
+    } catch (contextIngestionErr) {
+        console.warn('[aiPipeline] context ingestion failed for match_id=%s: %s', match_id, contextIngestionErr.message);
+    }
+
     const scoring = await scoreMatch({
         match_id,
         sport,
@@ -1107,37 +1132,6 @@ async function buildRawPredictionFromProviderItem(item) {
             bucket: 'missing_context',
             metadata: { match_id }
         });
-    }
-
-    let ingestedContextData = { injuries: null, h2h: null, weather: null };
-    try {
-        const fixtureIdForIngestion = matchInfo.match_id || match_id;
-        const homeTeamIdForIngestion = matchInfo.home_team_id || item.home_team_id || null;
-        const awayTeamIdForIngestion = matchInfo.away_team_id || item.away_team_id || null;
-        const cityForWeather = resolveContextIngestionCity(matchInfo, item);
-
-        const [injuriesRaw, h2hRaw, weatherRaw] = await Promise.all([
-            getInjuries(fixtureIdForIngestion),
-            getH2H(homeTeamIdForIngestion, awayTeamIdForIngestion),
-            getWeather(cityForWeather)
-        ]);
-
-        ingestedContextData = {
-            injuries: normalizeInjuriesFromProvider(injuriesRaw, homeTeamIdForIngestion, awayTeamIdForIngestion),
-            h2h: normalizeH2HFromProvider(h2hRaw),
-            weather: normalizeWeatherFromProvider(weatherRaw)
-        };
-
-        const hasIngestedPayload = Boolean(
-            (Array.isArray(ingestedContextData.injuries) && ingestedContextData.injuries.length)
-            || ingestedContextData.h2h
-            || ingestedContextData.weather
-        );
-        if (hasIngestedPayload) {
-            await saveContextData(directInsightsSupabase, match_id, ingestedContextData);
-        }
-    } catch (contextIngestionErr) {
-        console.warn('[aiPipeline] context ingestion failed for match_id=%s: %s', match_id, contextIngestionErr.message);
     }
 
     const contextSignals = normalizeContextSignals(contextEnriched?.contextSignals);

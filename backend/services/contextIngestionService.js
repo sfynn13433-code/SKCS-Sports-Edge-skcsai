@@ -29,7 +29,8 @@ async function getInjuries(fixtureId) {
             { headers: buildApiSportsHeaders(), timeout: 10000 }
         );
         return Array.isArray(res?.data?.response) ? res.data.response : null;
-    } catch (_err) {
+    } catch (err) {
+        console.error('API ERROR:', err.message);
         return null;
     }
 }
@@ -45,7 +46,8 @@ async function getH2H(team1, team2) {
             { headers: buildApiSportsHeaders(), timeout: 10000 }
         );
         return Array.isArray(res?.data?.response) ? res.data.response : null;
-    } catch (_err) {
+    } catch (err) {
+        console.error('API ERROR:', err.message);
         return null;
     }
 }
@@ -61,7 +63,8 @@ async function getWeather(city) {
             { timeout: 10000 }
         );
         return res?.data || null;
-    } catch (_err) {
+    } catch (err) {
+        console.error('API ERROR:', err.message);
         return null;
     }
 }
