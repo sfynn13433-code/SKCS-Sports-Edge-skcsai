@@ -287,24 +287,67 @@ function normalizeContextSignals(value) {
     };
 }
 
-function buildDirect1x2ContextAdjustments(contextSignals) {
-    const source = isObject(contextSignals) ? contextSignals : {};
-    const riskToAdjustment = (riskValue) => {
-        const risk = clamp(Number(riskValue) || 0, 0, 1);
-        const drawShift = risk * 0.04;
-        const sideShift = drawShift / 2;
-        return {
-            home: -sideShift,
-            draw: drawShift,
-            away: -sideShift
-        };
+function normalizeTeamTokenForSide(value) {
+    return String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function resolveInjuryTeamSide(entry, homeTeam, awayTeam) {
+    if (!entry || typeof entry !== 'object') return null;
+    const candidate = String(
+        entry.side
+        || entry.team_side
+        || entry.home_away
+        || entry.teamType
+        || entry.team_type
+        || entry.team
+        || entry.team_name
+        || ''
+    ).trim().toLowerCase();
+    if (!candidate) return null;
+    if (candidate === 'home' || candidate === 'h') return 'home';
+    if (candidate === 'away' || candidate === 'a') return 'away';
+
+    const normalizedCandidate = normalizeTeamTokenForSide(candidate);
+    if (normalizedCandidate && normalizedCandidate === normalizeTeamTokenForSide(homeTeam)) return 'home';
+    if (normalizedCandidate && normalizedCandidate === normalizeTeamTokenForSide(awayTeam)) return 'away';
+    return null;
+}
+
+function isKeyAbsence(entry) {
+    if (!entry || typeof entry !== 'object') return false;
+    if (entry.isKeyPlayer === true || entry.is_key_player === true) return true;
+    const priority = String(entry.priority || entry.importance || entry.role || '').trim().toLowerCase();
+    return priority === 'key' || priority === 'critical' || priority === 'starter';
+}
+
+function buildDirect1x2InjuryContext(effectiveMatchContext, matchInfo = {}) {
+    const context = isObject(effectiveMatchContext?.contextual_intelligence)
+        ? effectiveMatchContext.contextual_intelligence
+        : {};
+    const absences = []
+        .concat(ensureArray(context.injuries))
+        .concat(ensureArray(context.suspensions));
+
+    const out = {
+        home: { keyPlayersOut: 0 },
+        away: { keyPlayersOut: 0 }
     };
 
+    for (const absence of absences) {
+        if (!isKeyAbsence(absence)) continue;
+        const side = resolveInjuryTeamSide(absence, matchInfo.home_team, matchInfo.away_team);
+        if (side === 'home') out.home.keyPlayersOut += 1;
+        if (side === 'away') out.away.keyPlayersOut += 1;
+    }
+
     return {
-        weather: riskToAdjustment(source.weather_risk),
-        availability: riskToAdjustment(source.availability_risk),
-        discipline: riskToAdjustment(source.discipline_risk),
-        stability: riskToAdjustment(source.stability_risk)
+        home: { keyPlayersOut: out.home.keyPlayersOut },
+        away: { keyPlayersOut: out.away.keyPlayersOut }
     };
 }
 
@@ -326,6 +369,157 @@ function computeDirect1x2VolatilityScore(contextSignals) {
     if (!volatilitySignals.length) return 0;
     const average = volatilitySignals.reduce((sum, value) => sum + value, 0) / volatilitySignals.length;
     return clamp(average, 0, 1);
+}
+
+function extractWeatherForDirect1x2(effectiveMatchContext) {
+    const context = isObject(effectiveMatchContext?.contextual_intelligence)
+        ? effectiveMatchContext.contextual_intelligence
+        : {};
+    const weatherSource = context.weather || effectiveMatchContext?.weather || null;
+    if (!weatherSource) return null;
+
+    if (typeof weatherSource === 'string') {
+        const text = weatherSource.trim();
+        const key = text.toLowerCase();
+        const rain = key.includes('rain') || key.includes('shower') || key.includes('drizzle') || key.includes('storm');
+        return {
+            rain,
+            condition: text,
+            summary: text
+        };
+    }
+
+    if (typeof weatherSource === 'object') {
+        const condition = String(
+            weatherSource.condition
+            || weatherSource.description
+            || weatherSource.summary
+            || ''
+        ).trim();
+        const lower = condition.toLowerCase();
+        const precipitation = Number(weatherSource.precipitation || weatherSource.precipitation_probability || 0);
+        const rain = weatherSource.rain === true
+            || lower.includes('rain')
+            || lower.includes('shower')
+            || lower.includes('drizzle')
+            || lower.includes('storm')
+            || (Number.isFinite(precipitation) && precipitation >= 40);
+
+        return {
+            ...weatherSource,
+            rain,
+            condition: condition || null,
+            summary: condition || null
+        };
+    }
+
+    return null;
+}
+
+function detectLowScoringTrend(h2hSource) {
+    if (!h2hSource || typeof h2hSource !== 'object') return null;
+    if (typeof h2hSource.lowScoringTrend === 'boolean') return h2hSource.lowScoringTrend;
+
+    const avgGoals = Number(h2hSource.avgGoals || h2hSource.avg_goals || h2hSource.averageGoals);
+    if (Number.isFinite(avgGoals)) return avgGoals <= 2.2;
+
+    const under25Rate = Number(h2hSource.under25Rate || h2hSource.under_2_5_rate || h2hSource.under25);
+    if (Number.isFinite(under25Rate)) return under25Rate >= 0.55;
+
+    const recent = Array.isArray(h2hSource.matches) ? h2hSource.matches : [];
+    if (!recent.length) return null;
+    let lowScoring = 0;
+    for (const match of recent) {
+        const homeGoals = Number(match?.homeGoals ?? match?.home_goals ?? match?.home_score ?? 0);
+        const awayGoals = Number(match?.awayGoals ?? match?.away_goals ?? match?.away_score ?? 0);
+        if (Number.isFinite(homeGoals) && Number.isFinite(awayGoals) && (homeGoals + awayGoals) <= 2) {
+            lowScoring += 1;
+        }
+    }
+    return (lowScoring / recent.length) >= 0.6;
+}
+
+function extractH2HForDirect1x2(effectiveMatchContext) {
+    const context = isObject(effectiveMatchContext?.contextual_intelligence)
+        ? effectiveMatchContext.contextual_intelligence
+        : {};
+    const rawProvider = isObject(effectiveMatchContext?.raw_provider_data)
+        ? effectiveMatchContext.raw_provider_data
+        : {};
+    const source = context.h2h || effectiveMatchContext?.h2h || rawProvider?.h2h || null;
+    if (!source || typeof source !== 'object') return null;
+
+    const lowScoringTrend = detectLowScoringTrend(source);
+    return {
+        ...source,
+        lowScoringTrend: lowScoringTrend === true
+    };
+}
+
+function parseFormPoints(value) {
+    const raw = String(value || '').trim().toUpperCase();
+    if (!raw) return null;
+    let points = 0;
+    let matches = 0;
+    for (const char of raw.replace(/[^WDL]/g, '')) {
+        if (char === 'W') points += 3;
+        if (char === 'D') points += 1;
+        if (char === 'L') points += 0;
+        matches += 1;
+    }
+    return matches > 0 ? points : null;
+}
+
+function extractFormForDirect1x2(effectiveMatchContext) {
+    const context = isObject(effectiveMatchContext?.contextual_intelligence)
+        ? effectiveMatchContext.contextual_intelligence
+        : {};
+    const rawProvider = isObject(effectiveMatchContext?.raw_provider_data)
+        ? effectiveMatchContext.raw_provider_data
+        : {};
+    const source = context.form || effectiveMatchContext?.form || rawProvider?.form || rawProvider || {};
+    if (!source || typeof source !== 'object') return null;
+
+    const homePointsLast5 = Number(
+        source.homePointsLast5
+        ?? source.home_points_last5
+        ?? source.home_last5_points
+        ?? parseFormPoints(source.homeForm || source.home_form || source.home_recent_form)
+    );
+    const awayPointsLast5 = Number(
+        source.awayPointsLast5
+        ?? source.away_points_last5
+        ?? source.away_last5_points
+        ?? parseFormPoints(source.awayForm || source.away_form || source.away_recent_form)
+    );
+    const homeMomentum = Number(source.homeMomentum ?? source.home_momentum);
+    const awayMomentum = Number(source.awayMomentum ?? source.away_momentum);
+
+    const hasPoints = Number.isFinite(homePointsLast5) || Number.isFinite(awayPointsLast5);
+    const hasMomentum = Number.isFinite(homeMomentum) || Number.isFinite(awayMomentum);
+    if (!hasPoints && !hasMomentum) return null;
+
+    return {
+        homePointsLast5: Number.isFinite(homePointsLast5) ? homePointsLast5 : null,
+        awayPointsLast5: Number.isFinite(awayPointsLast5) ? awayPointsLast5 : null,
+        homeMomentum: Number.isFinite(homeMomentum) ? homeMomentum : null,
+        awayMomentum: Number.isFinite(awayMomentum) ? awayMomentum : null
+    };
+}
+
+function buildDirect1x2MatchContext({ waterfallProbabilities, effectiveMatchContext, contextSignals, matchInfo }) {
+    return {
+        baseProb: {
+            home: waterfallProbabilities.home_win,
+            draw: waterfallProbabilities.draw,
+            away: waterfallProbabilities.away_win
+        },
+        injuries: buildDirect1x2InjuryContext(effectiveMatchContext, matchInfo),
+        weather: extractWeatherForDirect1x2(effectiveMatchContext),
+        h2h: extractH2HForDirect1x2(effectiveMatchContext),
+        form: extractFormForDirect1x2(effectiveMatchContext),
+        volatilityScore: computeDirect1x2VolatilityScore(contextSignals)
+    };
 }
 
 function toTitleCase(text) {
@@ -663,15 +857,14 @@ async function buildRawPredictionFromProviderItem(item) {
     const effectiveMatchContext = contextEnriched || contextFixture;
     const storableMatchContext = sanitizeMatchContextForStorage(effectiveMatchContext);
     const waterfallProbabilities = deriveWaterfallProbabilities(prediction, p_adj, effectiveMatchContext);
-    const direct1x2Evaluation = evaluateDirect1x2({
-        baseProb: {
-            home: waterfallProbabilities.home_win,
-            draw: waterfallProbabilities.draw,
-            away: waterfallProbabilities.away_win
-        },
-        contextAdjustments: buildDirect1x2ContextAdjustments(contextSignals),
-        volatilityScore: computeDirect1x2VolatilityScore(contextSignals)
-    });
+    const direct1x2Evaluation = evaluateDirect1x2(
+        buildDirect1x2MatchContext({
+            waterfallProbabilities,
+            effectiveMatchContext,
+            contextSignals,
+            matchInfo
+        })
+    );
     if (direct1x2Evaluation.confidence < 45) {
         pipelineLogger.rejectionAdd({
             run_id: telemetryRunId,
@@ -823,6 +1016,7 @@ async function buildRawPredictionFromProviderItem(item) {
                 secondary_required: direct1x2Evaluation.secondaryRequired,
                 acca_eligible: direct1x2Evaluation.accaEligible,
                 volatility_score: direct1x2Evaluation.volatilityScore,
+                limited_context: direct1x2Evaluation.limitedContext === true,
                 stages: direct1x2Evaluation.stages
             },
             market_intelligence: {

@@ -1,5 +1,6 @@
 const moment = require('moment-timezone');
 const { query } = require('../db');
+const { evaluateDirect1x2 } = require('../services/direct1x2Engine');
 const { normalizePlanId, getPlan } = require('../config/subscriptionPlans');
 const {
     getPlanCapabilities,
@@ -23,6 +24,7 @@ const ACCA_DEFAULT_SIZE = 6;
 const ACCA_MEGA_SIZE = 12;
 const ACTIVE_DEPLOYMENT_SPORT = 'football';
 const DISABLED_SPORT_REPLY = 'That sport is currently being prepared and will be available soon.';
+const LIMITED_CONTEXT_REPLY = 'Limited contextual data available — insight based primarily on statistical baseline';
 const BOT_ACCA_CONFIDENCE_MIN = Math.max(ACCA_CONFIDENCE_MIN, Number(process.env.BOT_ACCA_CONFIDENCE_MIN || 70));
 const VISIBLE_WINDOW_HOURS = (() => {
     const raw = Number(process.env.EDGEMIND_VISIBLE_WINDOW_HOURS || 72);
@@ -60,6 +62,10 @@ const SPORT_ALIASES = Object.freeze({
 
 function normalizeText(value) {
     return String(value || '').trim();
+}
+
+function isObject(value) {
+    return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 
 function normalizeSport(value) {
@@ -375,12 +381,183 @@ function selectOnePickPerMatch(candidates, limit) {
     return out;
 }
 
-function formatSelections(title, selections, notes = []) {
+function normalizeProbabilityTriplet(probabilities) {
+    const safe = {
+        home: Math.max(0, Number(probabilities?.home ?? 0)),
+        draw: Math.max(0, Number(probabilities?.draw ?? 0)),
+        away: Math.max(0, Number(probabilities?.away ?? 0))
+    };
+    const total = safe.home + safe.draw + safe.away;
+    if (total <= 0) return { home: 1 / 3, draw: 1 / 3, away: 1 / 3 };
+    return {
+        home: safe.home / total,
+        draw: safe.draw / total,
+        away: safe.away / total
+    };
+}
+
+function formatProbabilitiesInline(probabilities) {
+    const p = normalizeProbabilityTriplet(probabilities);
+    const homePct = Math.round(p.home * 100);
+    const drawPct = Math.round(p.draw * 100);
+    const awayPct = Math.max(0, 100 - homePct - drawPct);
+    return `HOME ${homePct}% | DRAW ${drawPct}% | AWAY ${awayPct}%`;
+}
+
+function parseStageOneBaseline(metadata, pick) {
+    const stageBaseline = metadata?.pipeline_data?.stage_1_baseline;
+    if (isObject(stageBaseline)) {
+        const home = Number(stageBaseline.home);
+        const draw = Number(stageBaseline.draw);
+        const away = Number(stageBaseline.away);
+        if (Number.isFinite(home) && Number.isFinite(draw) && Number.isFinite(away)) {
+            return normalizeProbabilityTriplet({
+                home: home > 1 ? home / 100 : home,
+                draw: draw > 1 ? draw / 100 : draw,
+                away: away > 1 ? away / 100 : away
+            });
+        }
+    }
+
+    const confidence = Math.max(0, Math.min(100, Number(pick?.confidence || 0))) / 100;
+    const prediction = String(pick?.prediction || '').trim().toLowerCase();
+    if (prediction === 'home_win') return normalizeProbabilityTriplet({ home: confidence, draw: (1 - confidence) * 0.45, away: (1 - confidence) * 0.55 });
+    if (prediction === 'away_win') return normalizeProbabilityTriplet({ away: confidence, draw: (1 - confidence) * 0.45, home: (1 - confidence) * 0.55 });
+    if (prediction === 'draw') return normalizeProbabilityTriplet({ draw: confidence, home: (1 - confidence) * 0.5, away: (1 - confidence) * 0.5 });
+    return normalizeProbabilityTriplet({ home: 1 / 3, draw: 1 / 3, away: 1 / 3 });
+}
+
+function buildRealtimeDirectEvaluationFromMetadata(metadata, pick) {
+    const matchContext = isObject(metadata?.match_context) ? metadata.match_context : {};
+    const contextual = isObject(matchContext?.contextual_intelligence)
+        ? matchContext.contextual_intelligence
+        : {};
+    const signals = isObject(metadata?.context_intelligence?.signals)
+        ? metadata.context_intelligence.signals
+        : {};
+    const weather = contextual.weather || null;
+    const homeTeamKey = normalizeTeamKey(pick?.home_team);
+    const awayTeamKey = normalizeTeamKey(pick?.away_team);
+    const countKeyAbsences = (entries, side) => {
+        const list = Array.isArray(entries) ? entries : [];
+        let count = 0;
+        for (const entry of list) {
+            if (!isObject(entry)) continue;
+            const isKey = entry.isKeyPlayer === true
+                || entry.is_key_player === true
+                || String(entry.priority || entry.importance || '').trim().toLowerCase() === 'key'
+                || String(entry.role || '').trim().toLowerCase() === 'starter';
+            if (!isKey) continue;
+
+            const teamSide = String(entry.side || entry.team_side || entry.home_away || '').trim().toLowerCase();
+            if ((side === 'home' && (teamSide === 'home' || teamSide === 'h'))
+                || (side === 'away' && (teamSide === 'away' || teamSide === 'a'))) {
+                count += 1;
+                continue;
+            }
+
+            const teamName = normalizeTeamKey(entry.team || entry.team_name);
+            if (side === 'home' && teamName && teamName === homeTeamKey) count += 1;
+            if (side === 'away' && teamName && teamName === awayTeamKey) count += 1;
+        }
+        return count;
+    };
+    const injuries = {
+        home: {
+            keyPlayersOut: countKeyAbsences(contextual.injuries, 'home') + countKeyAbsences(contextual.suspensions, 'home')
+        },
+        away: {
+            keyPlayersOut: countKeyAbsences(contextual.injuries, 'away') + countKeyAbsences(contextual.suspensions, 'away')
+        }
+    };
+    const form = isObject(metadata?.form) ? metadata.form : (isObject(metadata?.raw_provider_data?.form) ? metadata.raw_provider_data.form : null);
+    const h2h = isObject(metadata?.h2h) ? metadata.h2h : (isObject(metadata?.raw_provider_data?.h2h) ? metadata.raw_provider_data.h2h : null);
+    const volatilityScore = (() => {
+        const values = [
+            Number(signals.weather_risk),
+            Number(signals.availability_risk),
+            Number(signals.discipline_risk),
+            Number(signals.stability_risk),
+            Number(signals.travel_fatigue_risk),
+            Number(signals.fixture_congestion_risk),
+            Number(signals.derby_risk),
+            Number(signals.rotation_risk),
+            Number(signals.market_movement_risk),
+            Number(signals.lineup_uncertainty_risk)
+        ].filter((value) => Number.isFinite(value));
+        if (!values.length) return 0;
+        const avg = values.reduce((sum, value) => sum + Math.max(0, Math.min(1, value)), 0) / values.length;
+        return Math.max(0, Math.min(1, avg));
+    })();
+
+    const evaluation = evaluateDirect1x2({
+        baseProb: parseStageOneBaseline(metadata, pick),
+        injuries,
+        weather,
+        h2h,
+        form,
+        volatilityScore
+    });
+    return evaluation;
+}
+
+function getStageByNumber(stages, stageNumber) {
+    return (Array.isArray(stages) ? stages : []).find((stage) => Number(stage?.stage) === Number(stageNumber)) || null;
+}
+
+function buildStageBlockForPick(pick) {
+    const metadata = isObject(pick?.metadata) ? pick.metadata : {};
+    const storedEngine = isObject(metadata?.direct_1x2_engine) ? metadata.direct_1x2_engine : null;
+    const storedStages = Array.isArray(storedEngine?.stages) ? storedEngine.stages : [];
+    const hasUsableStoredReasons = storedStages.length >= 6 && storedStages.some((stage) => String(stage?.reason || '').trim().length > 0);
+    const evaluation = hasUsableStoredReasons
+        ? {
+            ...storedEngine,
+            volatilityScore: Number(storedEngine?.volatilityScore ?? storedEngine?.volatility_score ?? 0),
+            limitedContext: storedEngine?.limitedContext === true || storedEngine?.limited_context === true,
+            stages: storedStages
+        }
+        : buildRealtimeDirectEvaluationFromMetadata(metadata, pick);
+
+    if (!evaluation || evaluation.limitedContext === true) {
+        return LIMITED_CONTEXT_REPLY;
+    }
+
+    const stage1 = getStageByNumber(evaluation.stages, 1);
+    const stage2 = getStageByNumber(evaluation.stages, 2);
+    const stage3 = getStageByNumber(evaluation.stages, 3);
+    const stage4 = getStageByNumber(evaluation.stages, 4);
+    const stage5 = getStageByNumber(evaluation.stages, 5);
+    const stage6 = getStageByNumber(evaluation.stages, 6);
+    const stage1Probabilities = stage1?.updatedProbabilities || stage1?.probabilities || parseStageOneBaseline(metadata, pick);
+
+    const lines = [
+        'Stage 1:',
+        `Raw probabilities: ${formatProbabilitiesInline(stage1Probabilities)}`,
+        'Stage 2:',
+        stage2?.reason || 'No weather adjustment applied.',
+        'Stage 3:',
+        stage3?.reason || 'No injury adjustment applied.',
+        'Stage 4:',
+        stage4?.reason || 'No H2H/form adjustment applied.',
+        'Stage 5:',
+        stage5?.reason || `Volatility check complete (score ${Number(evaluation?.volatilityScore || 0).toFixed(2)}).`,
+        'Stage 6:',
+        stage6?.reason || `Final insight: ${String(evaluation?.outcome || pick?.prediction || '').toUpperCase()} at ${Math.round(Number(evaluation?.confidence || pick?.confidence || 0))}% confidence.`
+    ];
+    return lines.join('\n');
+}
+
+function formatSelections(title, selections, notes = [], options = {}) {
+    const includeStages = options?.includeStages !== false;
     const lines = [title, ''];
     for (const pick of selections) {
         lines.push(`${pick.home_team} vs ${pick.away_team}`);
         lines.push(displayMarket(pick.market));
         lines.push(`${Math.round(Number(pick.confidence || 0))}%`);
+        if (includeStages) {
+            lines.push(buildStageBlockForPick(pick));
+        }
         lines.push('');
     }
     if (notes.length) {
@@ -504,6 +681,9 @@ async function buildDatasetForUser(user) {
             
             const homeTeam = normalizeText(row.home_team || row.matches?.[0]?.home_team || 'Unknown Home');
             const awayTeam = normalizeText(row.away_team || row.matches?.[0]?.away_team || 'Unknown Away');
+            const candidateMetadata = isObject(row?.matches?.[0]?.metadata)
+                ? row.matches[0].metadata
+                : (isObject(row?.metadata) ? row.metadata : {});
             
             const candidate = {
                 tier,
@@ -515,7 +695,13 @@ async function buildDatasetForUser(user) {
                 prediction: normalizeText(row.prediction || row.matches?.[0]?.prediction || ''),
                 home_team: homeTeam,
                 away_team: awayTeam,
-                kickoff_time: availabilityTime ? availabilityTime.toISOString() : null
+                kickoff_time: availabilityTime ? availabilityTime.toISOString() : null,
+                metadata: candidateMetadata,
+                edgemind_report: normalizeText(
+                    row?.edgemind_report
+                    || row?.matches?.[0]?.edgemind_report
+                    || candidateMetadata?.edgemind_report
+                ) || null
             };
 
             candidates.push(candidate);
@@ -573,6 +759,9 @@ async function buildDatasetForUser(user) {
 
             const homeTeam = normalizeText(match?.home_team || match?.metadata?.home_team || row?.home_team || 'Unknown Home');
             const awayTeam = normalizeText(match?.away_team || match?.metadata?.away_team || row?.away_team || 'Unknown Away');
+            const candidateMetadata = isObject(match?.metadata)
+                ? match.metadata
+                : (isObject(row?.metadata) ? row.metadata : {});
 
             const candidate = {
                 tier,
@@ -584,7 +773,13 @@ async function buildDatasetForUser(user) {
                 prediction: normalizeText(match?.prediction || row?.prediction || ''),
                 home_team: homeTeam,
                 away_team: awayTeam,
-                kickoff_time: availabilityTime ? availabilityTime.toISOString() : null
+                kickoff_time: availabilityTime ? availabilityTime.toISOString() : null,
+                metadata: candidateMetadata,
+                edgemind_report: normalizeText(
+                    match?.edgemind_report
+                    || row?.edgemind_report
+                    || candidateMetadata?.edgemind_report
+                ) || null
             };
 
             candidates.push(candidate);
