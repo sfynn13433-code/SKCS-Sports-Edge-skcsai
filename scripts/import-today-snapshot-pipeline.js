@@ -1343,18 +1343,22 @@ async function fetchCricketFallback() {
 }
 
 async function ingestCricbuzz() {
-    console.log('Fetching Cricbuzz matches...');
+    console.log('🏏 Fetching Cricbuzz matches...');
 
     const raw = await fetchCricbuzzMatches();
 
     if (!raw) {
-        console.log('No Cricbuzz data');
+        console.log('❌ No Cricbuzz data');
         return [];
     }
 
     const matches = normalizeCricbuzzData(raw);
 
-    console.log(`Cricbuzz matches found: ${matches.length}`);
+    console.log(`✅ Cricbuzz matches found: ${matches.length}`);
+    
+    for (const m of matches.slice(0, 5)) {
+        console.log(`   ${m.team1} vs ${m.team2} [${m.status}]`);
+    }
 
     return matches.map((m) => ({
         match_id: m.match_id,
