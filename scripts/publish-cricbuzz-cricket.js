@@ -165,6 +165,30 @@ async function upsertFixture(fixture) {
     return data;
 }
 
+function calculateCricketExpiry(fixtureRow) {
+    const start = fixtureRow.start_time ? new Date(fixtureRow.start_time) : new Date();
+    const status = String(fixtureRow.status || '').toLowerCase();
+    const format = String(fixtureRow.match_format || '').toLowerCase();
+
+    if (status.includes('complete') || status.includes('result')) {
+        return new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString();
+    }
+
+    if (format === 'test') {
+        return new Date(start.getTime() + 6 * 24 * 60 * 60 * 1000).toISOString();
+    }
+
+    if (format === 'odi') {
+        return new Date(start.getTime() + 36 * 60 * 60 * 1000).toISOString();
+    }
+
+    if (format === 't20') {
+        return new Date(start.getTime() + 18 * 60 * 60 * 1000).toISOString();
+    }
+
+    return new Date(start.getTime() + 24 * 60 * 60 * 1000).toISOString();
+}
+
 async function upsertInsight(fixtureRow, market) {
     const insight = {
         fixture_id: fixtureRow.id,
@@ -210,20 +234,51 @@ async function upsertInsight(fixtureRow, market) {
             analysis_status: market.recommendation_status
         },
 
-        expires_at: fixtureRow.start_time
-            ? new Date(new Date(fixtureRow.start_time).getTime() + 24 * 60 * 60 * 1000).toISOString()
-            : null
+        expires_at: calculateCricketExpiry(fixtureRow)
     };
+
+    // Manual replace because Supabase upsert cannot target the COALESCE expression index.
+    let deleteQuery = supabase
+        .from('cricket_insights_final')
+        .delete()
+        .eq('provider', insight.provider)
+        .eq('provider_match_id', insight.provider_match_id)
+        .eq('market_key', insight.market_key);
+
+    if (insight.selection === null || insight.selection === undefined || insight.selection === '') {
+        deleteQuery = deleteQuery.is('selection', null);
+    } else {
+        deleteQuery = deleteQuery.eq('selection', insight.selection);
+    }
+
+    if (insight.line === null || insight.line === undefined || insight.line === '') {
+        deleteQuery = deleteQuery.is('line', null);
+    } else {
+        deleteQuery = deleteQuery.eq('line', insight.line);
+    }
+
+    if (insight.over_under === null || insight.over_under === undefined || insight.over_under === '') {
+        deleteQuery = deleteQuery.is('over_under', null);
+    } else {
+        deleteQuery = deleteQuery.eq('over_under', insight.over_under);
+    }
+
+    const { error: deleteError } = await deleteQuery;
+
+    if (deleteError) {
+        throw new Error(`Insight replace delete failed: ${deleteError.message}`);
+    }
 
     const { data, error } = await supabase
         .from('cricket_insights_final')
-        .upsert(insight, {
-            onConflict: 'provider,provider_match_id,market_key,selection,line,over_under'
-        })
+        .insert(insight)
         .select('*')
         .single();
 
-    if (error) throw new Error(`Insight upsert failed: ${error.message}`);
+    if (error) {
+        throw new Error(`Insight insert failed: ${error.message}`);
+    }
+
     return data;
 }
 

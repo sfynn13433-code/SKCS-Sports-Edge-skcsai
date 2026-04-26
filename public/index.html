@@ -2800,6 +2800,99 @@
         return String(userPlanId || window.currentUserPlanId || window.userPlanId || storedPlan || 'elite_30day_deep_vip');
     }
 
+    async function fetchCricketInsights(container, accessToken) {
+        try {
+            const url = `${SKCS_BACKEND}/api/cricket/insights?include_expired=1&limit=100`;
+            const response = await fetch(url, {
+                method: 'GET',
+                cache: 'no-store',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+
+            console.log('[SKCS CRICKET] insights response', {
+                status: response.status
+            });
+
+            if (response.status === 401) {
+                if (container) container.innerHTML = '<p style="text-align:center;color:#dc2626;padding:20px;">Session expired. Please log in again.</p>';
+                redirectToSubscribeLocked();
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+            const insights = data?.insights || [];
+            
+            const grouped ={};
+            for (const row of insights) {
+                const group = row.market_group || 'unknown';
+                if (!grouped[group]) grouped[group] = [];
+                grouped[group].push(row);
+            }
+
+            console.log('[SKCS CRICKET] insights response', {
+                count: insights.length,
+                grouped_counts: Object.fromEntries(Object.entries(grouped).map(([k,v]) => [k, v.length]))
+            });
+
+            if (insights.length === 0) {
+                if (container) container.innerHTML = '<p style="text-align:center;color:#4a5568;padding:20px;">No new cricket insights available.</p>';
+                return;
+            }
+
+            window.sharedInsightsState = insights.slice();
+            renderCricketInsights(insights, container, grouped);
+        } catch (error) {
+            console.error('[SKCS CRICKET] fetch error:', error);
+            if (container) container.innerHTML = '<p style="text-align:center;color:#4a5568;padding:20px;">No new cricket insights available.</p>';
+        }
+    }
+
+    function renderCricketInsights(insights, container, grouped) {
+        if (!container) {
+            container = document.getElementById('cricket-matches');
+        }
+        if (!container) return;
+
+        const marketGroupLabels = {
+            'direct': 'Direct Cricket',
+            'direct_cover': 'Safer Covers',
+            'totals': 'Totals',
+            'wickets': 'Wickets',
+            'phase': 'Phase Markets',
+            'boundaries': 'Boundaries',
+            'player': 'Player Markets',
+            'test_phase': 'Test Phase Markets',
+            'special': 'High Risk Specials',
+            'unknown': 'Other'
+        };
+
+        let html = '<div class="prediction-grid">';
+        for (const row of insights) {
+            const home = row.home_team || 'TBD';
+            const away = row.away_team || 'TBD';
+            const market = row.market_label || row.market_key || 'Market';
+            const status = row.status || row.match_format || '';
+            const label = marketGroupLabels[row.market_group] || 'Other';
+
+            html += `<div class="prediction-card">
+                <div class="card-header">
+                    <span class="sport-badge">${label}</span>
+                    <span class="status-badge">${status}</span>
+                </div>
+                <div class="match-teams">${home} vs ${away}</div>
+                <div class="market-label">${market}</div>
+            </div>`;
+        }
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
     async function fetchPredictions(sport, userPlanId = 'elite_30day_deep_vip') {
         const accessToken = await getAccessTokenOrRedirect();
         if (!accessToken) return;
@@ -2813,6 +2906,13 @@
         }
 
         const container = document.getElementById(sport + '-matches');
+
+        // Special handling for cricket - use dedicated API
+        if (sport === 'cricket') {
+            await fetchCricketInsights(container, accessToken);
+            return;
+        }
+
         const requestSport = sport === 'accumulators' ? '' : sport;
         let supabaseFallbackStatus = 'not_attempted';
         if (container) {
