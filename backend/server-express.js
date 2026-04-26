@@ -111,6 +111,7 @@ const accuracyRouter    = require('./routes/accuracy');
 const vipRouter         = require('./routes/vip');
 const direct1x2Router   = require('./routes/direct1x2');
 const refreshAIRouter   = require('./routes/refresh-ai');
+const cricketInsightsRouter = require('./routes/cricketInsights');
 
 const DIRECT_INSIGHTS_SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
 const DIRECT_INSIGHTS_SUPABASE_KEY = String(
@@ -393,6 +394,7 @@ app.use('/api/edgemind', chatRouter);
 app.use('/api/accuracy', accuracyRouter);
 app.use('/api/vip', vipRouter);
 app.use('/api/direct-1x2', direct1x2Router);
+app.use('/api/cricket/insights', cricketInsightsRouter);
 
 // --- Cloud Scheduler endpoints -------------------------------------------------
 // These match the URLs documented in docs/google-cloud-soccer-refresh.md
