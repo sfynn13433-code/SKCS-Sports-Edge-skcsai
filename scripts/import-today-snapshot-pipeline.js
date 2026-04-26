@@ -9,6 +9,7 @@ const { buildMatchContext } = require('../backend/services/normalizerService');
 const { runPipelineForMatches, rebuildFinalOutputs } = require('../backend/services/aiPipeline');
 const { buildAndStoreDirect1X2 } = require('../backend/services/direct1x2Builder');
 const { getApiSportsKeyPool, getRapidApiKeyPool, maskKey } = require('../backend/utils/keyPool');
+const { fetchCricbuzzMatches, normalizeCricbuzzData } = require('../backend/services/cricbuzzService');
 
 const APISPORTS_KEYS = getApiSportsKeyPool();
 const CRICKETDATA_API_KEY = String(process.env.CRICKETDATA_API_KEY || '').trim();
@@ -51,7 +52,10 @@ const SPORT_SPECS = Object.freeze([
     { sport: 'volleyball', baseUrl: 'https://v1.volleyball.api-sports.io', endpoint: 'games' },
     { sport: 'handball', baseUrl: 'https://v1.handball.api-sports.io', endpoint: 'games' },
     { sport: 'american_football', baseUrl: 'https://v1.american-football.api-sports.io', endpoint: 'games' },
-    { sport: 'tennis', baseUrl: 'https://v1.tennis.api-sports.io', endpoint: 'games' },
+    { sport: 'tennis', baseUrl: 'https://v1.tennis.api-sports.io', endpoint: 'games' }
+]);
+
+const CRICKET_SPEC = Object.freeze([
     { sport: 'cricket', baseUrl: 'https://v1.cricket.api-sports.io', endpoint: 'games' }
 ]);
 
@@ -1338,6 +1342,40 @@ async function fetchCricketFallback() {
     }
 }
 
+async function ingestCricbuzz() {
+    console.log('Fetching Cricbuzz matches...');
+
+    const raw = await fetchCricbuzzMatches();
+
+    if (!raw) {
+        console.log('No Cricbuzz data');
+        return [];
+    }
+
+    const matches = normalizeCricbuzzData(raw);
+
+    console.log(`Cricbuzz matches found: ${matches.length}`);
+
+    return matches.map((m) => ({
+        match_id: m.match_id,
+        fixture_id: m.match_id,
+        sport: m.sport,
+        home_team: m.team1,
+        away_team: m.team2,
+        date: m.start_time,
+        status: m.status,
+        market: 'match_winner',
+        prediction: null,
+        confidence: null,
+        volatility: null,
+        odds: null,
+        provider: 'cricbuzz',
+        provider_name: 'Cricbuzz',
+        league: m.league,
+        raw_provider_data: m.raw
+    }));
+}
+
 async function upsertEvents(fixtures) {
     const rows = fixtures
         .filter((row) => row.match_id && row.home_team && row.away_team)
@@ -1620,14 +1658,25 @@ async function main() {
         await sleep(SPORT_STAGGER_MS);
     }
 
-    if (skippedSports.includes('cricket')) {
+    console.log('[snapshot-import] fetching cricket via Cricbuzz...');
+    const cricketCricbuzz = await ingestCricbuzz();
+    if (cricketCricbuzz.length > 0) {
+        importedFixtures.push(...cricketCricbuzz);
+        importReport.push({
+            sport: 'cricket',
+            provider: 'cricbuzz',
+            count: cricketCricbuzz.length,
+            status: 'ok'
+        });
+    } else {
+        console.log('[snapshot-import] Cricbuzz empty, trying CricketData API fallback...');
         const cricketFallback = await fetchCricketFallback();
         importedFixtures.push(...cricketFallback);
         importReport.push({
             sport: 'cricket',
             provider: 'cricapi',
             count: cricketFallback.length,
-            status: 'ok'
+            status: cricketFallback.length > 0 ? 'ok' : 'empty'
         });
     }
 
