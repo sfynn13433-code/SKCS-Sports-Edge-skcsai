@@ -750,7 +750,9 @@
         <p class="section-description" id="planDescription"></p>
         <div class="tabs-container">
             <div class="tabs-header">
-                <button class="tab-button active" data-tab="football"><span class="sport-icon">⚽</span> FOOTBALL</button>
+                <button class="tab-button active" data-tab="direct-markets"><span class="sport-icon">🎯</span> DIRECT 1X2</button>
+                <button class="tab-button" data-tab="accumulators"><span class="sport-icon">🧮</span> ACCA</button>
+                <button class="tab-button" data-tab="football"><span class="sport-icon">⚽</span> FOOTBALL</button>
                 <button class="tab-button" data-tab="tennis"><span class="sport-icon">🎾</span> TENNIS</button>
                 <button class="tab-button" data-tab="basketball"><span class="sport-icon">🏀</span> BASKETBALL</button>
                 <button class="tab-button" data-tab="rugby"><span class="sport-icon">🏉</span> RUGBY</button>
@@ -759,7 +761,6 @@
                 <button class="tab-button" data-tab="hockey"><span class="sport-icon">🏒</span> HOCKEY</button>
                 <button class="tab-button" data-tab="formula1"><span class="sport-icon">🏎️</span> MOTORSPORT</button>
                 <button class="tab-button" data-tab="mma"><span class="sport-icon">🥊</span> MMA</button>
-                <button class="tab-button" data-tab="accumulators"><span class="sport-icon">🧮</span> ACCA</button>
             </div>
             <!-- All tab contents -->
             <div id="direct-markets" class="tab-content">
@@ -1663,7 +1664,7 @@
         return rawType;
     }
 
-    const ENABLED_INSIGHT_TABS = new Set(['football', 'tennis', 'basketball', 'rugby', 'cricket', 'baseball', 'hockey', 'formula1', 'mma', 'afl', 'volleyball', 'handball', 'nfl', 'accumulators']);
+    const ENABLED_INSIGHT_TABS = new Set(['direct-markets', 'football', 'tennis', 'basketball', 'rugby', 'cricket', 'baseball', 'hockey', 'formula1', 'mma', 'afl', 'volleyball', 'handball', 'nfl', 'accumulators']);
     const DISABLED_SPORT_MESSAGE = 'Sport coming soon — currently in development';
 
     function isEnabledInsightTab(tabKey) {
