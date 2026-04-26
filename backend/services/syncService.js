@@ -8,6 +8,8 @@ const { buildMatchContext } = require('./normalizerService');
 const pipelineLogger = require('../utils/pipelineLogger');
 const config = require('../config');
 
+console.log('🚨 ACTIVE DATA SOURCE:', process.env.RAPIDAPI_HOST);
+
 // IRON-CLAD DATE PATCH: only drop matches that are CONFIRMED to be in the past
 // beyond the 15-minute grace period. The 7-day forward ingestion horizon is
 // preserved — future kickoffs (up to +7d) always pass this guard.

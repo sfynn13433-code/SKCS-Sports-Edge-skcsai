@@ -11,6 +11,9 @@ const { buildAndStoreDirect1X2 } = require('../backend/services/direct1x2Builder
 const { getApiSportsKeyPool, getRapidApiKeyPool, maskKey } = require('../backend/utils/keyPool');
 const { fetchCricbuzzMatches, normalizeCricbuzzData } = require('../backend/services/cricbuzzService');
 
+console.log('🚨 PIPELINE SPORT KEY:', process.env.RAPIDAPI_KEY ? 'RAPIDAPI_KEY present' : 'MISSING');
+console.log('🚨 CRICBUZZ HOST:', process.env.RAPIDAPI_HOST_CRICBUZZ);
+
 const APISPORTS_KEYS = getApiSportsKeyPool();
 const CRICKETDATA_API_KEY = String(process.env.CRICKETDATA_API_KEY || '').trim();
 const TODAY = new Date().toISOString().slice(0, 10);
