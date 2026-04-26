@@ -751,6 +751,14 @@
         <div class="tabs-container">
             <div class="tabs-header">
                 <button class="tab-button active" data-tab="football"><span class="sport-icon">⚽</span> FOOTBALL</button>
+                <button class="tab-button" data-tab="tennis"><span class="sport-icon">🎾</span> TENNIS</button>
+                <button class="tab-button" data-tab="basketball"><span class="sport-icon">🏀</span> BASKETBALL</button>
+                <button class="tab-button" data-tab="rugby"><span class="sport-icon">🏉</span> RUGBY</button>
+                <button class="tab-button" data-tab="cricket"><span class="sport-icon">🏏</span> CRICKET</button>
+                <button class="tab-button" data-tab="baseball"><span class="sport-icon">⚾</span> BASEBALL</button>
+                <button class="tab-button" data-tab="hockey"><span class="sport-icon">🏒</span> HOCKEY</button>
+                <button class="tab-button" data-tab="formula1"><span class="sport-icon">🏎️</span> MOTORSPORT</button>
+                <button class="tab-button" data-tab="mma"><span class="sport-icon">🥊</span> MMA</button>
                 <button class="tab-button" data-tab="accumulators"><span class="sport-icon">🧮</span> ACCA</button>
             </div>
             <!-- All tab contents -->
@@ -1655,7 +1663,7 @@
         return rawType;
     }
 
-    const ENABLED_INSIGHT_TABS = new Set(['football', 'accumulators']);
+    const ENABLED_INSIGHT_TABS = new Set(['football', 'tennis', 'basketball', 'rugby', 'cricket', 'baseball', 'hockey', 'formula1', 'mma', 'afl', 'volleyball', 'handball', 'nfl', 'accumulators']);
     const DISABLED_SPORT_MESSAGE = 'Sport coming soon — currently in development';
 
     function isEnabledInsightTab(tabKey) {
@@ -1683,7 +1691,7 @@
         content.classList.add('active');
     }
 
-    function enforcePhaseOneTabVisibility() {
+    function enforceTabVisibility() {
         document.querySelectorAll('.tab-button').forEach((btn) => {
             const tabKey = String(btn.getAttribute('data-tab') || '').trim().toLowerCase();
             btn.style.display = isEnabledInsightTab(tabKey) ? '' : 'none';
@@ -4282,7 +4290,7 @@
             updateSubscriptionGreeting(session).catch(() => {});
         }
 
-        enforcePhaseOneTabVisibility();
+        enforceTabVisibility();
 
         document.querySelectorAll('.tab-button').forEach(btn => {
             btn.addEventListener('click', function() {
