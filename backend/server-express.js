@@ -27,6 +27,7 @@ const { requireSupabaseUser } = require('./middleware/supabaseJwt');
 const { syncAllSports, syncSports }      = require('./services/syncService');
 const { bootstrap }          = require('./dbBootstrap');
 const { runLiveSync }       = require('../scripts/fetch-live-fixtures');
+const { publishCricbuzzCricket } = require('../scripts/publish-cricbuzz-cricket');
 const { jobLogger } = require('./utils/jobLogger');
 const {
     calculateExpirationTime,
@@ -938,6 +939,73 @@ app.get('/api/cron/sync-full', verifyCronSecret, async (req, res) => {
     } catch (err) {
         console.error('[cron/sync-full] Failed:', err.message);
         res.status(500).json({ error: 'Full sync failed' });
+    }
+});
+
+// CRICKET DAILY FIXTURES CRON
+app.get('/api/cron/cricket-daily-fixtures', verifyCronSecret, async (req, res) => {
+    console.log('[cron/cricket-daily-fixtures] Starting Cricbuzz daily cricket fixture sync...');
+
+    try {
+        const result = await runCronWithLog('cron_cricket_daily_fixtures', req, async () => {
+            return await publishCricbuzzCricket({
+                trigger: 'cron_cricket_daily_fixtures'
+            });
+        });
+
+        res.json({
+            status: 'ok',
+            job: 'cron_cricket_daily_fixtures',
+            result
+        });
+    } catch (err) {
+        console.error('[cron/cricket-daily-fixtures] Failed:', err.message);
+        res.status(500).json({
+            status: 'error',
+            job: 'cron_cricket_daily_fixtures',
+            message: err.message
+        });
+    }
+});
+
+// DEBUG: Cricket tables health check
+app.get('/api/debug/cricket-tables', async (_req, res) => {
+    try {
+        const { createClient } = require('@supabase/supabase-js');
+
+        const sb = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY ||
+            process.env.SUPABASE_KEY ||
+            process.env.SUPABASE_ANON_KEY,
+            { auth: { persistSession: false, autoRefreshToken: false } }
+        );
+
+        const fixtures = await sb
+            .from('cricket_fixtures')
+            .select('*', { count: 'exact', head: true });
+
+        const insights = await sb
+            .from('cricket_insights_final')
+            .select('*', { count: 'exact', head: true });
+
+        const rules = await sb
+            .from('cricket_market_rules')
+            .select('*', { count: 'exact', head: true });
+
+        res.json({
+            ok: true,
+            cricket_fixtures: fixtures.count || 0,
+            cricket_insights_final: insights.count || 0,
+            cricket_market_rules: rules.count || 0,
+            errors: {
+                fixtures: fixtures.error?.message || null,
+                insights: insights.error?.message || null,
+                rules: rules.error?.message || null
+            }
+        });
+    } catch (err) {
+        res.status(500).json({ ok: false, error: err.message });
     }
 });
 

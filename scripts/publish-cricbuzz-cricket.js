@@ -282,7 +282,8 @@ async function upsertInsight(fixtureRow, market) {
     return data;
 }
 
-(async () => {
+async function publishCricbuzzCricket(options = {}) {
+    const startedAt = new Date().toISOString();
     console.log('=== PUBLISH CRICBUZZ CRICKET START ===');
 
     const rules = await loadRules();
@@ -291,7 +292,18 @@ async function upsertInsight(fixtureRow, market) {
     if (!raw) {
         console.log('No Cricbuzz data received');
         console.log('=== PUBLISH CRICBUZZ CRICKET END ===');
-        return;
+        return {
+            ok: false,
+            source: 'cricbuzz',
+            fetched: 0,
+            normalized: 0,
+            fixtureUpserts: 0,
+            insightUpserts: 0,
+            skipped: 0,
+            errors: ['No Cricbuzz data received'],
+            startedAt,
+            finishedAt: new Date().toISOString()
+        };
     }
     
     const matches = normalizeCricbuzzData(raw);
@@ -327,6 +339,21 @@ async function upsertInsight(fixtureRow, market) {
         }
     }
 
+    const finishedAt = new Date().toISOString();
+    const summary = {
+        ok: true,
+        source: 'cricbuzz',
+        fetched: matches.length,
+        normalized,
+        fixtureUpserts,
+        insightUpserts,
+        skipped,
+        errors: errors.slice(0, 10),
+        startedAt,
+        finishedAt,
+        trigger: options.trigger || 'manual'
+    };
+
     console.log({
         CRICBUZZ_FETCHED: matches.length,
         NORMALIZED: normalized,
@@ -337,4 +364,22 @@ async function upsertInsight(fixtureRow, market) {
     });
 
     console.log('=== PUBLISH CRICBUZZ CRICKET END ===');
-})();
+    return summary;
+}
+
+if (require.main === module) {
+    publishCricbuzzCricket()
+        .then((summary) => {
+            console.log('=== PUBLISH CRICBUZZ CRICKET COMPLETE ===');
+            console.log(JSON.stringify(summary, null, 2));
+        })
+        .catch((err) => {
+            console.error('=== PUBLISH CRICBUZZ CRICKET FAILED ===');
+            console.error(err);
+            process.exit(1);
+        });
+}
+
+module.exports = {
+    publishCricbuzzCricket
+};
