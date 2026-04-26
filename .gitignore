@@ -28,6 +28,9 @@ parts/
 sdist/
 var/
 wheels/
+.mcp.json
+mcp.json
+.mcp/
 share/python-wheels/
 *.egg-info/
 .installed.cfg
