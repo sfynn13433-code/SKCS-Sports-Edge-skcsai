@@ -35,9 +35,9 @@ async function handleSyncRequest(res, options = {}) {
     const requestedSport = options.requestedSport ? String(options.requestedSport).toLowerCase() : null;
     const waitForCompletion = options.waitForCompletion === true;
     const triggerLabel = options.triggerLabel || 'manual sync';
-    const footballOnlyPhase = 'football';
+    const footballOnlyPhase = null;
 
-    if (requestedSport && requestedSport !== footballOnlyPhase) {
+    if (requestedSport && requestedSport !== footballOnlyPhase && footballOnlyPhase) {
         return res.status(200).json({
             ok: true,
             message: 'Sport disabled in current deployment phase',
