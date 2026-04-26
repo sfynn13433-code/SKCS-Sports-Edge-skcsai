@@ -1469,23 +1469,34 @@ async function runPipelineInChunks(matches) {
     let filteredInvalid = 0;
     const runIdRoot = `snapshot_${Date.now()}`;
 
+    const sports_in_pipeline = [...new Set(safeMatches.map(m => m.sport).filter(Boolean))];
+    console.log('[pipeline] Sports in batch:', sports_in_pipeline);
+
     for (let i = 0; i < safeMatches.length; i += PIPELINE_CHUNK_SIZE) {
         const chunk = safeMatches.slice(i, i + PIPELINE_CHUNK_SIZE);
         if (!chunk.length) continue;
         const chunkIndex = Math.floor(i / PIPELINE_CHUNK_SIZE) + 1;
-        const telemetry = {
-            run_id: `${runIdRoot}_c${chunkIndex}`,
-            sport: 'all'
-        };
-        const result = await runPipelineForMatches({
-            matches: chunk,
-            telemetry
-        });
-        if (Array.isArray(result?.inserted) && result.inserted.length > 0) {
-            inserted.push(...result.inserted);
+        const chunkSports = [...new Set(chunk.map(m => m.sport).filter(Boolean)];
+        
+        for (const sport of chunkSports) {
+            const sportMatches = chunk.filter(m => m.sport === sport);
+            const telemetry = {
+                run_id: `${runIdRoot}_${sport}_c${chunkIndex}`,
+                sport: sport
+            };
+            
+            console.log(`[pipeline] Running ${sport}: ${sportMatches.length} matches`);
+            
+            const result = await runPipelineForMatches({
+                matches: sportMatches,
+                telemetry
+            });
+            if (Array.isArray(result?.inserted) && result.inserted.length > 0) {
+                inserted.push(...result.inserted);
+            }
+            filteredValid += Number(result?.filtered_valid || 0);
+            filteredInvalid += Number(result?.filtered_invalid || 0);
         }
-        filteredValid += Number(result?.filtered_valid || 0);
-        filteredInvalid += Number(result?.filtered_invalid || 0);
     }
 
     return {
