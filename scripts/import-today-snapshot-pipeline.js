@@ -1348,36 +1348,52 @@ async function ingestCricbuzz() {
     const raw = await fetchCricbuzzMatches();
 
     if (!raw) {
-        console.log('❌ No Cricbuzz data');
+        console.log('❌ No Cricbuzz data received');
         return [];
     }
 
     const matches = normalizeCricbuzzData(raw);
+    
+    if (matches.length === 0) {
+        console.log('❌ NO VALID CRICKET MATCHES — BLOCKING PIPELINE');
+        return [];
+    }
 
     console.log(`✅ Cricbuzz matches found: ${matches.length}`);
     
     for (const m of matches.slice(0, 5)) {
-        console.log(`   ${m.team1} vs ${m.team2} [${m.status}]`);
+        console.log(`   ${m.team1} vs ${m.team2} [${m.match_format}] [${m.status}]`);
     }
 
-    return matches.map((m) => ({
-        match_id: m.match_id,
-        fixture_id: m.match_id,
-        sport: m.sport,
-        home_team: m.team1,
-        away_team: m.team2,
-        date: m.start_time,
-        status: m.status,
-        market: 'match_winner',
-        prediction: null,
-        confidence: null,
-        volatility: null,
-        odds: null,
-        provider: 'cricbuzz',
-        provider_name: 'Cricbuzz',
-        league: m.league,
-        raw_provider_data: m.raw
-    }));
+    const formatted = matches.map((m) => {
+        if (m.sport !== 'cricket') {
+            console.warn('⚠️ INVALID SPORT DETECTED — PIPELINE BLOCKED:', m.sport);
+            return null;
+        }
+        
+        return {
+            match_id: m.match_id,
+            fixture_id: m.match_id,
+            sport: 'cricket',
+            home_team: m.team1,
+            away_team: m.team2,
+            date: m.start_time,
+            status: m.status,
+            market: 'match_winner',
+            prediction: null,
+            confidence: null,
+            volatility: null,
+            odds: null,
+            provider: 'cricbuzz',
+            provider_name: 'Cricbuzz',
+            league: m.league,
+            match_format: m.match_format,
+            raw_provider_data: m.raw
+        };
+    }).filter(Boolean);
+
+    console.log(`✅ Valid cricket matches for insert: ${formatted.length}`);
+    return formatted;
 }
 
 async function upsertEvents(fixtures) {
