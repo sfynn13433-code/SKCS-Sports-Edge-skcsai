@@ -230,7 +230,7 @@ app.use(helmet({
       scriptSrc: ["'self'", "'unsafe-inline'", 'cdn.jsdelivr.net', 'cdnjs.cloudflare.com'],
       styleSrc: ["'self'", "'unsafe-inline'", 'cdn.jsdelivr.net', 'cdnjs.cloudflare.com'],
       imgSrc: ["'self'", 'data:', 'https:'],
-      connectSrc: ["'self'", 'https://*.supabase.co', 'https://api.odds.p.rapidapi.com', 'https://v3.football.api-sports.io'],
+      connectSrc: ["'self'", 'https://*.supabase.co', 'https://api.odds.p.rapidapi.com', 'https://v3.football.api-sports.io', 'https://cricbuzz-cricket.p.rapidapi.com', 'https://*.rapidapi.com'],
       fontSrc: ["'self'", 'data:', 'cdn.jsdelivr.net', 'cdnjs.cloudflare.com']
     }
   },
