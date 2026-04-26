@@ -2940,22 +2940,29 @@
                 }
             });
 
-            // Only redirect on 401 if NOT admin
-            if (response.status === 401 && !window.SKCS_ADMIN_UNLOCKED) {
-                redirectToSubscribeLocked();
+            console.log('[SKCS API] predictions request', {
+                sport: requestSport,
+                hasToken: !!accessToken,
+                url: url.substring(0, 80)
+            });
+            console.log('[SKCS API] predictions response', {
+                sport: requestSport,
+                status: response.status
+            });
+
+            // Clear stale data on 401 - prevent showing old sport data
+            if (response.status === 401) {
+                console.warn('[SKCS] 401 - clearing', requestSport, 'container');
+                if (container) container.innerHTML = '<p style="text-align:center;color:#dc2626;padding:20px;">Session expired. Please log in again.</p>';
+                if (!window.SKCS_ADMIN_UNLOCKED) {
+                    redirectToSubscribeLocked();
+                }
                 return;
             }
 
             let data = null;
             try { data = await response.json(); } catch (e) { data = null; }
             
-            // DEBUG: Log API response to verify data binding
-            console.log('[API] Response status:', response.status);
-            console.log('[API] Response data:', data);
-            console.log('[API] Predictions count:', data?.predictions?.length || 0);
-            console.log('[API] isAdmin:', window.SKCS_ADMIN_UNLOCKED);
-            console.log('[API] accessToken:', accessToken ? 'present' : 'missing');
-
             let preds = (response.ok && data && Array.isArray(data.predictions)) ? data.predictions : [];
             let directCounterSnapshot = (data && data.direct_market_counts && typeof data.direct_market_counts === 'object')
                 ? data.direct_market_counts
@@ -2975,6 +2982,12 @@
                     headers: {
                         'Authorization': `Bearer ${accessToken}`
                     }
+                });
+                
+                console.log('[SKCS API] fallback request', {
+                    sport: requestSport,
+                    hasToken: !!accessToken,
+                    status: r2.status
                 });
                 // Only check 401 for non-admin
                 if (r2.status === 401 && !window.SKCS_ADMIN_UNLOCKED) {
