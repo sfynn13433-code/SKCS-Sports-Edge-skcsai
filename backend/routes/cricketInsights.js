@@ -19,6 +19,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         const format = String(req.query.format || '').trim().toLowerCase();
         const marketGroup = String(req.query.market_group || '').trim().toLowerCase();
         const includeExpired = String(req.query.include_expired || '').trim() === '1';
+        const statusFilter = String(req.query.status || '').trim().toLowerCase();
         const limit = Math.min(Number(req.query.limit || 100), 250);
 
         let query = supabase
@@ -47,20 +48,50 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             return res.status(500).json({ error: 'Failed to load cricket insights', details: error.message });
         }
 
+        let filtered = data || [];
+        
+        if (statusFilter === 'active') {
+            filtered = filtered.filter(r => {
+                const s = String(r.status || '').toLowerCase();
+                return s.includes('stumps') || s.includes('toss') || s.includes('in progress') || s.includes('live');
+            });
+        } else if (statusFilter === 'upcoming') {
+            filtered = filtered.filter(r => {
+                const s = String(r.status || '').toLowerCase();
+                return !s.includes('complete') && !s.includes('result') && !s.includes('stumps');
+            });
+        } else if (statusFilter === 'complete') {
+            filtered = filtered.filter(r => {
+                const s = String(r.status || '').toLowerCase();
+                return s.includes('complete') || s.includes('result');
+            });
+        } else if (statusFilter === 'all_active') {
+            filtered = filtered.filter(r => {
+                const s = String(r.status || '').toLowerCase();
+                return !s.includes('complete') && !s.includes('result');
+            });
+        }
+
         const grouped = {};
-        for (const row of data || []) {
+        const directCount = 0;
+        for (const row of filtered) {
             const group = row.market_group || 'unknown';
             if (!grouped[group]) grouped[group] = [];
             grouped[group].push(row);
+            if (group === 'direct') {
+                directCount++;
+            }
         }
 
         return res.json({
             ok: true,
-            count: data?.length || 0,
+            count: filtered.length,
+            direct_count: directCount,
+            total_count: data?.length || 0,
             grouped_counts: Object.fromEntries(
                 Object.entries(grouped).map(([key, rows]) => [key, rows.length])
             ),
-            insights: data || []
+            insights: filtered
         });
     } catch (err) {
         console.error('[cricket-insights] failed:', err);
