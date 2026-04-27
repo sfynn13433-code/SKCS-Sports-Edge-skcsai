@@ -7,6 +7,12 @@ const {
     normalizeCricketFormat,
     evaluateCricketInsight
 } = require('../backend/services/cricketRulesEngine');
+const {
+    enrichTopCricketMatches
+} = require('../backend/services/cricketLiveEnrichmentService');
+const {
+    resolveMatchIds
+} = require('../backend/services/cricketLiveMatchResolver');
 
 // Publisher helper functions for cricket
 function buildPublisherCricketSelection(rule, fixture) {
@@ -355,6 +361,7 @@ async function upsertInsight(fixtureRow, market) {
 async function publishCricbuzzCricket(options = {}) {
     const startedAt = new Date().toISOString();
     console.log('=== PUBLISH CRICBUZZ CRICKET START ===');
+    const dryRunPreview = process.env.CRICKET_ENRICH_DRY_RUN === '1';
 
     const rules = await loadRules();
     const raw = await fetchCricbuzzMatches();
@@ -377,6 +384,50 @@ async function publishCricbuzzCricket(options = {}) {
     }
     
     const matches = normalizeCricbuzzData(raw);
+    let resolvedMatches = matches;
+    try {
+        resolvedMatches = await resolveMatchIds(matches);
+    } catch (err) {
+        console.log(`Cricket Live ID resolution skipped: ${err.message}`);
+        resolvedMatches = matches;
+    }
+
+    let enrichedMatches = resolvedMatches;
+    try {
+        enrichedMatches = await enrichTopCricketMatches(resolvedMatches);
+    } catch (err) {
+        console.log(`Cricket Live enrichment skipped: ${err.message}`);
+        enrichedMatches = resolvedMatches;
+    }
+
+    if (dryRunPreview) {
+        const enrichedCount = enrichedMatches.filter((m) => Boolean(m?.cricket_live_enrichment?.enriched)).length;
+        const resolvedCount = enrichedMatches.filter((m) => Boolean(m?.cricket_live_match_id)).length;
+        const intelligenceCount = enrichedMatches.filter((m) => Boolean(m?.intelligence)).length;
+        const fallbackIntelligenceCount = enrichedMatches.filter((m) => Boolean(m?.intelligence?.fallback)).length;
+        const firstHasEnrichment = Boolean(enrichedMatches[0]?.cricket_live_enrichment?.enriched);
+        const eleventhHasEnrichment = Boolean(enrichedMatches[10]?.cricket_live_enrichment?.enriched);
+        const sampleEnriched = enrichedMatches.find((m) => Boolean(m?.cricket_live_enrichment?.enriched)) || null;
+        const sampleForPreview = sampleEnriched || enrichedMatches[0] || null;
+        console.log(
+            JSON.stringify(
+                {
+                    dryRun: true,
+                    totalMatches: enrichedMatches.length,
+                    resolvedCount,
+                    enrichedCount,
+                    intelligenceCount,
+                    fallbackIntelligenceCount,
+                    firstHasEnrichment,
+                    eleventhHasEnrichment
+                },
+                null,
+                2
+            )
+        );
+        console.log(JSON.stringify(sampleForPreview, null, 2));
+        process.exit(0);
+    }
 
     let normalized = 0;
     let fixtureUpserts = 0;
@@ -384,7 +435,7 @@ async function publishCricbuzzCricket(options = {}) {
     let skipped = 0;
     const errors = [];
 
-    for (const match of matches) {
+    for (const match of enrichedMatches) {
         try {
             const fixture = normalizeCricbuzzMatch(match);
 
@@ -414,6 +465,8 @@ async function publishCricbuzzCricket(options = {}) {
         ok: true,
         source: 'cricbuzz',
         fetched: matches.length,
+        resolved: enrichedMatches.filter((m) => Boolean(m?.cricket_live_match_id)).length,
+        enriched: enrichedMatches.filter((m) => Boolean(m?.cricket_live_enrichment?.enriched)).length,
         normalized,
         fixtureUpserts,
         insightUpserts,
@@ -426,6 +479,8 @@ async function publishCricbuzzCricket(options = {}) {
 
     console.log({
         CRICBUZZ_FETCHED: matches.length,
+        RESOLVED_MATCH_IDS: enrichedMatches.filter((m) => Boolean(m?.cricket_live_match_id)).length,
+        ENRICHED_MATCHES: enrichedMatches.filter((m) => Boolean(m?.cricket_live_enrichment?.enriched)).length,
         NORMALIZED: normalized,
         FIXTURE_UPSERTS: fixtureUpserts,
         INSIGHT_UPSERTS: insightUpserts,
