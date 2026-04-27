@@ -9,6 +9,10 @@ const { buildMatchContext } = require('../backend/services/normalizerService');
 const { runPipelineForMatches, rebuildFinalOutputs } = require('../backend/services/aiPipeline');
 const { buildAndStoreDirect1X2 } = require('../backend/services/direct1x2Builder');
 const { getApiSportsKeyPool, getRapidApiKeyPool, maskKey } = require('../backend/utils/keyPool');
+const { fetchCricbuzzMatches, normalizeCricbuzzData } = require('../backend/services/cricbuzzService');
+
+console.log('🚨 PIPELINE SPORT KEY:', process.env.RAPIDAPI_KEY ? 'RAPIDAPI_KEY present' : 'MISSING');
+console.log('🚨 CRICBUZZ HOST:', process.env.RAPIDAPI_HOST_CRICBUZZ);
 
 const APISPORTS_KEYS = getApiSportsKeyPool();
 const CRICKETDATA_API_KEY = String(process.env.CRICKETDATA_API_KEY || '').trim();
@@ -51,7 +55,10 @@ const SPORT_SPECS = Object.freeze([
     { sport: 'volleyball', baseUrl: 'https://v1.volleyball.api-sports.io', endpoint: 'games' },
     { sport: 'handball', baseUrl: 'https://v1.handball.api-sports.io', endpoint: 'games' },
     { sport: 'american_football', baseUrl: 'https://v1.american-football.api-sports.io', endpoint: 'games' },
-    { sport: 'tennis', baseUrl: 'https://v1.tennis.api-sports.io', endpoint: 'games' },
+    { sport: 'tennis', baseUrl: 'https://v1.tennis.api-sports.io', endpoint: 'games' }
+]);
+
+const CRICKET_SPEC = Object.freeze([
     { sport: 'cricket', baseUrl: 'https://v1.cricket.api-sports.io', endpoint: 'games' }
 ]);
 
@@ -1338,6 +1345,60 @@ async function fetchCricketFallback() {
     }
 }
 
+async function ingestCricbuzz() {
+    console.log('🏏 Fetching Cricbuzz matches...');
+
+    const raw = await fetchCricbuzzMatches();
+
+    if (!raw) {
+        console.log('❌ No Cricbuzz data received');
+        return [];
+    }
+
+    const matches = normalizeCricbuzzData(raw);
+    
+    if (matches.length === 0) {
+        console.log('❌ NO VALID CRICKET MATCHES — BLOCKING PIPELINE');
+        return [];
+    }
+
+    console.log(`✅ Cricbuzz matches found: ${matches.length}`);
+    
+    for (const m of matches.slice(0, 5)) {
+        console.log(`   ${m.team1} vs ${m.team2} [${m.match_format}] [${m.status}]`);
+    }
+
+    const formatted = matches.map((m) => {
+        if (m.sport !== 'cricket') {
+            console.warn('⚠️ INVALID SPORT DETECTED — PIPELINE BLOCKED:', m.sport);
+            return null;
+        }
+        
+        return {
+            match_id: m.match_id,
+            fixture_id: m.match_id,
+            sport: 'cricket',
+            home_team: m.team1,
+            away_team: m.team2,
+            date: m.start_time,
+            status: m.status,
+            market: 'match_winner',
+            prediction: null,
+            confidence: null,
+            volatility: null,
+            odds: null,
+            provider: 'cricbuzz',
+            provider_name: 'Cricbuzz',
+            league: m.league,
+            match_format: m.match_format,
+            raw_provider_data: m.raw
+        };
+    }).filter(Boolean);
+
+    console.log(`✅ Valid cricket matches for insert: ${formatted.length}`);
+    return formatted;
+}
+
 async function upsertEvents(fixtures) {
     const rows = fixtures
         .filter((row) => row.match_id && row.home_team && row.away_team)
@@ -1411,23 +1472,34 @@ async function runPipelineInChunks(matches) {
     let filteredInvalid = 0;
     const runIdRoot = `snapshot_${Date.now()}`;
 
+    const sports_in_pipeline = [...new Set(safeMatches.map(m => m.sport).filter(Boolean))];
+    console.log('[pipeline] Sports in batch:', sports_in_pipeline);
+
     for (let i = 0; i < safeMatches.length; i += PIPELINE_CHUNK_SIZE) {
         const chunk = safeMatches.slice(i, i + PIPELINE_CHUNK_SIZE);
         if (!chunk.length) continue;
         const chunkIndex = Math.floor(i / PIPELINE_CHUNK_SIZE) + 1;
-        const telemetry = {
-            run_id: `${runIdRoot}_c${chunkIndex}`,
-            sport: 'all'
-        };
-        const result = await runPipelineForMatches({
-            matches: chunk,
-            telemetry
-        });
-        if (Array.isArray(result?.inserted) && result.inserted.length > 0) {
-            inserted.push(...result.inserted);
+        const chunkSports = [...new Set(chunk.map(m => m.sport).filter(Boolean)];
+        
+        for (const sport of chunkSports) {
+            const sportMatches = chunk.filter(m => m.sport === sport);
+            const telemetry = {
+                run_id: `${runIdRoot}_${sport}_c${chunkIndex}`,
+                sport: sport
+            };
+            
+            console.log(`[pipeline] Running ${sport}: ${sportMatches.length} matches`);
+            
+            const result = await runPipelineForMatches({
+                matches: sportMatches,
+                telemetry
+            });
+            if (Array.isArray(result?.inserted) && result.inserted.length > 0) {
+                inserted.push(...result.inserted);
+            }
+            filteredValid += Number(result?.filtered_valid || 0);
+            filteredInvalid += Number(result?.filtered_invalid || 0);
         }
-        filteredValid += Number(result?.filtered_valid || 0);
-        filteredInvalid += Number(result?.filtered_invalid || 0);
     }
 
     return {
@@ -1620,14 +1692,25 @@ async function main() {
         await sleep(SPORT_STAGGER_MS);
     }
 
-    if (skippedSports.includes('cricket')) {
+    console.log('[snapshot-import] fetching cricket via Cricbuzz...');
+    const cricketCricbuzz = await ingestCricbuzz();
+    if (cricketCricbuzz.length > 0) {
+        importedFixtures.push(...cricketCricbuzz);
+        importReport.push({
+            sport: 'cricket',
+            provider: 'cricbuzz',
+            count: cricketCricbuzz.length,
+            status: 'ok'
+        });
+    } else {
+        console.log('[snapshot-import] Cricbuzz empty, trying CricketData API fallback...');
         const cricketFallback = await fetchCricketFallback();
         importedFixtures.push(...cricketFallback);
         importReport.push({
             sport: 'cricket',
             provider: 'cricapi',
             count: cricketFallback.length,
-            status: 'ok'
+            status: cricketFallback.length > 0 ? 'ok' : 'empty'
         });
     }
 

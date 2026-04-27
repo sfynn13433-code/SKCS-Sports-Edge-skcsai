@@ -747,15 +747,23 @@
         <h2 class="section-title">Latest Insights</h2>
         <p style="text-align:center;"><span class="policy-badge">SKCS Rule: Single-use per team per week</span></p>
         <p class="policy-note">Once a team or athlete is used in an insight, the same match is blocked from other insight formats for the rest of that calendar week unless they appear in a different event.</p>
-        <div class="platform-update-notice">Platform Update Notice: Phase 1 is active. Football and ACCA insights are available; other sports are temporarily disabled.</div>
         <p class="section-description" id="planDescription"></p>
         <div class="tabs-container">
             <div class="tabs-header">
-                <button class="tab-button active" data-tab="football"><span class="sport-icon">⚽</span> FOOTBALL</button>
+                <button class="tab-button active" data-tab="direct-markets"><span class="sport-icon">🎯</span> DIRECT 1X2</button>
                 <button class="tab-button" data-tab="accumulators"><span class="sport-icon">🧮</span> ACCA</button>
+                <button class="tab-button" data-tab="football"><span class="sport-icon">⚽</span> FOOTBALL</button>
+                <button class="tab-button" data-tab="tennis"><span class="sport-icon">🎾</span> TENNIS</button>
+                <button class="tab-button" data-tab="basketball"><span class="sport-icon">🏀</span> BASKETBALL</button>
+                <button class="tab-button" data-tab="rugby"><span class="sport-icon">🏉</span> RUGBY</button>
+                <button class="tab-button" data-tab="cricket"><span class="sport-icon">🏏</span> CRICKET</button>
+                <button class="tab-button" data-tab="baseball"><span class="sport-icon">⚾</span> BASEBALL</button>
+                <button class="tab-button" data-tab="hockey"><span class="sport-icon">🏒</span> HOCKEY</button>
+                <button class="tab-button" data-tab="formula1"><span class="sport-icon">🏎️</span> MOTORSPORT</button>
+                <button class="tab-button" data-tab="mma"><span class="sport-icon">🥊</span> MMA</button>
             </div>
             <!-- All tab contents -->
-            <div id="direct-markets" class="tab-content">
+            <div id="direct-markets" class="tab-content active">
                 <h3 class="tab-title"><span class="sport-icon">🎯</span> Direct Markets</h3>
                 <p class="policy-note">Select a sport below to view predictions. Click any sport to see all available insights.</p>
                 <div class="direct-markets-menu">
@@ -826,7 +834,7 @@
                     </div>
                 </div>
             </div>
-            <div id="football" class="tab-content active">
+            <div id="football" class="tab-content">
                 <h3 class="tab-title"><span class="sport-icon">⚽</span> Football Insights</h3>
                 <div id="football-tier-summary" class="tier-allocation-summary" style="display:none;">
                     <h4>Your Daily Insight Allocation</h4>
@@ -939,6 +947,12 @@
             </div>
             <div id="cricket" class="tab-content">
                 <h3 class="tab-title"><span class="sport-icon">🏏</span> Cricket Insights</h3>
+                <div class="cricket-status-filters" style="margin-bottom: 1.5rem; text-align: center;">
+                    <button class="cricket-status-btn active" data-status="active" style="margin: 0.25rem; padding: 0.5rem 1rem; border: 1px solid #0d6efd; background: #0d6efd; color: white; border-radius: 4px; cursor: pointer;">Active</button>
+                    <button class="cricket-status-btn" data-status="upcoming" style="margin: 0.25rem; padding: 0.5rem 1rem; border: 1px solid #0d6efd; background: white; color: #0d6efd; border-radius: 4px; cursor: pointer;">Upcoming</button>
+                    <button class="cricket-status-btn" data-status="complete" style="margin: 0.25rem; padding: 0.5rem 1rem; border: 1px solid #0d6efd; background: white; color: #0d6efd; border-radius: 4px; cursor: pointer;">Complete</button>
+                    <button class="cricket-status-btn" data-status="all" style="margin: 0.25rem; padding: 0.5rem 1rem; border: 1px solid #0d6efd; background: white; color: #0d6efd; border-radius: 4px; cursor: pointer;">All</button>
+                </div>
                 <div class="prediction-sample">
                     <h4>🏏 Upcoming Insights</h4>
                     <div id="cricket-matches" class="prediction-grid"><p>Loading insights...</p></div>
@@ -1656,7 +1670,7 @@
         return rawType;
     }
 
-    const ENABLED_INSIGHT_TABS = new Set(['football', 'accumulators']);
+    const ENABLED_INSIGHT_TABS = new Set(['direct-markets', 'football', 'tennis', 'basketball', 'rugby', 'cricket', 'baseball', 'hockey', 'formula1', 'mma', 'afl', 'volleyball', 'handball', 'nfl', 'accumulators']);
     const DISABLED_SPORT_MESSAGE = 'Sport coming soon — currently in development';
 
     function isEnabledInsightTab(tabKey) {
@@ -1684,7 +1698,7 @@
         content.classList.add('active');
     }
 
-    function enforcePhaseOneTabVisibility() {
+    function enforceTabVisibility() {
         document.querySelectorAll('.tab-button').forEach((btn) => {
             const tabKey = String(btn.getAttribute('data-tab') || '').trim().toLowerCase();
             btn.style.display = isEnabledInsightTab(tabKey) ? '' : 'none';
@@ -2782,6 +2796,35 @@
         if (footballTabDirect) footballTabDirect.textContent = String(footballCount);
     }
 
+    async function updateCricketCount() {
+        try {
+            const accessToken = await getAccessTokenOrRedirect();
+            if (!accessToken) return;
+
+            const response = await fetch(`${SKCS_BACKEND}/api/cricket/count?status=active`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'x-api-key': getUserApiKey()
+                }
+            });
+
+            if (response.status === 401) {
+                redirectToSubscribeLocked();
+                return;
+            }
+
+            const data = await response.json();
+            if (data.ok) {
+                const cricketCount = Number(data.direct_count || 0);
+                const directCricketMenu = document.getElementById('direct-cricket-count');
+                if (directCricketMenu) directCricketMenu.textContent = `(${cricketCount})`;
+            }
+        } catch (err) {
+            console.warn('Failed to update cricket count:', err);
+        }
+    }
+
     function resolveUserPlanId(userPlanId) {
         let storedPlan = '';
         try {
@@ -2790,6 +2833,246 @@
             storedPlan = '';
         }
         return String(userPlanId || window.currentUserPlanId || window.userPlanId || storedPlan || 'elite_30day_deep_vip');
+    }
+
+    async function fetchCricketInsights(container, accessToken, status = 'active') {
+        try {
+            const url = `${SKCS_BACKEND}/api/cricket/insights?status=${status}&grouped=true&limit=100`;
+            const response = await fetch(url, {
+                method: 'GET',
+                cache: 'no-store',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+
+            console.log('[SKCS CRICKET] insights response', {
+                status: response.status
+            });
+
+            if (response.status === 401) {
+                if (container) container.innerHTML = '<p style="text-align:center;color:#dc2626;padding:20px;">Session expired. Please log in again.</p>';
+                redirectToSubscribeLocked();
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('[SKCS CRICKET] insights response', {
+                status: data.status,
+                grouped: data.grouped,
+                count: data.total_count
+            });
+
+            if (data.grouped && data.fixtures) {
+                // Handle grouped response
+                if (data.fixtures.length === 0) {
+                    if (container) container.innerHTML = '<p style="text-align:center;color:#4a5568;padding:20px;">No new cricket insights available.</p>';
+                    return;
+                }
+                renderCricketInsightsGrouped(data.fixtures, container, data.status);
+            } else {
+                // Handle ungrouped response (fallback)
+                const insights = data?.insights || [];
+                const directCount = data?.direct_count || 0;
+                
+                const grouped ={};
+                for (const row of insights) {
+                    const group = row.market_group || 'unknown';
+                    if (!grouped[group]) grouped[group] = [];
+                    grouped[group].push(row);
+                }
+
+                if (insights.length === 0) {
+                    if (container) container.innerHTML = '<p style="text-align:center;color:#4a5568;padding:20px;">No new cricket insights available.</p>';
+                    return;
+                }
+
+                window.sharedInsightsState = insights.slice();
+                
+                if (!window.__SKCS_DIRECT_COUNTS__) {
+                    window.__SKCS_DIRECT_COUNTS__ = { total: 0, by_sport: {} };
+                }
+                window.__SKCS_DIRECT_COUNTS__.by_sport.cricket = directCount;
+                
+                const cricketCountEl = document.getElementById('direct-cricket-count');
+                if (cricketCountEl) {
+                    cricketCountEl.textContent = `(${directCount})`;
+                }
+
+                renderCricketInsights(insights, container, grouped, data?.total_count || insights.length);
+            }
+        } catch (error) {
+            console.error('[SKCS CRICKET] fetch error:', error);
+            if (container) container.innerHTML = '<p style="text-align:center;color:#4a5568;padding:20px;">No new cricket insights available.</p>';
+        }
+    }
+
+    function renderCricketInsightsGrouped(fixtures, container, status) {
+        if (!container) {
+            container = document.getElementById('cricket-matches');
+        }
+        if (!container) return;
+
+        const marketGroupLabels = {
+            'direct': 'Direct Cricket',
+            'direct_cover': 'Safer Covers',
+            'totals': 'Totals',
+            'wickets': 'Wickets',
+            'phase': 'Phase Markets',
+            'boundaries': 'Boundaries',
+            'player': 'Player Markets',
+            'test_phase': 'Test Phase Markets',
+            'special': 'High Risk Specials',
+            'unknown': 'Other'
+        };
+
+        function cleanCricketCategoryLabel(value) {
+            if (!value) return "Cricket Market";
+            return String(value)
+                .replace(/\b(stumps|complete|completed|finished|live|in progress)\b/gi, "")
+                .replace(/\s+/g, " ")
+                .trim();
+        }
+
+        let html = `<div style="margin-bottom:1rem;color:#4a5568;font-size:0.9rem;">`;
+        html += `${fixtures.length} cricket fixtures (${status})</div>`;
+        html += '<div class="prediction-grid">';
+        
+        for (const fix of fixtures) {
+            const home = fix.home_team || 'TBD';
+            const away = fix.away_team || 'TBD';
+            const league = fix.league || fix.competition || '';
+            const startTime = fix.start_time ? new Date(fix.start_time).toLocaleString('en-ZA', {
+                day: '2-digit',
+                month: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            }) : '';
+            
+            html += `<div class="prediction-card" style="border-left:4px solid #22c55e;">
+                <div class="card-header">
+                    <div style="font-weight:600; color:#1a202c; margin-bottom:0.5rem;">${home} vs ${away}</div>
+                    <div style="color:#64748b; font-size:0.85rem; margin-bottom:0.5rem;">${league}</div>
+                    <div style="color:#64748b; font-size:0.85rem; margin-bottom:1rem;">${startTime} • ${fix.status || 'Scheduled'}</div>
+                </div>
+                <div class="card-body">
+                    <div style="font-weight:600; color:#374151; margin-bottom:0.75rem;">Markets:</div>`;
+            
+            // Group insights by market group
+            const marketsByGroup = {};
+            for (const insight of fix.insights || []) {
+                const group = insight.market_group || 'unknown';
+                if (!marketsByGroup[group]) {
+                    marketsByGroup[group] = [];
+                }
+                marketsByGroup[group].push(insight);
+            }
+            
+            for (const [group, groupInsights] of Object.entries(marketsByGroup)) {
+                const groupLabel = marketGroupLabels[group] || cleanCricketCategoryLabel(group);
+                html += `<div style="margin-bottom:1rem;">
+                    <div style="font-weight:600; color:#4b5563; margin-bottom:0.5rem;">${groupLabel}</div>`;
+                
+                for (const insight of groupInsights) {
+                    const confidence = Math.round(Number(insight.confidence || 0));
+                    const market = insight.market || insight.market_name || 'Market';
+                    const prediction = insight.prediction || insight.selection || 'Selection';
+                    const confidenceColor = confidence >= 80 ? '#22c55e' : confidence >= 70 ? '#3b82f6' : confidence >= 60 ? '#f59e0b' : '#ef4444';
+                    
+                    html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem; padding:0.25rem 0;">
+                        <div style="flex:1;">
+                            <div style="font-size:0.9rem; color:#374151;">${market} — ${prediction}</div>
+                        </div>
+                        <div style="background:${confidenceColor}; color:white; padding:0.2rem 0.5rem; border-radius:12px; font-size:0.8rem; font-weight:600;">${confidence}%</div>
+                    </div>`;
+                }
+                html += `</div>`;
+            }
+            
+            html += `</div></div>`;
+        }
+        
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    function renderCricketInsights(insights, container, grouped, totalCount) {
+        if (!container) {
+            container = document.getElementById('cricket-matches');
+        }
+        if (!container) return;
+
+        const byFixture = {};
+        for (const row of insights) {
+            const key = `${row.provider_match_id || row.fixture_id}`;
+            if (!byFixture[key]) {
+                byFixture[key] = {
+                    home_team: row.home_team,
+                    away_team: row.away_team,
+                    competition: row.competition,
+                    status: row.status,
+                    match_format: row.match_format,
+                    start_time: row.start_time,
+                    markets: []
+                };
+            }
+            byFixture[key].markets.push(row);
+        }
+
+        const marketGroupLabels = {
+            'direct': 'Direct Cricket',
+            'direct_cover': 'Safer Covers',
+            'totals': 'Totals',
+            'wickets': 'Wickets',
+            'phase': 'Phase Markets',
+            'boundaries': 'Boundaries',
+            'player': 'Player Markets',
+            'test_phase': 'Test Phase Markets',
+            'special': 'High Risk Specials',
+            'unknown': 'Other'
+        };
+
+        let html = `<div style="margin-bottom:1rem;color:#4a5568;font-size:0.9rem;">`;
+        html += `${totalCount || insights.length} total cricket insights</div>`;
+        html += '<div class="prediction-grid">';
+        
+        const fixtures = Object.values(byFixture);
+        for (const fix of fixtures) {
+            const home = fix.home_team || 'TBD';
+            const away = fix.away_team || 'TBD';
+            const status = fix.status || fix.match_format || '';
+            const format = fix.match_format || '';
+            
+            html += `<div class="prediction-card" style="border-left:4px solid #22c55e;">
+                <div class="card-header">
+                    <span class="sport-badge">${format.toUpperCase()}</span>
+                    <span class="status-badge">${status}</span>
+                </div>
+                <div class="match-teams" style="font-weight:600;font-size:1.1rem;">${home} vs ${away}</div>
+                <div style="font-size:0.85rem;color:#6b7280;margin-top:0.25rem;">${fix.competition || ''}</div>
+                <div class="markets-list" style="margin-top:0.75rem;padding-top:0.5rem;border-top:1px solid #e5e7eb;">`;
+            
+            for (const m of fix.markets.slice(0, 5)) {
+                const label = marketGroupLabels[m.market_group] || m.market_key;
+                const conf = m.confidence || 0;
+                html += `<div style="display:flex;justify-content:space-between;padding:0.25rem 0;font-size:0.85rem;">
+                    <span>${m.market_label || m.market_key}</span>
+                    <span style="color:${conf >= 65 ? '#22c55e' : conf >= 60 ? '#eab308' : '#ef4444'};">${conf}%</span>
+                </div>`;
+            }
+            if (fix.markets.length > 5) {
+                html += `<div style="font-size:0.8rem;color:#6b7280;">+${fix.markets.length - 5} more</div>`;
+            }
+            
+            html += `</div></div>`;
+        }
+        html += '</div>';
+        container.innerHTML = html;
     }
 
     async function fetchPredictions(sport, userPlanId = 'elite_30day_deep_vip') {
@@ -2805,6 +3088,13 @@
         }
 
         const container = document.getElementById(sport + '-matches');
+
+        // Special handling for cricket - use dedicated API
+        if (sport === 'cricket') {
+            await fetchCricketInsights(container, accessToken);
+            return;
+        }
+
         const requestSport = sport === 'accumulators' ? '' : sport;
         let supabaseFallbackStatus = 'not_attempted';
         if (container) {
@@ -2932,22 +3222,29 @@
                 }
             });
 
-            // Only redirect on 401 if NOT admin
-            if (response.status === 401 && !window.SKCS_ADMIN_UNLOCKED) {
-                redirectToSubscribeLocked();
+            console.log('[SKCS API] predictions request', {
+                sport: requestSport,
+                hasToken: !!accessToken,
+                url: url.substring(0, 80)
+            });
+            console.log('[SKCS API] predictions response', {
+                sport: requestSport,
+                status: response.status
+            });
+
+            // Clear stale data on 401 - prevent showing old sport data
+            if (response.status === 401) {
+                console.warn('[SKCS] 401 - clearing', requestSport, 'container');
+                if (container) container.innerHTML = '<p style="text-align:center;color:#dc2626;padding:20px;">Session expired. Please log in again.</p>';
+                if (!window.SKCS_ADMIN_UNLOCKED) {
+                    redirectToSubscribeLocked();
+                }
                 return;
             }
 
             let data = null;
             try { data = await response.json(); } catch (e) { data = null; }
             
-            // DEBUG: Log API response to verify data binding
-            console.log('[API] Response status:', response.status);
-            console.log('[API] Response data:', data);
-            console.log('[API] Predictions count:', data?.predictions?.length || 0);
-            console.log('[API] isAdmin:', window.SKCS_ADMIN_UNLOCKED);
-            console.log('[API] accessToken:', accessToken ? 'present' : 'missing');
-
             let preds = (response.ok && data && Array.isArray(data.predictions)) ? data.predictions : [];
             let directCounterSnapshot = (data && data.direct_market_counts && typeof data.direct_market_counts === 'object')
                 ? data.direct_market_counts
@@ -2967,6 +3264,12 @@
                     headers: {
                         'Authorization': `Bearer ${accessToken}`
                     }
+                });
+                
+                console.log('[SKCS API] fallback request', {
+                    sport: requestSport,
+                    hasToken: !!accessToken,
+                    status: r2.status
                 });
                 // Only check 401 for non-admin
                 if (r2.status === 401 && !window.SKCS_ADMIN_UNLOCKED) {
@@ -4283,7 +4586,7 @@
             updateSubscriptionGreeting(session).catch(() => {});
         }
 
-        enforcePhaseOneTabVisibility();
+        enforceTabVisibility();
 
         document.querySelectorAll('.tab-button').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -4314,9 +4617,38 @@
         });
         
         if (!isInitialLoadComplete) {
-            fetchPredictions('football');
+            // Update direct market counts with empty snapshot initially
+            syncDirectCountTargets({ total: 0, by_sport: {} });
+            // Update cricket count separately
+            updateCricketCount();
             isInitialLoadComplete = true;
         }
+
+        // Cricket status filter handlers
+        document.querySelectorAll('.cricket-status-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Update button styles
+                document.querySelectorAll('.cricket-status-btn').forEach(b => {
+                    b.style.background = 'white';
+                    b.style.color = '#0d6efd';
+                });
+                this.style.background = '#0d6efd';
+                this.style.color = 'white';
+                
+                // Fetch cricket insights with selected status
+                const status = this.getAttribute('data-status');
+                const container = document.getElementById('cricket-matches');
+                if (container) {
+                    getAccessTokenOrRedirect().then(token => {
+                        if (token) {
+                            fetchCricketInsights(container, token, status);
+                        }
+                    }).catch(err => {
+                        console.error('Failed to get access token for cricket filter:', err);
+                    });
+                }
+            });
+        });
 
         // Sport tab switcher for Direct Markets links
         window.switchSportTab = function(sportKey) {

@@ -21,7 +21,7 @@ const { enrichWithAvailability } = require('../utils/availability');
 const { filterPredictionsByUsagePolicy, markFixtureUsed } = require('../utils/insightUsage');
 
 const router = express.Router();
-const ACTIVE_DEPLOYMENT_SPORTS = new Set(['football', 'cricket']);
+const ACTIVE_DEPLOYMENT_SPORT = 'football';
 
 const SPORT_FILTER_MAP = {
     football: [
@@ -164,9 +164,9 @@ function normalizeTierLabel(value) {
 }
 
 function getSportFilterValues(sport) {
-    const key = normalizePredictionSportKey(String(sport || 'football').trim().toLowerCase());
-    if (!ACTIVE_DEPLOYMENT_SPORTS.has(key)) return SPORT_FILTER_MAP['football'] || ['football'];
-    return SPORT_FILTER_MAP[key] || SPORT_FILTER_MAP['football'] || ['football'];
+    const key = normalizePredictionSportKey(String(sport || ACTIVE_DEPLOYMENT_SPORT).trim().toLowerCase());
+    if (key !== ACTIVE_DEPLOYMENT_SPORT) return SPORT_FILTER_MAP[ACTIVE_DEPLOYMENT_SPORT] || [ACTIVE_DEPLOYMENT_SPORT];
+    return SPORT_FILTER_MAP[ACTIVE_DEPLOYMENT_SPORT] || [ACTIVE_DEPLOYMENT_SPORT];
 }
 
 function normalizeInsightTierLabel(value) {
@@ -2107,50 +2107,49 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         }
 
         const requestedSport = req.query.sport;
-        const normalizedRequestedSport = requestedSport ? normalizePredictionSportKey(requestedSport) : null;
-        const sport = (normalizedRequestedSport && ACTIVE_DEPLOYMENT_SPORTS.has(normalizedRequestedSport)) ? normalizedRequestedSport : 'football';
+        const sport = ACTIVE_DEPLOYMENT_SPORT;
         const isAdminAudit = req.user?.is_admin === true || req.user?.isAdmin === true || isHardcodedAdmin;
         const subscriptionViewTier = resolveRequestedSubscriptionViewTier(req, req.user);
         if (!isHardcodedAdmin && !canAccessSubscriptionViewTier(req.user, subscriptionViewTier)) {
-             return res.status(403).json({ error: 'Tier tab access denied for user' });
-         }
+            return res.status(403).json({ error: 'Tier tab access denied for user' });
+        }
 
-         const includeAllRequested = ['1', 'true'].includes(String(req.query.include_all || '').trim().toLowerCase());
-         // Require explicit include_all request; do not auto-enable full-history mode for admins.
-         const includeAll = includeAllRequested && (isAdminAudit || req.user?.is_test_user === true);
-         const sportFilterValues = getSportFilterValues(sport);
+        const includeAllRequested = ['1', 'true'].includes(String(req.query.include_all || '').trim().toLowerCase());
+        // Require explicit include_all request; do not auto-enable full-history mode for admins.
+        const includeAll = includeAllRequested && (isAdminAudit || req.user?.is_test_user === true);
+        const sportFilterValues = getSportFilterValues(sport);
+        
+        let historyWindowDays = Number(req.query.history_days);
+        if (isNaN(historyWindowDays)) {
+            // Default: strict 24 hour history window to block old matches (e.g. 5 days old)
+            historyWindowDays = 1; 
+        } else {
+            historyWindowDays = Math.max(0, Math.min(14, historyWindowDays));
+        }
+        
+        const futureWindowDays = Math.max(1, Math.min(14, Number(req.query.window_days) || 7));
 
-         let historyWindowDays = Number(req.query.history_days);
-         if (isNaN(historyWindowDays)) {
-             // Default: strict 24 hour history window to block old matches (e.g. 5 days old)
-             historyWindowDays = 1;
-         } else {
-             historyWindowDays = Math.max(0, Math.min(14, historyWindowDays));
-         }
+        console.log(
+            `[PREDICTIONS] Request for Plan: ${planId}, Sport: ${sport || 'all'}, include_all=${includeAll ? '1' : '0'}, ` +
+            `view_tier=${subscriptionViewTier}, admin_audit=${isAdminAudit ? '1' : '0'}`
+        );
+        if (requestedSport && normalizePredictionSportKey(requestedSport) !== ACTIVE_DEPLOYMENT_SPORT) {
+            console.log('[predictions] blocked non-football sport request: %s', requestedSport);
+        }
 
-         const futureWindowDays = Math.max(1, Math.min(14, Number(req.query.window_days) || 7));
+        // Get plan capabilities from subscription matrix
+        const planCapabilities = getPlanCapabilities(planId);
+        if (!planCapabilities) {
+            return res.status(400).json({ error: 'Invalid plan ID' });
+        }
+        const queryTiers = resolveQueryTiers(planCapabilities, includeAll);
 
-         console.log(
-             `[PREDICTIONS] Request for Plan: ${planId}, Sport: ${sport || 'all'}, include_all=${includeAll ? '1' : '0'}, ` +
-             `view_tier=${subscriptionViewTier}, admin_audit=${isAdminAudit ? '1' : '0'}`
-         );
-         if (requestedSport && normalizedRequestedSport && !ACTIVE_DEPLOYMENT_SPORTS.has(normalizedRequestedSport)) {
-             console.log('[predictions] blocked disabled sport request: %s', requestedSport);
-         }
-
-         // Get plan capabilities from subscription matrix
-         const planCapabilities = getPlanCapabilities(planId);
-         if (!planCapabilities) {
-             return res.status(400).json({ error: 'Invalid plan ID' });
-         }
-         const queryTiers = resolveQueryTiers(planCapabilities, includeAll);
-
-         const now = new Date();
-         const readPathDbCounts = await loadReadPathDbCounts(now);
-         let latestPublishRunId = null;
-         let publishRunSource = includeAll ? 'include_all_bypass' : 'completed_publish_run';
-         if (!includeAll) {
-             latestPublishRunId = await getLatestRelevantPublishRunId(sport);
+        const now = new Date();
+        const readPathDbCounts = await loadReadPathDbCounts(now);
+        let latestPublishRunId = null;
+        let publishRunSource = includeAll ? 'include_all_bypass' : 'completed_publish_run';
+        if (!includeAll) {
+            latestPublishRunId = await getLatestRelevantPublishRunId(ACTIVE_DEPLOYMENT_SPORT);
             if (!latestPublishRunId) {
                 latestPublishRunId = await getLatestPublishRunIdFromFinalTable();
                 if (latestPublishRunId) {
@@ -2511,7 +2510,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
 
         res.status(200).json({
             plan_id: planId,
-            sport: sport,
+            sport: ACTIVE_DEPLOYMENT_SPORT,
             publish_run_source: publishRunSource,
             include_all: includeAll,
             admin_audit: isAdminAudit,
