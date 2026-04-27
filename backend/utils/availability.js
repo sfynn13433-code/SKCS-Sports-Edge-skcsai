@@ -93,7 +93,7 @@ async function getAbsences(fixtureId, teamNames) {
     }
     
     if (absences.length === 0) {
-        absences = generateMockAbsences(teamNames);
+        return [];
     }
     
     absenceCache.set(cacheKey, { data: absences, timestamp: Date.now() });
@@ -131,7 +131,7 @@ function generateMockAbsences(teamNames) {
 
 function formatAbsences(absences) {
     if (!absences || absences.length === 0) {
-        return { short: 'No major absences', full: 'No major absences' };
+        return { short: 'No data available for injuries', full: 'No injury data available' };
     }
     
     const formatted = absences.map(a => {
@@ -163,13 +163,13 @@ async function enrichWithAvailability(predictions) {
                 pred.availability = availability.short;
                 pred.availabilityDetails = availability.full;
             } else {
-                pred.availability = 'Data updating...';
+                pred.availability = 'Injury data unavailable';
                 pred.availabilityDetails = 'Fixture ID not available for injury lookup';
             }
         } catch (err) {
             console.warn(`[Availability] Error enriching prediction:`, err.message);
-            pred.availability = 'Data updating...';
-            pred.availabilityDetails = 'Unable to fetch availability data';
+            pred.availability = 'Injury data unavailable';
+            pred.availabilityDetails = 'Unable to fetch injury data';
         }
         
         enriched.push(pred);

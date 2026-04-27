@@ -222,6 +222,18 @@ class APISportsClient {
             return null;
         }
     }
+
+    async getHeadToHead(teamA, teamB, sport = 'football') {
+        try {
+            const h2hParam = [teamA, teamB].sort((a, b) => a - b).join('-');
+            return await this.requestWithRotation(sport, 'fixtures/headtohead', {
+                h2h: h2hParam
+            });
+        } catch (error) {
+            console.error('API-Sports H2H error:', error.message);
+            return null;
+        }
+    }
 }
 
 class OddsAPIClient {

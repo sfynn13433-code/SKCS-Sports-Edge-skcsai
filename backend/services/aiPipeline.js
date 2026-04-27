@@ -22,7 +22,7 @@ const enrichFixtureWithContext = require('../src/services/contextIntelligence/ai
 const adjustProbability = require('../src/services/contextIntelligence/adjustProbability');
 
 let isRunning = false;
-const ACTIVE_DEPLOYMENT_SPORT = 'football';
+const ACTIVE_DEPLOYMENT_SPORTS = new Set(['football', 'cricket']);
 const DIRECT_INSIGHTS_SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
 const DIRECT_INSIGHTS_SUPABASE_KEY = String(
     process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -53,7 +53,7 @@ function normalizeSportForDeployment(value) {
 }
 
 function isDeploymentSportEnabled(value) {
-    return normalizeSportForDeployment(value) === ACTIVE_DEPLOYMENT_SPORT;
+    return ACTIVE_DEPLOYMENT_SPORTS.has(normalizeSportForDeployment(value));
 }
 
 function normalizePrediction(prediction) {
@@ -1507,24 +1507,24 @@ async function runPipelineForMatches({ matches, telemetry = {} }) {
     const eligibleMatches = matches.filter((item) =>
         isDeploymentSportEnabled(
             item?.sport
-            || item?.match_info?.sport
-            || item?.match?.sport
-            || item?.raw_provider_data?.sport
-            || ACTIVE_DEPLOYMENT_SPORT
-        )
-    );
+             || item?.match_info?.sport
+             || item?.match?.sport
+             || item?.raw_provider_data?.sport
+             || 'football'
+         )
+     );
 
-    if (!eligibleMatches.length) {
-        console.log('[aiPipeline] all input matches were skipped by phase-1 football-only sport gate');
-        return {
-            mode: 'manual',
-            inserted: [],
-            filtered: [],
-            filtered_valid: 0,
-            filtered_invalid: 0,
-            skipped_non_football: matches.length
-        };
-    }
+     if (!eligibleMatches.length) {
+         console.log('[aiPipeline] all input matches were skipped by active deployment sport gate');
+         return {
+             mode: 'manual',
+             inserted: [],
+             filtered: [],
+             filtered_valid: 0,
+             filtered_invalid: 0,
+             skipped_non_active: matches.length
+         };
+     }
 
     if (isRunning) {
         console.warn('[aiPipeline] blocked: pipeline already running');
@@ -1617,17 +1617,17 @@ async function runPipelineForMatches({ matches, telemetry = {} }) {
 }
 
 async function runPipelineFromConfiguredDataMode() {
-    console.log('PIPELINE STARTED');
-    const { mode, predictions } = await getPredictionInputs();
-    const eligiblePredictions = (Array.isArray(predictions) ? predictions : []).filter((item) =>
-        isDeploymentSportEnabled(
-            item?.sport
-            || item?.match_info?.sport
-            || item?.match?.sport
-            || item?.raw_provider_data?.sport
-            || ACTIVE_DEPLOYMENT_SPORT
-        )
-    );
+     console.log('PIPELINE STARTED');
+     const { mode, predictions } = await getPredictionInputs();
+     const eligiblePredictions = (Array.isArray(predictions) ? predictions : []).filter((item) =>
+         isDeploymentSportEnabled(
+             item?.sport
+             || item?.match_info?.sport
+             || item?.match?.sport
+             || item?.raw_provider_data?.sport
+             || 'football'
+         )
+     );
 
     if (isRunning) {
         console.warn('[aiPipeline] blocked: pipeline already running');

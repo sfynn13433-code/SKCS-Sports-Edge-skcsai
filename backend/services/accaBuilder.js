@@ -74,7 +74,7 @@ const SAME_MATCH_INSIGHT_TARGET = 6;
 const PHASE_ONE_ACCA_MIN_CONFIDENCE = Math.max(60, Number(process.env.PHASE_ONE_ACCA_MIN_CONFIDENCE || 70));
 const ACCA_MIN_LEG_CONFIDENCE = Math.max(ACCA_CONFIDENCE_MIN, PHASE_ONE_ACCA_MIN_CONFIDENCE);
 const VOLUME_CAP_MULTIPLIER = 5;
-const ACTIVE_DEPLOYMENT_SPORT = 'football';
+const ACTIVE_DEPLOYMENT_SPORTS = new Set(['football', 'cricket']);
 const MIXED_SPORT_TARGETS = new Set([
     'football',
     'tennis',
@@ -784,7 +784,7 @@ function normalizeSportKey(value) {
 }
 
 function isDeploymentSportEnabled(value) {
-    return normalizeSportKey(value) === ACTIVE_DEPLOYMENT_SPORT;
+    return ACTIVE_DEPLOYMENT_SPORTS.has(normalizeSportKey(value));
 }
 
 function resolveTelemetryRunId(options = {}) {
@@ -2767,9 +2767,9 @@ function normalizeRequestedSports(requestedSports = []) {
     const normalized = values
         .map((value) => normalizeSportKey(value))
         .filter((value) => value && value !== 'all');
-    if (!normalized.length) return [ACTIVE_DEPLOYMENT_SPORT];
+    if (!normalized.length) return ['football'];
     const filtered = normalized.filter((sport) => isDeploymentSportEnabled(sport));
-    return filtered.length ? filtered : [ACTIVE_DEPLOYMENT_SPORT];
+    return filtered.length ? filtered : ['football'];
 }
 
 function getPerSportCandidateLimit(requestedSports = []) {

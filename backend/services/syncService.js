@@ -18,7 +18,7 @@ const SYNC_GRACE_MINUTES = 15;
 const SYNC_FUTURE_DAYS = 7;
 const SPORT_FETCH_STAGGER_MS = Math.max(0, Number(process.env.SPORT_FETCH_STAGGER_MS || 1200));
 const DEFAULT_SYNC_WINDOW_DAYS = Math.max(2, Math.min(3, Number(process.env.LIVE_FETCH_WINDOW_DAYS || 3)));
-const ACTIVE_DEPLOYMENT_SPORT = 'football';
+const ACTIVE_DEPLOYMENT_SPORTS = new Set(['football', 'cricket']);
 
 function isObject(value) {
     return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -287,17 +287,17 @@ function normalizeRequestedSports(input) {
 }
 
 function isActiveDeploymentSport(value) {
-    return normalizeSportToken(value) === ACTIVE_DEPLOYMENT_SPORT;
+    return ACTIVE_DEPLOYMENT_SPORTS.has(normalizeSportToken(value));
 }
 
 function getSportsConfigForRequest(input) {
     const requestedSports = normalizeRequestedSports(input);
-    const footballConfigs = SPORTS_CONFIG.filter((item) => isActiveDeploymentSport(item.sport));
+    const enabledConfigs = SPORTS_CONFIG.filter((item) => ACTIVE_DEPLOYMENT_SPORTS.has(item.sport));
 
     if (!requestedSports.length) {
         return {
-            configs: footballConfigs,
-            requestedSports: [ACTIVE_DEPLOYMENT_SPORT],
+            configs: enabledConfigs,
+            requestedSports: Array.from(ACTIVE_DEPLOYMENT_SPORTS),
             blockedSports: []
         };
     }
@@ -305,18 +305,18 @@ function getSportsConfigForRequest(input) {
     const requestedSet = new Set(requestedSports);
     if (requestedSet.has('all')) {
         return {
-            configs: footballConfigs,
-            requestedSports: [ACTIVE_DEPLOYMENT_SPORT],
-            blockedSports: requestedSports.filter((sport) => !isActiveDeploymentSport(sport) && sport !== 'all')
+            configs: enabledConfigs,
+            requestedSports: Array.from(ACTIVE_DEPLOYMENT_SPORTS),
+            blockedSports: requestedSports.filter((sport) => !ACTIVE_DEPLOYMENT_SPORTS.has(sport) && sport !== 'all')
         };
     }
 
-    const hasFootballRequest = requestedSports.some((sport) => isActiveDeploymentSport(sport));
+    const enabledSportsInRequest = requestedSports.filter((sport) => ACTIVE_DEPLOYMENT_SPORTS.has(sport));
 
     return {
-        configs: hasFootballRequest ? footballConfigs : [],
-        requestedSports: hasFootballRequest ? [ACTIVE_DEPLOYMENT_SPORT] : requestedSports,
-        blockedSports: requestedSports.filter((sport) => !isActiveDeploymentSport(sport))
+        configs: enabledSportsInRequest.length ? enabledConfigs.filter((item) => enabledSportsInRequest.includes(item.sport)) : [],
+        requestedSports: enabledSportsInRequest.length ? enabledSportsInRequest : requestedSports,
+        blockedSports: requestedSports.filter((sport) => !ACTIVE_DEPLOYMENT_SPORTS.has(sport))
     };
 }
 
@@ -445,17 +445,17 @@ async function syncSports(options = {}) {
                             provider_sport: rawMatch?.sport || rawMatch?.raw_provider_data?.sport || normalizationInput?.match?.sport || 'unknown',
                             canonical_sport: normalized?.sport || item.sport
                         });
-                        if (!isActiveDeploymentSport(normalized?.sport || item.sport)) {
-                            pipelineLogger.rejectionAdd({
-                                run_id: telemetryRunId,
-                                sport: normalizeSportToken(normalized?.sport || item.sport) || 'unknown',
-                                bucket: 'sport_phase_block',
-                                metadata: {
-                                    reason: 'phase_1_football_only'
-                                }
-                            });
-                            continue;
-                        }
+                         if (!isActiveDeploymentSport(normalized?.sport || item.sport)) {
+                             pipelineLogger.rejectionAdd({
+                                 run_id: telemetryRunId,
+                                 sport: normalizeSportToken(normalized?.sport || item.sport) || 'unknown',
+                                 bucket: 'sport_deployment_block',
+                                 metadata: {
+                                     reason: 'sport_not_in_active_deployment_set'
+                                 }
+                             });
+                             continue;
+                         }
                         if (!hasAnySharpOdds(normalized)) {
                             pipelineLogger.rejectionAdd({
                                 run_id: telemetryRunId,
