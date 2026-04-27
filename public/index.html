@@ -96,6 +96,8 @@
         .prediction-sample h4 { color: #0d6efd; margin-bottom: 1rem; }
         .prediction-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
         .prediction-card { background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 3px 10px rgba(0,0,0,0.08); border-top: 3px solid #0d6efd; }
+        .cricket-fixture-league { color: #64748b; font-size: 0.85rem; margin-bottom: 0.5rem; }
+        .cricket-insight-explanation { font-size: 0.8rem; color: #6b7280; margin-top: 0.25rem; }
         .match-info { margin-bottom: 1rem; }
         .teams { font-weight: 600; font-size: 1.1rem; color: #212529; }
         .match-date { color: #6c757d; font-size: 0.9rem; margin-top: 0.3rem; }
@@ -2873,6 +2875,12 @@
                     if (container) container.innerHTML = '<p style="text-align:center;color:#4a5568;padding:20px;">No new cricket insights available.</p>';
                     return;
                 }
+                
+                // Development-only debug logging
+                if (window.location.hostname === "localhost") {
+                    console.log("[SKCS Cricket] grouped fixtures", data.fixtures);
+                }
+                
                 renderCricketInsightsGrouped(data.fixtures, container, data.status);
             } else {
                 // Handle ungrouped response (fallback)
@@ -2933,9 +2941,22 @@
         function cleanCricketCategoryLabel(value) {
             if (!value) return "Cricket Market";
             return String(value)
+                .replace(/_/g, " ")
                 .replace(/\b(stumps|complete|completed|finished|live|in progress)\b/gi, "")
                 .replace(/\s+/g, " ")
                 .trim();
+        }
+
+        function cleanPlaceholder(value, fallback) {
+            const text = String(value || "").trim();
+            const lower = text.toLowerCase();
+
+            if (!text) return fallback;
+            if (["market", "selection", "market — selection", "market - selection"].includes(lower)) {
+                return fallback;
+            }
+
+            return text;
         }
 
         let html = `<div style="margin-bottom:1rem;color:#4a5568;font-size:0.9rem;">`;
@@ -2945,7 +2966,7 @@
         for (const fix of fixtures) {
             const home = fix.home_team || 'TBD';
             const away = fix.away_team || 'TBD';
-            const league = fix.league || fix.competition || '';
+            const league = fix.league || fix.competition || fix.series_name || fix.tournament || 'Cricket';
             const startTime = fix.start_time ? new Date(fix.start_time).toLocaleString('en-ZA', {
                 day: '2-digit',
                 month: '2-digit',
@@ -2957,7 +2978,7 @@
             html += `<div class="prediction-card" style="border-left:4px solid #22c55e;">
                 <div class="card-header">
                     <div style="font-weight:600; color:#1a202c; margin-bottom:0.5rem;">${home} vs ${away}</div>
-                    <div style="color:#64748b; font-size:0.85rem; margin-bottom:0.5rem;">${league}</div>
+                    <div class="cricket-fixture-league">${league}</div>
                     <div style="color:#64748b; font-size:0.85rem; margin-bottom:1rem;">${startTime} • ${fix.status || 'Scheduled'}</div>
                 </div>
                 <div class="card-body">
@@ -2980,13 +3001,23 @@
                 
                 for (const insight of groupInsights) {
                     const confidence = Math.round(Number(insight.confidence || 0));
-                    const market = insight.market || insight.market_name || 'Market';
-                    const prediction = insight.prediction || insight.selection || 'Selection';
+
+                    const marketLabel = cleanPlaceholder(
+                        insight.market_label || insight.market_name || insight.market || insight.market_key,
+                        "Cricket Market"
+                    );
+
+                    const selectionLabel = cleanPlaceholder(
+                        insight.selection_label || insight.selection || insight.recommended_pick || insight.pick || insight.prediction,
+                        "Cricket insight"
+                    );
+
                     const confidenceColor = confidence >= 80 ? '#22c55e' : confidence >= 70 ? '#3b82f6' : confidence >= 60 ? '#f59e0b' : '#ef4444';
                     
                     html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem; padding:0.25rem 0;">
                         <div style="flex:1;">
-                            <div style="font-size:0.9rem; color:#374151;">${market} — ${prediction}</div>
+                            <div style="font-size:0.9rem; color:#374151;">${marketLabel} — ${selectionLabel}</div>
+                            ${insight.explanation ? `<p class="cricket-insight-explanation">${insight.explanation}</p>` : ''}
                         </div>
                         <div style="background:${confidenceColor}; color:white; padding:0.2rem 0.5rem; border-radius:12px; font-size:0.8rem; font-weight:600;">${confidence}%</div>
                     </div>`;
@@ -3014,7 +3045,7 @@
                 byFixture[key] = {
                     home_team: row.home_team,
                     away_team: row.away_team,
-                    competition: row.competition,
+                    competition: row.competition || row.league || row.series_name || row.tournament || '',
                     status: row.status,
                     match_format: row.match_format,
                     start_time: row.start_time,
@@ -3037,6 +3068,18 @@
             'unknown': 'Other'
         };
 
+        function cleanPlaceholder(value, fallback) {
+            const text = String(value || "").trim();
+            const lower = text.toLowerCase();
+
+            if (!text) return fallback;
+            if (["market", "selection", "market — selection", "market - selection"].includes(lower)) {
+                return fallback;
+            }
+
+            return text;
+        }
+
         let html = `<div style="margin-bottom:1rem;color:#4a5568;font-size:0.9rem;">`;
         html += `${totalCount || insights.length} total cricket insights</div>`;
         html += '<div class="prediction-grid">';
@@ -3054,16 +3097,26 @@
                     <span class="status-badge">${status}</span>
                 </div>
                 <div class="match-teams" style="font-weight:600;font-size:1.1rem;">${home} vs ${away}</div>
-                <div style="font-size:0.85rem;color:#6b7280;margin-top:0.25rem;">${fix.competition || ''}</div>
+                <div class="cricket-fixture-league">${fix.competition || 'Cricket'}</div>
                 <div class="markets-list" style="margin-top:0.75rem;padding-top:0.5rem;border-top:1px solid #e5e7eb;">`;
             
             for (const m of fix.markets.slice(0, 5)) {
-                const label = marketGroupLabels[m.market_group] || m.market_key;
                 const conf = m.confidence || 0;
+                const marketLabel = cleanPlaceholder(
+                    m.market_label || m.market_name || m.market || m.market_key,
+                    "Cricket Market"
+                );
+                const selectionLabel = cleanPlaceholder(
+                    m.selection_label || m.selection || m.recommended_pick || m.pick || m.prediction,
+                    "Cricket insight"
+                );
                 html += `<div style="display:flex;justify-content:space-between;padding:0.25rem 0;font-size:0.85rem;">
-                    <span>${m.market_label || m.market_key}</span>
+                    <span>${marketLabel} — ${selectionLabel}</span>
                     <span style="color:${conf >= 65 ? '#22c55e' : conf >= 60 ? '#eab308' : '#ef4444'};">${conf}%</span>
                 </div>`;
+                if (m.explanation) {
+                    html += `<p class="cricket-insight-explanation">${m.explanation}</p>`;
+                }
             }
             if (fix.markets.length > 5) {
                 html += `<div style="font-size:0.8rem;color:#6b7280;">+${fix.markets.length - 5} more</div>`;

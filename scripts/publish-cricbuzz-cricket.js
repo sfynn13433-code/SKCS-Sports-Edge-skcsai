@@ -8,6 +8,69 @@ const {
     evaluateCricketInsight
 } = require('../backend/services/cricketRulesEngine');
 
+// Publisher helper functions for cricket
+function buildPublisherCricketSelection(rule, fixture) {
+    const key = String(rule.market_key || rule.market || rule.rule_key || "").toLowerCase();
+
+    const home = fixture.home_team || fixture.team1 || fixture.home || "Home";
+    const away = fixture.away_team || fixture.team2 || fixture.away || "Away";
+
+    if (key.includes("match_winner")) return home;
+    if (key.includes("test_match_result")) return `${home} or Draw`;
+    if (key.includes("double_chance")) return `${home} or ${away}`;
+    if (key.includes("draw_no_bet")) return `${home} Draw No Bet`;
+    if (key.includes("innings_total_runs")) return "Over innings runs line";
+    if (key.includes("day_total_runs")) return "Over day runs line";
+    if (key.includes("team_total_runs")) return `${home} team runs`;
+    if (key.includes("first_innings")) return "Over first innings runs";
+    if (key.includes("second_innings")) return "Over second innings runs";
+    if (key.includes("match_total")) return "Over match runs line";
+    if (key.includes("boundaries_over")) return "Over boundaries line";
+    if (key.includes("boundaries_under")) return "Under boundaries line";
+    if (key.includes("fours_over") || key.includes("total_fours")) return "Over fours line";
+    if (key.includes("sixes_over") || key.includes("total_sixes")) return "Over sixes line";
+    if (key.includes("match_total_wickets")) return "Over wickets line";
+    if (key.includes("wicket_total")) return "Over wickets line";
+    if (key.includes("session_runs")) return "Over session runs";
+    if (key.includes("powerplay_runs")) return "Over powerplay runs";
+
+    return "Cricket insight";
+}
+
+function buildPublisherCricketExplanation(rule, fixture, selection, confidence) {
+    const marketName = rule.market_name || rule.market_label || rule.rule_name || rule.market || "Cricket Market";
+
+    const home = fixture.home_team || fixture.team1 || fixture.home || "Home";
+    const away = fixture.away_team || fixture.team2 || fixture.away || "Away";
+    const league = fixture.league || fixture.series_name || fixture.competition || "Cricket";
+
+    return `${marketName}: ${selection}. Confidence ${Math.round(confidence)}%. ${home} vs ${away} in ${league}.`;
+}
+
+function buildPublisherCricketMarketName(rule) {
+    const key = String(rule.market_key || rule.market || rule.rule_key || "").toLowerCase();
+
+    const labels = {
+        cricket_match_winner: "Match Winner",
+        test_match_result_1x2: "Test Match Result",
+        test_double_chance: "Double Chance",
+        test_draw_no_bet: "Draw No Bet",
+        innings_total_runs: "Innings Total Runs",
+        test_day_total_runs: "Day Total Runs",
+        team_total_runs: "Team Total Runs",
+        first_innings_runs: "First Innings Total",
+        second_innings_runs: "Second Innings Total",
+        match_total_runs: "Match Total Runs",
+        wicket_total: "Total Wickets",
+        session_runs: "Session Runs",
+        powerplay_runs: "Powerplay Runs",
+        top_batter: "Top Batter",
+        top_bowler: "Top Bowler"
+    };
+
+    return labels[key] || key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Cricket Market";
+}
+
 const { fetchCricbuzzMatches, normalizeCricbuzzData } = require('../backend/services/cricbuzzService');
 
 const supabase = createClient(
@@ -146,8 +209,30 @@ function buildStarterMarketsForFixture(fixture, rules) {
                 }
             });
 
+            const resolvedGroup =
+                rule?.market_group ||
+                rule?.category ||
+                rule?.group_key ||
+                candidate.market_group;
+
+            const resolvedLabel =
+                rule?.market_name ||
+                rule?.market_label ||
+                rule?.rule_name ||
+                candidate.market_label ||
+                buildPublisherCricketMarketName(candidate);
+
+            const resolvedConfidence = Number(
+                candidate.confidence ??
+                rule?.min_display_confidence ??
+                0
+            );
+
             return {
                 ...candidate,
+                market_group: resolvedGroup,
+                market_label: resolvedLabel,
+                confidence: resolvedConfidence,
                 ...evaluation
             };
         })
@@ -190,6 +275,9 @@ function calculateCricketExpiry(fixtureRow) {
 }
 
 async function upsertInsight(fixtureRow, market) {
+    const selection = buildPublisherCricketSelection(market, fixtureRow);
+    const explanation = buildPublisherCricketExplanation(market, fixtureRow, selection, market.confidence);
+
     const insight = {
         fixture_id: fixtureRow.id,
         provider: fixtureRow.provider,
@@ -207,7 +295,7 @@ async function upsertInsight(fixtureRow, market) {
         market_key: market.market_key,
         market_label: market.market_label,
 
-        selection: null,
+        selection,
         line: null,
         over_under: null,
         confidence: market.confidence,
@@ -222,7 +310,7 @@ async function upsertInsight(fixtureRow, market) {
         acca_eligible: market.acca_eligible,
         acca_reason: market.reason,
 
-        reasoning: market.reason,
+        reasoning: explanation,
         edgemind_summary: `Cricket ${market.market_label} market prepared for ${fixtureRow.home_team} vs ${fixtureRow.away_team}. Full analysis pending context, lineup, venue, and format checks.`,
         pipeline_data: {
             source: 'cricbuzz_primary',
@@ -244,24 +332,6 @@ async function upsertInsight(fixtureRow, market) {
         .eq('provider', insight.provider)
         .eq('provider_match_id', insight.provider_match_id)
         .eq('market_key', insight.market_key);
-
-    if (insight.selection === null || insight.selection === undefined || insight.selection === '') {
-        deleteQuery = deleteQuery.is('selection', null);
-    } else {
-        deleteQuery = deleteQuery.eq('selection', insight.selection);
-    }
-
-    if (insight.line === null || insight.line === undefined || insight.line === '') {
-        deleteQuery = deleteQuery.is('line', null);
-    } else {
-        deleteQuery = deleteQuery.eq('line', insight.line);
-    }
-
-    if (insight.over_under === null || insight.over_under === undefined || insight.over_under === '') {
-        deleteQuery = deleteQuery.is('over_under', null);
-    } else {
-        deleteQuery = deleteQuery.eq('over_under', insight.over_under);
-    }
 
     const { error: deleteError } = await deleteQuery;
 

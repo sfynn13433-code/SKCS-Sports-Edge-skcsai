@@ -80,6 +80,217 @@ function groupByFixtures(insights) {
     return Object.values(grouped);
 }
 
+// Cricket market display helpers
+function cleanCricketCategoryLabel(value) {
+    if (!value) return "Cricket Market";
+
+    const cleaned = String(value)
+        .replace(/_/g, " ")
+        .replace(/\b(stumps|complete|completed|finished|live|in progress)\b/gi, "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toLowerCase();
+
+    const labels = {
+        "direct cricket": "Direct Cricket",
+        "direct": "Direct Cricket",
+        "direct cover": "Safer Covers",
+        "direct covers": "Safer Covers",
+        "safer covers": "Safer Covers",
+        "covers": "Safer Covers",
+        "totals": "Totals",
+        "phase markets": "Phase Markets",
+        "phase": "Phase Markets",
+        "boundaries": "Boundaries",
+        "wickets": "Wickets",
+        "test phase markets": "Test Phase Markets",
+        "test phase": "Test Phase Markets",
+        "player markets": "Player Markets",
+        "player": "Player Markets"
+    };
+
+    return labels[cleaned] || cleaned.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function buildCricketMarketName(rawValue, marketKey) {
+    const value = String(rawValue || "").trim();
+
+    if (
+        value &&
+        !["market", "selection", "market — selection", "market - selection"].includes(value.toLowerCase())
+    ) {
+        return value;
+    }
+
+    const key = String(marketKey || "").toLowerCase();
+
+    const labels = {
+        cricket_match_winner: "Match Winner",
+        test_match_result_1x2: "Test Match Result",
+        test_match_result: "Test Match Result",
+        test_double_chance: "Double Chance",
+        double_chance: "Double Chance",
+        test_draw_no_bet: "Draw No Bet",
+        draw_no_bet: "Draw No Bet",
+        innings_total_runs: "Innings Total Runs",
+        day_total_runs: "Day Total Runs",
+        test_day_total_runs: "Day Total Runs",
+        team_total_runs: "Team Total Runs",
+        first_innings_runs: "First Innings Total",
+        first_innings_total: "First Innings Total",
+        second_innings_runs: "Second Innings Total",
+        match_total_runs: "Match Total Runs",
+        boundaries_over: "Total Boundaries Over",
+        boundaries_under: "Total Boundaries Under",
+        fours_over: "Total Fours Over",
+        sixes_over: "Total Sixes Over",
+        total_sixes: "Total Sixes",
+        total_fours: "Total Fours",
+        match_total_wickets: "Total Wickets",
+        wicket_total: "Total Wickets",
+        session_runs: "Session Runs",
+        powerplay_runs: "Powerplay Runs",
+        top_batter: "Top Batter",
+        top_bowler: "Top Bowler"
+    };
+
+    return labels[key] || key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Cricket Market";
+}
+
+function buildCricketSelection(rawValue, marketKey, row = {}) {
+    const value = String(rawValue || "").trim();
+
+    if (
+        value &&
+        !["selection", "market", "market — selection", "market - selection"].includes(value.toLowerCase())
+    ) {
+        return value;
+    }
+
+    const key = String(marketKey || "").toLowerCase();
+
+    const home = row.home_team || row.team_home || row.team1 || row.home || "Home";
+    const away = row.away_team || row.team_away || row.team2 || row.away || "Away";
+
+    if (key.includes("match_winner")) return home;
+    if (key.includes("test_match_result")) return `${home} or Draw`;
+    if (key.includes("double_chance")) return `${home} or ${away}`;
+    if (key.includes("draw_no_bet")) return `${home} Draw No Bet`;
+    if (key.includes("innings_total_runs")) return "Over innings runs line";
+    if (key.includes("day_total_runs")) return "Over day runs line";
+    if (key.includes("team_total_runs")) return `${home} team runs`;
+    if (key.includes("first_innings")) return "Over first innings runs";
+    if (key.includes("second_innings")) return "Over second innings runs";
+    if (key.includes("match_total")) return "Over match runs line";
+    if (key.includes("boundaries_over")) return "Over boundaries line";
+    if (key.includes("boundaries_under")) return "Under boundaries line";
+    if (key.includes("fours_over")) return "Over fours line";
+    if (key.includes("sixes_over") || key.includes("total_sixes")) return "Over sixes line";
+    if (key.includes("total_fours")) return "Over fours line";
+    if (key.includes("match_total_wickets")) return "Over wickets line";
+    if (key.includes("wicket_total")) return "Over wickets line";
+    if (key.includes("session_runs")) return "Over session runs";
+    if (key.includes("powerplay_runs")) return "Over powerplay runs";
+
+    return "Cricket insight";
+}
+
+function buildCricketExplanation(row, marketKey, rawSelection, confidence) {
+    const home = row.home_team || row.team_home || row.team1 || row.home || "the home side";
+    const away = row.away_team || row.team_away || row.team2 || row.away || "the away side";
+    const status = row.status || row.match_status || "scheduled";
+    const market = buildCricketMarketName(row.market_name || row.market || row.rule_name, marketKey);
+    const selection = buildCricketSelection(rawSelection, marketKey, row);
+
+    return `${market}: ${selection}. Confidence ${Math.round(confidence || 0)}%. Fixture: ${home} vs ${away}. Current status: ${status}.`;
+}
+
+function normalizeCricketInsightRow(row) {
+    const marketGroup =
+        row.market_group ||
+        row.category ||
+        row.market_category ||
+        row.group_key ||
+        "cricket_market";
+
+    const marketKey =
+        row.market_key ||
+        row.market_type ||
+        row.market ||
+        row.prediction_type ||
+        row.rule_key ||
+        "cricket_market";
+
+    const rawMarketName =
+        row.market_name ||
+        row.market_label ||
+        row.label ||
+        row.rule_name ||
+        row.market ||
+        marketKey;
+
+    const rawSelection =
+        row.selection ||
+        row.selection_label ||
+        row.recommended_pick ||
+        row.pick ||
+        row.prediction ||
+        row.outcome ||
+        row.bet_selection ||
+        "";
+
+    const confidence = Number(
+        row.confidence ??
+        row.confidence_score ??
+        row.score ??
+        row.probability ??
+        0
+    );
+
+    return {
+        id: row.id,
+        fixture_id: row.fixture_id || row.match_id || row.cricbuzz_match_id || row.provider_match_id,
+        home_team: row.home_team || row.team_home || row.team1 || row.home || "Unknown Home",
+        away_team: row.away_team || row.team_away || row.team2 || row.away || "Unknown Away",
+        league: row.league || row.competition || row.series_name || row.tournament || "Cricket",
+        start_time: row.start_time || row.match_time || row.commence_time || row.date,
+        status: row.status || row.match_status || "upcoming",
+
+        market_group: marketGroup,
+        market_group_label: cleanCricketCategoryLabel(marketGroup),
+
+        market_key: marketKey,
+        market_name: buildCricketMarketName(rawMarketName, marketKey),
+        market_label: buildCricketMarketName(rawMarketName, marketKey),
+
+        selection: buildCricketSelection(rawSelection, marketKey, row),
+        selection_label: buildCricketSelection(rawSelection, marketKey, row),
+
+        confidence,
+
+        explanation:
+            row.explanation ||
+            row.reason ||
+            row.reasoning ||
+            row.edgemind_summary ||
+            row.ai_reason ||
+            row.analysis ||
+            buildCricketExplanation(row, marketKey, rawSelection, confidence),
+
+        reason:
+            row.reason ||
+            row.explanation ||
+            row.reasoning ||
+            row.edgemind_summary ||
+            row.ai_reason ||
+            row.analysis ||
+            buildCricketExplanation(row, marketKey, rawSelection, confidence),
+
+        source: row.source || "cricbuzz",
+        created_at: row.created_at
+    };
+}
+
 // Lightweight count endpoint - must be defined before the catch-all route
 router.get('/count', requireSupabaseUser, async (req, res) => {
     console.log('[cricket-count] Route hit successfully');
@@ -157,8 +368,11 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         const allData = data || [];
         const filtered = filterByStatus(allData, status);
         
+        // Normalize all rows using the helper function
+        const normalizedRows = filtered.map(row => normalizeCricketInsightRow(row));
+        
         // Count direct market insights for cricket
-        const directCount = filtered.filter(row => 
+        const directCount = normalizedRows.filter(row => 
             String(row.market_group || '').toLowerCase() === 'direct'
         ).length;
 
@@ -167,14 +381,19 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             sport: 'cricket',
             status: status,
             direct_count: directCount,
-            total_count: filtered.length,
+            total_count: normalizedRows.length,
             grouped: grouped
         };
 
         if (grouped) {
-            response.fixtures = groupByFixtures(filtered);
+            response.fixtures = groupByFixtures(normalizedRows);
         } else {
-            response.insights = filtered;
+            response.insights = normalizedRows;
+        }
+
+        // Development-only debug logging
+        if (process.env.NODE_ENV !== "production") {
+            console.log("[SKCS Cricket] insights response sample", normalizedRows.slice(0, 2));
         }
 
         return res.json(response);
