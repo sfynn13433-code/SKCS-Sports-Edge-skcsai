@@ -113,8 +113,8 @@ function buildPublisherCricketSelection(rule, fixture) {
     }
     if (key.includes("most_match_sixes")) return `${home} to hit more sixes`;
     if (key.includes("most_match_fours")) return `${home} to hit more fours`;
-    if (key.includes("top_batter")) return `${home} top batter market`;
-    if (key.includes("top_bowler")) return `${home} top bowler market`;
+    if (key.includes("top_batter")) return `${home} to provide top batter`;
+    if (key.includes("top_bowler")) return `${home} to provide top bowler`;
     if (key.includes("highest_opening_partnership")) return `${home} higher opening stand`;
     if (key.includes("any_player_50")) return "Yes - at least one player scores 50+";
     if (key.includes("any_player_100")) return "Yes - at least one player scores 100+";
@@ -359,14 +359,27 @@ async function loadRules() {
     return map;
 }
 
-function buildStarterMarketsForFixture(fixture, rules) {
+function buildStarterMarketsForFixture(fixture, rules, sourceMatch = null) {
     const format = normalizeCricketFormat(fixture.match_format);
     const formatCatalog = CRICKET_MARKET_CATALOG.filter((entry) => entry.formats.includes(format));
+    const hasTrustedContext = Boolean(sourceMatch?.cricket_live_enrichment?.enriched) && !Boolean(sourceMatch?.intelligence?.fallback);
+
     const primary = formatCatalog.filter((entry) => entry.profile === 'primary');
     const secondary = formatCatalog
         .filter((entry) => entry.profile === 'secondary')
         .slice(0, MAX_CRICKET_SECONDARY_MARKETS_PER_FIXTURE);
-    const selected = [...primary, ...secondary];
+    const contextSafeCore = new Set([
+        'cricket_match_winner',
+        'test_match_result_1x2',
+        'innings_total_runs',
+        'team_total_runs',
+        'powerplay_runs',
+        'most_match_sixes',
+        'most_match_fours'
+    ]);
+    const selected = hasTrustedContext
+        ? [...primary, ...secondary]
+        : [...primary, ...secondary].filter((entry) => contextSafeCore.has(entry.market_key));
     const candidates = selected.map((entry) => ({
         market_key: entry.market_key,
         market_group: entry.market_group,
@@ -649,7 +662,7 @@ async function publishCricbuzzCricket(options = {}) {
             fixtureUpserts++;
             await clearFixtureInsights(fixtureRow);
 
-            const markets = buildStarterMarketsForFixture(fixtureRow, rules);
+            const markets = buildStarterMarketsForFixture(fixtureRow, rules, match);
 
             for (const market of markets) {
                 await upsertInsight(fixtureRow, market, match);
