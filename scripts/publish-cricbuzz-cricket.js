@@ -362,9 +362,11 @@ async function publishCricbuzzCricket(options = {}) {
     const startedAt = new Date().toISOString();
     console.log('=== PUBLISH CRICBUZZ CRICKET START ===');
     const dryRunPreview = process.env.CRICKET_ENRICH_DRY_RUN === '1';
+    const cricbuzzFeed = String(options.feed || process.env.CRICKET_CRICBUZZ_FEED || 'upcoming').trim().toLowerCase();
+    console.log(`[cricket-policy] source=cricbuzz feed=${cricbuzzFeed} (live feed disabled for prediction ingestion)`);
 
     const rules = await loadRules();
-    const raw = await fetchCricbuzzMatches();
+    const raw = await fetchCricbuzzMatches({ feed: cricbuzzFeed });
     
     if (!raw) {
         console.log('No Cricbuzz data received');

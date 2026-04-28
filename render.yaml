@@ -76,3 +76,16 @@ services:
         sync: false
       - key: ADMIN_API_KEY
         sync: false
+  - type: cron
+    name: skcs-cricket-daily-fixtures
+    env: node
+    region: frankfurt
+    plan: free
+    schedule: "1 22 * * *"
+    buildCommand: npm install
+    startCommand: node backend/deploy-trigger-cricket.js
+    envVars:
+      - key: SKCS_TRIGGER_HOST
+        sync: false
+      - key: CRON_SECRET
+        sync: false

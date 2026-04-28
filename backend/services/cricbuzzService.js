@@ -4,6 +4,8 @@ const axios = require('axios');
 
 const RAPID_KEY = process.env.RAPIDAPI_KEY;
 const HOST = process.env.RAPIDAPI_HOST_CRICBUZZ;
+const ALLOWED_FEEDS = new Set(['upcoming', 'recent']);
+const DEFAULT_FEED = 'upcoming';
 
 function validateCricketMatch(match) {
     const info = match?.matchInfo;
@@ -15,15 +17,26 @@ function validateCricketMatch(match) {
     return false;
 }
 
-async function fetchCricbuzzMatches() {
+function normalizeFeed(feed) {
+    return String(feed || '').trim().toLowerCase();
+}
+
+async function fetchCricbuzzMatches(options = {}) {
     if (!RAPID_KEY || !HOST) {
         console.error('Cricbuzz: Missing RAPIDAPI_KEY or RAPIDAPI_HOST_CRICBUZZ');
         return null;
     }
-    
+
+    const feed = normalizeFeed(options.feed || DEFAULT_FEED);
+    if (!ALLOWED_FEEDS.has(feed)) {
+        throw new Error(
+            `Cricbuzz feed "${feed}" is not allowed. Policy: no live calls for prediction ingestion; use one of: ${Array.from(ALLOWED_FEEDS).join(', ')}`
+        );
+    }
+
     try {
         const res = await axios.get(
-            'https://cricbuzz-cricket.p.rapidapi.com/matches/v1/live',
+            `https://cricbuzz-cricket.p.rapidapi.com/matches/v1/${feed}`,
             {
                 headers: {
                     'x-rapidapi-key': RAPID_KEY,
@@ -32,11 +45,11 @@ async function fetchCricbuzzMatches() {
                 timeout: 10000
             }
         );
-        
-        console.log('Cricbuzz API response status:', res.status);
+
+        console.log(`Cricbuzz API (${feed}) response status:`, res.status);
         return res.data;
     } catch (err) {
-        console.error('Cricbuzz fetch failed:', err.response?.status || err.message);
+        console.error(`Cricbuzz ${feed} fetch failed:`, err.response?.status || err.message);
         return null;
     }
 }

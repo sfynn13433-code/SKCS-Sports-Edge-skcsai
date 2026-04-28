@@ -53,6 +53,12 @@ GET
 - **ONLY** use CRON_SECRET for authentication
 - The RapidAPI key must remain in Render environment variables
 
+## Prediction Ingestion Rule (Cricket)
+
+- The daily cricket publisher must not call Cricbuzz `live` feed.
+- Allowed feeds for prediction ingestion: `upcoming` (default) and `recent`.
+- Current policy is `upcoming` once daily to stay within call limits.
+
 ## Render Environment Variables
 
 Ensure these exist in your Render backend environment:
