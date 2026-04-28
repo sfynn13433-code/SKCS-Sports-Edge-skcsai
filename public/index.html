@@ -4348,7 +4348,7 @@
                 <div style="color:#059669; font-weight:bold;">${finalRecommendation.market || fallbackLabel}</div>
                 <div style="color:#4a5568; font-size:0.85rem;">${finalRecommendation.confidence}% Confidence</div>
             </div>
-            ${reasoning ? `<div style="margin-top:10px;padding:10px;border-radius:6px;background:#f8fafc;color:#334155;font-size:0.85rem;line-height:1.5;"><strong>AI Insight:</strong> ${reasoning}</div>` : ''}
+            ${reasoning ? `<div style="margin-top:10px;padding:10px;border-radius:6px;background:#f8fafc;color:#334155;font-size:0.85rem;line-height:1.5;"><strong>EdgeMind BOT Analysis:</strong> ${reasoning}</div>` : ''}
             ${insightsHtml}
             ${engineLogHtml}
         `;
@@ -4430,7 +4430,7 @@
                 <div style="color:${isMegaAcca ? '#7c3aed' : '#f87171'}; font-weight:bold;">${outcome}</div>
                 <div style="color:#4a5568; font-size:0.85rem;">Total Ticket Probability: ${compoundProbability}%</div>
             </div>
-            ${reasoning ? `<div style="margin-top:10px;padding:10px;border-radius:6px;background:#f8fafc;color:#334155;font-size:0.85rem;line-height:1.5;"><strong>AI Insight:</strong> ${reasoning}</div>` : ''}
+            ${reasoning ? `<div style="margin-top:10px;padding:10px;border-radius:6px;background:#f8fafc;color:#334155;font-size:0.85rem;line-height:1.5;"><strong>EdgeMind BOT Analysis:</strong> ${reasoning}</div>` : ''}
             ${renderInsightsPanel(pred)}
             ${renderEngineLogPanel(getPredictionEngineLog(pred))}
         `;

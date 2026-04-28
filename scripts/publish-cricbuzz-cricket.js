@@ -108,9 +108,14 @@ function buildSixStageCricketNarrative(rule, fixture, selection, confidence, sou
     const weather = info?.weather?.weather_desc || info?.weather?.weather || null;
     const pitch = info?.pitch?.pitch_condition || null;
     const venue = fixture.venue || info?.venue?.name || 'venue pending';
+    const weatherText = String(weather || '').toLowerCase();
+    const rainLikely = ['rain', 'storm', 'thunder', 'shower', 'drizzle'].some((t) => weatherText.includes(t));
     const lineupHint = String(info?.pre_squad || '').toLowerCase() === 'true'
         ? 'Pre-squad available; final XI not confirmed.'
         : 'Lineups not confirmed yet; monitor toss and XI updates.';
+    const injuryHint = info?.injury_report
+        ? `Injury watch: ${String(info.injury_report)}.`
+        : 'Injury/availability feed is limited; verify final XI and late scratches before stake placement.';
 
     const momentum = toNum(sourceMatch?.intelligence?.momentum, 50);
     const volatility = toNum(sourceMatch?.intelligence?.volatility, 50);
@@ -118,12 +123,12 @@ function buildSixStageCricketNarrative(rule, fixture, selection, confidence, sou
     const confidenceMeta = classifyConfidence(confidence);
     const logic = marketLogicNote(marketGroup, marketKey, selection);
 
-    const stage1 = `S1 Baseline: ${home} vs ${away} in ${league} (${format}) with model confidence ${Math.round(toNum(confidence, 0))}%.`;
-    const stage2 = `S2 Match State: Kickoff ${kickoff}; current status ${status}; venue ${venue}.`;
-    const stage3 = `S3 Context: ${lineupHint} ${weather ? `Weather ${weather}.` : 'Weather signal limited.'} ${pitch ? `Pitch ${pitch}.` : 'Pitch signal limited.'}`;
-    const stage4 = `S4 Market Logic (${marketName}): ${logic}`;
-    const stage5 = `S5 Risk Frame: Risk=${confidenceMeta.risk}; momentum=${Math.round(momentum)}, pressure=${Math.round(pressure)}, volatility=${Math.round(volatility)}.`;
-    const stage6 = `S6 Decision: ${selection}. ${confidenceMeta.advisory}`;
+    const stage1 = `S1 Baseline: EdgeMind BOT here. We have ${home} vs ${away} in ${league} (${format}), and the initial model confidence is ${Math.round(toNum(confidence, 0))}%.`;
+    const stage2 = `S2 Match State: Kickoff is ${kickoff}, current status is ${status}, and venue is ${venue}.`;
+    const stage3 = `S3 Team News: ${lineupHint} ${injuryHint}`;
+    const stage4 = `S4 Conditions: ${weather ? `Current weather signal is "${weather}".` : 'Weather signal is currently limited.'} ${pitch ? `Pitch profile shows "${pitch}".` : 'Pitch profile is currently limited.'} ${rainLikely ? 'Rain/storm risk is present, so a D/L scenario can materially change run-rate and target logic.' : 'No strong rain/storm trigger detected right now, so D/L disruption risk is lower at this stage.'}`;
+    const stage5 = `S5 Market Logic (${marketName}): ${logic} Metrics check: momentum ${Math.round(momentum)}, pressure ${Math.round(pressure)}, volatility ${Math.round(volatility)}.`;
+    const stage6 = `S6 Final Call: Selection is ${selection}. Risk is ${confidenceMeta.risk}. ${confidenceMeta.advisory}`;
 
     return `${stage1} ${stage2} ${stage3} ${stage4} ${stage5} ${stage6}`;
 }
