@@ -162,15 +162,20 @@ function buildCricketMarketName(rawValue, marketKey) {
 
 function buildCricketSelection(rawValue, marketKey, row = {}) {
     const value = String(rawValue || "").trim();
+    const key = String(marketKey || "").toLowerCase();
+
+    const looksLikeRunsLine = /\bruns?\b/i.test(value);
+    const looksLikeWicketsLine = /\bwickets?\b/i.test(value);
+    const keyIsWickets = key.includes("wicket");
+    const keyIsRuns = key.includes("run") || key.includes("total");
 
     if (
         value &&
-        !["selection", "market", "market — selection", "market - selection"].includes(value.toLowerCase())
+        !["selection", "market", "market — selection", "market - selection"].includes(value.toLowerCase()) &&
+        !((keyIsWickets && looksLikeRunsLine && !looksLikeWicketsLine) || (keyIsRuns && looksLikeWicketsLine && !looksLikeRunsLine))
     ) {
         return value;
     }
-
-    const key = String(marketKey || "").toLowerCase();
     const format = String(row.match_format || "").toLowerCase();
 
     const home = row.home_team || row.team_home || row.team1 || row.home || "Home";
@@ -221,6 +226,12 @@ function buildCricketSelection(rawValue, marketKey, row = {}) {
         if (format === "odi") return "Over 52.5 runs (first 10 overs)";
         return "Over 49.5 runs (first 6 overs)";
     }
+    if (key.includes("top_batter")) return `${home} to provide top batter`;
+    if (key.includes("top_bowler")) return `${home} to provide top bowler`;
+    if (key.includes("team_with_top_batter")) return `${home} to provide top batter`;
+    if (key.includes("team_with_top_bowler")) return `${home} to provide top bowler`;
+    if (key.includes("any_player_50")) return "Yes - at least one player scores 50+";
+    if (key.includes("any_player_100")) return "Yes - at least one player scores 100+";
 
     return "Cricket insight";
 }

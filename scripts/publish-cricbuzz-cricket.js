@@ -26,10 +26,7 @@ const CRICKET_MARKET_CATALOG = Object.freeze([
     // T20 secondary
     { market_key: 'any_player_50_yesno', market_group: 'player', market_label: 'Any Player 50+ (Yes/No)', formats: ['t20'], profile: 'secondary', confidence: 60, volatility: 'high' },
     { market_key: 'player_total_runs_ou', market_group: 'player', market_label: 'Player Total Runs O/U', formats: ['t20'], profile: 'secondary', confidence: 60, volatility: 'high', lineupRequired: true },
-    { market_key: 'over_runs_ou', market_group: 'phase', market_label: 'Over Runs O/U', formats: ['t20'], profile: 'secondary', confidence: 59, volatility: 'high' },
     { market_key: 'over_dismissal_yesno', market_group: 'wickets', market_label: 'Wicket In Over (Yes/No)', formats: ['t20'], profile: 'secondary', confidence: 59, volatility: 'high' },
-    { market_key: 'highest_scoring_over_total', market_group: 'phase', market_label: 'Highest Scoring Over Total', formats: ['t20'], profile: 'secondary', confidence: 59, volatility: 'high' },
-    { market_key: 'first_dismissal_method', market_group: 'wickets', market_label: '1st Dismissal Method', formats: ['t20'], profile: 'secondary', confidence: 58, volatility: 'high' },
 
     // ODI primary
     { market_key: 'cricket_match_winner', market_group: 'direct', market_label: 'Match Winner', formats: ['odi'], profile: 'primary', confidence: 50, volatility: 'high' },
@@ -43,10 +40,6 @@ const CRICKET_MARKET_CATALOG = Object.freeze([
     { market_key: 'player_milestone_50_100', market_group: 'player', market_label: 'Player Milestones 50/100', formats: ['odi'], profile: 'secondary', confidence: 60, volatility: 'medium', lineupRequired: true },
     { market_key: 'first_15_overs_1x2', market_group: 'phase', market_label: 'Overs 0-15 Result (1x2)', formats: ['odi'], profile: 'secondary', confidence: 60, volatility: 'high' },
     { market_key: 'team_total_at_first_dismissal', market_group: 'phase', market_label: 'Team Runs At 1st Dismissal O/U', formats: ['odi'], profile: 'secondary', confidence: 60, volatility: 'high' },
-    { market_key: 'total_runouts_match', market_group: 'wickets', market_label: 'Total Run Outs O/U', formats: ['odi'], profile: 'secondary', confidence: 59, volatility: 'high' },
-    { market_key: 'team_with_top_batter', market_group: 'player', market_label: 'Team With Top Batter', formats: ['odi'], profile: 'secondary', confidence: 60, volatility: 'medium' },
-    { market_key: 'team_with_top_bowler', market_group: 'player', market_label: 'Team With Top Bowler', formats: ['odi'], profile: 'secondary', confidence: 60, volatility: 'medium' },
-    { market_key: 'match_tie_yesno', market_group: 'direct_cover', market_label: 'Will There Be A Tie (Yes/No)', formats: ['odi'], profile: 'secondary', confidence: 58, volatility: 'high' },
 
     // Test primary
     { market_key: 'test_match_result_1x2', market_group: 'direct', market_label: 'Test Match Result', formats: ['test'], profile: 'primary', confidence: 50, volatility: 'high' },
@@ -57,15 +50,12 @@ const CRICKET_MARKET_CATALOG = Object.freeze([
     { market_key: 'any_player_50_yesno', market_group: 'player', market_label: 'Any Player 50+ (1st Innings)', formats: ['test'], profile: 'primary', confidence: 64, volatility: 'medium' },
     // Test secondary
     { market_key: 'session_runs', market_group: 'test_phase', market_label: 'Session Runs O/U', formats: ['test'], profile: 'secondary', confidence: 61, volatility: 'medium' },
-    { market_key: 'first_innings_first_dismissal_runs', market_group: 'test_phase', market_label: 'Runs At 1st Dismissal (1st Inns)', formats: ['test'], profile: 'secondary', confidence: 60, volatility: 'medium' },
-    { market_key: 'next_man_out', market_group: 'player', market_label: 'Next Man Out', formats: ['test'], profile: 'secondary', confidence: 59, volatility: 'high', lineupRequired: true },
-    { market_key: 'next_dismissal_method', market_group: 'wickets', market_label: 'Method Of Next Dismissal', formats: ['test'], profile: 'secondary', confidence: 59, volatility: 'high' },
-    { market_key: 'player_total_runs_ou', market_group: 'player', market_label: 'Player Total Runs O/U (1st Inns)', formats: ['test'], profile: 'secondary', confidence: 60, volatility: 'medium', lineupRequired: true }
+    { market_key: 'first_innings_first_dismissal_runs', market_group: 'test_phase', market_label: 'Runs At 1st Dismissal (1st Inns)', formats: ['test'], profile: 'secondary', confidence: 60, volatility: 'medium' }
 ]);
 
 const MAX_CRICKET_SECONDARY_MARKETS_PER_FIXTURE = Math.max(
     0,
-    Math.min(8, Number(process.env.CRICKET_MAX_SECONDARY_MARKETS || 5))
+    Math.min(8, Number(process.env.CRICKET_MAX_SECONDARY_MARKETS || 2))
 );
 
 // Publisher helper functions for cricket
@@ -553,6 +543,18 @@ async function upsertInsight(fixtureRow, market, sourceMatch = null) {
     return data;
 }
 
+async function clearFixtureInsights(fixtureRow) {
+    const { error } = await supabase
+        .from('cricket_insights_final')
+        .delete()
+        .eq('provider', fixtureRow.provider)
+        .eq('provider_match_id', fixtureRow.provider_match_id);
+
+    if (error) {
+        throw new Error(`Fixture insight cleanup failed: ${error.message}`);
+    }
+}
+
 async function publishCricbuzzCricket(options = {}) {
     const startedAt = new Date().toISOString();
     console.log('=== PUBLISH CRICBUZZ CRICKET START ===');
@@ -645,6 +647,7 @@ async function publishCricbuzzCricket(options = {}) {
 
             const fixtureRow = await upsertFixture(fixture);
             fixtureUpserts++;
+            await clearFixtureInsights(fixtureRow);
 
             const markets = buildStarterMarketsForFixture(fixtureRow, rules);
 
