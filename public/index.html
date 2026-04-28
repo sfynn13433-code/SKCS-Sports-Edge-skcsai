@@ -2959,8 +2959,16 @@
             return text;
         }
 
+        const statusLabelMap = {
+            active: 'active',
+            upcoming: 'upcoming',
+            complete: 'complete',
+            all: 'all statuses'
+        };
+        const statusLabel = statusLabelMap[String(status || '').toLowerCase()] || String(status || 'active');
+
         let html = `<div style="margin-bottom:1rem;color:#4a5568;font-size:0.9rem;">`;
-        html += `${fixtures.length} cricket fixtures (${status})</div>`;
+        html += `${fixtures.length} cricket fixtures (${statusLabel})</div>`;
         html += '<div class="prediction-grid">';
         
         for (const fix of fixtures) {

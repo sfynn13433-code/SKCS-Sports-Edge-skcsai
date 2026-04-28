@@ -53,6 +53,81 @@ function buildPublisherCricketExplanation(rule, fixture, selection, confidence) 
     return `${marketName}: ${selection}. Confidence ${Math.round(confidence)}%. ${home} vs ${away} in ${league}.`;
 }
 
+function toNum(value, fallback = 0) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : fallback;
+}
+
+function classifyConfidence(confidence) {
+    const c = toNum(confidence, 0);
+    if (c >= 80) return { band: 'high_confidence', risk: 'low', advisory: 'Direct market can be used as the primary angle with standard staking.' };
+    if (c >= 70) return { band: 'moderate', risk: 'medium', advisory: 'Playable but keep stake disciplined and pair with one safer cover.' };
+    if (c >= 59) return { band: 'high_risk', risk: 'high', advisory: 'High-risk direct angle; prioritize safer secondary markets.' };
+    return { band: 'extreme_risk', risk: 'extreme', advisory: 'Extreme-risk direct angle; avoid direct exposure and use only safer alternatives.' };
+}
+
+function marketLogicNote(marketGroup, marketKey, selection) {
+    const group = String(marketGroup || '').toLowerCase();
+    const key = String(marketKey || '').toLowerCase();
+
+    if (group === 'direct') {
+        return `Outcome market bias is ${selection}; edge depends on base strength and match state variance.`;
+    }
+    if (group === 'direct_cover') {
+        return `Cover market selected (${selection}) to reduce variance while keeping directional bias.`;
+    }
+    if (group === 'totals' || key.includes('total') || key.includes('runs')) {
+        return `Totals angle (${selection}) is tied to expected run environment and innings pace.`;
+    }
+    if (group === 'wickets' || key.includes('wicket')) {
+        return `Wickets line (${selection}) reflects expected bowling pressure and batting depth.`;
+    }
+    if (group === 'boundaries' || key.includes('four') || key.includes('six') || key.includes('boundar')) {
+        return `Boundary projection (${selection}) tracks strike intent and venue scoring profile.`;
+    }
+    if (group === 'phase' || group === 'test_phase' || key.includes('powerplay') || key.includes('session') || key.includes('day_')) {
+        return `Phase market (${selection}) targets tempo windows where variance is usually lower than full-match outcomes.`;
+    }
+
+    return `Market selection ${selection} is kept as a context-aware supplemental angle.`;
+}
+
+function buildSixStageCricketNarrative(rule, fixture, selection, confidence, sourceMatch) {
+    const marketName = rule.market_name || rule.market_label || rule.rule_name || rule.market || "Cricket Market";
+    const marketGroup = String(rule.market_group || '').trim().toLowerCase() || 'unknown';
+    const marketKey = String(rule.market_key || rule.market || '').trim().toLowerCase();
+
+    const home = fixture.home_team || fixture.team1 || fixture.home || "Home";
+    const away = fixture.away_team || fixture.team2 || fixture.away || "Away";
+    const league = fixture.league || fixture.series_name || fixture.competition || "Cricket";
+    const format = String(fixture.match_format || 'unknown').toUpperCase();
+    const status = String(fixture.status || 'scheduled');
+    const kickoff = fixture.start_time ? new Date(fixture.start_time).toISOString() : 'TBD';
+
+    const info = sourceMatch?.cricket_live_enrichment?.info || {};
+    const weather = info?.weather?.weather_desc || info?.weather?.weather || null;
+    const pitch = info?.pitch?.pitch_condition || null;
+    const venue = fixture.venue || info?.venue?.name || 'venue pending';
+    const lineupHint = String(info?.pre_squad || '').toLowerCase() === 'true'
+        ? 'Pre-squad available; final XI not confirmed.'
+        : 'Lineups not confirmed yet; monitor toss and XI updates.';
+
+    const momentum = toNum(sourceMatch?.intelligence?.momentum, 50);
+    const volatility = toNum(sourceMatch?.intelligence?.volatility, 50);
+    const pressure = toNum(sourceMatch?.intelligence?.pressure, 50);
+    const confidenceMeta = classifyConfidence(confidence);
+    const logic = marketLogicNote(marketGroup, marketKey, selection);
+
+    const stage1 = `S1 Baseline: ${home} vs ${away} in ${league} (${format}) with model confidence ${Math.round(toNum(confidence, 0))}%.`;
+    const stage2 = `S2 Match State: Kickoff ${kickoff}; current status ${status}; venue ${venue}.`;
+    const stage3 = `S3 Context: ${lineupHint} ${weather ? `Weather ${weather}.` : 'Weather signal limited.'} ${pitch ? `Pitch ${pitch}.` : 'Pitch signal limited.'}`;
+    const stage4 = `S4 Market Logic (${marketName}): ${logic}`;
+    const stage5 = `S5 Risk Frame: Risk=${confidenceMeta.risk}; momentum=${Math.round(momentum)}, pressure=${Math.round(pressure)}, volatility=${Math.round(volatility)}.`;
+    const stage6 = `S6 Decision: ${selection}. ${confidenceMeta.advisory}`;
+
+    return `${stage1} ${stage2} ${stage3} ${stage4} ${stage5} ${stage6}`;
+}
+
 function buildPublisherCricketMarketName(rule) {
     const key = String(rule.market_key || rule.market || rule.rule_key || "").toLowerCase();
 
@@ -280,9 +355,10 @@ function calculateCricketExpiry(fixtureRow) {
     return new Date(start.getTime() + 24 * 60 * 60 * 1000).toISOString();
 }
 
-async function upsertInsight(fixtureRow, market) {
+async function upsertInsight(fixtureRow, market, sourceMatch = null) {
     const selection = buildPublisherCricketSelection(market, fixtureRow);
     const explanation = buildPublisherCricketExplanation(market, fixtureRow, selection, market.confidence);
+    const sixStageNarrative = buildSixStageCricketNarrative(market, fixtureRow, selection, market.confidence, sourceMatch);
 
     const insight = {
         fixture_id: fixtureRow.id,
@@ -316,8 +392,8 @@ async function upsertInsight(fixtureRow, market) {
         acca_eligible: market.acca_eligible,
         acca_reason: market.reason,
 
-        reasoning: explanation,
-        edgemind_summary: `Cricket ${market.market_label} market prepared for ${fixtureRow.home_team} vs ${fixtureRow.away_team}. Full analysis pending context, lineup, venue, and format checks.`,
+        reasoning: sixStageNarrative,
+        edgemind_summary: `${explanation} ${sixStageNarrative}`,
         pipeline_data: {
             source: 'cricbuzz_primary',
             rule_result: market
@@ -325,7 +401,8 @@ async function upsertInsight(fixtureRow, market) {
         metadata: {
             provider: 'cricbuzz',
             source: 'cricbuzz_primary',
-            analysis_status: market.recommendation_status
+            analysis_status: market.recommendation_status,
+            six_stage_logic: true
         },
 
         expires_at: calculateCricketExpiry(fixtureRow)
@@ -454,7 +531,7 @@ async function publishCricbuzzCricket(options = {}) {
             const markets = buildStarterMarketsForFixture(fixtureRow, rules);
 
             for (const market of markets) {
-                await upsertInsight(fixtureRow, market);
+                await upsertInsight(fixtureRow, market, match);
                 insightUpserts++;
             }
         } catch (err) {
