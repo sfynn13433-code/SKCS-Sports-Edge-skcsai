@@ -98,6 +98,17 @@
         .prediction-card { background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 3px 10px rgba(0,0,0,0.08); border-top: 3px solid #0d6efd; }
         .cricket-fixture-league { color: #64748b; font-size: 0.85rem; margin-bottom: 0.5rem; }
         .cricket-insight-explanation { font-size: 0.8rem; color: #6b7280; margin-top: 0.25rem; }
+        .cricket-fixtures-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        @media (max-width: 960px) {
+            .cricket-fixtures-grid {
+                grid-template-columns: 1fr;
+            }
+        }
         .match-info { margin-bottom: 1rem; }
         .teams { font-weight: 600; font-size: 1.1rem; color: #212529; }
         .match-date { color: #6c757d; font-size: 0.9rem; margin-top: 0.3rem; }
@@ -950,10 +961,7 @@
             <div id="cricket" class="tab-content">
                 <h3 class="tab-title"><span class="sport-icon">🏏</span> Cricket Insights</h3>
                 <div class="cricket-status-filters" style="margin-bottom: 1.5rem; text-align: center;">
-                    <button class="cricket-status-btn active" data-status="active" style="margin: 0.25rem; padding: 0.5rem 1rem; border: 1px solid #0d6efd; background: #0d6efd; color: white; border-radius: 4px; cursor: pointer;">Active</button>
-                    <button class="cricket-status-btn" data-status="upcoming" style="margin: 0.25rem; padding: 0.5rem 1rem; border: 1px solid #0d6efd; background: white; color: #0d6efd; border-radius: 4px; cursor: pointer;">Upcoming</button>
-                    <button class="cricket-status-btn" data-status="complete" style="margin: 0.25rem; padding: 0.5rem 1rem; border: 1px solid #0d6efd; background: white; color: #0d6efd; border-radius: 4px; cursor: pointer;">Complete</button>
-                    <button class="cricket-status-btn" data-status="all" style="margin: 0.25rem; padding: 0.5rem 1rem; border: 1px solid #0d6efd; background: white; color: #0d6efd; border-radius: 4px; cursor: pointer;">All</button>
+                    <button class="cricket-status-btn active" data-status="upcoming" style="margin: 0.25rem; padding: 0.5rem 1rem; border: 1px solid #0d6efd; background: #0d6efd; color: white; border-radius: 4px; cursor: default;">Upcoming Only</button>
                 </div>
                 <div class="prediction-sample">
                     <h4>🏏 Upcoming Insights</h4>
@@ -2803,7 +2811,7 @@
             const accessToken = await getAccessTokenOrRedirect();
             if (!accessToken) return;
 
-            const response = await fetch(`${SKCS_BACKEND}/api/cricket/count?status=active`, {
+            const response = await fetch(`${SKCS_BACKEND}/api/cricket/count?status=upcoming`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
@@ -2837,9 +2845,25 @@
         return String(userPlanId || window.currentUserPlanId || window.userPlanId || storedPlan || 'elite_30day_deep_vip');
     }
 
-    async function fetchCricketInsights(container, accessToken, status = 'active') {
+    function summarizeCricketExplanation(explanation) {
+        const text = String(explanation || '').trim();
+        if (!text) return '';
+        const cleaned = text
+            .replace(/\s+/g, ' ')
+            .replace(/S\d+\s*/g, '')
+            .trim();
+        const limitedSignals = /(weather signal is currently limited|pitch profile is currently limited|injury\/availability feed is limited|lineups not confirmed yet)/i;
+        if (limitedSignals.test(cleaned)) {
+            return 'EdgeMind BOT: Context is still loading (lineups/weather). Treat this as early and wait for final team news.';
+        }
+        const firstSentence = cleaned.split(/(?<=[.!?])\s+/)[0] || cleaned;
+        return `EdgeMind BOT: ${firstSentence}`.trim();
+    }
+
+    async function fetchCricketInsights(container, accessToken, status = 'upcoming') {
         try {
-            const url = `${SKCS_BACKEND}/api/cricket/insights?status=${status}&grouped=true&limit=100`;
+            const enforcedStatus = 'upcoming';
+            const url = `${SKCS_BACKEND}/api/cricket/insights?status=${enforcedStatus}&grouped=true&limit=100`;
             const response = await fetch(url, {
                 method: 'GET',
                 cache: 'no-store',
@@ -2881,7 +2905,7 @@
                     console.log("[SKCS Cricket] grouped fixtures", data.fixtures);
                 }
                 
-                renderCricketInsightsGrouped(data.fixtures, container, data.status);
+                renderCricketInsightsGrouped(data.fixtures, container, 'upcoming');
             } else {
                 // Handle ungrouped response (fallback)
                 const insights = data?.insights || [];
@@ -2959,17 +2983,11 @@
             return text;
         }
 
-        const statusLabelMap = {
-            active: 'active',
-            upcoming: 'upcoming',
-            complete: 'complete',
-            all: 'all statuses'
-        };
-        const statusLabel = statusLabelMap[String(status || '').toLowerCase()] || String(status || 'active');
+        const statusLabel = 'upcoming';
 
         let html = `<div style="margin-bottom:1rem;color:#4a5568;font-size:0.9rem;">`;
         html += `${fixtures.length} cricket fixtures (${statusLabel})</div>`;
-        html += '<div class="prediction-grid">';
+        html += '<div class="cricket-fixtures-grid">';
         
         for (const fix of fixtures) {
             const home = fix.home_team || 'TBD';
@@ -3025,7 +3043,7 @@
                     html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem; padding:0.25rem 0;">
                         <div style="flex:1;">
                             <div style="font-size:0.9rem; color:#374151;">${marketLabel} — ${selectionLabel}</div>
-                            ${insight.explanation ? `<p class="cricket-insight-explanation">${insight.explanation}</p>` : ''}
+                            ${insight.explanation ? `<p class="cricket-insight-explanation">${summarizeCricketExplanation(insight.explanation)}</p>` : ''}
                         </div>
                         <div style="background:${confidenceColor}; color:white; padding:0.2rem 0.5rem; border-radius:12px; font-size:0.8rem; font-weight:600;">${confidence}%</div>
                     </div>`;
@@ -3090,7 +3108,7 @@
 
         let html = `<div style="margin-bottom:1rem;color:#4a5568;font-size:0.9rem;">`;
         html += `${totalCount || insights.length} total cricket insights</div>`;
-        html += '<div class="prediction-grid">';
+        html += '<div class="cricket-fixtures-grid">';
         
         const fixtures = Object.values(byFixture);
         for (const fix of fixtures) {
@@ -3123,7 +3141,7 @@
                     <span style="color:${conf >= 65 ? '#22c55e' : conf >= 60 ? '#eab308' : '#ef4444'};">${conf}%</span>
                 </div>`;
                 if (m.explanation) {
-                    html += `<p class="cricket-insight-explanation">${m.explanation}</p>`;
+                    html += `<p class="cricket-insight-explanation">${summarizeCricketExplanation(m.explanation)}</p>`;
                 }
             }
             if (fix.markets.length > 5) {
@@ -3152,7 +3170,7 @@
 
         // Special handling for cricket - use dedicated API
         if (sport === 'cricket') {
-            await fetchCricketInsights(container, accessToken);
+            await fetchCricketInsights(container, accessToken, 'upcoming');
             return;
         }
 
@@ -4685,7 +4703,7 @@
             isInitialLoadComplete = true;
         }
 
-        // Cricket status filter handlers
+        // Cricket status filter handlers (upcoming-only lock)
         document.querySelectorAll('.cricket-status-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 // Update button styles
@@ -4697,12 +4715,11 @@
                 this.style.color = 'white';
                 
                 // Fetch cricket insights with selected status
-                const status = this.getAttribute('data-status');
                 const container = document.getElementById('cricket-matches');
                 if (container) {
                     getAccessTokenOrRedirect().then(token => {
                         if (token) {
-                            fetchCricketInsights(container, token, status);
+                            fetchCricketInsights(container, token, 'upcoming');
                         }
                     }).catch(err => {
                         console.error('Failed to get access token for cricket filter:', err);
