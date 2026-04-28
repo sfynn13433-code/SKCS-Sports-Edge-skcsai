@@ -14,6 +14,60 @@ const {
     resolveMatchIds
 } = require('../backend/services/cricketLiveMatchResolver');
 
+const CRICKET_MARKET_CATALOG = Object.freeze([
+    // T20 primary
+    { market_key: 'cricket_match_winner', market_group: 'direct', market_label: 'Match Winner', formats: ['t20'], profile: 'primary', confidence: 50, volatility: 'high' },
+    { market_key: 'most_match_sixes', market_group: 'boundaries', market_label: 'Most Match Sixes', formats: ['t20'], profile: 'primary', confidence: 63, volatility: 'high' },
+    { market_key: 'most_match_fours', market_group: 'boundaries', market_label: 'Most Match Fours', formats: ['t20'], profile: 'primary', confidence: 63, volatility: 'high' },
+    { market_key: 'top_batter', market_group: 'player', market_label: 'Top Batter (Team)', formats: ['t20'], profile: 'primary', confidence: 61, volatility: 'high' },
+    { market_key: 'top_bowler', market_group: 'player', market_label: 'Top Bowler (Team)', formats: ['t20'], profile: 'primary', confidence: 61, volatility: 'high' },
+    { market_key: 'highest_opening_partnership', market_group: 'phase', market_label: 'Highest Opening Partnership', formats: ['t20'], profile: 'primary', confidence: 62, volatility: 'medium' },
+    { market_key: 'powerplay_runs', market_group: 'phase', market_label: 'Powerplay Runs', formats: ['t20'], profile: 'primary', confidence: 65, volatility: 'medium' },
+    // T20 secondary
+    { market_key: 'any_player_50_yesno', market_group: 'player', market_label: 'Any Player 50+ (Yes/No)', formats: ['t20'], profile: 'secondary', confidence: 60, volatility: 'high' },
+    { market_key: 'player_total_runs_ou', market_group: 'player', market_label: 'Player Total Runs O/U', formats: ['t20'], profile: 'secondary', confidence: 60, volatility: 'high', lineupRequired: true },
+    { market_key: 'over_runs_ou', market_group: 'phase', market_label: 'Over Runs O/U', formats: ['t20'], profile: 'secondary', confidence: 59, volatility: 'high' },
+    { market_key: 'over_dismissal_yesno', market_group: 'wickets', market_label: 'Wicket In Over (Yes/No)', formats: ['t20'], profile: 'secondary', confidence: 59, volatility: 'high' },
+    { market_key: 'highest_scoring_over_total', market_group: 'phase', market_label: 'Highest Scoring Over Total', formats: ['t20'], profile: 'secondary', confidence: 59, volatility: 'high' },
+    { market_key: 'first_dismissal_method', market_group: 'wickets', market_label: '1st Dismissal Method', formats: ['t20'], profile: 'secondary', confidence: 58, volatility: 'high' },
+
+    // ODI primary
+    { market_key: 'cricket_match_winner', market_group: 'direct', market_label: 'Match Winner', formats: ['odi'], profile: 'primary', confidence: 50, volatility: 'high' },
+    { market_key: 'top_batter', market_group: 'player', market_label: 'Top Batter (Team)', formats: ['odi'], profile: 'primary', confidence: 62, volatility: 'medium' },
+    { market_key: 'top_bowler', market_group: 'player', market_label: 'Top Bowler (Team)', formats: ['odi'], profile: 'primary', confidence: 62, volatility: 'medium' },
+    { market_key: 'any_player_100_yesno', market_group: 'player', market_label: 'Any Player 100+ (Yes/No)', formats: ['odi'], profile: 'primary', confidence: 61, volatility: 'medium' },
+    { market_key: 'any_player_50_yesno', market_group: 'player', market_label: 'Any Player 50+ (Yes/No)', formats: ['odi'], profile: 'primary', confidence: 62, volatility: 'medium' },
+    { market_key: 'highest_opening_partnership', market_group: 'phase', market_label: 'Highest Opening Partnership', formats: ['odi'], profile: 'primary', confidence: 62, volatility: 'medium' },
+    { market_key: 'innings_total_runs', market_group: 'totals', market_label: '1st Innings Total Runs', formats: ['odi'], profile: 'primary', confidence: 62, volatility: 'medium' },
+    // ODI secondary
+    { market_key: 'player_milestone_50_100', market_group: 'player', market_label: 'Player Milestones 50/100', formats: ['odi'], profile: 'secondary', confidence: 60, volatility: 'medium', lineupRequired: true },
+    { market_key: 'first_15_overs_1x2', market_group: 'phase', market_label: 'Overs 0-15 Result (1x2)', formats: ['odi'], profile: 'secondary', confidence: 60, volatility: 'high' },
+    { market_key: 'team_total_at_first_dismissal', market_group: 'phase', market_label: 'Team Runs At 1st Dismissal O/U', formats: ['odi'], profile: 'secondary', confidence: 60, volatility: 'high' },
+    { market_key: 'total_runouts_match', market_group: 'wickets', market_label: 'Total Run Outs O/U', formats: ['odi'], profile: 'secondary', confidence: 59, volatility: 'high' },
+    { market_key: 'team_with_top_batter', market_group: 'player', market_label: 'Team With Top Batter', formats: ['odi'], profile: 'secondary', confidence: 60, volatility: 'medium' },
+    { market_key: 'team_with_top_bowler', market_group: 'player', market_label: 'Team With Top Bowler', formats: ['odi'], profile: 'secondary', confidence: 60, volatility: 'medium' },
+    { market_key: 'match_tie_yesno', market_group: 'direct_cover', market_label: 'Will There Be A Tie (Yes/No)', formats: ['odi'], profile: 'secondary', confidence: 58, volatility: 'high' },
+
+    // Test primary
+    { market_key: 'test_match_result_1x2', market_group: 'direct', market_label: 'Test Match Result', formats: ['test'], profile: 'primary', confidence: 50, volatility: 'high' },
+    { market_key: 'top_batter_first_innings', market_group: 'player', market_label: '1st Innings Top Batter', formats: ['test'], profile: 'primary', confidence: 62, volatility: 'medium' },
+    { market_key: 'top_bowler_first_innings', market_group: 'player', market_label: '1st Innings Top Bowler', formats: ['test'], profile: 'primary', confidence: 62, volatility: 'medium' },
+    { market_key: 'first_innings_lead', market_group: 'totals', market_label: '1st Innings Lead', formats: ['test'], profile: 'primary', confidence: 63, volatility: 'medium' },
+    { market_key: 'any_player_100_yesno', market_group: 'player', market_label: 'Any Player 100+ (1st Innings)', formats: ['test'], profile: 'primary', confidence: 63, volatility: 'medium' },
+    { market_key: 'any_player_50_yesno', market_group: 'player', market_label: 'Any Player 50+ (1st Innings)', formats: ['test'], profile: 'primary', confidence: 64, volatility: 'medium' },
+    // Test secondary
+    { market_key: 'session_runs', market_group: 'test_phase', market_label: 'Session Runs O/U', formats: ['test'], profile: 'secondary', confidence: 61, volatility: 'medium' },
+    { market_key: 'first_innings_first_dismissal_runs', market_group: 'test_phase', market_label: 'Runs At 1st Dismissal (1st Inns)', formats: ['test'], profile: 'secondary', confidence: 60, volatility: 'medium' },
+    { market_key: 'next_man_out', market_group: 'player', market_label: 'Next Man Out', formats: ['test'], profile: 'secondary', confidence: 59, volatility: 'high', lineupRequired: true },
+    { market_key: 'next_dismissal_method', market_group: 'wickets', market_label: 'Method Of Next Dismissal', formats: ['test'], profile: 'secondary', confidence: 59, volatility: 'high' },
+    { market_key: 'player_total_runs_ou', market_group: 'player', market_label: 'Player Total Runs O/U (1st Inns)', formats: ['test'], profile: 'secondary', confidence: 60, volatility: 'medium', lineupRequired: true }
+]);
+
+const MAX_CRICKET_SECONDARY_MARKETS_PER_FIXTURE = Math.max(
+    0,
+    Math.min(8, Number(process.env.CRICKET_MAX_SECONDARY_MARKETS || 5))
+);
+
 // Publisher helper functions for cricket
 function buildPublisherCricketSelection(rule, fixture) {
     const key = String(rule.market_key || rule.market || rule.rule_key || "").toLowerCase();
@@ -26,11 +80,13 @@ function buildPublisherCricketSelection(rule, fixture) {
     if (key.includes("test_match_result")) return `${home} or Draw`;
     if (key.includes("double_chance")) return `${home} or ${away}`;
     if (key.includes("draw_no_bet")) return `${home} Draw No Bet`;
+    if (key.includes("match_total_wickets") || key.includes("wicket_total")) return "Over 13.5 wickets";
     if (key.includes("innings_total_runs")) {
         if (format === 'odi') return "Over 299.5 runs (50 overs)";
         if (format === 'test') return "Over 324.5 runs (first innings)";
         return "Over 171.5 runs (20 overs)";
     }
+    if (key.includes("first_10_overs_runs")) return "Over 52.5 runs (first 10 overs)";
     if (key.includes("day_total_runs")) {
         if (format === 'test') return "Over 274.5 runs (Day 1, 90 overs)";
         if (format === 'odi') return "Over 244.5 runs (40 overs)";
@@ -60,13 +116,34 @@ function buildPublisherCricketSelection(rule, fixture) {
     if (key.includes("boundaries_under")) return "Under boundaries line";
     if (key.includes("fours_over") || key.includes("total_fours")) return "Over 21.5 fours";
     if (key.includes("sixes_over") || key.includes("total_sixes")) return "Over 12.5 sixes";
-    if (key.includes("match_total_wickets")) return "Over 13.5 wickets";
-    if (key.includes("wicket_total")) return "Over 13.5 wickets";
     if (key.includes("session_runs")) return "Over 76.5 session runs (session block)";
     if (key.includes("powerplay_runs")) {
         if (format === 'odi') return "Over 52.5 runs (first 10 overs)";
         return "Over 49.5 runs (first 6 overs)";
     }
+    if (key.includes("most_match_sixes")) return `${home} to hit more sixes`;
+    if (key.includes("most_match_fours")) return `${home} to hit more fours`;
+    if (key.includes("top_batter")) return `${home} top batter market`;
+    if (key.includes("top_bowler")) return `${home} top bowler market`;
+    if (key.includes("highest_opening_partnership")) return `${home} higher opening stand`;
+    if (key.includes("any_player_50")) return "Yes - at least one player scores 50+";
+    if (key.includes("any_player_100")) return "Yes - at least one player scores 100+";
+    if (key.includes("player_total_runs_ou")) return "Over 24.5 player runs";
+    if (key.includes("over_runs_ou")) return "Over 8.5 runs in selected over";
+    if (key.includes("over_dismissal_yesno")) return "Yes - wicket in selected over";
+    if (key.includes("highest_scoring_over_total")) return "Over 15.5 runs in highest scoring over";
+    if (key.includes("first_dismissal_method")) return "Caught";
+    if (key.includes("player_milestone_50_100")) return "50+ milestone (Yes)";
+    if (key.includes("first_15_overs_1x2")) return `${home} ahead after 15 overs`;
+    if (key.includes("team_total_at_first_dismissal")) return "Over 21.5 runs at first dismissal";
+    if (key.includes("total_runouts_match")) return "Under 1.5 run outs";
+    if (key.includes("team_with_top_batter")) return `${home} side to produce top batter`;
+    if (key.includes("team_with_top_bowler")) return `${home} side to produce top bowler`;
+    if (key.includes("match_tie_yesno")) return "No";
+    if (key.includes("first_innings_lead")) return `${home} to lead after first innings`;
+    if (key.includes("first_innings_first_dismissal_runs")) return "Over 35.5 runs at first dismissal";
+    if (key.includes("next_man_out")) return `${away} top-order batter next out`;
+    if (key.includes("next_dismissal_method")) return "LBW or Bowled";
 
     return "Cricket insight";
 }
@@ -270,42 +347,50 @@ async function loadRules() {
     for (const rule of data || []) {
         map.set(rule.market_key, rule);
     }
+
+    for (const entry of CRICKET_MARKET_CATALOG) {
+        if (map.has(entry.market_key)) continue;
+        map.set(entry.market_key, {
+            market_key: entry.market_key,
+            market_group: entry.market_group,
+            allowed_formats: entry.formats,
+            min_display_confidence: 58,
+            strong_confidence: 70,
+            elite_confidence: 80,
+            acca_min_confidence: 76,
+            acca_allowed: entry.profile === 'primary',
+            requires_confirmed_lineup: Boolean(entry.lineupRequired),
+            requires_toss: false,
+            display_only: false,
+            volatility_level: entry.volatility || 'medium',
+            notes: `fallback rule from code catalog (${entry.profile})`
+        });
+    }
     return map;
 }
 
 function buildStarterMarketsForFixture(fixture, rules) {
     const format = normalizeCricketFormat(fixture.match_format);
+    const formatCatalog = CRICKET_MARKET_CATALOG.filter((entry) => entry.formats.includes(format));
+    const primary = formatCatalog.filter((entry) => entry.profile === 'primary');
+    const secondary = formatCatalog
+        .filter((entry) => entry.profile === 'secondary')
+        .slice(0, MAX_CRICKET_SECONDARY_MARKETS_PER_FIXTURE);
+    const selected = [...primary, ...secondary];
+    const candidates = selected.map((entry) => ({
+        market_key: entry.market_key,
+        market_group: entry.market_group,
+        market_label: entry.market_label,
+        confidence: entry.confidence
+    }));
 
-    const candidates = [];
-
-    if (format === 't20') {
-        candidates.push(
-            { market_key: 'cricket_match_winner', market_group: 'direct', market_label: 'Match Winner', confidence: 50 },
-            { market_key: 'innings_total_runs', market_group: 'totals', market_label: 'Innings Total Runs', confidence: 62 },
-            { market_key: 'team_total_runs', market_group: 'totals', market_label: 'Team Total Runs', confidence: 63 },
-            { market_key: 'powerplay_runs', market_group: 'phase', market_label: 'Powerplay Runs', confidence: 65 },
-            { market_key: 'total_sixes', market_group: 'boundaries', market_label: 'Total Sixes', confidence: 65 }
-        );
-    } else if (format === 'odi') {
-        candidates.push(
-            { market_key: 'cricket_match_winner', market_group: 'direct', market_label: 'Match Winner', confidence: 50 },
-            { market_key: 'innings_total_runs', market_group: 'totals', market_label: 'Innings Total Runs', confidence: 62 },
-            { market_key: 'team_total_runs', market_group: 'totals', market_label: 'Team Total Runs', confidence: 63 },
-            { market_key: 'first_10_overs_runs', market_group: 'phase', market_label: 'First 10 Overs Runs', confidence: 64 },
-            { market_key: 'match_total_wickets', market_group: 'wickets', market_label: 'Match Total Wickets', confidence: 64 }
-        );
-    } else if (format === 'test') {
-        candidates.push(
-            { market_key: 'test_match_result_1x2', market_group: 'direct', market_label: 'Test Match Result', confidence: 50 },
-            { market_key: 'test_draw_no_bet', market_group: 'direct_cover', market_label: 'Draw No Bet', confidence: 60 },
-            { market_key: 'test_double_chance', market_group: 'direct_cover', market_label: 'Double Chance', confidence: 60 },
-            { market_key: 'innings_total_runs', market_group: 'totals', market_label: 'Innings Total Runs', confidence: 62 },
-            { market_key: 'test_day_total_runs', market_group: 'test_phase', market_label: 'Day Total Runs', confidence: 64 }
-        );
-    } else {
-        candidates.push(
-            { market_key: 'cricket_match_winner', market_group: 'direct', market_label: 'Match Winner', confidence: 50 }
-        );
+    if (candidates.length === 0) {
+        candidates.push({
+            market_key: 'cricket_match_winner',
+            market_group: 'direct',
+            market_label: 'Match Winner',
+            confidence: 50
+        });
     }
 
     return candidates

@@ -177,11 +177,13 @@ function buildCricketSelection(rawValue, marketKey, row = {}) {
     if (key.includes("test_match_result")) return `${home} or Draw`;
     if (key.includes("double_chance")) return `${home} or ${away}`;
     if (key.includes("draw_no_bet")) return `${home} Draw No Bet`;
+    if (key.includes("match_total_wickets") || key.includes("wicket_total")) return "Over 13.5 wickets";
     if (key.includes("innings_total_runs")) {
         if (format === "odi") return "Over 299.5 runs (50 overs)";
         if (format === "test") return "Over 324.5 runs (first innings)";
         return "Over 171.5 runs (20 overs)";
     }
+    if (key.includes("first_10_overs_runs")) return "Over 52.5 runs (first 10 overs)";
     if (key.includes("day_total_runs")) {
         if (format === "test") return "Over 274.5 runs (Day 1, 90 overs)";
         if (format === "odi") return "Over 244.5 runs (40 overs)";
@@ -211,7 +213,6 @@ function buildCricketSelection(rawValue, marketKey, row = {}) {
     if (key.includes("boundaries_under")) return "Under boundaries line";
     if (key.includes("fours_over") || key.includes("total_fours")) return "Over 21.5 fours";
     if (key.includes("sixes_over") || key.includes("total_sixes")) return "Over 12.5 sixes";
-    if (key.includes("match_total_wickets") || key.includes("wicket_total")) return "Over 13.5 wickets";
     if (key.includes("session_runs")) return "Over 76.5 session runs (session block)";
     if (key.includes("powerplay_runs")) {
         if (format === "odi") return "Over 52.5 runs (first 10 overs)";
