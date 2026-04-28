@@ -1,5 +1,7 @@
 'use strict';
 
+const { FOOTBALL_RULES } = require('../config/footballRules');
+
 function toFiniteNumber(value, fallback = 0) {
     const n = Number(value);
     return Number.isFinite(n) ? n : fallback;
@@ -217,14 +219,14 @@ function evaluateDirect1x2(matchContext = {}) {
         accaEligible = true;
     }
 
-    if (volatilityScore > 0.7) {
+    if (volatilityScore > FOOTBALL_RULES.volatility.extremeThreshold) {
         tier = 'EXTREME_CAUTION';
         secondaryRequired = true;
         accaEligible = false;
     }
 
     let stage5Reason = `Volatility score ${volatilityScore.toFixed(2)} — no override applied.`;
-    if (volatilityScore > 0.7) {
+    if (volatilityScore > FOOTBALL_RULES.volatility.extremeThreshold) {
         stage5Reason = `Volatility score ${volatilityScore.toFixed(2)} — high volatility override applied (tier forced to EXTREME CAUTION).`;
     }
     stages.push(stagePayload(5, 'Volatility Check', stage5Reason, probabilities));

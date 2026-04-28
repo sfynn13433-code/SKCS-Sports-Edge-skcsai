@@ -15,6 +15,9 @@ const {
 } = require('./marketIntelligence');
 const { safeFetch, getInjuries, getH2H, getWeather } = require('./contextIngestionService');
 const { evaluateDirect1x2 } = require('./direct1x2Engine');
+const { extractRankData, buildPredictionFromRank } = require('./footballRankExtractor');
+const { canUseFootballHighlights, fetchHeadToHeadFallback } = require('./footballHighlightsService');
+const { buildH2HSignal, getH2HVolatilityAdjustment } = require('./footballH2HExtractor');
 const { saveContextData } = require('./saveContextData');
 const { saveDirectInsight } = require('./saveDirectInsights');
 const pipelineLogger = require('../utils/pipelineLogger');
@@ -100,6 +103,250 @@ function normalizeMarketKey(value) {
         .trim()
         .toLowerCase()
         .replace(/[\s-]+/g, '_');
+}
+
+function normalizeRankPrimaryMarket(market) {
+    const key = String(market || '').trim().toUpperCase();
+    if (key === 'HOME_WIN') return 'home_win';
+    if (key === 'DRAW') return 'draw';
+    if (key === 'AWAY_WIN') return 'away_win';
+    return null;
+}
+
+function normalizeRankSecondaryMarket(market) {
+    const key = String(market || '').trim().toUpperCase();
+    if (key === 'OVER_2.5') return 'over_2_5';
+    if (key === 'OVER_1.5') return 'over_1_5';
+    if (key === 'BTTS_YES') return 'btts_yes';
+    return null;
+}
+
+function normalizeTeamIdValue(value) {
+    if (typeof value === 'number' && Number.isFinite(value)) return String(Math.floor(value));
+    const text = String(value || '').trim();
+    if (!/^\d+$/.test(text)) return null;
+    return text;
+}
+
+function extractFootballHighlightsTeamIds(match) {
+    const source = isObject(match) ? match : {};
+    const homeCandidates = [
+        { value: source?.homeTeam?.id, field: 'homeTeam.id' },
+        { value: source?.home_team_id, field: 'home_team_id' },
+        { value: source?.homeTeamId, field: 'homeTeamId' },
+        { value: source?.home?.id, field: 'home.id' },
+        { value: source?.teams?.home?.id, field: 'teams.home.id' },
+        { value: source?.match_info?.home_team_id, field: 'match_info.home_team_id' },
+        { value: source?.raw?.homeTeam?.id, field: 'raw.homeTeam.id' },
+        { value: source?.raw_provider_data?.homeTeam?.id, field: 'raw_provider_data.homeTeam.id' }
+    ];
+    const awayCandidates = [
+        { value: source?.awayTeam?.id, field: 'awayTeam.id' },
+        { value: source?.away_team_id, field: 'away_team_id' },
+        { value: source?.awayTeamId, field: 'awayTeamId' },
+        { value: source?.away?.id, field: 'away.id' },
+        { value: source?.teams?.away?.id, field: 'teams.away.id' },
+        { value: source?.match_info?.away_team_id, field: 'match_info.away_team_id' },
+        { value: source?.raw?.awayTeam?.id, field: 'raw.awayTeam.id' },
+        { value: source?.raw_provider_data?.awayTeam?.id, field: 'raw_provider_data.awayTeam.id' }
+    ];
+
+    let homeTeamId = null;
+    let homeField = null;
+    for (const candidate of homeCandidates) {
+        const id = normalizeTeamIdValue(candidate.value);
+        if (id) {
+            homeTeamId = id;
+            homeField = candidate.field;
+            break;
+        }
+    }
+
+    let awayTeamId = null;
+    let awayField = null;
+    for (const candidate of awayCandidates) {
+        const id = normalizeTeamIdValue(candidate.value);
+        if (id) {
+            awayTeamId = id;
+            awayField = candidate.field;
+            break;
+        }
+    }
+
+    return {
+        homeTeamId,
+        awayTeamId,
+        sourceField: homeField && awayField ? `${homeField}|${awayField}` : null
+    };
+}
+
+async function applyFootballH2HEnrichment(
+    {
+        sport,
+        fixtureId,
+        candidatePrediction,
+        candidateConfidence,
+        match,
+        currentVolatilityScore
+    },
+    deps = {}
+) {
+    const fetchFn = deps.fetchHeadToHeadFallback || fetchHeadToHeadFallback;
+    const buildSignalFn = deps.buildH2HSignal || buildH2HSignal;
+    const canUseFn = deps.canUseFootballHighlights || canUseFootballHighlights;
+    const volatilityAdjustFn = deps.getH2HVolatilityAdjustment || getH2HVolatilityAdjustment;
+
+    const metadata = {
+        h2h_enrichment_source: 'football_highlights',
+        h2h_enrichment_endpoint: 'head-2-head',
+        h2h_match_count: null,
+        h2h_edge_label: null,
+        h2h_draw_rate: null,
+        h2h_btts_rate: null,
+        h2h_over_1_5_rate: null,
+        h2h_over_2_5_rate: null,
+        h2h_volatility_hint: null,
+        h2h_confidence_adjustment: 0,
+        h2h_notes: []
+    };
+
+    const safeFixtureId = String(fixtureId || 'unknown_fixture');
+    const normalizedSport = normalizeSportForDeployment(sport);
+    if (normalizedSport !== 'football') {
+        const reason = 'non_football_sport';
+        console.log(`[H2H] skipped: match=${safeFixtureId} reason=${reason}`);
+        return {
+            confidence: candidateConfidence,
+            metadata: {
+                ...metadata,
+                h2h_enrichment_status: 'skipped',
+                h2h_enrichment_reason: reason
+            }
+        };
+    }
+
+    if (!String(candidatePrediction || '').trim()) {
+        const reason = 'missing_candidate_prediction';
+        console.log(`[H2H] skipped: match=${safeFixtureId} reason=${reason}`);
+        return {
+            confidence: candidateConfidence,
+            metadata: {
+                ...metadata,
+                h2h_enrichment_status: 'skipped',
+                h2h_enrichment_reason: reason
+            }
+        };
+    }
+
+    const confidence = Number(candidateConfidence);
+    if (!Number.isFinite(confidence) || confidence < 65 || confidence > 78) {
+        const reason = 'confidence_outside_h2h_window';
+        console.log(`[H2H] skipped: match=${safeFixtureId} reason=${reason}`);
+        return {
+            confidence: candidateConfidence,
+            metadata: {
+                ...metadata,
+                h2h_enrichment_status: 'skipped',
+                h2h_enrichment_reason: reason
+            }
+        };
+    }
+
+    const ids = extractFootballHighlightsTeamIds(match);
+    if (!ids.homeTeamId || !ids.awayTeamId) {
+        const reason = 'missing_team_id';
+        console.log(`[H2H] skipped: match=${safeFixtureId} reason=${reason}`);
+        return {
+            confidence: candidateConfidence,
+            metadata: {
+                ...metadata,
+                h2h_enrichment_status: 'skipped',
+                h2h_enrichment_reason: reason
+            }
+        };
+    }
+
+    if (!canUseFn()) {
+        const reason = 'daily_budget_reached';
+        console.log(`[H2H] skipped: match=${safeFixtureId} reason=${reason}`);
+        return {
+            confidence: candidateConfidence,
+            metadata: {
+                ...metadata,
+                h2h_enrichment_status: 'skipped',
+                h2h_enrichment_reason: reason
+            }
+        };
+    }
+
+    const result = await fetchFn(ids.homeTeamId, ids.awayTeamId);
+    if (!result?.ok || !result?.data) {
+        const reason = String(result?.reason || 'request_failed').trim() || 'request_failed';
+        const status = result?.skipped ? 'skipped' : 'failed';
+        const logLabel = status === 'failed' ? 'failed' : 'skipped';
+        console.log(`[H2H] ${logLabel}: match=${safeFixtureId} reason=${reason}`);
+        return {
+            confidence: candidateConfidence,
+            metadata: {
+                ...metadata,
+                h2h_enrichment_status: status,
+                h2h_enrichment_reason: reason
+            }
+        };
+    }
+
+    const signal = buildSignalFn(result.data);
+    const adjustment = clamp(Math.round(Number(signal?.confidence_adjustment) || 0), -4, 4);
+    const adjustedConfidence = clamp(Math.round(confidence + adjustment), 55, 92);
+
+    const nextMetadata = {
+        ...metadata,
+        h2h_enrichment_status: 'applied',
+        h2h_match_count: Number(signal?.match_count) || Number(result?.data?.match_count) || 0,
+        h2h_edge_label: signal?.h2h_edge_label || result?.data?.summary?.h2h_edge_label || null,
+        h2h_draw_rate: Number.isFinite(Number(signal?.draw_rate)) ? Number(signal.draw_rate) : null,
+        h2h_btts_rate: Number.isFinite(Number(signal?.btts_rate)) ? Number(signal.btts_rate) : null,
+        h2h_over_1_5_rate: Number.isFinite(Number(signal?.over_1_5_rate)) ? Number(signal.over_1_5_rate) : null,
+        h2h_over_2_5_rate: Number.isFinite(Number(signal?.over_2_5_rate)) ? Number(signal.over_2_5_rate) : null,
+        h2h_volatility_hint: signal?.volatility_hint || null,
+        h2h_confidence_adjustment: adjustment,
+        h2h_notes: Array.isArray(signal?.notes) ? signal.notes : [],
+        h2h_team_id_source: ids.sourceField || null
+    };
+
+    if (String(signal?.volatility_hint || '').trim().toUpperCase() === 'HIGH') {
+        const existingVolatility = Number(currentVolatilityScore);
+        if (Number.isFinite(existingVolatility)) {
+            const volAdj = clamp(Math.round(Number(volatilityAdjustFn(signal)) || 0), -10, 15);
+            if (volAdj > 0) {
+                nextMetadata.volatility_score = clamp(
+                    Math.max(existingVolatility, existingVolatility + volAdj),
+                    0,
+                    100
+                );
+            } else {
+                nextMetadata.volatility_score = existingVolatility;
+            }
+        } else {
+            nextMetadata.h2h_volatility_warning = 'high_h2h_volatility';
+        }
+    }
+
+    console.log(`[H2H] applied: match=${safeFixtureId} adjustment=${adjustment} volatility=${signal?.volatility_hint || 'MEDIUM'}`);
+    return {
+        confidence: adjustedConfidence,
+        metadata: nextMetadata
+    };
+}
+
+function defaultPredictionForMarket(market) {
+    const key = normalizeMarketKey(market);
+    if (key === 'home_win' || key === 'away_win' || key === 'draw') return key;
+    if (key.startsWith('over_')) return 'over';
+    if (key.startsWith('under_')) return 'under';
+    if (key === 'btts_yes') return 'yes';
+    if (key === 'btts_no') return 'no';
+    return key || 'home_win';
 }
 
 function isPrimaryMatchOutcomeMarket(value) {
@@ -1243,27 +1490,116 @@ async function buildRawPredictionFromProviderItem(item) {
 
     const selectedDirect = marketSelections.direct || null;
     const selectedSecondary = marketSelections.secondary || null;
-    const market = selectedDirect?.market || requestedMarket;
-    const routedPrediction = selectedDirect?.prediction || direct1x2Evaluation.outcome || prediction || fallbackPredictionForMarket(market, prediction);
-    const confidenceProbabilityRaw = selectedDirect?.probability || (direct1x2Evaluation.confidence / 100) || p_adj;
-    const confidenceProbability = adjustProbability.applyMarketAdjustment(
-        confidenceProbabilityRaw,
-        market,
+    const rankMatchShape = {
+        ...(isObject(matchContext) ? matchContext : {}),
+        ...(isObject(item?.raw_provider_data) ? item.raw_provider_data : {}),
+        ...(isObject(item) ? item : {})
+    };
+    const rankData = extractRankData(rankMatchShape);
+    const rankPrediction = rankData ? buildPredictionFromRank(rankData) : null;
+    const rankMarket = rankPrediction ? normalizeRankPrimaryMarket(rankPrediction.market) : null;
+    const rankSecondaryMarket = rankPrediction?.secondary
+        ? normalizeRankSecondaryMarket(rankPrediction.secondary)
+        : null;
+    const rankProbability = Number(rankPrediction?.probability);
+    const rankCalibratedConfidence = Number(rankPrediction?.confidence);
+    const rankVolatilityScore = Number(rankPrediction?.volatility_score ?? rankPrediction?.volatility);
+    const rankApplied = Boolean(rankMarket && Number.isFinite(rankProbability));
+
+    const baseMarket = selectedDirect?.market || requestedMarket;
+    const baseRoutedPrediction = selectedDirect?.prediction
+        || direct1x2Evaluation.outcome
+        || prediction
+        || fallbackPredictionForMarket(baseMarket, prediction);
+    const baseConfidenceProbabilityRaw = selectedDirect?.probability || (direct1x2Evaluation.confidence / 100) || p_adj;
+    const baseConfidenceProbability = adjustProbability.applyMarketAdjustment(
+        baseConfidenceProbabilityRaw,
+        baseMarket,
         contextSignals.market_adjustments
     );
-    const confidence = toConfidencePercent(confidenceProbability);
+    const baseConfidence = toConfidencePercent(baseConfidenceProbability);
+
+    const market = rankApplied ? rankMarket : baseMarket;
+    const routedPrediction = rankApplied ? defaultPredictionForMarket(rankMarket) : baseRoutedPrediction;
+    const confidence = rankApplied
+        ? (
+            Number.isFinite(rankCalibratedConfidence)
+                ? clamp(Math.round(rankCalibratedConfidence), 55, 92)
+                : clamp(Math.round(clamp(rankProbability, 0, 1) * 100), 0, 100)
+        )
+        : baseConfidence;
+    let confidenceWithH2H = confidence;
+    let h2hMetadata = {
+        h2h_enrichment_status: 'skipped',
+        h2h_enrichment_reason: 'not_evaluated',
+        h2h_enrichment_source: 'football_highlights',
+        h2h_enrichment_endpoint: 'head-2-head',
+        h2h_match_count: null,
+        h2h_edge_label: null,
+        h2h_draw_rate: null,
+        h2h_btts_rate: null,
+        h2h_over_1_5_rate: null,
+        h2h_over_2_5_rate: null,
+        h2h_volatility_hint: null,
+        h2h_confidence_adjustment: 0,
+        h2h_notes: []
+    };
+    const preH2HVolatilityScore = rankApplied
+        ? Number(rankPrediction?.volatility_score ?? rankPrediction?.volatility)
+        : null;
+    const h2hMatchShape = {
+        ...(isObject(matchContext) ? matchContext : {}),
+        ...(isObject(item?.raw_provider_data) ? item.raw_provider_data : {}),
+        ...(isObject(item) ? item : {}),
+        match_info: isObject(matchInfo) ? matchInfo : {},
+        raw: isObject(item?.raw_provider_data) ? item.raw_provider_data : {}
+    };
+    const h2hEnrichment = await applyFootballH2HEnrichment({
+        sport,
+        fixtureId: match_id,
+        candidatePrediction: routedPrediction,
+        candidateConfidence: confidence,
+        match: h2hMatchShape,
+        currentVolatilityScore: preH2HVolatilityScore
+    });
+    confidenceWithH2H = Number.isFinite(Number(h2hEnrichment?.confidence))
+        ? clamp(Math.round(Number(h2hEnrichment.confidence)), 55, 92)
+        : confidence;
+    h2hMetadata = h2hEnrichment?.metadata && typeof h2hEnrichment.metadata === 'object'
+        ? h2hEnrichment.metadata
+        : h2hMetadata;
+
+    const confidenceProbabilityRaw = rankApplied ? (confidenceWithH2H / 100) : baseConfidenceProbabilityRaw;
+    const confidenceProbability = rankApplied ? (confidenceWithH2H / 100) : baseConfidenceProbability;
+    const selectedSecondaryFinal = rankApplied && rankSecondaryMarket
+        ? {
+            market: rankSecondaryMarket,
+            prediction: defaultPredictionForMarket(rankSecondaryMarket),
+            confidence: confidenceWithH2H,
+            probability: confidenceWithH2H / 100,
+            source: 'rank_data'
+        }
+        : selectedSecondary;
+    if (rankApplied) {
+        const rankFixtureId = String(matchInfo?.id || item?.fixture_id || match_id || '');
+        console.log(`[RANK] Applied calibrated rank prediction for match ${rankFixtureId} confidence=${confidence} band=${rankPrediction?.confidence_band || 'LOW_EDGE'} volatility=${rankPrediction?.volatility_label || 'MEDIUM'}`);
+    }
     const riskLevel = isPrimaryMatchOutcomeMarket(market)
-        ? riskLevelFromConfidence(confidence)
+        ? riskLevelFromConfidence(confidenceWithH2H)
         : 'good';
     const transparencyFlags = transparencyFlagsForRiskLevel(riskLevel);
     const secondaryInsights = buildMandatorySecondaryInsights({
         candidates: marketIntelligence.candidates,
         selectedMarket: market,
         primaryOutcome: routedPrediction,
-        primaryConfidence: confidence,
-        ruleOf4: marketSelections.rule_of_4_markets || []
+        primaryConfidence: confidenceWithH2H,
+        ruleOf4: rankApplied && rankSecondaryMarket
+            ? [{ market: rankSecondaryMarket, prediction: defaultPredictionForMarket(rankSecondaryMarket), confidence: confidenceWithH2H }]
+            : (marketSelections.rule_of_4_markets || [])
     });
-    const volatility = item.volatility || scoring.volatility || volatilityFromRiskProfile(marketIntelligence.risk_profile, 'medium');
+    const volatility = rankApplied && Number.isFinite(rankVolatilityScore)
+        ? clamp(Math.round(rankVolatilityScore), 0, 100)
+        : (item.volatility || scoring.volatility || volatilityFromRiskProfile(marketIntelligence.risk_profile, 'medium'));
     const aiSource = scoring.source || null; // 'dolphin', 'fallback', 'odds', etc.
     const aiReasoning = scoring.reasoning || null;
     const uiInsights = buildUiInsights(contextFixture, contextSignals);
@@ -1273,13 +1609,21 @@ async function buildRawPredictionFromProviderItem(item) {
         sport,
         market,
         prediction: routedPrediction,
-        confidence,
+        confidence: confidenceWithH2H,
         volatility,
         odds: item.odds !== undefined ? item.odds : null,
         metadata: {
             source: 'aiPipeline:v3-normalized+market-intelligence',
             data_mode: item.data_mode || null,
-            prediction_source: predictionSource,
+            prediction_source: rankApplied ? 'rank_data' : predictionSource,
+            confidence_band: rankApplied ? (rankPrediction?.confidence_band || null) : null,
+            volatility_score: Number.isFinite(Number(h2hMetadata?.volatility_score))
+                ? Number(h2hMetadata.volatility_score)
+                : (rankApplied ? (rankPrediction?.volatility_score ?? rankPrediction?.volatility ?? null) : null),
+            volatility_label: rankApplied ? (rankPrediction?.volatility_label || null) : null,
+            calibration_notes: rankApplied ? (rankPrediction?.calibration_notes || []) : [],
+            rank_filter_warning: rankApplied ? (rankPrediction?.rank_filter_warning || null) : null,
+            rank_volatility_warning: rankApplied ? (rankPrediction?.rank_volatility_warning || null) : null,
             ai_source: aiSource,
             ai_reasoning: aiReasoning,
             provider: item.provider || matchContext.provider || null,
@@ -1309,7 +1653,7 @@ async function buildRawPredictionFromProviderItem(item) {
                 p_base,
                 p_adj,
                 confidence_base_pct: Math.round(toProbability(baselineConfidence) * 10000) / 100,
-                confidence_adj_pct: confidence
+                confidence_adj_pct: confidenceWithH2H
             },
             direct_1x2_engine: {
                 market: direct1x2Evaluation.market,
@@ -1331,7 +1675,7 @@ async function buildRawPredictionFromProviderItem(item) {
                     confidence_tier_warning: directConfidenceTierWarning(direct1x2Evaluation.confidence)
                 },
                 direct_market: selectedDirect,
-                secondary_market: selectedSecondary,
+                secondary_market: selectedSecondaryFinal,
                 rule_of_4_markets: marketSelections.rule_of_4_markets || [],
                 same_match: marketSelections.same_match,
                 secondary_insights: secondaryInsights,
@@ -1353,27 +1697,43 @@ async function buildRawPredictionFromProviderItem(item) {
                 status: 'locked',
                 final_recommendation: {
                     market: toTitleCase(market),
-                    confidence
+                    confidence: confidenceWithH2H
                 },
                 engine_log: [
-                    `Primary outcome retained: ${toTitleCase(market)} at ${confidence}% confidence.`,
+                    `Primary outcome retained: ${toTitleCase(market)} at ${confidenceWithH2H}% confidence.`,
                     `Direct 1X2 tier: ${direct1x2Evaluation.tier} (${direct1x2Evaluation.confidence}%).`,
                     'Defensive floor market mutation disabled for transparency.'
                 ],
                 probabilities: waterfallProbabilities || {},
                 insights: uiInsights
             },
+            h2h_enrichment_status: h2hMetadata.h2h_enrichment_status || 'skipped',
+            h2h_enrichment_source: h2hMetadata.h2h_enrichment_source || 'football_highlights',
+            h2h_enrichment_endpoint: h2hMetadata.h2h_enrichment_endpoint || 'head-2-head',
+            h2h_match_count: h2hMetadata.h2h_match_count,
+            h2h_edge_label: h2hMetadata.h2h_edge_label,
+            h2h_draw_rate: h2hMetadata.h2h_draw_rate,
+            h2h_btts_rate: h2hMetadata.h2h_btts_rate,
+            h2h_over_1_5_rate: h2hMetadata.h2h_over_1_5_rate,
+            h2h_over_2_5_rate: h2hMetadata.h2h_over_2_5_rate,
+            h2h_volatility_hint: h2hMetadata.h2h_volatility_hint,
+            h2h_confidence_adjustment: h2hMetadata.h2h_confidence_adjustment,
+            h2h_notes: h2hMetadata.h2h_notes || [],
+            h2h_enrichment_reason: h2hMetadata.h2h_enrichment_reason || null,
+            h2h_volatility_warning: h2hMetadata.h2h_volatility_warning || null,
             risk_level: riskLevel,
             secondary_insights: secondaryInsights,
             transparency_flags: transparencyFlags,
-            ai: predictionSource === 'ai_fallback'
+            ai: !rankApplied && predictionSource === 'ai_fallback'
                 ? {
                     winner: scoring.winner,
                     source: aiSource,
                     reasoning: aiReasoning
                 }
                 : null
-        }
+        },
+        secondary_market: rankApplied ? (rankPrediction?.secondary || null) : null,
+        source: rankApplied ? 'rank_data' : predictionSource
     };
 
     try {
@@ -1829,5 +2189,9 @@ async function rebuildFinalOutputs(options = {}) {
 module.exports = {
     runPipelineForMatches,
     runPipelineFromConfiguredDataMode,
-    rebuildFinalOutputs
+    rebuildFinalOutputs,
+    __test: {
+        extractFootballHighlightsTeamIds,
+        applyFootballH2HEnrichment
+    }
 };

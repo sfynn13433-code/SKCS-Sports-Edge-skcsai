@@ -4,6 +4,7 @@ const { createClient } = require('@supabase/supabase-js');
 const { query: dbQuery } = require('../db');
 const { selectSecondaryMarkets } = require('../utils/secondaryMarketSelector');
 const { generateInsight, isDolphinAvailable, isGroqAvailable } = require('./aiProvider');
+const { FOOTBALL_RULES } = require('../config/footballRules');
 
 const SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
 const SUPABASE_KEY = String(
@@ -76,10 +77,11 @@ function blendBaselines(primary, secondary, secondaryWeight = 0.55) {
 
 function getRiskTier(confidence) {
     const score = clampConfidence(confidence);
-    if (score >= 80) return 'HIGH_CONFIDENCE';
-    if (score >= 70) return 'MODERATE_RISK';
-    if (score >= 59) return 'HIGH_RISK';
-    return 'EXTREME_RISK';
+    const bands = FOOTBALL_RULES.confidenceBands;
+    if (score >= bands.highConfidence.min) return bands.highConfidence.label;
+    if (score >= bands.moderateRisk.min) return bands.moderateRisk.label;
+    if (score >= bands.highRisk.min) return bands.highRisk.label;
+    return bands.extremeRisk.label;
 }
 
 function toLegacyRiskLevel(confidence) {

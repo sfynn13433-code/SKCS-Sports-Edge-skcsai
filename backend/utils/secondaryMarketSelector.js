@@ -1,5 +1,7 @@
 'use strict';
 
+const { FOOTBALL_RULES } = require('../config/footballRules');
+
 // Allowed markets (explicitly excludes red cards and full-match over_0_5).
 const ALLOWED_MARKETS = Object.freeze([
     { market: 'double_chance_1x', category: 'double_chance' },
@@ -41,11 +43,8 @@ const ALLOWED_MARKETS = Object.freeze([
 ]);
 
 const GOAL_HEAVY_CATEGORIES = new Set(['goals', 'team_goals', 'ultra']);
-const SECONDARY_THRESHOLD = 76;
-const DIVERSITY_LIMITS = Object.freeze({
-    goals: 2,
-    cards: 1
-});
+const SECONDARY_THRESHOLD = FOOTBALL_RULES.secondary.minConfidence;
+const DIVERSITY_LIMITS = Object.freeze({ ...FOOTBALL_RULES.secondary.diversityCaps });
 
 function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));

@@ -3,6 +3,7 @@
 const { query, withTransaction } = require('../db');
 const { validateRawPredictionInput } = require('../utils/validation');
 const pipelineLogger = require('../utils/pipelineLogger');
+const { FOOTBALL_RULES } = require('../config/footballRules');
 const { filterRawPrediction } = require('./filterEngine');
 const { getPredictionInputs } = require('./dataProvider');
 const { scoreMatch } = require('./aiScoring');
@@ -71,7 +72,10 @@ const {
 const MEGA_ACCA_SIZE = 12;
 const ACCA_SIZE = 6;
 const SAME_MATCH_INSIGHT_TARGET = 6;
-const PHASE_ONE_ACCA_MIN_CONFIDENCE = Math.max(60, Number(process.env.PHASE_ONE_ACCA_MIN_CONFIDENCE || 70));
+const PHASE_ONE_ACCA_MIN_CONFIDENCE = Math.max(
+    60,
+    Number(process.env.PHASE_ONE_ACCA_MIN_CONFIDENCE || FOOTBALL_RULES.acca.minLegConfidence)
+);
 const ACCA_MIN_LEG_CONFIDENCE = Math.max(ACCA_CONFIDENCE_MIN, PHASE_ONE_ACCA_MIN_CONFIDENCE);
 const VOLUME_CAP_MULTIPLIER = 5;
 const ACTIVE_DEPLOYMENT_SPORTS = new Set(['football', 'cricket']);
