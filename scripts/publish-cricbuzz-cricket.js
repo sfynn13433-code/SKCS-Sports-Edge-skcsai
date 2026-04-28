@@ -17,6 +17,7 @@ const {
 // Publisher helper functions for cricket
 function buildPublisherCricketSelection(rule, fixture) {
     const key = String(rule.market_key || rule.market || rule.rule_key || "").toLowerCase();
+    const format = String(fixture.match_format || '').toLowerCase();
 
     const home = fixture.home_team || fixture.team1 || fixture.home || "Home";
     const away = fixture.away_team || fixture.team2 || fixture.away || "Away";
@@ -25,20 +26,47 @@ function buildPublisherCricketSelection(rule, fixture) {
     if (key.includes("test_match_result")) return `${home} or Draw`;
     if (key.includes("double_chance")) return `${home} or ${away}`;
     if (key.includes("draw_no_bet")) return `${home} Draw No Bet`;
-    if (key.includes("innings_total_runs")) return "Over innings runs line";
-    if (key.includes("day_total_runs")) return "Over day runs line";
-    if (key.includes("team_total_runs")) return `${home} team runs`;
-    if (key.includes("first_innings")) return "Over first innings runs";
-    if (key.includes("second_innings")) return "Over second innings runs";
-    if (key.includes("match_total")) return "Over match runs line";
+    if (key.includes("innings_total_runs")) {
+        if (format === 'odi') return "Over 299.5 runs (50 overs)";
+        if (format === 'test') return "Over 324.5 runs (first innings)";
+        return "Over 171.5 runs (20 overs)";
+    }
+    if (key.includes("day_total_runs")) {
+        if (format === 'test') return "Over 274.5 runs (Day 1, 90 overs)";
+        if (format === 'odi') return "Over 244.5 runs (40 overs)";
+        return "Over 132.5 runs (15 overs)";
+    }
+    if (key.includes("team_total_runs")) {
+        if (format === 'odi') return `${home} over 154.5 runs (first innings)`;
+        if (format === 'test') return `${home} over 289.5 runs (first innings)`;
+        return `${home} over 84.5 runs (20 overs)`;
+    }
+    if (key.includes("first_innings")) {
+        if (format === 'odi') return "Over 299.5 runs (50 overs)";
+        if (format === 'test') return "Over 324.5 runs (first innings)";
+        return "Over 171.5 runs (20 overs)";
+    }
+    if (key.includes("second_innings")) {
+        if (format === 'odi') return "Over 266.5 runs chase line (50 overs)";
+        if (format === 'test') return "Over 238.5 runs chase line (4th innings)";
+        return "Over 162.5 runs chase line (20 overs)";
+    }
+    if (key.includes("match_total")) {
+        if (format === 'odi') return "Over 569.5 total match runs";
+        if (format === 'test') return "Over 684.5 total match runs";
+        return "Over 333.5 total match runs";
+    }
     if (key.includes("boundaries_over")) return "Over boundaries line";
     if (key.includes("boundaries_under")) return "Under boundaries line";
-    if (key.includes("fours_over") || key.includes("total_fours")) return "Over fours line";
-    if (key.includes("sixes_over") || key.includes("total_sixes")) return "Over sixes line";
-    if (key.includes("match_total_wickets")) return "Over wickets line";
-    if (key.includes("wicket_total")) return "Over wickets line";
-    if (key.includes("session_runs")) return "Over session runs";
-    if (key.includes("powerplay_runs")) return "Over powerplay runs";
+    if (key.includes("fours_over") || key.includes("total_fours")) return "Over 21.5 fours";
+    if (key.includes("sixes_over") || key.includes("total_sixes")) return "Over 12.5 sixes";
+    if (key.includes("match_total_wickets")) return "Over 13.5 wickets";
+    if (key.includes("wicket_total")) return "Over 13.5 wickets";
+    if (key.includes("session_runs")) return "Over 76.5 session runs (session block)";
+    if (key.includes("powerplay_runs")) {
+        if (format === 'odi') return "Over 52.5 runs (first 10 overs)";
+        return "Over 49.5 runs (first 6 overs)";
+    }
 
     return "Cricket insight";
 }
