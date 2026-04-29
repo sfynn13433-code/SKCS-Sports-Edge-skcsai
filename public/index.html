@@ -2459,12 +2459,58 @@
         const seen = new Set();
         const out = [];
         (items || []).forEach((item) => {
-            const key = `${normalizeMarketKey(item && item.market)}:${String(item && item.prediction || '').trim().toLowerCase()}`;
+            const key = buildSecondaryDedupKey(item);
             if (!key || seen.has(key)) return;
             seen.add(key);
             out.push(item);
         });
         return out;
+    }
+
+    function buildSecondaryDedupKey(item) {
+        if (!item) return '';
+
+        const marketRaw = normalizeMarketKey(item.market || item.market_type || item.type || '');
+        const labelRaw = normalizeMarketKey(item.label || item.market_label || item.selection_label || '');
+        let predictionRaw = String(
+            item.prediction
+            || item.recommendation
+            || item.pick
+            || item.selection
+            || item.outcome
+            || ''
+        ).trim().toLowerCase();
+
+        if (!predictionRaw) {
+            if (/\b1x\b/.test(labelRaw)) predictionRaw = '1x';
+            else if (/\bx2\b/.test(labelRaw)) predictionRaw = 'x2';
+            else if (/\b12\b/.test(labelRaw)) predictionRaw = '12';
+            else if (/\bhome\b/.test(labelRaw)) predictionRaw = 'home';
+            else if (/\baway\b/.test(labelRaw)) predictionRaw = 'away';
+            else if (/\bover\b/.test(labelRaw)) predictionRaw = 'over';
+            else if (/\bunder\b/.test(labelRaw)) predictionRaw = 'under';
+            else if (/\byes\b/.test(labelRaw)) predictionRaw = 'yes';
+            else if (/\bno\b/.test(labelRaw)) predictionRaw = 'no';
+        }
+
+        let marketCanonical = marketRaw;
+        if (!marketCanonical) {
+            if (labelRaw.includes('double_chance')) marketCanonical = 'double_chance';
+            else if (labelRaw.includes('draw_no_bet')) marketCanonical = 'draw_no_bet';
+            else if (labelRaw.startsWith('over_') || labelRaw.includes('_over_')) marketCanonical = 'over';
+            else if (labelRaw.startsWith('under_') || labelRaw.includes('_under_')) marketCanonical = 'under';
+            else if (labelRaw.includes('btts')) marketCanonical = 'btts';
+        }
+        if (marketCanonical.startsWith('double_chance_')) marketCanonical = 'double_chance';
+        if (marketCanonical.startsWith('draw_no_bet_')) marketCanonical = 'draw_no_bet';
+        if (marketCanonical.startsWith('over_')) marketCanonical = 'over';
+        if (marketCanonical.startsWith('under_')) marketCanonical = 'under';
+        if (marketCanonical.startsWith('btts_')) marketCanonical = 'btts';
+
+        if (marketCanonical || predictionRaw) {
+            return `${marketCanonical}:${predictionRaw}`;
+        }
+        return `label:${labelRaw}`;
     }
 
     function buildSecondaryMarketDisplayItem(pred) {
@@ -2603,7 +2649,7 @@
         (items || []).forEach((item) => {
             const normalized = normalizeSecondaryCandidate(item);
             if (!normalized) return;
-            const key = `${normalizeMarketKey(normalized.market)}:${String(normalized.prediction || '').trim().toLowerCase()}:${normalized.label.toLowerCase()}`;
+            const key = buildSecondaryDedupKey(normalized);
             if (seen.has(key)) return;
             seen.add(key);
             out.push(normalized);
@@ -3036,6 +3082,7 @@
                 
                 for (const insight of groupInsights) {
                     const confidence = Math.round(Number(insight.confidence || 0));
+                    const isPreviewOnlyDirect = normalizeMarketKey(group).startsWith('direct') && confidence <= 55;
 
                     const marketLabel = cleanPlaceholder(
                         insight.market_label || insight.market_name || insight.market || insight.market_key,
@@ -3052,6 +3099,7 @@
                     html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem; padding:0.25rem 0;">
                         <div style="flex:1;">
                             <div style="font-size:0.9rem; color:#374151;">${marketLabel} — ${selectionLabel}</div>
+                            ${isPreviewOnlyDirect ? `<div style="display:inline-block;margin-top:4px;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:999px;font-size:0.72rem;font-weight:700;">Preview Only — Awaiting Final Context</div>` : ''}
                             ${insight.explanation ? `<p class="cricket-insight-explanation">${summarizeCricketExplanation(insight.explanation)}</p>` : ''}
                         </div>
                         <div style="background:${confidenceColor}; color:white; padding:0.2rem 0.5rem; border-radius:12px; font-size:0.8rem; font-weight:600;">${confidence}%</div>
@@ -3137,6 +3185,7 @@
             
             for (const m of fix.markets.slice(0, 5)) {
                 const conf = m.confidence || 0;
+                const isPreviewOnlyDirect = normalizeMarketKey(m.market_group || '').startsWith('direct') && Number(conf) <= 55;
                 const marketLabel = cleanPlaceholder(
                     m.market_label || m.market_name || m.market || m.market_key,
                     "Cricket Market"
@@ -3149,6 +3198,9 @@
                     <span>${marketLabel} — ${selectionLabel}</span>
                     <span style="color:${conf >= 65 ? '#22c55e' : conf >= 60 ? '#eab308' : '#ef4444'};">${conf}%</span>
                 </div>`;
+                if (isPreviewOnlyDirect) {
+                    html += `<div style="margin:2px 0 4px 0;"><span style="display:inline-block;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:999px;font-size:0.72rem;font-weight:700;">Preview Only — Awaiting Final Context</span></div>`;
+                }
                 if (m.explanation) {
                     html += `<p class="cricket-insight-explanation">${summarizeCricketExplanation(m.explanation)}</p>`;
                 }
@@ -3586,7 +3638,7 @@
         if (tierSummary) tierSummary.style.display = 'block';
 
         setFootballSection('football-direct-matches', sortedDirectWithLinkedSecondary, createPredictionCard, 'No direct football insights available.');
-        setFootballSection('football-secondary-matches', secondaryDisplay, createPredictionCard, 'No football double chance or special insights available.');
+        setFootballSection('football-secondary-matches', secondaryDisplay, createPredictionCard, 'No standalone secondary insight cards available. Lower-variance alternatives are shown under Direct Insights where available.');
         setFootballSection('football-multi-matches', multiPreds, createMultiCard, 'No football multi-leg insights available.');
         setFootballSection('football-same-matches', sameMatchPreds, createMultiCard, 'No same-match football selection builders available.');
 
