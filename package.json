@@ -19,7 +19,10 @@
     "accuracy:track": "node scripts/track-prediction-accuracy.js",
     "accuracy:april5": "node scripts/track-prediction-accuracy.js --date=2026-04-05 --sport=football",
     "context:backfill": "node scripts/backfill-football-context.js",
-    "context:april5": "node scripts/backfill-football-context.js --date=2026-04-05 --sport=football"
+    "context:april5": "node scripts/backfill-football-context.js --date=2026-04-05 --sport=football",
+    "sync:sportsrc": "node backend/scripts/sync-sportsrc-fixtures.js",
+    "cricket:cache:daily": "node scripts/cricapi-cache-refresh.js --mode=daily",
+    "cricket:cache:live": "node scripts/cricapi-cache-refresh.js --mode=live"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
