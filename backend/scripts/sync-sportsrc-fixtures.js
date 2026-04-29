@@ -173,6 +173,24 @@ function buildContextRows(fixtures) {
     }));
 }
 
+async function verifySchema() {
+    const rawCheck = await supabase
+        .from('raw_fixtures')
+        .select('fixture_key', { count: 'exact', head: true })
+        .limit(1);
+    if (rawCheck.error) {
+        throw new Error(`Schema check failed for raw_fixtures: ${rawCheck.error.message}`);
+    }
+
+    const contextCheck = await supabase
+        .from('match_context_data')
+        .select('fixture_key', { count: 'exact', head: true })
+        .limit(1);
+    if (contextCheck.error) {
+        throw new Error(`Schema check failed for match_context_data.fixture_key: ${contextCheck.error.message}`);
+    }
+}
+
 async function fetchSportSRCMatches(sport) {
     const url = `${SPORTSRC_BASE}?data=matches&category=${encodeURIComponent(sport)}`;
     const response = await fetch(url, {
@@ -252,6 +270,7 @@ async function syncSport(sport) {
 
 async function syncSportSRC() {
     console.log('=== SKCS SportSRC Fixture Sync Started ===');
+    await verifySchema();
     const results = [];
 
     for (const sport of SUPPORTED_SPORTS) {
