@@ -19,6 +19,38 @@ const supabase = hasSupabaseConfig
     ? createClient(config.supabase.url, config.supabase.anonKey)
     : null;
 
+function normalizeSportForAuthContract(value) {
+    const key = String(value || '').trim().toLowerCase();
+    if (!key || key === 'soccer') return 'football';
+    return key;
+}
+
+function isPredictionsRequest(req) {
+    const originalUrl = String(req?.originalUrl || '');
+    const baseUrl = String(req?.baseUrl || '');
+    const path = String(req?.path || '');
+    return (
+        originalUrl.startsWith('/api/predictions')
+        || baseUrl === '/api/predictions'
+        || path === '/api/predictions'
+    );
+}
+
+function sendAuthError(req, res, statusCode, message) {
+    if (isPredictionsRequest(req)) {
+        const sport = normalizeSportForAuthContract(req?.query?.sport);
+        return res.status(statusCode).json({
+            ok: false,
+            predictions: [],
+            count: 0,
+            sport,
+            source: '/api/predictions',
+            error: String(message || 'Authentication failed')
+        });
+    }
+    return res.status(statusCode).json({ error: message });
+}
+
 function resolveAccessTierFromPlanId(planId) {
     const raw = String(planId || '').trim().toLowerCase();
     if (!raw) return null;
@@ -98,7 +130,7 @@ function resolveAccessContext({ activeSubscriptions = [], profilePlanId = null, 
 
 async function requireSupabaseUser(req, res, next) {
     if (!supabase) {
-        res.status(500).json({ error: 'Supabase Auth is not configured (missing SUPABASE_URL / SUPABASE_ANON_KEY)' });
+        sendAuthError(req, res, 500, 'Supabase Auth is not configured (missing SUPABASE_URL / SUPABASE_ANON_KEY)');
         return;
     }
 
@@ -133,7 +165,7 @@ async function requireSupabaseUser(req, res, next) {
                 return next();
             }
         }
-        res.status(401).json({ error: 'Access token required' });
+        sendAuthError(req, res, 401, 'Access token required');
         return;
     }
 
@@ -141,7 +173,7 @@ async function requireSupabaseUser(req, res, next) {
         const { data, error } = await supabase.auth.getUser(token);
         if (error || !data?.user) {
             console.error('[SUPABASE_JWT] Token validation failed:', error?.message || 'Unknown error');
-            res.status(401).json({ error: 'Invalid or expired token' });
+            sendAuthError(req, res, 401, 'Invalid or expired token');
             return;
         }
 
@@ -269,7 +301,7 @@ async function requireSupabaseUser(req, res, next) {
         next();
     } catch (err) {
         console.error('[supabaseJwt] error:', err);
-        res.status(401).json({ error: 'Invalid or expired token' });
+        sendAuthError(req, res, 401, 'Invalid or expired token');
     }
 }
 

@@ -20,7 +20,7 @@ const supabase = createClient(
 const STATUS_MAP = {
     completed: ['complete', 'completed', 'finished', 'ft', 'stumps', 'abandoned', 'cancelled', 'canceled'],
     active: ['active', 'live', 'in progress', 'in_progress', 'started'],
-    upcoming: ['upcoming', 'scheduled', 'not started', 'not_started', 'pre-match', 'prematch']
+    upcoming: ['upcoming', 'scheduled', 'not started', 'not_started', 'pre-match', 'prematch', 'preview']
 };
 
 function getStatusCategory(status) {
@@ -40,18 +40,21 @@ function filterByStatus(data, statusFilter) {
     
     return data.filter(row => {
         const statusCategory = getStatusCategory(row.status);
+        const kickoffMs = row.start_time ? new Date(row.start_time).getTime() : NaN;
+        const nowMs = Date.now();
+        const hasFutureKickoff = Number.isFinite(kickoffMs) && kickoffMs >= (nowMs - (15 * 60 * 1000));
         
         switch (statusFilter) {
             case 'active':
-                return statusCategory === 'active' || statusCategory === 'upcoming';
+                return statusCategory === 'active' || statusCategory === 'upcoming' || (statusCategory === 'unknown' && hasFutureKickoff);
             case 'upcoming':
-                return statusCategory === 'upcoming';
+                return statusCategory === 'upcoming' || (statusCategory === 'unknown' && hasFutureKickoff);
             case 'complete':
                 return statusCategory === 'completed';
             case 'all':
                 return true;
             default:
-                return statusCategory === 'active' || statusCategory === 'upcoming';
+                return statusCategory === 'active' || statusCategory === 'upcoming' || (statusCategory === 'unknown' && hasFutureKickoff);
         }
     });
 }
@@ -61,11 +64,16 @@ router.get('/', requireSupabaseUser, async (req, res) => {
     console.log('[cricket-count] Route hit successfully');
     try {
         const status = String(req.query.status || 'active').trim().toLowerCase();
+        const includeExpired = String(req.query.include_expired || '').trim() === '1';
 
         let query = supabase
             .from('cricket_insights_final')
             .select('*')
             .eq('sport', 'cricket');
+        
+        if (!includeExpired) {
+            query = query.or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`);
+        }
 
         const { data, error } = await query;
 

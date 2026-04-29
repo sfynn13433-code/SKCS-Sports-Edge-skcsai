@@ -2081,6 +2081,39 @@ function canUserAccessPlan(user, requestedPlanId) {
     return access.has('core') || access.has('elite') || access.has('vip');
 }
 
+const DEFAULT_PREDICTIONS_SOURCE = 'direct1x2_prediction_final';
+
+function sendPredictionsSuccess(res, payload = {}, statusCode = 200) {
+    const predictions = Array.isArray(payload?.predictions) ? payload.predictions : [];
+    const count = Number.isFinite(payload?.count) ? payload.count : predictions.length;
+    const sport = String(payload?.sport || ACTIVE_DEPLOYMENT_SPORT || 'football');
+    const source = String(payload?.source || DEFAULT_PREDICTIONS_SOURCE);
+
+    return res.status(statusCode).json({
+        ...payload,
+        ok: true,
+        sport,
+        source,
+        count,
+        predictions
+    });
+}
+
+function sendPredictionsError(res, statusCode, errorMessage, payload = {}) {
+    const sport = String(payload?.sport || ACTIVE_DEPLOYMENT_SPORT || 'football');
+    const source = String(payload?.source || DEFAULT_PREDICTIONS_SOURCE);
+
+    return res.status(statusCode).json({
+        ...payload,
+        ok: false,
+        sport,
+        source,
+        predictions: [],
+        count: 0,
+        error: String(errorMessage || 'Request failed')
+    });
+}
+
 // GET /api/predictions
 // Default tier = deep (elite pool); subscription limits use /api/user/predictions
 router.get('/', requireSupabaseUser, async (req, res) => {
@@ -2096,12 +2129,12 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             planId = isHardcodedAdmin ? 'elite_30day_deep_vip' : req.query.plan_id;
         }
         if (!planId) {
-            return res.status(400).json({ error: 'Invalid plan ID' });
+            return sendPredictionsError(res, 400, 'Invalid plan ID');
         }
         if (!isHardcodedAdmin && !canUserAccessPlan(req.user, planId)) {
             const fallbackPlanId = resolveBestKnownPlanId(req.user);
             if (!fallbackPlanId || !canUserAccessPlan(req.user, fallbackPlanId)) {
-                return res.status(403).json({ error: 'Plan access denied for user' });
+                return sendPredictionsError(res, 403, 'Plan access denied for user');
             }
             planId = fallbackPlanId;
         }
@@ -2111,7 +2144,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         const isAdminAudit = req.user?.is_admin === true || req.user?.isAdmin === true || isHardcodedAdmin;
         const subscriptionViewTier = resolveRequestedSubscriptionViewTier(req, req.user);
         if (!isHardcodedAdmin && !canAccessSubscriptionViewTier(req.user, subscriptionViewTier)) {
-            return res.status(403).json({ error: 'Tier tab access denied for user' });
+            return sendPredictionsError(res, 403, 'Tier tab access denied for user');
         }
 
         const includeAllRequested = ['1', 'true'].includes(String(req.query.include_all || '').trim().toLowerCase());
@@ -2140,7 +2173,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         // Get plan capabilities from subscription matrix
         const planCapabilities = getPlanCapabilities(planId);
         if (!planCapabilities) {
-            return res.status(400).json({ error: 'Invalid plan ID' });
+            return sendPredictionsError(res, 400, 'Invalid plan ID');
         }
         const queryTiers = resolveQueryTiers(planCapabilities, includeAll);
 
@@ -2508,9 +2541,10 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         res.set('Pragma', 'no-cache');
         res.set('Expires', '0');
 
-        res.status(200).json({
+        return sendPredictionsSuccess(res, {
             plan_id: planId,
             sport: ACTIVE_DEPLOYMENT_SPORT,
+            source: DEFAULT_PREDICTIONS_SOURCE,
             publish_run_source: publishRunSource,
             include_all: includeAll,
             admin_audit: isAdminAudit,
@@ -2548,10 +2582,10 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             },
             count: predictionsEnriched.length,
             predictions: predictionsEnriched
-        });
+        }, 200);
     } catch (err) {
         console.error('[predictions] Route Error:', err);
-        res.status(500).json({ error: 'Internal server error' });
+        return sendPredictionsError(res, 500, 'Internal server error');
     }
 });
 

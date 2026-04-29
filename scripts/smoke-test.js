@@ -106,9 +106,24 @@ async function run() {
             throw new Error('Accuracy endpoint did not return the expected structure');
         }
 
+        const userApiKeys = String(env.USER_API_KEYS || '')
+            .split(',')
+            .map((value) => value.trim())
+            .filter(Boolean);
+        const allowLegacyUserKey = String(env.ALLOW_LEGACY_USER_KEY || '').trim().toLowerCase() === 'true';
+        const smokeApiKey = String(
+            env.USER_API_KEY
+            || userApiKeys[0]
+            || env.ADMIN_API_KEY
+            || (allowLegacyUserKey ? 'skcs_user_12345' : '')
+        ).trim();
+        if (!smokeApiKey) {
+            throw new Error('No API key configured for predictions smoke check (USER_API_KEY, USER_API_KEYS, or ADMIN_API_KEY)');
+        }
+
         const predictions = await fetchJson(`${baseUrl}/api/predictions?sport=football&plan_id=elite_30day_deep_vip`, {
             headers: {
-                'x-api-key': env.USER_API_KEY || 'skcs_user_12345'
+                'x-api-key': smokeApiKey
             }
         });
 
