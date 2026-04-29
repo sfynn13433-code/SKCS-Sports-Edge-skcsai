@@ -45,6 +45,26 @@ function pickFirst(match, keys, fallback = null) {
     return fallback;
 }
 
+function pickFirstPath(source, paths, fallback = null) {
+    for (const path of paths) {
+        const parts = String(path || '').split('.').filter(Boolean);
+        let cursor = source;
+        let missing = false;
+        for (const part of parts) {
+            if (!cursor || typeof cursor !== 'object' || !(part in cursor)) {
+                missing = true;
+                break;
+            }
+            cursor = cursor[part];
+        }
+        if (missing) continue;
+        if (cursor === undefined || cursor === null) continue;
+        if (String(cursor).trim() === '') continue;
+        return cursor;
+    }
+    return fallback;
+}
+
 function normalizeTimestamp(match) {
     const rawTime = pickFirst(match, [
         'timestamp',
@@ -86,7 +106,10 @@ function normalizeSportSRCMatch(match, sport) {
     }
 
     const homeTeam = safeString(
-        pickFirst(match, [
+        pickFirstPath(match, [
+            'teams.home.name',
+            'home.name'
+        ]) || pickFirst(match, [
             'home_team_name',
             'home_team',
             'home',
@@ -95,7 +118,10 @@ function normalizeSportSRCMatch(match, sport) {
         ])
     );
     const awayTeam = safeString(
-        pickFirst(match, [
+        pickFirstPath(match, [
+            'teams.away.name',
+            'away.name'
+        ]) || pickFirst(match, [
             'away_team_name',
             'away_team',
             'away',
@@ -128,8 +154,12 @@ function normalizeSportSRCMatch(match, sport) {
             round: safeString(pickFirst(match, ['round'])),
             home_team: homeTeam,
             away_team: awayTeam,
-            home_team_id: safeString(pickFirst(match, ['home_id', 'home_team_id'])),
-            away_team_id: safeString(pickFirst(match, ['away_id', 'away_team_id'])),
+            home_team_id: safeString(
+                pickFirstPath(match, ['teams.home.id', 'home.id']) || pickFirst(match, ['home_id', 'home_team_id'])
+            ),
+            away_team_id: safeString(
+                pickFirstPath(match, ['teams.away.id', 'away.id']) || pickFirst(match, ['away_id', 'away_team_id'])
+            ),
             kickoff_time: kickoffTime,
             status: safeString(pickFirst(match, ['status', 'match_status']), 'upcoming'),
             venue: safeString(pickFirst(match, ['venue', 'stadium']), 'TBD'),
@@ -211,13 +241,22 @@ async function fetchSportSRCMatches(sport) {
 async function upsertFixtures(fixtures) {
     if (!fixtures.length) return { count: 0 };
 
-    const { error } = await supabase
+    let result = await supabase
         .from('raw_fixtures')
         .upsert(fixtures, {
             onConflict: 'provider,provider_fixture_id,sport'
         });
 
-    if (error) throw error;
+    if (result.error && String(result.error.message || '').includes('no unique or exclusion constraint')) {
+        console.warn('[sync:sportsrc] raw_fixtures composite unique missing; falling back to fixture_key conflict.');
+        result = await supabase
+            .from('raw_fixtures')
+            .upsert(fixtures, {
+                onConflict: 'fixture_key'
+            });
+    }
+
+    if (result.error) throw result.error;
     return { count: fixtures.length };
 }
 
