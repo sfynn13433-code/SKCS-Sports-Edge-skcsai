@@ -13,7 +13,7 @@ const {
     selectDirectSecondarySameMatch,
     getStandardSecondaryMarkets
 } = require('./marketIntelligence');
-const { safeFetch, getInjuries, getH2H, getWeather } = require('./contextIngestionService');
+const { safeFetch, getInjuries, getH2H, getWeather, getTeamNewsContext } = require('./contextIngestionService');
 const { evaluateDirect1x2 } = require('./direct1x2Engine');
 const { extractRankData, buildPredictionFromRank } = require('./footballRankExtractor');
 const { canUseFootballHighlights, fetchHeadToHeadFallback } = require('./footballHighlightsService');
@@ -751,6 +751,25 @@ function normalizeWeatherFromProvider(rawWeather) {
     };
 }
 
+function dedupePublicIncidents(rows = []) {
+    const safeRows = ensureArray(rows);
+    const out = [];
+    const seen = new Set();
+
+    for (const row of safeRows) {
+        if (!isObject(row)) continue;
+        const key = String(
+            row?.url
+            || `${row?.team_name || ''}|${row?.title || ''}|${row?.published_at || ''}`
+        ).trim().toLowerCase();
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        out.push(row);
+    }
+
+    return out;
+}
+
 function mergeIngestedContextIntoMatchContext(effectiveMatchContext, ingestedContextData) {
     const source = isObject(effectiveMatchContext) ? effectiveMatchContext : {};
     const ingested = isObject(ingestedContextData) ? ingestedContextData : {};
@@ -763,6 +782,13 @@ function mergeIngestedContextIntoMatchContext(effectiveMatchContext, ingestedCon
     const ingestedInjuries = ensureArray(ingested.injuries);
     if (ingestedInjuries.length && !ensureArray(contextual.injuries).length) {
         contextual.injuries = ingestedInjuries;
+    }
+    const ingestedNews = dedupePublicIncidents(ingested.news);
+    if (ingestedNews.length) {
+        contextual.public_incidents = dedupePublicIncidents([
+            ...ensureArray(contextual.public_incidents),
+            ...ingestedNews
+        ]).slice(0, 8);
     }
     if (ingested.weather && !contextual.weather) {
         contextual.weather = ingested.weather;
@@ -784,6 +810,9 @@ function mergeIngestedContextIntoMatchContext(effectiveMatchContext, ingestedCon
     }
     if (ingestedInjuries.length && !ensureArray(rawProvider.injuries).length) {
         rawProvider.injuries = ingestedInjuries;
+    }
+    if (ingestedNews.length) {
+        rawProvider.news_context = ingestedNews;
     }
     if (Object.keys(rawProvider).length) {
         merged.raw_provider_data = rawProvider;
@@ -1310,31 +1339,45 @@ async function buildRawPredictionFromProviderItem(item) {
     });
 
     // Always ingest context for football fixtures before downstream pipeline filtering.
-    let ingestedContextData = { injuries: {}, h2h: {}, weather: {} };
+    let ingestedContextData = { injuries: {}, h2h: {}, weather: {}, news: [] };
     try {
         console.log('Processing fixture:', match_id);
         const fixtureIdForIngestion = matchInfo.match_id || match_id;
         const homeTeamIdForIngestion = matchInfo.home_team_id || item.home_team_id || null;
         const awayTeamIdForIngestion = matchInfo.away_team_id || item.away_team_id || null;
         const cityForWeather = resolveContextIngestionCity(matchInfo, item);
+        const homeTeamForNews = matchInfo.home_team || item.home_team || null;
+        const awayTeamForNews = matchInfo.away_team || item.away_team || null;
+        const kickoffForNews = matchInfo.kickoff || item.date || item.kickoff || null;
 
-        const injuriesRaw = await safeFetch(
-            () => getInjuries(fixtureIdForIngestion),
-            'Injuries'
-        );
-        const h2hRaw = await safeFetch(
-            () => getH2H(homeTeamIdForIngestion, awayTeamIdForIngestion),
-            'H2H'
-        );
-        const weatherRaw = await safeFetch(
-            () => getWeather(cityForWeather),
-            'Weather'
-        );
+        const [injuriesRaw, h2hRaw, weatherRaw, newsRaw] = await Promise.all([
+            safeFetch(
+                () => getInjuries(fixtureIdForIngestion),
+                'Injuries'
+            ),
+            safeFetch(
+                () => getH2H(homeTeamIdForIngestion, awayTeamIdForIngestion),
+                'H2H'
+            ),
+            safeFetch(
+                () => getWeather(cityForWeather),
+                'Weather'
+            ),
+            safeFetch(
+                () => getTeamNewsContext({
+                    homeTeam: homeTeamForNews,
+                    awayTeam: awayTeamForNews,
+                    kickoff: kickoffForNews
+                }),
+                'News'
+            )
+        ]);
 
         ingestedContextData = {
             injuries: normalizeInjuriesFromProvider(injuriesRaw, homeTeamIdForIngestion, awayTeamIdForIngestion),
             h2h: normalizeH2HFromProvider(h2hRaw),
-            weather: normalizeWeatherFromProvider(weatherRaw)
+            weather: normalizeWeatherFromProvider(weatherRaw),
+            news: dedupePublicIncidents(newsRaw)
         };
 
         console.log('ATTEMPTING INSERT:', fixtureIdForIngestion);
