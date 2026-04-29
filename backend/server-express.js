@@ -291,11 +291,29 @@ app.post('/api/select-plan', requireSupabaseUser, async (req, res) => {
 
         const billingEnabled = String(process.env.BILLING_ENABLED || 'false').toLowerCase() === 'true';
         const subscriptionOpen = String(process.env.SUBSCRIPTION_OPEN || 'true').toLowerCase() !== 'false';
+        const allowSelfServePlanSelection = String(process.env.ALLOW_SELF_SERVE_PLAN_SELECTION || 'false').toLowerCase() === 'true';
         if (!billingEnabled && !subscriptionOpen) {
             return res.status(403).json({
                 requires_payment: true,
                 message: 'Billing is not live yet. Access is currently limited to approved accounts or staging mode.'
             });
+        }
+
+        const isPrivilegedBypass = req.user?.is_admin === true || req.user?.is_test_user === true;
+        if (!allowSelfServePlanSelection && !isPrivilegedBypass) {
+            return res.status(403).json({
+                requires_payment_confirmation: true,
+                message: 'Plan activation requires a verified payment confirmation.'
+            });
+        }
+
+        if (billingEnabled && !isPrivilegedBypass) {
+            const paymentReference = String(req.body?.payment_reference || '').trim();
+            if (!paymentReference) {
+                return res.status(400).json({
+                    error: 'payment_reference is required when billing is enabled'
+                });
+            }
         }
 
         const userId = req.user?.id;
@@ -507,6 +525,49 @@ app.get('/api/debug/sync-test', requireRefreshKey, async (req, res) => {
     }
 });
 
+async function runSettlementJob({ sport, gradeDate }) {
+    const scriptPath = path.join(__dirname, '..', 'scripts', 'track-prediction-accuracy.js');
+    const args = [`--sport=${sport}`, `--date=${gradeDate}`];
+
+    const result = await new Promise((resolve, reject) => {
+        const child = spawn(process.execPath, [scriptPath, ...args], {
+            env:   { ...process.env },
+            stdio: ['ignore', 'pipe', 'pipe'],
+            timeout: 25 * 60 * 1000   // 25 minutes
+        });
+
+        let stdout = '';
+        let stderr = '';
+        child.stdout.on('data', (chunk) => { stdout += chunk; });
+        child.stderr.on('data', (chunk) => { stderr += chunk; });
+
+        child.on('close', (code) => {
+            if (code === 0) {
+                resolve({ stdout, stderr });
+            } else {
+                reject(new Error(`Grading script exited with code ${code}: ${stderr || stdout}`));
+            }
+        });
+
+        child.on('error', reject);
+    });
+
+    let summary = null;
+    try {
+        const lines = result.stdout.trim().split('\n');
+        for (let i = lines.length - 1; i >= 0; i--) {
+            if (lines[i].trim().startsWith('{')) {
+                summary = JSON.parse(lines.slice(i).join('\n'));
+                break;
+            }
+        }
+    } catch {
+        summary = null;
+    }
+
+    return { summary, raw: result.stdout.slice(-2000) };
+}
+
 app.post('/api/grade-predictions', requireRefreshKey, async (req, res) => {
     const sport     = req.query.sport || req.body?.sport || 'football';
     const dateParam = req.query.date  || req.body?.date  || null;
@@ -517,56 +578,43 @@ app.post('/api/grade-predictions', requireRefreshKey, async (req, res) => {
 
     console.log(`[scheduler] grading ${sport} for ${gradeDate}`);
 
-    const scriptPath = path.join(__dirname, '..', 'scripts', 'track-prediction-accuracy.js');
-    const args = [`--sport=${sport}`, `--date=${gradeDate}`];
-
     try {
-        const result = await new Promise((resolve, reject) => {
-            const child = spawn(process.execPath, [scriptPath, ...args], {
-                env:   { ...process.env },
-                stdio: ['ignore', 'pipe', 'pipe'],
-                timeout: 25 * 60 * 1000   // 25 minutes
-            });
-
-            let stdout = '';
-            let stderr = '';
-            child.stdout.on('data', (chunk) => { stdout += chunk; });
-            child.stderr.on('data', (chunk) => { stderr += chunk; });
-
-            child.on('close', (code) => {
-                if (code === 0) {
-                    resolve({ stdout, stderr });
-                } else {
-                    reject(new Error(`Grading script exited with code ${code}: ${stderr || stdout}`));
-                }
-            });
-
-            child.on('error', reject);
-        });
-
-        // Try to parse the JSON summary the script prints on success
-        let summary = null;
-        try {
-            const lines = result.stdout.trim().split('\n');
-            for (let i = lines.length - 1; i >= 0; i--) {
-                if (lines[i].trim().startsWith('{')) {
-                    summary = JSON.parse(lines.slice(i).join('\n'));
-                    break;
-                }
-            }
-        } catch { /* ignore parse errors */ }
+        const result = await runSettlementJob({ sport, gradeDate });
 
         res.status(200).json({
             ok: true,
             message: `Grading completed for ${sport} on ${gradeDate}`,
             gradeDate,
             sport,
-            summary,
-            raw: result.stdout.slice(-2000)
+            summary: result.summary,
+            raw: result.raw
         });
     } catch (err) {
         console.error(`[scheduler] grading failed:`, err.message);
         res.status(500).json({ ok: false, error: err.message, gradeDate, sport });
+    }
+});
+
+app.post('/api/settlement/run', requireRefreshKey, async (req, res) => {
+    const sport = req.query.sport || req.body?.sport || 'football';
+    const dateParam = req.query.date || req.body?.date || null;
+    const settlementDate = dateParam
+        || moment().tz('Africa/Johannesburg').subtract(1, 'day').format('YYYY-MM-DD');
+
+    console.log(`[scheduler] settlement ${sport} for ${settlementDate}`);
+    try {
+        const result = await runSettlementJob({ sport, gradeDate: settlementDate });
+        res.status(200).json({
+            ok: true,
+            message: `Settlement completed for ${sport} on ${settlementDate}`,
+            settlementDate,
+            sport,
+            summary: result.summary,
+            raw: result.raw
+        });
+    } catch (err) {
+        console.error(`[scheduler] settlement failed:`, err.message);
+        res.status(500).json({ ok: false, error: err.message, settlementDate, sport });
     }
 });
 

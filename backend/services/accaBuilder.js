@@ -68,6 +68,7 @@ const {
     getCardDescriptor,
     getFamilyCaps,
 } = require('../utils/insightEngine');
+const { resolveActiveDeploymentSports } = require('../config/activeSports');
 
 const MEGA_ACCA_SIZE = 12;
 const ACCA_SIZE = 6;
@@ -78,7 +79,7 @@ const PHASE_ONE_ACCA_MIN_CONFIDENCE = Math.max(
 );
 const ACCA_MIN_LEG_CONFIDENCE = Math.max(ACCA_CONFIDENCE_MIN, PHASE_ONE_ACCA_MIN_CONFIDENCE);
 const VOLUME_CAP_MULTIPLIER = 5;
-const ACTIVE_DEPLOYMENT_SPORTS = new Set(['football', 'cricket']);
+const ACTIVE_DEPLOYMENT_SPORTS = resolveActiveDeploymentSports();
 const MIXED_SPORT_TARGETS = new Set([
     'football',
     'tennis',
@@ -2983,45 +2984,64 @@ function addTeamCompetitionPair(map, team, competition) {
 }
 
 async function loadWeekLockedTeamCompetitionMap(client, now = new Date()) {
-    const weekStart = startOfWeekSast(now);
-    const weekEnd = endOfWeekSast(now);
-    const res = await client.query(
-        `
-        WITH latest_week_run AS (
-            SELECT MAX(publish_run_id) AS publish_run_id
-            FROM direct1x2_prediction_final
-            WHERE created_at >= $1
-              AND created_at < $2
-              AND type IN ('acca_6match', 'mega_acca_12', 'acca')
-              AND publish_run_id IS NOT NULL
-        )
-        SELECT pf.matches
-        FROM direct1x2_prediction_final pf
-        LEFT JOIN latest_week_run lwr ON TRUE
-        WHERE pf.created_at >= $1
-          AND pf.created_at < $2
-          AND pf.type IN ('acca_6match', 'mega_acca_12', 'acca')
-          AND (
-              lwr.publish_run_id IS NULL
-              OR pf.publish_run_id = lwr.publish_run_id
-          )
-        `,
-        [weekStart.toISOString(), weekEnd.toISOString()]
-    );
-
     const map = new Map();
+    const currentWeekKey = getWeekKey(now);
 
-    for (const row of res.rows) {
-        const legs = Array.isArray(row.matches) ? row.matches : [];
-        for (const leg of legs) {
-            const pairs = extractTeamCompetitionPairsFromMatch(leg);
-            for (const pair of pairs) {
-                addTeamCompetitionPair(map, pair.team, pair.competition);
+    try {
+        const lockRows = await client.query(
+            `
+            SELECT team_key, competition_key
+            FROM team_week_locks
+            WHERE week_key = $1
+            `,
+            [currentWeekKey]
+        );
+
+        for (const row of lockRows.rows || []) {
+            const team = normalizeTeamToken(row?.team_key);
+            const competition = normalizeCompetitionToken(row?.competition_key);
+            addTeamCompetitionPair(map, team, competition);
+        }
+        return map;
+    } catch (error) {
+        // Backward-compatible fallback if the lock table is not yet provisioned.
+        const weekStart = startOfWeekSast(now);
+        const weekEnd = endOfWeekSast(now);
+        const res = await client.query(
+            `
+            WITH latest_week_run AS (
+                SELECT MAX(publish_run_id) AS publish_run_id
+                FROM direct1x2_prediction_final
+                WHERE created_at >= $1
+                  AND created_at < $2
+                  AND type IN ('acca_6match', 'mega_acca_12', 'acca')
+                  AND publish_run_id IS NOT NULL
+            )
+            SELECT pf.matches
+            FROM direct1x2_prediction_final pf
+            LEFT JOIN latest_week_run lwr ON TRUE
+            WHERE pf.created_at >= $1
+              AND pf.created_at < $2
+              AND pf.type IN ('acca_6match', 'mega_acca_12', 'acca')
+              AND (
+                  lwr.publish_run_id IS NULL
+                  OR pf.publish_run_id = lwr.publish_run_id
+              )
+            `,
+            [weekStart.toISOString(), weekEnd.toISOString()]
+        );
+
+        for (const row of res.rows) {
+            const legs = Array.isArray(row.matches) ? row.matches : [];
+            for (const leg of legs) {
+                const pairs = extractTeamCompetitionPairsFromMatch(leg);
+                for (const pair of pairs) {
+                    addTeamCompetitionPair(map, pair.team, pair.competition);
+                }
             }
         }
+        return map;
     }
-
-    return map;
 }
 
 function normalizeFixtureIdentityToken(value, fallback = null) {
@@ -3126,6 +3146,62 @@ function reservePredictionTeams(prediction, runTeamCompetitionMap) {
     }
 }
 
+function collectWeekLockEntriesFromPrediction(prediction, fallbackDate = new Date()) {
+    const entries = [];
+    const matches = Array.isArray(prediction?.matches) ? prediction.matches : [];
+    const rows = matches.length > 0 ? matches : [prediction];
+
+    for (const row of rows) {
+        const pairs = predictionTeamCompetitionPairs(row);
+        const kickoff = parseKickoff(row) || fallbackDate;
+        const weekKey = getWeekKey(kickoff);
+        for (const pair of pairs) {
+            if (!pair?.team || !pair?.competition) continue;
+            entries.push({
+                week_key: weekKey,
+                team_key: normalizeTeamToken(pair.team),
+                competition_key: normalizeCompetitionToken(pair.competition)
+            });
+        }
+    }
+
+    return uniqueBy(entries, (entry) => `${entry.week_key}:${entry.team_key}:${entry.competition_key}`);
+}
+
+async function persistTeamWeekLocks(client, prediction, options = {}) {
+    const publishRunId = options.publishRunId || null;
+    const sourceType = String(options.sourceType || '').trim().toLowerCase() || null;
+    const sourceTier = String(options.sourceTier || '').trim().toLowerCase() || null;
+    const fallbackDate = options.now instanceof Date ? options.now : new Date();
+    const entries = collectWeekLockEntriesFromPrediction(prediction, fallbackDate);
+    if (!entries.length) return;
+
+    for (const entry of entries) {
+        await client.query(
+            `
+            INSERT INTO team_week_locks (
+                week_key,
+                team_key,
+                competition_key,
+                publish_run_id,
+                source_type,
+                source_tier
+            )
+            VALUES ($1, $2, $3, $4, $5, $6)
+            ON CONFLICT (week_key, team_key, competition_key) DO NOTHING
+            `,
+            [
+                entry.week_key,
+                entry.team_key,
+                entry.competition_key,
+                publishRunId,
+                sourceType,
+                sourceTier
+            ]
+        );
+    }
+}
+
 function filterAvailablePredictions(predictions, usedFixtureIds, historicalTeamCompetitionMap, runTeamCompetitionMap) {
     return predictions.filter((prediction) => {
         if (isPredictionHighRisk(prediction)) return false;
@@ -3216,6 +3292,51 @@ function extractMarketAndRecommendation(matches) {
     return { market_type: marketType, recommendation };
 }
 
+function isStrictSecondaryMarketKey(marketKey) {
+    const key = normalizeMarketKeyMI(marketKey || '');
+    if (!key) return false;
+    if (key.includes('double_chance')) return true;
+    if (key.includes('draw_no_bet')) return true;
+    if (key.includes('btts')) return true;
+    if (key.includes('team_total')) return true;
+    if (key.includes('corners')) return true;
+    if (key.includes('cards')) return true;
+    if (key.includes('first_half')) return true;
+    if (key.includes('second_half')) return true;
+    if (key.startsWith('over_') || key.startsWith('under_')) return true;
+    return false;
+}
+
+function validatePublishRowByType(type, matches, totalConfidence) {
+    const normalizedType = String(type || '').trim().toLowerCase();
+    const legs = Array.isArray(matches) ? matches : [];
+
+    if ((normalizedType === 'direct' || normalizedType === 'secondary') && legs.length !== 1) {
+        return { valid: false, reason: `${normalizedType} requires exactly 1 leg` };
+    }
+
+    if (normalizedType === 'acca_6match' && legs.length !== 6) {
+        return { valid: false, reason: 'acca_6match requires exactly 6 legs' };
+    }
+
+    if (normalizedType === 'mega_acca_12' && legs.length !== 12) {
+        return { valid: false, reason: 'mega_acca_12 requires exactly 12 legs' };
+    }
+
+    if (normalizedType === 'secondary') {
+        const confidence = Number(totalConfidence || legs[0]?.confidence || 0);
+        if (!Number.isFinite(confidence) || confidence < SAFE_CONFIDENCE_MIN) {
+            return { valid: false, reason: `secondary requires confidence >= ${SAFE_CONFIDENCE_MIN}` };
+        }
+        const market = legs[0]?.market || legs[0]?.market_type || legs[0]?.metadata?.market_type || '';
+        if (!isStrictSecondaryMarketKey(market)) {
+            return { valid: false, reason: `secondary market not allowed (${String(market || 'unknown')})` };
+        }
+    }
+
+    return { valid: true };
+}
+
 async function insertFinalRow({ publish_run_id, tier, type, matches, total_confidence, risk_level }, client) {
     const plan_visibility = getVisibilityForTierType(tier, type);
     const sport = extractSportFromMatches(matches);
@@ -3241,6 +3362,11 @@ async function insertFinalRow({ publish_run_id, tier, type, matches, total_confi
         if (Number.isNaN(parsed.getTime())) return null;
         return parsed.toISOString();
     })();
+    const rowValidation = validatePublishRowByType(normalizedType, matches, total_confidence);
+    if (!rowValidation.valid) {
+        console.warn('[accaBuilder] Skipping publish row type=%s due to rule enforcement: %s', normalizedType || 'unknown', rowValidation.reason);
+        return null;
+    }
 
     if (!isDeploymentSportEnabled(sport)) {
         console.warn('[accaBuilder] Skipping publish row type=%s due to phase-1 football-only gate (sport=%s)', normalizedType || 'unknown', sport || 'unknown');
@@ -3681,8 +3807,8 @@ async function buildFinalForTier(tier, options = {}) {
         const baseAccaInput = filterAvailablePredictions(
             limitedCandidates,
             globalUsedFixtures,
-            new Map(),
-            new Map()
+            weekLockedTeamCompetitionMap,
+            runTeamCompetitionMap
         );
         let accaMarketCandidates = await buildAccaLegCandidatePool(
             baseAccaInput,
@@ -3718,8 +3844,8 @@ async function buildFinalForTier(tier, options = {}) {
                 limitedCandidates.filter((candidate) => isDirectMarketSelection(candidate))
             ),
             globalUsedFixtures,
-            new Map(),
-            new Map(),
+            weekLockedTeamCompetitionMap,
+            runTeamCompetitionMap,
             Infinity
         );
         for (const prediction of directSelections) {
@@ -3733,7 +3859,15 @@ async function buildFinalForTier(tier, options = {}) {
                 total_confidence: total,
                 risk_level: riskLevelFromConfidence(total)
             }, client);
-            if (row) directRows.push(row);
+            if (row) {
+                directRows.push(row);
+                await persistTeamWeekLocks(client, row, {
+                    publishRunId,
+                    sourceType: 'direct',
+                    sourceTier: t,
+                    now
+                });
+            }
         }
 
         // ---------------------------------------------------------------------
@@ -3747,7 +3881,12 @@ async function buildFinalForTier(tier, options = {}) {
         const accaPublishDiagnostics = initAccaPublishDiagnostics();
 
         // Start with filtered candidate pool
-        let candidatePool = filterAvailablePredictions(accaMarketCandidates, globalUsedFixtures, new Map(), new Map());
+        let candidatePool = filterAvailablePredictions(
+            accaMarketCandidates,
+            globalUsedFixtures,
+            weekLockedTeamCompetitionMap,
+            runTeamCompetitionMap
+        );
 
         // Mega diagnostics
         const megaDiagnostics = initMegaDiagnostics();
@@ -3825,7 +3964,7 @@ async function buildFinalForTier(tier, options = {}) {
                     megaDiagnostics.mega_rejected_for_family_caps += Math.max(1, familyCapState.exceededFamilies.length);
                     console.log('[accaBuilder] %s: card rejected for family caps %s', step.type, JSON.stringify(familyCapState.exceededFamilies));
                     addCardFixtureKeysToSet(candidateRow, usedFixtureKeys);
-                    candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, new Map());
+                    candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
                     continue;
                 }
                 // For 6-leg cards, preserve existing builder behavior and track the condition for observability.
@@ -3846,7 +3985,7 @@ async function buildFinalForTier(tier, options = {}) {
                 megaDiagnostics.mega_rejected_for_low_diversity += 1;
                 console.log('[accaBuilder] %s: card rejected for low market diversity (<%s families)', step.type, MIN_FAMILIES_PER_CARD);
                 addCardFixtureKeysToSet(candidateRow, usedFixtureKeys);
-                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, new Map());
+                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
                 continue;
             }
 
@@ -3875,7 +4014,7 @@ async function buildFinalForTier(tier, options = {}) {
                 if (step.legCount === 12) megaDiagnostics.mega_rejected_for_duplicate_overlap += 1;
                 console.log('[accaBuilder] %s: card rejected for fixture overlap=%s with %s', step.type, overlapResult.overlap, overlapResult.comparedAgainst);
                 addCardFixtureKeysToSet(candidateRow, usedFixtureKeys);
-                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, new Map());
+                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
                 continue;
             }
 
@@ -3895,7 +4034,7 @@ async function buildFinalForTier(tier, options = {}) {
                 if (step.legCount === 12) megaDiagnostics.mega_rejected_for_weekly_team_lock += 1;
                 console.log('[accaBuilder] %s: card rejected by weekly team lock', step.type);
                 addCardFixtureKeysToSet(candidateRow, usedFixtureKeys);
-                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, new Map());
+                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
 
                 const retryUsed = new Set(globalUsedFixtures);
                 const retryRow = buildAccumulatorRowWithFallbackLadder(
@@ -3958,9 +4097,15 @@ async function buildFinalForTier(tier, options = {}) {
             } else {
                 accaRows.push(inserted);
             }
+            await persistTeamWeekLocks(client, inserted, {
+                publishRunId,
+                sourceType: step.type,
+                sourceTier: t,
+                now
+            });
 
             // SKCS LAW: Rotate candidate pool
-            candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, new Map());
+            candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
             accaPublishDiagnostics.remaining_candidate_pool_after_each_publish.push({
                 type: step.type,
                 profile: step.profile,
@@ -4000,7 +4145,15 @@ async function buildFinalForTier(tier, options = {}) {
                     risk_level: fallbackCard.risk_level,
                 }, client);
                 if (inserted) accaRows.push(inserted);
-                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, new Map());
+                if (inserted) {
+                    await persistTeamWeekLocks(client, inserted, {
+                        publishRunId,
+                        sourceType: 'acca_6match',
+                        sourceTier: t,
+                        now
+                    });
+                }
+                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
                 console.log('[accaBuilder] fallback acca_6match published.');
             } else {
                 pipelineLogger.rejectionAdd({
@@ -4048,8 +4201,14 @@ async function buildFinalForTier(tier, options = {}) {
                 if (inserted) {
                     megaAccaRows.push(inserted);
                     megaDiagnostics.mega_final_cards_built += 1;
+                    await persistTeamWeekLocks(client, inserted, {
+                        publishRunId,
+                        sourceType: 'mega_acca_12',
+                        sourceTier: t,
+                        now
+                    });
                 }
-                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, new Map());
+                candidatePool = rotateCandidatePool(candidatePool, usedFixtureKeys, usedTeamsWeekly);
                 console.log('[accaBuilder] fallback mega_acca_12 published.');
             } else {
                 pipelineLogger.rejectionAdd({
@@ -4090,10 +4249,10 @@ async function buildFinalForTier(tier, options = {}) {
         // ---------------------------------------------------------------------
         const multiRows = [];
         const multiSelections = takeAvailablePredictions(
-            buildMultiCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, new Map(), new Map())),
+            buildMultiCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap)),
             globalUsedFixtures,
-            new Map(),
-            new Map(),
+            weekLockedTeamCompetitionMap,
+            runTeamCompetitionMap,
             categoryBuildCaps.multi
         );
         for (const row of multiSelections) {
@@ -4105,7 +4264,15 @@ async function buildFinalForTier(tier, options = {}) {
                 total_confidence: row.total_confidence,
                 risk_level: row.risk_level
             }, client);
-            if (inserted) multiRows.push(inserted);
+            if (inserted) {
+                multiRows.push(inserted);
+                await persistTeamWeekLocks(client, inserted, {
+                    publishRunId,
+                    sourceType: 'multi',
+                    sourceTier: t,
+                    now
+                });
+            }
         }
 
         // ---------------------------------------------------------------------
@@ -4113,12 +4280,12 @@ async function buildFinalForTier(tier, options = {}) {
         // ---------------------------------------------------------------------
         const sameMatchRows = [];
         const sameMatchSelections = takeAvailablePredictions(
-            await buildSameMatchCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, new Map(), new Map()), {
+            await buildSameMatchCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap), {
                 no_conflicting_markets: accaRules.no_conflicting_markets
             }),
             globalUsedFixtures,
-            new Map(),
-            new Map(),
+            weekLockedTeamCompetitionMap,
+            runTeamCompetitionMap,
             categoryBuildCaps.same_match
         );
         for (const row of sameMatchSelections) {
@@ -4130,7 +4297,15 @@ async function buildFinalForTier(tier, options = {}) {
                 total_confidence: row.total_confidence,
                 risk_level: row.risk_level
             }, client);
-            if (inserted) sameMatchRows.push(inserted);
+            if (inserted) {
+                sameMatchRows.push(inserted);
+                await persistTeamWeekLocks(client, inserted, {
+                    publishRunId,
+                    sourceType: 'same_match',
+                    sourceTier: t,
+                    now
+                });
+            }
         }
 
         // ---------------------------------------------------------------------
@@ -4138,13 +4313,13 @@ async function buildFinalForTier(tier, options = {}) {
         // ---------------------------------------------------------------------
         const secondaryRows = [];
         const safeSinglesPool = (
-            await buildSecondaryCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, new Map(), new Map()))
+            await buildSecondaryCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap))
         ).filter((candidate) => isSafeSinglesSelection(candidate));
         const secondarySelections = takeAvailablePredictions(
             safeSinglesPool,
             globalUsedFixtures,
-            new Map(),
-            new Map(),
+            weekLockedTeamCompetitionMap,
+            runTeamCompetitionMap,
             categoryBuildCaps.secondary
         );
         for (const prediction of secondarySelections) {
@@ -4158,7 +4333,15 @@ async function buildFinalForTier(tier, options = {}) {
                 total_confidence: total,
                 risk_level: riskLevelFromConfidence(total)
             }, client);
-            if (row) secondaryRows.push(row);
+            if (row) {
+                secondaryRows.push(row);
+                await persistTeamWeekLocks(client, row, {
+                    publishRunId,
+                    sourceType: 'secondary',
+                    sourceTier: t,
+                    now
+                });
+            }
         }
 
         const insightRowsInserted = directRows.length + secondaryRows.length + sameMatchRows.length + multiRows.length;

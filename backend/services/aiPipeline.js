@@ -23,9 +23,10 @@ const { saveDirectInsight } = require('./saveDirectInsights');
 const pipelineLogger = require('../utils/pipelineLogger');
 const enrichFixtureWithContext = require('../src/services/contextIntelligence/aiPipeline');
 const adjustProbability = require('../src/services/contextIntelligence/adjustProbability');
+const { resolveActiveDeploymentSports } = require('../config/activeSports');
 
 let isRunning = false;
-const ACTIVE_DEPLOYMENT_SPORTS = new Set(['football', 'cricket']);
+const ACTIVE_DEPLOYMENT_SPORTS = resolveActiveDeploymentSports();
 const DIRECT_INSIGHTS_SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
 const DIRECT_INSIGHTS_SUPABASE_KEY = String(
     process.env.SUPABASE_SERVICE_ROLE_KEY

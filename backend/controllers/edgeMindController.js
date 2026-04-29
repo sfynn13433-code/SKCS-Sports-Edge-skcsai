@@ -16,13 +16,14 @@ const {
     SAFE_CONFIDENCE_MIN,
     ACCA_CONFIDENCE_MIN
 } = require('../services/marketIntelligence');
+const { resolveActiveDeploymentSports } = require('../config/activeSports');
 
 const TZ = 'Africa/Johannesburg';
 const MAX_DB_ROWS = 4000;
 const DEFAULT_SINGLE_COUNT = 6;
 const ACCA_DEFAULT_SIZE = 6;
 const ACCA_MEGA_SIZE = 12;
-const ACTIVE_DEPLOYMENT_SPORTS = new Set(['football', 'cricket']);
+const ACTIVE_DEPLOYMENT_SPORTS = resolveActiveDeploymentSports();
 const DISABLED_SPORT_REPLY = 'That sport is currently being prepared and will be available soon.';
 const LIMITED_CONTEXT_REPLY = 'Limited contextual data available. This insight is mainly based on baseline probability and market/statistical structure.';
 const BOT_ACCA_CONFIDENCE_MIN = Math.max(ACCA_CONFIDENCE_MIN, Number(process.env.BOT_ACCA_CONFIDENCE_MIN || 70));

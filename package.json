@@ -14,6 +14,8 @@
     "refresh:football": "node scripts/trigger-refresh.js --sport=football",
     "grade:trigger": "node scripts/trigger-grade.js",
     "grade:football": "node scripts/trigger-grade.js --sport=football",
+    "settlement:trigger": "node scripts/trigger-settlement.js",
+    "settlement:football": "node scripts/trigger-settlement.js --sport=football",
     "accuracy:track": "node scripts/track-prediction-accuracy.js",
     "accuracy:april5": "node scripts/track-prediction-accuracy.js --date=2026-04-05 --sport=football",
     "context:backfill": "node scripts/backfill-football-context.js",

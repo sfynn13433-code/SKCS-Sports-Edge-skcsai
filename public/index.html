@@ -2862,6 +2862,9 @@
 
     async function fetchCricketInsights(container, accessToken, status = 'upcoming') {
         try {
+            if (container) {
+                container.innerHTML = '<p style="text-align:center;color:#4a5568;padding:20px;">Loading upcoming cricket insights...</p>';
+            }
             const enforcedStatus = 'upcoming';
             const url = `${SKCS_BACKEND}/api/cricket/insights?status=${enforcedStatus}&grouped=true&limit=100`;
             const response = await fetch(url, {
@@ -2896,6 +2899,8 @@
             if (data.grouped && data.fixtures) {
                 // Handle grouped response
                 if (data.fixtures.length === 0) {
+                    const cricketCountEl = document.getElementById('direct-cricket-count');
+                    if (cricketCountEl) cricketCountEl.textContent = '(0)';
                     if (container) container.innerHTML = '<p style="text-align:center;color:#4a5568;padding:20px;">No new cricket insights available.</p>';
                     return;
                 }
@@ -2919,6 +2924,8 @@
                 }
 
                 if (insights.length === 0) {
+                    const cricketCountEl = document.getElementById('direct-cricket-count');
+                    if (cricketCountEl) cricketCountEl.textContent = '(0)';
                     if (container) container.innerHTML = '<p style="text-align:center;color:#4a5568;padding:20px;">No new cricket insights available.</p>';
                     return;
                 }
@@ -2939,6 +2946,8 @@
             }
         } catch (error) {
             console.error('[SKCS CRICKET] fetch error:', error);
+            const cricketCountEl = document.getElementById('direct-cricket-count');
+            if (cricketCountEl) cricketCountEl.textContent = '(0)';
             if (container) container.innerHTML = '<p style="text-align:center;color:#4a5568;padding:20px;">No new cricket insights available.</p>';
         }
     }

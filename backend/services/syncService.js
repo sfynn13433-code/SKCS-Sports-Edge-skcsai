@@ -7,6 +7,7 @@ const { assertRapidApiCacheWallReady } = require('./dataProviders');
 const { buildMatchContext } = require('./normalizerService');
 const pipelineLogger = require('../utils/pipelineLogger');
 const config = require('../config');
+const { resolveActiveDeploymentSports } = require('../config/activeSports');
 
 console.log('🚨 ACTIVE DATA SOURCE:', process.env.RAPIDAPI_HOST);
 
@@ -20,7 +21,7 @@ const SYNC_GRACE_MINUTES = 15;
 const SYNC_FUTURE_DAYS = 7;
 const SPORT_FETCH_STAGGER_MS = Math.max(0, Number(process.env.SPORT_FETCH_STAGGER_MS || 1200));
 const DEFAULT_SYNC_WINDOW_DAYS = Math.max(2, Math.min(3, Number(process.env.LIVE_FETCH_WINDOW_DAYS || 3)));
-const ACTIVE_DEPLOYMENT_SPORTS = new Set(['football', 'cricket']);
+const ACTIVE_DEPLOYMENT_SPORTS = resolveActiveDeploymentSports();
 
 function isObject(value) {
     return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -337,7 +338,7 @@ async function syncSports(options = {}) {
     const scopeLabel = requestedSports.length ? requestedSports.join(', ') : 'all sports';
     console.log(`[syncService] Starting sports data sync for REAL matches (${scopeLabel})...`);
     if (blockedSports.length > 0) {
-        console.log('[syncService] Phase-1 football-only gate blocked requested sports: %s', blockedSports.join(', '));
+        console.log('[syncService] Active-sports gate blocked requested sports: %s', blockedSports.join(', '));
     }
     console.log(`[syncService] Using season config: SEASON_YEAR=${SEASON_YEAR}, SEASON_RANGE=${SEASON_RANGE}`);
     const telemetryRunId = `sync_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;

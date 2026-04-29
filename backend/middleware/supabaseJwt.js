@@ -109,7 +109,7 @@ async function requireSupabaseUser(req, res, next) {
         const apiKey = req.headers['x-api-key'];
         if (apiKey) {
             const adminKey = process.env.ADMIN_API_KEY;
-            const allowLegacy = String(process.env.ALLOW_LEGACY_USER_KEY || 'true').toLowerCase() !== 'false';
+            const allowLegacy = String(process.env.ALLOW_LEGACY_USER_KEY || 'false').toLowerCase() === 'true';
             
             let userKeys = [];
             if (process.env.USER_API_KEY) userKeys.push(...process.env.USER_API_KEY.split(',').map(s=>s.trim()));

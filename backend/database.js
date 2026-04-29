@@ -423,6 +423,26 @@ async function initializeTables() {
             CHECK (type IN ('single', 'acca', 'direct', 'secondary', 'multi', 'same_match', 'acca_6match', 'mega_acca_12'))
         `);
 
+        await client.query(`
+            DROP VIEW IF EXISTS public.predictions_final;
+        `);
+
+        await client.query(`
+            CREATE OR REPLACE VIEW public.predictions_final AS
+            SELECT *
+            FROM public.direct1x2_prediction_final;
+        `);
+
+        await client.query(`
+            DROP VIEW IF EXISTS public.prediction_final;
+        `);
+
+        await client.query(`
+            CREATE OR REPLACE VIEW public.prediction_final AS
+            SELECT *
+            FROM public.direct1x2_prediction_final;
+        `);
+
         // Tier Rules
         await client.query(`CREATE TABLE IF NOT EXISTS tier_rules (
             tier TEXT PRIMARY KEY CHECK (tier IN ('normal', 'deep')),
@@ -487,9 +507,11 @@ async function initializeTables() {
                 ('direct1x2_prediction_final', 'active', TRUE, 'publish', 'Live published insights table.'),
                 ('prediction_publish_runs', 'active', TRUE, 'publish', 'Run tracking table for all publish flows.'),
                 ('predictions_accuracy', 'active', TRUE, 'grading', 'Prediction grading and outcomes table.'),
+                ('team_week_locks', 'active', TRUE, 'publish', 'Persistent single-use team/week lock table across publish runs.'),
                 ('rapidapi_cache', 'active', TRUE, 'ingest', 'RapidAPI payload cache wall table.'),
                 ('scheduling_logs', 'active', TRUE, 'scheduler', 'Scheduler telemetry table.'),
                 ('predictions_final', 'compatibility', TRUE, 'compatibility', 'Compatibility view that mirrors direct1x2_prediction_final.'),
+                ('prediction_final', 'compatibility', TRUE, 'compatibility', 'Legacy compatibility view that mirrors direct1x2_prediction_final.'),
                 ('prediction_results', 'legacy', FALSE, 'legacy', 'Legacy accuracy table replaced by predictions_accuracy.'),
                 ('scheduler_run_locks', 'legacy', FALSE, 'legacy', 'Legacy scheduler lock table not used by active cron routes.')
             ON CONFLICT (table_name) DO UPDATE SET
@@ -506,6 +528,18 @@ async function initializeTables() {
             publish_window TEXT NOT NULL,
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             UNIQUE (publish_window)
+        )`);
+
+        await client.query(`CREATE TABLE IF NOT EXISTS team_week_locks (
+            id BIGSERIAL PRIMARY KEY,
+            week_key TEXT NOT NULL,
+            team_key TEXT NOT NULL,
+            competition_key TEXT NOT NULL,
+            publish_run_id BIGINT REFERENCES prediction_publish_runs(id) ON DELETE SET NULL,
+            source_type TEXT,
+            source_tier TEXT,
+            locked_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            UNIQUE (week_key, team_key, competition_key)
         )`);
 
         // Prediction Results (Historical Data)

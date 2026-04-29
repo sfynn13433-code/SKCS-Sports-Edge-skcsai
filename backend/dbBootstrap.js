@@ -62,6 +62,16 @@ async function ensureFinalPredictionsCompatibility() {
         SELECT *
         FROM public.direct1x2_prediction_final;
     `);
+
+    await query(`
+        DROP VIEW IF EXISTS public.prediction_final;
+    `);
+
+    await query(`
+        CREATE OR REPLACE VIEW public.prediction_final AS
+        SELECT *
+        FROM public.direct1x2_prediction_final;
+    `);
 }
 
 async function markStalePublishRuns() {
@@ -710,6 +720,20 @@ async function bootstrap() {
         `);
 
         await query(`
+            CREATE TABLE IF NOT EXISTS team_week_locks (
+                id BIGSERIAL PRIMARY KEY,
+                week_key TEXT NOT NULL,
+                team_key TEXT NOT NULL,
+                competition_key TEXT NOT NULL,
+                publish_run_id BIGINT REFERENCES prediction_publish_runs(id) ON DELETE SET NULL,
+                source_type TEXT,
+                source_tier TEXT,
+                locked_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                UNIQUE (week_key, team_key, competition_key)
+            );
+        `);
+
+        await query(`
             INSERT INTO table_lifecycle_registry (table_name, lifecycle_state, is_active, owner_component, notes)
             VALUES
                 ('predictions_raw', 'active', true, 'pipeline', 'Primary raw prediction ingest table.'),
@@ -717,9 +741,11 @@ async function bootstrap() {
                 ('direct1x2_prediction_final', 'active', true, 'publish', 'Live published insights table.'),
                 ('prediction_publish_runs', 'active', true, 'publish', 'Run tracking table for all publish flows.'),
                 ('predictions_accuracy', 'active', true, 'grading', 'Prediction grading and outcomes table.'),
+                ('team_week_locks', 'active', true, 'publish', 'Persistent single-use team/week lock table across publish runs.'),
                 ('rapidapi_cache', 'active', true, 'ingest', 'RapidAPI payload cache wall table.'),
                 ('scheduling_logs', 'active', true, 'scheduler', 'Scheduler telemetry table.'),
                 ('predictions_final', 'compatibility', true, 'compatibility', 'Compatibility view that mirrors direct1x2_prediction_final.'),
+                ('prediction_final', 'compatibility', true, 'compatibility', 'Legacy compatibility view that mirrors direct1x2_prediction_final.'),
                 ('prediction_results', 'legacy', false, 'legacy', 'Legacy accuracy table replaced by predictions_accuracy.'),
                 ('scheduler_run_locks', 'legacy', false, 'legacy', 'Legacy scheduler lock table not used by active cron routes.')
             ON CONFLICT (table_name) DO UPDATE SET
