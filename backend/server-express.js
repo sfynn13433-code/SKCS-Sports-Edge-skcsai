@@ -13,6 +13,12 @@ const path         = require('path');
 const { createClient } = require('@supabase/supabase-js');
 const config       = require('./config');
 const { query }            = require('./db');
+const {
+    shouldAllowOddsCall,
+    consumeOddsCallSlot,
+    applyOddsProviderHeaders,
+    getOddsBudgetStatus
+} = require('./services/oddsBudgetService');
 const { requireRole }        = require('./utils/auth');
 const {
     createSubscriptionRecord,
@@ -115,6 +121,7 @@ const refreshAIRouter   = require('./routes/refresh-ai');
 const cricketInsightsRouter = require('./routes/cricketInsights');
 const cricketCountRouter = require('./routes/cricketCount');
 const cricketCronRouter = require('./routes/cricketCron');
+const cricketCacheRouter = require('./routes/cricketCache');
 
 const DIRECT_INSIGHTS_SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
 const DIRECT_INSIGHTS_SUPABASE_KEY = String(
@@ -390,14 +397,30 @@ async function proxyOdds(req, res) {
     return res.status(503).json({ error: 'Odds API not configured' });
   }
 
+  const budget = shouldAllowOddsCall();
+  if (!budget.allowed) {
+    return res.status(429).json({
+      error: 'Odds API daily budget reached',
+      reason: budget.reason,
+      budget: getOddsBudgetStatus()
+    });
+  }
+
   const target = `https://api.the-odds-api.com/v4${req.path}`;
   const params = { ...req.query, apiKey: process.env.ODDS_API_KEY };
 
   try {
     const axios = require('axios');
+    consumeOddsCallSlot();
     const response = await axios.get(target, { params, timeout: 10000 });
+    applyOddsProviderHeaders(response?.headers || {});
+    const budgetStatus = getOddsBudgetStatus();
+    res.setHeader('x-skcs-odds-daily-limit', String(budgetStatus.dailyLimitToday));
+    res.setHeader('x-skcs-odds-remaining-today', String(budgetStatus.remainingToday));
+    res.setHeader('x-skcs-odds-remaining-month', String(budgetStatus.remainingMonth));
     res.json(response.data);
   } catch (err) {
+    applyOddsProviderHeaders(err?.response?.headers || {});
     console.error('[odds-proxy] error:', err.message);
     res.status(502).json({ error: 'Upstream error', details: err.message });
   }
@@ -419,6 +442,8 @@ app.use('/api/cricket/insights', cricketInsightsRouter);
 console.log('[server] Cricket insights router mounted at /api/cricket/insights');
 app.use('/api/cricket/count', cricketCountRouter);
 console.log('[server] Cricket count router mounted at /api/cricket/count');
+app.use('/api/cricket/cache', cricketCacheRouter);
+console.log('[server] Cricket cache router mounted at /api/cricket/cache');
 app.use('/api/cron', cricketCronRouter);
 
 // --- Cloud Scheduler endpoints -------------------------------------------------

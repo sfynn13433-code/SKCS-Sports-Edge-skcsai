@@ -3,6 +3,11 @@ const config = require('./config');
 const { fetchRapidApiCustom, getRapidApiProviderForSport, getRapidApiHostCandidates } = require('./services/dataProviders');
 const { getApiSportsKeyPool, maskKey } = require('./utils/keyPool');
 const {
+    shouldAllowOddsCall,
+    consumeOddsCallSlot,
+    applyOddsProviderHeaders
+} = require('./services/oddsBudgetService');
+const {
     shouldAllow: circuitShouldAllow,
     recordFailure: circuitRecordFailure,
     recordSuccess: circuitRecordSuccess
@@ -243,7 +248,14 @@ class OddsAPIClient {
     }
 
     async getOdds(sportKey, regions = 'us', markets = 'h2h') {
+        const budget = shouldAllowOddsCall();
+        if (!budget.allowed) {
+            console.warn(`[OddsAPI] skipped: ${budget.reason}`);
+            return null;
+        }
+
         try {
+            consumeOddsCallSlot();
             const response = await axios.get(`${this.baseUrl}/sports/${sportKey}/odds`, {
                 params: {
                     apiKey: this.apiKey,
@@ -251,8 +263,10 @@ class OddsAPIClient {
                     markets
                 }
             });
+            applyOddsProviderHeaders(response?.headers || {});
             return response.data;
         } catch (error) {
+            applyOddsProviderHeaders(error?.response?.headers || {});
             console.error('Odds API error:', error.message);
             return null;
         }
@@ -583,30 +597,68 @@ class CricketDataClient {
         this.baseUrl = 'https://api.cricapi.com/v1';
     }
 
-    async getFixtures() {
+    async request(endpoint, params = {}) {
         if (!this.apiKey) {
             throw new Error('CricketData: CRICKETDATA_API_KEY not configured');
         }
 
         try {
-            const response = await axios.get(`${this.baseUrl}/matches`, {
+            const response = await axios.get(`${this.baseUrl}/${endpoint}`, {
                 params: {
                     apikey: this.apiKey,
-                    offset: 0,
+                    ...params
                 },
-                timeout: 10000,
+                timeout: 10000
             });
 
-            const data = response.data?.data || [];
-            console.log(`[CricketData] returned ${Array.isArray(data) ? data.length : 0} matches`);
-            return data;
-        } catch (error) {
-            console.error(`[CricketData] error:`, error.message);
-            if (error.response) {
-                console.error(`[CricketData] Response:`, error.response.status, error.response.data);
+            if (response.data?.status !== 'success') {
+                const reason = response.data?.reason || response.data?.message || 'unknown error';
+                throw new Error(`CricketData ${endpoint} failed: ${reason}`);
             }
-            return [];
+
+            return response.data?.data;
+        } catch (error) {
+            console.error(`[CricketData] ${endpoint} error:`, error.message);
+            if (error.response) {
+                console.error(`[CricketData] ${endpoint} response:`, error.response.status, error.response.data);
+            }
+            return null;
         }
+    }
+
+    async getFixtures() {
+        const data = await this.request('matches', { offset: 0 });
+        const rows = Array.isArray(data) ? data : [];
+        console.log(`[CricketData] fixtures returned ${rows.length} matches`);
+        return rows;
+    }
+
+    async getCurrentMatches(offset = 0) {
+        const data = await this.request('currentMatches', { offset });
+        const rows = Array.isArray(data) ? data : [];
+        console.log(`[CricketData] currentMatches returned ${rows.length} matches`);
+        return rows;
+    }
+
+    async getMatchInfo(matchId) {
+        const id = String(matchId || '').trim();
+        if (!id) return null;
+        const data = await this.request('match_info', { id });
+        return data && typeof data === 'object' ? data : null;
+    }
+
+    async getSeriesPointsTable(seriesId) {
+        const id = String(seriesId || '').trim();
+        if (!id) return null;
+        const data = await this.request('series_pointsTable', { id });
+        return data && typeof data === 'object' ? data : null;
+    }
+
+    async getSeriesSquad(seriesId) {
+        const id = String(seriesId || '').trim();
+        if (!id) return null;
+        const data = await this.request('series_squad', { id });
+        return data && typeof data === 'object' ? data : null;
     }
 
     normalizeFixture(match) {
