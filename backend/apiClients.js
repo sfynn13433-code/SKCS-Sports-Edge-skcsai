@@ -382,13 +382,14 @@ class SportsDataOrgClient {
 
 class SportsDataIOClient {
     constructor() {
-        this.apiKey = config.sportsDbKey;
+        this.apiKey = config.sportsDataIoKey;
         this.baseUrl = 'https://api.sportsdata.io/v3';
     }
 
     async getFixtures(sport) {
         if (!this.apiKey) {
-            throw new Error('SportsData.io: SPORTS_DB_KEY not configured');
+            console.log(`[SportsData.io] ${sport}: skipped (missing SPORTSDATA_IO_KEY or SPORTS_DB_KEY)`);
+            return [];
         }
 
         const sportMap = {

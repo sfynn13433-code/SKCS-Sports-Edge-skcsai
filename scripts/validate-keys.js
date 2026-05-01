@@ -33,6 +33,16 @@ function isSet(name) {
   return Boolean(process.env[name] && String(process.env[name]).trim());
 }
 
+function resolveEnvValue(preferredName, fallbackName) {
+  if (isSet(preferredName)) {
+    return { keyName: preferredName, keyValue: String(process.env[preferredName]).trim() };
+  }
+  if (fallbackName && isSet(fallbackName)) {
+    return { keyName: fallbackName, keyValue: String(process.env[fallbackName]).trim() };
+  }
+  return null;
+}
+
 async function testSupabase() {
   const name = 'SUPABASE_URL + SUPABASE_ANON_KEY';
   if (!isSet('SUPABASE_URL') || !isSet('SUPABASE_ANON_KEY')) {
@@ -208,26 +218,67 @@ async function testFootballDataToken() {
   }
 }
 
-async function testSportsDbKey() {
-  const name = 'SPORTS_DB_KEY';
-  if (!isSet('SPORTS_DB_KEY')) {
-    return { name, status: 'missing', detail: 'SPORTS_DB_KEY is not set' };
+async function testTheSportsDbKey() {
+  const name = 'THESPORTSDB_KEY';
+  const resolved = resolveEnvValue('THESPORTSDB_KEY', 'SPORTS_DB_KEY');
+  if (!resolved) {
+    return {
+      name,
+      status: 'missing',
+      detail: 'THESPORTSDB_KEY is not set (legacy fallback SPORTS_DB_KEY also missing)'
+    };
   }
 
   try {
-    const response = await axios.get('https://api.sportsdata.io/v3/soccer/scores/json/AreAnyGamesInProgress', {
-      headers: { 'Ocp-Apim-Subscription-Key': process.env.SPORTS_DB_KEY },
+    const response = await axios.get(`https://www.thesportsdb.com/api/v1/json/${resolved.keyValue}/all_sports.php`, {
       timeout: TIMEOUT_MS,
       validateStatus: () => true
     });
 
     if (response.status >= 200 && response.status < 300) {
-      return { name, status: 'ok', detail: `status ${response.status}` };
+      const totalSports = Array.isArray(response.data?.sports) ? response.data.sports.length : 0;
+      if (totalSports > 0) {
+        return { name, status: 'ok', detail: `status ${response.status}; source=${resolved.keyName}; sports=${totalSports}` };
+      }
+      return { name, status: 'warning', detail: `status ${response.status}; source=${resolved.keyName}; unexpected payload` };
     }
     if (response.status === 401 || response.status === 403) {
-      return { name, status: 'invalid', detail: `status ${response.status}` };
+      return { name, status: 'invalid', detail: `status ${response.status}; source=${resolved.keyName}` };
     }
-    return { name, status: 'warning', detail: `status ${response.status}` };
+    return { name, status: 'warning', detail: `status ${response.status}; source=${resolved.keyName}` };
+  } catch (error) {
+    return { name, status: 'error', detail: toErrorMessage(error) };
+  }
+}
+
+async function testSportsDataIoKey() {
+  const name = 'SPORTSDATA_IO_KEY';
+  const resolved = resolveEnvValue('SPORTSDATA_IO_KEY', 'SPORTS_DB_KEY');
+  if (!resolved) {
+    return {
+      name,
+      status: 'missing',
+      detail: 'SPORTSDATA_IO_KEY is not set (legacy fallback SPORTS_DB_KEY also missing)'
+    };
+  }
+
+  try {
+    const response = await axios.get('https://api.sportsdata.io/v3/soccer/scores/json/AreAnyGamesInProgress', {
+      headers: { 'Ocp-Apim-Subscription-Key': resolved.keyValue },
+      timeout: TIMEOUT_MS,
+      validateStatus: () => true
+    });
+
+    if (response.status >= 200 && response.status < 300) {
+      return { name, status: 'ok', detail: `status ${response.status}; source=${resolved.keyName}` };
+    }
+    if (response.status === 401 || response.status === 403) {
+      return { name, status: 'invalid', detail: `status ${response.status}; source=${resolved.keyName}` };
+    }
+    if (response.status === 404) {
+      return { name, status: 'warning', detail: `status 404; source=${resolved.keyName}; endpoint/resource unavailable` };
+    }
+    return { name, status: 'warning', detail: `status ${response.status}; source=${resolved.keyName}` };
   } catch (error) {
     return { name, status: 'error', detail: toErrorMessage(error) };
   }
@@ -434,7 +485,8 @@ async function run() {
   results.push(await testOddsApiKey());
   results.push(await testCricketDataKey());
   results.push(await testFootballDataToken());
-  results.push(await testSportsDbKey());
+  results.push(await testTheSportsDbKey());
+  results.push(await testSportsDataIoKey());
   results.push(await testWeatherKey());
   results.push(await testGeminiKeyAndModels());
   results.push(await testRapidApiHosts());

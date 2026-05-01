@@ -18,6 +18,10 @@ module.exports = {
     
     oddsApiKey: process.env.ODDS_API_KEY,
     sportsOddsApiKey: process.env.SPORTS_ODDS_API_KEY,
+    // Provider-specific keys with legacy fallback to SPORTS_DB_KEY.
+    theSportsDbKey: process.env.THESPORTSDB_KEY || process.env.SPORTS_DB_KEY,
+    sportsDataIoKey: process.env.SPORTSDATA_IO_KEY || process.env.SPORTS_DB_KEY,
+    // Legacy shared key kept for backward compatibility during migration.
     sportsDbKey: process.env.SPORTS_DB_KEY,
     sportsDataOrgToken: process.env.X_AUTH_TOKEN,
     cricketDataApiKey: process.env.CRICKETDATA_API_KEY,
