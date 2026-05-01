@@ -118,10 +118,12 @@ const accuracyRouter    = require('./routes/accuracy');
 const vipRouter         = require('./routes/vip');
 const direct1x2Router   = require('./routes/direct1x2');
 const refreshAIRouter   = require('./routes/refresh-ai');
+const tier1Router       = require('./routes/tier1');
 const cricketInsightsRouter = require('./routes/cricketInsights');
 const cricketCountRouter = require('./routes/cricketCount');
 const cricketCronRouter = require('./routes/cricketCron');
 const cricketCacheRouter = require('./routes/cricketCache');
+const { runTier1Stage1Bootstrap } = require('./services/tier1BootstrapService');
 
 const DIRECT_INSIGHTS_SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
 const DIRECT_INSIGHTS_SUPABASE_KEY = String(
@@ -438,6 +440,7 @@ app.use('/api/edgemind', chatRouter);
 app.use('/api/accuracy', accuracyRouter);
 app.use('/api/vip', vipRouter);
 app.use('/api/direct-1x2', direct1x2Router);
+app.use('/api/tier1', tier1Router);
 app.use('/api/cricket/insights', cricketInsightsRouter);
 console.log('[server] Cricket insights router mounted at /api/cricket/insights');
 app.use('/api/cricket/count', cricketCountRouter);
@@ -792,6 +795,38 @@ app.get('/api/cron/sync-live', verifyCronSecret, async (req, res) => {
             durationMs: Date.now() - startedAtMs
         });
         res.json({ status: 'error', message: err.message });
+    }
+});
+
+// TIER 1 ENTITY BOOTSTRAP (TheSportsDB + priority queue ordering)
+app.get('/api/cron/tier1-stage1-bootstrap', verifyCronSecret, async (req, res) => {
+    console.log('[cron/tier1-stage1-bootstrap] Starting Tier 1 entity bootstrap...');
+    try {
+        const result = await runCronWithLog('cron_tier1_stage1_bootstrap', req, async () => {
+            const rawCountries = String(req.query.countries || '').trim();
+            const countries = rawCountries
+                ? rawCountries.split(',').map((value) => String(value || '').trim()).filter(Boolean)
+                : undefined;
+            const delayMs = Number(req.query.delayMs || 0) || undefined;
+            const payload = await runTier1Stage1Bootstrap({ countries, delayMs });
+            const summary = (Array.isArray(payload?.results) ? payload.results : []).map((row) => ({
+                sport: row.sport,
+                priority: row.priority,
+                leagues_discovered: row.leagues_discovered,
+                leagues_hydrated: row.leagues_hydrated,
+                teams_hydrated: row.teams_hydrated,
+                players_hydrated: row.players_hydrated
+            }));
+            return {
+                fixturesImported: 0,
+                predictionsGenerated: 0,
+                tier1Summary: summary
+            };
+        });
+        return res.json({ status: 'ok', ...result });
+    } catch (error) {
+        console.error('[cron/tier1-stage1-bootstrap] Failed:', error.message);
+        return res.status(500).json({ status: 'error', message: error.message });
     }
 });
 

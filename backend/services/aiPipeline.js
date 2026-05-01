@@ -1339,7 +1339,7 @@ async function buildRawPredictionFromProviderItem(item) {
     });
 
     // Always ingest context for football fixtures before downstream pipeline filtering.
-    let ingestedContextData = { injuries: {}, h2h: {}, weather: {}, news: [] };
+    let ingestedContextData = { injuries: {}, h2h: {}, weather: {}, news: [], sport };
     try {
         console.log('Processing fixture:', match_id);
         const fixtureIdForIngestion = matchInfo.match_id || match_id;
@@ -1377,7 +1377,8 @@ async function buildRawPredictionFromProviderItem(item) {
             injuries: normalizeInjuriesFromProvider(injuriesRaw, homeTeamIdForIngestion, awayTeamIdForIngestion),
             h2h: normalizeH2HFromProvider(h2hRaw),
             weather: normalizeWeatherFromProvider(weatherRaw),
-            news: dedupePublicIncidents(newsRaw)
+            news: dedupePublicIncidents(newsRaw),
+            sport
         };
 
         console.log('ATTEMPTING INSERT:', fixtureIdForIngestion);

@@ -20,8 +20,15 @@ const SYNC_GRACE_MINUTES = 15;
 // Maximum future window accepted at sync time — matches beyond 7 days are ignored.
 const SYNC_FUTURE_DAYS = 7;
 const SPORT_FETCH_STAGGER_MS = Math.max(0, Number(process.env.SPORT_FETCH_STAGGER_MS || 1200));
+const TIER1_MIN_HTTP_DELAY_MS = Math.max(2400, Number(process.env.TIER1_HTTP_DELAY_MS || 2400));
 const DEFAULT_SYNC_WINDOW_DAYS = Math.max(2, Math.min(3, Number(process.env.LIVE_FETCH_WINDOW_DAYS || 3)));
 const ACTIVE_DEPLOYMENT_SPORTS = resolveActiveDeploymentSports();
+const TIER1_SPORT_PRIORITY = Object.freeze({
+    football: 100,
+    basketball: 90,
+    rugby: 80,
+    mma: 70
+});
 
 function isObject(value) {
     return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -29,6 +36,15 @@ function isObject(value) {
 
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function tier1PriorityForSport(sport) {
+    const token = normalizeSportToken(sport);
+    return Number(TIER1_SPORT_PRIORITY[token] || 0);
+}
+
+function isTier1PrioritySport(sport) {
+    return tier1PriorityForSport(sport) > 0;
 }
 
 /**
@@ -383,6 +399,9 @@ async function syncSports(options = {}) {
         const prioritizedConfigs = configs
             .slice()
             .sort((a, b) => {
+                const priorityA = tier1PriorityForSport(a?.sport);
+                const priorityB = tier1PriorityForSport(b?.sport);
+                if (priorityA !== priorityB) return priorityB - priorityA;
                 const tierA = Number(a?.leagueTier || 9);
                 const tierB = Number(b?.leagueTier || 9);
                 if (tierA !== tierB) return tierA - tierB;
@@ -534,8 +553,13 @@ async function syncSports(options = {}) {
                 // Continue with next sport instead of failing completely
             } finally {
                 if (index < prioritizedConfigs.length - 1 && SPORT_FETCH_STAGGER_MS > 0) {
-                    console.log(`[syncService] Stagger delay ${SPORT_FETCH_STAGGER_MS}ms before next sport fetch...`);
-                    await sleep(SPORT_FETCH_STAGGER_MS);
+                    const nextItem = prioritizedConfigs[index + 1];
+                    const enforceTier1Delay = isTier1PrioritySport(item?.sport) || isTier1PrioritySport(nextItem?.sport);
+                    const delayMs = enforceTier1Delay
+                        ? Math.max(SPORT_FETCH_STAGGER_MS, TIER1_MIN_HTTP_DELAY_MS)
+                        : SPORT_FETCH_STAGGER_MS;
+                    console.log(`[syncService] Stagger delay ${delayMs}ms before next sport fetch...`);
+                    await sleep(delayMs);
                 }
             }
         }

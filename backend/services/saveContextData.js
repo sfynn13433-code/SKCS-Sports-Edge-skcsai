@@ -1,5 +1,7 @@
 'use strict';
 
+const { mergeTier1SchemaIntoContext } = require('./tier1SchemaProfile');
+
 let contextInsertProbeCompleted = false;
 
 function isDuplicateKeyError(error) {
@@ -35,10 +37,11 @@ async function saveContextData(supabase, matchId, data) {
     console.log('Saving context for match:', safeMatchId);
 
     const payload = data && typeof data === 'object' ? data : {};
+    const normalizedSport = String(payload.sport || payload.match_sport || payload?.metadata?.sport || '').trim();
     const safePayload = {
         match_id: safeMatchId,
         injuries: payload.injuries ?? {},
-        h2h: payload.h2h ?? {},
+        h2h: mergeTier1SchemaIntoContext(payload.h2h ?? {}, normalizedSport),
         weather: payload.weather ?? {}
     };
 

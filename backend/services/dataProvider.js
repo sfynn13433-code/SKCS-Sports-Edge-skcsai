@@ -19,7 +19,8 @@ const LEAGUE_SPORT_MAP = {
 const THESPORTSDB_SUPPORTED_SPORTS = new Set(Object.values(LEAGUE_SPORT_MAP));
 
 const THESPORTSDB_BASE_URL = 'https://www.thesportsdb.com/api/v1/json';
-const THESPORTSDB_DELAY_MS = 500;
+const THESPORTSDB_DELAY_MS = Math.max(0, Number(process.env.THESPORTSDB_DELAY_MS || 500));
+const TIER1_HTTP_DELAY_MS = Math.max(2400, Number(process.env.TIER1_HTTP_DELAY_MS || 2400));
 
 const sportsClient = axios.create({
     baseURL: THESPORTSDB_BASE_URL,
@@ -105,6 +106,14 @@ function normalizeRequestedSport(sport) {
     if (key === 'formula-1' || key === 'formula_1') return 'formula1';
     if (key === 'american-football') return 'american_football';
     return key;
+}
+
+function isTier1PrioritySport(sport) {
+    const normalized = normalizeRequestedSport(sport);
+    return normalized === 'football'
+        || normalized === 'basketball'
+        || normalized === 'rugby'
+        || normalized === 'mma';
 }
 
 function normalizeCompetitionText(value) {
@@ -1158,6 +1167,8 @@ async function fetchUpcomingFixtures(options = {}) {
     const seasonLabel = String(options.seasonLabel || deriveSeasonLabel(new Date())).trim();
     const { start: windowStart, endExclusive: windowEndExclusive } = buildUtcWindow(fromDate, toDate);
     const requestedSport = normalizeRequestedSport(options.requestedSport || 'football');
+    const enforceTier1Delay = isTier1PrioritySport(requestedSport);
+    const effectiveDelayMs = enforceTier1Delay ? Math.max(TIER1_HTTP_DELAY_MS, THESPORTSDB_DELAY_MS) : THESPORTSDB_DELAY_MS;
     const daySweepSportLabel = ({
         football: 'Soccer',
         basketball: 'Basketball',
@@ -1195,7 +1206,7 @@ async function fetchUpcomingFixtures(options = {}) {
             }
 
             if (i < dateList.length - 1) {
-                await sleep(THESPORTSDB_DELAY_MS);
+                await sleep(effectiveDelayMs);
             }
         }
     }
@@ -1262,7 +1273,7 @@ async function fetchUpcomingFixtures(options = {}) {
         );
 
         if (i < uniqueLeagueIds.length - 1) {
-            await sleep(THESPORTSDB_DELAY_MS);
+            await sleep(effectiveDelayMs);
         }
     }
 
