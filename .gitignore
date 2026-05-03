@@ -67,3 +67,6 @@ tmp/
 
 # Local provider cache (runtime only)
 backend/cache/*.json
+
+# Stakpak session files
+.stakpak/session*

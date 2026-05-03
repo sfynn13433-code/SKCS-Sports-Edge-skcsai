@@ -3,14 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SKCS Direct 1X2 Markets</title>
+    <title>SportAnalytics Pro</title>
     <style>
         :root {
-            --bg: #f3f6fb;
-            --card: #ffffff;
-            --text: #0f172a;
-            --muted: #475569;
-            --border: #d9e1ee;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --border: #334155;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --risk-high-conf: #10b981;
+            --risk-mod: #3b82f6;
+            --risk-high-caut: #f97316;
+            --risk-ext: #ef4444;
         }
         * { box-sizing: border-box; }
         body {
@@ -18,16 +24,111 @@
             font-family: Arial, sans-serif;
             background: var(--bg);
             color: var(--text);
+            padding-bottom: 80px; /* Space for bottom nav */
         }
+        
+        /* Top Navigation / Header */
+        .top-bar {
+            background: var(--card);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .top-bar h1 {
+            font-size: 1.4rem;
+            margin: 0;
+            color: var(--text);
+        }
+        .btn {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .btn:hover {
+            background: var(--border);
+        }
+
+        /* Bottom Navigation Dropdown */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: var(--card);
+            padding: 15px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            z-index: 20;
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .bottom-nav select {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px;
+            font-size: 1rem;
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            appearance: none;
+            outline: none;
+        }
+
         .wrap {
             max-width: 1080px;
             margin: 0 auto;
-            padding: 20px 14px 40px;
+            padding: 20px 14px;
         }
-        h1 {
-            font-size: 1.6rem;
-            margin: 0 0 14px;
+        
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text);
         }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        /* Sport Category Cards (Tier List) */
+        .sport-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+            text-align: center;
+        }
+        .sport-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+        }
+        .sport-card h3 {
+            margin: 0 0 10px 0;
+            color: var(--text);
+        }
+        .sport-card p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        /* Toolbar / Filters */
         .toolbar {
             display: flex;
             flex-wrap: wrap;
@@ -36,294 +137,472 @@
             align-items: center;
         }
         .toolbar select, .toolbar button {
-            height: 36px;
+            height: 38px;
             border: 1px solid var(--border);
             border-radius: 6px;
-            padding: 0 10px;
+            padding: 0 12px;
             font-size: 0.9rem;
-            background: #fff;
-            color: #0f172a;
+            background: var(--card);
+            color: var(--text);
+            outline: none;
         }
         .toolbar button {
             cursor: pointer;
             font-weight: 700;
-            background: #2563eb;
+            background: var(--accent);
             color: #fff;
-            border-color: #1d4ed8;
+            border-color: var(--accent-hover);
+            transition: background 0.2s;
         }
+        .toolbar button:hover {
+            background: var(--accent-hover);
+        }
+
+        /* State Messages */
         .state {
-            padding: 10px 12px;
+            padding: 12px;
             border-radius: 6px;
-            margin-bottom: 12px;
-            font-size: 0.92rem;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
         }
         .state.error {
-            color: #7f1d1d;
-            background: #fee2e2;
-            border: 1px solid #fecaca;
+            color: #fca5a5;
+            background: rgba(127, 29, 29, 0.4);
+            border: 1px solid #7f1d1d;
         }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 12px;
+        .state.info {
+            color: #93c5fd;
+            background: rgba(30, 58, 138, 0.4);
+            border: 1px solid #1e3a8a;
         }
+
+        /* Match Cards */
         .card {
             background: var(--card);
             border: 1px solid var(--border);
-            border-left: 4px solid #94a3b8;
+            border-left: 4px solid var(--muted);
             border-radius: 8px;
-            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
-            padding: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            padding: 16px;
         }
         .teams {
             margin: 0;
-            font-size: 1rem;
+            font-size: 1.1rem;
+            color: var(--text);
         }
         .meta {
-            font-size: 0.82rem;
+            font-size: 0.85rem;
             color: var(--muted);
-            margin-top: 4px;
+            margin-top: 6px;
         }
         .row {
             display: flex;
             justify-content: space-between;
             gap: 8px;
-            margin-top: 12px;
+            margin-top: 14px;
             align-items: center;
         }
         .pick {
             font-weight: 700;
-            font-size: 1.04rem;
+            font-size: 1.1rem;
         }
         .confidence {
             font-weight: 700;
-            font-size: 0.88rem;
+            font-size: 0.9rem;
             border-radius: 999px;
-            padding: 5px 10px;
-            background: #eef2ff;
+            padding: 4px 10px;
+            background: rgba(255,255,255,0.1);
         }
         .notice {
-            margin-top: 10px;
+            margin-top: 12px;
             border-radius: 6px;
             padding: 10px;
-            font-size: 0.88rem;
-            line-height: 1.45;
+            font-size: 0.9rem;
+            line-height: 1.4;
         }
         .report {
-            margin-top: 10px;
-            background: #f8fafc;
+            margin-top: 12px;
+            background: rgba(255,255,255,0.03);
             border-radius: 6px;
-            padding: 10px;
-            border: 1px solid #e2e8f0;
-            font-size: 0.85rem;
-            line-height: 1.45;
-            color: #334155;
+            padding: 12px;
+            border: 1px solid var(--border);
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: var(--muted);
         }
         details {
-            margin-top: 10px;
-            border: 1px solid #dbeafe;
-            background: #eff6ff;
+            margin-top: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.02);
             border-radius: 6px;
-            padding: 8px 10px;
+            padding: 10px;
         }
         summary {
             font-weight: 700;
             cursor: pointer;
-            color: #1e40af;
-            font-size: 0.9rem;
+            color: var(--accent);
+            font-size: 0.95rem;
         }
         ul {
-            margin: 8px 0 0;
-            padding-left: 18px;
+            margin: 10px 0 0;
+            padding-left: 20px;
         }
         li {
-            margin-bottom: 7px;
-            font-size: 0.85rem;
-            color: #1e293b;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text);
         }
     </style>
 </head>
 <body>
-<main class="wrap">
-    <h1>Direct 1X2 Markets</h1>
-    <div class="toolbar">
-        <select id="riskTier">
-            <option value="">All Caution Tiers</option>
-            <option value="HIGH_CONFIDENCE">High Confidence</option>
-            <option value="MODERATE_RISK">Moderate Caution</option>
-            <option value="HIGH_RISK">High Caution</option>
-            <option value="EXTREME_RISK">Extreme Caution Advised</option>
+
+    <header class="top-bar">
+        <h1>SportAnalytics Pro</h1>
+        <div id="backBtnContainer" style="display: none;">
+            <button id="backBtn" class="btn">← Back to <span id="backTierName">Global Majors</span></button>
+        </div>
+    </header>
+    
+    <main class="wrap" id="mainContent">
+        <!-- Dynamic Content Injected Here -->
+    </main>
+
+    <div class="bottom-nav">
+        <select id="primaryRouter">
+            <optgroup label="Tiers">
+                <option value="global_majors">Global Majors</option>
+                <option value="premium_markets">Premium Markets</option>
+                <option value="niche_markets">Niche Markets</option>
+            </optgroup>
+            <option value="acca_engine">ACCA Engine</option>
         </select>
-        <button id="refreshBtn" type="button">Refresh</button>
     </div>
-    <div id="state"></div>
-    <section id="cards" class="grid"></section>
-</main>
 
-<script>
-    const riskConfig = {
-        HIGH_CONFIDENCE: {
-            color: '#10b981',
-            badge: 'High Confidence',
-            warning: null
-        },
-        MODERATE_RISK: {
-            color: '#3b82f6',
-            badge: 'Moderate Caution',
-            warning: null
-        },
-        HIGH_RISK: {
-            color: '#f97316',
-            badge: 'High Caution',
-            warning: 'This direct market has elevated variance. We recommend selecting a safer option from Secondary Insights.'
-        },
-        EXTREME_RISK: {
-            color: '#ef4444',
-            badge: 'Extreme Caution Advised',
-            warning: 'This direct market is highly fragile. Please pivot to Secondary Insights for safer coverage.'
-        }
-    };
-
-    function toText(value, fallback = '-') {
-        const text = String(value ?? '').trim();
-        return text ? text : fallback;
-    }
-
-    function formatPredictionLabel(value) {
-        const key = String(value || '').trim().toLowerCase();
-        if (key === 'home_win' || key === 'home') return 'HOME WIN';
-        if (key === 'away_win' || key === 'away') return 'AWAY WIN';
-        if (key === 'draw' || key === 'x') return 'DRAW';
-        return toText(value, 'SELECTION').replace(/_/g, ' ').toUpperCase();
-    }
-
-    function formatKickoff(value) {
-        if (!value) return 'Date pending';
-        const parsed = new Date(value);
-        if (Number.isNaN(parsed.getTime())) return toText(value, 'Date pending');
-        return parsed.toLocaleString('en-ZA', {
-            timeZone: 'Africa/Johannesburg',
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-        });
-    }
-
-    function renderState(message, type = 'error') {
-        const stateEl = document.getElementById('state');
-        if (!message) {
-            stateEl.innerHTML = '';
-            return;
-        }
-        stateEl.innerHTML = `<div class="state ${type}">${message}</div>`;
-    }
-
-    function createCard(prediction) {
-        const config = riskConfig[prediction.risk_tier] || riskConfig.MODERATE_RISK;
-        const card = document.createElement('article');
-        card.className = 'card';
-        card.style.borderLeftColor = config.color;
-
-        const kickoff = formatKickoff(prediction.match_date);
-        const confidence = Number(prediction.confidence || 0);
-        const split = prediction && prediction.one_x2_probabilities && typeof prediction.one_x2_probabilities === 'object'
-            ? prediction.one_x2_probabilities
-            : null;
-        const splitHtml = split
-            ? `<div class="meta" style="margin-top:8px;font-weight:700;color:#334155;">🏠 HOME ${Number(split.home || 0)}% | 🤝 DRAW ${Number(split.draw || 0)}% | ✈️ AWAY ${Number(split.away || 0)}%</div>`
-            : '';
-        const leagueLabel = toText(prediction.league, '');
-        const dataLimited = prediction && prediction.data_sufficient === false;
-        const dataLimitedHtml = dataLimited
-            ? `<div class="notice" style="background:#fff7ed;border:1px solid #fdba74;color:#9a3412;">
-                    <strong>⚠️ Limited data available for this match.</strong><br>
-                    ${toText(prediction.data_note, 'Probability split and secondary markets are based on league averages only.')}
-               </div>`
-            : '';
-
-        const warningHtml = config.warning
-            ? `<div class="notice" style="background:${config.color}12;border:1px solid ${config.color}40;color:${config.color};">
-                    <strong>${config.badge} (${confidence}%):</strong> ${config.warning}
-               </div>`
-            : '';
-
-        const extremeHtml = prediction.risk_tier === 'EXTREME_RISK'
-            ? `<div class="notice" style="background:#fff1f2;border:1px solid #fecdd3;color:#9f1239;">
-                   <strong>Extreme Caution Advised:</strong> Select one of the Secondary Insights below instead of the direct market.
-               </div>`
-            : '';
-
-        const secondary = Array.isArray(prediction.secondary_markets) ? prediction.secondary_markets.slice(0, 4) : [];
-        const secondaryNote = toText(prediction.secondary_markets_note, '');
-        const secondaryHtml = secondary.length
-            ? `<details>
-                    <summary>View Secondary Insights (${secondary.length})</summary>
-                    <ul>
-                        ${secondary.map((market) => {
-                            const line = toText(market.prediction || market.market, 'Secondary Insight').replace(/_/g, ' ').toUpperCase();
-                            const conf = Number(market.confidence || 0);
-                            const desc = toText(market.description, '');
-                            return `<li><strong>${line}</strong> - ${conf}%${desc ? `<br><span style="color:#475569;">${desc}</span>` : ''}</li>`;
-                        }).join('')}
-                    </ul>
-                    ${secondaryNote ? `<div style="margin-top:6px;font-size:0.8rem;color:#1d4ed8;font-weight:700;">${secondaryNote}</div>` : ''}
-                </details>`
-            : (secondaryNote
-                ? `<div class="notice" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;">${secondaryNote}</div>`
-                : '');
-
-        card.innerHTML = `
-            <h3 class="teams">${toText(prediction.home_team)} vs ${toText(prediction.away_team)}</h3>
-            <div class="meta">${toText(prediction.sport, 'football')}${leagueLabel ? ` • ${leagueLabel}` : ''} | ${kickoff}</div>
-            ${splitHtml}
-            ${dataLimitedHtml}
-            <div class="row">
-                <div class="pick" style="color:${config.color};">${formatPredictionLabel(prediction.prediction)}</div>
-                <div class="confidence" style="color:${config.color};">${confidence}%</div>
-            </div>
-            ${warningHtml}
-            ${extremeHtml}
-            <div class="report"><strong>EdgeMind Report:</strong> ${toText(prediction.edgemind_report, 'No report yet.')}</div>
-            ${secondaryHtml}
-        `;
-        return card;
-    }
-
-    async function loadPredictions() {
-        const cards = document.getElementById('cards');
-        const riskTier = document.getElementById('riskTier').value;
-        const params = new URLSearchParams({ sport: 'football', limit: '100' });
-        if (riskTier) params.set('risk_tier', riskTier);
-
-        renderState('');
-        cards.innerHTML = '';
-
-        try {
-            const response = await fetch(`/api/direct-1x2?${params.toString()}`);
-            if (!response.ok) {
-                throw new Error(`Request failed (${response.status})`);
+    <script>
+        const TIERS = {
+            global_majors: {
+                name: 'Global Majors',
+                sports: ['Football', 'Tennis', 'Basketball', 'Cricket', 'eSports']
+            },
+            premium_markets: {
+                name: 'Premium Markets',
+                sports: ['NFL', 'MLB', 'MMA', 'F1', 'Golf', 'Rugby', 'Boxing']
+            },
+            niche_markets: {
+                name: 'Niche Markets',
+                sports: ['NHL', 'AFL', 'Volleyball', 'Handball']
+            },
+            acca_engine: {
+                name: 'ACCA Engine',
+                sports: []
             }
+        };
 
-            const payload = await response.json();
-            const rows = Array.isArray(payload.predictions) ? payload.predictions : [];
+        const riskConfig = {
+            HIGH_CONFIDENCE: {
+                color: 'var(--risk-high-conf)',
+                badge: 'High Confidence',
+                warning: null
+            },
+            MODERATE_RISK: {
+                color: 'var(--risk-mod)',
+                badge: 'Moderate Caution',
+                warning: null
+            },
+            HIGH_RISK: {
+                color: 'var(--risk-high-caut)',
+                badge: 'High Caution',
+                warning: 'This direct market has elevated variance. We recommend selecting a safer option from Secondary Insights.'
+            },
+            EXTREME_RISK: {
+                color: 'var(--risk-ext)',
+                badge: 'Extreme Caution Advised',
+                warning: 'This direct market is highly fragile. Please pivot to Secondary Insights for safer coverage.'
+            }
+        };
 
-            if (!rows.length) {
-                renderState('No Direct 1X2 rows returned for this filter.');
+        let appState = {
+            view: 'tier_list', // 'tier_list', 'sport_insights', 'acca_selection', 'acca_view'
+            tier: 'global_majors',
+            sport: null,
+            accaType: null
+        };
+
+        function toText(value, fallback = '-') {
+            const text = String(value ?? '').trim();
+            return text ? text : fallback;
+        }
+
+        function formatPredictionLabel(value) {
+            const key = String(value || '').trim().toLowerCase();
+            if (key === 'home_win' || key === 'home') return 'HOME WIN';
+            if (key === 'away_win' || key === 'away') return 'AWAY WIN';
+            if (key === 'draw' || key === 'x') return 'DRAW';
+            return toText(value, 'SELECTION').replace(/_/g, ' ').toUpperCase();
+        }
+
+        function formatKickoff(value) {
+            if (!value) return 'Date pending';
+            const parsed = new Date(value);
+            if (Number.isNaN(parsed.getTime())) return toText(value, 'Date pending');
+            return parsed.toLocaleString('en-ZA', {
+                timeZone: 'Africa/Johannesburg',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+        }
+
+        function renderStateMsg(message, type = 'error') {
+            const stateEl = document.getElementById('app-state-msg');
+            if (!stateEl) return;
+            if (!message) {
+                stateEl.innerHTML = '';
                 return;
             }
-
-            rows.forEach((row) => cards.appendChild(createCard(row)));
-        } catch (error) {
-            renderState(error.message || 'Unable to load direct markets.');
+            stateEl.innerHTML = `<div class="state ${type}">${message}</div>`;
         }
-    }
 
-    document.getElementById('refreshBtn').addEventListener('click', loadPredictions);
-    document.getElementById('riskTier').addEventListener('change', loadPredictions);
-    loadPredictions();
-</script>
+        function createCard(prediction) {
+            const config = riskConfig[prediction.risk_tier] || riskConfig.MODERATE_RISK;
+            const card = document.createElement('article');
+            card.className = 'card';
+            card.style.borderLeftColor = config.color;
+
+            const kickoff = formatKickoff(prediction.match_date);
+            const confidence = Number(prediction.confidence || 0);
+            const split = prediction && prediction.one_x2_probabilities && typeof prediction.one_x2_probabilities === 'object'
+                ? prediction.one_x2_probabilities
+                : null;
+            const splitHtml = split
+                ? `<div class="meta" style="margin-top:8px;font-weight:700;color:var(--text);">🏠 HOME ${Number(split.home || 0)}% | 🤝 DRAW ${Number(split.draw || 0)}% | ✈️ AWAY ${Number(split.away || 0)}%</div>`
+                : '';
+            const leagueLabel = toText(prediction.league, '');
+            const dataLimited = prediction && prediction.data_sufficient === false;
+            const dataLimitedHtml = dataLimited
+                ? `<div class="notice" style="background:rgba(249, 115, 22, 0.1);border:1px solid var(--risk-high-caut);color:var(--risk-high-caut);">
+                        <strong>⚠️ Limited data available for this match.</strong><br>
+                        ${toText(prediction.data_note, 'Probability split and secondary markets are based on league averages only.')}
+                   </div>`
+                : '';
+
+            const warningHtml = config.warning
+                ? `<div class="notice" style="background:${config.color}20;border:1px solid ${config.color}80;color:${config.color};">
+                        <strong>${config.badge} (${confidence}%):</strong> ${config.warning}
+                   </div>`
+                : '';
+
+            const extremeHtml = prediction.risk_tier === 'EXTREME_RISK'
+                ? `<div class="notice" style="background:rgba(239, 68, 68, 0.1);border:1px solid var(--risk-ext);color:var(--risk-ext);">
+                       <strong>Extreme Caution Advised:</strong> Select one of the Secondary Insights below instead of the direct market.
+                   </div>`
+                : '';
+
+            const secondary = Array.isArray(prediction.secondary_markets) ? prediction.secondary_markets.slice(0, 4) : [];
+            const secondaryNote = toText(prediction.secondary_markets_note, '');
+            const secondaryHtml = secondary.length
+                ? `<details>
+                        <summary>View Secondary Insights (${secondary.length})</summary>
+                        <ul>
+                            ${secondary.map((market) => {
+                                const line = toText(market.prediction || market.market, 'Secondary Insight').replace(/_/g, ' ').toUpperCase();
+                                const conf = Number(market.confidence || 0);
+                                const desc = toText(market.description, '');
+                                return `<li><strong>${line}</strong> - ${conf}%${desc ? `<br><span style="color:var(--muted);">${desc}</span>` : ''}</li>`;
+                            }).join('')}
+                        </ul>
+                        ${secondaryNote ? `<div style="margin-top:6px;font-size:0.9rem;color:var(--accent);font-weight:700;">${secondaryNote}</div>` : ''}
+                    </details>`
+                : (secondaryNote
+                    ? `<div class="notice" style="background:rgba(59, 130, 246, 0.1);border:1px solid var(--risk-mod);color:var(--accent);">${secondaryNote}</div>`
+                    : '');
+
+            card.innerHTML = `
+                <h3 class="teams">${toText(prediction.home_team)} vs ${toText(prediction.away_team)}</h3>
+                <div class="meta">${toText(prediction.sport, appState.sport)}${leagueLabel ? ` • ${leagueLabel}` : ''} | ${kickoff}</div>
+                ${splitHtml}
+                ${dataLimitedHtml}
+                <div class="row">
+                    <div class="pick" style="color:${config.color};">${formatPredictionLabel(prediction.prediction)}</div>
+                    <div class="confidence" style="color:${config.color};">${confidence}%</div>
+                </div>
+                ${warningHtml}
+                ${extremeHtml}
+                <div class="report"><strong>EdgeMind Report:</strong> ${toText(prediction.edgemind_report, 'No report yet.')}</div>
+                ${secondaryHtml}
+            `;
+            return card;
+        }
+
+        async function loadPredictions(sport) {
+            const cards = document.getElementById('cards');
+            const riskTierEl = document.getElementById('riskTier');
+            if (!cards) return;
+            
+            const riskTier = riskTierEl ? riskTierEl.value : '';
+            const params = new URLSearchParams({ sport: sport.toLowerCase(), limit: '100' });
+            if (riskTier) params.set('risk_tier', riskTier);
+
+            renderStateMsg('');
+            cards.innerHTML = '<div style="color:var(--muted); font-size: 1.1rem; grid-column: 1 / -1; text-align: center; padding: 40px;">Loading insights...</div>';
+
+            try {
+                const response = await fetch(`/api/direct-1x2?${params.toString()}`);
+                if (!response.ok) {
+                    throw new Error(`Request failed (${response.status})`);
+                }
+
+                const payload = await response.json();
+                const rows = Array.isArray(payload.predictions) ? payload.predictions : [];
+
+                cards.innerHTML = '';
+                
+                if (!rows.length) {
+                    renderStateMsg(`No Direct 1X2 rows returned for ${sport} with this filter.`, 'info');
+                    return;
+                }
+
+                rows.forEach((row) => cards.appendChild(createCard(row)));
+            } catch (error) {
+                cards.innerHTML = '';
+                renderStateMsg(error.message || 'Unable to load direct markets.');
+            }
+        }
+
+        function renderSportInsights(container) {
+            container.innerHTML = `
+                <h2 style="margin-top:0;">${appState.sport} Insights</h2>
+                <div class="toolbar">
+                    <select id="riskTier">
+                        <option value="">All Caution Tiers</option>
+                        <option value="HIGH_CONFIDENCE">High Confidence</option>
+                        <option value="MODERATE_RISK">Moderate Caution</option>
+                        <option value="HIGH_RISK">High Caution</option>
+                        <option value="EXTREME_RISK">Extreme Caution Advised</option>
+                    </select>
+                    <button id="refreshBtn" type="button">Refresh</button>
+                </div>
+                <div id="app-state-msg"></div>
+                <section id="cards" class="grid"></section>
+            `;
+            
+            document.getElementById('refreshBtn').addEventListener('click', () => loadPredictions(appState.sport));
+            document.getElementById('riskTier').addEventListener('change', () => loadPredictions(appState.sport));
+            
+            loadPredictions(appState.sport);
+        }
+
+        window.selectAcca = function(type) {
+            appState.view = 'acca_view';
+            appState.accaType = type;
+            render();
+        }
+
+        function renderAccaSelection(container) {
+            container.innerHTML = `
+                <h2 style="margin-top:0;">ACCA Engine</h2>
+                <p style="color:var(--muted); margin-bottom: 24px;">Select an accumulator matrix to isolate the view.</p>
+                <div class="grid">
+                    <div class="sport-card" onclick="selectAcca('6_match')">
+                        <h3>6 Match ACCA</h3>
+                        <p>Curated 6-leg accumulators</p>
+                    </div>
+                    <div class="sport-card" onclick="selectAcca('12_match')">
+                        <h3>12 Match ACCA</h3>
+                        <p>High-yield 12-leg mega accumulators</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAccaView(container) {
+            const title = appState.accaType === '6_match' ? '6 Match ACCA' : '12 Match ACCA';
+            container.innerHTML = `
+                <h2 style="margin-top:0;">${title}</h2>
+                <div class="notice" style="background:var(--card);border:1px solid var(--border);">
+                    <strong>ACCA Matrix isolated.</strong>
+                    <p style="margin: 8px 0 0; color: var(--muted);">The engine is generating the optimal ${title.toLowerCase()} combinations based on current market dynamics.</p>
+                </div>
+                <div id="app-state-msg"></div>
+                <section id="cards" class="grid"></section>
+            `;
+            
+            renderStateMsg('Accumulator logic loaded. Waiting for engine sync...', 'info');
+        }
+
+        function renderTierList(container) {
+            const tier = TIERS[appState.tier];
+            container.innerHTML = `
+                <h2 style="margin-top:0;">${tier.name}</h2>
+                <div class="grid" id="sportCards"></div>
+            `;
+            const grid = document.getElementById('sportCards');
+            
+            tier.sports.forEach(sport => {
+                const card = document.createElement('div');
+                card.className = 'sport-card';
+                card.innerHTML = `<h3>${sport}</h3><p>View insights and direct markets</p>`;
+                card.onclick = () => {
+                    appState.view = 'sport_insights';
+                    appState.sport = sport;
+                    render();
+                };
+                grid.appendChild(card);
+            });
+        }
+
+        function render() {
+            const main = document.getElementById('mainContent');
+            const backBtnContainer = document.getElementById('backBtnContainer');
+            const backTierName = document.getElementById('backTierName');
+            
+            main.innerHTML = '';
+            
+            if (appState.view === 'tier_list') {
+                backBtnContainer.style.display = 'none';
+                renderTierList(main);
+            } else if (appState.view === 'sport_insights') {
+                backBtnContainer.style.display = 'block';
+                backTierName.textContent = TIERS[appState.tier].name;
+                renderSportInsights(main);
+            } else if (appState.view === 'acca_selection') {
+                backBtnContainer.style.display = 'none';
+                renderAccaSelection(main);
+            } else if (appState.view === 'acca_view') {
+                backBtnContainer.style.display = 'block';
+                backTierName.textContent = 'ACCA Engine';
+                renderAccaView(main);
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('primaryRouter').addEventListener('change', (e) => {
+            const val = e.target.value;
+            if (val === 'acca_engine') {
+                appState.tier = 'acca_engine';
+                appState.view = 'acca_selection';
+            } else {
+                appState.tier = val;
+                appState.view = 'tier_list';
+            }
+            render();
+        });
+
+        document.getElementById('backBtn').addEventListener('click', () => {
+            if (appState.tier === 'acca_engine') {
+                appState.view = 'acca_selection';
+            } else {
+                appState.view = 'tier_list';
+            }
+            render();
+        });
+
+        // Initialize App
+        render();
+
+    </script>
 </body>
 </html>
