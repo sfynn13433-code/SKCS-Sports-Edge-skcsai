@@ -32,9 +32,9 @@
             background: var(--card);
             padding: 16px 20px;
             border-bottom: 1px solid var(--border);
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
             align-items: center;
-            justify-content: space-between;
             position: sticky;
             top: 0;
             z-index: 10;
@@ -44,6 +44,26 @@
             font-size: 1.4rem;
             margin: 0;
             color: var(--text);
+            text-align: center;
+            grid-column: 2;
+        }
+        .header-info {
+            grid-column: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .header-info .info-line {
+            font-size: 0.75rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+        .header-info .info-line .label {
+            color: var(--text);
+            font-weight: 700;
         }
         .btn {
             background: var(--card);
@@ -59,31 +79,57 @@
             background: var(--border);
         }
 
-        /* Bottom Navigation Dropdown */
+        /* Bottom Navigation Footer Panel */
         .bottom-nav {
             position: fixed;
             bottom: 0; left: 0; right: 0;
             background: var(--card);
-            padding: 15px 20px;
+            padding: 0;
             border-top: 1px solid var(--border);
+            z-index: 20;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .footer-panel {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 16px 20px;
             display: flex;
             justify-content: center;
-            z-index: 20;
-            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+            align-items: center;
+        }
+        .dropdown-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 320px;
+        }
+        .dropdown-wrapper::after {
+            content: '▼';
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            color: var(--muted);
+            pointer-events: none;
         }
         .bottom-nav select {
             width: 100%;
-            max-width: 400px;
-            padding: 12px;
-            font-size: 1rem;
+            padding: 12px 40px 12px 16px;
+            font-size: 0.95rem;
             background: var(--bg);
             color: var(--text);
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 999px;
             font-weight: 600;
             cursor: pointer;
             appearance: none;
             outline: none;
+            text-align: center;
+            text-align-last: center;
+        }
+        .bottom-nav select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
 
         .wrap {
@@ -96,6 +142,14 @@
             font-size: 1.5rem;
             margin-bottom: 20px;
             color: var(--text);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        h2 .icon {
+            font-size: 1.2rem;
         }
 
         .grid {
@@ -257,8 +311,12 @@
 <body>
 
     <header class="top-bar">
+        <div class="header-info">
+            <div class="info-line"><span class="label">VIEW:</span> PORTAL</div>
+            <div class="info-line"><span class="label">SELECTION:</span> <span id="selectionText">None</span></div>
+        </div>
         <h1>SportAnalytics Pro</h1>
-        <div id="backBtnContainer" style="display: none;">
+        <div id="backBtnContainer" style="display: none; grid-column: 3; justify-self: end;">
             <button id="backBtn" class="btn">← Back to <span id="backTierName">Global Majors</span></button>
         </div>
     </header>
@@ -268,14 +326,18 @@
     </main>
 
     <div class="bottom-nav">
-        <select id="primaryRouter">
-            <optgroup label="Tiers">
-                <option value="global_majors">Global Majors</option>
-                <option value="premium_markets">Premium Markets</option>
-                <option value="niche_markets">Niche Markets</option>
-            </optgroup>
-            <option value="acca_engine">ACCA Engine</option>
-        </select>
+        <div class="footer-panel">
+            <div class="dropdown-wrapper">
+                <select id="primaryRouter">
+                    <optgroup label="Tiers">
+                        <option value="global_majors">Global Majors</option>
+                        <option value="premium_markets">Premium Markets</option>
+                        <option value="niche_markets">Niche Markets</option>
+                    </optgroup>
+                    <option value="acca_engine">ACCA Engine</option>
+                </select>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -554,6 +616,23 @@
             });
         }
 
+        function updateSelectionText() {
+            const selectionText = document.getElementById('selectionText');
+            if (!selectionText) return;
+            
+            if (appState.view === 'sport_insights' && appState.sport) {
+                selectionText.textContent = appState.sport.toUpperCase();
+            } else if (appState.view === 'acca_selection') {
+                selectionText.textContent = 'ACCA ENGINE';
+            } else if (appState.view === 'acca_view' && appState.accaType) {
+                selectionText.textContent = appState.accaType === '6_match' ? '6 MATCH ACCA' : '12 MATCH ACCA';
+            } else if (appState.view === 'tier_list') {
+                selectionText.textContent = TIERS[appState.tier].name.toUpperCase();
+            } else {
+                selectionText.textContent = 'None';
+            }
+        }
+
         function render() {
             const main = document.getElementById('mainContent');
             const backBtnContainer = document.getElementById('backBtnContainer');
@@ -576,6 +655,8 @@
                 backTierName.textContent = 'ACCA Engine';
                 renderAccaView(main);
             }
+            
+            updateSelectionText();
         }
 
         // Event Listeners
