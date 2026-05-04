@@ -253,6 +253,16 @@ app.use(helmet({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Ensure all JSON responses use UTF-8 encoding for proper emoji/character support
+app.use((req, res, next) => {
+    const originalJson = res.json.bind(res);
+    res.json = (data) => {
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        return originalJson(data);
+    };
+    next();
+});
+
 if (process.env.NODE_ENV !== 'test') {
   app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 }

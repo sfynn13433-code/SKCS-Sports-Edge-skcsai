@@ -24,7 +24,8 @@ const pool = new Pool({
     max: 10,
     idleTimeoutMillis: 30_000,
     connectionTimeoutMillis: 10_000,
-    ssl: connectionString ? { rejectUnauthorized: false } : undefined
+    ssl: connectionString ? { rejectUnauthorized: false } : undefined,
+    options: '-c client_encoding=UTF8'
 });
 
 pool.on('error', (err) => {
