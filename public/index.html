@@ -137,7 +137,7 @@
         .framework-card-text { color: #e9ecef; line-height: 1.7; margin-bottom: 1.5rem; }
         .framework-list { list-style-type: none; padding-left: 0; margin: 1.5rem 0; }
         .framework-list li { padding: 0.8rem 0; color: #adb5bd; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-left: 1.5rem; position: relative; }
-        .framework-list li:before { content: "ΓÇó"; color: #0d6efd; position: absolute; left: 0; font-size: 1.2rem; }
+        .framework-list li:before { content: "•"; color: #0d6efd; position: absolute; left: 0; font-size: 1.2rem; }
         .framework-list li:last-child { border-bottom: none; }
         .philosophy-section { background-color: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 3rem; margin-top: 4rem; border: 1px solid rgba(0, 110, 253, 0.3); }
         .philosophy-title { color: #0d6efd; font-size: 1.8rem; margin-bottom: 2rem; text-align: center; }
@@ -253,7 +253,7 @@
             border-bottom: 1px solid #e9ecef;
         }
         .plan-features li:before {
-            content: "Γ£ô";
+            content: "✓";
             color: #198754;
             font-weight: bold;
             margin-right: 0.5rem;
@@ -640,10 +640,10 @@
 
         /* Bottom Navigation Router */
         .bottom-router {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
+            position: relative;
+            margin: 2rem auto;
+            max-width: fit-content;
+            
             z-index: 1000;
             background: var(--portal-card);
             border: 1px solid var(--portal-accent);
@@ -740,14 +740,14 @@
         <div class="nav-container">
             <a href="#" class="logo">SKCS AI Sports Edge</a>
             <div class="nav-links">
-                <a href="#pipeline">≡ƒñû AI Pipeline</a>
-                <a href="#insights">≡ƒôè Insights</a>
-                <a href="#framework">ΓÜÖ∩╕Å Framework</a>
-                <a href="#about">≡ƒôï About</a>
-                <a href="#contact">≡ƒôº Contact</a>
-                <a href="accuracy.html">≡ƒôê Accuracy</a>
-                <a href="/subscribe">≡ƒÆÄ Subscribe</a>
-                <a href="language-switch.html">≡ƒîÉ Language</a>
+                <a href="#pipeline">🤖 AI Pipeline</a>
+                <a href="#insights">🏆 Insights</a>
+                <a href="#framework">⚙️ Framework</a>
+                <a href="#about">📋 About</a>
+                <a href="#contact">📧 Contact</a>
+                <a href="accuracy.html">📈 Accuracy</a>
+                <a href="/subscribe">💎 Subscribe</a>
+                <a href="language-switch.html">🌐 Language</a>
                 <span id="subscriptionGreeting" class="nav-greeting" aria-live="polite"></span>
                 <!-- Auth link will be dynamically replaced by JS -->
                 <a href="#" id="authLink">Login</a>
@@ -770,7 +770,7 @@
         <div class="hero-content">
                 <h1>SKCS AI Sports Edge</h1>
             <p>Smart, confidence-based sports insights across multiple sports</p>
-            <p>ΓÜ╜ ≡ƒÅë ≡ƒÅÉ ΓÜ╛ ≡ƒÅÇ ≡ƒÅÄ∩╕Å ≡ƒÅÅ 13 Sports Coverage</p>
+            <p>⚽ 🏉 🏈 🏒 🏀 🏎∩╕Å 🏏 13 Sports Coverage</p>
             <a href="direct-markets.html" class="cta-button" style="display:inline-block;background:#0d6efd;color:white;padding:14px 32px;border-radius:8px;font-size:1.1rem;font-weight:600;text-decoration:none;margin-top:1rem;">Access Insights Portal</a>
         </div>
     </section>
@@ -782,9 +782,9 @@
             intelligent probability analysis for better decision making.
         </p>
         <div class="features">
-            <div class="feature"><h3>≡ƒÄ» Confidence-Based</h3><p>Every insight comes with a confidence score, not just guesses. We show you how sure we are about each recommendation.</p></div>
-            <div class="feature"><h3>≡ƒ¢í∩╕Å Responsible Analytics</h3><p>We provide safer alternatives for volatile matches. When confidence is low, we suggest more conservative options.</p></div>
-            <div class="feature"><h3>≡ƒôè Multi-Sport Coverage</h3><p>13 sports covered: Football, Rugby, AFL, Baseball, Basketball, Formula 1, Cricket, NFL, Hockey, MMA, Handball, Volleyball, and Tennis.</p></div>
+            <div class="feature"><h3>🎯 Confidence-Based</h3><p>Every insight comes with a confidence score, not just guesses. We show you how sure we are about each recommendation.</p></div>
+            <div class="feature"><h3>🛡️ Responsible Analytics</h3><p>We provide safer alternatives for volatile matches. When confidence is low, we suggest more conservative options.</p></div>
+            <div class="feature"><h3>🏆 Multi-Sport Coverage</h3><p>13 sports covered: Football, Rugby, AFL, Baseball, Basketball, Formula 1, Cricket, NFL, Hockey, MMA, Handball, Volleyball, and Tennis.</p></div>
         </div>
     </div>
     <!-- Pipeline Section -->
@@ -797,7 +797,7 @@
                 <div class="pipeline-stage">
                     <div class="stage-number">1</div>
                     <div class="stage-content">
-                        <h3><span class="stage-icon">≡ƒôÑ</span> API Data Collection</h3>
+                        <h3><span class="stage-icon">📥</span> API Data Collection</h3>
                         <div class="stage-card">
                             <h4>Raw JSON Input</h4>
                             <pre><code>{
@@ -809,7 +809,7 @@
 }</code></pre>
                             <p><strong>Input:</strong> Multiple API sources (fixtures, odds, stats, injuries, weather)</p>
                             <p><strong>Output:</strong> Raw structured JSON</p>
-                            <p><strong>Status:</strong> Γ£à Facts collected, Γ¥î No intelligence yet</p>
+                            <p><strong>Status:</strong> ✅ Facts collected, ❌ No intelligence yet</p>
                         </div>
                     </div>
                 </div>
@@ -817,7 +817,7 @@
                 <div class="pipeline-stage">
                     <div class="stage-number">2</div>
                     <div class="stage-content">
-                        <h3><span class="stage-icon">≡ƒöä</span> Data Normalization</h3>
+                        <h3><span class="stage-icon">🔄</span> Data Normalization</h3>
                         <div class="stage-card">
                             <h4>SKCS Standard Format</h4>
                             <pre><code>{
@@ -836,7 +836,7 @@
                 <div class="pipeline-stage">
                     <div class="stage-number">3</div>
                     <div class="stage-content">
-                        <h3><span class="stage-icon">≡ƒñû</span> AI Stage 1: Initial Prediction</h3>
+                        <h3><span class="stage-icon">🤖</span> AI Stage 1: Initial Prediction</h3>
                         <div class="stage-card">
                             <h4>Baseline Probability Analysis</h4>
                             <pre><code>{
@@ -855,7 +855,7 @@
                 <div class="pipeline-stage">
                     <div class="stage-number">4</div>
                     <div class="stage-content">
-                        <h3><span class="stage-icon">≡ƒºá</span> AI Stage 2: Deep Context</h3>
+                        <h3><span class="stage-icon">🧠</span> AI Stage 2: Deep Context</h3>
                         <div class="stage-card">
                             <h4>Team & Player Intelligence</h4>
                             <pre><code>{
@@ -865,7 +865,7 @@
   }
 }</code></pre>
                             <p><strong>Factors:</strong> Injuries, suspensions, manager changes, fatigue</p>
-                            <p><strong>Example Logic:</strong> Missing striker ΓåÆ reduce goal expectancy</p>
+                            <p><strong>Example Logic:</strong> Missing striker → reduce goal expectancy</p>
                             <p><strong>Purpose:</strong> Human-like analyst thinking</p>
                         </div>
                     </div>
@@ -874,7 +874,7 @@
                 <div class="pipeline-stage">
                     <div class="stage-number">5</div>
                     <div class="stage-content">
-                        <h3><span class="stage-icon">ΓÜá∩╕Å</span> AI Stage 3: Reality Check</h3>
+                        <h3><span class="stage-icon">⚠️</span> AI Stage 3: Reality Check</h3>
                         <div class="stage-card">
                             <h4>External Factor Analysis</h4>
                             <pre><code>{
@@ -893,7 +893,7 @@
                 <div class="pipeline-stage">
                     <div class="stage-number">6</div>
                     <div class="stage-content">
-                        <h3><span class="stage-icon">≡ƒÄ»</span> AI Stage 4: Decision Engine</h3>
+                        <h3><span class="stage-icon">🎯</span> AI Stage 4: Decision Engine</h3>
                         <div class="stage-card">
                             <h4>Final SKCS Insights</h4>
                             <pre><code>{
@@ -913,7 +913,7 @@
             </div>
             <!-- Pipeline Summary -->
             <div class="pipeline-summary">
-                <h3>ΓÜÖ∩╕Å How This Powers Your Insights</h3>
+                <h3>⚙️ How This Powers Your Insights</h3>
                 <div class="summary-grid">
                     <div class="summary-item"><h4>1X2 Markets</h4><p>Must survive <strong>all 6 stages</strong> with high confidence</p></div>
                     <div class="summary-item"><h4>Multi Bets</h4><p>Built from <strong>low-correlation</strong> matches passing Stages 1-4</p></div>
@@ -921,7 +921,7 @@
                     <div class="summary-item"><h4>Accumulators</h4><p>Only matches passing <strong>all stages</strong> + kill-switch for volatility</p></div>
                     <div class="summary-item"><h4>Single-Use Policy</h4><p>Once a match is published in one insight format, it is blocked from the other formats for the rest of the week</p></div>
                 </div>
-                <div class="disclaimer-note"><p>≡ƒÆí <strong>Transparency First:</strong> We show our process so you understand our confidence scores. No black boxes, no hidden logic.</p></div>
+                <div class="disclaimer-note"><p>💡 <strong>Transparency First:</strong> We show our process so you understand our confidence scores. No black boxes, no hidden logic.</p></div>
             </div>
         </div>
     </section>
@@ -941,7 +941,7 @@
         <div id="chat-box"></div>
         <div class="input-area">
           <input type="text" id="chat-input" placeholder="Ask EdgeMind BOT..." /> 
-          <button id="send-btn">ΓåÆ</button> 
+          <button id="send-btn">→</button> 
         </div>
       </div>
     </div> 
@@ -957,10 +957,10 @@
         <div id="portal-container">
             <div class="portal-header">
                 <div class="portal-title">
-                    <span id="view-icon">≡ƒôè</span> <span id="view-title">Global Majors</span>
+                    <span id="view-icon">🏆</span> <span id="view-title">Global Majors</span>
                 </div>
                 <button id="portal-back-btn" class="back-btn" style="display: none;">
-                    <span>ΓåÉ</span> Back to <span id="back-target-name">Tier</span>
+                    <span>←</span> Back to <span id="back-target-name">Tier</span>
                 </button>
             </div>
 
@@ -968,27 +968,27 @@
             <div id="tier-global" class="portal-view active">
                 <div class="tier-grid">
                     <div class="sport-card-dark js-portal-sport" data-sport="football">
-                        <span class="sport-emoji">ΓÜ╜</span>
+                        <span class="sport-emoji">⚽</span>
                         <span class="sport-name">Football</span>
                         <span class="sport-count" id="portal-football-count">(0)</span>
                     </div>
                     <div class="sport-card-dark js-portal-sport" data-sport="tennis">
-                        <span class="sport-emoji">≡ƒÄ╛</span>
+                        <span class="sport-emoji">🎾</span>
                         <span class="sport-name">Tennis</span>
                         <span class="sport-count" id="portal-tennis-count">(0)</span>
                     </div>
                     <div class="sport-card-dark js-portal-sport" data-sport="basketball">
-                        <span class="sport-emoji">≡ƒÅÇ</span>
+                        <span class="sport-emoji">🏀</span>
                         <span class="sport-name">Basketball</span>
                         <span class="sport-count" id="portal-basketball-count">(0)</span>
                     </div>
                     <div class="sport-card-dark js-portal-sport" data-sport="cricket">
-                        <span class="sport-emoji">≡ƒÅÅ</span>
+                        <span class="sport-emoji">🏏</span>
                         <span class="sport-name">Cricket</span>
                         <span class="sport-count" id="portal-cricket-count">(0)</span>
                     </div>
                     <div class="sport-card-dark js-portal-sport" data-sport="esports">
-                        <span class="sport-emoji">≡ƒÄ«</span>
+                        <span class="sport-emoji">🎮</span>
                         <span class="sport-name">eSports</span>
                         <span class="sport-count" id="portal-esports-count">(0)</span>
                     </div>
@@ -999,37 +999,37 @@
             <div id="tier-premium" class="portal-view">
                 <div class="tier-grid">
                     <div class="sport-card-dark js-portal-sport" data-sport="nfl">
-                        <span class="sport-emoji">≡ƒÅê</span>
+                        <span class="sport-emoji">🏈</span>
                         <span class="sport-name">NFL</span>
                         <span class="sport-count" id="portal-nfl-count">(0)</span>
                     </div>
                     <div class="sport-card-dark js-portal-sport" data-sport="baseball">
-                        <span class="sport-emoji">ΓÜ╛</span>
+                        <span class="sport-emoji">🏒</span>
                         <span class="sport-name">MLB</span>
                         <span class="sport-count" id="portal-baseball-count">(0)</span>
                     </div>
                     <div class="sport-card-dark js-portal-sport" data-sport="mma">
-                        <span class="sport-emoji">≡ƒÑè</span>
+                        <span class="sport-emoji">🥊</span>
                         <span class="sport-name">MMA</span>
                         <span class="sport-count" id="portal-mma-count">(0)</span>
                     </div>
                     <div class="sport-card-dark js-portal-sport" data-sport="formula1">
-                        <span class="sport-emoji">≡ƒÅÄ∩╕Å</span>
+                        <span class="sport-emoji">🏎∩╕Å</span>
                         <span class="sport-name">F1</span>
                         <span class="sport-count" id="portal-formula1-count">(0)</span>
                     </div>
                     <div class="sport-card-dark js-portal-sport" data-sport="golf">
-                        <span class="sport-emoji">Γ¢│</span>
+                        <span class="sport-emoji">⛳</span>
                         <span class="sport-name">Golf</span>
                         <span class="sport-count" id="portal-golf-count">(0)</span>
                     </div>
                     <div class="sport-card-dark js-portal-sport" data-sport="rugby">
-                        <span class="sport-emoji">≡ƒÅë</span>
+                        <span class="sport-emoji">🏉</span>
                         <span class="sport-name">Rugby</span>
                         <span class="sport-count" id="portal-rugby-count">(0)</span>
                     </div>
                     <div class="sport-card-dark js-portal-sport" data-sport="boxing">
-                        <span class="sport-emoji">≡ƒÑè</span>
+                        <span class="sport-emoji">🥊</span>
                         <span class="sport-name">Boxing</span>
                         <span class="sport-count" id="portal-boxing-count">(0)</span>
                     </div>
@@ -1040,22 +1040,22 @@
             <div id="tier-niche" class="portal-view">
                 <div class="tier-grid">
                     <div class="sport-card-dark js-portal-sport" data-sport="hockey">
-                        <span class="sport-emoji">≡ƒÅÆ</span>
+                        <span class="sport-emoji">🏒</span>
                         <span class="sport-name">NHL</span>
                         <span class="sport-count" id="portal-hockey-count">(0)</span>
                     </div>
                     <div class="sport-card-dark js-portal-sport" data-sport="afl">
-                        <span class="sport-emoji">≡ƒªÿ</span>
+                        <span class="sport-emoji">🦘</span>
                         <span class="sport-name">AFL</span>
                         <span class="sport-count" id="portal-afl-count">(0)</span>
                     </div>
                     <div class="sport-card-dark js-portal-sport" data-sport="volleyball">
-                        <span class="sport-emoji">≡ƒÅÉ</span>
+                        <span class="sport-emoji">🏈</span>
                         <span class="sport-name">Volleyball</span>
                         <span class="sport-count" id="portal-volleyball-count">(0)</span>
                     </div>
                     <div class="sport-card-dark js-portal-sport" data-sport="handball">
-                        <span class="sport-emoji">≡ƒñ╛</span>
+                        <span class="sport-emoji">🤾</span>
                         <span class="sport-name">Handball</span>
                         <span class="sport-count" id="portal-handball-count">(0)</span>
                     </div>
@@ -1085,158 +1085,158 @@
         <div id="legacy-ui-wrapper" style="display: none;">
             <div style="padding: 1rem; border-bottom: 1px solid #eee; margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem;">
                 <button id="legacy-back-to-portal" class="back-btn" style="background: #f1f5f9; color: #0f172a; border-color: #cbd5e1;">
-                    <span>ΓåÉ</span> Back to <span id="legacy-back-tier-name">Portal</span>
+                    <span>←</span> Back to <span id="legacy-back-tier-name">Portal</span>
                 </button>
                 <h3 id="legacy-sport-title" style="margin: 0; color: #0d6efd;">Sport Insights</h3>
             </div>
             <div class="tabs-container">
             <div class="tabs-header">
-                <button class="tab-button active" data-tab="direct-markets"><span class="sport-icon">≡ƒÄ»</span> DIRECT 1X2</button>
-                <button class="tab-button" data-tab="accumulators"><span class="sport-icon">≡ƒº«</span> ACCA</button>
-                <button class="tab-button" data-tab="football"><span class="sport-icon">ΓÜ╜</span> FOOTBALL</button>
-                <button class="tab-button" data-tab="tennis"><span class="sport-icon">≡ƒÄ╛</span> TENNIS</button>
-                <button class="tab-button" data-tab="basketball"><span class="sport-icon">≡ƒÅÇ</span> BASKETBALL</button>
-                <button class="tab-button" data-tab="rugby"><span class="sport-icon">≡ƒÅë</span> RUGBY</button>
-                <button class="tab-button" data-tab="cricket"><span class="sport-icon">≡ƒÅÅ</span> CRICKET</button>
-                <button class="tab-button" data-tab="baseball"><span class="sport-icon">ΓÜ╛</span> BASEBALL</button>
-                <button class="tab-button" data-tab="hockey"><span class="sport-icon">≡ƒÅÆ</span> HOCKEY</button>
-                <button class="tab-button" data-tab="formula1"><span class="sport-icon">≡ƒÅÄ∩╕Å</span> MOTORSPORT</button>
-                <button class="tab-button" data-tab="mma"><span class="sport-icon">≡ƒÑè</span> MMA</button>
+                <button class="tab-button active" data-tab="direct-markets"><span class="sport-icon">🎯</span> DIRECT 1X2</button>
+                <button class="tab-button" data-tab="accumulators"><span class="sport-icon">🧮</span> ACCA</button>
+                <button class="tab-button" data-tab="football"><span class="sport-icon">⚽</span> FOOTBALL</button>
+                <button class="tab-button" data-tab="tennis"><span class="sport-icon">🎾</span> TENNIS</button>
+                <button class="tab-button" data-tab="basketball"><span class="sport-icon">🏀</span> BASKETBALL</button>
+                <button class="tab-button" data-tab="rugby"><span class="sport-icon">🏉</span> RUGBY</button>
+                <button class="tab-button" data-tab="cricket"><span class="sport-icon">🏏</span> CRICKET</button>
+                <button class="tab-button" data-tab="baseball"><span class="sport-icon">🏒</span> BASEBALL</button>
+                <button class="tab-button" data-tab="hockey"><span class="sport-icon">🏒</span> HOCKEY</button>
+                <button class="tab-button" data-tab="formula1"><span class="sport-icon">🏎∩╕Å</span> MOTORSPORT</button>
+                <button class="tab-button" data-tab="mma"><span class="sport-icon">🥊</span> MMA</button>
             </div>
             <!-- All tab contents -->
             <div id="direct-markets" class="tab-content active">
-                <h3 class="tab-title"><span class="sport-icon">≡ƒÄ»</span> Direct Markets</h3>
+                <h3 class="tab-title"><span class="sport-icon">🎯</span> Direct Markets</h3>
                 <p class="policy-note">Select a sport below to view predictions. Click any sport to see all available insights.</p>
                 <div class="direct-markets-menu">
                     <div class="sport-menu-item" data-sport="football">
-                        <span class="sport-emoji">ΓÜ╜</span>
+                        <span class="sport-emoji">⚽</span>
                         <span class="sport-name">Football</span>
                         <span class="sport-count" id="direct-football-count">(0)</span>
                     </div>
                     <div class="sport-menu-item" data-sport="tennis">
-                        <span class="sport-emoji">≡ƒÄ╛</span>
+                        <span class="sport-emoji">🎾</span>
                         <span class="sport-name">Tennis</span>
                         <span class="sport-count" id="direct-tennis-count">(0)</span>
                     </div>
                     <div class="sport-menu-item" data-sport="basketball">
-                        <span class="sport-emoji">≡ƒÅÇ</span>
+                        <span class="sport-emoji">🏀</span>
                         <span class="sport-name">Basketball</span>
                         <span class="sport-count" id="direct-basketball-count">(0)</span>
                     </div>
                     <div class="sport-menu-item" data-sport="rugby">
-                        <span class="sport-emoji">≡ƒÅë</span>
+                        <span class="sport-emoji">🏉</span>
                         <span class="sport-name">Rugby</span>
                         <span class="sport-count" id="direct-rugby-count">(0)</span>
                     </div>
                     <div class="sport-menu-item" data-sport="cricket">
-                        <span class="sport-emoji">≡ƒÅÅ</span>
+                        <span class="sport-emoji">🏏</span>
                         <span class="sport-name">Cricket</span>
                         <span class="sport-count" id="direct-cricket-count">(0)</span>
                     </div>
                     <div class="sport-menu-item" data-sport="baseball">
-                        <span class="sport-emoji">ΓÜ╛</span>
+                        <span class="sport-emoji">🏒</span>
                         <span class="sport-name">Baseball</span>
                         <span class="sport-count" id="direct-baseball-count">(0)</span>
                     </div>
                     <div class="sport-menu-item" data-sport="hockey">
-                        <span class="sport-emoji">≡ƒÅÆ</span>
+                        <span class="sport-emoji">🏒</span>
                         <span class="sport-name">Hockey</span>
                         <span class="sport-count" id="direct-hockey-count">(0)</span>
                     </div>
                     <div class="sport-menu-item" data-sport="formula1">
-                        <span class="sport-emoji">≡ƒÅÄ∩╕Å</span>
+                        <span class="sport-emoji">🏎∩╕Å</span>
                         <span class="sport-name">Motorsport</span>
                         <span class="sport-count" id="direct-formula1-count">(0)</span>
                     </div>
                     <div class="sport-menu-item" data-sport="mma">
-                        <span class="sport-emoji">≡ƒÑè</span>
+                        <span class="sport-emoji">🥊</span>
                         <span class="sport-name">MMA</span>
                         <span class="sport-count" id="direct-mma-count">(0)</span>
                     </div>
                     <div class="sport-menu-item" data-sport="afl">
-                        <span class="sport-emoji">≡ƒªÿ</span>
+                        <span class="sport-emoji">🦘</span>
                         <span class="sport-name">AFL</span>
                         <span class="sport-count" id="direct-afl-count">(0)</span>
                     </div>
                     <div class="sport-menu-item" data-sport="volleyball">
-                        <span class="sport-emoji">≡ƒÅÉ</span>
+                        <span class="sport-emoji">🏈</span>
                         <span class="sport-name">Volleyball</span>
                         <span class="sport-count" id="direct-volleyball-count">(0)</span>
                     </div>
                     <div class="sport-menu-item" data-sport="handball">
-                        <span class="sport-emoji">≡ƒñ╛</span>
+                        <span class="sport-emoji">🤾</span>
                         <span class="sport-name">Handball</span>
                         <span class="sport-count" id="direct-handball-count">(0)</span>
                     </div>
                     <div class="sport-menu-item" data-sport="nfl">
-                        <span class="sport-emoji">≡ƒÅê</span>
+                        <span class="sport-emoji">🏈</span>
                         <span class="sport-name">NFL</span>
                         <span class="sport-count" id="direct-nfl-count">(0)</span>
                     </div>
                 </div>
             </div>
             <div id="football" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">ΓÜ╜</span> Football Insights</h3>
+                <h3 class="tab-title"><span class="sport-icon">⚽</span> Football Insights</h3>
                 <div id="football-tier-summary" class="tier-allocation-summary" style="display:none;">
                     <h4>Your Daily Insight Allocation</h4>
                     <p class="policy-note" style="font-size: 0.85rem; color: #aaa; margin-bottom: 15px; font-style: italic;">
                         <strong>SKCS Insight Allocation Policy:</strong> Each fixture may only appear once across all insight formats per weekly cycle. Once a match is used (Direct, Analytical, Multi, Same Match, or ACCA), it is locked and cannot be reused. This ensures independence, prevents correlation stacking, and maintains accurate performance tracking.
                     </p>
                     <div class="allocation-row">
-                        <span class="allocation-label">ΓÜ╜ Direct Insights:</span>
+                        <span class="allocation-label">⚽ Direct Insights:</span>
                         <span class="allocation-value"><span id="football-direct-count">0</span> available</span>
                     </div>
 
                     <div class="allocation-row">
-                        <span class="allocation-label">≡ƒöÇ Double Chance &amp; Specials (Linked + Standalone):</span>
+                        <span class="allocation-label">🔀 Double Chance &amp; Specials (Linked + Standalone):</span>
                         <span class="allocation-value"><span id="football-secondary-count">0</span> available</span>
                     </div>
 
                     <div class="allocation-row">
-                        <span class="allocation-label">≡ƒöù Multi (Combined):</span>
+                        <span class="allocation-label">🔗 Multi (Combined):</span>
                         <span class="allocation-value"><span id="football-multi-count">0</span> available</span>
                     </div>
                     <div class="allocation-row">
-                        <span class="allocation-label">≡ƒÄ» Same Match (Bet Builders):</span>
+                        <span class="allocation-label">🎯 Same Match (Bet Builders):</span>
                         <span class="allocation-value"><span id="football-same-count">0</span> available</span>
                     </div>
                 </div>
                 <div id="football-direct" class="prediction-category">
-                    <h4 style="color:#60a5fa;margin-bottom:1rem;">ΓÜ╜ Direct Insights</h4>
+                    <h4 style="color:#60a5fa;margin-bottom:1rem;">⚽ Direct Insights</h4>
                     <div id="football-direct-matches" class="prediction-grid"><p>Loading...</p></div>
                 </div>
                 <div id="football-secondary" class="prediction-category">
-                    <h4 style="color:#c084fc;margin-bottom:1rem;">≡ƒöÇ Standalone Secondary Insights</h4>
+                    <h4 style="color:#c084fc;margin-bottom:1rem;">🔀 Standalone Secondary Insights</h4>
                     <div id="football-secondary-matches" class="prediction-grid"><p>Loading...</p></div>
                 </div>
                 <div id="football-multi" class="prediction-category">
-                    <h4 style="color:#7c3aed;margin-bottom:1rem;">≡ƒöù Multi (Combined Selections)</h4>
+                    <h4 style="color:#7c3aed;margin-bottom:1rem;">🔗 Multi (Combined Selections)</h4>
                     <div id="football-multi-matches" class="prediction-grid"><p>Loading...</p></div>
                 </div>
                 <div id="football-same" class="prediction-category">
-                    <h4 style="color:#34d399;margin-bottom:1rem;">≡ƒÄ» Same Match (Bet Builders)</h4>
+                    <h4 style="color:#34d399;margin-bottom:1rem;">🎯 Same Match (Bet Builders)</h4>
                     <div id="football-same-matches" class="prediction-grid"><p>Loading...</p></div>
                 </div>
             </div>
             <div id="accumulators" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">≡ƒº«</span> Accumulators</h3>
+                <h3 class="tab-title"><span class="sport-icon">🧮</span> Accumulators</h3>
                 <div id="accumulator-tier-summary" class="tier-allocation-summary" style="display:none;">
                     <h4>Your Daily Accumulator Allocation</h4>
                     <div class="allocation-row">
-                        <span class="allocation-label">≡ƒöÑ Daily 6-Leg ACCAs:</span>
+                        <span class="allocation-label">🎯 Daily 6-Leg ACCAs:</span>
                         <span class="allocation-value"><span id="accumulator-acca-count">0</span> available</span>
                     </div>
                     <div class="allocation-row">
-                        <span class="allocation-label">≡ƒîÉ 12-Leg Mega ACCAs:</span>
+                        <span class="allocation-label">🌐 12-Leg Mega ACCAs:</span>
                         <span class="allocation-value"><span id="accumulator-mega-count">0</span> available</span>
                     </div>
                 </div>
                 <div id="accumulator-acca" class="prediction-category">
-                    <h4 style="color:#f87171;margin-bottom:1rem;">≡ƒöÑ Daily 6-Leg ACCAs</h4>
+                    <h4 style="color:#f87171;margin-bottom:1rem;">🎯 Daily 6-Leg ACCAs</h4>
                     <div id="accumulator-acca-matches" class="prediction-grid"><p>Loading...</p></div>
                 </div>
                 <div id="accumulator-mega" class="prediction-category">
-                    <h4 style="color:#7c3aed;margin-bottom:1rem;">≡ƒîÉ Mega ACCAs (12 Legs)</h4>
+                    <h4 style="color:#7c3aed;margin-bottom:1rem;">🌐 Mega ACCAs (12 Legs)</h4>
                     <div id="accumulator-mega-matches" class="prediction-grid"><p>Loading...</p></div>
                     <div id="mega-acca-disclosure" class="mega-acca-disclosure" style="background-color: #1a1a1a; border-left: 4px solid #ff4444; padding: 16px; margin-top: 24px; border-radius: 4px; font-size: 0.85rem; color: #a0a0a0;">
                         <div style="display: flex; align-items: center; margin-bottom: 8px;">
@@ -1252,89 +1252,89 @@
                 </div>
             </div>
             <div id="rugby" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">≡ƒÅë</span> Rugby Insights</h3>
+                <h3 class="tab-title"><span class="sport-icon">🏉</span> Rugby Insights</h3>
                 <div class="prediction-sample">
-                    <h4>≡ƒÅë Upcoming Insights</h4>
+                    <h4>🏉 Upcoming Insights</h4>
                     <div id="rugby-matches" class="prediction-grid"><p>Loading insights...</p></div>
                 </div>
             </div>
             <div id="afl" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">≡ƒÅÉ</span> AFL Insights</h3>
+                <h3 class="tab-title"><span class="sport-icon">🏈</span> AFL Insights</h3>
                 <div class="prediction-sample">
-                    <h4>≡ƒÅÉ Upcoming Insights</h4>
+                    <h4>🏈 Upcoming Insights</h4>
                     <div id="afl-matches" class="prediction-grid"><p>Loading insights...</p></div>
                 </div>
             </div>
             <div id="baseball" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">ΓÜ╛</span> Baseball Insights</h3>
+                <h3 class="tab-title"><span class="sport-icon">🏒</span> Baseball Insights</h3>
                 <div class="prediction-sample">
-                    <h4>ΓÜ╛ Upcoming Insights</h4>
+                    <h4>🏒 Upcoming Insights</h4>
                     <div id="baseball-matches" class="prediction-grid"><p>Loading insights...</p></div>
                 </div>
             </div>
             <div id="basketball" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">≡ƒÅÇ</span> Basketball Insights</h3>
+                <h3 class="tab-title"><span class="sport-icon">🏀</span> Basketball Insights</h3>
                 <div class="prediction-sample">
-                    <h4>≡ƒÅÇ Upcoming Insights</h4>
+                    <h4>🏀 Upcoming Insights</h4>
                     <div id="basketball-matches" class="prediction-grid"><p>Loading insights...</p></div>
                 </div>
             </div>
             <div id="formula1" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">≡ƒÅÄ∩╕Å</span> Formula 1 Insights</h3>
+                <h3 class="tab-title"><span class="sport-icon">🏎∩╕Å</span> Formula 1 Insights</h3>
                 <div class="prediction-sample">
-                    <h4>≡ƒÅÄ∩╕Å Upcoming Insights</h4>
+                    <h4>🏎∩╕Å Upcoming Insights</h4>
                     <div id="formula1-matches" class="prediction-grid"><p>Loading insights...</p></div>
                 </div>
             </div>
             <div id="cricket" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">≡ƒÅÅ</span> Cricket Insights</h3>
+                <h3 class="tab-title"><span class="sport-icon">🏏</span> Cricket Insights</h3>
                 <div class="cricket-status-filters" style="margin-bottom: 1.5rem; text-align: center;">
                     <button class="cricket-status-btn active" data-status="upcoming" style="margin: 0.25rem; padding: 0.5rem 1rem; border: 1px solid #0d6efd; background: #0d6efd; color: white; border-radius: 4px; cursor: default;">Upcoming Only</button>
                 </div>
                 <div class="prediction-sample">
-                    <h4>≡ƒÅÅ Upcoming Insights</h4>
+                    <h4>🏏 Upcoming Insights</h4>
                     <div id="cricket-matches"><p>Loading insights...</p></div>
                 </div>
             </div>
             <div id="nfl" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">≡ƒÅê</span> NFL Insights</h3>
+                <h3 class="tab-title"><span class="sport-icon">🏈</span> NFL Insights</h3>
                 <div class="prediction-sample">
-                    <h4>≡ƒÅê Upcoming Games</h4>
+                    <h4>🏈 Upcoming Games</h4>
                     <div id="nfl-matches" class="prediction-grid"><p>Loading insights...</p></div>
                 </div>
             </div>
             <div id="hockey" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">≡ƒÅÆ</span> Hockey Insights</h3>
+                <h3 class="tab-title"><span class="sport-icon">🏒</span> Hockey Insights</h3>
                 <div class="prediction-sample">
-                    <h4>≡ƒÅÆ Upcoming Matches</h4>
+                    <h4>🏒 Upcoming Matches</h4>
                     <div id="hockey-matches" class="prediction-grid"><p>Loading insights...</p></div>
                 </div>
             </div>
             <div id="mma" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">≡ƒñ╝</span> MMA Insights</h3>
+                <h3 class="tab-title"><span class="sport-icon">🥊</span> MMA Insights</h3>
                 <div class="prediction-sample">
-                    <h4>≡ƒñ╝ Upcoming Fights</h4>
+                    <h4>🥊 Upcoming Fights</h4>
                     <div id="mma-matches" class="prediction-grid"><p>Loading insights...</p></div>
                 </div>
             </div>
             <div id="handball" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">≡ƒñ╛</span> Handball Insights</h3>
+                <h3 class="tab-title"><span class="sport-icon">🤾</span> Handball Insights</h3>
                 <div class="prediction-sample">
-                    <h4>≡ƒñ╛ Upcoming Matches</h4>
+                    <h4>🤾 Upcoming Matches</h4>
                     <div id="handball-matches" class="prediction-grid"><p>Loading insights...</p></div>
                 </div>
             </div>
             <div id="volleyball" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">≡ƒÅÉ</span> Volleyball Insights</h3>
+                <h3 class="tab-title"><span class="sport-icon">🏈</span> Volleyball Insights</h3>
                 <div class="prediction-sample">
-                    <h4>≡ƒÅÉ Upcoming Matches</h4>
+                    <h4>🏈 Upcoming Matches</h4>
                     <div id="volleyball-matches" class="prediction-grid"><p>Loading insights...</p></div>
                 </div>
             </div>
             <div id="tennis" class="tab-content">
-                <h3 class="tab-title"><span class="sport-icon">≡ƒÄ╛</span> Tennis Insights</h3>
+                <h3 class="tab-title"><span class="sport-icon">🎾</span> Tennis Insights</h3>
                 <div class="prediction-sample">
-                    <h4>≡ƒÄ╛ Upcoming Matches</h4>
+                    <h4>🎾 Upcoming Matches</h4>
                     <div id="tennis-matches" class="prediction-grid"><p>Loading insights...</p></div>
                 </div>
             </div>
@@ -1345,8 +1345,8 @@
     <!-- Framework Section -->
     <section id="framework" class="framework-section">
         <div class="framework-container">
-            <h2 class="framework-title">SKCS ΓÇô Overall Outcome & Sports Analysis Framework</h2>
-            <p class="framework-subtitle">Pure SKCS vision + outcomes ΓÇö probability-driven system evaluating single markets and combined markets</p>
+            <h2 class="framework-title">SKCS – Overall Outcome & Sports Analysis Framework</h2>
+            <p class="framework-subtitle">Pure SKCS vision + outcomes — probability-driven system evaluating single markets and combined markets</p>
             <div class="framework-intro">
                 <p>SKCS is built to analyze sports outcomes through a structured, probability-driven system that evaluates <strong>single markets and combined markets</strong> with the same level of discipline and risk awareness.</p>
                 <p>Rather than treating all bets the same, SKCS categorizes and processes outcomes based on <strong>complexity, correlation, and exposure</strong>.</p>
@@ -1406,7 +1406,7 @@
                     <div class="principle"><h4>Risk awareness over payout appeal</h4></div>
                     <div class="principle"><h4>Consistency over short-term results</h4></div>
                 </div>
-                <p class="philosophy-statement">SKCS does not promise wins.<br>It provides <strong>clarity</strong>, <strong>discipline</strong>, and <strong>measured insight</strong> into how outcomes behave ΓÇö individually and in combination.<br>The final outcome is a <strong>decision framework</strong>.</p>
+                <p class="philosophy-statement">SKCS does not promise wins.<br>It provides <strong>clarity</strong>, <strong>discipline</strong>, and <strong>measured insight</strong> into how outcomes behave — individually and in combination.<br>The final outcome is a <strong>decision framework</strong>.</p>
             </div>
         </div>
     </section>
@@ -1420,15 +1420,15 @@
                 <p><strong>SKCS (Smart Knowledge & Control Systems)</strong> is a data-driven analytics platform focused on transforming raw sports data into structured, responsible insights.</p>
                 <p>Our core mission is simple: <span class="highlight">turn complex, fragmented sports data into clear, intelligent decision support.</span></p>
             </div>
-            <p>SKCS AI aggregates and processes information from multiple trusted data sources ΓÇö including football, rugby, AFL, baseball, basketball, Formula 1, cricket, and more ΓÇö using automated pipelines, statistical models, and validation layers. Rather than relying on hype or guarantees, SKCS emphasizes <span class="highlight">probability, context, and transparency</span>.</p>
+            <p>SKCS AI aggregates and processes information from multiple trusted data sources — including football, rugby, AFL, baseball, basketball, Formula 1, cricket, and more — using automated pipelines, statistical models, and validation layers. Rather than relying on hype or guarantees, SKCS emphasizes <span class="highlight">probability, context, and transparency</span>.</p>
             <h3 class="section-subtitle">What Makes SKCS Different</h3>
             <ul class="feature-list">
-                <li><strong>Multi-sport intelligence</strong> ΓÇô One unified system across 13 sports</li>
-                <li><strong>Layered analysis</strong> ΓÇô Data is filtered, validated, and refined before insights are generated</li>
-                <li><strong>Single-use insight policy</strong> ΓÇô Once a fixture is published in one insight format, it is blocked from the other formats for that calendar week</li>
-                <li><strong>Responsible design</strong> ΓÇô No promises, no manipulation, no false certainty</li>
-                <li><strong>Automation-first</strong> ΓÇô Built to scale with minimal manual intervention</li>
-                <li><strong>Developer-friendly</strong> ΓÇô Modular architecture designed for expansion</li>
+                <li><strong>Multi-sport intelligence</strong> – One unified system across 13 sports</li>
+                <li><strong>Layered analysis</strong> – Data is filtered, validated, and refined before insights are generated</li>
+                <li><strong>Single-use insight policy</strong> – Once a fixture is published in one insight format, it is blocked from the other formats for that calendar week</li>
+                <li><strong>Responsible design</strong> – No promises, no manipulation, no false certainty</li>
+                <li><strong>Automation-first</strong> – Built to scale with minimal manual intervention</li>
+                <li><strong>Developer-friendly</strong> – Modular architecture designed for expansion</li>
             </ul>
             <h3 class="section-subtitle">Our Vision</h3>
             <p>SKCS is designed to grow beyond daily sports insights alone. The long-term vision includes:</p>
@@ -1454,9 +1454,9 @@
                 </form>
             </div>
             <div class="contact-info">
-                <div class="contact-item"><h4>≡ƒôº General Inquiries</h4><p>Email: <a href="mailto:info@skcs.co.za" class="email-link">info@skcs.co.za</a></p><p>Response time: 24-48 hours</p></div>
-                <div class="contact-item"><h4>≡ƒöº Technical Support</h4><p>Email: <a href="mailto:support@skcs.co.za" class="email-link">support@skcs.co.za</a></p><p>For website or platform issues</p></div>
-                <div class="contact-item"><h4>≡ƒôì Follow Our Updates</h4><p>Updates and announcements coming soon</p></div>
+                <div class="contact-item"><h4>📧 General Inquiries</h4><p>Email: <a href="mailto:info@skcs.co.za" class="email-link">info@skcs.co.za</a></p><p>Response time: 24-48 hours</p></div>
+                <div class="contact-item"><h4>🔧 Technical Support</h4><p>Email: <a href="mailto:support@skcs.co.za" class="email-link">support@skcs.co.za</a></p><p>For website or platform issues</p></div>
+                <div class="contact-item"><h4>📍 Follow Our Updates</h4><p>Updates and announcements coming soon</p></div>
                 <p class="contact-note">We're currently in development phase. Full contact options will be available when we launch.</p>
             </div>
         </div>
@@ -1480,7 +1480,7 @@
         </div>
     </footer>
     <!-- Scroll to top button -->
-    <button id="scrollTopBtn" title="Go to top">Γ¼å∩╕Å</button>
+    <button id="scrollTopBtn" title="Go to top">⬆️</button>
 
     <script src="js/config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1734,7 +1734,7 @@
         };
 
         const quotaBtn = document.createElement('button');
-        quotaBtn.innerHTML = '≡ƒôè Quotas';
+        quotaBtn.innerHTML = '🏆 Quotas';
         quotaBtn.style.cssText = 'background:#198754;color:white;border:none;padding:0.45rem 0.7rem;border-radius:6px;font-weight:700;cursor:pointer;';
         quotaBtn.onclick = async () => {
             const token = session?.access_token || await getAccessTokenOrRedirect();
@@ -1751,7 +1751,7 @@
         };
 
         const debugBtn = document.createElement('button');
-        debugBtn.innerHTML = '≡ƒöì Debug';
+        debugBtn.innerHTML = '🔍 Debug';
         debugBtn.style.cssText = 'background:#dc3545;color:white;border:none;padding:0.45rem 0.7rem;border-radius:6px;font-weight:700;cursor:pointer;';
         debugBtn.onclick = showRawPrediction;
 
@@ -1789,9 +1789,9 @@
         const toast = document.createElement('div');
         toast.id = 'admin-toast';
         toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#059669;color:white;padding:1rem 1.5rem;border-radius:8px;font-weight:700;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.3);animation:slideIn 0.3s ease';
-        toast.innerHTML = '≡ƒöô Admin Access Granted ΓÇö Dashboard Unlocked';
+        toast.innerHTML = '🔓 Admin Access Granted — Dashboard Unlocked';
         document.body.appendChild(toast);
-        console.log('≡ƒöô Admin detected, unlocking dashboard');
+        console.log('🔓 Admin detected, unlocking dashboard');
         setTimeout(() => {
             toast.style.animation = 'fadeOut 0.3s ease forwards';
             setTimeout(() => toast.remove(), 300);
@@ -1852,7 +1852,7 @@
             return;
         }
         // If the user has experience_mode active, send them to the experience
-        // window instead of the subscription wall ΓÇö this breaks the redirect loop.
+        // window instead of the subscription wall — this breaks the redirect loop.
         try {
             const experienceMode = localStorage.getItem('skcs_experience_mode') === '1';
             if (experienceMode) {
@@ -2010,7 +2010,7 @@
     }
 
     const ENABLED_INSIGHT_TABS = new Set(['direct-markets', 'football', 'tennis', 'basketball', 'rugby', 'cricket', 'baseball', 'hockey', 'formula1', 'mma', 'afl', 'volleyball', 'handball', 'nfl', 'accumulators']);
-    const DISABLED_SPORT_MESSAGE = 'Sport coming soon ΓÇö currently in development';
+    const DISABLED_SPORT_MESSAGE = 'Sport coming soon — currently in development';
 
     function isEnabledInsightTab(tabKey) {
         return ENABLED_INSIGHT_TABS.has(String(tabKey || '').trim().toLowerCase());
@@ -3360,7 +3360,7 @@
             const lower = text.toLowerCase();
 
             if (!text) return fallback;
-            if (["market", "selection", "market ΓÇö selection", "market - selection"].includes(lower)) {
+            if (["market", "selection", "market — selection", "market - selection"].includes(lower)) {
                 return fallback;
             }
 
@@ -3389,7 +3389,7 @@
                 <div class="card-header">
                     <div style="font-weight:600; color:#1a202c; margin-bottom:0.5rem;">${home} vs ${away}</div>
                     <div class="cricket-fixture-league">${league}</div>
-                    <div style="color:#64748b; font-size:0.85rem; margin-bottom:1rem;">${startTime} ΓÇó ${fix.status || 'Scheduled'}</div>
+                    <div style="color:#64748b; font-size:0.85rem; margin-bottom:1rem;">${startTime} • ${fix.status || 'Scheduled'}</div>
                 </div>
                 <div class="card-body">
                     <div style="font-weight:600; color:#374151; margin-bottom:0.75rem;">Markets:</div>`;
@@ -3427,8 +3427,8 @@
                     
                     html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem; padding:0.25rem 0;">
                         <div style="flex:1;">
-                            <div style="font-size:0.9rem; color:#374151;">${marketLabel} ΓÇö ${selectionLabel}</div>
-                            ${isPreviewOnlyDirect ? `<div style="display:inline-block;margin-top:4px;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:999px;font-size:0.72rem;font-weight:700;">Preview Only ΓÇö Awaiting Final Context</div>` : ''}
+                            <div style="font-size:0.9rem; color:#374151;">${marketLabel} — ${selectionLabel}</div>
+                            ${isPreviewOnlyDirect ? `<div style="display:inline-block;margin-top:4px;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:999px;font-size:0.72rem;font-weight:700;">Preview Only — Awaiting Final Context</div>` : ''}
                             ${insight.explanation ? `<p class="cricket-insight-explanation">${summarizeCricketExplanation(insight.explanation)}</p>` : ''}
                         </div>
                         <div style="background:${confidenceColor}; color:white; padding:0.2rem 0.5rem; border-radius:12px; font-size:0.8rem; font-weight:600;">${confidence}%</div>
@@ -3485,7 +3485,7 @@
             const lower = text.toLowerCase();
 
             if (!text) return fallback;
-            if (["market", "selection", "market ΓÇö selection", "market - selection"].includes(lower)) {
+            if (["market", "selection", "market — selection", "market - selection"].includes(lower)) {
                 return fallback;
             }
 
@@ -3524,11 +3524,11 @@
                     "Cricket insight"
                 );
                 html += `<div style="display:flex;justify-content:space-between;padding:0.25rem 0;font-size:0.85rem;">
-                    <span>${marketLabel} ΓÇö ${selectionLabel}</span>
+                    <span>${marketLabel} — ${selectionLabel}</span>
                     <span style="color:${conf >= 65 ? '#22c55e' : conf >= 60 ? '#eab308' : '#ef4444'};">${conf}%</span>
                 </div>`;
                 if (isPreviewOnlyDirect) {
-                    html += `<div style="margin:2px 0 4px 0;"><span style="display:inline-block;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:999px;font-size:0.72rem;font-weight:700;">Preview Only ΓÇö Awaiting Final Context</span></div>`;
+                    html += `<div style="margin:2px 0 4px 0;"><span style="display:inline-block;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:999px;font-size:0.72rem;font-weight:700;">Preview Only — Awaiting Final Context</span></div>`;
                 }
                 if (m.explanation) {
                     html += `<p class="cricket-insight-explanation">${summarizeCricketExplanation(m.explanation)}</p>`;
@@ -3986,7 +3986,7 @@
 
     /**
      * Render Sport - Complete Hierarchical UI
-     * Direct (1X2) ΓåÆ Secondary nested inside ΓåÆ Multi ΓåÆ Same Match ΓåÆ ACCA
+     * Direct (1X2) → Secondary nested inside → Multi → Same Match → ACCA
      */
     function renderSport(sport, containerId, predictions, activePlanId = '') {
         const container = document.getElementById(containerId);
@@ -4015,11 +4015,11 @@
         // FIX: Let all 1X2 matches through to show the warning and secondary markets
         const directSingles = selectDirectInsights(singles);
 
-        // Section 1: Direct (1X2) ΓÇö only true single-match rows (multi-leg lives under Multi)
+        // Section 1: Direct (1X2) — only true single-match rows (multi-leg lives under Multi)
         if (directSingles.length > 0) {
             const directSection = document.createElement('div');
             directSection.style.marginBottom = '2rem';
-            directSection.innerHTML = `<h4 style="color:#60a5fa;margin-bottom:1rem;font-size:1.1rem;">ΓÜ╜ Direct (Match Winners)</h4>`;
+            directSection.innerHTML = `<h4 style="color:#60a5fa;margin-bottom:1rem;font-size:1.1rem;">⚽ Direct (Match Winners)</h4>`;
             
             const directGrid = document.createElement('div');
             directGrid.className = 'prediction-grid';
@@ -4048,7 +4048,7 @@
         if (multiPreds.length > 0) {
             const multiSection = document.createElement('div');
             multiSection.style.marginBottom = '2rem';
-            multiSection.innerHTML = `<h4 style="color:#c084fc;margin-bottom:1rem;font-size:1.1rem;">≡ƒöÇ Multi (Combined Selections)</h4>`;
+            multiSection.innerHTML = `<h4 style="color:#c084fc;margin-bottom:1rem;font-size:1.1rem;">🔀 Multi (Combined Selections)</h4>`;
             
             const multiGrid = document.createElement('div');
             multiGrid.className = 'prediction-grid';
@@ -4074,7 +4074,7 @@
         if (sameMatchPreds.length > 0) {
             const sameMatchSection = document.createElement('div');
             sameMatchSection.style.marginBottom = '2rem';
-            sameMatchSection.innerHTML = `<h4 style="color:#22c55e;margin-bottom:1rem;font-size:1.1rem;">≡ƒÄ» Same Match (Bet Builders)</h4>`;
+            sameMatchSection.innerHTML = `<h4 style="color:#22c55e;margin-bottom:1rem;font-size:1.1rem;">🎯 Same Match (Bet Builders)</h4>`;
 
             const sameMatchGrid = document.createElement('div');
             sameMatchGrid.className = 'prediction-grid';
@@ -4096,7 +4096,7 @@
         if (accas.length > 0) {
             const accaSection = document.createElement('div');
             accaSection.style.marginBottom = '2rem';
-            accaSection.innerHTML = `<h4 style="color:#f87171;margin-bottom:1rem;font-size:1.1rem;">≡ƒöÑ 6-Match ACCA</h4>`;
+            accaSection.innerHTML = `<h4 style="color:#f87171;margin-bottom:1rem;font-size:1.1rem;">🎯 6-Match ACCA</h4>`;
             
             const accaGrid = document.createElement('div');
             accaGrid.className = 'prediction-grid';
@@ -4325,7 +4325,7 @@
             'competition.country'
         ]);
 
-        const leagueContext = [country, league].filter(Boolean).join(' ΓÇó ')
+        const leagueContext = [country, league].filter(Boolean).join(' • ')
             || humanizeToken(safeMatch.sport || fallbackSport || metadata.sport || metadata.sport_type || 'fixture');
 
         return { league, country, leagueContext };
@@ -4561,7 +4561,7 @@
         if (!split) return '';
         return `
             <div style="margin-top:8px;font-size:0.8rem;color:#334155;font-weight:700;line-height:1.4;">
-                ≡ƒÅá HOME ${split.home}% | ≡ƒñ¥ DRAW ${split.draw}% | Γ£ê∩╕Å AWAY ${split.away}%
+                🏠 HOME ${split.home}% | 🤝 DRAW ${split.draw}% | ✈️ AWAY ${split.away}%
             </div>
         `;
     }
@@ -4572,7 +4572,7 @@
         const message = dataState.dataNote || 'Probability split and secondary markets are based on league averages only.';
         return `
             <div style="margin-top:8px;padding:8px 10px;border-left:4px solid #f97316;background:#fff7ed;color:#9a3412;border-radius:4px;font-size:0.8rem;line-height:1.45;">
-                <strong>ΓÜá∩╕Å Limited data available for this match.</strong><br>${message}
+                <strong>⚠️ Limited data available for this match.</strong><br>${message}
             </div>
         `;
     }
@@ -4708,7 +4708,7 @@
             </div>
             ` : ''}
             <div style="margin-top:12px;padding:10px;background:#e9ecef;border-radius:6px;border-left:4px solid #6c757d;">
-                <div style="font-size:0.85em;font-weight:bold;color:#495057;margin-bottom:6px;">≡ƒñû EdgeMind Bot</div>
+                <div style="font-size:0.85em;font-weight:bold;color:#495057;margin-bottom:6px;">🤖 EdgeMind Bot</div>
                 <p style="font-size:0.85em;line-height:1.4;color:#495057;margin:0;font-style:italic;white-space:pre-line;">"${edgeMindReportText}"</p>
             </div>
             ${insightsHtml}
@@ -4811,8 +4811,8 @@
         const isFootballOnly = sportsUsed.size === 1 && sportsUsed.has('football');
         const isMixedSports = sportsUsed.size > 1;
         const accaCompositionLabel = isFootballOnly
-            ? 'ΓÜ╜ Football ACCA'
-            : (isMixedSports ? '≡ƒîÉ Mixed Sport ACCA' : '≡ƒîÉ Mixed Sport ACCA');
+            ? '⚽ Football ACCA'
+            : (isMixedSports ? '🌐 Mixed Sport ACCA' : '🌐 Mixed Sport ACCA');
 
         const legsHtml = (pred.matches || []).map((m, idx) => {
             const info = formatMatchInfo(m, m?.sport_type || m?.sport || m?.metadata?.sport_type || m?.metadata?.sport || sport);
@@ -4903,20 +4903,20 @@
         const leagueDetails = resolveLeagueCountryContext(match, sport || match.sport || meta.sport_type || meta.sport);
         const leagueName = String(leagueDetails.league || (homeInfo && homeInfo.league && homeInfo.league.name) || '').trim();
         const countryName = String(leagueDetails.country || (homeInfo && homeInfo.league && homeInfo.league.country) || '').trim();
-        const roundBits = `${meta.matchday ? ' ΓÇó ' + meta.matchday : ''}${meta.week ? ' ΓÇó ' + meta.week : ''}${meta.round ? ' ΓÇó ' + meta.round : ''}${meta.division ? ' ΓÇó ' + meta.division : ''}${meta.conference ? ' ΓÇó ' + meta.conference : ''}`;
+        const roundBits = `${meta.matchday ? ' • ' + meta.matchday : ''}${meta.week ? ' • ' + meta.week : ''}${meta.round ? ' • ' + meta.round : ''}${meta.division ? ' • ' + meta.division : ''}${meta.conference ? ' • ' + meta.conference : ''}`;
 
         if (meta.header_info) {
             contextLabel = meta.header_info;
         } else if (meta.race_name) {
-            contextLabel = `${meta.race_name}${meta.circuit ? ' ΓÇó ' + meta.circuit : ''}`;
+            contextLabel = `${meta.race_name}${meta.circuit ? ' • ' + meta.circuit : ''}`;
         } else if (meta.tournament) {
-            contextLabel = `${meta.tournament}${meta.stage ? ' ΓÇó ' + meta.stage : ''}${meta.gender ? ' ΓÇó ' + meta.gender : ''}`;
+            contextLabel = `${meta.tournament}${meta.stage ? ' • ' + meta.stage : ''}${meta.gender ? ' • ' + meta.gender : ''}`;
         } else if (meta.event) {
-            contextLabel = `${meta.event}${meta.weight_class ? ' ΓÇó ' + meta.weight_class : ''}${meta.venue ? ' ΓÇó ' + meta.venue : ''}`;
+            contextLabel = `${meta.event}${meta.weight_class ? ' • ' + meta.weight_class : ''}${meta.venue ? ' • ' + meta.venue : ''}`;
         } else if (meta.series) {
-            contextLabel = `${meta.series}${meta.format ? ' ΓÇó ' + meta.format : ''}`;
+            contextLabel = `${meta.series}${meta.format ? ' • ' + meta.format : ''}`;
         } else if (leagueName) {
-            contextLabel = `${countryName ? countryName + ' ΓÇó ' : ''}${leagueName}${roundBits}`;
+            contextLabel = `${countryName ? countryName + ' • ' : ''}${leagueName}${roundBits}`;
         } else if (countryName) {
             contextLabel = countryName;
         } else if (match.sport) {
@@ -4949,7 +4949,7 @@
             teams: `${homeLogo}${h} <span style="color:#718096;font-size:0.8rem;">vs</span> ${a}${awayLogo}`,
             context: meta.header_info
                 ? contextLabel
-                : `${sportLabel || 'Sport'}${dateTimeStr ? ' ΓÇó ' + dateTimeStr : ''}${contextLabel ? ' ΓÇó ' + contextLabel : ''}`
+                : `${sportLabel || 'Sport'}${dateTimeStr ? ' • ' + dateTimeStr : ''}${contextLabel ? ' • ' + contextLabel : ''}`
         };
     }
 
@@ -5032,7 +5032,7 @@
 
         // KILL-SWITCH: Admin bypass - remove experience mode flags and stop ALL redirects
         if (isAdmin) {
-            console.log('≡ƒöô Admin detected, unlocking dashboard');
+            console.log('🔓 Admin detected, unlocking dashboard');
             try {
                 localStorage.removeItem('skcs_experience_mode');
                 localStorage.removeItem('skcs_role');
@@ -5080,10 +5080,10 @@
                 const opt = document.querySelector(`#portal-router option[value="${tierId}"]`);
                 if (opt) {
                     viewTitle.textContent = opt.textContent;
-                    if (tierId === 'tier-global') viewIcon.textContent = '≡ƒôè';
-                    else if (tierId === 'tier-premium') viewIcon.textContent = '≡ƒÆÄ';
-                    else if (tierId === 'tier-niche') viewIcon.textContent = '≡ƒöì';
-                    else if (tierId === 'tier-acca') viewIcon.textContent = '≡ƒº«';
+                    if (tierId === 'tier-global') viewIcon.textContent = '🏆';
+                    else if (tierId === 'tier-premium') viewIcon.textContent = '💎';
+                    else if (tierId === 'tier-niche') viewIcon.textContent = '🔍';
+                    else if (tierId === 'tier-acca') viewIcon.textContent = '🧮';
                 }
                 
                 if (tierId === 'tier-acca') {
@@ -5284,11 +5284,11 @@
     });
 </script>
 
-<button id="scrollTopBtn" title="Go to top">Γåæ</button>
+<button id="scrollTopBtn" title="Go to top">↑</button>
 
 <!-- SportAnalytics Pro Primary Router -->
 <div class="bottom-router">
-    <span style="color: var(--portal-accent); font-size: 1.2rem;">≡ƒÜÇ</span>
+    <span style="color: var(--portal-accent); font-size: 1.2rem;">🚀</span>
     <select id="portal-router" class="router-select">
         <optgroup label="Global Majors">
             <option value="tier-global" selected>Global Majors</option>
