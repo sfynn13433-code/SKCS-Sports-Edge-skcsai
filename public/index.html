@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -594,6 +594,17 @@
         @keyframes fadeInPortal {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Shimmer animation for loading placeholders */
+        @keyframes shimmer {
+            0% { opacity: 0.4; }
+            50% { opacity: 0.7; }
+            100% { opacity: 0.4; }
+        }
+        
+        [style*="background: rgba(148, 163, 184,"] {
+            animation: shimmer 1.5s ease-in-out infinite;
         }
 
         /* Tier Grid Styles */
@@ -5114,26 +5125,53 @@
 
         function showPortalSportInsights(sportKey) {
             const portalContainer = document.getElementById('portal-container');
-            const legacyWrapper = document.getElementById('legacy-ui-wrapper');
-            const legacyBackTierName = document.getElementById('legacy-back-tier-name');
-            const legacySportTitle = document.getElementById('legacy-sport-title');
-
-            portalContainer.style.display = 'none';
-            legacyWrapper.style.display = 'block';
+            const viewTitle = document.getElementById('view-title');
+            const viewIcon = document.getElementById('view-icon');
+            const portalBackBtn = document.getElementById('portal-back-btn');
+            const backTargetName = document.getElementById('back-target-name');
             
+            // Hide portal grid and show sport insights
+            document.querySelectorAll('.portal-view').forEach(view => {
+                view.style.display = 'none';
+            });
+            
+            // Create sport insights view with placeholder loading
+            const sportInsightsHtml = `
+                <div id="sport-insights-view" class="portal-view active" style="padding: 40px 24px;">
+                    <h2 style="margin: 0 0 28px; font-size: 1.5rem; font-weight: 600; color: var(--text);">
+                        ${sportKey.charAt(0).toUpperCase() + sportKey.slice(1)} Insights
+                    </h2>
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        ${Array.from({ length: 3 }).map(() => `
+                            <div style="background: rgba(51, 65, 85, 0.6); border-radius: 10px; padding: 24px;">
+                                <div style="display: flex; flex-direction: column; gap: 12px;">
+                                    <div style="height: 16px; background: rgba(148, 163, 184, 0.4); border-radius: 4px; width: 40%;"></div>
+                                    <div style="height: 12px; background: rgba(148, 163, 184, 0.25); border-radius: 4px; width: 25%;"></div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            // Insert sport insights view
+            portalContainer.insertAdjacentHTML('beforeend', sportInsightsHtml);
+            
+            // Update header
+            const sportIcons = {
+                football: '⚽', tennis: '🎾', basketball: '🏀', cricket: '🏏', 
+                esports: '🎮', nfl: '🏈', baseball: '⚾', mma: '🥊',
+                formula1: '🏎️', golf: '⛳', rugby: '🏉', boxing: '🥊',
+                hockey: '🏒', afl: '🦘', volleyball: '🏐', handball: '🤾'
+            };
+            
+            viewIcon.textContent = sportIcons[sportKey] || '🏆';
+            viewTitle.textContent = sportKey.charAt(0).toUpperCase() + sportKey.slice(1) + ' Insights';
+            
+            // Show back button
+            portalBackBtn.style.display = 'inline-flex';
             const opt = document.querySelector(`#portal-router option[value="${currentPortalTier}"]`);
-            if (opt) legacyBackTierName.textContent = opt.textContent;
-            
-            legacySportTitle.textContent = sportKey.charAt(0).toUpperCase() + sportKey.slice(1) + ' Insights';
-
-            if (typeof window.switchSportTab === 'function') {
-                window.switchSportTab(sportKey);
-            }
-
-            const insightsSection = document.getElementById('insights');
-            if (insightsSection) {
-                insightsSection.scrollIntoView({ behavior: 'smooth' });
-            }
+            if (opt) backTargetName.textContent = opt.textContent;
         }
 
         // Initialize Portal Event Listeners
@@ -5157,11 +5195,32 @@
             });
         });
 
-        const legacyBackBtn = document.getElementById('legacy-back-to-portal');
-        if (legacyBackBtn) {
-            legacyBackBtn.addEventListener('click', () => {
-                document.getElementById('portal-container').style.display = 'block';
-                document.getElementById('legacy-ui-wrapper').style.display = 'none';
+        const portalBackBtn = document.getElementById('portal-back-btn');
+        if (portalBackBtn) {
+            portalBackBtn.addEventListener('click', () => {
+                // Remove sport insights view
+                const sportInsightsView = document.getElementById('sport-insights-view');
+                if (sportInsightsView) {
+                    sportInsightsView.remove();
+                }
+                
+                // Show current tier view
+                const currentTierView = document.getElementById(`tier-${currentPortalTier.replace('tier-', '')}`);
+                if (currentTierView) {
+                    currentTierView.style.display = 'block';
+                }
+                
+                // Hide back button
+                portalBackBtn.style.display = 'none';
+                
+                // Reset header
+                const viewTitle = document.getElementById('view-title');
+                const viewIcon = document.getElementById('view-icon');
+                const opt = document.querySelector(`#portal-router option[value="${currentPortalTier}"]`);
+                if (opt && viewTitle && viewIcon) {
+                    viewTitle.textContent = opt.textContent;
+                    viewIcon.textContent = '🏆';
+                }
             });
         }
 
