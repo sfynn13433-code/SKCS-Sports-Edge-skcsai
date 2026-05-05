@@ -306,11 +306,48 @@
     margin-top: 14px;
     display: none;
   }
+
+  /* New Component Layout Styles */
+  #dashboardHeader {
+    margin-bottom: 20px;
+  }
+
+  #mainContentArea {
+    min-height: 400px;
+  }
+
+  #bottomControls {
+    margin-top: 20px;
+  }
+
+  /* Animated placeholder shimmer for loading state */
+  @keyframes shimmer {
+    0% { opacity: 0.4; }
+    50% { opacity: 0.7; }
+    100% { opacity: 0.4; }
+  }
+
+  [style*="background: rgba(148, 163, 184,"] {
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  /* Smooth transitions for cards */
+  [onclick*="selectSport"] {
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  [onclick*="selectSport"]:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
 </style>
 </head>
 <body>
 <div class="shell">
-  <section class="hero">
+  <!-- Dynamic Header -->
+  <div id="dashboardHeader"></div>
+
+  <!-- Legacy Controls (hidden when using new component mode) -->
+  <section id="legacyHero" class="hero" style="display: none;">
     <h1>Saturday VIP Absolute Max Validation</h1>
     <p>Master source is <strong>30-Day Deep VIP</strong>. Every Core and Elite offer is validated as a slice from this same baseline pool, so lower tiers are covered from one consistent source of truth.</p>
     <div class="controls">
@@ -331,14 +368,19 @@
     <div id="errorBox" class="error"></div>
   </section>
 
-  <section id="statsGrid" class="stats"></section>
+  <!-- VIP Stats (shown when sport selected) -->
+  <section id="statsGrid" class="stats" style="display: none;"></section>
 
-  <section class="coverage">
+  <section id="coverageSection" class="coverage" style="display: none;">
     <h2>Offer Coverage Matrix (Derived From 30-Day Deep VIP)</h2>
     <div id="coverageTableWrap"></div>
   </section>
 
-  <section id="sectionsWrap" class="sections"></section>
+  <!-- Main Content Area (Portal / Sport Insights / ACCA) -->
+  <div id="mainContentArea"></div>
+
+  <!-- Bottom Controls -->
+  <div id="bottomControls"></div>
 </div>
 
 <script src="js/config.js"></script>

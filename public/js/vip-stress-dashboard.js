@@ -5,7 +5,7 @@
     // STEP 1: CENTRALIZED STATE MANAGEMENT
     // ============================================
     const STATE = {
-        currentNavGroup: 'Global Majors',
+        currentNavGroup: 'Niche Markets', // Default to Niche Markets per design
         viewState: 'PORTAL', // 'PORTAL', 'MARKET', 'ACCA'
         selectedSport: null,
         animationSpeed: 10,
@@ -34,29 +34,27 @@
     const errorBox = document.getElementById('errorBox');
 
     // ============================================
-    // NAVIGATION GROUPS & SPORTS
+    // MARKET CATEGORIES & SPORTS (Portal Design)
     // ============================================
     const SPORTS_CATALOG = {
+        'Niche Markets': [
+            { id: 'rugby', name: 'Rugby', icon: '🏉', color: '#60a5fa' },
+            { id: 'mma', name: 'MMA', icon: '🥊', color: '#4ade80' },
+            { id: 'darts', name: 'Darts', icon: '🎯', color: '#fbbf24' }
+        ],
+        'Premium Markets': [
+            { id: 'cricket', name: 'Cricket', icon: '🏏', color: '#f87171' },
+            { id: 'esports', name: 'eSports', icon: '🎮', color: '#a78bfa' }
+        ],
         'Global Majors': [
-            { id: 'football', name: '⚽ Football', icon: '⚽' },
-            { id: 'basketball', name: '🏀 Basketball', icon: '🏀' },
-            { id: 'tennis', name: '🎾 Tennis', icon: '🎾' },
-            { id: 'cricket', name: '🏏 Cricket', icon: '🏏' }
+            { id: 'football', name: 'Football', icon: '⚽', color: '#3b82f6' },
+            { id: 'basketball', name: 'Basketball', icon: '🏀', color: '#f97316' },
+            { id: 'tennis', name: 'Tennis', icon: '🎾', color: '#22c55e' }
         ],
         'American Sports': [
-            { id: 'american_football', name: '🏈 American Football', icon: '🏈' },
-            { id: 'baseball', name: '⚾ Baseball', icon: '⚾' },
-            { id: 'hockey', name: '🏒 Hockey', icon: '🏒' }
-        ],
-        'Niche Sports': [
-            { id: 'rugby', name: '🏉 Rugby', icon: '🏉' },
-            { id: 'volleyball', name: '🏐 Volleyball', icon: '🏐' },
-            { id: 'handball', name: '🤝 Handball', icon: '🤝' },
-            { id: 'afl', name: '🦗 AFL', icon: '🦗' }
-        ],
-        'Motor & Combat': [
-            { id: 'formula1', name: '🏎️ Formula 1', icon: '🏎️' },
-            { id: 'mma', name: '🥊 MMA', icon: '🥊' }
+            { id: 'american_football', name: 'American Football', icon: '🏈', color: '#8b5cf6' },
+            { id: 'baseball', name: 'Baseball', icon: '⚾', color: '#ef4444' },
+            { id: 'hockey', name: 'Hockey', icon: '🏒', color: '#06b6d4' }
         ]
     };
 
@@ -476,26 +474,27 @@
 
     // COMPONENT: DashboardHeader
     function DashboardHeader() {
+        // Determine view label: PORTAL when no sport selected, MARKET when viewing a sport
+        const viewLabel = STATE.selectedSport ? 'MARKET' : 
+                          STATE.viewState === 'ACCA' ? 'ACCA' : 'PORTAL';
         return `
-            <section class="hero">
-                <h1>SportAnalytics Pro</h1>
-                <p>Advanced multi-sport prediction analytics and portfolio management.</p>
-                <div class="stats" style="margin-top: 16px; gap: 16px;">
-                    <div class="stat">
-                        <div class="label">STATUS</div>
-                        <div class="value">${STATE.viewState}</div>
+            <section class="hero" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <h1 style="margin: 0;">SportAnalytics Pro</h1>
+                    <p style="margin: 8px 0 0; color: var(--muted);">Advanced multi-sport prediction analytics and portfolio management.</p>
+                </div>
+                <div class="stats" style="gap: 24px; margin: 0;">
+                    <div class="stat" style="text-align: right;">
+                        <div class="label" style="font-size: 0.75rem; letter-spacing: 0.05em; color: var(--muted);">STATUS</div>
+                        <div class="value" style="font-size: 0.95rem; font-weight: 700; color: #4ade80;">Live</div>
                     </div>
-                    <div class="stat">
-                        <div class="label">VIEW</div>
-                        <div class="value">${STATE.currentNavGroup}</div>
+                    <div class="stat" style="text-align: right;">
+                        <div class="label" style="font-size: 0.75rem; letter-spacing: 0.05em; color: var(--muted);">VIEW</div>
+                        <div class="value" style="font-size: 0.95rem; font-weight: 700;">${viewLabel}</div>
                     </div>
-                    <div class="stat">
-                        <div class="label">SELECTION</div>
-                        <div class="value">${STATE.selectedSport ? STATE.selectedSport.toUpperCase() : 'None'}</div>
-                    </div>
-                    <div class="stat">
-                        <div class="label">ANIM SPEED</div>
-                        <div class="value">${STATE.animationSpeed}ms</div>
+                    <div class="stat" style="text-align: right;">
+                        <div class="label" style="font-size: 0.75rem; letter-spacing: 0.05em; color: var(--muted);">SELECTION</div>
+                        <div class="value" style="font-size: 0.95rem; font-weight: 700;">${STATE.selectedSport ? STATE.selectedSport.toUpperCase() : 'None'}</div>
                     </div>
                 </div>
             </section>
@@ -505,19 +504,19 @@
     // COMPONENT: BottomControls
     function BottomControls() {
         return `
-            <div class="controls" style="flex-direction: column; gap: 16px; margin-top: 24px; padding: 16px; border: 1px solid rgba(148, 163, 184, 0.28); border-radius: 12px; background: rgba(15, 30, 44, 0.5);">
-                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-                    <label for="navGroupSelect" style="font-weight: 700;">Navigation:</label>
-                    <select id="navGroupSelect" style="border: 1px solid rgba(148, 163, 184, 0.35); background: rgba(15, 23, 42, 0.78); color: var(--text); border-radius: 10px; padding: 10px 12px; font-size: 0.92rem; cursor: pointer;">
+            <div class="controls" style="flex-direction: row; gap: 24px; margin-top: 24px; padding: 16px 20px; border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 12px; background: rgba(15, 30, 44, 0.5); align-items: center; flex-wrap: wrap;">
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <label for="navGroupSelect" style="font-weight: 600; color: var(--muted); font-size: 0.9rem;">Navigation</label>
+                    <select id="navGroupSelect" style="border: 1px solid rgba(148, 163, 184, 0.35); background: rgba(15, 23, 42, 0.78); color: var(--text); border-radius: 10px; padding: 10px 14px; font-size: 0.92rem; cursor: pointer; min-width: 160px;">
                         ${Object.keys(SPORTS_CATALOG).map(group => `
                             <option value="${group}" ${group === STATE.currentNavGroup ? 'selected' : ''}>${group}</option>
                         `).join('')}
                     </select>
                 </div>
                 <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-                    <label for="animSpeed" style="font-weight: 700;">Animation Speed:</label>
-                    <input type="range" id="animSpeed" min="1" max="50" value="${STATE.animationSpeed}" style="width: 200px; cursor: pointer;">
-                    <span id="speedValue" style="color: var(--muted); font-size: 0.9rem; min-width: 60px;">${STATE.animationSpeed}ms</span>
+                    <label for="animSpeed" style="font-weight: 600; color: var(--muted); font-size: 0.9rem;">Anim Speed</label>
+                    <input type="range" id="animSpeed" min="1" max="50" value="${STATE.animationSpeed}" style="width: 160px; cursor: pointer;">
+                    <span id="speedValue" style="background: rgba(30, 41, 59, 0.8); color: var(--text); font-size: 0.9rem; padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(148, 163, 184, 0.2); min-width: 40px; text-align: center; font-weight: 600;">${STATE.animationSpeed}</span>
                 </div>
             </div>
         `;
@@ -544,36 +543,91 @@
     // COMPONENT: SportCategoryPortal
     function SportCategoryPortal() {
         const sports = SPORTS_CATALOG[STATE.currentNavGroup] || [];
+        const marketTitle = STATE.currentNavGroup; // "Niche Markets", "Premium Markets", etc.
 
         if (STATE.selectedSport === null) {
-            // Sport selection grid
+            // Sport selection grid - matches screenshot design
             return `
-                <section class="section" style="margin-top: 24px;">
-                    <h3 style="margin: 0 0 20px;">
-                        <span>${STATE.currentNavGroup}</span>
-                    </h3>
-                    <div class="cards" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                <section style="margin-top: 24px; background: rgba(15, 23, 42, 0.6); border-radius: 16px; padding: 32px 24px;">
+                    <h2 style="text-align: center; margin: 0 0 32px; font-size: 1.5rem; font-weight: 600; color: var(--text);">
+                        Explore ${marketTitle}
+                    </h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; justify-items: center;">
                         ${sports.map(sport => `
-                            <div class="card" style="cursor: pointer; transition: all 0.3s ease; text-align: center; padding: 20px;" onclick="window.selectSport('${sport.id}')">
-                                <div style="font-size: 3rem; margin-bottom: 12px;">${sport.icon}</div>
-                                <div style="font-weight: 700; font-size: 1.1rem;">${sport.name}</div>
-                                <div style="color: var(--muted); font-size: 0.9rem; margin-top: 8px;">Click to explore</div>
+                            <div onclick="window.selectSport('${sport.id}')" 
+                                 style="cursor: pointer; 
+                                        background: rgba(30, 41, 59, 0.8); 
+                                        border-radius: 16px; 
+                                        padding: 40px 24px; 
+                                        width: 100%; 
+                                        max-width: 220px;
+                                        text-align: center; 
+                                        transition: all 0.3s ease;
+                                        border: 1px solid rgba(148, 163, 184, 0.1);
+                                        display: flex;
+                                        flex-direction: column;
+                                        align-items: center;
+                                        min-height: 180px;"
+                                 onmouseover="this.style.transform='translateY(-4px)'; this.style.borderColor='rgba(148, 163, 184, 0.3)';"
+                                 onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(148, 163, 184, 0.1)';">
+                                <div style="font-size: 3.5rem; margin-bottom: 20px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); color: ${sport.color};">${sport.icon}</div>
+                                <div style="font-weight: 700; font-size: 1.25rem; color: var(--text);">${sport.name}</div>
                             </div>
                         `).join('')}
                     </div>
                 </section>
             `;
         } else {
-            // Show VIP dashboard (existing functionality) for selected sport
+            // Show sport insights with back button
+            const selectedSportData = sports.find(s => s.id === STATE.selectedSport);
+            const sportName = selectedSportData ? selectedSportData.name : STATE.selectedSport;
             return `
-                <div style="margin-top: 24px;">
-                    <div style="margin-bottom: 16px;">
-                        <button onclick="window.deselectSport()" style="border: 1px solid rgba(148, 163, 184, 0.35); background: rgba(15, 23, 42, 0.78); color: var(--text); border-radius: 10px; padding: 10px 12px; font-size: 0.92rem; cursor: pointer; font-weight: 700;">← Back to ${STATE.currentNavGroup}</button>
+                <div style="margin-top: 16px;">
+                    <div style="margin-bottom: 20px;">
+                        <button onclick="window.deselectSport()" 
+                                style="display: inline-flex; 
+                                       align-items: center; 
+                                       gap: 8px;
+                                       border: 1px solid rgba(148, 163, 184, 0.2); 
+                                       background: rgba(30, 41, 59, 0.8); 
+                                       color: #60a5fa; 
+                                       border-radius: 10px; 
+                                       padding: 12px 18px; 
+                                       font-size: 0.95rem; 
+                                       cursor: pointer; 
+                                       font-weight: 600;
+                                       transition: all 0.2s ease;"
+                                onmouseover="this.style.background='rgba(51, 65, 85, 0.9)';"
+                                onmouseout="this.style.background='rgba(30, 41, 59, 0.8)';">
+                            <span style="font-size: 1.2rem;">←</span>
+                            <span>Back to ${marketTitle}</span>
+                        </button>
                     </div>
-                    ${renderVIPDashboard()}
+                    ${SportInsightsLoading(sportName)}
                 </div>
             `;
         }
+    }
+
+    // COMPONENT: Sport Insights Loading (matches screenshot placeholder UI)
+    function SportInsightsLoading(sportName) {
+        return `
+            <section style="background: rgba(15, 23, 42, 0.6); border-radius: 16px; padding: 32px 40px;">
+                <h2 style="margin: 0 0 28px; font-size: 1.5rem; font-weight: 600; color: var(--text);">
+                    ${sportName} Insights
+                </h2>
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    ${Array.from({ length: 3 }).map(() => `
+                        <div style="background: rgba(51, 65, 85, 0.6); border-radius: 10px; padding: 24px;">
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <div style="height: 16px; background: rgba(148, 163, 184, 0.4); border-radius: 4px; width: 40%;"></div>
+                                <div style="height: 12px; background: rgba(148, 163, 184, 0.25); border-radius: 4px; width: 25%;"></div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </section>
+        `;
     }
 
     // COMPONENT: SportInsights
@@ -607,18 +661,19 @@
         `;
     }
 
-    // COMPONENT: AccaEngine
+    // COMPONENT: AccaEngine (Cross-Sport Accumulator Engine per screenshot)
     function AccaEngine() {
-        const radius = 150;
-        const speed = (60 - STATE.animationSpeed) / 10; // Inverse: higher speed value = faster rotation
-        const dotsCount = 12;
+        const radius = 140;
+        const speed = Math.max(2, (55 - STATE.animationSpeed) / 5); // Rotation speed
+        const dotsCount = 10;
 
         return `
-            <section class="section" style="margin-top: 24px; text-align: center;">
-                <h3>🎯 ACCA Engine</h3>
-                <p class="meta">Multi-leg combination builder with circular layout.</p>
-                <div style="display: flex; justify-content: center; align-items: center; padding: 40px 20px;">
-                    <svg width="400" height="400" viewBox="0 0 400 400" style="filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.2));">
+            <section style="margin-top: 24px; background: rgba(15, 23, 42, 0.6); border-radius: 16px; padding: 40px 24px; text-align: center;">
+                <h2 style="margin: 0 0 40px; font-size: 1.5rem; font-weight: 600; color: var(--text);">
+                    Cross-Sport Accumulator Engine
+                </h2>
+                <div style="display: flex; justify-content: center; align-items: center; padding: 20px;">
+                    <svg width="360" height="360" viewBox="0 0 360 360" style="filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.15));">
                         <defs>
                             <style>
                                 @keyframes spinDots {
@@ -626,33 +681,32 @@
                                     to { transform: rotate(360deg); }
                                 }
                                 .rotating-group {
-                                    transform-origin: 200px 200px;
+                                    transform-origin: 180px 180px;
                                     animation: spinDots ${speed}s linear infinite;
                                 }
                             </style>
                         </defs>
-                        <circle cx="200" cy="200" r="100" fill="none" stroke="rgba(59, 130, 246, 0.2)" stroke-width="2"/>
-                        <circle cx="200" cy="200" r="150" fill="none" stroke="rgba(59, 130, 246, 0.1)" stroke-width="1" stroke-dasharray="5,5"/>
+                        <!-- Outer ring -->
+                        <circle cx="180" cy="180" r="${radius}" fill="none" stroke="rgba(148, 163, 184, 0.3)" stroke-width="1.5"/>
+                        
+                        <!-- Rotating dots -->
                         <g class="rotating-group">
                             ${Array.from({ length: dotsCount }).map((_, i) => {
-                                const angle = (i / dotsCount) * Math.PI * 2;
-                                const x = 200 + radius * Math.cos(angle);
-                                const y = 200 + radius * Math.sin(angle);
-                                const color = i % 2 === 0 ? '#3b82f6' : '#f59e0b';
+                                const angle = (i / dotsCount) * Math.PI * 2 - Math.PI / 2; // Start from top
+                                const x = 180 + radius * Math.cos(angle);
+                                const y = 180 + radius * Math.sin(angle);
+                                // Purple for most, blue for a few (matching screenshot)
+                                const color = i < 3 ? '#3b82f6' : '#8b5cf6';
                                 return `
-                                    <circle cx="${x}" cy="${y}" r="8" fill="${color}" opacity="0.7"/>
-                                    <text x="${x}" y="${y + 25}" text-anchor="middle" fill="var(--muted)" font-size="12" font-weight="700">Leg ${i + 1}</text>
+                                    <circle cx="${x}" cy="${y}" r="12" fill="${color}" opacity="0.9"/>
                                 `;
                             }).join('')}
                         </g>
-                        <circle cx="200" cy="200" r="20" fill="#10b981" opacity="0.8"/>
-                        <text x="200" y="207" text-anchor="middle" fill="white" font-size="14" font-weight="700">ACCA</text>
                     </svg>
                 </div>
-                <div style="margin-top: 24px; color: var(--muted);">
-                    <p>Animation Speed: ${STATE.animationSpeed}ms | Rotation: ${speed.toFixed(1)}s/cycle</p>
-                    <p style="font-size: 0.9rem;">Combine up to 12 legs in parallel streams for enhanced odds.</p>
-                </div>
+                <p style="margin: 24px 0 0; color: #8b5cf6; font-size: 1rem; font-weight: 500;">
+                    Real-time correlation matrix active
+                </p>
             </section>
         `;
     }
@@ -678,18 +732,44 @@
     // MAIN RENDER & EVENT WIRING
     // ============================================
     function render() {
-        // For now, keep the VIP dashboard as primary view when viewing PORTAL with sport selected
-        // The components above provide the framework for future expansion
-        if (STATE.viewState === 'PORTAL' && STATE.selectedSport === null) {
-            // Show sport selection instead
-            statsGrid.parentElement.style.display = 'none';
-            coverageTableWrap.parentElement.style.display = 'none';
-            sectionsWrap.innerHTML = SportCategoryPortal();
-        } else {
-            // Show VIP dashboard
-            statsGrid.parentElement.style.display = 'grid';
-            coverageTableWrap.parentElement.style.display = 'block';
-            sectionsWrap.parentElement.style.display = 'block';
+        // Render header
+        const headerContainer = document.getElementById('dashboardHeader');
+        if (headerContainer) {
+            headerContainer.innerHTML = DashboardHeader();
+        }
+
+        // Render main content area
+        const mainContainer = document.getElementById('mainContentArea');
+        if (mainContainer) {
+            mainContainer.innerHTML = MainContentArea();
+        }
+
+        // Render bottom controls
+        const controlsContainer = document.getElementById('bottomControls');
+        if (controlsContainer) {
+            controlsContainer.innerHTML = BottomControls();
+        }
+
+        // Wire up control event listeners after render
+        wireControls();
+    }
+
+    function wireControls() {
+        // Navigation group selector
+        const navSelect = document.getElementById('navGroupSelect');
+        if (navSelect) {
+            navSelect.addEventListener('change', (e) => {
+                updateState({ currentNavGroup: e.target.value, selectedSport: null });
+            });
+        }
+
+        // Animation speed slider
+        const animSpeedInput = document.getElementById('animSpeed');
+        if (animSpeedInput) {
+            animSpeedInput.addEventListener('input', (e) => {
+                const speed = parseInt(e.target.value);
+                updateState({ animationSpeed: speed });
+            });
         }
     }
 
@@ -704,35 +784,14 @@
     };
 
     window.resetView = function() {
-        updateState({ viewState: 'PORTAL' });
+        updateState({ viewState: 'PORTAL', selectedSport: null });
     };
 
-    // Wire up controls
-    document.addEventListener('DOMContentLoaded', function() {
-        // Navigation group selector
-        setTimeout(() => {
-            const navSelect = document.getElementById('navGroupSelect');
-            if (navSelect) {
-                navSelect.addEventListener('change', (e) => {
-                    updateState({ currentNavGroup: e.target.value });
-                });
-            }
+    // Legacy button wiring (for VIP data loading)
+    if (refreshBtn) refreshBtn.addEventListener('click', refresh);
+    if (daySelect) daySelect.addEventListener('change', refresh);
+    if (downloadBtn) downloadBtn.addEventListener('click', downloadPayload);
 
-            // Animation speed slider
-            const animSpeedInput = document.getElementById('animSpeed');
-            if (animSpeedInput) {
-                animSpeedInput.addEventListener('input', (e) => {
-                    const speed = parseInt(e.target.value);
-                    updateState({ animationSpeed: speed });
-                    const speedValue = document.getElementById('speedValue');
-                    if (speedValue) speedValue.textContent = speed + 'ms';
-                });
-            }
-        }, 100);
-    });
-
-    refreshBtn.addEventListener('click', refresh);
-    daySelect.addEventListener('change', refresh);
-    downloadBtn.addEventListener('click', downloadPayload);
-    refresh();
+    // Initial render
+    render();
 })();
