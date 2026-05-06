@@ -1008,20 +1008,24 @@
 
             <!-- Sport Insights View -->
             <div id="sport-insights-view" class="portal-view" style="display: none; padding: 40px 24px;">
+                <!-- Client Field Header -->
+                <div style="text-align: center; margin-bottom: 32px;">
+                    <div style="display: inline-flex; align-items: center; gap: 12px; padding: 16px 24px; background: rgba(15, 23, 42, 0.8); border-radius: 16px; border: 1px solid rgba(148, 163, 184, 0.2);">
+                        <span id="client-field-icon" style="font-size: 2rem;">🏀</span>
+                        <div>
+                            <div style="font-size: 0.9rem; color: var(--muted); margin-bottom: 4px;">Current Field</div>
+                            <div id="client-field-name" style="font-size: 1.25rem; font-weight: 600; color: var(--text);">Basketball</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sport Title and Back Button -->
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px;">
                     <h2 id="insights-title" style="margin: 0; font-size: 1.5rem; font-weight: 600; color: var(--text);"></h2>
-                    <div style="display: flex; gap: 16px; align-items: center;">
-                        <select id="insights-market-dropdown" style="border: 1px solid rgba(148, 163, 184, 0.35); background: rgba(15, 23, 42, 0.78); color: var(--text); border-radius: 10px; padding: 10px 14px; font-size: 0.92rem; cursor: pointer; min-width: 160px;">
-                            <option value="global">Global Majors</option>
-                            <option value="premium">Premium Markets</option>
-                            <option value="niche">Niche Markets</option>
-                            <option value="acca">ACCA Market</option>
-                        </select>
-                        <button id="insights-back-btn" style="display: none; border: 1px solid rgba(148, 163, 184, 0.2); background: rgba(30, 41, 59, 0.8); color: #60a5fa; border-radius: 10px; padding: 12px 18px; font-size: 0.95rem; cursor: pointer; font-weight: 600; transition: all 0.2s ease;">
-                            <span style="font-size: 1.2rem;">←</span>
-                            <span>Back to Portal</span>
-                        </button>
-                    </div>
+                    <button id="insights-back-btn" style="display: none; border: 1px solid rgba(148, 163, 184, 0.2); background: rgba(30, 41, 59, 0.8); color: #60a5fa; border-radius: 10px; padding: 12px 18px; font-size: 0.95rem; cursor: pointer; font-weight: 600; transition: all 0.2s ease;">
+                        <span style="font-size: 1.2rem;">←</span>
+                        <span>Back to Portal</span>
+                    </button>
                 </div>
 
                 <!-- Market Content Container -->
@@ -1244,6 +1248,19 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Market Dropdown at Bottom -->
+                <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(148, 163, 184, 0.1);">
+                    <div style="display: inline-flex; align-items: center; gap: 12px;">
+                        <label style="font-weight: 600; color: var(--muted); font-size: 0.9rem;">Market:</label>
+                        <select id="insights-market-dropdown" style="border: 1px solid rgba(148, 163, 184, 0.35); background: rgba(15, 23, 42, 0.78); color: var(--text); border-radius: 10px; padding: 10px 14px; font-size: 0.92rem; cursor: pointer; min-width: 160px;">
+                            <option value="global" selected>Global Majors</option>
+                            <option value="premium">Premium Markets</option>
+                            <option value="niche">Niche Markets</option>
+                            <option value="acca">ACCA Market</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -1764,9 +1781,33 @@
             hockey: '🏒', afl: '🦘', volleyball: '🏐', handball: '🤾'
         };
         
+        // Update client field at top
+        const clientFieldIcon = document.getElementById('client-field-icon');
+        const clientFieldName = document.getElementById('client-field-name');
+        if (clientFieldIcon && clientFieldName) {
+            clientFieldIcon.textContent = sportIcons[sport] || '🏆';
+            clientFieldName.textContent = sport.charAt(0).toUpperCase() + sport.slice(1);
+        }
+        
+        // Update sport title
         document.getElementById('insights-title').textContent = sport.charAt(0).toUpperCase() + sport.slice(1) + ' Insights';
         document.getElementById('view-title').textContent = sport.charAt(0).toUpperCase() + sport.slice(1) + ' Insights';
         document.getElementById('view-icon').textContent = sportIcons[sport] || '🏆';
+        
+        // Reset dropdown to Global Majors and show global content
+        const dropdown = document.getElementById('insights-market-dropdown');
+        if (dropdown) {
+            dropdown.value = 'global';
+        }
+        
+        // Hide all market content and show global by default
+        document.querySelectorAll('.insights-market-content').forEach(content => {
+            content.style.display = 'none';
+        });
+        const globalContent = document.getElementById('insights-global');
+        if (globalContent) {
+            globalContent.style.display = 'block';
+        }
         
         // Show back button
         document.getElementById('insights-back-btn').style.display = 'inline-flex';
