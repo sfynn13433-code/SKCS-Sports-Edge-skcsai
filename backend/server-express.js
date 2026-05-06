@@ -46,6 +46,9 @@ const { normalizeFixtureDate, getPredictionWindow, isFixtureEligibleForPredictio
 
 void bootstrap().catch(err => console.error('[startup] bootstrap failed:', err.message));
 
+const isProd = process.env.NODE_ENV === 'production';
+const safeErr = (err) => isProd ? 'Internal server error' : (err?.message || 'Unknown error');
+
 const WEEKLY_ROLLING_SCRAPE_CRON = '0 2 * * 1'; // Monday 02:00 UTC = 04:00 SAST
 const ACCA_ROLLING_SYNC_CRON = '0 */4 * * *';
 const CORE_MARKET_ROLLING_SYNC_CRON = '0 */2 * * *';
@@ -384,7 +387,7 @@ app.post('/api/select-plan', requireSupabaseUser, async (req, res) => {
         });
     } catch (err) {
         console.error('[select-plan] error:', err);
-        return res.status(500).json({ error: 'Failed to activate plan', details: err.message });
+        return res.status(500).json({ error: 'Failed to activate plan', details: safeErr(err) });
     }
 });
 
@@ -434,7 +437,7 @@ async function proxyOdds(req, res) {
   } catch (err) {
     applyOddsProviderHeaders(err?.response?.headers || {});
     console.error('[odds-proxy] error:', err.message);
-    res.status(502).json({ error: 'Upstream error', details: err.message });
+    res.status(502).json({ error: 'Upstream error', details: safeErr(err) });
   }
 }
 
@@ -559,7 +562,7 @@ app.get('/api/debug/sync-test', requireRefreshKey, async (req, res) => {
 
         res.json({ ok: true, debug });
     } catch (err) {
-        res.status(500).json({ ok: false, error: err.message });
+        res.status(500).json({ ok: false, error: safeErr(err) });
     }
 });
 
@@ -629,7 +632,7 @@ app.post('/api/grade-predictions', requireRefreshKey, async (req, res) => {
         });
     } catch (err) {
         console.error(`[scheduler] grading failed:`, err.message);
-        res.status(500).json({ ok: false, error: err.message, gradeDate, sport });
+        res.status(500).json({ ok: false, error: safeErr(err), gradeDate, sport });
     }
 });
 
@@ -652,7 +655,7 @@ app.post('/api/settlement/run', requireRefreshKey, async (req, res) => {
         });
     } catch (err) {
         console.error(`[scheduler] settlement failed:`, err.message);
-        res.status(500).json({ ok: false, error: err.message, settlementDate, sport });
+        res.status(500).json({ ok: false, error: safeErr(err), settlementDate, sport });
     }
 });
 
@@ -664,18 +667,20 @@ app.post('/api/settlement/run', requireRefreshKey, async (req, res) => {
 const { fetchWithWaterfall } = require('./utils/rapidApiWaterfall');
 const { pool } = require('./database');
 
-const CRON_SECRET = process.env.CRON_SECRET || 'skcs_super_secret_cron_key_2026';
+const CRON_SECRET = process.env.CRON_SECRET;
+if (!CRON_SECRET) {
+    console.error('[startup] CRON_SECRET env var is not set — cron endpoints will reject all requests');
+}
 
 // Allow secret via header OR query parameter for easier cron-job.org configuration
 function verifyCronSecret(req, res, next) {
     const headerSecret = req.headers['x-cron-secret'];
     const querySecret = req.query.secret;
-    
+
     const validSecret = headerSecret || querySecret;
-    
-    if (!validSecret || validSecret !== CRON_SECRET) {
+
+    if (!CRON_SECRET || !validSecret || validSecret !== CRON_SECRET) {
         console.warn(`[cron-auth] Rejected: missing or invalid secret from ${req.ip}`);
-        console.warn(`[cron-auth] Header: '${headerSecret}', Query: '${querySecret}', Expected: '${CRON_SECRET}'`);
         return res.status(401).json({ status: 'error', message: 'Unauthorized' });
     }
     next();
@@ -754,7 +759,7 @@ app.get('/api/admin/reset-tier-rules', async (_req, res) => {
         `);
         res.json({ ok: true, message: 'Tier rules reset to minimal' });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: safeErr(err) });
     }
 });
 
@@ -1129,7 +1134,7 @@ app.get('/api/debug/cricket-tables', async (_req, res) => {
             }
         });
     } catch (err) {
-        res.status(500).json({ ok: false, error: err.message });
+        res.status(500).json({ ok: false, error: safeErr(err) });
     }
 });
 

@@ -307,7 +307,7 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
                    LIMIT 3000`;
         const queryParams = includeAll
             ? []
-            : (latestPublishRunId ? [latestPublishRunId] : [masterPlan.tiers.map((tier) => String(tier).toLowerCase())]);
+            : (latestPublishRunId ? [latestPublishRunId] : masterPlan.tiers.map((tier) => String(tier).toLowerCase()));
 
         const dbRes = await query(queryText, queryParams);
 

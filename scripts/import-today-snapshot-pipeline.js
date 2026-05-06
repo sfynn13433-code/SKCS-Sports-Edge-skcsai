@@ -1479,7 +1479,7 @@ async function runPipelineInChunks(matches) {
         const chunk = safeMatches.slice(i, i + PIPELINE_CHUNK_SIZE);
         if (!chunk.length) continue;
         const chunkIndex = Math.floor(i / PIPELINE_CHUNK_SIZE) + 1;
-        const chunkSports = [...new Set(chunk.map(m => m.sport).filter(Boolean)];
+        const chunkSports = [...new Set(chunk.map(m => m.sport).filter(Boolean))];
         
         for (const sport of chunkSports) {
             const sportMatches = chunk.filter(m => m.sport === sport);

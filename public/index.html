@@ -743,6 +743,201 @@
         #portal-container .policy-note {
             color: var(--portal-text-dim);
         }
+
+        /* ===== EdgeMind Hub Redesign ===== */
+        .portal-header {
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .hub-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .edgemind-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+        }
+
+        .hub-robot-icon {
+            font-size: 2.4rem;
+            line-height: 1;
+        }
+
+        .hub-title {
+            font-size: 1.65rem;
+            font-weight: 800;
+            color: var(--portal-text);
+            letter-spacing: -0.4px;
+            line-height: 1.2;
+        }
+
+        .hub-subtitle {
+            font-size: 0.82rem;
+            color: var(--portal-text-dim);
+            margin-top: 3px;
+        }
+
+        .hub-status-bar {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+            padding-top: 2px;
+        }
+
+        .hub-status-pill {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .hub-status-label {
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: var(--portal-text-dim);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .hub-status-value {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--portal-text);
+        }
+
+        .hub-status-value.live       { color: #4ade80; }
+        .hub-status-value.portal-mode { color: var(--portal-accent); }
+        .hub-status-value.market-mode { color: #f59e0b; }
+        .hub-status-value.acca-mode  { color: #a78bfa; }
+
+        .hub-back-row {
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 0.85rem;
+            padding-top: 0.85rem;
+            border-top: 1px solid var(--portal-border);
+            width: 100%;
+        }
+
+        .hub-back-row.visible { display: flex; }
+
+        .hub-back-btn {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            color: var(--portal-accent);
+            padding: 0.45rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s;
+        }
+
+        .hub-back-btn:hover {
+            border-color: var(--portal-accent);
+            background: rgba(56, 189, 248, 0.08);
+        }
+
+        /* Explore section title */
+        .tier-explore-title {
+            text-align: center;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--portal-text);
+            margin: 0 0 1.75rem;
+            padding-top: 0.5rem;
+        }
+
+        /* Navigation label in bottom router */
+        .router-nav-label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--portal-text-dim);
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+        }
+
+        /* ACCA Engine animation */
+        .acca-engine-header {
+            text-align: center;
+            padding: 1.5rem 1rem 2rem;
+        }
+
+        .acca-engine-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--portal-text);
+            margin-bottom: 1.75rem;
+        }
+
+        .acca-orbit-container {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 1.25rem;
+        }
+
+        .acca-orbit-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .acca-dot {
+            position: absolute;
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            margin: -5.5px 0 0 -5.5px;
+            animation: orbitDot linear infinite;
+        }
+
+        .acca-dot:nth-child(2)  { background: #8b5cf6; animation-duration: 9s;   animation-delay:  0s;     }
+        .acca-dot:nth-child(3)  { background: #7c3aed; animation-duration: 9s;   animation-delay: -0.75s;  }
+        .acca-dot:nth-child(4)  { background: #6d28d9; animation-duration: 9s;   animation-delay: -1.5s;   }
+        .acca-dot:nth-child(5)  { background: #7c3aed; animation-duration: 9s;   animation-delay: -2.25s;  }
+        .acca-dot:nth-child(6)  { background: #818cf8; animation-duration: 9s;   animation-delay: -3s;     }
+        .acca-dot:nth-child(7)  { background: #60a5fa; animation-duration: 9s;   animation-delay: -3.75s;  }
+        .acca-dot:nth-child(8)  { background: #38bdf8; animation-duration: 9s;   animation-delay: -4.5s;   }
+        .acca-dot:nth-child(9)  { background: #60a5fa; animation-duration: 9s;   animation-delay: -5.25s;  }
+        .acca-dot:nth-child(10) { background: #818cf8; animation-duration: 9s;   animation-delay: -6s;     }
+        .acca-dot:nth-child(11) { background: #7c3aed; animation-duration: 9s;   animation-delay: -6.75s;  }
+        .acca-dot:nth-child(12) { background: #8b5cf6; animation-duration: 9s;   animation-delay: -7.5s;   }
+        .acca-dot:nth-child(13) { background: #a78bfa; animation-duration: 9s;   animation-delay: -8.25s;  }
+
+        @keyframes orbitDot {
+            from { transform: rotate(0deg)   translateX(100px); }
+            to   { transform: rotate(360deg) translateX(100px); }
+        }
+
+        .acca-correlation-text {
+            font-size: 0.88rem;
+            color: #a78bfa;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+
+        /* Disclaimer line */
+        .hub-disclaimer {
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--portal-text-dim);
+            padding: 1rem 0 0.25rem;
+            border-top: 1px solid var(--portal-border);
+            margin-top: 1.5rem;
+        }
     </style>
 </head>
 <body>
@@ -964,44 +1159,61 @@
         <p class="policy-note">Once a team or athlete is used in an insight, the same match is blocked from other insight formats for the rest of that calendar week unless they appear in a different event.</p>
         <p class="section-description" id="planDescription"></p>
 
-        <!-- SportAnalytics Pro Portal -->
+        <!-- EdgeMind Hub Portal -->
         <div id="portal-container">
             <div class="portal-header">
-                <div class="portal-title">
-                    <span id="view-icon">🏆</span> <span id="view-title">Global Majors</span>
+                <div class="hub-header-row">
+                    <div class="edgemind-brand">
+                        <span class="hub-robot-icon">🤖</span>
+                        <div>
+                            <div class="hub-title">EdgeMind Hub</div>
+                            <div class="hub-subtitle">Select a sport below to view AI-driven insights and probabilities.</div>
+                        </div>
+                    </div>
+                    <div class="hub-status-bar">
+                        <div class="hub-status-pill">
+                            <span class="hub-status-label">STATUS</span>
+                            <span class="hub-status-value live" id="hub-status">Live</span>
+                        </div>
+                        <div class="hub-status-pill">
+                            <span class="hub-status-label">VIEW</span>
+                            <span class="hub-status-value portal-mode" id="hub-view">PORTAL</span>
+                        </div>
+                        <div class="hub-status-pill">
+                            <span class="hub-status-label">SELECTION</span>
+                            <span class="hub-status-value" id="hub-selection">None</span>
+                        </div>
+                    </div>
                 </div>
-                <button id="portal-back-btn" class="back-btn" style="display: none;">
-                    <span>←</span> Back to <span id="back-target-name">Tier</span>
-                </button>
+                <!-- Back row (visible when a sport is selected) -->
+                <div class="hub-back-row" id="hub-back-row">
+                    <button id="portal-back-btn" class="hub-back-btn">
+                        <span>←</span> Back to <span id="back-target-name">Tier</span>
+                    </button>
+                </div>
+                <!-- Hidden legacy refs kept for backward-compat JS -->
+                <span id="view-icon" style="display:none;">🏆</span>
+                <span id="view-title" style="display:none;">Global Majors</span>
             </div>
 
             <!-- Global Majors Tier -->
             <div id="tier-global" class="portal-view active">
+                <h2 class="tier-explore-title">Explore Global Majors</h2>
                 <div class="tier-grid">
-                    <div class="sport-card-dark" data-sport="football" style="cursor: pointer;">
+                    <div class="sport-card-dark" data-sport="football" style="cursor:pointer;">
                         <span class="sport-emoji">⚽</span>
                         <span class="sport-name">Football</span>
                         <span class="sport-count" id="portal-football-count">(0)</span>
                     </div>
-                    <div class="sport-card-dark" data-sport="tennis" style="cursor: pointer;">
-                        <span class="sport-emoji">🎾</span>
-                        <span class="sport-name">Tennis</span>
-                        <span class="sport-count" id="portal-tennis-count">(0)</span>
-                    </div>
-                    <div class="sport-card-dark" data-sport="basketball" style="cursor: pointer;">
+                    <div class="sport-card-dark" data-sport="basketball" style="cursor:pointer;">
                         <span class="sport-emoji">🏀</span>
                         <span class="sport-name">Basketball</span>
                         <span class="sport-count" id="portal-basketball-count">(0)</span>
                     </div>
-                    <div class="sport-card-dark" data-sport="cricket" style="cursor: pointer;">
-                        <span class="sport-emoji">🏏</span>
-                        <span class="sport-name">Cricket</span>
-                        <span class="sport-count" id="portal-cricket-count">(0)</span>
-                    </div>
-                    <div class="sport-card-dark" data-sport="esports" style="cursor: pointer;">
-                        <span class="sport-emoji">🎮</span>
-                        <span class="sport-name">eSports</span>
-                        <span class="sport-count" id="portal-esports-count">(0)</span>
+                    <div class="sport-card-dark" data-sport="tennis" style="cursor:pointer;">
+                        <span class="sport-emoji">🎾</span>
+                        <span class="sport-name">Tennis</span>
+                        <span class="sport-count" id="portal-tennis-count">(0)</span>
                     </div>
                 </div>
             </div>
@@ -1267,74 +1479,66 @@
             </div>
 
             <!-- Premium Markets Tier -->
+            <!-- Premium Markets Tier -->
             <div id="tier-premium" class="portal-view">
+                <h2 class="tier-explore-title">Explore Premium Markets</h2>
                 <div class="tier-grid">
-                    <div class="sport-card-dark js-portal-sport" data-sport="nfl">
-                        <span class="sport-emoji">🏈</span>
-                        <span class="sport-name">NFL</span>
-                        <span class="sport-count" id="portal-nfl-count">(0)</span>
+                    <div class="sport-card-dark" data-sport="cricket" style="cursor:pointer;">
+                        <span class="sport-emoji">🏏</span>
+                        <span class="sport-name">Cricket</span>
+                        <span class="sport-count" id="portal-cricket-count">(0)</span>
                     </div>
-                    <div class="sport-card-dark js-portal-sport" data-sport="baseball">
-                        <span class="sport-emoji">🏒</span>
-                        <span class="sport-name">MLB</span>
-                        <span class="sport-count" id="portal-baseball-count">(0)</span>
-                    </div>
-                    <div class="sport-card-dark js-portal-sport" data-sport="mma">
-                        <span class="sport-emoji">🥊</span>
-                        <span class="sport-name">MMA</span>
-                        <span class="sport-count" id="portal-mma-count">(0)</span>
-                    </div>
-                    <div class="sport-card-dark js-portal-sport" data-sport="formula1">
-                        <span class="sport-emoji">🏎∩╕Å</span>
-                        <span class="sport-name">F1</span>
-                        <span class="sport-count" id="portal-formula1-count">(0)</span>
-                    </div>
-                    <div class="sport-card-dark js-portal-sport" data-sport="golf">
-                        <span class="sport-emoji">⛳</span>
-                        <span class="sport-name">Golf</span>
-                        <span class="sport-count" id="portal-golf-count">(0)</span>
-                    </div>
-                    <div class="sport-card-dark js-portal-sport" data-sport="rugby">
-                        <span class="sport-emoji">🏉</span>
-                        <span class="sport-name">Rugby</span>
-                        <span class="sport-count" id="portal-rugby-count">(0)</span>
-                    </div>
-                    <div class="sport-card-dark js-portal-sport" data-sport="boxing">
-                        <span class="sport-emoji">🥊</span>
-                        <span class="sport-name">Boxing</span>
-                        <span class="sport-count" id="portal-boxing-count">(0)</span>
+                    <div class="sport-card-dark" data-sport="esports" style="cursor:pointer;">
+                        <span class="sport-emoji">🎮</span>
+                        <span class="sport-name">eSports</span>
+                        <span class="sport-count" id="portal-esports-count">(0)</span>
                     </div>
                 </div>
             </div>
 
             <!-- Niche Markets Tier -->
             <div id="tier-niche" class="portal-view">
+                <h2 class="tier-explore-title">Explore Niche Markets</h2>
                 <div class="tier-grid">
-                    <div class="sport-card-dark js-portal-sport" data-sport="hockey">
-                        <span class="sport-emoji">🏒</span>
-                        <span class="sport-name">NHL</span>
-                        <span class="sport-count" id="portal-hockey-count">(0)</span>
+                    <div class="sport-card-dark" data-sport="rugby" style="cursor:pointer;">
+                        <span class="sport-emoji">🏉</span>
+                        <span class="sport-name">Rugby</span>
+                        <span class="sport-count" id="portal-rugby-count">(0)</span>
                     </div>
-                    <div class="sport-card-dark js-portal-sport" data-sport="afl">
-                        <span class="sport-emoji">🦘</span>
-                        <span class="sport-name">AFL</span>
-                        <span class="sport-count" id="portal-afl-count">(0)</span>
+                    <div class="sport-card-dark" data-sport="mma" style="cursor:pointer;">
+                        <span class="sport-emoji">🥊</span>
+                        <span class="sport-name">MMA</span>
+                        <span class="sport-count" id="portal-mma-count">(0)</span>
                     </div>
-                    <div class="sport-card-dark js-portal-sport" data-sport="volleyball">
-                        <span class="sport-emoji">🏈</span>
-                        <span class="sport-name">Volleyball</span>
-                        <span class="sport-count" id="portal-volleyball-count">(0)</span>
-                    </div>
-                    <div class="sport-card-dark js-portal-sport" data-sport="handball">
-                        <span class="sport-emoji">🤾</span>
-                        <span class="sport-name">Handball</span>
-                        <span class="sport-count" id="portal-handball-count">(0)</span>
+                    <div class="sport-card-dark" data-sport="darts" style="cursor:pointer;">
+                        <span class="sport-emoji">🎯</span>
+                        <span class="sport-name">Darts</span>
+                        <span class="sport-count" id="portal-darts-count">(0)</span>
                     </div>
                 </div>
             </div>
 
             <!-- ACCA Engine View -->
             <div id="tier-acca" class="portal-view">
+                <div class="acca-engine-header">
+                    <div class="acca-engine-title">Cross-Sport Accumulator Engine</div>
+                    <div class="acca-orbit-container">
+                        <div class="acca-orbit-ring"></div>
+                        <div class="acca-dot"></div>
+                        <div class="acca-dot"></div>
+                        <div class="acca-dot"></div>
+                        <div class="acca-dot"></div>
+                        <div class="acca-dot"></div>
+                        <div class="acca-dot"></div>
+                        <div class="acca-dot"></div>
+                        <div class="acca-dot"></div>
+                        <div class="acca-dot"></div>
+                        <div class="acca-dot"></div>
+                        <div class="acca-dot"></div>
+                        <div class="acca-dot"></div>
+                    </div>
+                    <div class="acca-correlation-text">Real-time correlation matrix active</div>
+                </div>
                 <div class="acca-sub-menu">
                     <button class="acca-toggle active" data-acca="6">6-Match ACCA</button>
                     <button class="acca-toggle" data-acca="12">12-Match ACCA</button>
@@ -1763,76 +1967,119 @@
     </style>
     <script>
     // Simple sport insights navigation functions
+    // Hub pill helpers
+    function hubSetView(mode, label) {
+        const el = document.getElementById('hub-view');
+        if (!el) return;
+        el.textContent = label;
+        el.className = 'hub-status-value ' + mode;
+    }
+    function hubSetSelection(text) {
+        const el = document.getElementById('hub-selection');
+        if (el) el.textContent = text;
+    }
+    function hubShowBack(marketName) {
+        const row = document.getElementById('hub-back-row');
+        if (row) row.classList.add('visible');
+        const target = document.getElementById('back-target-name');
+        if (target && marketName) target.textContent = marketName;
+    }
+    function hubHideBack() {
+        const row = document.getElementById('hub-back-row');
+        if (row) row.classList.remove('visible');
+    }
+
     function showSportInsights(sport) {
-        // Hide portal view
-        document.getElementById('tier-global').style.display = 'none';
-        document.getElementById('tier-premium').style.display = 'none';
-        document.getElementById('tier-niche').style.display = 'none';
-        
+        // Determine which market this sport belongs to
+        const marketLabels = {
+            football: 'Global Majors', basketball: 'Global Majors', tennis: 'Global Majors',
+            cricket: 'Premium Markets', esports: 'Premium Markets',
+            rugby: 'Niche Markets', mma: 'Niche Markets', darts: 'Niche Markets'
+        };
+        const marketName = marketLabels[sport] || document.querySelector('#portal-router option:checked')?.textContent || 'Portal';
+
+        // Hide tier views
+        ['tier-global','tier-premium','tier-niche','tier-acca'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        });
+
         // Show insights view
         const insightsView = document.getElementById('sport-insights-view');
-        insightsView.style.display = 'block';
-        
-        // Update title
+        if (insightsView) insightsView.style.display = 'block';
+
         const sportIcons = {
-            football: '⚽', tennis: '🎾', basketball: '🏀', cricket: '🏏', 
+            football: '⚽', tennis: '🎾', basketball: '🏀', cricket: '🏏',
             esports: '🎮', nfl: '🏈', baseball: '⚾', mma: '🥊',
             formula1: '🏎️', golf: '⛳', rugby: '🏉', boxing: '🥊',
-            hockey: '🏒', afl: '🦘', volleyball: '🏐', handball: '🤾'
+            hockey: '🏒', afl: '🦘', volleyball: '🏐', handball: '🤾', darts: '🎯'
         };
-        
-        // Update client field at top
+
+        // Update client field
         const clientFieldIcon = document.getElementById('client-field-icon');
         const clientFieldName = document.getElementById('client-field-name');
-        if (clientFieldIcon && clientFieldName) {
-            clientFieldIcon.textContent = sportIcons[sport] || '🏆';
-            clientFieldName.textContent = sport.charAt(0).toUpperCase() + sport.slice(1);
-        }
-        
+        if (clientFieldIcon) clientFieldIcon.textContent = sportIcons[sport] || '🏆';
+        if (clientFieldName) clientFieldName.textContent = sport.charAt(0).toUpperCase() + sport.slice(1);
+
         // Update sport title
-        document.getElementById('insights-title').textContent = sport.charAt(0).toUpperCase() + sport.slice(1) + ' Insights';
-        document.getElementById('view-title').textContent = sport.charAt(0).toUpperCase() + sport.slice(1) + ' Insights';
-        document.getElementById('view-icon').textContent = sportIcons[sport] || '🏆';
-        
-        // Reset dropdown to Global Majors and show global content
+        const insightsTitle = document.getElementById('insights-title');
+        if (insightsTitle) insightsTitle.textContent = sport.charAt(0).toUpperCase() + sport.slice(1) + ' Insights';
+
+        // Legacy refs (hidden)
+        const vt = document.getElementById('view-title');
+        const vi = document.getElementById('view-icon');
+        if (vt) vt.textContent = sport.charAt(0).toUpperCase() + sport.slice(1) + ' Insights';
+        if (vi) vi.textContent = sportIcons[sport] || '🏆';
+
+        // Reset market dropdown
         const dropdown = document.getElementById('insights-market-dropdown');
-        if (dropdown) {
-            dropdown.value = 'global';
-        }
-        
-        // Hide all market content and show global by default
-        document.querySelectorAll('.insights-market-content').forEach(content => {
-            content.style.display = 'none';
-        });
+        if (dropdown) dropdown.value = 'global';
+
+        // Show global content by default
+        document.querySelectorAll('.insights-market-content').forEach(c => { c.style.display = 'none'; });
         const globalContent = document.getElementById('insights-global');
-        if (globalContent) {
-            globalContent.style.display = 'block';
-        }
-        
+        if (globalContent) globalContent.style.display = 'block';
+
         // Show back button
-        document.getElementById('insights-back-btn').style.display = 'inline-flex';
+        const insightsBackBtn = document.getElementById('insights-back-btn');
+        if (insightsBackBtn) insightsBackBtn.style.display = 'inline-flex';
+
+        // Update hub pills
+        hubSetView('market-mode', 'MARKET');
+        hubSetSelection(sport.charAt(0).toUpperCase() + sport.slice(1));
+        hubShowBack(marketName);
     }
-    
+
     function backToPortal() {
         // Hide insights view
-        document.getElementById('sport-insights-view').style.display = 'none';
-        
-        // Show current portal view
-        const currentTier = document.getElementById('portal-router').value;
-        if (currentTier === 'tier-global') {
-            document.getElementById('tier-global').style.display = 'block';
-            document.getElementById('view-title').textContent = 'Global Majors';
-        } else if (currentTier === 'tier-premium') {
-            document.getElementById('tier-premium').style.display = 'block';
-            document.getElementById('view-title').textContent = 'Premium Markets';
-        } else if (currentTier === 'tier-niche') {
-            document.getElementById('tier-niche').style.display = 'block';
-            document.getElementById('view-title').textContent = 'Niche Markets';
-        }
-        
-        // Reset icon and hide back button
-        document.getElementById('view-icon').textContent = '🏆';
-        document.getElementById('insights-back-btn').style.display = 'none';
+        const insightsView = document.getElementById('sport-insights-view');
+        if (insightsView) insightsView.style.display = 'none';
+
+        // Show current portal tier
+        const currentTier = document.getElementById('portal-router')?.value || 'tier-global';
+        const tierLabels = {
+            'tier-global': 'Global Majors',
+            'tier-premium': 'Premium Markets',
+            'tier-niche': 'Niche Markets',
+            'tier-acca': 'ACCA Engine'
+        };
+        const tierEl = document.getElementById(currentTier);
+        if (tierEl) tierEl.style.display = 'block';
+
+        // Legacy refs
+        const vt = document.getElementById('view-title');
+        const vi = document.getElementById('view-icon');
+        if (vt) vt.textContent = tierLabels[currentTier] || 'Global Majors';
+        if (vi) vi.textContent = '🏆';
+
+        // Hide insights back button
+        const insightsBackBtn = document.getElementById('insights-back-btn');
+        if (insightsBackBtn) insightsBackBtn.style.display = 'none';
+
+        // Reset hub pills
+        hubSetView('portal-mode', 'PORTAL');
+        hubSetSelection('None');
+        hubHideBack();
     }
     
     // Configuration: use shared frontend config first, with a safe fallback.
@@ -5415,21 +5662,34 @@
             portalContainer.style.display = 'block';
             legacyWrapper.style.display = 'none';
 
+            // Also reset insights view if visible
+            const insightsView = document.getElementById('sport-insights-view');
+            if (insightsView) insightsView.style.display = 'none';
+
             const targetView = document.getElementById(tierId);
             if (targetView) {
                 targetView.classList.add('active');
                 currentPortalTier = tierId;
 
-                // Update Header
+                // Update legacy hidden refs
                 const opt = document.querySelector(`#portal-router option[value="${tierId}"]`);
-                if (opt) {
-                    viewTitle.textContent = opt.textContent;
+                if (opt && viewTitle) viewTitle.textContent = opt.textContent;
+                if (viewIcon) {
                     if (tierId === 'tier-global') viewIcon.textContent = '🏆';
                     else if (tierId === 'tier-premium') viewIcon.textContent = '💎';
                     else if (tierId === 'tier-niche') viewIcon.textContent = '🔍';
                     else if (tierId === 'tier-acca') viewIcon.textContent = '🧮';
                 }
-                
+
+                // Update hub pills
+                const tierViewMode = tierId === 'tier-acca' ? 'acca-mode' : 'portal-mode';
+                const tierViewLabel = tierId === 'tier-acca' ? 'ACCA' : 'PORTAL';
+                if (typeof hubSetView === 'function') {
+                    hubSetView(tierViewMode, tierViewLabel);
+                    hubSetSelection('None');
+                    hubHideBack();
+                }
+
                 if (tierId === 'tier-acca') {
                     switchAccaSubView('6');
                 }
@@ -5564,28 +5824,33 @@
         const portalBackBtn = document.getElementById('portal-back-btn');
         if (portalBackBtn) {
             portalBackBtn.addEventListener('click', () => {
-                // Remove sport insights view
+                // Hide insights view (don't remove — it's the static view)
                 const sportInsightsView = document.getElementById('sport-insights-view');
-                if (sportInsightsView) {
-                    sportInsightsView.remove();
-                }
-                
+                if (sportInsightsView) sportInsightsView.style.display = 'none';
+
+                // Also remove any dynamically-injected duplicate if present
+                document.querySelectorAll('#portal-container #sport-insights-view ~ #sport-insights-view').forEach(el => el.remove());
+
                 // Show current tier view
-                const currentTierView = document.getElementById(`tier-${currentPortalTier.replace('tier-', '')}`);
+                const currentTierView = document.getElementById(currentPortalTier);
                 if (currentTierView) {
-                    currentTierView.style.display = 'block';
+                    currentTierView.classList.add('active');
+                    currentTierView.style.display = '';
                 }
-                
-                // Hide back button
-                portalBackBtn.style.display = 'none';
-                
-                // Reset header
+
+                // Reset legacy hidden refs
                 const viewTitle = document.getElementById('view-title');
                 const viewIcon = document.getElementById('view-icon');
                 const opt = document.querySelector(`#portal-router option[value="${currentPortalTier}"]`);
-                if (opt && viewTitle && viewIcon) {
-                    viewTitle.textContent = opt.textContent;
-                    viewIcon.textContent = '🏆';
+                if (opt && viewTitle) viewTitle.textContent = opt.textContent;
+                if (viewIcon) viewIcon.textContent = '🏆';
+
+                // Reset hub pills
+                if (typeof hubSetView === 'function') {
+                    const isAcca = currentPortalTier === 'tier-acca';
+                    hubSetView(isAcca ? 'acca-mode' : 'portal-mode', isAcca ? 'ACCA' : 'PORTAL');
+                    hubSetSelection('None');
+                    hubHideBack();
                 }
             });
         }
@@ -5711,22 +5976,14 @@
 
 <button id="scrollTopBtn" title="Go to top">↑</button>
 
-<!-- SportAnalytics Pro Primary Router -->
+<!-- EdgeMind Hub Primary Router -->
 <div class="bottom-router">
-    <span style="color: var(--portal-accent); font-size: 1.2rem;">🚀</span>
+    <span class="router-nav-label">Navigation</span>
     <select id="portal-router" class="router-select">
-        <optgroup label="Global Majors">
-            <option value="tier-global" selected>Global Majors</option>
-        </optgroup>
-        <optgroup label="Premium Markets">
-            <option value="tier-premium">Premium Markets</option>
-        </optgroup>
-        <optgroup label="Niche Markets">
-            <option value="tier-niche">Niche Markets</option>
-        </optgroup>
-        <optgroup label="Specialized Tools">
-            <option value="tier-acca">ACCA Engine</option>
-        </optgroup>
+        <option value="tier-global" selected>Global Majors</option>
+        <option value="tier-premium">Premium Markets</option>
+        <option value="tier-niche">Niche Markets</option>
+        <option value="tier-acca">ACCA Engine</option>
     </select>
 </div>
 

@@ -15,7 +15,7 @@ const { pool } = require('../database');
 // POST /api/admin/refresh-ai-insights
 router.post('/refresh-ai-insights', requireAdmin, async (req, res) => {
     try {
-        const limit = Math.min(parseInt(req.query.limit) || 20, 50); // Max 50 at a time
+        const limit = Math.min(parseInt(req.query.limit, 10) || 20, 50); // Max 50 at a time
         
         console.log('[Admin] Starting AI insight refresh...');
 

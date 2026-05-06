@@ -2,8 +2,11 @@
 
 const express = require('express');
 const { saveProvisioningPayload } = require('../services/tier1BootstrapService');
+const { requireRole } = require('../utils/auth');
 
 const router = express.Router();
+
+const requireAdmin = requireRole('admin');
 
 const SPORTMONKS_SIDELINED_HINT = Object.freeze({
     soccer: 'https://api.sportmonks.com/v3/football/fixtures/{fixture_id}?include=sidelined',
@@ -52,19 +55,19 @@ async function handleProvisioningSave(req, res, namespace) {
     }
 }
 
-router.post('/ingestion/mma-variables', async (req, res) => {
+router.post('/ingestion/mma-variables', requireAdmin, async (req, res) => {
     await handleProvisioningSave(req, res, 'mma');
 });
 
-router.post('/ingestion/basketball-variables', async (req, res) => {
+router.post('/ingestion/basketball-variables', requireAdmin, async (req, res) => {
     await handleProvisioningSave(req, res, 'basketball');
 });
 
-router.post('/ingestion/soccer-sidelined', async (req, res) => {
+router.post('/ingestion/soccer-sidelined', requireAdmin, async (req, res) => {
     await handleProvisioningSave(req, res, 'soccer_sidelined');
 });
 
-router.post('/ingestion/rugby-sidelined', async (req, res) => {
+router.post('/ingestion/rugby-sidelined', requireAdmin, async (req, res) => {
     await handleProvisioningSave(req, res, 'rugby_sidelined');
 });
 

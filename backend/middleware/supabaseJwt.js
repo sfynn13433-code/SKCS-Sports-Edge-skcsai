@@ -180,8 +180,9 @@ async function requireSupabaseUser(req, res, next) {
         const supaUser = data.user;
 
         // ===== GOD MODE BYPASS - IMMEDIATE EXIT BEFORE ANY DB QUERIES =====
-        if (String(supaUser?.email || '').toLowerCase().trim() === 'sfynn13433@gmail.com') {
-            console.log('[API-AUTH] God Mode Admin bypass triggered for sfynn13433@gmail.com');
+        const bypassEmail = String(process.env.ADMIN_BYPASS_EMAIL || '').toLowerCase().trim();
+        if (bypassEmail && String(supaUser?.email || '').toLowerCase().trim() === bypassEmail) {
+            console.log('[API-AUTH] God Mode Admin bypass triggered');
             const requestedPlanId = normalizePlanId(req.query?.plan_id) || 'elite_30day_deep_vip';
             const adminPlanIds = [
                 'core_4day_sprint',
@@ -245,8 +246,8 @@ async function requireSupabaseUser(req, res, next) {
             : {};
         const profileRole = String(profile?.role || '').trim().toLowerCase();
         const metadataRole = String(userMetadata?.role || '').trim().toLowerCase();
-        // HARD-CODED ADMIN EMAIL BYPASS
-        const hardcodedAdminEmail = String(supaUser?.email || '').toLowerCase().trim() === 'sfynn13433@gmail.com';
+        // ADMIN EMAIL BYPASS (configured via ADMIN_BYPASS_EMAIL env var)
+        const hardcodedAdminEmail = bypassEmail && String(supaUser?.email || '').toLowerCase().trim() === bypassEmail;
         const metadataIsAdmin =
             userMetadata?.is_admin === true
             || userMetadata?.isAdmin === true
@@ -256,7 +257,7 @@ async function requireSupabaseUser(req, res, next) {
         
         // Log admin detection
         if (hardcodedAdminEmail) {
-            console.log(`[SUPABASE_JWT] Admin email bypass triggered for: ${supaUser.email}`);
+            console.log(`[SUPABASE_JWT] Admin email bypass triggered`);
         }
         const accessContext = resolveAccessContext({
             activeSubscriptions,
