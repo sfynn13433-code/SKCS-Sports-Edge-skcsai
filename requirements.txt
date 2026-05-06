@@ -11,7 +11,7 @@ nba_api
 # data + ML (LOCKED — VERY IMPORTANT)
 numpy==1.26.4
 pandas==2.2.2
-scikit-learn==1.4.2
+scikit-learn==1.5.0
 
 # build stability
 setuptools>=70.0.0
