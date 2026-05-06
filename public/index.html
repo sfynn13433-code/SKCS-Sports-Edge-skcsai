@@ -1006,7 +1006,7 @@
                 </div>
             </div>
 
-            <!-- Sport Insights Loading View -->
+            <!-- Sport Insights View -->
             <div id="sport-insights-view" class="portal-view" style="display: none; padding: 40px 24px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px;">
                     <h2 id="insights-title" style="margin: 0; font-size: 1.5rem; font-weight: 600; color: var(--text);"></h2>
@@ -1015,23 +1015,119 @@
                         <span>Back to Global Majors</span>
                     </button>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <div style="background: rgba(51, 65, 85, 0.6); border-radius: 10px; padding: 24px;">
-                        <div style="display: flex; flex-direction: column; gap: 12px;">
-                            <div style="height: 16px; background: rgba(148, 163, 184, 0.4); border-radius: 4px; width: 40%;"></div>
-                            <div style="height: 12px; background: rgba(148, 163, 184, 0.25); border-radius: 4px; width: 25%;"></div>
+                
+                <!-- Market Overview -->
+                <div style="background: rgba(15, 23, 42, 0.6); border-radius: 16px; padding: 32px; margin-bottom: 24px;">
+                    <h3 style="margin: 0 0 20px; font-size: 1.25rem; font-weight: 600; color: var(--text);">Market Overview</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px;">
+                        <div style="text-align: center; padding: 20px; background: rgba(30, 41, 59, 0.8); border-radius: 12px;">
+                            <div style="font-size: 1.8rem; font-weight: 700; color: #4ade80; margin-bottom: 8px;">85%</div>
+                            <div style="font-size: 0.9rem; color: var(--muted);">Accuracy Rate</div>
+                        </div>
+                        <div style="text-align: center; padding: 20px; background: rgba(30, 41, 59, 0.8); border-radius: 12px;">
+                            <div style="font-size: 1.8rem; font-weight: 700; color: #60a5fa; margin-bottom: 8px;">24</div>
+                            <div style="font-size: 0.9rem; color: var(--muted);">Active Fixtures</div>
+                        </div>
+                        <div style="text-align: center; padding: 20px; background: rgba(30, 41, 59, 0.8); border-radius: 12px;">
+                            <div style="font-size: 1.8rem; font-weight: 700; color: #fbbf24; margin-bottom: 8px;">18</div>
+                            <div style="font-size: 0.9rem; color: var(--muted);">High Confidence</div>
+                        </div>
+                        <div style="text-align: center; padding: 20px; background: rgba(30, 41, 59, 0.8); border-radius: 12px;">
+                            <div style="font-size: 1.8rem; font-weight: 700; color: #a78bfa; margin-bottom: 8px;">92%</div>
+                            <div style="font-size: 0.9rem; color: var(--muted);">Success Rate</div>
                         </div>
                     </div>
-                    <div style="background: rgba(51, 65, 85, 0.6); border-radius: 10px; padding: 24px;">
-                        <div style="display: flex; flex-direction: column; gap: 12px;">
-                            <div style="height: 16px; background: rgba(148, 163, 184, 0.4); border-radius: 4px; width: 35%;"></div>
-                            <div style="height: 12px; background: rgba(148, 163, 184, 0.25); border-radius: 4px; width: 30%;"></div>
+                </div>
+
+                <!-- Today's Fixtures -->
+                <div style="background: rgba(15, 23, 42, 0.6); border-radius: 16px; padding: 32px; margin-bottom: 24px;">
+                    <h3 style="margin: 0 0 20px; font-size: 1.25rem; font-weight: 600; color: var(--text);">Today's Fixtures</h3>
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div style="background: rgba(30, 41, 59, 0.8); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600; color: var(--text); margin-bottom: 8px;">Team A vs Team B</div>
+                                <div style="font-size: 0.9rem; color: var(--muted);">League Name • 15:00</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="background: #4ade80; color: white; padding: 4px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">HIGH CONFIDENCE</div>
+                                <div style="font-size: 0.9rem; color: var(--muted);">85% Win Rate</div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(30, 41, 59, 0.8); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600; color: var(--text); margin-bottom: 8px;">Team C vs Team D</div>
+                                <div style="font-size: 0.9rem; color: var(--muted);">League Name • 18:30</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="background: #fbbf24; color: white; padding: 4px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">MODERATE RISK</div>
+                                <div style="font-size: 0.9rem; color: var(--muted);">72% Win Rate</div>
+                            </div>
                         </div>
                     </div>
-                    <div style="background: rgba(51, 65, 85, 0.6); border-radius: 10px; padding: 24px;">
-                        <div style="display: flex; flex-direction: column; gap: 12px;">
-                            <div style="height: 16px; background: rgba(148, 163, 184, 0.4); border-radius: 4px; width: 45%;"></div>
-                            <div style="height: 12px; background: rgba(148, 163, 184, 0.25); border-radius: 4px; width: 20%;"></div>
+                </div>
+
+                <!-- Top Predictions -->
+                <div style="background: rgba(15, 23, 42, 0.6); border-radius: 16px; padding: 32px; margin-bottom: 24px;">
+                    <h3 style="margin: 0 0 20px; font-size: 1.25rem; font-weight: 600; color: var(--text);">Top Predictions</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                        <div style="background: rgba(30, 41, 59, 0.8); border-radius: 12px; padding: 16px;">
+                            <div style="font-weight: 600; color: var(--text); margin-bottom: 8px;">Team A to Win</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 0.9rem; color: var(--muted);">vs Team B</span>
+                                <span style="background: #4ade80; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">88%</span>
+                            </div>
+                        </div>
+                        <div style="background: rgba(30, 41, 59, 0.8); border-radius: 12px; padding: 16px;">
+                            <div style="font-weight: 600; color: var(--text); margin-bottom: 8px;">Over 2.5 Goals</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 0.9rem; color: var(--muted);">Team C vs D</span>
+                                <span style="background: #4ade80; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">82%</span>
+                            </div>
+                        </div>
+                        <div style="background: rgba(30, 41, 59, 0.8); border-radius: 12px; padding: 16px;">
+                            <div style="font-weight: 600; color: var(--text); margin-bottom: 8px;">Both Teams Score</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 0.9rem; color: var(--muted);">Team E vs F</span>
+                                <span style="background: #fbbf24; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">75%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Performance -->
+                <div style="background: rgba(15, 23, 42, 0.6); border-radius: 16px; padding: 32px;">
+                    <h3 style="margin: 0 0 20px; font-size: 1.25rem; font-weight: 600; color: var(--text);">Recent Performance</h3>
+                    <div style="background: rgba(30, 41, 59, 0.8); border-radius: 12px; padding: 24px; text-align: center;">
+                        <div style="font-size: 1.1rem; color: var(--muted); margin-bottom: 16px;">Last 7 Days Performance Chart</div>
+                        <div style="display: flex; justify-content: space-around; align-items: end; height: 120px;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                <div style="width: 30px; height: 60px; background: #4ade80; border-radius: 4px;"></div>
+                                <span style="font-size: 0.8rem; color: var(--muted);">Mon</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                <div style="width: 30px; height: 80px; background: #4ade80; border-radius: 4px;"></div>
+                                <span style="font-size: 0.8rem; color: var(--muted);">Tue</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                <div style="width: 30px; height: 45px; background: #fbbf24; border-radius: 4px;"></div>
+                                <span style="font-size: 0.8rem; color: var(--muted);">Wed</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                <div style="width: 30px; height: 90px; background: #4ade80; border-radius: 4px;"></div>
+                                <span style="font-size: 0.8rem; color: var(--muted);">Thu</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                <div style="width: 30px; height: 70px; background: #4ade80; border-radius: 4px;"></div>
+                                <span style="font-size: 0.8rem; color: var(--muted);">Fri</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                <div style="width: 30px; height: 85px; background: #4ade80; border-radius: 4px;"></div>
+                                <span style="font-size: 0.8rem; color: var(--muted);">Sat</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                <div style="width: 30px; height: 95px; background: #4ade80; border-radius: 4px;"></div>
+                                <span style="font-size: 0.8rem; color: var(--muted);">Sun</span>
+                            </div>
                         </div>
                     </div>
                 </div>
