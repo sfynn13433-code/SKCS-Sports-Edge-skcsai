@@ -652,15 +652,14 @@
         /* Bottom Navigation Router */
         .bottom-router {
             position: relative;
-            margin: 2rem auto;
+            margin: 1.5rem auto 0;
             max-width: fit-content;
-            
-            z-index: 1000;
+            z-index: 10;
             background: var(--portal-card);
             border: 1px solid var(--portal-accent);
             border-radius: 50px;
             padding: 0.5rem 1.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -1555,6 +1554,18 @@
             <div id="tier-insights" class="portal-view">
                 <div id="portal-insights-dynamic"></div>
             </div>
+
+            <!-- Bottom Market Navigation (inside portal frame) -->
+            <div class="bottom-router">
+                <span class="router-nav-label">Navigation</span>
+                <select id="portal-router" class="router-select">
+                    <option value="tier-global" selected>Global Majors</option>
+                    <option value="tier-premium">Premium Markets</option>
+                    <option value="tier-niche">Niche Markets</option>
+                    <option value="tier-acca">ACCA Engine</option>
+                </select>
+            </div>
+            <p class="hub-disclaimer">All insights are for informational purposes only. No guarantees are provided.</p>
         </div>
 
         <div id="legacy-ui-wrapper" style="display: none;">
@@ -5976,16 +5987,6 @@
 
 <button id="scrollTopBtn" title="Go to top">↑</button>
 
-<!-- EdgeMind Hub Primary Router -->
-<div class="bottom-router">
-    <span class="router-nav-label">Navigation</span>
-    <select id="portal-router" class="router-select">
-        <option value="tier-global" selected>Global Majors</option>
-        <option value="tier-premium">Premium Markets</option>
-        <option value="tier-niche">Niche Markets</option>
-        <option value="tier-acca">ACCA Engine</option>
-    </select>
-</div>
 
 </body>
 </html>
