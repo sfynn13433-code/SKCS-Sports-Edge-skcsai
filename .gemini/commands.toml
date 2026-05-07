@@ -1,0 +1,14 @@
+[commands.risk]
+description = "Analyzes match data and calculates the risk tier based on our AI pipeline rules."
+prompt = """
+Review the following match payload and calculate its expected Risk Tier based on our football prediction engine rules. 
+
+Be sure to reference the logic in:
+- @backend/services/aiPipeline.js
+- @backend/config/footballRules.js
+
+Output the Canonical Tier, Legacy Label, and UI Transparency Level. 
+
+Match payload to analyze:
+{{input}}
+"""
