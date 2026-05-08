@@ -759,41 +759,47 @@
                 <div class="controls-grid">
                     <div class="control-group">
                         <label>Global Majors</label>
-                        <select onchange="displayCodes(this, 'Global Majors')">
-                            <option value="" disabled selected>Select a market...</option>
-                            <option value="EPL, UCL, FIFA">Football (Soccer)</option>
-                            <option value="NBA, FIBA">Basketball</option>
-                            <option value="NFL, NCAAF">American Football</option>
+                        <select id="global-majors-select" class="market-select" onchange="displayCodes(this, 'Global Majors')">
+                            <option value="">Select a market...</option>
+                            <option value="football">Football</option>
+                            <option value="tennis">Tennis</option>
+                            <option value="basketball">Basketball</option>
+                            <option value="cricket">Cricket</option>
+                            <option value="esports">eSports</option>
                         </select>
                     </div>
 
                     <div class="control-group">
                         <label>Premium Markets</label>
-                        <select onchange="displayCodes(this, 'Premium Markets')">
-                            <option value="" disabled selected>Select a market...</option>
-                            <option value="MLB, NPB">Baseball</option>
-                            <option value="NHL, KHL">Ice Hockey</option>
-                            <option value="UFC, Bellator, PFL">MMA / Combat</option>
+                        <select id="premium-markets-select" class="market-select" onchange="displayCodes(this, 'Premium Markets')">
+                            <option value="">Select a market...</option>
+                            <option value="nfl">NFL</option>
+                            <option value="mlb">MLB</option>
+                            <option value="mma">MMA</option>
+                            <option value="f1">F1</option>
+                            <option value="golf">Golf</option>
+                            <option value="rugby">Rugby</option>
+                            <option value="boxing">Boxing</option>
                         </select>
                     </div>
 
                     <div class="control-group">
                         <label>Niche Markets</label>
-                        <select onchange="displayCodes(this, 'Niche Markets')">
-                            <option value="" disabled selected>Select a market...</option>
-                            <option value="PDC, WDF">Darts</option>
-                            <option value="WST, Q Tour">Snooker</option>
-                            <option value="CS2, LoL, DOTA2">Esports</option>
+                        <select id="niche-markets-select" class="market-select" onchange="displayCodes(this, 'Niche Markets')">
+                            <option value="">Select a market...</option>
+                            <option value="nhl">NHL</option>
+                            <option value="afl">AFL</option>
+                            <option value="volleyball">Volleyball</option>
+                            <option value="handball">Handball</option>
                         </select>
                     </div>
 
                     <div class="control-group">
                         <label>ACCA's</label>
-                        <select onchange="displayCodes(this, 'ACCA\'s')">
-                            <option value="" disabled selected>Select a market...</option>
-                            <option value="Match Winner, Over/Under 2.5, BTTS">Weekend Football ACCA</option>
-                            <option value="Player Points, Rebounds, Assists">NBA Player Props ACCA</option>
-                            <option value="Moneyline, Spread, Totals">Cross-Sport Mega ACCA</option>
+                        <select id="acca-select" class="market-select" onchange="displayCodes(this, 'ACCA's')">
+                            <option value="">Select a market...</option>
+                            <option value="6-match">6 Match ACCA</option>
+                            <option value="12-match">12 Match ACCA</option>
                         </select>
                     </div>
                 </div>
