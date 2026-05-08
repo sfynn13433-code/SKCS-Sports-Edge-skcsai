@@ -11,7 +11,7 @@
     <style>
         /* ========== ALL YOUR EXISTING STYLES (kept exactly as before) ========== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f8f9fa; color: #212529; line-height: 1.6; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #ffffff; color: #212529; line-height: 1.6; }
         .navbar { background-color: #0d6efd; padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
         .logo { color: white; font-size: 1.5rem; font-weight: bold; text-decoration: none; }
@@ -22,7 +22,7 @@
         .hero-section { position: relative; height: 500px; overflow: hidden; display: flex; align-items: center; justify-content: center; text-align: center; color: white; padding: 3rem; }
         .hero-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
         .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); }
-        .hero-content { position: relative; z-index: 2; max-width: 800px; }
+        .hero-content { position: relative; z-index: 2; max-width: 1100px; }
         .hero-content h1 { font-size: 3rem; margin-bottom: 1rem; color: white; text-shadow: 2px 2px 8px rgba(0,0,0,0.7); }
         .hero-content p { font-size: 1.3rem; margin-bottom: 2rem; text-shadow: 1px 1px 4px rgba(0,0,0,0.7); }
         .main-content { max-width: 1200px; margin: 3rem auto; padding: 0 1rem; }
@@ -30,7 +30,7 @@
         .feature { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.08); flex: 1; min-width: 250px; max-width: 350px; }
         .feature h3 { color: #0d6efd; margin-bottom: 0.5rem; }
         .section-title { text-align: center; color: #0d6efd; margin-bottom: 2rem; font-size: 2.2rem; }
-        .section-description { text-align: center; color: #666; font-size: 1.2rem; max-width: 800px; margin: 0 auto 3rem auto; }
+        .section-description { text-align: center; color: #666; font-size: 1.2rem; max-width: 1100px; margin: 0 auto 3rem auto; }
         .platform-update-notice {
             max-width: 960px;
             margin: 0 auto 1.5rem auto;
@@ -77,7 +77,7 @@
         .disclaimer-note p { color: white; font-size: 1rem; line-height: 1.6; margin: 0; }
         .predictions-section { max-width: 1400px; margin: 4rem auto; padding: 0 1rem; }
         .tabs-container { background: white; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); overflow: hidden; }
-        .tabs-header { display: flex; background-color: #f8f9fa; border-bottom: 2px solid #e9ecef; overflow-x: auto; scrollbar-width: none; }
+        .tabs-header { display: flex; background-color: #ffffff; border-bottom: 2px solid #e9ecef; overflow-x: auto; scrollbar-width: none; }
         .tabs-header::-webkit-scrollbar { display: none; }
         .tab-button { flex-shrink: 0; padding: 1.2rem 1.5rem; background: none; border: none; font-size: 1rem; font-weight: 600; color: #6c757d; cursor: pointer; transition: all 0.3s ease; border-bottom: 3px solid transparent; white-space: nowrap; }
         .tab-button:hover { background-color: #e9ecef; color: #0d6efd; }
@@ -88,9 +88,9 @@
         .sport-icon { font-size: 1.5rem; margin-right: 10px; vertical-align: middle; }
         .tab-title { color: #0d6efd; font-size: 1.8rem; margin-bottom: 1.5rem; display: flex; align-items: center; }
         .subscription-status { display: inline-block; background-color: #198754; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; margin-left: 1rem; font-weight: 600; }
-        .coming-soon-message { text-align: center; padding: 3rem 1rem; background-color: #f8f9fa; border-radius: 8px; margin-bottom: 2rem; }
+        .coming-soon-message { text-align: center; padding: 3rem 1rem; background-color: #ffffff; border-radius: 8px; margin-bottom: 2rem; }
         .coming-soon-message h3 { color: #0d6efd; margin-bottom: 1rem; font-size: 1.5rem; }
-        .prediction-sample { background-color: #f8f9fa; border-radius: 8px; padding: 1.5rem; margin-top: 2rem; border-left: 4px solid #0d6efd; }
+        .prediction-sample { background-color: #ffffff; border-radius: 8px; padding: 1.5rem; margin-top: 2rem; border-left: 4px solid #0d6efd; }
         .prediction-sample h4 { color: #0d6efd; margin-bottom: 1rem; }
         .prediction-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
         .prediction-card { background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 3px 10px rgba(0,0,0,0.08); border-top: 3px solid #0d6efd; }
@@ -123,7 +123,7 @@
         .framework-section { background-color: #212529; color: white; padding: 5rem 2rem; margin: 4rem 0; }
         .framework-container { max-width: 1200px; margin: 0 auto; }
         .framework-title { color: #fff; font-size: 2.5rem; margin-bottom: 1rem; text-align: center; }
-        .framework-subtitle { color: #adb5bd; font-size: 1.2rem; text-align: center; max-width: 800px; margin: 0 auto 3rem auto; font-style: italic; }
+        .framework-subtitle { color: #adb5bd; font-size: 1.2rem; text-align: center; max-width: 1100px; margin: 0 auto 3rem auto; font-style: italic; }
         .framework-intro { background-color: rgba(255, 255, 255, 0.05); padding: 3rem; border-radius: 8px; margin-bottom: 3rem; border-left: 4px solid #0d6efd; }
         .framework-intro p { font-size: 1.1rem; line-height: 1.8; margin-bottom: 1rem; }
         .framework-intro strong { color: #0d6efd; }
@@ -160,7 +160,7 @@
         .vision-list li { background-color: rgba(255, 255, 255, 0.9); padding: 1.5rem; border-radius: 8px; text-align: center; border-top: 3px solid #0d6efd; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
         .core-principle { font-size: 1.1rem; color: #495057; margin-top: 0.5rem; }
         .contact-section { background-color: #e9ecef; padding: 4rem 2rem; margin-top: 3rem; }
-        .contact-container { max-width: 800px; margin: 0 auto; text-align: center; }
+        .contact-container { max-width: 1100px; margin: 0 auto; text-align: center; }
         .contact-title { color: #0d6efd; font-size: 2.2rem; margin-bottom: 1.5rem; }
         .contact-info { background: white; padding: 3rem; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 600px; margin: 0 auto; }
         .contact-item { margin-bottom: 1.5rem; text-align: left; padding-left: 1rem; }
@@ -194,7 +194,7 @@
         /* ===== EdgeMind BOT CSS ===== */
         #skcs-chatbot { 
             width: 100%; 
-            max-width: 800px; 
+            max-width: 1100px; 
             margin: 40px auto; 
             background: #020617; 
             border: 1px solid rgba(96,165,250,0.4); 
@@ -618,8 +618,8 @@
                     background-color: #1c1f26;
                     border-radius: 12px;
                     width: 100%;
-                    max-width: 800px;
-                    padding: 24px;
+                    max-width: 1100px;
+                    padding: 40px;
                     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
                     border: 1px solid #2d313b;
                 }
@@ -654,11 +654,11 @@
                 .display-panel {
                     background-color: #272b36;
                     border-radius: 10px;
-                    padding: 40px 20px;
+                    padding: 50px 30px;
                     text-align: center;
                     margin-bottom: 30px;
                     border: 1px solid #363b47;
-                    min-height: 180px;
+                    min-height: 280px;
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
@@ -4756,7 +4756,7 @@
                     </h2>
                     <div style="display: flex; flex-direction: column; gap: 16px;">
                         ${Array.from({ length: 3 }).map(() => `
-                            <div style="background: rgba(51, 65, 85, 0.6); border-radius: 10px; padding: 24px;">
+                            <div style="background: rgba(51, 65, 85, 0.6); border-radius: 10px; padding: 40px;">
                                 <div style="display: flex; flex-direction: column; gap: 12px;">
                                     <div style="height: 16px; background: rgba(148, 163, 184, 0.4); border-radius: 4px; width: 40%;"></div>
                                     <div style="height: 12px; background: rgba(148, 163, 184, 0.25); border-radius: 4px; width: 25%;"></div>
