@@ -48,14 +48,14 @@
     // ── Card registry for click handlers ──────────────────────────────────────
     /**
      * Registers a card in the global registry so the Match Detail modal
-     * (defined in vip-stress-dashboard.js) can access the prediction data.
+     * can access the prediction data.
      */
     function registerSmhCard(cardId, prediction) {
-        // Ensure the global registry exists (used by vip-stress-dashboard.js)
-        if (!window.CARD_REGISTRY) {
-            window.CARD_REGISTRY = new Map();
+        // Ensure the global registry exists
+        if (!window.SMH_CARD_REGISTRY) {
+            window.SMH_CARD_REGISTRY = new Map();
         }
-        window.CARD_REGISTRY.set(cardId, prediction);
+        window.SMH_CARD_REGISTRY.set(cardId, prediction);
     }
 
     // ── Core: handle a sport selection ────────────────────────────────────────
@@ -188,7 +188,7 @@
         }
 
         // Clear previous SMH entries if needed, or rely on unique IDs.
-        // We avoid clearing window.CARD_REGISTRY entirely to not break the main dashboard
+        // We avoid clearing window.SMH_CARD_REGISTRY entirely to not break the main dashboard
         // but we ensure these specific sport insights are available.
 
         var html = '<div class="results-scroll-container" style="width:100%;max-height:420px;overflow-y:auto;padding-right:8px;">';
@@ -330,7 +330,7 @@
 // ============================================
 
 window.openMatchDetail = function(cardId) {
-    const prediction = SMH_CARD_REGISTRY.get(cardId);
+    const prediction = window.SMH_CARD_REGISTRY.get(cardId);
     if (!prediction) {
         console.error('[SMH] No prediction found for card ID:', cardId);
         return;
