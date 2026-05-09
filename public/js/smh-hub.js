@@ -324,53 +324,123 @@
 
 })();
 
-// Global Modal Functions for Sports Market Hub
+// ============================================
+// GLOBAL MATCH DETAIL MODAL FUNCTIONS
+// Defined at top level for global scope access
+// ============================================
+
 window.openMatchDetail = function(cardId) {
     const prediction = SMH_CARD_REGISTRY.get(cardId);
     if (!prediction) {
         console.error('[SMH] No prediction found for card ID:', cardId);
-        alert('Match details not found.');
         return;
     }
 
-    const match = (prediction.matches && prediction.matches[0]) ? prediction.matches[0] : {};
-    const home = match.home_team || (match.metadata && match.metadata.home_team) || 'Home';
-    const away = match.away_team || (match.metadata && match.metadata.away_team) || 'Away';
-    const pick = match.prediction || match.recommendation || (match.metadata && match.metadata.prediction) || 'N/A';
-    const confidence = Math.round(Number(prediction.total_confidence || match.confidence || 0));
-    const market = String(match.market || (match.metadata && match.metadata.market) || '1X2').toUpperCase();
+    const leg = Array.isArray(prediction.matches) && prediction.matches[0] ? prediction.matches[0] : {};
+    const home = leg.home_team || (leg.metadata && leg.metadata.home_team) || 'Home';
+    const away = leg.away_team || (leg.metadata && leg.metadata.away_team) || 'Away';
+    const sectionType = String(prediction.section_type || prediction.type || 'direct');
+    const confidence = Math.round(Number(prediction.total_confidence || 0));
+    const league = leg.metadata && leg.metadata.league ? leg.metadata.league : (leg.sport || sectionType);
 
-    const details = `
-Match: ${home} vs ${away}
-Market: ${market}
-Pick: ${String(pick).replace(/_/g, ' ').toUpperCase()}
-Confidence: ${confidence}%
-    `.trim();
+    // Kickoff time
+    const kickoffRaw = leg.commence_time || leg.match_date
+        || (leg.metadata && (leg.metadata.match_time || leg.metadata.kickoff || leg.metadata.kickoff_time))
+        || prediction.created_at;
+    let kickoffStr = 'TBC';
+    if (kickoffRaw) {
+        try {
+            const d = new Date(kickoffRaw);
+            if (!isNaN(d.getTime())) kickoffStr = d.toLocaleString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) + ' UTC';
+        } catch (e) {}
+    }
 
-    alert(details);
-    console.log('[SMH] Match details:', prediction);
+    // Build markets list from all legs
+    const legs = Array.isArray(prediction.matches) ? prediction.matches : [leg];
+    const CONF_COLORS = ['#ef4444','#f97316','#facc15','#84cc16','#22c55e','#4ade80'];
+    function confColor(c) { const idx = Math.min(5, Math.floor(c / 17)); return CONF_COLORS[idx]; }
+
+    const marketsHtml = legs.map(function(m, i) {
+        const mHome = m.home_team || (m.metadata && m.metadata.home_team) || home;
+        const mAway = m.away_team || (m.metadata && m.metadata.away_team) || away;
+        const mMarket = String(m.market || (m.metadata && m.metadata.market) || '1X2').toUpperCase();
+        const mPick = String(m.prediction || m.recommendation || (m.metadata && m.metadata.prediction) || 'N/A').replace(/_/g,' ').toUpperCase();
+        const mConf = Math.round(Number(m.confidence || 0));
+        const color = confColor(mConf);
+        const pct = Math.min(100, mConf);
+        // Secondary markets if available
+        const secMarkets = Array.isArray(m.secondary_markets) ? m.secondary_markets : [];
+        const secHtml = secMarkets.map(function(sm) {
+            const smConf = Math.round(Number(sm.confidence || 0));
+            return '<div style="margin-top:8px;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">' +
+                '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+                    '<span style="font-size:0.78rem;color:#94a3b8;font-weight:600;">' + String(sm.market || 'Secondary').toUpperCase() + '</span>' +
+                    '<span style="font-size:0.78rem;color:' + confColor(smConf) + ';font-weight:700;">' + smConf + '%</span>' +
+                '</div>' +
+                '<div style="font-size:0.82rem;color:#e2e8f0;margin-top:4px;">' + String(sm.prediction || sm.pick || 'N/A').replace(/_/g,' ').toUpperCase() + '</div>' +
+            '</div>';
+        }).join('');
+        return '<div style="background:rgba(15,23,42,0.7);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.07);">' +
+            (legs.length > 1 ? '<div style="font-size:0.72rem;color:#64748b;font-weight:700;margin-bottom:6px;">LEG ' + (i+1) + '</div>' : '') +
+            '<div style="font-size:0.95rem;font-weight:700;color:#f1f5f9;margin-bottom:10px;">' + mHome + ' <span style="color:#475569;font-weight:400;">vs</span> ' + mAway + '</div>' +
+            '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
+                '<span style="font-size:0.75rem;color:#94a3b8;font-weight:700;text-transform:uppercase;min-width:90px;">' + mMarket + '</span>' +
+                '<div style="flex:1;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">' +
+                    '<div style="height:100%;width:' + pct + '%;background:' + color + ';border-radius:3px;transition:width 0.6s ease;"></div>' +
+                '</div>' +
+                '<span style="font-size:0.8rem;color:' + color + ';font-weight:800;min-width:36px;text-align:right;">' + mConf + '%</span>' +
+            '</div>' +
+            '<div style="display:inline-block;background:rgba(74,222,128,0.1);color:#4ade80;padding:4px 10px;border-radius:5px;font-size:0.85rem;font-weight:700;">⚡ ' + mPick + '</div>' +
+            secHtml +
+        '</div>';
+    }).join('');
+
+    // Insights chips
+    const insights = prediction.insights || {};
+    const chips = [
+        insights.weather ? '<span style="font-size:0.78rem;background:rgba(96,165,250,0.1);color:#60a5fa;padding:4px 10px;border-radius:20px;">🌤 ' + insights.weather + '</span>' : '',
+        insights.availability ? '<span style="font-size:0.78rem;background:rgba(74,222,128,0.1);color:#4ade80;padding:4px 10px;border-radius:20px;">👥 ' + insights.availability + '</span>' : '',
+        insights.stability ? '<span style="font-size:0.78rem;background:rgba(251,191,36,0.1);color:#fbbf24;padding:4px 10px;border-radius:20px;">📊 ' + insights.stability + '</span>' : ''
+    ].filter(Boolean).join(' ');
+
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('skcsMatchDetailModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'skcsMatchDetailModal';
+        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:10000;padding:20px;';
+        modal.innerHTML = 
+            '<div style="background:#1c1f26;border-radius:16px;padding:24px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 60px rgba(0,0,0,0.5);">' +
+                '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
+                    '<h2 style="margin:0;font-size:1.3rem;font-weight:800;color:#f1f5f9;">Match Details</h2>' +
+                    '<button onclick="window.closeMatchDetail()" style="background:none;border:none;color:#94a3b8;font-size:1.5rem;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:background 0.2s;">&times;</button>' +
+                '</div>' +
+                '<div id="skcsModalBody"></div>' +
+            '</div>';
+        document.body.appendChild(modal);
+    }
+
+    const body = document.getElementById('skcsModalBody');
+    if (body) {
+        body.innerHTML =
+            '<div style="margin-bottom:20px;">' +
+                '<div style="font-size:1.4rem;font-weight:800;color:#f1f5f9;margin-bottom:4px;">' + home + ' <span style="color:#475569;">vs</span> ' + away + '</div>' +
+                '<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:6px;">' +
+                    '<span style="font-size:0.8rem;color:#94a3b8;">🕐 ' + kickoffStr + '</span>' +
+                    (league ? '<span style="font-size:0.8rem;color:#94a3b8;">🏆 ' + league + '</span>' : '') +
+                    '<span style="font-size:0.8rem;font-weight:700;color:' + confColor(confidence) + ';">⚡ ' + confidence + '% overall confidence</span>' +
+                '</div>' +
+                (chips ? '<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">' + chips + '</div>' : '') +
+            '</div>' +
+            '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;">Market Breakdown</div>' +
+            '<div style="display:flex;flex-direction:column;gap:10px;">' + marketsHtml + '</div>';
+    }
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
 };
 
 window.closeMatchDetail = function() {
-    // Simple stub for now - can be expanded if a modal is added
-    console.log('[SMH] Close match detail');
+    const modal = document.getElementById('skcsMatchDetailModal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
 };
-
-// Bulletproof Global Click Listener for Insight Buttons
-document.body.addEventListener('click', function(e) {
-    const btn = e.target.closest('.insight-btn');
-    if (!btn) return; // If they didn't click the button, ignore it.
-
-    e.preventDefault(); // Stop any default button behavior
-    
-    const cardId = btn.getAttribute('data-card-id');
-    console.log("[Trigger] Insight button clicked! Extracted ID:", cardId);
-
-    // Ensure the function exists before calling it
-    if (typeof window.openMatchDetail === 'function') {
-        window.openMatchDetail(cardId);
-    } else {
-        console.error("[Fatal Error] window.openMatchDetail is not defined in the global scope!");
-        alert("System Error: Modal function is not accessible.");
-    }
-});
