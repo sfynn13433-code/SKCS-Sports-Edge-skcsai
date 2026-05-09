@@ -783,7 +783,7 @@
                 <div class="controls-grid">
                     <div class="control-group">
                         <label>Global Majors</label>
-                        <select id="global-majors-select" class="market-select" onchange="displayCodes(this, 'Global Majors')">
+                        <select id="global-majors-select" class="market-select">
                             <option value="">Select a market...</option>
                             <option value="Football">Football</option>
                             <option value="Tennis">Tennis</option>
@@ -795,7 +795,7 @@
 
                     <div class="control-group">
                         <label>Premium Markets</label>
-                        <select id="premium-markets-select" class="market-select" onchange="displayCodes(this, 'Premium Markets')">
+                        <select id="premium-markets-select" class="market-select">
                             <option value="">Select a market...</option>
                             <option value="NFL">NFL</option>
                             <option value="MLB">MLB</option>
@@ -809,7 +809,7 @@
 
                     <div class="control-group">
                         <label>Niche Markets</label>
-                        <select id="niche-markets-select" class="market-select" onchange="displayCodes(this, 'Niche Markets')">
+                        <select id="niche-markets-select" class="market-select">
                             <option value="">Select a market...</option>
                             <option value="NHL">NHL</option>
                             <option value="AFL">AFL</option>
@@ -820,7 +820,7 @@
 
                     <div class="control-group">
                         <label>ACCA's</label>
-                        <select id="acca-select" class="market-select" onchange="displayCodes(this, 'ACCAs')">
+                        <select id="acca-select" class="market-select">
                             <option value="">Select a market...</option>
                             <option value="6-match">6 Match ACCA</option>
                             <option value="12-match">12 Match ACCA</option>
@@ -829,200 +829,23 @@
                 </div>
             </div>
 
-            <script>
-                async function displayCodes(selectElement, category) {
-                    const sport = selectElement.value;
-                    const displayTitle = document.getElementById('displayTitle');
-                    const codesList = document.getElementById('codesList');
-                    const displayIcon = document.getElementById('displayIcon');
-                    const resultsPanel = document.getElementById('resultsPanel');
-                    
-                    if (!sport) return;
-
-                    // Loading State
-                    displayIcon.style.display = 'none';
-                    resultsPanel.style.justifyContent = 'center';
-                    displayTitle.textContent = `Connecting to SKCS Engine...`;
-                    displayTitle.style.color = '#94a3b8';
-                    displayTitle.style.fontSize = '0.9rem';
-                    codesList.innerHTML = `
-                        <div class="loading-spinner"></div>
-                        <p style="color: #3b82f6; font-size: 1rem; font-weight: 600; margin-top: 10px;">
-                            Fetching data for ${sport}...
-                        </p>
-                    `;
-                    
-                    // Clear other selects
-                    const allSelects = document.querySelectorAll('.market-select');
-                    allSelects.forEach(select => {
-                        if (select !== selectElement) {
-                            select.selectedIndex = 0;
-                        }
-                    });
-
-                    try {
-                        const backendUrl = window.API_BASE_URL || "https://skcs-sports-edge-skcsai.onrender.com";
-                        const apiKey = window.USER_API_KEY || 'skcs_user_12345';
-                        
-                        // Use Title Case for the sport name in the request
-                        const normalizedSport = sport.charAt(0).toUpperCase() + sport.slice(1);
-                        
-                        const response = await fetch(`${backendUrl}/api/vip/stress-payload?sport=${encodeURIComponent(normalizedSport)}&include_all=true`, {
-                            headers: {
-                                'x-api-key': apiKey
-                            }
-                        });
-
-                        if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
-                        
-                        const data = await response.json();
-                        renderResultsInPanel(data, normalizedSport, category);
-
-                        // Also trigger the original insights view if function exists
-                        if (typeof showSportInsights === 'function') {
-                            showSportInsights(normalizedSport);
-                        }
-                    } catch (error) {
-                        console.error('Error fetching sport data:', error);
-                        displayTitle.textContent = 'Connection Error';
-                        codesList.innerHTML = `
-                            <p style="color: #ef4444; font-size: 1rem; font-weight: 600;">
-                                Could not retrieve ${sport} data.
-                            </p>
-                            <button onclick="location.reload()" style="margin-top: 15px; padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer;">Retry</button>
-                        `;
-                    }
+            <style>
+                /* CSP-safe hover for result cards — replaces inline onmouseover/onmouseout */
+                .smh-result-item {
+                    background: rgba(15,23,42,0.8);
+                    border-radius: 12px;
+                    padding: 14px 16px;
+                    margin-bottom: 10px;
+                    border: 1px solid rgba(255,255,255,0.07);
+                    text-align: left;
+                    transition: transform 0.18s ease, box-shadow 0.18s ease;
                 }
-
-                function renderResultsInPanel(data, sport, category) {
-                    const codesList = document.getElementById('codesList');
-                    const displayTitle = document.getElementById('displayTitle');
-                    const resultsPanel = document.getElementById('resultsPanel');
-
-                    // Aggregate predictions from ALL category buckets
-                    const cats = data.payload?.categories || {};
-                    const allPredictions = [
-                        ...(cats.direct || []),
-                        ...(cats.analytical_insights || []),
-                        ...(cats.multi || []),
-                        ...(cats.same_match || []),
-                        ...(cats.acca_6match || []),
-                        ...(cats.mega_acca_12 || [])
-                    ];
-
-                    // Debug: log what the API returned
-                    console.log('[SMH] ' + sport + ' payload — source_rows=' + (data.source_rows || 0) + ', buckets:', {
-                        direct: (cats.direct || []).length,
-                        analytical_insights: (cats.analytical_insights || []).length,
-                        multi: (cats.multi || []).length,
-                        same_match: (cats.same_match || []).length,
-                        acca_6match: (cats.acca_6match || []).length,
-                        mega_acca_12: (cats.mega_acca_12 || []).length
-                    });
-
-                    if (allPredictions.length === 0) {
-                        resultsPanel.style.justifyContent = 'center';
-                        displayTitle.textContent = sport + ' — No Predictions Available';
-                        const sourceRows = data.source_rows || 0;
-                        codesList.innerHTML =
-                            '<div style="text-align:center;padding:20px;">' +
-                                '<div style="font-size:2.5rem;margin-bottom:12px;">📭</div>' +
-                                '<p style="color:#94a3b8;font-size:1rem;margin-bottom:8px;">No published predictions found for <strong style="color:#38bdf8;">' + sport + '</strong>.</p>' +
-                                (sourceRows > 0
-                                    ? '<p style="color:#64748b;font-size:0.85rem;">The database has ' + sourceRows + ' raw row(s) but none passed the category filter. Check confidence thresholds or trigger a new AI pipeline run.</p>'
-                                    : '<p style="color:#64748b;font-size:0.85rem;">No records in the database for this sport. A sync may be needed — wait for the scheduled refresh or contact your admin.</p>') +
-                            '</div>';
-                        return;
-                    }
-
-                    resultsPanel.style.justifyContent = 'flex-start';
-                    displayTitle.textContent = sport + ' \u00b7 ' + allPredictions.length + ' Insight' + (allPredictions.length !== 1 ? 's' : '');
-                    displayTitle.style.fontSize = '1rem';
-                    displayTitle.style.color = '#94a3b8';
-                    displayTitle.style.marginBottom = '16px';
-
-                    const SECTION_LABELS = {
-                        direct: 'Direct Pick', secondary: 'Analytical',
-                        multi: 'Multi', same_match: 'Same Match',
-                        acca_6match: 'ACCA 6', mega_acca_12: 'MEGA ACCA'
-                    };
-                    const SECTION_COLORS = {
-                        direct: '#38bdf8', secondary: '#a78bfa',
-                        multi: '#fb923c', same_match: '#34d399',
-                        acca_6match: '#f59e0b', mega_acca_12: '#ef4444'
-                    };
-
-                    let html = '<div class="results-scroll-container" style="width:100%;max-height:420px;overflow-y:auto;padding-right:8px;">';
-
-                    allPredictions.forEach(function(pred) {
-                        const sectionType = pred.section_type || 'direct';
-                        const accentColor = SECTION_COLORS[sectionType] || '#38bdf8';
-                        const sectionLabel = SECTION_LABELS[sectionType] || sectionType.replace(/_/g, ' ').toUpperCase();
-                        const legCount = Array.isArray(pred.matches) ? pred.matches.length : 1;
-                        const isAcca = legCount > 1;
-
-                        const match = pred.matches && pred.matches[0] ? pred.matches[0] : {};
-                        const home = match.home_team || (match.metadata && match.metadata.home_team) || '—';
-                        const away = match.away_team || (match.metadata && match.metadata.away_team) || '—';
-
-                        const pickRaw = match.prediction
-                            || (pred.final_recommendation && pred.final_recommendation.market)
-                            || (match.metadata && match.metadata.prediction)
-                            || match.recommendation
-                            || 'N/A';
-                        const pick = String(pickRaw).replace(/_/g, ' ').toUpperCase();
-
-                        const confidence = Math.round(pred.total_confidence || match.confidence || 0);
-                        const market = String(match.market || (match.metadata && match.metadata.market) || '1X2').toUpperCase();
-
-                        const kickoffRaw = match.commence_time || match.match_date
-                            || (match.metadata && (match.metadata.match_time || match.metadata.kickoff || match.metadata.kickoff_time))
-                            || pred.created_at;
-                        let kickoffStr = '';
-                        if (kickoffRaw) {
-                            try {
-                                const d = new Date(kickoffRaw);
-                                if (!isNaN(d.getTime())) {
-                                    kickoffStr = d.toLocaleString('en-GB', {weekday:'short',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'UTC'}) + ' UTC';
-                                }
-                            } catch(e) {}
-                        }
-
-                        const oddsVal = (match.metadata && match.metadata.odds && match.metadata.odds.home)
-                            || (match.metadata && match.metadata.sharp_odds && match.metadata.sharp_odds.home_win)
-                            || match.odds || null;
-                        const oddsHtml = oddsVal ? '<span style="color:#facc15;font-weight:700;margin-left:8px;">@ ' + Number(oddsVal).toFixed(2) + '</span>' : '';
-
-                        const confColor = confidence >= 80 ? '#4ade80' : confidence >= 65 ? '#facc15' : '#fb923c';
-                        const timeHtml = kickoffStr ? '<span style="color:#475569;font-size:0.78rem;margin-left:auto;">\uD83D\uDD50 ' + kickoffStr + '</span>' : '';
-
-                        html +=
-                            '<div class="result-item" style="background:rgba(15,23,42,0.8);border-radius:12px;padding:14px 16px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.07);border-left:4px solid ' + accentColor + ';text-align:left;transition:transform 0.18s ease,box-shadow 0.18s ease;" onmouseover="this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 8px 24px rgba(0,0,0,0.4)\'" onmouseout="this.style.transform=\'translateY(0)\';this.style.boxShadow=\'none\'">' +
-                                '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px;flex-wrap:wrap;">' +
-                                    '<div style="display:flex;align-items:center;gap:6px;">' +
-                                        '<span style="font-size:0.7rem;color:' + accentColor + ';font-weight:800;text-transform:uppercase;letter-spacing:0.8px;background:rgba(255,255,255,0.06);padding:2px 7px;border-radius:4px;">' + sectionLabel + (isAcca ? ' \u00b7 ' + legCount + ' legs' : '') + '</span>' +
-                                        '<span style="font-size:0.7rem;color:#64748b;font-weight:600;text-transform:uppercase;">' + market + '</span>' +
-                                    '</div>' +
-                                    '<span style="font-size:0.8rem;color:' + confColor + ';font-weight:800;">' + confidence + '% CONF.</span>' +
-                                '</div>' +
-                                '<div style="font-size:1.05rem;font-weight:700;color:#f1f5f9;margin-bottom:5px;line-height:1.3;">' +
-                                    home + ' <span style="color:#475569;font-weight:400;font-size:0.9rem;">vs</span> ' + away +
-                                    (isAcca ? '<span style="font-size:0.75rem;color:#64748b;font-weight:400;"> +' + (legCount - 1) + ' more</span>' : '') +
-                                '</div>' +
-                                '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;">' +
-                                    '<span style="background:rgba(74,222,128,0.12);color:#4ade80;padding:3px 9px;border-radius:4px;font-size:0.88rem;font-weight:700;">\u26A1 ' + pick + '</span>' +
-                                    oddsHtml + timeHtml +
-                                '</div>' +
-                            '</div>';
-                    });
-
-                    html += '</div>';
-                    codesList.innerHTML = html;
-                    codesList.style.fontSize = '1rem';
-                    codesList.style.fontWeight = '400';
-                    codesList.style.width = '100%';
+                .smh-result-item:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
                 }
-            </script>
+            </style>
+            <script src="/js/smh-hub.js"></script>
         </div> <!-- End of Sports Market Hub widget -->
 
         <!-- Rest of the original portal/tabs structure remains unchanged -->
