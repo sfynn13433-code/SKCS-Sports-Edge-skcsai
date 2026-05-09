@@ -296,29 +296,21 @@
             });
         }
 
-        // Delegated click for the "Click for insights" button
-        // (CSP-safe, no inline onclick)
-        if (codesList) {
-            codesList.addEventListener('click', function (e) {
-                var insightBtn = e.target.closest('.insight-btn');
-                if (insightBtn) {
-                    var cardId = insightBtn.getAttribute('data-card-id');
-                    console.log('[SMH Trigger] Opening details for card:', cardId);
-                    if (cardId) {
-                        var prediction = SMH_CARD_REGISTRY.get(cardId);
-                        if (prediction) {
-                            console.log('[SMH Trigger] Prediction data:', prediction);
-                            // Try to use the global openMatchDetail function if available
-                            if (typeof window.openMatchDetail === 'function') {
-                                window.openMatchDetail(cardId);
-                            } else {
-                                console.warn('[SMH] window.openMatchDetail not available');
-                            }
-                        }
-                    }
+        // Bulletproof document-level delegation for "Click for insights" button
+        // Attached to document.body to survive DOM updates (codesList gets overwritten)
+        document.body.addEventListener('click', function (e) {
+            var insightBtn = e.target.closest('.insight-btn');
+            if (insightBtn) {
+                var cardId = insightBtn.getAttribute('data-card-id');
+                console.log("[Trigger] Button clicked! Match ID:", cardId);
+
+                if (typeof window.openMatchDetail === 'function') {
+                    window.openMatchDetail(cardId);
+                } else {
+                    console.error("[Error] openMatchDetail function is missing or not in scope!");
                 }
-            });
-        }
+            }
+        });
     });
 
 })();
