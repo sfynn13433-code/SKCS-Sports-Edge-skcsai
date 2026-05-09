@@ -3,16 +3,28 @@
 const { query } = require('../db');
 
 function normalizeSport(value) {
-    const sport = String(value || '').trim().toLowerCase();
-    if (!sport) return 'unknown';
-    if (sport.startsWith('soccer_')) return 'football';
-    if (sport.startsWith('icehockey_')) return 'hockey';
-    if (sport.startsWith('basketball_')) return 'basketball';
-    if (sport.startsWith('americanfootball_')) return 'american_football';
-    if (sport.startsWith('baseball_')) return 'baseball';
-    if (sport.startsWith('rugbyunion_')) return 'rugby';
-    if (sport.startsWith('aussierules_')) return 'afl';
-    return sport;
+    const key = String(value || '').trim().toLowerCase();
+    if (!key) return 'unknown';
+
+    if (key === 'soccer' || key === 'football' || key.startsWith('soccer_')) return 'Football';
+    if (key === 'nba' || key === 'basketball' || key.startsWith('basketball_')) return 'Basketball';
+    if (key === 'nfl' || key === 'american_football' || key.startsWith('americanfootball_')) return 'NFL';
+    if (key === 'nhl' || key === 'hockey' || key.startsWith('icehockey_')) return 'NHL';
+    if (key === 'mlb' || key === 'baseball' || key.startsWith('baseball_')) return 'MLB';
+    if (key === 'rugby' || key.startsWith('rugbyunion_')) return 'Rugby';
+    if (key === 'afl' || key.startsWith('aussierules_')) return 'AFL';
+    if (key === 'volleyball') return 'Volleyball';
+    if (key === 'handball') return 'Handball';
+    if (key === 'f1' || key === 'formula1') return 'F1';
+    if (key === 'mma') return 'MMA';
+    if (key === 'golf') return 'Golf';
+    if (key === 'boxing') return 'Boxing';
+    if (key === 'tennis') return 'Tennis';
+    if (key === 'cricket') return 'Cricket';
+    if (key === 'esports') return 'Esports';
+    if (key === 'darts') return 'Darts';
+
+    return value;
 }
 
 function extractProviderEventId(item) {

@@ -22,8 +22,8 @@ const PROVIDER_CONFIG = Object.freeze({
     sofascore: { hostEnv: 'RAPIDAPI_HOST_SOFASCORE', cacheDurationMinutes: 1440 },
     cricbuzz: { hostEnv: 'RAPIDAPI_HOST_CRICBUZZ', cacheDurationMinutes: 1440 },
     tennis_api: { hostEnv: 'RAPIDAPI_HOST_TENNIS', cacheDurationMinutes: 1440 },
-    sport_api_nba: { hostEnv: 'RAPIDAPI_HOST_SPORT', cacheDurationMinutes: 1440 },
-    free_live_football: { hostEnv: 'RAPIDAPI_HOST_FREE_FOOTBALL', cacheDurationMinutes: 1440 },
+    sport_api_Basketball: { hostEnv: 'RAPIDAPI_HOST_SPORT', cacheDurationMinutes: 1440 },
+    free_live_Football: { hostEnv: 'RAPIDAPI_HOST_FREE_FOOTBALL', cacheDurationMinutes: 1440 },
     today_prediction: { hostEnv: 'RAPIDAPI_HOST_TODAY_PREDICTION', cacheDurationMinutes: 1440 },
     flashlive: { hostEnv: 'RAPIDAPI_HOST_FLASHLIVE', cacheDurationMinutes: 1440 },
     livescore: { hostEnv: 'RAPIDAPI_HOST_LIVESCORE', cacheDurationMinutes: 1440 },
@@ -37,20 +37,20 @@ const PROVIDER_CONFIG = Object.freeze({
 });
 
 const SPORT_PROVIDER_MAP = Object.freeze({
-    football: 'football_api',
-    baseball: 'tank01_mlb',
-    basketball: 'sport_api_nba',
-    nba: 'sport_api_nba',
-    rugby: 'rugby_live_data',
-    hockey: 'icehockeyapi',
-    american_football: 'nfl_api',
-    nfl: 'nfl_api',
-    formula1: 'f1_motorsport',
-    cricket: 'cricket_api',
-    handball: 'allsportsapi',
-    volleyball: 'allsportsapi',
-    afl: 'allsportsapi',
-    mma: 'allsportsapi'
+    Football: 'football_api',
+    MLB: 'tank01_mlb',
+    Basketball: 'sport_api_nba',
+    Basketball: 'sport_api_nba',
+    Rugby: 'rugby_live_data',
+    NHL: 'icehockeyapi',
+    american_Football: 'nfl_api',
+    NFL: 'nfl_api',
+    F1: 'f1_motorsport',
+    Cricket: 'cricket_api',
+    Handball: 'allsportsapi',
+    Volleyball: 'allsportsapi',
+    AFL: 'allsportsapi',
+    MMA: 'allsportsapi'
 });
 
 const FOOTBALL_NEWS_FALLBACK_LEAGUE = String(
@@ -58,21 +58,21 @@ const FOOTBALL_NEWS_FALLBACK_LEAGUE = String(
 ).trim();
 
 const SPORT_HOST_KEY_HINTS = Object.freeze({
-    football: ['FOOTBALL', 'SOCCER', 'LIVESCORE', 'FLASHSCORE', 'SCORE', 'ODDSPEDIA', 'ALLSPORTS', 'ALLSCORES', 'SPORT_RADAR'],
-    basketball: ['BASKETBALL', 'NBA', 'WNBA'],
-    nba: ['BASKETBALL', 'NBA', 'WNBA'],
-    baseball: ['BASEBALL', 'MLB'],
-    hockey: ['HOCKEY', 'ICE_HOCKEY', 'NHL'],
-    rugby: ['RUGBY'],
-    american_football: ['NFL', 'AMERICAN_FOOTBALL', 'AMERICANFOOTBALL'],
-    nfl: ['NFL', 'AMERICAN_FOOTBALL', 'AMERICANFOOTBALL'],
-    volleyball: ['VOLLEYBALL'],
-    handball: ['HANDBALL'],
-    afl: ['AUSSIE', 'AFL'],
-    mma: ['MMA', 'UFC'],
-    formula1: ['F1', 'FORMULA', 'MOTOR'],
-    cricket: ['CRICKET'],
-    tennis: ['TENNIS']
+    Football: ['FOOTBALL', 'SOCCER', 'LIVESCORE', 'FLASHSCORE', 'SCORE', 'ODDSPEDIA', 'ALLSPORTS', 'ALLSCORES', 'SPORT_RADAR'],
+    Basketball: ['BASKETBALL', 'NBA', 'WNBA'],
+    Basketball: ['BASKETBALL', 'NBA', 'WNBA'],
+    MLB: ['BASEBALL', 'MLB'],
+    NHL: ['HOCKEY', 'ICE_HOCKEY', 'NHL'],
+    Rugby: ['RUGBY'],
+    american_Football: ['NFL', 'AMERICAN_FOOTBALL', 'AMERICANFOOTBALL'],
+    NFL: ['NFL', 'AMERICAN_FOOTBALL', 'AMERICANFOOTBALL'],
+    Volleyball: ['VOLLEYBALL'],
+    Handball: ['HANDBALL'],
+    AFL: ['AUSSIE', 'AFL'],
+    MMA: ['MMA', 'UFC'],
+    F1: ['F1', 'FORMULA', 'MOTOR'],
+    Cricket: ['CRICKET'],
+    Tennis: ['TENNIS']
 });
 
 function normalizeHost(value) {
@@ -119,9 +119,23 @@ function getAllRapidApiHostEntries() {
 function normalizeSportToken(sport) {
     const key = String(sport || '').trim().toLowerCase();
     if (!key) return '';
-    if (key === 'nfl') return 'american_football';
-    if (key === 'nba') return 'basketball';
-    if (key === 'soccer') return 'football';
+    if (key === 'soccer' || key === 'football' || key.startsWith('soccer_')) return 'Football';
+    if (key === 'nba' || key === 'basketball' || key.startsWith('basketball_')) return 'Basketball';
+    if (key === 'nfl' || key === 'american_football' || key.startsWith('americanfootball_')) return 'NFL';
+    if (key === 'nhl' || key === 'hockey' || key.startsWith('icehockey_')) return 'NHL';
+    if (key === 'mlb' || key === 'baseball' || key.startsWith('baseball_')) return 'MLB';
+    if (key === 'rugby' || key.startsWith('rugbyunion_')) return 'Rugby';
+    if (key === 'afl' || key.startsWith('aussierules_')) return 'AFL';
+    if (key === 'volleyball') return 'Volleyball';
+    if (key === 'handball') return 'Handball';
+    if (key === 'f1' || key === 'formula1') return 'F1';
+    if (key === 'mma') return 'MMA';
+    if (key === 'golf') return 'Golf';
+    if (key === 'boxing') return 'Boxing';
+    if (key === 'tennis') return 'Tennis';
+    if (key === 'cricket') return 'Cricket';
+    if (key === 'esports') return 'Esports';
+    if (key === 'darts') return 'Darts';
     return key;
 }
 

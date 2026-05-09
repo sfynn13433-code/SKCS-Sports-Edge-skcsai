@@ -198,13 +198,18 @@ function normalizeProvider(raw) {
 function normalizeSport(raw) {
     const key = normalizeString(
         pickFirstWithMatch(raw, ['sport', 'metadata.sport', 'raw_provider_data.sport']),
-        'football'
+        'Football'
     ).toLowerCase();
 
-    if (key === 'soccer' || key.startsWith('soccer_')) return 'football';
-    if (key === 'nba') return 'basketball';
+    if (key === 'soccer' || key.startsWith('soccer_')) return 'Football';
+    if (key === 'nba') return 'Basketball';
 
     const exactMapping = {
+        football: 'Football',
+        basketball: 'Basketball',
+        tennis: 'Tennis',
+        cricket: 'Cricket',
+        esports: 'Esports',
         nfl: 'NFL',
         american_football: 'NFL',
         mlb: 'MLB',
@@ -219,7 +224,8 @@ function normalizeSport(raw) {
         handball: 'Handball',
         golf: 'Golf',
         rugby: 'Rugby',
-        boxing: 'Boxing'
+        boxing: 'Boxing',
+        darts: 'Darts'
     };
 
     return exactMapping[key] || key;

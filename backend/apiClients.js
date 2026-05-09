@@ -20,22 +20,22 @@ class APISportsClient {
 
     getBaseUrl(sport) {
         const urls = {
-            football:         'https://v3.football.api-sports.io',
+            Football:         'https://v3.football.api-sports.io',
             afl:              'https://v1.afl.api-sports.io',
-            baseball:         'https://v1.baseball.api-sports.io',
-            basketball:       'https://v1.basketball.api-sports.io',
+            MLB:         'https://v1.baseball.api-sports.io',
+            Basketball:       'https://v1.basketball.api-sports.io',
             cricket:          'https://v1.cricket.api-sports.io',
             formula1:         'https://v1.formula-1.api-sports.io',
             handball:         'https://v1.handball.api-sports.io',
-            hockey:           'https://v1.hockey.api-sports.io',
+            NHL:           'https://v1.hockey.api-sports.io',
             mma:              'https://v1.mma.api-sports.io',
             nba:              'https://v2.nba.api-sports.io',
-            american_football:'https://v1.american-football.api-sports.io',
+            american_Football:'https://v1.american-football.api-sports.io',
             rugby:            'https://v1.rugby.api-sports.io',
             tennis:           'https://v1.tennis.api-sports.io',
             volleyball:       'https://v1.volleyball.api-sports.io'
         };
-        return urls[sport] || urls.football;
+        return urls[sport] || urls.Football;
     }
 
     getHostForSport(sport) {
@@ -44,17 +44,17 @@ class APISportsClient {
 
     getEnvPrefixForSport(sport) {
         const prefixes = {
-            football: 'API_FOOTBALL_KEY',
-            basketball: 'API_BASKETBALL_KEY',
+            Football: 'API_FOOTBALL_KEY',
+            Basketball: 'API_BASKETBALL_KEY',
             nba: 'API_NBA_KEY',
             afl: 'API_AFL_KEY',
-            baseball: 'API_BASEBALL_KEY',
+            MLB: 'API_BASEBALL_KEY',
             cricket: 'API_CRICKET_KEY',
             formula1: 'API_FORMULA1_KEY',
             handball: 'API_HANDBALL_KEY',
-            hockey: 'API_HOCKEY_KEY',
+            NHL: 'API_HOCKEY_KEY',
             mma: 'API_MMA_KEY',
-            american_football: 'API_NFL_KEY',
+            american_Football: 'API_NFL_KEY',
             rugby: 'API_RUGBY_KEY',
             tennis: 'API_TENNIS_KEY',
             volleyball: 'API_VOLLEYBALL_KEY'
@@ -143,14 +143,14 @@ class APISportsClient {
 
     getEndpoint(sport) {
         const endpoints = {
-            football:         'fixtures',
+            Football:         'fixtures',
             formula1:         'races',
             mma:              'fights'
         };
         return endpoints[sport] || 'games';
     }
 
-    async getFixtures(leagueId, season, options = {}, sport = 'football') {
+    async getFixtures(leagueId, season, options = {}, sport = 'Football') {
         try {
             const endpoint = this.getEndpoint(sport);
             const params = {};
@@ -181,7 +181,7 @@ class APISportsClient {
     }
 
     // NEW: Get teams for a league and season
-    async getTeams(leagueId, season, sport = 'football') {
+    async getTeams(leagueId, season, sport = 'Football') {
         try {
             const params = { league: leagueId, season };
 
@@ -203,7 +203,7 @@ class APISportsClient {
         }
     }
 
-    async getTeamStats(leagueId, season, teamId, sport = 'football') {
+    async getTeamStats(leagueId, season, teamId, sport = 'Football') {
         try {
             return await this.requestWithRotation(sport, 'teams/statistics', {
                 league: leagueId,
@@ -216,7 +216,7 @@ class APISportsClient {
         }
     }
 
-    async getInjuries(leagueId, season, sport = 'football') {
+    async getInjuries(leagueId, season, sport = 'Football') {
         try {
             return await this.requestWithRotation(sport, 'injuries', {
                 league: leagueId,
@@ -228,7 +228,7 @@ class APISportsClient {
         }
     }
 
-    async getHeadToHead(teamA, teamB, sport = 'football') {
+    async getHeadToHead(teamA, teamB, sport = 'Football') {
         try {
             const h2hParam = [teamA, teamB].sort((a, b) => a - b).join('-');
             return await this.requestWithRotation(sport, 'fixtures/headtohead', {
@@ -308,8 +308,8 @@ class SportsDataOrgClient {
         }
 
         const normalizedSport = String(sport || '').trim().toLowerCase();
-        if (normalizedSport !== 'football') {
-            console.log(`[FootballData.org] ${sport}: skipped (football-only provider)`);
+        if (normalizedSport !== 'Football') {
+            console.log(`[FootballData.org] ${sport}: skipped (Football-only provider)`);
             return [];
         }
 
@@ -393,15 +393,15 @@ class SportsDataIOClient {
         }
 
         const sportMap = {
-            football: 'soccer',
+            Football: 'soccer',
             nba: 'nba',
-            basketball: 'basketball',
+            Basketball: 'basketball',
             nfl: 'nfl',
-            american_football: 'nfl',
+            american_Football: 'nfl',
             mlb: 'mlb',
-            baseball: 'mlb',
+            MLB: 'mlb',
             nhl: 'hockey',
-            hockey: 'hockey',
+            NHL: 'hockey',
         };
 
         const sportEndpoint = sportMap[sport];
@@ -477,12 +477,12 @@ class RapidAPIClient {
 
     getBaseUrlForSport(sport) {
         const urls = {
-            football: 'https://v3.football.api-sports.io',
-            basketball: 'https://v1.basketball.api-sports.io',
-            baseball: 'https://v1.baseball.api-sports.io',
-            hockey: 'https://v1.hockey.api-sports.io',
+            Football: 'https://v3.football.api-sports.io',
+            Basketball: 'https://v1.basketball.api-sports.io',
+            MLB: 'https://v1.baseball.api-sports.io',
+            NHL: 'https://v1.hockey.api-sports.io',
             rugby: 'https://v1.rugby.api-sports.io',
-            american_football: 'https://v1.american-football.api-sports.io',
+            american_Football: 'https://v1.american-football.api-sports.io',
             volleyball: 'https://v1.volleyball.api-sports.io',
             handball: 'https://v1.handball.api-sports.io',
             afl: 'https://v1.afl.api-sports.io',
@@ -491,7 +491,7 @@ class RapidAPIClient {
             formula1: 'https://v1.formula-1.api-sports.io',
             cricket: 'https://v1.cricket.api-sports.io',
         };
-        return urls[sport] || urls.football;
+        return urls[sport] || urls.Football;
     }
 
     getHostForSport(sport) {
@@ -500,12 +500,12 @@ class RapidAPIClient {
 
     getEndpointForSport(sport) {
         const endpoints = {
-            football: 'fixtures',
-            basketball: 'games',
-            baseball: 'games',
-            hockey: 'games',
+            Football: 'fixtures',
+            Basketball: 'games',
+            MLB: 'games',
+            NHL: 'games',
             rugby: 'games',
-            american_football: 'games',
+            american_Football: 'games',
             volleyball: 'games',
             handball: 'games',
             afl: 'games',

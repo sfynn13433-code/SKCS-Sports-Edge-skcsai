@@ -53,11 +53,11 @@
             { id: 'Boxing', name: 'Boxing', icon: '🥊', color: '#ef4444' }
         ],
         'Global Majors': [
-            { id: 'football', name: 'Football', icon: '⚽', color: '#3b82f6' },
-            { id: 'tennis', name: 'Tennis', icon: '🎾', color: '#22c55e' },
-            { id: 'basketball', name: 'Basketball', icon: '🏀', color: '#f97316' },
-            { id: 'cricket', name: 'Cricket', icon: '🏏', color: '#f87171' },
-            { id: 'esports', name: 'eSports', icon: '🎮', color: '#a78bfa' }
+            { id: 'Football', name: 'Football', icon: '⚽', color: '#3b82f6' },
+            { id: 'Tennis', name: 'Tennis', icon: '🎾', color: '#22c55e' },
+            { id: 'Basketball', name: 'Basketball', icon: '🏀', color: '#f97316' },
+            { id: 'Cricket', name: 'Cricket', icon: '🏏', color: '#f87171' },
+            { id: 'Esports', name: 'Esports', icon: '🎮', color: '#a78bfa' }
         ]
     };
 

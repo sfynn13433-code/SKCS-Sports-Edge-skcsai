@@ -349,15 +349,29 @@ function isSafeMarketAllowed(market) {
 
 function resolveTelemetry(options = {}, matchContext = {}) {
     const telemetry = options?.telemetry && typeof options.telemetry === 'object' ? options.telemetry : {};
-    const sport = String(
+    const rawSport = String(
         telemetry.sport
         || matchContext?.sport
         || matchContext?.match_info?.sport
         || 'unknown'
     ).trim().toLowerCase();
+
+    let sport = rawSport;
+    if (rawSport === 'soccer' || rawSport === 'football' || rawSport.startsWith('soccer_')) sport = 'Football';
+    else if (rawSport === 'nba' || rawSport === 'basketball' || rawSport.startsWith('basketball_')) sport = 'Basketball';
+    else if (rawSport === 'nfl' || rawSport === 'american_football' || rawSport.startsWith('americanfootball_')) sport = 'NFL';
+    else if (rawSport === 'nhl' || rawSport === 'hockey' || rawSport.startsWith('icehockey_')) sport = 'NHL';
+    else if (rawSport === 'mlb' || rawSport === 'baseball' || rawSport.startsWith('baseball_')) sport = 'MLB';
+    else if (rawSport === 'rugby' || rawSport.startsWith('rugbyunion_')) sport = 'Rugby';
+    else if (rawSport === 'afl' || rawSport.startsWith('aussierules_')) sport = 'AFL';
+    else if (rawSport === 'volleyball') sport = 'Volleyball';
+    else if (rawSport === 'handball') sport = 'Handball';
+    else if (rawSport === 'f1' || rawSport === 'formula1') sport = 'F1';
+    else if (rawSport === 'mma') sport = 'MMA';
+
     return {
         run_id: telemetry.run_id || null,
-        sport: sport || 'unknown'
+        sport: sport
     };
 }
 

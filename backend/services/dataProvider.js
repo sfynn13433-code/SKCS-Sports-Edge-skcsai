@@ -6,15 +6,15 @@ const { APISportsClient, OddsAPIClient, SportsDataOrgClient, SportsDataIOClient,
 
 const SUPPORTED_LEAGUES = ['4328', '4332', '4331', '4335', '4334', '4387', '4424', '4380', '4391'];
 const LEAGUE_SPORT_MAP = {
-    '4328': 'football',          // EPL
-    '4332': 'football',          // Serie A
-    '4331': 'football',          // Bundesliga
-    '4335': 'football',          // La Liga
-    '4334': 'football',          // Ligue 1
-    '4387': 'basketball',        // NBA
-    '4424': 'baseball',          // MLB
-    '4380': 'hockey',            // NHL
-    '4391': 'american_football'  // NFL
+    '4328': 'Football',          // EPL
+    '4332': 'Football',          // Serie A
+    '4331': 'Football',          // Bundesliga
+    '4335': 'Football',          // La Liga
+    '4334': 'Football',          // Ligue 1
+    '4387': 'Basketball',        // NBA
+    '4424': 'MLB',          // MLB
+    '4380': 'NHL',            // NHL
+    '4391': 'NFL'  // NFL
 };
 const THESPORTSDB_SUPPORTED_SPORTS = new Set(Object.values(LEAGUE_SPORT_MAP));
 
@@ -28,18 +28,18 @@ const sportsClient = axios.create({
 });
 
 const SPORT_KEY_MAP = {
-    'soccer_epl': 'football',
-    'soccer_england_efl_cup': 'football',
-    'soccer_uefa_champs_league': 'football',
-    'basketball_nba': 'basketball',
-    'basketball_euroleague': 'basketball',
-    'americanfootball_nfl': 'nfl',
-    'icehockey_nhl': 'hockey',
-    'baseball_mlb': 'baseball',
-    'mma_mixed_martial_arts': 'mma',
-    'aussierules_afl': 'afl',
-    'rugbyunion_six_nations': 'rugby',
-    'rugbyunion_international': 'rugby'
+    'soccer_epl': 'Football',
+    'soccer_england_efl_cup': 'Football',
+    'soccer_uefa_champs_league': 'Football',
+    'basketball_nba': 'Basketball',
+    'basketball_euroleague': 'Basketball',
+    'americanfootball_nfl': 'NFL',
+    'icehockey_nhl': 'NHL',
+    'baseball_mlb': 'MLB',
+    'mma_mixed_martial_arts': 'MMA',
+    'aussierules_afl': 'AFL',
+    'rugbyunion_six_nations': 'Rugby',
+    'rugbyunion_international': 'Rugby'
 };
 
 function normalizeSportKey(sportKey) {
@@ -98,22 +98,22 @@ function parsePositiveInt(value, fallback, min, max) {
 function normalizeRequestedSport(sport) {
     const key = String(sport || '').trim().toLowerCase();
     if (!key) return null;
-    if (key === 'nba') return 'basketball';
-    if (key === 'mlb') return 'baseball';
-    if (key === 'nhl') return 'hockey';
-    if (key === 'nfl') return 'american_football';
-    if (key === 'motorsport') return 'formula1';
-    if (key === 'formula-1' || key === 'formula_1') return 'formula1';
-    if (key === 'american-football') return 'american_football';
+    if (key === 'nba') return 'Basketball';
+    if (key === 'mlb') return 'MLB';
+    if (key === 'nhl') return 'NHL';
+    if (key === 'nfl') return 'NFL';
+    if (key === 'motorsport') return 'F1';
+    if (key === 'formula-1' || key === 'formula_1') return 'F1';
+    if (key === 'american-football') return 'NFL';
     return key;
 }
 
 function isTier1PrioritySport(sport) {
     const normalized = normalizeRequestedSport(sport);
-    return normalized === 'football'
-        || normalized === 'basketball'
-        || normalized === 'rugby'
-        || normalized === 'mma';
+    return normalized === 'Football'
+        || normalized === 'Basketball'
+        || normalized === 'Rugby'
+        || normalized === 'MMA';
 }
 
 function normalizeCompetitionText(value) {

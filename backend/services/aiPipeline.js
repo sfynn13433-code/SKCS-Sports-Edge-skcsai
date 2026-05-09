@@ -50,10 +50,10 @@ function normalizeSportForDeployment(value) {
     if (!key) return 'unknown';
 
     const mapping = {
-        soccer: 'football',
-        football: 'football',
-        nba: 'basketball',
-        basketball: 'basketball',
+        soccer: 'Football',
+        football: 'Football',
+        nba: 'Basketball',
+        basketball: 'Basketball',
         nfl: 'NFL',
         american_football: 'NFL',
         mlb: 'MLB',
@@ -68,12 +68,16 @@ function normalizeSportForDeployment(value) {
         handball: 'Handball',
         golf: 'Golf',
         rugby: 'Rugby',
-        boxing: 'Boxing'
+        boxing: 'Boxing',
+        tennis: 'Tennis',
+        cricket: 'Cricket',
+        esports: 'Esports',
+        darts: 'Darts'
     };
 
-    if (key.startsWith('soccer_') || key.startsWith('football_')) return 'football';
+    if (key.startsWith('soccer_') || key.startsWith('football_')) return 'Football';
     if (key.startsWith('americanfootball_')) return 'NFL';
-    if (key.startsWith('basketball_')) return 'basketball';
+    if (key.startsWith('basketball_')) return 'Basketball';
     if (key.startsWith('icehockey_')) return 'NHL';
     if (key.startsWith('rugbyunion_')) return 'Rugby';
 
@@ -237,7 +241,7 @@ async function applyFootballH2HEnrichment(
 
     const safeFixtureId = String(fixtureId || 'unknown_fixture');
     const normalizedSport = normalizeSportForDeployment(sport);
-    if (normalizedSport !== 'football') {
+    if (normalizedSport !== 'Football') {
         const reason = 'non_football_sport';
         console.log(`[H2H] skipped: match=${safeFixtureId} reason=${reason}`);
         return {
@@ -1341,7 +1345,7 @@ async function buildRawPredictionFromProviderItem(item) {
     const match_id = String(matchInfo.match_id || item.match_id || item.id || '').trim();
     if (!match_id) throw new Error('match_id missing in provider item');
 
-    const sport = normalizeSportForDeployment(matchContext?.sport || item.sport || 'football');
+    const sport = normalizeSportForDeployment(matchContext?.sport || item.sport || 'Football');
     if (!isDeploymentSportEnabled(sport)) {
         pipelineLogger.rejectionAdd({
             run_id: telemetryRunId,
@@ -1349,7 +1353,7 @@ async function buildRawPredictionFromProviderItem(item) {
             bucket: 'sport_phase_block',
             metadata: {
                 match_id,
-                reason: 'phase_1_football_only'
+                reason: 'phase_1_Football_only'
             }
         });
         return null;
@@ -1939,7 +1943,7 @@ async function runPipelineForMatches({ matches, telemetry = {} }) {
              || item?.match_info?.sport
              || item?.match?.sport
              || item?.raw_provider_data?.sport
-             || 'football'
+             || 'Football'
          )
      );
 
@@ -1969,7 +1973,7 @@ async function runPipelineForMatches({ matches, telemetry = {} }) {
             let normalValid = 0;
             let normalInvalid = 0;
 
-        console.log('[aiPipeline] manual matches input count=%s eligible_football=%s', matches.length, eligibleMatches.length);
+        console.log('[aiPipeline] manual matches input count=%s eligible_Football=%s', matches.length, eligibleMatches.length);
 
         for (const item of eligibleMatches) {
             const fixtureId = String(item?.id || item?.match_id || item?.match_info?.match_id || '').trim();
@@ -2054,7 +2058,7 @@ async function runPipelineFromConfiguredDataMode() {
              || item?.match_info?.sport
              || item?.match?.sport
              || item?.raw_provider_data?.sport
-             || 'football'
+             || 'Football'
          )
      );
 
@@ -2070,7 +2074,7 @@ async function runPipelineFromConfiguredDataMode() {
             const inserted = [];
             const seenRawKeys = new Set();
 
-        console.log('[aiPipeline] DATA_MODE=%s provider_items=%s eligible_football=%s', mode, predictions.length, eligiblePredictions.length);
+        console.log('[aiPipeline] DATA_MODE=%s provider_items=%s eligible_Football=%s', mode, predictions.length, eligiblePredictions.length);
 
         for (const item of eligiblePredictions) {
             const fixtureId = String(item?.id || item?.match_id || item?.match_info?.match_id || '').trim();

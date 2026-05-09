@@ -1,8 +1,8 @@
 'use strict';
 
 const DEFAULT_ACTIVE_SPORTS = Object.freeze([
-    'football',
-    'basketball',
+    'Football',
+    'Basketball',
     'Rugby',
     'NFL',
     'MLB',
@@ -14,9 +14,10 @@ const DEFAULT_ACTIVE_SPORTS = Object.freeze([
     'MMA',
     'Golf',
     'Boxing',
-    'tennis',
-    'cricket',
-    'esports'
+    'Tennis',
+    'Cricket',
+    'Esports',
+    'Darts'
 ]);
 
 function normalizeActiveSportToken(value) {
@@ -43,8 +44,14 @@ function normalizeActiveSportToken(value) {
         golf: 'Golf',
         rugby: 'Rugby',
         boxing: 'Boxing',
-        soccer: 'football',
-        nba: 'basketball'
+        darts: 'Darts',
+        soccer: 'Football',
+        football: 'Football',
+        nba: 'Basketball',
+        basketball: 'Basketball',
+        tennis: 'Tennis',
+        cricket: 'Cricket',
+        esports: 'Esports'
     };
 
     return aliases[token] || token;

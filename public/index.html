@@ -760,11 +760,11 @@
                         <label>Global Majors</label>
                         <select id="global-majors-select" class="market-select" onchange="displayCodes(this, 'Global Majors')">
                             <option value="">Select a market...</option>
-                            <option value="football">Football</option>
-                            <option value="tennis">Tennis</option>
-                            <option value="basketball">Basketball</option>
-                            <option value="cricket">Cricket</option>
-                            <option value="esports">eSports</option>
+                            <option value="Football">Football</option>
+                            <option value="Tennis">Tennis</option>
+                            <option value="Basketball">Basketball</option>
+                            <option value="Cricket">Cricket</option>
+                            <option value="Esports">eSports</option>
                         </select>
                     </div>
 
@@ -806,28 +806,34 @@
 
             <script>
                 function displayCodes(selectElement, category) {
-                    const codes = selectElement.value;
+                    const sport = selectElement.value;
                     const displayTitle = document.getElementById('displayTitle');
                     const codesList = document.getElementById('codesList');
                     const displayIcon = document.getElementById('displayIcon');
                     
-                    if (codes) {
+                    if (sport) {
                         displayIcon.style.display = 'none';
                         displayTitle.textContent = `Codes for ${category}`;
                         displayTitle.style.color = '#94a3b8';
                         displayTitle.style.fontSize = '1.1rem';
                         
-                        codesList.textContent = codes;
+                        codesList.textContent = sport;
                         codesList.style.color = '#38bdf8';
                         codesList.style.fontSize = '1.8rem';
                         codesList.style.fontWeight = '700';
                         
-                        const allSelects = document.querySelectorAll('select');
+                        // Clear other selects
+                        const allSelects = document.querySelectorAll('.market-select');
                         allSelects.forEach(select => {
                             if (select !== selectElement) {
                                 select.selectedIndex = 0;
                             }
                         });
+
+                        // Trigger insights view
+                        if (typeof showSportInsights === 'function') {
+                            showSportInsights(sport);
+                        }
                     }
                 }
             </script>
@@ -1011,7 +1017,7 @@
     function showSportInsights(sport) {
         // Determine which market this sport belongs to
         const marketLabels = {
-            football: 'Global Majors', tennis: 'Global Majors', basketball: 'Global Majors', cricket: 'Global Majors', esports: 'Global Majors',
+            Football: 'Global Majors', Tennis: 'Global Majors', Basketball: 'Global Majors', Cricket: 'Global Majors', Esports: 'Global Majors',
             NFL: 'Premium Markets', MLB: 'Premium Markets', MMA: 'Premium Markets', F1: 'Premium Markets', Golf: 'Premium Markets', Rugby: 'Premium Markets', Boxing: 'Premium Markets',
             NHL: 'Niche Markets', AFL: 'Niche Markets', Volleyball: 'Niche Markets', Handball: 'Niche Markets'
         };
@@ -1028,10 +1034,10 @@
         if (insightsView) insightsView.style.display = 'block';
 
         const sportIcons = {
-            football: '⚽', tennis: '🎾', basketball: '🏀', cricket: '🏏',
-            esports: '🎮', NFL: '🏈', MLB: '⚾', MMA: '🥊',
+            Football: '⚽', Tennis: '🎾', Basketball: '🏀', Cricket: '🏏',
+            Esports: '🎮', NFL: '🏈', MLB: '⚾', MMA: '🥊',
             F1: '🏎️', Golf: '⛳', Rugby: '🏉', Boxing: '🥊',
-            NHL: '🏒', AFL: '🦘', Volleyball: '🏐', Handball: '🤾', darts: '🎯'
+            NHL: '🏒', AFL: '🦘', Volleyball: '🏐', Handball: '🤾', Darts: '🎯'
         };
 
         // Update client field
@@ -1066,7 +1072,7 @@
         // Update hub pills
         hubSetView('market-mode', 'MARKET');
         const displayNames = {
-            football: 'FOOTBALL', tennis: 'TENNIS', basketball: 'BASKETBALL', cricket: 'CRICKET', esports: 'ESPORTS',
+            Football: 'FOOTBALL', Tennis: 'TENNIS', Basketball: 'BASKETBALL', Cricket: 'CRICKET', Esports: 'ESPORTS',
             NFL: 'NFL', MLB: 'MLB', MMA: 'MMA', F1: 'F1', Golf: 'GOLF', Rugby: 'RUGBY', Boxing: 'BOXING',
             NHL: 'NHL', AFL: 'AFL', Volleyball: 'VOLLEYBALL', Handball: 'HANDBALL'
         };

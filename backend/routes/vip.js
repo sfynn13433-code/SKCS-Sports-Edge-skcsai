@@ -49,14 +49,14 @@ function resolveReferenceDateForDay(day, now = new Date()) {
 function normalizeSportName(value) {
     const sport = String(value || '').trim().toLowerCase();
     if (!sport) return '';
-    if (sport.startsWith('soccer_')) return 'football';
-    if (sport.startsWith('icehockey_')) return 'hockey';
-    if (sport.startsWith('basketball_')) return 'basketball';
-    if (sport.startsWith('americanfootball_')) return 'nfl';
-    if (sport.startsWith('baseball_')) return 'baseball';
-    if (sport.startsWith('rugbyunion_')) return 'rugby';
-    if (sport.startsWith('aussierules_')) return 'afl';
-    if (sport.startsWith('mma_')) return 'mma';
+    if (sport.startsWith('soccer_')) return 'Football';
+    if (sport.startsWith('icehockey_')) return 'NHL';
+    if (sport.startsWith('basketball_')) return 'Basketball';
+    if (sport.startsWith('americanfootball_')) return 'NFL';
+    if (sport.startsWith('baseball_')) return 'MLB';
+    if (sport.startsWith('rugbyunion_')) return 'Rugby';
+    if (sport.startsWith('aussierules_')) return 'AFL';
+    if (sport.startsWith('mma_')) return 'MMA';
     return sport;
 }
 
@@ -289,20 +289,20 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
         const queryText = includeAll
             ? `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
                FROM direct1x2_prediction_final
-               WHERE LOWER(COALESCE(sport, 'football')) = 'football'
+               WHERE COALESCE(sport, 'Football') = 'Football'
                ORDER BY created_at DESC
                LIMIT 2500`
             : latestPublishRunId
                 ? `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
                    FROM direct1x2_prediction_final
                    WHERE publish_run_id = $1
-                     AND LOWER(COALESCE(sport, 'football')) = 'football'
+                     AND COALESCE(sport, 'Football') = 'Football'
                    ORDER BY total_confidence DESC, created_at DESC
                    LIMIT 3000`
                 : `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
                    FROM direct1x2_prediction_final
                    WHERE LOWER(COALESCE(tier, 'normal')) = ANY($1::text[])
-                     AND LOWER(COALESCE(sport, 'football')) = 'football'
+                     AND COALESCE(sport, 'Football') = 'Football'
                    ORDER BY total_confidence DESC, created_at DESC
                    LIMIT 3000`;
         const queryParams = includeAll

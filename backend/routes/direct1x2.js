@@ -186,7 +186,7 @@ function formatPredictionRow(row) {
     return {
         id: row?.id || null,
         fixture_id: String(row?.fixture_id || firstMatch?.fixture_id || ''),
-        sport: row?.sport || firstMatch?.sport || 'football',
+        sport: row?.sport || firstMatch?.sport || 'Football',
         home_team: row?.home_team || firstMatch?.home_team || '',
         away_team: row?.away_team || firstMatch?.away_team || '',
         match_date: row?.match_date || firstMatch?.match_date || firstMatch?.commence_time || null,
@@ -213,7 +213,7 @@ router.get('/', async (req, res) => {
             return res.status(500).json({ error: 'Supabase is not configured.' });
         }
 
-        const sport = String(req.query?.sport || 'football').trim().toLowerCase();
+        const sport = String(req.query?.sport || 'Football').trim();
         const riskTier = String(req.query?.risk_tier || '').trim().toUpperCase();
         const limit = Math.min(500, Math.max(1, Number.parseInt(String(req.query?.limit || '100'), 10) || 100));
         const historyDays = Math.max(0, Math.min(7, Number.parseInt(String(req.query?.history_days || '1'), 10) || 1));

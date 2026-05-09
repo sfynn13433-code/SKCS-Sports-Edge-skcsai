@@ -81,18 +81,20 @@ const ACCA_MIN_LEG_CONFIDENCE = Math.max(ACCA_CONFIDENCE_MIN, PHASE_ONE_ACCA_MIN
 const VOLUME_CAP_MULTIPLIER = 5;
 const ACTIVE_DEPLOYMENT_SPORTS = resolveActiveDeploymentSports();
 const MIXED_SPORT_TARGETS = new Set([
-    'football',
-    'tennis',
-    'basketball',
-    'rugby',
-    'cricket',
-    'baseball',
-    'hockey',
-    'american_football',
-    'mma',
-    'afl',
-    'volleyball',
-    'handball'
+    'Football',
+    'Tennis',
+    'Basketball',
+    'Rugby',
+    'Cricket',
+    'MLB',
+    'NHL',
+    'NFL',
+    'MMA',
+    'AFL',
+    'Volleyball',
+    'Handball',
+    'Darts',
+    'Esports'
 ]);
 const SAFE_TIER3_ACCA_MARKETS = new Set(['btts_no', 'under_3_5', 'first_half_draw']);
 const ACCA_FALLBACK_LADDER = Object.freeze([
@@ -772,20 +774,28 @@ function getPublishWindowDays(tier) {
 }
 
 function normalizeSportKey(value) {
-    const sport = String(value || '').trim().toLowerCase();
-    if (!sport) return 'unknown';
-    if (sport.startsWith('soccer_')) return 'football';
-    if (sport.startsWith('icehockey_')) return 'hockey';
-    if (sport === 'nhl') return 'hockey';
-    if (sport.startsWith('basketball_')) return 'basketball';
-    if (sport === 'nba') return 'basketball';
-    if (sport.startsWith('americanfootball_')) return 'american_football';
-    if (sport === 'nfl') return 'american_football';
-    if (sport.startsWith('mma_')) return 'mma';
-    if (sport.startsWith('aussierules_')) return 'afl';
-    if (sport.startsWith('baseball_')) return 'baseball';
-    if (sport.startsWith('rugbyunion_')) return 'rugby';
-    return sport;
+    const key = String(value || '').trim().toLowerCase();
+    if (!key) return 'unknown';
+
+    if (key === 'soccer' || key === 'football' || key.startsWith('soccer_')) return 'Football';
+    if (key === 'nba' || key === 'basketball' || key.startsWith('basketball_')) return 'Basketball';
+    if (key === 'nfl' || key === 'american_football' || key.startsWith('americanfootball_')) return 'NFL';
+    if (key === 'nhl' || key === 'hockey' || key.startsWith('icehockey_')) return 'NHL';
+    if (key === 'mlb' || key === 'baseball' || key.startsWith('baseball_')) return 'MLB';
+    if (key === 'rugby' || key.startsWith('rugbyunion_')) return 'Rugby';
+    if (key === 'afl' || key.startsWith('aussierules_')) return 'AFL';
+    if (key === 'volleyball') return 'Volleyball';
+    if (key === 'handball') return 'Handball';
+    if (key === 'f1' || key === 'formula1') return 'F1';
+    if (key === 'mma' || key.startsWith('mma_')) return 'MMA';
+    if (key === 'golf') return 'Golf';
+    if (key === 'boxing') return 'Boxing';
+    if (key === 'tennis') return 'Tennis';
+    if (key === 'cricket') return 'Cricket';
+    if (key === 'esports') return 'Esports';
+    if (key === 'darts') return 'Darts';
+
+    return value;
 }
 
 function isDeploymentSportEnabled(value) {

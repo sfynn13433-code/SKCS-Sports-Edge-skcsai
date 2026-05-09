@@ -17,7 +17,7 @@ router.get('/provisioning/hooks', (_req, res) => {
     res.json({
         status: 'ok',
         tier: 1,
-        sports: ['football', 'basketball', 'rugby', 'mma'],
+        sports: ['Football', 'Basketball', 'Rugby', 'MMA'],
         hooks: {
             mma: {
                 fields: ['reach', 'stance', 'weight_cut_history'],

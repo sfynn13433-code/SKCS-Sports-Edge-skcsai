@@ -1,11 +1,11 @@
 'use strict';
 
 const TIER1_SCHEMA_PROFILES = Object.freeze({
-    football: Object.freeze({
+    Football: Object.freeze({
         timeline_markers: Object.freeze(['H1', 'H2', 'ET', 'PEN']),
         scoring_events: Object.freeze(['goals', 'yellow_cards', 'red_cards', 'substitutions'])
     }),
-    basketball: Object.freeze({
+    Basketball: Object.freeze({
         timeline_markers: Object.freeze(['Q1', 'Q2', 'Q3', 'Q4', 'OT1']),
         scoring_events: Object.freeze(['points', 'three_pointers', 'free_throws'])
     }),
@@ -23,8 +23,8 @@ const TIER1_SCHEMA_PROFILES = Object.freeze({
 function normalizeTier1Sport(value) {
     const key = String(value || '').trim().toLowerCase();
     if (!key) return '';
-    if (key === 'soccer' || key === 'association football') return 'football';
-    if (key === 'basketball_nba' || key === 'nba') return 'basketball';
+    if (key === 'soccer' || key === 'association football' || key === 'football') return 'Football';
+    if (key === 'basketball_nba' || key === 'nba' || key === 'basketball') return 'Basketball';
     if (key === 'rugby union' || key === 'rugby league' || key === 'rugby') return 'Rugby';
     if (key === 'mixed martial arts' || key === 'mma') return 'MMA';
     if (key === 'nfl' || key === 'american_football') return 'NFL';
@@ -36,6 +36,10 @@ function normalizeTier1Sport(value) {
     if (key === 'handball') return 'Handball';
     if (key === 'golf') return 'Golf';
     if (key === 'boxing') return 'Boxing';
+    if (key === 'tennis') return 'Tennis';
+    if (key === 'cricket') return 'Cricket';
+    if (key === 'esports') return 'Esports';
+    if (key === 'darts') return 'Darts';
     return key;
 }
 

@@ -66,9 +66,9 @@ const KNOWN_MARKETS = new Set([
 ]);
 
 const KNOWN_SPORTS = new Set([
-    'football', 'tennis', 'basketball', 'cricket', 'esports',
+    'Football', 'Tennis', 'Basketball', 'Cricket', 'Esports',
     'NFL', 'MLB', 'MMA', 'F1', 'Golf', 'Rugby', 'Boxing',
-    'NHL', 'AFL', 'Volleyball', 'Handball', 'darts'
+    'NHL', 'AFL', 'Volleyball', 'Handball', 'Darts'
 ]);
 
 const KNOWN_VOLATILITY = new Set(['low', 'medium', 'high']);

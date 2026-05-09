@@ -17,7 +17,7 @@ const PUBLISHED_ROW_QUALITY_SQL = `
     AND pf.away_team IS NOT NULL
     AND LOWER(pf.home_team) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
     AND LOWER(pf.away_team) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
-    AND LOWER(COALESCE(pf.sport, 'football')) <> 'unknown'
+    AND COALESCE(pf.sport, 'Football') <> 'unknown'
 `;
 
 function startOfWeekUtc(now = new Date()) {
@@ -102,7 +102,7 @@ router.get('/', async (req, res) => {
     try {
         const { date, sport, run_id } = req.query;
         const requestedDate = date || new Date().toISOString().slice(0, 10);
-        const filterSport = sport || 'football';
+        const filterSport = sport || 'Football';
         const filterRunId = run_id || null;
 
         console.log(`[accuracy] Fetching accuracy for requested_date=${requestedDate}, sport=${filterSport}, run_id=${filterRunId || 'latest'}`);
@@ -324,7 +324,7 @@ router.get('/', async (req, res) => {
                 UNION
                 SELECT DATE(COALESCE(match_date, created_at) AT TIME ZONE 'Africa/Johannesburg') AS date
                 FROM direct1x2_prediction_final pf
-                WHERE LOWER(COALESCE(pf.sport, 'football')) = LOWER($1)
+                WHERE COALESCE(pf.sport, 'Football') = $1
                   AND ${PUBLISHED_ROW_QUALITY_SQL}
             ) d
             WHERE date IS NOT NULL
@@ -376,7 +376,7 @@ router.get('/', async (req, res) => {
                     END
                 ), 0)::int AS legs
             FROM direct1x2_prediction_final pf
-            WHERE LOWER(COALESCE(pf.sport, 'football')) = LOWER($1)
+            WHERE COALESCE(pf.sport, 'Football') = $1
               AND DATE(COALESCE(pf.match_date, pf.created_at) AT TIME ZONE 'Africa/Johannesburg') = $2::date
               AND ($3::bigint IS NULL OR pf.publish_run_id = $3::bigint)
               AND ${PUBLISHED_ROW_QUALITY_SQL}

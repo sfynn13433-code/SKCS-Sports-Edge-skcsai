@@ -575,11 +575,11 @@ async function initializeTables() {
         if (parseInt(countRes.rows[0].count) === 0) {
             console.log('Inserting dummy historical data into prediction_results...');
             const dummyData = [
-                ['EPL_1', 'football', 'normal', '1X2', 'Home Win', 'Home Win', 'Win', 72, 1.85],
-                ['EPL_2', 'football', 'deep', '1X2', 'Away Win', 'Draw', 'Loss', 81, 2.10],
-                ['NBA_1', 'basketball', 'normal', 'Spread', 'Lakers -4.5', 'Lakers -4.5', 'Win', 68, 1.91],
-                ['NBA_2', 'basketball', 'deep', 'Over/Under', 'Over 210.5', 'Over 210.5', 'Win', 79, 1.91],
-                ['MLB_1', 'baseball', 'normal', 'Moneyline', 'Dodgers', 'Dodgers', 'Win', 65, 1.70],
+                ['EPL_1', 'Football', 'normal', '1X2', 'Home Win', 'Home Win', 'Win', 72, 1.85],
+                ['EPL_2', 'Football', 'deep', '1X2', 'Away Win', 'Draw', 'Loss', 81, 2.10],
+                ['NBA_1', 'Basketball', 'normal', 'Spread', 'Lakers -4.5', 'Lakers -4.5', 'Win', 68, 1.91],
+                ['NBA_2', 'Basketball', 'deep', 'Over/Under', 'Over 210.5', 'Over 210.5', 'Win', 79, 1.91],
+                ['MLB_1', 'MLB', 'normal', 'Moneyline', 'Dodgers', 'Dodgers', 'Win', 65, 1.70],
                 ['NFL_1', 'nfl', 'deep', '1X2', 'Chiefs', 'Chiefs', 'Win', 85, 1.55],
                 ['UFC_1', 'mma', 'normal', 'Winner', 'McGregor', 'Loss', 'Loss', 74, 1.65],
                 ['F1_1', 'formula1', 'deep', 'Winner', 'Verstappen', 'Verstappen', 'Win', 92, 1.40]

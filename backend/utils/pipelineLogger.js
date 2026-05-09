@@ -37,8 +37,29 @@ function nowIso() {
 }
 
 function toKey(value, fallback = 'unknown') {
-    const key = String(value || '').trim().toLowerCase();
-    return key || fallback;
+    const raw = String(value || '').trim();
+    if (!raw) return fallback;
+
+    const lower = raw.toLowerCase();
+    if (lower === 'soccer' || lower === 'football' || lower.startsWith('soccer_')) return 'Football';
+    if (lower === 'nba' || lower === 'basketball' || lower.startsWith('basketball_')) return 'Basketball';
+    if (lower === 'nfl' || lower === 'american_football' || lower.startsWith('americanfootball_')) return 'NFL';
+    if (lower === 'nhl' || lower === 'hockey' || lower.startsWith('icehockey_')) return 'NHL';
+    if (lower === 'mlb' || lower === 'baseball' || lower.startsWith('baseball_')) return 'MLB';
+    if (lower === 'rugby' || lower.startsWith('rugbyunion_')) return 'Rugby';
+    if (lower === 'afl' || lower.startsWith('aussierules_')) return 'AFL';
+    if (lower === 'volleyball') return 'Volleyball';
+    if (lower === 'handball') return 'Handball';
+    if (lower === 'f1' || lower === 'formula1') return 'F1';
+    if (lower === 'mma') return 'MMA';
+    if (lower === 'golf') return 'Golf';
+    if (lower === 'boxing') return 'Boxing';
+    if (lower === 'tennis') return 'Tennis';
+    if (lower === 'cricket') return 'Cricket';
+    if (lower === 'esports') return 'Esports';
+    if (lower === 'darts') return 'Darts';
+
+    return raw;
 }
 
 function makeStageCounters() {

@@ -540,14 +540,14 @@ app.get('/api/debug/sync-test', requireRefreshKey, async (req, res) => {
 
         // Test football API
         try {
-            const footballKeys = client.getKeysForSport('football');
+            const footballKeys = client.getKeysForSport('Football');
             debug.apiTest.football = {
                 keysFound: footballKeys.length,
                 test: `EPL league 39, season ${seasonYear}`,
             };
 
             if (footballKeys.length > 0) {
-                const data = await client.getFixtures('39', String(seasonYear), { from: today, to: windowEnd }, 'football');
+                const data = await client.getFixtures('39', String(seasonYear), { from: today, to: windowEnd }, 'Football');
                 debug.apiTest.football.result = data ? {
                     results: data.results || 0,
                     errors: data.errors || null,
@@ -610,7 +610,7 @@ async function runSettlementJob({ sport, gradeDate }) {
 }
 
 app.post('/api/grade-predictions', requireRefreshKey, async (req, res) => {
-    const sport     = req.query.sport || req.body?.sport || 'football';
+    const sport     = req.query.sport || req.body?.sport || 'Football';
     const dateParam = req.query.date  || req.body?.date  || null;
 
     // Default to yesterday in Africa/Johannesburg
@@ -637,7 +637,7 @@ app.post('/api/grade-predictions', requireRefreshKey, async (req, res) => {
 });
 
 app.post('/api/settlement/run', requireRefreshKey, async (req, res) => {
-    const sport = req.query.sport || req.body?.sport || 'football';
+    const sport = req.query.sport || req.body?.sport || 'Football';
     const dateParam = req.query.date || req.body?.date || null;
     const settlementDate = dateParam
         || moment().tz('Africa/Johannesburg').subtract(1, 'day').format('YYYY-MM-DD');
@@ -883,7 +883,7 @@ app.get('/api/cron/sync-standard', verifyCronSecret, async (req, res) => {
 
                     publishRunId = await startPublishRun(
                         'cron_sync_standard',
-                        ['football'],
+                        ['Football'],
                         'football_standard',
                         'Tier 2 standard sync fallback publish',
                         { provider_host: fixtures.host || null }
@@ -905,7 +905,7 @@ app.get('/api/cron/sync-standard', verifyCronSecret, async (req, res) => {
                                 sport, market_type, recommendation, fixture_id, home_team, away_team,
                                 prediction, confidence, match_date, created_at
                             )
-                            VALUES ($1, 'normal', 'direct', $2::jsonb, 62, 'medium', 'football', '1X2', $3, $4, $5, $6, $7, 62, $8::timestamptz, NOW())
+                            VALUES ($1, 'normal', 'direct', $2::jsonb, 62, 'medium', 'Football', '1X2', $3, $4, $5, $6, $7, 62, $8::timestamptz, NOW())
                             ON CONFLICT DO NOTHING
                         `, [
                             publishRunId,
