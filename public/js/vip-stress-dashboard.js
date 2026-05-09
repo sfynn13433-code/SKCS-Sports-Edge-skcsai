@@ -386,7 +386,7 @@
 
         const cardId = registerCard(prediction);
         return `
-          <article class="card skcs-clickable-card" data-card-id="${cardId}" style="cursor:pointer;transition:box-shadow 0.18s ease,transform 0.18s ease;" onmouseover="this.style.boxShadow='0 0 0 2px #3b82f6';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='';this.style.transform=''">
+          <article class="card skcs-clickable-card" data-card-id="${cardId}" style="cursor:pointer;">
             <div class="teams">${teams}</div>
             <div class="line">${line}</div>
             <div class="line">${league} • ${kickoff}</div>
@@ -420,18 +420,49 @@
         wireCardClicks();
     }
 
+    let _isClicksWired = false;
     function wireCardClicks() {
-        if (!sectionsWrap) return;
-        // Remove any previously attached listener by cloning the node
-        const fresh = sectionsWrap.cloneNode(true);
-        sectionsWrap.parentNode.replaceChild(fresh, sectionsWrap);
-        // Re-assign the module-scoped reference so future calls still work
-        // (We can't reassign a const, so we use the global id lookup)
-        document.getElementById('sectionsWrap').addEventListener('click', function(e) {
-            const article = e.target.closest('[data-card-id]');
-            if (!article) return;
-            const cardId = article.getAttribute('data-card-id');
-            if (cardId) window.openMatchDetail(cardId);
+        if (_isClicksWired) return;
+        _isClicksWired = true;
+
+        // Use a permanent delegated listener on document.body
+        document.body.addEventListener('click', function(e) {
+            // 1. Handle Match Detail Clicks
+            const article = e.target.closest('.skcs-clickable-card[data-card-id]');
+            if (article) {
+                const cardId = article.getAttribute('data-card-id');
+                if (cardId) window.openMatchDetail(cardId);
+                return;
+            }
+
+            // 2. Handle Sport Selection Clicks (CSP-safe delegation)
+            const sportSelect = e.target.closest('[data-select-sport]');
+            if (sportSelect) {
+                const sportId = sportSelect.getAttribute('data-select-sport');
+                if (window.selectSport) window.selectSport(sportId);
+                return;
+            }
+
+            // 3. Handle Reset View Clicks
+            const resetBtn = e.target.closest('[data-action="reset-view"]');
+            if (resetBtn) {
+                if (window.resetView) window.resetView();
+                return;
+            }
+
+            // 4. Handle Modal Close Clicks (X button)
+            const closeModalBtn = e.target.closest('[data-action="close-modal"]');
+            if (closeModalBtn) {
+                if (window.closeMatchDetail) window.closeMatchDetail();
+                return;
+            }
+
+            // 5. Handle Modal Backdrop Clicks
+            const backdrop = e.target.closest('[data-action="close-modal-backdrop"]');
+            if (backdrop && e.target === backdrop) {
+                if (window.closeMatchDetail) window.closeMatchDetail();
+                return;
+            }
         });
     }
 
@@ -589,7 +620,7 @@
                     </h2>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; justify-items: center;">
                         ${sports.map(sport => `
-                            <div onclick="window.selectSport('${sport.id}')" 
+                            <div data-select-sport="${sport.id}" 
                                  style="cursor: pointer; 
                                         background: rgba(30, 41, 59, 0.8); 
                                         border-radius: 16px; 
@@ -671,7 +702,7 @@
             <section class="section" style="margin-top: 24px;">
                 <h3 style="display: flex; justify-content: space-between; align-items: center;">
                     <span>📊 Deep Insights: ${STATE.selectedSport ? STATE.selectedSport.toUpperCase() : 'All Sports'}</span>
-                    <button onclick="window.resetView()" style="border: 1px solid rgba(148, 163, 184, 0.35); background: rgba(15, 23, 42, 0.78); color: var(--text); border-radius: 10px; padding: 8px 12px; font-size: 0.85rem; cursor: pointer;">Reset</button>
+                    <button data-action="reset-view" style="border: 1px solid rgba(148, 163, 184, 0.35); background: rgba(15, 23, 42, 0.78); color: var(--text); border-radius: 10px; padding: 8px 12px; font-size: 0.85rem; cursor: pointer;">Reset</button>
                 </h3>
                 <p class="meta">Advanced analytics and contextual insights.</p>
                 <div class="cards">
