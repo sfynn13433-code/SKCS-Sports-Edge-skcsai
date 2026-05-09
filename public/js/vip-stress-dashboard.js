@@ -396,7 +396,7 @@
             ${legsPreview}
             ${insightsFooter}
             ${engineLogFooter}
-            <div style="margin-top:10px;font-size:0.75rem;color:#3b82f6;font-weight:600;letter-spacing:0.5px;">🔍 Click for full market breakdown</div>
+            <button class="insight-trigger-btn" data-card-id="${cardId}" style="margin-top:10px;padding:8px 16px;background:linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);color:#ffffff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 12px rgba(139,92,246,0.3);transition:all 0.2s ease;">Click for insights</button>
           </article>
         `;
     }

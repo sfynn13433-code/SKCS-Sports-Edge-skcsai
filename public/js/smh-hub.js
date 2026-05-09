@@ -45,6 +45,12 @@
     // ── DOM helpers ────────────────────────────────────────────────────────────
     function el(id) { return document.getElementById(id); }
 
+    // ── Card registry for click handlers ──────────────────────────────────────
+    var SMH_CARD_REGISTRY = new Map();
+    function registerSmhCard(cardId, prediction) {
+        SMH_CARD_REGISTRY.set(cardId, prediction);
+    }
+
     // ── Core: handle a sport selection ────────────────────────────────────────
     async function handleSelectChange(selectElement, category) {
         const sport = selectElement.value;
@@ -174,6 +180,8 @@
             displayTitle.style.marginBottom = '16px';
         }
 
+        SMH_CARD_REGISTRY.clear(); // Reset registry on each render
+
         var html = '<div class="results-scroll-container" style="width:100%;max-height:420px;overflow-y:auto;padding-right:8px;">';
 
         allPredictions.forEach(function (pred) {
@@ -229,9 +237,13 @@
                 ? '<span style="color:#475569;font-size:0.78rem;margin-left:auto;">\uD83D\uDD50 ' + kickoffStr + '</span>'
                 : '';
 
+            // Generate unique card ID for this prediction
+            var cardId = 'smh_card_' + (pred.id || pred.prediction_id || Math.random().toString(36).substr(2, 9));
+            registerSmhCard(cardId, pred); // Register prediction for click handling
+
             // Use .smh-result-item class for hover (CSP-safe, no inline onmouseover)
             html +=
-                '<div class="smh-result-item" style="border-left:4px solid ' + accentColor + ';">' +
+                '<div class="smh-result-item" data-card-id="' + cardId + '" style="border-left:4px solid ' + accentColor + ';">' +
                     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px;flex-wrap:wrap;">' +
                         '<div style="display:flex;align-items:center;gap:6px;">' +
                             '<span style="font-size:0.7rem;color:' + accentColor + ';font-weight:800;text-transform:uppercase;letter-spacing:0.8px;background:rgba(255,255,255,0.06);padding:2px 7px;border-radius:4px;">' +
@@ -245,10 +257,11 @@
                         home + ' <span style="color:#475569;font-weight:400;font-size:0.9rem;">vs</span> ' + away +
                         (isAcca ? '<span style="font-size:0.75rem;color:#64748b;font-weight:400;"> +' + (legCount - 1) + ' more</span>' : '') +
                     '</div>' +
-                    '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;">' +
+                    '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:10px;">' +
                         '<span style="background:rgba(74,222,128,0.12);color:#4ade80;padding:3px 9px;border-radius:4px;font-size:0.88rem;font-weight:700;">\u26A1 ' + pick + '</span>' +
                         oddsHtml + timeHtml +
                     '</div>' +
+                    '<button class="insight-btn" data-card-id="' + cardId + '" style="width:100%;padding:10px 16px;background:linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);color:#ffffff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 12px rgba(139,92,246,0.3);transition:all 0.2s ease;margin-top:8px;">Click for insights</button>' +
                 '</div>';
         });
 
@@ -280,6 +293,30 @@
             codesList.addEventListener('click', function (e) {
                 var btn = e.target.closest('[data-action="smh-retry"]');
                 if (btn) location.reload();
+            });
+        }
+
+        // Delegated click for the "Click for insights" button
+        // (CSP-safe, no inline onclick)
+        if (codesList) {
+            codesList.addEventListener('click', function (e) {
+                var insightBtn = e.target.closest('.insight-btn');
+                if (insightBtn) {
+                    var cardId = insightBtn.getAttribute('data-card-id');
+                    console.log('[SMH Trigger] Opening details for card:', cardId);
+                    if (cardId) {
+                        var prediction = SMH_CARD_REGISTRY.get(cardId);
+                        if (prediction) {
+                            console.log('[SMH Trigger] Prediction data:', prediction);
+                            // Try to use the global openMatchDetail function if available
+                            if (typeof window.openMatchDetail === 'function') {
+                                window.openMatchDetail(cardId);
+                            } else {
+                                console.warn('[SMH] window.openMatchDetail not available');
+                            }
+                        }
+                    }
+                }
             });
         }
     });

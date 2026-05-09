@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sports Market Hub</title>
+<meta name="description" content="Explore sports markets with SKCS AI">
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #0f1117; /* Very dark background for the page */
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    color: #e2e8f0;
+  }
+
+  .hub-card {
+    background-color: #1c1f26;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 800px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid #2d313b;
+  }
+
+  .hub-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .hub-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .hub-status {
+    text-align: right;
+  }
+
+  .status-label {
+    display: block;
+    font-size: 0.7rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+
+  .status-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .display-panel {
+    background-color: #272b36;
+    border-radius: 10px;
+    padding: 40px 20px;
+    text-align: center;
+    margin-bottom: 30px;
+    border: 1px solid #363b47;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+  }
+
+  .icon-wrapper {
+    margin-bottom: 15px;
+  }
+
+  .icon-wrapper svg {
+    width: 48px;
+    height: 48px;
+    fill: #94a3b8;
+  }
+
+  .display-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 8px 0;
+  }
+
+  .display-subtitle {
+    font-size: 1rem;
+    color: #94a3b8;
+    margin: 0;
+  }
+
+  .controls-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 40px;
+  }
+
+  .control-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .control-group label {
+    font-size: 0.95rem;
+    color: #e2e8f0;
+    font-weight: 500;
+  }
+
+  select {
+    width: 65%;
+    padding: 10px 12px;
+    background-color: #15171e;
+    border: 1px solid #363b47;
+    border-radius: 8px;
+    color: #e2e8f0;
+    font-size: 0.95rem;
+    appearance: none; /* Removes default OS styling */
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px top 50%;
+    background-size: 10px auto;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+  }
+
+  select:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+
+  /* Responsive for smaller screens */
+  @media (max-width: 600px) {
+    .controls-grid {
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+    .control-group {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .control-group label {
+      margin-bottom: 8px;
+    }
+    select {
+      width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<main>
+<div class="hub-card">
+  <div class="hub-header">
+    <h2 class="hub-title">Sports Market Hub</h2>
+    <div class="hub-status">
+      <span class="status-label">STATUS</span>
+      <span class="status-value">Ready</span>
+    </div>
+  </div>
+
+  <div class="display-panel" id="resultsPanel">
+    <div class="icon-wrapper" id="displayIcon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+      </svg>
+    </div>
+    <h3 class="display-title" id="displayTitle">Awaiting Selection...</h3>
+    <p class="display-subtitle" id="codesList">Please select a market from the dropdowns below.</p>
+  </div>
+
+  <div class="controls-grid">
+    <div class="control-group">
+      <label for="global-majors-select">Global Majors</label>
+      <select id="global-majors-select" class="market-select">
+        <option value="" disabled selected>Select a market...</option>
+        <option value="EPL, UCL, FIFA">Football (Soccer)</option>
+        <option value="NBA, FIBA">Basketball</option>
+        <option value="NFL, NCAAF">American Football</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label for="premium-markets-select">Premium Markets</label>
+      <select id="premium-markets-select" class="market-select">
+        <option value="" disabled selected>Select a market...</option>
+        <option value="MLB, NPB">Baseball</option>
+        <option value="NHL, KHL">Ice Hockey</option>
+        <option value="UFC, Bellator, PFL">MMA / Combat</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label for="niche-markets-select">Niche Markets</label>
+      <select id="niche-markets-select" class="market-select">
+        <option value="" disabled selected>Select a market...</option>
+        <option value="PDC, WDF">Darts</option>
+        <option value="WST, Q Tour">Snooker</option>
+        <option value="CS2, LoL, DOTA2">Esports</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label for="acca-select">ACCAs</label>
+      <select id="acca-select" class="market-select">
+        <option value="" disabled selected>Select a market...</option>
+        <option value="Match Winner, Over/Under 2.5, BTTS">Weekend Football ACCA</option>
+        <option value="Player Points, Rebounds, Assists">NBA Player Props ACCA</option>
+        <option value="Moneyline, Spread, Totals">Cross-Sport Mega ACCA</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<script>
+  function displayCodes(selectElement, category) {
+    const codes = selectElement.value;
+    const displayTitle = document.getElementById('displayTitle');
+    const codesList = document.getElementById('codesList');
+    const displayIcon = document.getElementById('displayIcon');
+
+    if (codes) {
+      // Remove the clipboard icon once a selection is made to clean up the UI
+      displayIcon.style.display = 'none';
+
+      // Update text with a distinct color for the codes
+      displayTitle.textContent = `Codes for ${category}`;
+      displayTitle.style.color = '#94a3b8'; // Grey out title
+      displayTitle.style.fontSize = '1.1rem';
+
+      codesList.textContent = codes;
+      codesList.style.color = '#38bdf8'; // Blue highlight for actual codes
+      codesList.style.fontSize = '1.8rem';
+      codesList.style.fontWeight = '700';
+
+      // Reset the other dropdowns so only one selection is active at a time
+      const allSelects = document.querySelectorAll('select');
+      allSelects.forEach(select => {
+        if (select !== selectElement) {
+          select.selectedIndex = 0;
+        }
+      });
+    }
+  }
+</script>
+
+</body>
+</html>
