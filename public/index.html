@@ -651,18 +651,43 @@
                     color: #ffffff;
                 }
                 .display-panel {
-                    background-color: #272b36;
+                    background-color: #1a1d24;
                     border-radius: 10px;
-                    padding: 50px 30px;
+                    padding: 40px 20px;
                     text-align: center;
                     margin-bottom: 30px;
-                    border: 1px solid #363b47;
-                    min-height: 280px;
+                    border: 1px solid #2d313b;
+                    min-height: 320px;
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
                     align-items: center;
                     transition: all 0.3s ease;
+                    position: relative;
+                    overflow: hidden;
+                }
+                .results-scroll-container::-webkit-scrollbar {
+                    width: 6px;
+                }
+                .results-scroll-container::-webkit-scrollbar-track {
+                    background: rgba(255, 255, 255, 0.05);
+                }
+                .results-scroll-container::-webkit-scrollbar-thumb {
+                    background: #3b82f6;
+                    border-radius: 10px;
+                }
+                .loading-spinner {
+                    border: 3px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 50%;
+                    border-top: 3px solid #3b82f6;
+                    width: 40px;
+                    height: 40px;
+                    animation: spin 1s linear infinite;
+                    margin: 20px auto;
+                }
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
                 }
                 .icon-wrapper {
                     margin-bottom: 15px;
@@ -805,36 +830,129 @@
             </div>
 
             <script>
-                function displayCodes(selectElement, category) {
+                async function displayCodes(selectElement, category) {
                     const sport = selectElement.value;
                     const displayTitle = document.getElementById('displayTitle');
                     const codesList = document.getElementById('codesList');
                     const displayIcon = document.getElementById('displayIcon');
+                    const resultsPanel = document.getElementById('resultsPanel');
                     
-                    if (sport) {
-                        displayIcon.style.display = 'none';
-                        displayTitle.textContent = `Codes for ${category}`;
-                        displayTitle.style.color = '#94a3b8';
-                        displayTitle.style.fontSize = '1.1rem';
+                    if (!sport) return;
+
+                    // Loading State
+                    displayIcon.style.display = 'none';
+                    resultsPanel.style.justifyContent = 'center';
+                    displayTitle.textContent = `Connecting to SKCS Engine...`;
+                    displayTitle.style.color = '#94a3b8';
+                    displayTitle.style.fontSize = '0.9rem';
+                    codesList.innerHTML = `
+                        <div class="loading-spinner"></div>
+                        <p style="color: #3b82f6; font-size: 1rem; font-weight: 600; margin-top: 10px;">
+                            Fetching data for ${sport}...
+                        </p>
+                    `;
+                    
+                    // Clear other selects
+                    const allSelects = document.querySelectorAll('.market-select');
+                    allSelects.forEach(select => {
+                        if (select !== selectElement) {
+                            select.selectedIndex = 0;
+                        }
+                    });
+
+                    try {
+                        const backendUrl = window.API_BASE_URL || "https://skcs-sports-edge-skcsai.onrender.com";
+                        const apiKey = window.USER_API_KEY || 'skcs_user_12345';
                         
-                        codesList.textContent = sport;
-                        codesList.style.color = '#38bdf8';
-                        codesList.style.fontSize = '1.8rem';
-                        codesList.style.fontWeight = '700';
+                        // Use Title Case for the sport name in the request
+                        const normalizedSport = sport.charAt(0).toUpperCase() + sport.slice(1);
                         
-                        // Clear other selects
-                        const allSelects = document.querySelectorAll('.market-select');
-                        allSelects.forEach(select => {
-                            if (select !== selectElement) {
-                                select.selectedIndex = 0;
+                        const response = await fetch(`${backendUrl}/api/vip/stress-payload?sport=${encodeURIComponent(normalizedSport)}&include_all=true`, {
+                            headers: {
+                                'x-api-key': apiKey
                             }
                         });
 
-                        // Trigger insights view
+                        if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
+                        
+                        const data = await response.json();
+                        renderResultsInPanel(data, normalizedSport, category);
+
+                        // Also trigger the original insights view if function exists
                         if (typeof showSportInsights === 'function') {
-                            showSportInsights(sport);
+                            showSportInsights(normalizedSport);
                         }
+                    } catch (error) {
+                        console.error('Error fetching sport data:', error);
+                        displayTitle.textContent = 'Connection Error';
+                        codesList.innerHTML = `
+                            <p style="color: #ef4444; font-size: 1rem; font-weight: 600;">
+                                Could not retrieve ${sport} data.
+                            </p>
+                            <button onclick="location.reload()" style="margin-top: 15px; padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer;">Retry</button>
+                        `;
                     }
+                }
+
+                function renderResultsInPanel(data, sport, category) {
+                    const codesList = document.getElementById('codesList');
+                    const displayTitle = document.getElementById('displayTitle');
+                    const resultsPanel = document.getElementById('resultsPanel');
+                    
+                    // The payload structure typically puts predictions in categories.direct
+                    const predictions = data.payload?.categories?.direct || [];
+                    
+                    if (predictions.length === 0) {
+                        resultsPanel.style.justifyContent = 'center';
+                        displayTitle.textContent = `${sport} - No Matches Found`;
+                        codesList.innerHTML = `
+                            <p style="color: #94a3b8; font-size: 1.1rem;">
+                                No active insights available for this market currently.
+                            </p>
+                        `;
+                        return;
+                    }
+
+                    resultsPanel.style.justifyContent = 'flex-start';
+                    displayTitle.textContent = `${category}: ${sport} Insights`;
+                    displayTitle.style.fontSize = '1.1rem';
+                    displayTitle.style.color = '#94a3b8';
+                    displayTitle.style.marginBottom = '20px';
+
+                    let html = '<div class="results-scroll-container" style="width: 100%; max-height: 400px; overflow-y: auto; padding-right: 8px;">';
+                    
+                    predictions.forEach(pred => {
+                        const match = pred.matches?.[0] || {};
+                        const home = match.home_team || match.metadata?.home_team || 'Home';
+                        const away = match.away_team || match.metadata?.away_team || 'Away';
+                        const prediction = match.prediction || pred.final_recommendation?.market || 'N/A';
+                        const confidence = Math.round(pred.total_confidence || 0);
+                        const market = match.market || 'Match Winner';
+                        
+                        // Extract odds if available in metadata
+                        const odds = match.metadata?.odds?.home || match.metadata?.odds?.away || null;
+                        const oddsDisplay = odds ? `<span style="color: #facc15; margin-left: 10px;">@ ${odds}</span>` : '';
+
+                        html += `
+                            <div class="result-item" style="background: rgba(30, 41, 59, 0.7); border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(56, 189, 248, 0.2); border-left: 4px solid #38bdf8; text-align: left; transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${market}</span>
+                                    <span style="font-size: 0.85rem; color: #38bdf8; font-weight: 800;">${confidence}% CONFIDENCE</span>
+                                </div>
+                                <div style="font-size: 1.1rem; font-weight: 700; color: #ffffff; margin-bottom: 6px;">${home} <span style="color: #64748b; font-weight: 400;">vs</span> ${away}</div>
+                                <div style="display: flex; align-items: center; font-size: 0.95rem; color: #4ade80; font-weight: 700;">
+                                    <span style="background: rgba(74, 222, 128, 0.1); padding: 4px 8px; border-radius: 4px;">PICK: ${prediction.replace(/_/g, ' ').toUpperCase()}</span>
+                                    ${oddsDisplay}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div>';
+                    codesList.innerHTML = html;
+                    codesList.style.fontSize = '1rem';
+                    codesList.style.fontWeight = '400';
+                    codesList.style.width = '100%';
                 }
             </script>
         </div> <!-- End of Sports Market Hub widget -->

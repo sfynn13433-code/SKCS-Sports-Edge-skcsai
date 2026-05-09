@@ -268,6 +268,7 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
 
         const includeAll = ['1', 'true'].includes(String(req.query.include_all || '').trim().toLowerCase());
         const day = normalizeDay(req.query.day || 'saturday');
+        const sportParam = req.query.sport || 'Football';
         const now = new Date();
         const generatedAt = now.toISOString();
         const referenceDate = resolveReferenceDateForDay(day, now);
@@ -289,25 +290,25 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
         const queryText = includeAll
             ? `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
                FROM direct1x2_prediction_final
-               WHERE COALESCE(sport, 'Football') = 'Football'
+               WHERE COALESCE(sport, 'Football') = $1
                ORDER BY created_at DESC
                LIMIT 2500`
             : latestPublishRunId
                 ? `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
                    FROM direct1x2_prediction_final
                    WHERE publish_run_id = $1
-                     AND COALESCE(sport, 'Football') = 'Football'
+                     AND COALESCE(sport, 'Football') = $2
                    ORDER BY total_confidence DESC, created_at DESC
                    LIMIT 3000`
                 : `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
                    FROM direct1x2_prediction_final
                    WHERE LOWER(COALESCE(tier, 'normal')) = ANY($1::text[])
-                     AND COALESCE(sport, 'Football') = 'Football'
+                     AND COALESCE(sport, 'Football') = $2
                    ORDER BY total_confidence DESC, created_at DESC
                    LIMIT 3000`;
         const queryParams = includeAll
-            ? []
-            : (latestPublishRunId ? [latestPublishRunId] : masterPlan.tiers.map((tier) => String(tier).toLowerCase()));
+            ? [sportParam]
+            : (latestPublishRunId ? [latestPublishRunId, sportParam] : [masterPlan.tiers.map((tier) => String(tier).toLowerCase()), sportParam]);
 
         const dbRes = await query(queryText, queryParams);
 
