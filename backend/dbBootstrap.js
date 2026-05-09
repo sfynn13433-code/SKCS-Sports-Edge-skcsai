@@ -1,6 +1,6 @@
 'use strict';
 
-const { query } = require('./db');
+const { query } = require('./database');
 
 async function cleanupLegacyFixtureRows() {
     const tableRes = await query(`SELECT to_regclass('public.fixtures') IS NOT NULL AS exists;`);

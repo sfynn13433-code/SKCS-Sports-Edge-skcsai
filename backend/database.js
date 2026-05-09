@@ -41,15 +41,27 @@ if (hasDatabaseUrl) {
     console.log('🔎 DATABASE_URL runtime summary:', summarizeDatabaseUrl(databaseUrl));
 }
 
+// Auto-convert direct Supabase URL to pooler URL to fix auth errors
+let effectiveConnectionString = databaseUrl;
+if (hasDatabaseUrl && effectiveConnectionString.includes('db.ghzjntdvaptuxfpvhybb.supabase.co')) {
+    effectiveConnectionString = effectiveConnectionString
+        .replace('db.ghzjntdvaptuxfpvhybb.supabase.co:5432', 'aws-1-eu-central-1.pooler.supabase.com:6543')
+        .replace('postgres:', 'postgres.ghzjntdvaptuxfpvhybb:');
+    if (!effectiveConnectionString.includes('pgbouncer=')) {
+        effectiveConnectionString += (effectiveConnectionString.includes('?') ? '&' : '?') + 'pgbouncer=true';
+    }
+    console.log('🔄 Auto-converted DATABASE_URL to Supabase pooler URL for production stability.');
+}
+
 // Create a connection pool to PostgreSQL only when configured.
 // This keeps local/dev and Render boot clean when DATABASE_URL is not set yet.
 const pool = hasDatabaseUrl
     ? new Pool({
-        connectionString: databaseUrl,
+        connectionString: effectiveConnectionString,
         connectionTimeoutMillis: 10_000,
         idleTimeoutMillis: 30_000,
         max: 10,
-        ssl: shouldUseSsl(databaseUrl) ? { rejectUnauthorized: false } : false
+        ssl: shouldUseSsl(effectiveConnectionString) ? { rejectUnauthorized: false } : false
     })
     : null;
 
@@ -1019,9 +1031,36 @@ async function getAccuracyStats() {
     };
 }
 
+async function query(text, params) {
+    if (!pool) await ensureDbInitialized();
+    return pool.query(text, params);
+}
+
+async function withTransaction(fn) {
+    if (!pool) await ensureDbInitialized();
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        const result = await fn(client);
+        await client.query('COMMIT');
+        return result;
+    } catch (err) {
+        try {
+            await client.query('ROLLBACK');
+        } catch (rollbackErr) {
+            console.error('❌ Transaction rollback error:', rollbackErr);
+        }
+        throw err;
+    } finally {
+        client.release();
+    }
+}
+
 // ========== EXPORTS ==========
 module.exports = {
     pool, // for advanced use
+    query,
+    withTransaction,
     ensureDbInitialized,
     getMatch,
     getTeamStats,

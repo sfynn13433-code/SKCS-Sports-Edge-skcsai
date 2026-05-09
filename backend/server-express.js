@@ -12,7 +12,7 @@ const moment       = require('moment-timezone');
 const path         = require('path');
 const { createClient } = require('@supabase/supabase-js');
 const config       = require('./config');
-const { query }            = require('./db');
+const { query }            = require('./database');
 const {
     shouldAllowOddsCall,
     consumeOddsCallSlot,

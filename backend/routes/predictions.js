@@ -165,8 +165,7 @@ function normalizeTierLabel(value) {
 
 function getSportFilterValues(sport) {
     const key = normalizePredictionSportKey(String(sport || ACTIVE_DEPLOYMENT_SPORT).trim().toLowerCase());
-    if (key !== ACTIVE_DEPLOYMENT_SPORT) return SPORT_FILTER_MAP[ACTIVE_DEPLOYMENT_SPORT] || [ACTIVE_DEPLOYMENT_SPORT];
-    return SPORT_FILTER_MAP[ACTIVE_DEPLOYMENT_SPORT] || [ACTIVE_DEPLOYMENT_SPORT];
+    return SPORT_FILTER_MAP[key] || [key];
 }
 
 function normalizeInsightTierLabel(value) {
