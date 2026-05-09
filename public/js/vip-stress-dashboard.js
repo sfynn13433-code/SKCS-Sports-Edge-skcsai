@@ -38,23 +38,26 @@
     // ============================================
     const SPORTS_CATALOG = {
         'Niche Markets': [
-            { id: 'rugby', name: 'Rugby', icon: '🏉', color: '#60a5fa' },
-            { id: 'mma', name: 'MMA', icon: '🥊', color: '#4ade80' },
-            { id: 'darts', name: 'Darts', icon: '🎯', color: '#fbbf24' }
+            { id: 'hockey', name: 'NHL', icon: '🏒', color: '#06b6d4' },
+            { id: 'afl', name: 'AFL', icon: '🦘', color: '#8b5cf6' },
+            { id: 'volleyball', name: 'Volleyball', icon: '🏐', color: '#fbbf24' },
+            { id: 'handball', name: 'Handball', icon: '🤾', color: '#4ade80' }
         ],
         'Premium Markets': [
-            { id: 'cricket', name: 'Cricket', icon: '🏏', color: '#f87171' },
-            { id: 'esports', name: 'eSports', icon: '🎮', color: '#a78bfa' }
+            { id: 'nfl', name: 'NFL', icon: '🏈', color: '#8b5cf6' },
+            { id: 'baseball', name: 'MLB', icon: '⚾', color: '#ef4444' },
+            { id: 'mma', name: 'MMA', icon: '🥊', color: '#4ade80' },
+            { id: 'formula1', name: 'F1', icon: '🏎️', color: '#a78bfa' },
+            { id: 'golf', name: 'Golf', icon: '⛳', color: '#22c55e' },
+            { id: 'rugby', name: 'Rugby', icon: '🏉', color: '#60a5fa' },
+            { id: 'boxing', name: 'Boxing', icon: '🥊', color: '#ef4444' }
         ],
         'Global Majors': [
             { id: 'football', name: 'Football', icon: '⚽', color: '#3b82f6' },
+            { id: 'tennis', name: 'Tennis', icon: '🎾', color: '#22c55e' },
             { id: 'basketball', name: 'Basketball', icon: '🏀', color: '#f97316' },
-            { id: 'tennis', name: 'Tennis', icon: '🎾', color: '#22c55e' }
-        ],
-        'American Sports': [
-            { id: 'american_football', name: 'American Football', icon: '🏈', color: '#8b5cf6' },
-            { id: 'baseball', name: 'Baseball', icon: '⚾', color: '#ef4444' },
-            { id: 'hockey', name: 'Hockey', icon: '🏒', color: '#06b6d4' }
+            { id: 'cricket', name: 'Cricket', icon: '🏏', color: '#f87171' },
+            { id: 'esports', name: 'eSports', icon: '🎮', color: '#a78bfa' }
         ]
     };
 
@@ -477,6 +480,9 @@
         // Determine view label: PORTAL when no sport selected, MARKET when viewing a sport
         const viewLabel = STATE.selectedSport ? 'MARKET' : 
                           STATE.viewState === 'ACCA' ? 'ACCA' : 'PORTAL';
+        const sportData = STATE.selectedSport ? Object.values(SPORTS_CATALOG).flat().find(s => s.id === STATE.selectedSport) : null;
+        const selectionDisplay = sportData ? sportData.name.toUpperCase() : (STATE.selectedSport ? STATE.selectedSport.toUpperCase() : 'NONE');
+
         return `
             <section class="hero" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
                 <div>
@@ -494,7 +500,7 @@
                     </div>
                     <div class="stat" style="text-align: right;">
                         <div class="label" style="font-size: 0.75rem; letter-spacing: 0.05em; color: var(--muted);">SELECTION</div>
-                        <div class="value" style="font-size: 0.95rem; font-weight: 700;">${STATE.selectedSport ? STATE.selectedSport.toUpperCase() : 'None'}</div>
+                        <div class="value" style="font-size: 0.95rem; font-weight: 700;">${selectionDisplay}</div>
                     </div>
                 </div>
             </section>

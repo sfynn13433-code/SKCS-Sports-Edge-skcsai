@@ -1011,9 +1011,9 @@
     function showSportInsights(sport) {
         // Determine which market this sport belongs to
         const marketLabels = {
-            football: 'Global Majors', basketball: 'Global Majors', tennis: 'Global Majors',
-            cricket: 'Premium Markets', esports: 'Premium Markets',
-            rugby: 'Niche Markets', mma: 'Niche Markets', darts: 'Niche Markets'
+            football: 'Global Majors', tennis: 'Global Majors', basketball: 'Global Majors', cricket: 'Global Majors', esports: 'Global Majors',
+            nfl: 'Premium Markets', baseball: 'Premium Markets', mma: 'Premium Markets', formula1: 'Premium Markets', golf: 'Premium Markets', rugby: 'Premium Markets', boxing: 'Premium Markets',
+            hockey: 'Niche Markets', afl: 'Niche Markets', volleyball: 'Niche Markets', handball: 'Niche Markets'
         };
         const marketName = marketLabels[sport] || document.querySelector('#portal-router option:checked')?.textContent || 'Portal';
 
@@ -1065,7 +1065,12 @@
 
         // Update hub pills
         hubSetView('market-mode', 'MARKET');
-        hubSetSelection(sport.charAt(0).toUpperCase() + sport.slice(1));
+        const displayNames = {
+            football: 'FOOTBALL', tennis: 'TENNIS', basketball: 'BASKETBALL', cricket: 'CRICKET', esports: 'ESPORTS',
+            nfl: 'NFL', baseball: 'MLB', mma: 'MMA', formula1: 'F1', golf: 'GOLF', rugby: 'RUGBY', boxing: 'BOXING',
+            hockey: 'NHL', afl: 'AFL', volleyball: 'VOLLEYBALL', handball: 'HANDBALL'
+        };
+        hubSetSelection(displayNames[sport] || sport.toUpperCase());
         hubShowBack(marketName);
     }
 
