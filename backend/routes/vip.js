@@ -49,15 +49,33 @@ function resolveReferenceDateForDay(day, now = new Date()) {
 function normalizeSportName(value) {
     const sport = String(value || '').trim().toLowerCase();
     if (!sport) return '';
-    if (sport.startsWith('soccer_')) return 'Football';
-    if (sport.startsWith('icehockey_')) return 'NHL';
-    if (sport.startsWith('basketball_')) return 'Basketball';
-    if (sport.startsWith('americanfootball_')) return 'NFL';
-    if (sport.startsWith('baseball_')) return 'MLB';
-    if (sport.startsWith('rugbyunion_')) return 'Rugby';
-    if (sport.startsWith('aussierules_')) return 'AFL';
-    if (sport.startsWith('mma_')) return 'MMA';
-    return sport;
+    if (sport.startsWith('soccer_') || sport === 'soccer' || sport === 'football') return 'Football';
+    if (sport.startsWith('icehockey_') || sport === 'nhl') return 'NHL';
+    if (sport.startsWith('basketball_') || sport === 'nba' || sport === 'basketball') return 'Basketball';
+    if (sport.startsWith('americanfootball_') || sport === 'nfl') return 'NFL';
+    if (sport.startsWith('baseball_') || sport === 'mlb') return 'MLB';
+    if (sport.startsWith('rugbyunion_') || sport === 'rugby') return 'Rugby';
+    if (sport.startsWith('aussierules_') || sport === 'afl') return 'AFL';
+    if (sport.startsWith('mma_') || sport === 'mma') return 'MMA';
+    return sport.charAt(0).toUpperCase() + sport.slice(1);
+}
+
+// Build SQL sport alias array for use in queries — matches all known aliases for a given sport
+function buildSportAliasArray(sportParam) {
+    const sport = String(sportParam || 'Football').trim().toLowerCase();
+    const SPORT_ALIAS_MAP = {
+        football: ['Football', 'football', 'soccer', 'soccer_epl', 'soccer_england_efl_cup',
+            'soccer_uefa_champs_league', 'soccer_spain_la_liga', 'soccer_germany_bundesliga',
+            'soccer_italy_serie_a', 'soccer_france_ligue_one', 'soccer_uefa_europa_league'],
+        basketball: ['Basketball', 'basketball', 'nba', 'basketball_nba', 'basketball_euroleague'],
+        nfl: ['NFL', 'nfl', 'american_football', 'americanfootball_nfl'],
+        rugby: ['Rugby', 'rugby', 'rugbyunion_international', 'rugbyunion_six_nations'],
+        nhl: ['NHL', 'nhl', 'hockey', 'icehockey_nhl'],
+        mlb: ['MLB', 'mlb', 'baseball', 'baseball_mlb'],
+        afl: ['AFL', 'afl', 'aussierules_afl'],
+        mma: ['MMA', 'mma', 'mma_mixed_martial_arts']
+    };
+    return SPORT_ALIAS_MAP[sport] || [sportParam, sport];
 }
 
 function parseKickoff(match) {
@@ -286,31 +304,68 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
 
         console.log('[vip/stress-payload] latest_publish_run_id=%s include_all=%s', latestPublishRunId, includeAll ? '1' : '0');
 
+        // Build a sport alias array to catch all case/prefix variants stored in the DB
+        const sportAliases = buildSportAliasArray(sportParam);
+
         // include_all bypass: query wide set for UI stress testing without plan/tier gating.
         const queryText = includeAll
             ? `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
                FROM direct1x2_prediction_final
-               WHERE COALESCE(sport, 'Football') = $1
+               WHERE COALESCE(sport, 'Football') = ANY($1::text[])
                ORDER BY created_at DESC
                LIMIT 2500`
             : latestPublishRunId
                 ? `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
                    FROM direct1x2_prediction_final
                    WHERE publish_run_id = $1
-                     AND COALESCE(sport, 'Football') = $2
+                     AND COALESCE(sport, 'Football') = ANY($2::text[])
                    ORDER BY total_confidence DESC, created_at DESC
                    LIMIT 3000`
                 : `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
                    FROM direct1x2_prediction_final
                    WHERE LOWER(COALESCE(tier, 'normal')) = ANY($1::text[])
-                     AND COALESCE(sport, 'Football') = $2
+                     AND COALESCE(sport, 'Football') = ANY($2::text[])
                    ORDER BY total_confidence DESC, created_at DESC
                    LIMIT 3000`;
         const queryParams = includeAll
-            ? [sportParam]
-            : (latestPublishRunId ? [latestPublishRunId, sportParam] : [masterPlan.tiers.map((tier) => String(tier).toLowerCase()), sportParam]);
+            ? [sportAliases]
+            : (latestPublishRunId ? [latestPublishRunId, sportAliases] : [masterPlan.tiers.map((tier) => String(tier).toLowerCase()), sportAliases]);
 
-        const dbRes = await query(queryText, queryParams);
+        let dbRes = await query(queryText, queryParams);
+
+        // Fallback: if the final table is empty for this sport, check predictions_raw for any recent data
+        if (!dbRes.rows.length) {
+            console.log('[vip/stress-payload] No rows in direct1x2_prediction_final for sport=%s — falling back to predictions_raw', sportParam);
+            const rawRes = await query(
+                `SELECT id,
+                        NULL::bigint AS publish_run_id,
+                        'normal' AS tier,
+                        'direct' AS type,
+                        jsonb_build_array(
+                            jsonb_build_object(
+                                'match_id', match_id,
+                                'home_team', (metadata->>'home_team'),
+                                'away_team', (metadata->>'away_team'),
+                                'prediction', prediction,
+                                'confidence', confidence,
+                                'market', market,
+                                'metadata', metadata
+                            )
+                        ) AS matches,
+                        confidence AS total_confidence,
+                        'medium' AS risk_level,
+                        created_at
+                 FROM predictions_raw
+                 WHERE COALESCE(sport, 'Football') = ANY($1::text[])
+                 ORDER BY created_at DESC
+                 LIMIT 500`,
+                [sportAliases]
+            );
+            if (rawRes.rows.length) {
+                console.log('[vip/stress-payload] fallback_raw_rows=%d', rawRes.rows.length);
+                dbRes = rawRes;
+            }
+        }
 
         console.log('[vip/stress-payload] db_rows=%d tier_filter=%s', dbRes.rows.length, includeAll ? 'include_all' : (latestPublishRunId ? `run_${latestPublishRunId}` : 'tier-only'));
 

@@ -898,56 +898,124 @@
                     const codesList = document.getElementById('codesList');
                     const displayTitle = document.getElementById('displayTitle');
                     const resultsPanel = document.getElementById('resultsPanel');
-                    
-                    // The payload structure typically puts predictions in categories.direct
-                    const predictions = data.payload?.categories?.direct || [];
-                    
-                    if (predictions.length === 0) {
+
+                    // Aggregate predictions from ALL category buckets
+                    const cats = data.payload?.categories || {};
+                    const allPredictions = [
+                        ...(cats.direct || []),
+                        ...(cats.analytical_insights || []),
+                        ...(cats.multi || []),
+                        ...(cats.same_match || []),
+                        ...(cats.acca_6match || []),
+                        ...(cats.mega_acca_12 || [])
+                    ];
+
+                    // Debug: log what the API returned
+                    console.log('[SMH] ' + sport + ' payload — source_rows=' + (data.source_rows || 0) + ', buckets:', {
+                        direct: (cats.direct || []).length,
+                        analytical_insights: (cats.analytical_insights || []).length,
+                        multi: (cats.multi || []).length,
+                        same_match: (cats.same_match || []).length,
+                        acca_6match: (cats.acca_6match || []).length,
+                        mega_acca_12: (cats.mega_acca_12 || []).length
+                    });
+
+                    if (allPredictions.length === 0) {
                         resultsPanel.style.justifyContent = 'center';
-                        displayTitle.textContent = `${sport} - No Matches Found`;
-                        codesList.innerHTML = `
-                            <p style="color: #94a3b8; font-size: 1.1rem;">
-                                No active insights available for this market currently.
-                            </p>
-                        `;
+                        displayTitle.textContent = sport + ' — No Predictions Available';
+                        const sourceRows = data.source_rows || 0;
+                        codesList.innerHTML =
+                            '<div style="text-align:center;padding:20px;">' +
+                                '<div style="font-size:2.5rem;margin-bottom:12px;">📭</div>' +
+                                '<p style="color:#94a3b8;font-size:1rem;margin-bottom:8px;">No published predictions found for <strong style="color:#38bdf8;">' + sport + '</strong>.</p>' +
+                                (sourceRows > 0
+                                    ? '<p style="color:#64748b;font-size:0.85rem;">The database has ' + sourceRows + ' raw row(s) but none passed the category filter. Check confidence thresholds or trigger a new AI pipeline run.</p>'
+                                    : '<p style="color:#64748b;font-size:0.85rem;">No records in the database for this sport. A sync may be needed — wait for the scheduled refresh or contact your admin.</p>') +
+                            '</div>';
                         return;
                     }
 
                     resultsPanel.style.justifyContent = 'flex-start';
-                    displayTitle.textContent = `${category}: ${sport} Insights`;
-                    displayTitle.style.fontSize = '1.1rem';
+                    displayTitle.textContent = sport + ' \u00b7 ' + allPredictions.length + ' Insight' + (allPredictions.length !== 1 ? 's' : '');
+                    displayTitle.style.fontSize = '1rem';
                     displayTitle.style.color = '#94a3b8';
-                    displayTitle.style.marginBottom = '20px';
+                    displayTitle.style.marginBottom = '16px';
 
-                    let html = '<div class="results-scroll-container" style="width: 100%; max-height: 400px; overflow-y: auto; padding-right: 8px;">';
-                    
-                    predictions.forEach(pred => {
-                        const match = pred.matches?.[0] || {};
-                        const home = match.home_team || match.metadata?.home_team || 'Home';
-                        const away = match.away_team || match.metadata?.away_team || 'Away';
-                        const prediction = match.prediction || pred.final_recommendation?.market || 'N/A';
-                        const confidence = Math.round(pred.total_confidence || 0);
-                        const market = match.market || 'Match Winner';
-                        
-                        // Extract odds if available in metadata
-                        const odds = match.metadata?.odds?.home || match.metadata?.odds?.away || null;
-                        const oddsDisplay = odds ? `<span style="color: #facc15; margin-left: 10px;">@ ${odds}</span>` : '';
+                    const SECTION_LABELS = {
+                        direct: 'Direct Pick', secondary: 'Analytical',
+                        multi: 'Multi', same_match: 'Same Match',
+                        acca_6match: 'ACCA 6', mega_acca_12: 'MEGA ACCA'
+                    };
+                    const SECTION_COLORS = {
+                        direct: '#38bdf8', secondary: '#a78bfa',
+                        multi: '#fb923c', same_match: '#34d399',
+                        acca_6match: '#f59e0b', mega_acca_12: '#ef4444'
+                    };
 
-                        html += `
-                            <div class="result-item" style="background: rgba(30, 41, 59, 0.7); border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(56, 189, 248, 0.2); border-left: 4px solid #38bdf8; text-align: left; transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                    <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${market}</span>
-                                    <span style="font-size: 0.85rem; color: #38bdf8; font-weight: 800;">${confidence}% CONFIDENCE</span>
-                                </div>
-                                <div style="font-size: 1.1rem; font-weight: 700; color: #ffffff; margin-bottom: 6px;">${home} <span style="color: #64748b; font-weight: 400;">vs</span> ${away}</div>
-                                <div style="display: flex; align-items: center; font-size: 0.95rem; color: #4ade80; font-weight: 700;">
-                                    <span style="background: rgba(74, 222, 128, 0.1); padding: 4px 8px; border-radius: 4px;">PICK: ${prediction.replace(/_/g, ' ').toUpperCase()}</span>
-                                    ${oddsDisplay}
-                                </div>
-                            </div>
-                        `;
+                    let html = '<div class="results-scroll-container" style="width:100%;max-height:420px;overflow-y:auto;padding-right:8px;">';
+
+                    allPredictions.forEach(function(pred) {
+                        const sectionType = pred.section_type || 'direct';
+                        const accentColor = SECTION_COLORS[sectionType] || '#38bdf8';
+                        const sectionLabel = SECTION_LABELS[sectionType] || sectionType.replace(/_/g, ' ').toUpperCase();
+                        const legCount = Array.isArray(pred.matches) ? pred.matches.length : 1;
+                        const isAcca = legCount > 1;
+
+                        const match = pred.matches && pred.matches[0] ? pred.matches[0] : {};
+                        const home = match.home_team || (match.metadata && match.metadata.home_team) || '—';
+                        const away = match.away_team || (match.metadata && match.metadata.away_team) || '—';
+
+                        const pickRaw = match.prediction
+                            || (pred.final_recommendation && pred.final_recommendation.market)
+                            || (match.metadata && match.metadata.prediction)
+                            || match.recommendation
+                            || 'N/A';
+                        const pick = String(pickRaw).replace(/_/g, ' ').toUpperCase();
+
+                        const confidence = Math.round(pred.total_confidence || match.confidence || 0);
+                        const market = String(match.market || (match.metadata && match.metadata.market) || '1X2').toUpperCase();
+
+                        const kickoffRaw = match.commence_time || match.match_date
+                            || (match.metadata && (match.metadata.match_time || match.metadata.kickoff || match.metadata.kickoff_time))
+                            || pred.created_at;
+                        let kickoffStr = '';
+                        if (kickoffRaw) {
+                            try {
+                                const d = new Date(kickoffRaw);
+                                if (!isNaN(d.getTime())) {
+                                    kickoffStr = d.toLocaleString('en-GB', {weekday:'short',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'UTC'}) + ' UTC';
+                                }
+                            } catch(e) {}
+                        }
+
+                        const oddsVal = (match.metadata && match.metadata.odds && match.metadata.odds.home)
+                            || (match.metadata && match.metadata.sharp_odds && match.metadata.sharp_odds.home_win)
+                            || match.odds || null;
+                        const oddsHtml = oddsVal ? '<span style="color:#facc15;font-weight:700;margin-left:8px;">@ ' + Number(oddsVal).toFixed(2) + '</span>' : '';
+
+                        const confColor = confidence >= 80 ? '#4ade80' : confidence >= 65 ? '#facc15' : '#fb923c';
+                        const timeHtml = kickoffStr ? '<span style="color:#475569;font-size:0.78rem;margin-left:auto;">\uD83D\uDD50 ' + kickoffStr + '</span>' : '';
+
+                        html +=
+                            '<div class="result-item" style="background:rgba(15,23,42,0.8);border-radius:12px;padding:14px 16px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.07);border-left:4px solid ' + accentColor + ';text-align:left;transition:transform 0.18s ease,box-shadow 0.18s ease;" onmouseover="this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 8px 24px rgba(0,0,0,0.4)\'" onmouseout="this.style.transform=\'translateY(0)\';this.style.boxShadow=\'none\'">' +
+                                '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px;flex-wrap:wrap;">' +
+                                    '<div style="display:flex;align-items:center;gap:6px;">' +
+                                        '<span style="font-size:0.7rem;color:' + accentColor + ';font-weight:800;text-transform:uppercase;letter-spacing:0.8px;background:rgba(255,255,255,0.06);padding:2px 7px;border-radius:4px;">' + sectionLabel + (isAcca ? ' \u00b7 ' + legCount + ' legs' : '') + '</span>' +
+                                        '<span style="font-size:0.7rem;color:#64748b;font-weight:600;text-transform:uppercase;">' + market + '</span>' +
+                                    '</div>' +
+                                    '<span style="font-size:0.8rem;color:' + confColor + ';font-weight:800;">' + confidence + '% CONF.</span>' +
+                                '</div>' +
+                                '<div style="font-size:1.05rem;font-weight:700;color:#f1f5f9;margin-bottom:5px;line-height:1.3;">' +
+                                    home + ' <span style="color:#475569;font-weight:400;font-size:0.9rem;">vs</span> ' + away +
+                                    (isAcca ? '<span style="font-size:0.75rem;color:#64748b;font-weight:400;"> +' + (legCount - 1) + ' more</span>' : '') +
+                                '</div>' +
+                                '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;">' +
+                                    '<span style="background:rgba(74,222,128,0.12);color:#4ade80;padding:3px 9px;border-radius:4px;font-size:0.88rem;font-weight:700;">\u26A1 ' + pick + '</span>' +
+                                    oddsHtml + timeHtml +
+                                '</div>' +
+                            '</div>';
                     });
-                    
+
                     html += '</div>';
                     codesList.innerHTML = html;
                     codesList.style.fontSize = '1rem';
