@@ -46,9 +46,16 @@
     function el(id) { return document.getElementById(id); }
 
     // ── Card registry for click handlers ──────────────────────────────────────
-    var SMH_CARD_REGISTRY = new Map();
+    /**
+     * Registers a card in the global registry so the Match Detail modal
+     * (defined in vip-stress-dashboard.js) can access the prediction data.
+     */
     function registerSmhCard(cardId, prediction) {
-        SMH_CARD_REGISTRY.set(cardId, prediction);
+        // Ensure the global registry exists (used by vip-stress-dashboard.js)
+        if (!window.CARD_REGISTRY) {
+            window.CARD_REGISTRY = new Map();
+        }
+        window.CARD_REGISTRY.set(cardId, prediction);
     }
 
     // ── Core: handle a sport selection ────────────────────────────────────────
@@ -180,7 +187,9 @@
             displayTitle.style.marginBottom = '16px';
         }
 
-        SMH_CARD_REGISTRY.clear(); // Reset registry on each render
+        // Clear previous SMH entries if needed, or rely on unique IDs.
+        // We avoid clearing window.CARD_REGISTRY entirely to not break the main dashboard
+        // but we ensure these specific sport insights are available.
 
         var html = '<div class="results-scroll-container" style="width:100%;max-height:420px;overflow-y:auto;padding-right:8px;">';
 
@@ -314,3 +323,22 @@
     });
 
 })();
+
+// Bulletproof Global Click Listener for Insight Buttons
+document.body.addEventListener('click', function(e) {
+    const btn = e.target.closest('.insight-btn');
+    if (!btn) return; // If they didn't click the button, ignore it.
+
+    e.preventDefault(); // Stop any default button behavior
+    
+    const cardId = btn.getAttribute('data-card-id');
+    console.log("[Trigger] Insight button clicked! Extracted ID:", cardId);
+
+    // Ensure the function exists before calling it
+    if (typeof window.openMatchDetail === 'function') {
+        window.openMatchDetail(cardId);
+    } else {
+        console.error("[Fatal Error] window.openMatchDetail is not defined in the global scope!");
+        alert("System Error: Modal function is not accessible.");
+    }
+});
