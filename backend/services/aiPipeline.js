@@ -42,7 +42,14 @@ const directInsightsSupabase = DIRECT_INSIGHTS_SUPABASE_URL && DIRECT_INSIGHTS_S
 
 function normalizeSport(sport) {
     if (typeof sport !== 'string' || sport.trim().length === 0) throw new Error('sport must be a non-empty string');
-    return sport.trim().toLowerCase();
+    const s = sport.trim().toLowerCase();
+    const map = {
+        football: 'Football', basketball: 'Basketball', tennis: 'Tennis', cricket: 'Cricket',
+        esports: 'Esports', nfl: 'NFL', mlb: 'MLB', mma: 'MMA', f1: 'F1', golf: 'Golf',
+        rugby: 'Rugby', boxing: 'Boxing', nhl: 'NHL', afl: 'AFL', volleyball: 'Volleyball',
+        handball: 'Handball', darts: 'Darts'
+    };
+    return map[s] || (s.charAt(0).toUpperCase() + s.slice(1));
 }
 
 function normalizeSportForDeployment(value) {
@@ -81,7 +88,10 @@ function normalizeSportForDeployment(value) {
     if (key.startsWith('icehockey_')) return 'NHL';
     if (key.startsWith('rugbyunion_')) return 'Rugby';
 
-    return mapping[key] || key;
+    const resolved = mapping[key];
+    if (resolved) return resolved;
+
+    return key.charAt(0).toUpperCase() + key.slice(1);
 }
 
 function isDeploymentSportEnabled(value) {

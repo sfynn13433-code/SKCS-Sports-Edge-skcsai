@@ -12,10 +12,10 @@ const MAX_PLAYERS_PER_TEAM = Math.max(1, Math.min(50, Number(process.env.TIER1_M
 const TIER1_REDIS_QUEUE_KEY = String(process.env.TIER1_REDIS_QUEUE_KEY || 'skcs:tier1:priority:queue').trim();
 
 const SPORT_PRIORITY = Object.freeze({
-    football: 100,
-    basketball: 90,
-    rugby: 80,
-    mma: 70
+    Football: 100,
+    Basketball: 90,
+    Rugby: 80,
+    MMA: 70
 });
 
 const DISCOVERY_COUNTRIES = Object.freeze(['World', 'USA']);
