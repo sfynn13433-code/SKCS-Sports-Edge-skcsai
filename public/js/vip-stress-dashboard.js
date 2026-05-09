@@ -12,6 +12,16 @@
         lastPayload: null
     };
 
+    // Registry: maps a generated card ID to the full prediction object so
+    // clicking a card doesn't require a second network fetch.
+    const CARD_REGISTRY = new Map();
+    let _cardSeq = 0;
+    function registerCard(prediction) {
+        const id = 'card_' + (++_cardSeq);
+        CARD_REGISTRY.set(id, prediction);
+        return id;
+    }
+
     function updateState(updates) {
         Object.assign(STATE, updates);
         render();
@@ -374,8 +384,9 @@
             `
             : '';
 
+        const cardId = registerCard(prediction);
         return `
-          <article class="card">
+          <article class="card skcs-clickable-card" data-card-id="${cardId}" style="cursor:pointer;transition:box-shadow 0.18s ease,transform 0.18s ease;" onmouseover="this.style.boxShadow='0 0 0 2px #3b82f6';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='';this.style.transform=''">
             <div class="teams">${teams}</div>
             <div class="line">${line}</div>
             <div class="line">${league} • ${kickoff}</div>
@@ -385,11 +396,13 @@
             ${legsPreview}
             ${insightsFooter}
             ${engineLogFooter}
+            <div style="margin-top:10px;font-size:0.75rem;color:#3b82f6;font-weight:600;letter-spacing:0.5px;">🔍 Click for full market breakdown</div>
           </article>
         `;
     }
 
     function renderSections(payload) {
+        CARD_REGISTRY.clear(); // Reset registry on each full render
         const categories = payload.categories || {};
         sectionsWrap.innerHTML = SECTION_META.map((section) => {
             const items = Array.isArray(categories[section.key]) ? categories[section.key] : [];
@@ -404,6 +417,22 @@
               </section>
             `;
         }).join('');
+        wireCardClicks();
+    }
+
+    function wireCardClicks() {
+        if (!sectionsWrap) return;
+        // Remove any previously attached listener by cloning the node
+        const fresh = sectionsWrap.cloneNode(true);
+        sectionsWrap.parentNode.replaceChild(fresh, sectionsWrap);
+        // Re-assign the module-scoped reference so future calls still work
+        // (We can't reassign a const, so we use the global id lookup)
+        document.getElementById('sectionsWrap').addEventListener('click', function(e) {
+            const article = e.target.closest('[data-card-id]');
+            if (!article) return;
+            const cardId = article.getAttribute('data-card-id');
+            if (cardId) window.openMatchDetail(cardId);
+        });
     }
 
     async function fetchPayload() {
@@ -791,6 +820,107 @@
 
     window.resetView = function() {
         updateState({ viewState: 'PORTAL', selectedSport: null });
+    };
+
+    // ============================================
+    // MATCH DETAIL MODAL
+    // ============================================
+    window.openMatchDetail = function(cardId) {
+        const prediction = CARD_REGISTRY.get(cardId);
+        if (!prediction) return;
+        const modal = document.getElementById('skcsMatchDetailModal');
+        if (!modal) { console.warn('[SKCS] Match detail modal not found in DOM'); return; }
+
+        const leg = Array.isArray(prediction.matches) && prediction.matches[0] ? prediction.matches[0] : {};
+        const home = leg.home_team || (leg.metadata && leg.metadata.home_team) || 'Home';
+        const away = leg.away_team || (leg.metadata && leg.metadata.away_team) || 'Away';
+        const sectionType = String(prediction.section_type || prediction.type || 'direct');
+        const confidence = Math.round(Number(prediction.total_confidence || 0));
+        const league = leg.metadata && leg.metadata.league ? leg.metadata && leg.metadata.league : (leg.sport || sectionType);
+
+        // Kickoff time
+        const kickoffRaw = leg.commence_time || leg.match_date
+            || (leg.metadata && (leg.metadata.match_time || leg.metadata.kickoff || leg.metadata.kickoff_time))
+            || prediction.created_at;
+        let kickoffStr = 'TBC';
+        if (kickoffRaw) {
+            try {
+                const d = new Date(kickoffRaw);
+                if (!isNaN(d.getTime())) kickoffStr = d.toLocaleString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) + ' UTC';
+            } catch (e) {}
+        }
+
+        // Build markets list from all legs
+        const legs = Array.isArray(prediction.matches) ? prediction.matches : [leg];
+        const CONF_COLORS = ['#ef4444','#f97316','#facc15','#84cc16','#22c55e','#4ade80'];
+        function confColor(c) { const idx = Math.min(5, Math.floor(c / 17)); return CONF_COLORS[idx]; }
+
+        const marketsHtml = legs.map(function(m, i) {
+            const mHome = m.home_team || (m.metadata && m.metadata.home_team) || home;
+            const mAway = m.away_team || (m.metadata && m.metadata.away_team) || away;
+            const mMarket = String(m.market || (m.metadata && m.metadata.market) || '1X2').toUpperCase();
+            const mPick = String(m.prediction || m.recommendation || (m.metadata && m.metadata.prediction) || 'N/A').replace(/_/g,' ').toUpperCase();
+            const mConf = Math.round(Number(m.confidence || 0));
+            const color = confColor(mConf);
+            const pct = Math.min(100, mConf);
+            // Secondary markets if available
+            const secMarkets = Array.isArray(m.secondary_markets) ? m.secondary_markets : [];
+            const secHtml = secMarkets.map(function(sm) {
+                const smConf = Math.round(Number(sm.confidence || 0));
+                return '<div style="margin-top:8px;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">' +
+                    '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+                        '<span style="font-size:0.78rem;color:#94a3b8;font-weight:600;">' + String(sm.market || 'Secondary').toUpperCase() + '</span>' +
+                        '<span style="font-size:0.78rem;color:' + confColor(smConf) + ';font-weight:700;">' + smConf + '%</span>' +
+                    '</div>' +
+                    '<div style="font-size:0.82rem;color:#e2e8f0;margin-top:4px;">' + String(sm.prediction || sm.pick || 'N/A').replace(/_/g,' ').toUpperCase() + '</div>' +
+                '</div>';
+            }).join('');
+            return '<div style="background:rgba(15,23,42,0.7);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.07);">' +
+                (legs.length > 1 ? '<div style="font-size:0.72rem;color:#64748b;font-weight:700;margin-bottom:6px;">LEG ' + (i+1) + '</div>' : '') +
+                '<div style="font-size:0.95rem;font-weight:700;color:#f1f5f9;margin-bottom:10px;">' + mHome + ' <span style="color:#475569;font-weight:400;">vs</span> ' + mAway + '</div>' +
+                '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
+                    '<span style="font-size:0.75rem;color:#94a3b8;font-weight:700;text-transform:uppercase;min-width:90px;">' + mMarket + '</span>' +
+                    '<div style="flex:1;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">' +
+                        '<div style="height:100%;width:' + pct + '%;background:' + color + ';border-radius:3px;transition:width 0.6s ease;"></div>' +
+                    '</div>' +
+                    '<span style="font-size:0.8rem;color:' + color + ';font-weight:800;min-width:36px;text-align:right;">' + mConf + '%</span>' +
+                '</div>' +
+                '<div style="display:inline-block;background:rgba(74,222,128,0.1);color:#4ade80;padding:4px 10px;border-radius:5px;font-size:0.85rem;font-weight:700;">⚡ ' + mPick + '</div>' +
+                secHtml +
+            '</div>';
+        }).join('');
+
+        // Insights chips
+        const insights = prediction.insights || {};
+        const chips = [
+            insights.weather ? '<span style="font-size:0.78rem;background:rgba(96,165,250,0.1);color:#60a5fa;padding:4px 10px;border-radius:20px;">🌤 ' + insights.weather + '</span>' : '',
+            insights.availability ? '<span style="font-size:0.78rem;background:rgba(74,222,128,0.1);color:#4ade80;padding:4px 10px;border-radius:20px;">👥 ' + insights.availability + '</span>' : '',
+            insights.stability ? '<span style="font-size:0.78rem;background:rgba(251,191,36,0.1);color:#fbbf24;padding:4px 10px;border-radius:20px;">📊 ' + insights.stability + '</span>' : ''
+        ].filter(Boolean).join(' ');
+
+        const body = document.getElementById('skcsModalBody');
+        if (body) {
+            body.innerHTML =
+                '<div style="margin-bottom:20px;">' +
+                    '<div style="font-size:1.4rem;font-weight:800;color:#f1f5f9;margin-bottom:4px;">' + home + ' <span style="color:#475569;">vs</span> ' + away + '</div>' +
+                    '<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:6px;">' +
+                        '<span style="font-size:0.8rem;color:#94a3b8;">🕐 ' + kickoffStr + '</span>' +
+                        (league ? '<span style="font-size:0.8rem;color:#94a3b8;">🏆 ' + league + '</span>' : '') +
+                        '<span style="font-size:0.8rem;font-weight:700;color:' + confColor(confidence) + ';">⚡ ' + confidence + '% overall confidence</span>' +
+                    '</div>' +
+                    (chips ? '<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">' + chips + '</div>' : '') +
+                '</div>' +
+                '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;">Market Breakdown</div>' +
+                '<div style="display:flex;flex-direction:column;gap:10px;">' + marketsHtml + '</div>';
+        }
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeMatchDetail = function() {
+        const modal = document.getElementById('skcsMatchDetailModal');
+        if (modal) modal.style.display = 'none';
+        document.body.style.overflow = '';
     };
 
     // Legacy button wiring (for VIP data loading)
