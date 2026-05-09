@@ -200,12 +200,29 @@ function normalizeSport(raw) {
         pickFirstWithMatch(raw, ['sport', 'metadata.sport', 'raw_provider_data.sport']),
         'football'
     ).toLowerCase();
+
     if (key === 'soccer' || key.startsWith('soccer_')) return 'football';
     if (key === 'nba') return 'basketball';
-    if (key === 'nfl') return 'american_football';
-    if (key === 'mlb') return 'baseball';
-    if (key === 'nhl') return 'hockey';
-    return key;
+
+    const exactMapping = {
+        nfl: 'NFL',
+        american_football: 'NFL',
+        mlb: 'MLB',
+        baseball: 'MLB',
+        nhl: 'NHL',
+        hockey: 'NHL',
+        formula1: 'F1',
+        f1: 'F1',
+        mma: 'MMA',
+        afl: 'AFL',
+        volleyball: 'Volleyball',
+        handball: 'Handball',
+        golf: 'Golf',
+        rugby: 'Rugby',
+        boxing: 'Boxing'
+    };
+
+    return exactMapping[key] || key;
 }
 
 function buildMatchInfo(raw) {

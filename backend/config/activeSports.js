@@ -3,17 +3,20 @@
 const DEFAULT_ACTIVE_SPORTS = Object.freeze([
     'football',
     'basketball',
-    'rugby',
-    'american_football',
-    'baseball',
-    'hockey',
-    'volleyball',
-    'handball',
-    'afl',
-    'formula1',
-    'mma',
+    'Rugby',
+    'NFL',
+    'MLB',
+    'NHL',
+    'Volleyball',
+    'Handball',
+    'AFL',
+    'F1',
+    'MMA',
+    'Golf',
+    'Boxing',
     'tennis',
-    'cricket'
+    'cricket',
+    'esports'
 ]);
 
 function normalizeActiveSportToken(value) {
@@ -21,17 +24,27 @@ function normalizeActiveSportToken(value) {
     if (!token) return '';
 
     const aliases = {
-        nfl: 'american_football',
-        'american-football': 'american_football',
-        'american football': 'american_football',
-        motorsport: 'formula1',
-        'formula-1': 'formula1',
-        formula_1: 'formula1',
-        basketball_nba: 'basketball',
-        nba: 'basketball',
-        hockey_nhl: 'hockey',
-        nhl: 'hockey',
-        soccer: 'football'
+        nfl: 'NFL',
+        american_football: 'NFL',
+        'american-football': 'NFL',
+        'american football': 'NFL',
+        mlb: 'MLB',
+        baseball: 'MLB',
+        nhl: 'NHL',
+        hockey: 'NHL',
+        f1: 'F1',
+        formula1: 'F1',
+        'formula-1': 'F1',
+        formula_1: 'F1',
+        mma: 'MMA',
+        afl: 'AFL',
+        volleyball: 'Volleyball',
+        handball: 'Handball',
+        golf: 'Golf',
+        rugby: 'Rugby',
+        boxing: 'Boxing',
+        soccer: 'football',
+        nba: 'basketball'
     };
 
     return aliases[token] || token;

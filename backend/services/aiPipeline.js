@@ -48,12 +48,36 @@ function normalizeSport(sport) {
 function normalizeSportForDeployment(value) {
     const key = String(value || '').trim().toLowerCase();
     if (!key) return 'unknown';
-    if (key === 'soccer' || key === 'football' || key.startsWith('soccer_') || key.startsWith('football_')) return 'football';
-    if (key.startsWith('americanfootball_')) return 'american_football';
-    if (key === 'nba' || key.startsWith('basketball_')) return 'basketball';
-    if (key === 'nhl' || key.startsWith('icehockey_')) return 'hockey';
-    if (key.startsWith('rugbyunion_')) return 'rugby';
-    return key;
+
+    const mapping = {
+        soccer: 'football',
+        football: 'football',
+        nba: 'basketball',
+        basketball: 'basketball',
+        nfl: 'NFL',
+        american_football: 'NFL',
+        mlb: 'MLB',
+        baseball: 'MLB',
+        nhl: 'NHL',
+        hockey: 'NHL',
+        f1: 'F1',
+        formula1: 'F1',
+        mma: 'MMA',
+        afl: 'AFL',
+        volleyball: 'Volleyball',
+        handball: 'Handball',
+        golf: 'Golf',
+        rugby: 'Rugby',
+        boxing: 'Boxing'
+    };
+
+    if (key.startsWith('soccer_') || key.startsWith('football_')) return 'football';
+    if (key.startsWith('americanfootball_')) return 'NFL';
+    if (key.startsWith('basketball_')) return 'basketball';
+    if (key.startsWith('icehockey_')) return 'NHL';
+    if (key.startsWith('rugbyunion_')) return 'Rugby';
+
+    return mapping[key] || key;
 }
 
 function isDeploymentSportEnabled(value) {

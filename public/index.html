@@ -772,13 +772,13 @@
                         <label>Premium Markets</label>
                         <select id="premium-markets-select" class="market-select" onchange="displayCodes(this, 'Premium Markets')">
                             <option value="">Select a market...</option>
-                            <option value="nfl">NFL</option>
-                            <option value="baseball">MLB</option>
-                            <option value="mma">MMA</option>
-                            <option value="formula1">F1</option>
-                            <option value="golf">Golf</option>
-                            <option value="rugby">Rugby</option>
-                            <option value="boxing">Boxing</option>
+                            <option value="NFL">NFL</option>
+                            <option value="MLB">MLB</option>
+                            <option value="MMA">MMA</option>
+                            <option value="F1">F1</option>
+                            <option value="Golf">Golf</option>
+                            <option value="Rugby">Rugby</option>
+                            <option value="Boxing">Boxing</option>
                         </select>
                     </div>
 
@@ -786,10 +786,10 @@
                         <label>Niche Markets</label>
                         <select id="niche-markets-select" class="market-select" onchange="displayCodes(this, 'Niche Markets')">
                             <option value="">Select a market...</option>
-                            <option value="hockey">NHL</option>
-                            <option value="afl">AFL</option>
-                            <option value="volleyball">Volleyball</option>
-                            <option value="handball">Handball</option>
+                            <option value="NHL">NHL</option>
+                            <option value="AFL">AFL</option>
+                            <option value="Volleyball">Volleyball</option>
+                            <option value="Handball">Handball</option>
                         </select>
                     </div>
 
@@ -1012,8 +1012,8 @@
         // Determine which market this sport belongs to
         const marketLabels = {
             football: 'Global Majors', tennis: 'Global Majors', basketball: 'Global Majors', cricket: 'Global Majors', esports: 'Global Majors',
-            nfl: 'Premium Markets', baseball: 'Premium Markets', mma: 'Premium Markets', formula1: 'Premium Markets', golf: 'Premium Markets', rugby: 'Premium Markets', boxing: 'Premium Markets',
-            hockey: 'Niche Markets', afl: 'Niche Markets', volleyball: 'Niche Markets', handball: 'Niche Markets'
+            NFL: 'Premium Markets', MLB: 'Premium Markets', MMA: 'Premium Markets', F1: 'Premium Markets', Golf: 'Premium Markets', Rugby: 'Premium Markets', Boxing: 'Premium Markets',
+            NHL: 'Niche Markets', AFL: 'Niche Markets', Volleyball: 'Niche Markets', Handball: 'Niche Markets'
         };
         const marketName = marketLabels[sport] || document.querySelector('#portal-router option:checked')?.textContent || 'Portal';
 
@@ -1029,9 +1029,9 @@
 
         const sportIcons = {
             football: '⚽', tennis: '🎾', basketball: '🏀', cricket: '🏏',
-            esports: '🎮', nfl: '🏈', baseball: '⚾', mma: '🥊',
-            formula1: '🏎️', golf: '⛳', rugby: '🏉', boxing: '🥊',
-            hockey: '🏒', afl: '🦘', volleyball: '🏐', handball: '🤾', darts: '🎯'
+            esports: '🎮', NFL: '🏈', MLB: '⚾', MMA: '🥊',
+            F1: '🏎️', Golf: '⛳', Rugby: '🏉', Boxing: '🥊',
+            NHL: '🏒', AFL: '🦘', Volleyball: '🏐', Handball: '🤾', darts: '🎯'
         };
 
         // Update client field
@@ -1067,8 +1067,8 @@
         hubSetView('market-mode', 'MARKET');
         const displayNames = {
             football: 'FOOTBALL', tennis: 'TENNIS', basketball: 'BASKETBALL', cricket: 'CRICKET', esports: 'ESPORTS',
-            nfl: 'NFL', baseball: 'MLB', mma: 'MMA', formula1: 'F1', golf: 'GOLF', rugby: 'RUGBY', boxing: 'BOXING',
-            hockey: 'NHL', afl: 'AFL', volleyball: 'VOLLEYBALL', handball: 'HANDBALL'
+            NFL: 'NFL', MLB: 'MLB', MMA: 'MMA', F1: 'F1', Golf: 'GOLF', Rugby: 'RUGBY', Boxing: 'BOXING',
+            NHL: 'NHL', AFL: 'AFL', Volleyball: 'VOLLEYBALL', Handball: 'HANDBALL'
         };
         hubSetSelection(displayNames[sport] || sport.toUpperCase());
         hubShowBack(marketName);

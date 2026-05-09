@@ -9,11 +9,11 @@ const TIER1_SCHEMA_PROFILES = Object.freeze({
         timeline_markers: Object.freeze(['Q1', 'Q2', 'Q3', 'Q4', 'OT1']),
         scoring_events: Object.freeze(['points', 'three_pointers', 'free_throws'])
     }),
-    rugby: Object.freeze({
+    Rugby: Object.freeze({
         timeline_markers: Object.freeze(['H1', 'H2', 'ET']),
         scoring_events: Object.freeze(['tries', 'conversions', 'penalty_kicks', 'drop_goals'])
     }),
-    mma: Object.freeze({
+    MMA: Object.freeze({
         timeline_markers: Object.freeze(['R1', 'R2', 'R3', 'R4', 'R5']),
         scoring_events: Object.freeze(['knockdowns', 'takedowns', 'submission_attempts']),
         resolution_codes: Object.freeze(['KO_TKO', 'SUB', 'U_DEC', 'S_DEC', 'M_DEC', 'DRAW'])
@@ -23,11 +23,19 @@ const TIER1_SCHEMA_PROFILES = Object.freeze({
 function normalizeTier1Sport(value) {
     const key = String(value || '').trim().toLowerCase();
     if (!key) return '';
-    if (key === 'soccer') return 'football';
-    if (key === 'association football') return 'football';
+    if (key === 'soccer' || key === 'association football') return 'football';
     if (key === 'basketball_nba' || key === 'nba') return 'basketball';
-    if (key === 'rugby union' || key === 'rugby league') return 'rugby';
-    if (key === 'mixed martial arts') return 'mma';
+    if (key === 'rugby union' || key === 'rugby league' || key === 'rugby') return 'Rugby';
+    if (key === 'mixed martial arts' || key === 'mma') return 'MMA';
+    if (key === 'nfl' || key === 'american_football') return 'NFL';
+    if (key === 'mlb' || key === 'baseball') return 'MLB';
+    if (key === 'nhl' || key === 'hockey') return 'NHL';
+    if (key === 'f1' || key === 'formula1') return 'F1';
+    if (key === 'afl') return 'AFL';
+    if (key === 'volleyball') return 'Volleyball';
+    if (key === 'handball') return 'Handball';
+    if (key === 'golf') return 'Golf';
+    if (key === 'boxing') return 'Boxing';
     return key;
 }
 

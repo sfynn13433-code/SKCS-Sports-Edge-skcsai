@@ -65,7 +65,11 @@ const KNOWN_MARKETS = new Set([
     'penalty_no'
 ]);
 
-const KNOWN_VOLATILITY = new Set(['low', 'medium', 'high']);
+const KNOWN_SPORTS = new Set([
+    'football', 'tennis', 'basketball', 'cricket', 'esports',
+    'NFL', 'MLB', 'MMA', 'F1', 'Golf', 'Rugby', 'Boxing',
+    'NHL', 'AFL', 'Volleyball', 'Handball', 'darts'
+]);
 
 function assert(condition, message) {
     if (!condition) {
@@ -73,6 +77,11 @@ function assert(condition, message) {
         err.name = 'ValidationError';
         throw err;
     }
+}
+
+function validateSport(sport) {
+    assert(typeof sport === 'string' && sport.trim().length > 0, 'sport must be a non-empty string');
+    assert(KNOWN_SPORTS.has(sport), `sport is not known: ${sport}`);
 }
 
 function validateConfidence(confidence) {
@@ -98,8 +107,7 @@ function validateRawPredictionInput(pred) {
     assert(pred && typeof pred === 'object', 'prediction must be an object');
 
     validateMatchId(pred.match_id);
-
-    assert(typeof pred.sport === 'string' && pred.sport.trim().length > 0, 'sport must be a non-empty string');
+    validateSport(pred.sport);
     validateMarket(pred.market);
 
     assert(typeof pred.prediction === 'string' && pred.prediction.trim().length > 0, 'prediction must be a non-empty string');

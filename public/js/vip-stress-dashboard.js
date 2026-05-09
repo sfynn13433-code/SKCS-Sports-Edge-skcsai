@@ -38,19 +38,19 @@
     // ============================================
     const SPORTS_CATALOG = {
         'Niche Markets': [
-            { id: 'hockey', name: 'NHL', icon: '🏒', color: '#06b6d4' },
-            { id: 'afl', name: 'AFL', icon: '🦘', color: '#8b5cf6' },
-            { id: 'volleyball', name: 'Volleyball', icon: '🏐', color: '#fbbf24' },
-            { id: 'handball', name: 'Handball', icon: '🤾', color: '#4ade80' }
+            { id: 'NHL', name: 'NHL', icon: '🏒', color: '#06b6d4' },
+            { id: 'AFL', name: 'AFL', icon: '🦘', color: '#8b5cf6' },
+            { id: 'Volleyball', name: 'Volleyball', icon: '🏐', color: '#fbbf24' },
+            { id: 'Handball', name: 'Handball', icon: '🤾', color: '#4ade80' }
         ],
         'Premium Markets': [
-            { id: 'nfl', name: 'NFL', icon: '🏈', color: '#8b5cf6' },
-            { id: 'baseball', name: 'MLB', icon: '⚾', color: '#ef4444' },
-            { id: 'mma', name: 'MMA', icon: '🥊', color: '#4ade80' },
-            { id: 'formula1', name: 'F1', icon: '🏎️', color: '#a78bfa' },
-            { id: 'golf', name: 'Golf', icon: '⛳', color: '#22c55e' },
-            { id: 'rugby', name: 'Rugby', icon: '🏉', color: '#60a5fa' },
-            { id: 'boxing', name: 'Boxing', icon: '🥊', color: '#ef4444' }
+            { id: 'NFL', name: 'NFL', icon: '🏈', color: '#8b5cf6' },
+            { id: 'MLB', name: 'MLB', icon: '⚾', color: '#ef4444' },
+            { id: 'MMA', name: 'MMA', icon: '🥊', color: '#4ade80' },
+            { id: 'F1', name: 'F1', icon: '🏎️', color: '#a78bfa' },
+            { id: 'Golf', name: 'Golf', icon: '⛳', color: '#22c55e' },
+            { id: 'Rugby', name: 'Rugby', icon: '🏉', color: '#60a5fa' },
+            { id: 'Boxing', name: 'Boxing', icon: '🥊', color: '#ef4444' }
         ],
         'Global Majors': [
             { id: 'football', name: 'Football', icon: '⚽', color: '#3b82f6' },

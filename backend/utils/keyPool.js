@@ -137,13 +137,16 @@ function normalizeSportToken(sport) {
     if (!key) return '';
 
     const aliases = {
-        nfl: 'american_football',
+        nfl: 'nfl',
         nba: 'basketball',
-        mlb: 'baseball',
-        nhl: 'hockey',
-        formula_1: 'formula1',
-        formula1: 'formula1',
-        american_football: 'american_football'
+        mlb: 'mlb',
+        nhl: 'nhl',
+        formula_1: 'f1',
+        formula1: 'f1',
+        f1: 'f1',
+        american_football: 'nfl',
+        hockey: 'nhl',
+        baseball: 'mlb'
     };
     return aliases[key] || key;
 }
@@ -155,15 +158,15 @@ function sportSpecificPrefixes(sport) {
     const mapped = {
         football: 'API_FOOTBALL_KEY',
         basketball: 'API_BASKETBALL_KEY',
-        baseball: 'API_BASEBALL_KEY',
-        hockey: 'API_HOCKEY_KEY',
+        mlb: 'API_BASEBALL_KEY',
+        nhl: 'API_HOCKEY_KEY',
         rugby: 'API_RUGBY_KEY',
-        american_football: 'API_NFL_KEY',
+        nfl: 'API_NFL_KEY',
         volleyball: 'API_VOLLEYBALL_KEY',
         handball: 'API_HANDBALL_KEY',
         afl: 'API_AFL_KEY',
         mma: 'API_MMA_KEY',
-        formula1: 'API_FORMULA1_KEY',
+        f1: 'API_FORMULA1_KEY',
         cricket: 'API_CRICKET_KEY',
         tennis: 'API_TENNIS_KEY'
     };
