@@ -324,6 +324,38 @@
 
 })();
 
+// Global Modal Functions for Sports Market Hub
+window.openMatchDetail = function(cardId) {
+    const prediction = SMH_CARD_REGISTRY.get(cardId);
+    if (!prediction) {
+        console.error('[SMH] No prediction found for card ID:', cardId);
+        alert('Match details not found.');
+        return;
+    }
+
+    const match = (prediction.matches && prediction.matches[0]) ? prediction.matches[0] : {};
+    const home = match.home_team || (match.metadata && match.metadata.home_team) || 'Home';
+    const away = match.away_team || (match.metadata && match.metadata.away_team) || 'Away';
+    const pick = match.prediction || match.recommendation || (match.metadata && match.metadata.prediction) || 'N/A';
+    const confidence = Math.round(Number(prediction.total_confidence || match.confidence || 0));
+    const market = String(match.market || (match.metadata && match.metadata.market) || '1X2').toUpperCase();
+
+    const details = `
+Match: ${home} vs ${away}
+Market: ${market}
+Pick: ${String(pick).replace(/_/g, ' ').toUpperCase()}
+Confidence: ${confidence}%
+    `.trim();
+
+    alert(details);
+    console.log('[SMH] Match details:', prediction);
+};
+
+window.closeMatchDetail = function() {
+    // Simple stub for now - can be expanded if a modal is added
+    console.log('[SMH] Close match detail');
+};
+
 // Bulletproof Global Click Listener for Insight Buttons
 document.body.addEventListener('click', function(e) {
     const btn = e.target.closest('.insight-btn');
