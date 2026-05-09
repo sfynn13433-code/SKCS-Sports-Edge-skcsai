@@ -71,6 +71,8 @@ const KNOWN_SPORTS = new Set([
     'NHL', 'AFL', 'Volleyball', 'Handball', 'darts'
 ]);
 
+const KNOWN_VOLATILITY = new Set(['low', 'medium', 'high']);
+
 function assert(condition, message) {
     if (!condition) {
         const err = new Error(message);
