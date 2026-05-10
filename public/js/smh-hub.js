@@ -445,6 +445,8 @@ window.openMatchDetail = function(cardId) {
     // Dynamically build secondary markets HTML with a robust fallback
     let secondaryMarketsHTML = '';
     let secInsights = prediction.secondary_insights || prediction.secondary_markets || [];
+    let dcHTML = '';
+    let smbHTML = '';
 
     // FALLBACK: If Supabase doesn't send the array, build a basic one from 1X2 data
     if (confidence < 59 && (!Array.isArray(secInsights) || secInsights.length === 0)) {
@@ -461,8 +463,8 @@ window.openMatchDetail = function(cardId) {
     }
 
     if (confidence < 59 && Array.isArray(secInsights) && secInsights.length > 0) {
-        let dcHTML = '';
-        let smbHTML = '';
+        dcHTML = '';
+        smbHTML = '';
 
         secInsights.forEach((insight, index) => {
             const marketLabel = (insight.market || insight.prediction || '').toLowerCase();
@@ -474,26 +476,19 @@ window.openMatchDetail = function(cardId) {
                  const titleClass = isPrimaryDC ? 'text-emerald-500' : 'text-slate-400';
                  const pctClass = isPrimaryDC ? 'text-emerald-400' : 'text-slate-300';
                  
-                 dcHTML += '<div class="flex-1 border rounded-md p-2 text-center ' + bgClass + '">' +
-                             '<div class="text-[10px] font-bold mb-1 ' + titleClass + '">' + (insight.market || insight.prediction) + '</div>' +
-                             '<div class="font-mono text-sm font-bold ' + pctClass + '">' + (insight.confidence || 0) + '%</div>' +
+                 dcHTML += '<div class="bg-emerald-900/20 border border-emerald-500/40 rounded-lg p-3 text-center shadow-[0_0_10px_rgba(16,185,129,0.05)]">' +
+                             '<div class="text-[10px] text-emerald-500 font-bold mb-1 uppercase">Double Chance</div>' +
+                             '<div class="font-bold text-emerald-400 text-sm">' + (insight.market || insight.prediction) + '</div>' +
+                             '<div class="font-mono text-xs text-emerald-500/70 mt-1">' + (insight.confidence || 0) + '% Conf</div>' +
                            '</div>';
             } else {
-                 smbHTML += '<div class="bg-indigo-950/30 border border-indigo-500/40 rounded-lg p-3 flex justify-between items-center group hover:bg-indigo-900/40 transition-colors cursor-pointer mb-2">' +
-                                 '<div>' +
-                                     '<div class="text-sm font-bold text-indigo-300 flex items-center gap-2">' + (insight.market || insight.prediction) + '</div>' +
-                                     '<div class="text-[10px] text-indigo-400/70 mt-1 flex gap-2">' +
-                                         '<span class="bg-indigo-900/50 px-1.5 py-0.5 rounded border border-indigo-700/50">Strong Correlation</span>' +
-                                     '</div>' +
-                                 '</div>' +
-                                 '<div class="text-xl font-mono font-bold text-white">' + (insight.confidence || 0) + '%</div>' +
-                             '</div>';
+                 smbHTML += '<tr class="hover:bg-slate-800/30"><td class="py-2 px-4">' + (insight.market || insight.prediction) + '</td><td class="py-2 px-4 font-bold text-white text-right">' + (insight.confidence || 0) + '%</td></tr>';
             }
         });
 
         // If no Same-Match builds were found or generated, provide a placeholder so the section doesn't look broken
         if (smbHTML === '') {
-            smbHTML = '<div class="text-xs text-slate-500 italic p-2">Pending correlation analysis...</div>';
+            smbHTML = '<tr class="hover:bg-slate-800/30"><td class="py-2 px-4 text-xs text-slate-500 italic" colspan="2">Pending correlation analysis...</td></tr>';
         }
 
         secondaryMarketsHTML = 
@@ -519,6 +514,9 @@ window.openMatchDetail = function(cardId) {
             '</div>';
     }
 
+    if (!dcHTML) dcHTML = '<div class="bg-slate-800/40 border border-slate-700 rounded-lg p-3 text-center"><div class="text-xs text-slate-500 italic">Pending analysis...</div></div>';
+    if (!smbHTML) smbHTML = '<tr class="hover:bg-slate-800/30"><td class="py-2 px-4 text-xs text-slate-500 italic" colspan="2">Pending correlation analysis...</td></tr>';
+
     // Create modal if it doesn't exist
     let modal = document.getElementById('skcsMatchDetailModal');
     if (!modal) {
@@ -541,49 +539,45 @@ window.openMatchDetail = function(cardId) {
     if (body) {
         body.innerHTML = `
 <div class="bg-[#0f172a] text-slate-300 rounded-xl overflow-hidden shadow-2xl border border-slate-700/50 flex flex-col max-h-[85vh]">
-
     <div class="bg-slate-900 p-6 border-b border-slate-800">
         <div class="flex justify-between items-start mb-4">
             <div>
                 <div class="text-[10px] uppercase tracking-widest text-slate-400 mb-1 flex items-center gap-2">
-                    <span>🇫🇷 France</span> <span class="w-1 h-1 bg-slate-600 rounded-full"></span> <span>Ligue 1</span>
+                    <span>${prediction.country || 'Global'}</span> <span class="w-1 h-1 bg-slate-600 rounded-full"></span> <span>${prediction.league || 'League'}</span>
                 </div>
-                <h2 class="text-2xl font-bold text-white tracking-tight">Angers SCO <span class="text-slate-500 font-normal text-lg mx-1">vs</span> RC Strasbourg</h2>
+                <h2 class="text-2xl font-bold text-white tracking-tight">${prediction.homeTeam || 'Home Team'} <span class="text-slate-500 font-normal text-lg mx-1">vs</span> ${prediction.awayTeam || 'Away Team'}</h2>
             </div>
             <div class="text-right">
-                <div class="text-xs font-mono text-slate-400">Sun, 10 May 2026</div>
-                <div class="text-sm font-bold text-slate-300">19:00 UTC</div>
+                <div class="text-xs font-mono text-slate-400">${prediction.date || 'TBD'}</div>
+                <div class="text-sm font-bold text-slate-300">${prediction.time || 'TBD'}</div>
             </div>
         </div>
         <div class="flex gap-2">
-            <span class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-[10px] text-slate-300">🌤️ Unavailable</span>
-            <span class="bg-emerald-900/30 border border-emerald-800/50 px-2 py-1 rounded text-[10px] text-emerald-400">👥 No major absences</span>
+            <span class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-[10px] text-slate-300">🌤️ ${prediction.weather || 'Unavailable'}</span>
+            <span class="bg-emerald-900/30 border border-emerald-800/50 px-2 py-1 rounded text-[10px] text-emerald-400">👥 ${prediction.injuries || 'No major absences'}</span>
         </div>
     </div>
 
     <div class="p-6 overflow-y-auto custom-scrollbar space-y-8">
-
         <section>
             <h3 class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3 flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-blue-500"></span> Direct 1X2 & EdgeMind Analysis
             </h3>
-
             <div class="bg-slate-800/40 border border-slate-700/50 rounded-t-lg p-4 flex justify-between">
-                <div class="text-center flex-1 border-r border-slate-700/50"><div class="text-[10px] text-slate-400 mb-1">HT (1)</div><div class="text-lg font-mono font-bold text-white">45%</div></div>
-                <div class="text-center flex-1 border-r border-slate-700/50"><div class="text-[10px] text-slate-400 mb-1">D (X)</div><div class="text-lg font-mono font-bold text-slate-300">35%</div></div>
-                <div class="text-center flex-1"><div class="text-[10px] text-slate-400 mb-1">AT (2)</div><div class="text-lg font-mono font-bold text-slate-400">20%</div></div>
+                <div class="text-center flex-1 border-r border-slate-700/50"><div class="text-[10px] text-slate-400 mb-1">HT (1)</div><div class="text-lg font-mono font-bold text-white">${prediction.home || 45}%</div></div>
+                <div class="text-center flex-1 border-r border-slate-700/50"><div class="text-[10px] text-slate-400 mb-1">D (X)</div><div class="text-lg font-mono font-bold text-slate-300">${prediction.draw || 35}%</div></div>
+                <div class="text-center flex-1"><div class="text-[10px] text-slate-400 mb-1">AT (2)</div><div class="text-lg font-mono font-bold text-slate-400">${prediction.away || 20}%</div></div>
             </div>
-
             <div class="bg-slate-900 border-x border-b border-slate-700/50 rounded-b-lg p-4">
                 <div class="flex justify-between items-center mb-3">
                     <div class="text-sm font-bold text-white flex items-center gap-2">🤖 EdgeMind BOT</div>
-                    <div class="bg-amber-900/30 border border-amber-500/50 text-amber-500 px-2 py-0.5 rounded text-[10px] font-bold uppercase">Medium Viability</div>
+                    <div class="bg-amber-900/30 border border-amber-500/50 text-amber-500 px-2 py-0.5 rounded text-[10px] font-bold uppercase">${confidence >= 70 ? 'High' : (confidence >= 59 ? 'Medium' : 'Low')} Viability</div>
                 </div>
                 <div class="w-full bg-slate-800 rounded-full h-1.5 mb-3">
-                    <div class="bg-amber-500 h-1.5 rounded-full" style="width: 58%"></div>
+                    <div class="bg-amber-500 h-1.5 rounded-full" style="width: ${confidence}%"></div>
                 </div>
                 <p class="text-[11px] text-slate-400 leading-relaxed">
-                    The primary 1X2 outcome holds a <span class="text-white font-bold">58% confidence</span> rating. Match tempo is highly unpredictable. We strongly advise utilizing a risk-adjusted secondary insight or value combo for this fixture.
+                    The primary 1X2 outcome holds a <span class="text-white font-bold">${confidence}% confidence</span> rating. ${confidence < 59 ? 'Match tempo is highly unpredictable. We strongly advise utilizing a risk-adjusted secondary insight.' : 'This indicates a stable market probability.'}
                 </p>
             </div>
         </section>
@@ -593,26 +587,7 @@ window.openMatchDetail = function(cardId) {
                 <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Secondary Alternatives
             </h3>
             <div class="grid grid-cols-2 gap-3">
-                <div class="bg-emerald-900/20 border border-emerald-500/40 rounded-lg p-3 text-center shadow-[0_0_10px_rgba(16,185,129,0.05)]">
-                    <div class="text-[10px] text-emerald-500 font-bold mb-1 uppercase">Double Chance</div>
-                    <div class="font-bold text-emerald-400 text-sm">1X (Home/Draw)</div>
-                    <div class="font-mono text-xs text-emerald-500/70 mt-1">80% Conf</div>
-                </div>
-                <div class="bg-slate-800/40 border border-slate-700 rounded-lg p-3 text-center">
-                    <div class="text-[10px] text-slate-400 font-bold mb-1 uppercase">Draw No Bet</div>
-                    <div class="font-bold text-slate-200 text-sm">Home (DNB)</div>
-                    <div class="font-mono text-xs text-slate-500 mt-1">72% Conf</div>
-                </div>
-                <div class="bg-slate-800/40 border border-slate-700 rounded-lg p-3 text-center">
-                    <div class="text-[10px] text-slate-400 font-bold mb-1 uppercase">Totals</div>
-                    <div class="font-bold text-slate-200 text-sm">Under 3.5 Goals</div>
-                    <div class="font-mono text-xs text-slate-500 mt-1">85% Conf</div>
-                </div>
-                <div class="bg-slate-800/40 border border-slate-700 rounded-lg p-3 text-center">
-                    <div class="text-[10px] text-slate-400 font-bold mb-1 uppercase">Halves</div>
-                    <div class="font-bold text-slate-200 text-sm">Over 0.5 First Half</div>
-                    <div class="font-mono text-xs text-slate-500 mt-1">68% Conf</div>
-                </div>
+                ${dcHTML || '<div class="text-xs text-slate-500 col-span-2">No secondary markets available.</div>'}
             </div>
         </section>
 
@@ -627,15 +602,7 @@ window.openMatchDetail = function(cardId) {
                         <span class="text-slate-500 text-xs">+</span>
                         <span class="bg-slate-900 border border-slate-600 px-2 py-1 rounded text-xs font-bold text-white">Over 1.5 Goals</span>
                     </div>
-                    <div class="font-mono font-bold text-purple-400">74%</div>
-                </div>
-                <div class="bg-slate-800/40 border border-slate-700 rounded-lg p-3 flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <span class="bg-slate-900 border border-slate-600 px-2 py-1 rounded text-xs font-bold text-white">BTTS YES</span>
-                        <span class="text-slate-500 text-xs">+</span>
-                        <span class="bg-slate-900 border border-slate-600 px-2 py-1 rounded text-xs font-bold text-white">Over 2.5 Goals</span>
-                    </div>
-                    <div class="font-mono font-bold text-slate-300">61%</div>
+                    <div class="font-mono font-bold text-purple-400">Pending Data</div>
                 </div>
             </div>
         </section>
@@ -644,26 +611,10 @@ window.openMatchDetail = function(cardId) {
             <h3 class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3 flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-indigo-500"></span> Same Match Builder
             </h3>
-            <div class="bg-indigo-950/20 border border-indigo-900/50 rounded-lg overflow-hidden">
-                <div class="bg-indigo-900/40 px-4 py-2 flex justify-between items-center border-b border-indigo-900/50">
-                    <span class="text-xs font-bold text-indigo-300">6-Leg Correlation Build</span>
-                    <span class="text-sm font-mono font-bold text-indigo-400">42% Success Rate</span>
-                </div>
-                <div class="p-0">
-                    <table class="w-full text-left text-xs text-slate-300">
-                        <tbody class="divide-y divide-slate-800/50">
-                            <tr class="hover:bg-slate-800/30"><td class="py-2 px-4">1. Double Chance</td><td class="py-2 px-4 font-bold text-white text-right">1X (Home/Draw)</td></tr>
-                            <tr class="hover:bg-slate-800/30"><td class="py-2 px-4">2. Match Goals</td><td class="py-2 px-4 font-bold text-white text-right">Under 3.5 Goals</td></tr>
-                            <tr class="hover:bg-slate-800/30"><td class="py-2 px-4">3. Both Teams to Score</td><td class="py-2 px-4 font-bold text-white text-right">No</td></tr>
-                            <tr class="hover:bg-slate-800/30"><td class="py-2 px-4">4. Match Corners</td><td class="py-2 px-4 font-bold text-white text-right">Under 10.5 Corners</td></tr>
-                            <tr class="hover:bg-slate-800/30"><td class="py-2 px-4">5. Team Goals</td><td class="py-2 px-4 font-bold text-white text-right">Home Over 0.5</td></tr>
-                            <tr class="hover:bg-slate-800/30"><td class="py-2 px-4">6. First Half Goals</td><td class="py-2 px-4 font-bold text-white text-right">Under 1.5 Goals</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="bg-indigo-950/20 border border-indigo-900/50 rounded-lg overflow-hidden p-2">
+                ${smbHTML || '<div class="text-xs text-slate-500 italic">Pending correlation analysis...</div>'}
             </div>
         </section>
-
     </div>
 </div>
 `;
