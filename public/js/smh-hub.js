@@ -437,6 +437,66 @@ window.openMatchDetail = function(cardId) {
         insights.stability ? '<span style="font-size:0.78rem;background:rgba(251,191,36,0.1);color:#fbbf24;padding:4px 10px;border-radius:20px;">📊 ' + insights.stability + '</span>' : ''
     ].filter(Boolean).join(' ');
 
+    // Dynamically build secondary markets HTML based on backend governance (< 59% EXTREME_RISK)
+    let secondaryMarketsHTML = '';
+    const secInsights = prediction.secondary_insights || prediction.secondary_markets || [];
+
+    if (confidence < 59 && Array.isArray(secInsights) && secInsights.length > 0) {
+        let dcHTML = '';
+        let smbHTML = '';
+
+        secInsights.forEach((insight, index) => {
+            const marketLabel = (insight.market || insight.prediction || '').toLowerCase();
+            const isDoubleChance = marketLabel.includes('double chance') || marketLabel.includes('1x') || marketLabel.includes('12') || marketLabel.includes('x2');
+            
+            if (isDoubleChance) {
+                 const isPrimaryDC = index === 0;
+                 const bgClass = isPrimaryDC ? 'bg-emerald-900/20 border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.1)]' : 'bg-slate-800/50 border-slate-700';
+                 const titleClass = isPrimaryDC ? 'text-emerald-500' : 'text-slate-400';
+                 const pctClass = isPrimaryDC ? 'text-emerald-400' : 'text-slate-300';
+                 
+                 dcHTML += '<div class="flex-1 border rounded-md p-2 text-center ' + bgClass + '">' +
+                             '<div class="text-[10px] font-bold mb-1 ' + titleClass + '">' + (insight.market || insight.prediction) + '</div>' +
+                             '<div class="font-mono text-sm font-bold ' + pctClass + '">' + (insight.confidence || 0) + '%</div>' +
+                         '</div>';
+            } else {
+                 smbHTML += '<div class="bg-indigo-950/30 border border-indigo-500/40 rounded-lg p-3 flex justify-between items-center group hover:bg-indigo-900/40 transition-colors cursor-pointer mb-2">' +
+                             '<div>' +
+                                 '<div class="text-sm font-bold text-indigo-300 flex items-center gap-2">' +
+                                     (insight.market || insight.prediction) +
+                                 '</div>' +
+                                 '<div class="text-[10px] text-indigo-400/70 mt-1 flex gap-2">' +
+                                     '<span class="bg-indigo-900/50 px-1.5 py-0.5 rounded border border-indigo-700/50">Strong Correlation</span>' +
+                                 '</div>' +
+                             '</div>' +
+                             '<div class="text-xl font-mono font-bold text-white">' + (insight.confidence || 0) + '%</div>' +
+                         '</div>';
+            }
+        });
+
+        secondaryMarketsHTML = 
+            '<div class="mt-4 bg-amber-950/40 border border-amber-700/50 rounded-lg p-3 flex items-start gap-3">' +
+                '<span class="text-amber-500 mt-0.5">⚠️</span>' +
+                '<div>' +
+                    '<h4 class="text-[11px] font-bold text-amber-500 uppercase tracking-wide">High Variance Alert</h4>' +
+                    '<p class="text-[11px] text-amber-200/70 mt-1 leading-relaxed">The 1X2 outcome carries higher risk for this fixture. Consider the risk-adjusted secondary markets below.</p>' +
+                '</div>' +
+            '</div>' +
+            '<div class="mt-6 border-t border-slate-700/50 pt-5">' +
+                '<h3 class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">' +
+                    '<span class="w-2 h-2 rounded-full bg-blue-500"></span> Secondary Alternatives' +
+                '</h3>' +
+                '<div class="mb-5">' +
+                    '<h4 class="text-[10px] uppercase text-slate-500 font-bold mb-2">Double Chance</h4>' +
+                    '<div class="flex gap-2">' + dcHTML + '</div>' +
+                '</div>' +
+                '<div>' +
+                    '<h4 class="text-[10px] uppercase text-slate-500 font-bold mb-2">Correlated Markets <span>(S)</span></h4>' +
+                    smbHTML +
+                '</div>' +
+            '</div>';
+    }
+
     // Create modal if it doesn't exist
     let modal = document.getElementById('skcsMatchDetailModal');
     if (!modal) {
@@ -466,50 +526,7 @@ window.openMatchDetail = function(cardId) {
                     '<span style="font-size:0.8rem;font-weight:700;color:' + confColor(confidence) + ';">⚡ ' + confidence + '% overall confidence</span>' +
                 '</div>' +
                 (chips ? '<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">' + chips + '</div>' : '') +
-                '<div class="mt-4 bg-amber-950/40 border border-amber-700/50 rounded-lg p-3 flex items-start gap-3">' +
-                    '<span class="text-amber-500 mt-0.5">⚠️</span>' +
-                    '<div>' +
-                        '<h4 class="text-[11px] font-bold text-amber-500 uppercase tracking-wide">High Variance Alert</h4>' +
-                        '<p class="text-[11px] text-amber-200/70 mt-1 leading-relaxed">The 1X2 outcome carries higher risk for this fixture. Consider the risk-adjusted Double Chance or Same-Match combinations below.</p>' +
-                    '</div>' +
-                '</div>' +
-                '<div class="mt-6 border-t border-slate-700/50 pt-5">' +
-                    '<h3 class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">' +
-                        '<span class="w-2 h-2 rounded-full bg-blue-500"></span> Secondary Alternatives' +
-                    '</h3>' +
-                    '<div class="mb-5">' +
-                        '<h4 class="text-[10px] uppercase text-slate-500 font-bold mb-2">Double Chance</h4>' +
-                        '<div class="flex gap-2">' +
-                            '<div class="flex-1 bg-emerald-900/20 border border-emerald-500/40 rounded-md p-2 text-center shadow-[0_0_10px_rgba(16,185,129,0.1)]">' +
-                                '<div class="text-[10px] font-bold text-emerald-500 mb-1">1X (Home/Draw)</div>' +
-                                '<div class="font-mono text-sm font-bold text-emerald-400">80%</div>' +
-                            '</div>' +
-                            '<div class="flex-1 bg-slate-800/50 border border-slate-700 rounded-md p-2 text-center">' +
-                                '<div class="text-[10px] text-slate-400 mb-1">12 (Any Winner)</div>' +
-                                '<div class="font-mono text-sm font-bold text-slate-300">75%</div>' +
-                            '</div>' +
-                            '<div class="flex-1 bg-slate-800/50 border border-slate-700 rounded-md p-2 text-center">' +
-                                '<div class="text-[10px] text-slate-400 mb-1">X2 (Draw/Away)</div>' +
-                                '<div class="font-mono text-sm font-bold text-slate-300">55%</div>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div>' +
-                        '<h4 class="text-[10px] uppercase text-slate-500 font-bold mb-2">Same-Match Build <span>(S)</span></h4>' +
-                        '<div class="bg-indigo-950/30 border border-indigo-500/40 rounded-lg p-3 flex justify-between items-center group hover:bg-indigo-900/40 transition-colors cursor-pointer">' +
-                            '<div>' +
-                                '<div class="text-sm font-bold text-indigo-300 flex items-center gap-2">' +
-                                    '1X + Under 3.5 Goals' +
-                                '</div>' +
-                                '<div class="text-[10px] text-indigo-400/70 mt-1 flex gap-2">' +
-                                    '<span class="bg-indigo-900/50 px-1.5 py-0.5 rounded border border-indigo-700/50">Strong Correlation</span>' +
-                                    '<span class="bg-emerald-900/50 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-700/50">Value Bet</span>' +
-                                '</div>' +
-                            '</div>' +
-                            '<div class="text-xl font-mono font-bold text-white">68%</div>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>' +
+                secondaryMarketsHTML +
             '</div>' +
             '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;">Market Breakdown</div>' +
             '<div class="market-1x2-breakdown" style="display: flex; justify-content: space-between; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 15px;">' +
