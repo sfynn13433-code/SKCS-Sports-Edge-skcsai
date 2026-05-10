@@ -329,6 +329,40 @@
 // Defined at top level for global scope access
 // ============================================
 
+// Data source for the pipeline UI
+const SKCS_PIPELINE_DATA = [
+    {
+        title: "📥 API Data Collection",
+        purpose: "Collect raw facts. No intelligence yet.",
+        json: `{\n  "homeTeam": "Arsenal",\n  "awayTeam": "Chelsea",\n  "odds": { "home": 1.85, "draw": 3.4, "away": 4.2 },\n  "weather": "Rain",\n  "injuries": ["Player A", "Player B"]\n}` 
+    },
+    {
+        title: "🔄 Data Normalization",
+        purpose: "Convert all APIs to uniform SKCS format. Clean, consistent fuel.",
+        json: `{\n  "match_id": "EPL_ARS_CHE_2026_02_10",\n  "teams": { "home": "Arsenal", "away": "Chelsea" },\n  "markets": { "1x2": { "home": 1.85, "draw": 3.4, "away": 4.2 } },\n  "context": { "weather": "Rain", "injuries": 2 }\n}` 
+    },
+    {
+        title: "🤖 AI Stage 1: Initial Prediction",
+        purpose: "Baseline probability analysis. 'On paper, who should win?'",
+        json: `{\n  "stage_1": {\n    "1x2": { "home": 54, "draw": 26, "away": 20 },\n    "confidence": "medium"\n  }\n}` 
+    },
+    {
+        title: "🧠 AI Stage 2: Deep Context",
+        purpose: "Team & Player Intelligence. Adjustments for injuries, fatigue, etc.",
+        json: `{\n  "stage_2": {\n    "adjustments": { "home": -6, "draw": +3, "away": +3 },\n    "confidence": "medium-low"\n  }\n}` 
+    },
+    {
+        title: "⚠️ AI Stage 3: Reality Check",
+        purpose: "External Factor Analysis. Volatility scoring based on news/weather.",
+        json: `{\n  "stage_3": {\n    "volatility": "high",\n    "risk_flags": ["weather", "team unrest"]\n  }\n}` 
+    },
+    {
+        title: "🎯 AI Stage 4: Decision Engine",
+        purpose: "Final SKCS Insights. Combine all stages for market recommendations.",
+        json: `{\n  "final_prediction": {\n    "recommended": ["Home Win", "Over 1.5"],\n    "avoid": ["BTTS"],\n    "acca_safe": false,\n    "confidence": 72\n  }\n}` 
+    }
+];
+
 window.openMatchDetail = function(cardId) {
     const prediction = window.SMH_CARD_REGISTRY.get(cardId);
     if (!prediction) {
@@ -529,6 +563,46 @@ document.body.addEventListener('click', function(e) {
                 node.style.background = '#334155';
                 node.style.color = '#cbd5e1';
                 btn.querySelector('span:first-child').style.color = '#cbd5e1';
+            }
+        });
+    }
+
+    // Global Event Delegation for Pipeline Stepper
+    const stepBtn = e.target.closest('.pipeline-step-btn');
+    if (stepBtn) {
+        const index = parseInt(stepBtn.getAttribute('data-index'));
+        const data = SKCS_PIPELINE_DATA[index];
+        
+        if (!data) return;
+
+        // Update Terminal Content
+        var terminalTitle = document.getElementById('terminal-title');
+        var terminalPurpose = document.getElementById('terminal-purpose');
+        var terminalJson = document.getElementById('terminal-json');
+        var terminalBadge = document.getElementById('terminal-stage-badge');
+        
+        if (terminalTitle) terminalTitle.innerHTML = data.title;
+        if (terminalPurpose) terminalPurpose.innerText = 'Purpose: ' + data.purpose;
+        if (terminalJson) terminalJson.textContent = data.json;
+        if (terminalBadge) terminalBadge.innerText = 'STAGE ' + (index + 1) + '/6';
+
+        // Update UI States for all buttons
+        document.querySelectorAll('.pipeline-step-btn').forEach(function(btn, i) {
+            var circle = btn.querySelector('.step-circle');
+            var label = btn.querySelector('.step-label');
+            
+            if (i === index) {
+                // Active State
+                circle.className = "w-10 h-10 rounded-full bg-blue-500 border-4 border-slate-900 flex items-center justify-center text-white font-bold shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-all step-circle";
+                label.className = "mt-2 text-xs font-semibold text-blue-400 step-label";
+            } else if (i < index) {
+                // Completed State
+                circle.className = "w-10 h-10 rounded-full bg-blue-800 border-4 border-slate-900 flex items-center justify-center text-blue-300 transition-all step-circle";
+                label.className = "mt-2 text-xs font-semibold text-slate-500 step-label";
+            } else {
+                // Future State
+                circle.className = "w-10 h-10 rounded-full bg-slate-700 border-4 border-slate-900 flex items-center justify-center text-slate-400 transition-all step-circle";
+                label.className = "mt-2 text-xs font-semibold text-slate-600 step-label";
             }
         });
     }

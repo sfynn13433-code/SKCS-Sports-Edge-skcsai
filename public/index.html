@@ -54,27 +54,6 @@
         .pipeline-section { background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%); color: white; padding: 5rem 2rem; margin: 4rem 0; position: relative; overflow: hidden; }
         .pipeline-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" opacity="0.05"><path d="M0,0H1000V1000H0Z" stroke="none"/><path d="M250,250H750V750H250Z" stroke="white" stroke-width="2" fill="none"/></svg>'); background-size: 300px; }
         .pipeline-container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
-        .pipeline-timeline { position: relative; margin: 4rem 0; }
-        .pipeline-timeline::before { content: ''; position: absolute; left: 30px; top: 0; bottom: 0; width: 4px; background: rgba(255, 255, 255, 0.3); border-radius: 2px; }
-        .pipeline-stage { display: flex; margin-bottom: 3rem; position: relative; }
-        .stage-number { width: 60px; height: 60px; background: white; color: #0d6efd; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin-right: 2rem; flex-shrink: 0; z-index: 2; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .stage-content { flex: 1; background: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 1.5rem; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
-        .stage-content h3 { color: white; margin-bottom: 1rem; font-size: 1.4rem; display: flex; align-items: center; gap: 10px; }
-        .stage-icon { font-size: 1.8rem; }
-        .stage-card { background: rgba(0, 0, 0, 0.3); border-radius: 8px; padding: 1.5rem; margin-top: 1rem; }
-        .stage-card h4 { color: #6ea8fe; margin-bottom: 1rem; font-size: 1.1rem; }
-        .stage-card pre { background: rgba(0, 0, 0, 0.5); border-radius: 6px; padding: 1rem; overflow-x: auto; margin: 1rem 0; border-left: 3px solid #6ea8fe; }
-        .stage-card code { color: #f0f0f0; font-family: 'Courier New', monospace; font-size: 0.9rem; }
-        .stage-card p { color: #e0e0e0; margin: 0.5rem 0; font-size: 0.95rem; }
-        .stage-card strong { color: white; }
-        .pipeline-summary { background: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 2.5rem; margin-top: 3rem; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
-        .pipeline-summary h3 { color: white; text-align: center; margin-bottom: 2rem; font-size: 1.8rem; }
-        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
-        .summary-item { background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 1.5rem; text-align: center; border-top: 3px solid #6ea8fe; }
-        .summary-item h4 { color: #6ea8fe; margin-bottom: 0.8rem; font-size: 1.2rem; }
-        .summary-item p { color: #e0e0e0; font-size: 0.95rem; line-height: 1.5; }
-        .disclaimer-note { background: rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 1.5rem; margin-top: 2rem; border-left: 4px solid #6ea8fe; }
-        .disclaimer-note p { color: white; font-size: 1rem; line-height: 1.6; margin: 0; }
         .predictions-section { max-width: 1400px; margin: 4rem auto; padding: 0 1rem; }
         .tabs-container { background: white; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); overflow: hidden; }
         .tabs-header { display: flex; background-color: #ffffff; border-bottom: 2px solid #e9ecef; overflow-x: auto; scrollbar-width: none; }
@@ -177,8 +156,7 @@
         .policy-badge { display: inline-block; background: #e7f1ff; color: #0d6efd; border: 1px solid #bfd7ff; border-radius: 999px; padding: 0.55rem 1rem; font-weight: 700; margin: 0 auto 1rem; }
         .policy-note { max-width: 1200px; margin: 0 auto 1.75rem auto; text-align: center; color: #495057; }
         .copyright { margin-top: 1rem; color: #adb5bd; font-size: 0.9rem; }
-        @media (max-width: 768px) { .pipeline-timeline::before { left: 25px; } .stage-number { width: 50px; height: 50px; margin-right: 1.5rem; font-size: 1.3rem; } .stage-content h3 { font-size: 1.2rem; } .stage-icon { font-size: 1.5rem; } }
-        @media (max-width: 480px) { .pipeline-stage { flex-direction: column; } .stage-number { margin-bottom: 1rem; margin-right: 0; } .pipeline-timeline::before { left: 25px; } .summary-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .pipeline-section { padding: 3rem 1rem; } }
         .subscribe-btn { background-color: #198754; color: white; padding: 0.6rem 1.4rem; border-radius: 6px; font-weight: bold; text-decoration: none; transition: background-color 0.3s; }
         .subscribe-btn:hover { background-color: #146c43; }
         .language-link { color: white; font-weight: bold; text-decoration: none; padding: 0.6rem 1.2rem; border-radius: 6px; transition: background 0.3s; }
@@ -446,138 +424,66 @@
     <!-- Pipeline Section -->
     <section id="pipeline" class="pipeline-section">
         <div class="pipeline-container">
-            <h2 class="section-title">The SKCS AI Analysis Pipeline</h2>
-            <p class="section-description">6-stage AI process transforming raw API data into confidence-based sports insights</p>
-            <div class="pipeline-timeline">
-                <!-- Stage 1 -->
-                <div class="pipeline-stage">
-                    <div class="stage-number">1</div>
-                    <div class="stage-content">
-                        <h3><span class="stage-icon">📥</span> API Data Collection</h3>
-                        <div class="stage-card">
-                            <h4>Raw JSON Input</h4>
-                            <pre><code>{
+            <div class="max-w-4xl mx-auto my-12 p-6" id="interactive-pipeline-section">
+                <div class="text-center mb-10">
+                    <h2 class="text-2xl font-bold text-white mb-2">How the Decision Engine Works</h2>
+                    <p class="text-slate-400">Click through the steps to see how we process raw data into actionable insights.</p>
+                </div>
+
+                <div class="flex items-center justify-between mb-8 relative">
+                    <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-slate-700 -z-10 rounded"></div>
+                    
+                    <button class="pipeline-step-btn relative flex flex-col items-center group active" data-index="0">
+                        <div class="w-10 h-10 rounded-full bg-blue-500 border-4 border-slate-900 flex items-center justify-center text-white font-bold shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-all step-circle">1</div>
+                        <span class="mt-2 text-xs font-semibold text-blue-400 step-label">Step 1</span>
+                    </button>
+                    <button class="pipeline-step-btn relative flex flex-col items-center group" data-index="1">
+                        <div class="w-10 h-10 rounded-full bg-slate-700 border-4 border-slate-900 flex items-center justify-center text-slate-300 transition-all step-circle">2</div>
+                        <span class="mt-2 text-xs font-semibold text-slate-500 step-label">Step 2</span>
+                    </button>
+                    <button class="pipeline-step-btn relative flex flex-col items-center group" data-index="2">
+                        <div class="w-10 h-10 rounded-full bg-slate-700 border-4 border-slate-900 flex items-center justify-center text-slate-300 transition-all step-circle">3</div>
+                        <span class="mt-2 text-xs font-semibold text-slate-500 step-label">Step 3</span>
+                    </button>
+                    <button class="pipeline-step-btn relative flex flex-col items-center group" data-index="3">
+                        <div class="w-10 h-10 rounded-full bg-slate-700 border-4 border-slate-900 flex items-center justify-center text-slate-300 transition-all step-circle">4</div>
+                        <span class="mt-2 text-xs font-semibold text-slate-500 step-label">Step 4</span>
+                    </button>
+                    <button class="pipeline-step-btn relative flex flex-col items-center group" data-index="4">
+                        <div class="w-10 h-10 rounded-full bg-slate-700 border-4 border-slate-900 flex items-center justify-center text-slate-300 transition-all step-circle">5</div>
+                        <span class="mt-2 text-xs font-semibold text-slate-500 step-label">Step 5</span>
+                    </button>
+                    <button class="pipeline-step-btn relative flex flex-col items-center group" data-index="5">
+                        <div class="w-10 h-10 rounded-full bg-slate-700 border-4 border-slate-900 flex items-center justify-center text-slate-300 transition-all step-circle">6</div>
+                        <span class="mt-2 text-xs font-semibold text-slate-500 step-label">Step 6</span>
+                    </button>
+                </div>
+
+                <div class="bg-[#1e1e2e] rounded-xl shadow-2xl border border-slate-700/50 overflow-hidden relative min-h-[350px]">
+                    <div class="bg-[#181825] px-4 py-3 flex items-center justify-between border-b border-slate-700/50">
+                        <div class="flex space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-rose-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                        </div>
+                        <div class="text-xs font-mono text-slate-400 bg-slate-800/50 px-3 py-1 rounded-full border border-slate-700" id="terminal-stage-badge">STAGE 1/6</div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2" id="terminal-title">📥 API Data Collection</h3>
+                        <p class="text-sm text-slate-400 mb-4" id="terminal-purpose">Purpose: Collect raw facts. No intelligence yet.</p>
+                        
+                        <pre class="bg-[#11111b] p-4 rounded-lg overflow-x-auto border border-slate-800/50"><code class="font-mono text-[13px] text-emerald-400" id="terminal-json">
+{
   "homeTeam": "Arsenal",
   "awayTeam": "Chelsea",
   "odds": { "home": 1.85, "draw": 3.4, "away": 4.2 },
   "weather": "Rain",
   "injuries": ["Player A", "Player B"]
-}</code></pre>
-                            <p><strong>Input:</strong> Multiple API sources (fixtures, odds, stats, injuries, weather)</p>
-                            <p><strong>Output:</strong> Raw structured JSON</p>
-                            <p><strong>Status:</strong> ✅ Facts collected, ❌ No intelligence yet</p>
-                        </div>
+}
+                        </code></pre>
                     </div>
                 </div>
-                <!-- Stage 2 -->
-                <div class="pipeline-stage">
-                    <div class="stage-number">2</div>
-                    <div class="stage-content">
-                        <h3><span class="stage-icon">🔄</span> Data Normalization</h3>
-                        <div class="stage-card">
-                            <h4>SKCS Standard Format</h4>
-                            <pre><code>{
-  "match_id": "EPL_ARS_CHE_2026_02_10",
-  "teams": { "home": "Arsenal", "away": "Chelsea" },
-  "markets": { "1x2": { "home": 1.85, "draw": 3.4, "away": 4.2 } },
-  "context": { "weather": "Rain", "injuries": 2 }
-}</code></pre>
-                            <p><strong>Process:</strong> Convert all APIs to uniform SKCS format</p>
-                            <p><strong>Purpose:</strong> Clean, consistent fuel for AI stages</p>
-                            <p><strong>Key:</strong> Same structure across all 13 sports</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Stage 3 -->
-                <div class="pipeline-stage">
-                    <div class="stage-number">3</div>
-                    <div class="stage-content">
-                        <h3><span class="stage-icon">🤖</span> AI Stage 1: Initial Prediction</h3>
-                        <div class="stage-card">
-                            <h4>Baseline Probability Analysis</h4>
-                            <pre><code>{
-  "stage_1": {
-    "1x2": { "home": 54, "draw": 26, "away": 20 },
-    "confidence": "medium"
-  }
-}</code></pre>
-                            <p><strong>Input:</strong> Normalized data + historical stats</p>
-                            <p><strong>Question:</strong> "On paper, who should win?"</p>
-                            <p><strong>Output:</strong> Initial probabilities & confidence flags</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Stage 4 -->
-                <div class="pipeline-stage">
-                    <div class="stage-number">4</div>
-                    <div class="stage-content">
-                        <h3><span class="stage-icon">🧠</span> AI Stage 2: Deep Context</h3>
-                        <div class="stage-card">
-                            <h4>Team & Player Intelligence</h4>
-                            <pre><code>{
-  "stage_2": {
-    "adjustments": { "home": -6, "draw": +3, "away": +3 },
-    "confidence": "medium-low"
-  }
-}</code></pre>
-                            <p><strong>Factors:</strong> Injuries, suspensions, manager changes, fatigue</p>
-                            <p><strong>Example Logic:</strong> Missing striker → reduce goal expectancy</p>
-                            <p><strong>Purpose:</strong> Human-like analyst thinking</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Stage 5 -->
-                <div class="pipeline-stage">
-                    <div class="stage-number">5</div>
-                    <div class="stage-content">
-                        <h3><span class="stage-icon">⚠️</span> AI Stage 3: Reality Check</h3>
-                        <div class="stage-card">
-                            <h4>External Factor Analysis</h4>
-                            <pre><code>{
-  "stage_3": {
-    "volatility": "high",
-    "risk_flags": ["weather", "team unrest"]
-  }
-}</code></pre>
-                            <p><strong>Input:</strong> News, press conferences, weather impact, travel</p>
-                            <p><strong>Question:</strong> "What's happening that stats don't show?"</p>
-                            <p><strong>Output:</strong> Volatility scoring & risk flags</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Stage 6 -->
-                <div class="pipeline-stage">
-                    <div class="stage-number">6</div>
-                    <div class="stage-content">
-                        <h3><span class="stage-icon">🎯</span> AI Stage 4: Decision Engine</h3>
-                        <div class="stage-card">
-                            <h4>Final SKCS Insights</h4>
-                            <pre><code>{
-  "final_prediction": {
-    "recommended": ["Home Win", "Over 1.5"],
-    "avoid": ["BTTS"],
-    "acca_safe": false,
-    "confidence": 72
-  }
-}</code></pre>
-                            <p><strong>Process:</strong> Combine all 5 previous stages</p>
-                            <p><strong>Output:</strong> Market-specific recommendations</p>
-                            <p><strong>Filtering:</strong> 1X2 > Multi Bets > Same-Match > Accumulators</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Pipeline Summary -->
-            <div class="pipeline-summary">
-                <h3>⚙️ How This Powers Your Insights</h3>
-                <div class="summary-grid">
-                    <div class="summary-item"><h4>1X2 Markets</h4><p>Must survive <strong>all 6 stages</strong> with high confidence</p></div>
-                    <div class="summary-item"><h4>Multi Bets</h4><p>Built from <strong>low-correlation</strong> matches passing Stages 1-4</p></div>
-                    <div class="summary-item"><h4>Same-Match Bets</h4><p>Created after Stage 2, adjusted by Stage 3 volatility</p></div>
-                    <div class="summary-item"><h4>Accumulators</h4><p>Only matches passing <strong>all stages</strong> + kill-switch for volatility</p></div>
-                    <div class="summary-item"><h4>Single-Use Policy</h4><p>Once a match is published in one insight format, it is blocked from the other formats for the rest of the week</p></div>
-                </div>
-                <div class="disclaimer-note"><p>💡 <strong>Transparency First:</strong> We show our process so you understand our confidence scores. No black boxes, no hidden logic.</p></div>
             </div>
         </div>
     </section>
