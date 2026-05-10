@@ -148,6 +148,17 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
             cats.mega_acca_12        || []
         );
 
+        // FILTER: Only show predictions matching the current sport
+        var sportLower = sport.toLowerCase();
+        var filteredPredictions = allPredictions.filter(function(pred) {
+            var match = (pred.matches && pred.matches[0]) ? pred.matches[0] : {};
+            var meta = (match.metadata && typeof match.metadata === 'object') ? match.metadata : {};
+            
+            // Check sport in multiple possible locations
+            var predSport = (pred.sport || match.sport || meta.sport || '').toLowerCase();
+            return predSport === sportLower;
+        });
+
         console.log('[SMH] ' + sport + ' payload — source_rows=' + (data.source_rows || 0) + ', buckets:', {
             direct:              (cats.direct              || []).length,
             analytical_insights: (cats.analytical_insights || []).length,
@@ -156,9 +167,10 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
             acca_6match:         (cats.acca_6match         || []).length,
             mega_acca_12:        (cats.mega_acca_12        || []).length
         });
+        console.log('[SMH] ' + sport + ' filtering: ' + allPredictions.length + ' total -> ' + filteredPredictions.length + ' after sport filter');
 
         // ── Empty state ──────────────────────────────────────────────────────
-        if (allPredictions.length === 0) {
+        if (filteredPredictions.length === 0) {
             if (resultsPanel) resultsPanel.style.justifyContent = 'center';
             if (displayTitle) displayTitle.textContent = sport + ' \u2014 No Predictions Available';
 
@@ -184,7 +196,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
         // ── Populated state ──────────────────────────────────────────────────
         if (resultsPanel) resultsPanel.style.justifyContent = 'flex-start';
         if (displayTitle) {
-            displayTitle.textContent  = sport + ' \u00b7 ' + allPredictions.length + ' Insight' + (allPredictions.length !== 1 ? 's' : '');
+            displayTitle.textContent  = sport + ' \u00b7 ' + filteredPredictions.length + ' Insight' + (filteredPredictions.length !== 1 ? 's' : '');
             displayTitle.style.fontSize   = '1rem';
             displayTitle.style.color      = '#94a3b8';
             displayTitle.style.marginBottom = '16px';
@@ -196,7 +208,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
 
         var html = '<div class="results-scroll-container" style="width:100%;max-height:420px;overflow-y:auto;padding-right:8px;">';
 
-        allPredictions.forEach(function (pred) {
+        filteredPredictions.forEach(function (pred) {
             var sectionType  = pred.section_type || 'direct';
             var accentColor  = SECTION_COLORS[sectionType] || '#38bdf8';
             var sectionLabel = SECTION_LABELS[sectionType] || sectionType.replace(/_/g, ' ').toUpperCase();

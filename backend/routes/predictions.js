@@ -2222,6 +2222,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                         ORDER BY created_at DESC
                         LIMIT 2500;
                     `;
+                    // Sport column is included in SELECT for frontend filtering
                     queryParams = sportFilterValues.map(s => s.toLowerCase());
                 } else {
                     // No sport filter - return all
