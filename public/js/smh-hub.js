@@ -252,8 +252,8 @@
 
             // Dynamic risk logic for badges
             var isHighVariance = confidence < 59;
-            var pickTypeLabel  = isHighVariance ? "Risk-Adjusted" : sectionLabel;
-            var marketLabel    = isHighVariance ? "Double Chance" : market;
+            var pickTypeLabel  = isHighVariance ? "Risk-Adjusted" : "Direct Pick";
+            var marketLabel    = isHighVariance ? "Double Chance" : "1X2";
             var pickTypeColor  = isHighVariance ? "text-amber-500" : "text-slate-400";
             var marketBgColor  = isHighVariance ? "bg-amber-950/50 text-amber-400 border border-amber-700/50" : "bg-slate-800 text-white";
 
