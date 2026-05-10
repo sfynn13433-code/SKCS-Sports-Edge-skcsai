@@ -408,12 +408,13 @@ window.openMatchDetail = function(cardId) {
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'skcsMatchDetailModal';
+        modal.className = 'modal-backdrop';
         modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:10000;padding:20px;';
-        modal.innerHTML = 
+        modal.innerHTML =
             '<div style="background:#1c1f26;border-radius:16px;padding:24px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 60px rgba(0,0,0,0.5);">' +
                 '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
-                    '<h2 style="margin:0;font-size:1.3rem;font-weight:800;color:#f1f5f9;">Match Details</h2>' +
-                    '<button onclick="window.closeMatchDetail()" style="background:none;border:none;color:#94a3b8;font-size:1.5rem;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:background 0.2s;">&times;</button>' +
+                    '<button class="close-match-modal-btn" style="background:transparent;border:none;color:#3b82f6;font-size:0.95rem;font-weight:600;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;transition:color 0.2s;">← Back to Fixtures</button>' +
+                    '<button class="close-match-modal-btn" style="background:none;border:none;color:#94a3b8;font-size:1.5rem;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:background 0.2s;">&times;</button>' +
                 '</div>' +
                 '<div id="skcsModalBody"></div>' +
             '</div>';
@@ -444,3 +445,13 @@ window.closeMatchDetail = function() {
     if (modal) modal.style.display = 'none';
     document.body.style.overflow = '';
 };
+
+// Global event listener for closing modal via delegation (CSP-safe)
+document.body.addEventListener('click', function(e) {
+    // Check if they clicked the back arrow, the 'x', or the dark backdrop overlay
+    if (e.target.closest('.close-match-modal-btn') || e.target.matches('.modal-backdrop')) {
+        if (typeof window.closeMatchDetail === 'function') {
+            window.closeMatchDetail();
+        }
+    }
+});
