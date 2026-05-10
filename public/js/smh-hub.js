@@ -503,16 +503,11 @@ document.body.addEventListener('click', function(e) {
         
         if (!data) return;
 
-        // Update Terminal Content
-        var terminalTitle = document.getElementById('terminal-title');
-        var terminalPurpose = document.getElementById('terminal-purpose');
-        var terminalJson = document.getElementById('terminal-json');
-        var terminalBadge = document.getElementById('terminal-stage-badge');
-        
-        if (terminalTitle) terminalTitle.innerHTML = data.title;
-        if (terminalPurpose) terminalPurpose.innerText = 'Purpose: ' + data.purpose;
-        if (terminalJson) terminalJson.textContent = data.json;
-        if (terminalBadge) terminalBadge.innerText = 'STAGE ' + (index + 1) + '/6';
+        // 1. Update Terminal Content
+        document.getElementById('terminal-title').innerHTML = data.title;
+        document.getElementById('terminal-purpose').innerText = `Purpose: ${data.purpose}`;
+        document.getElementById('terminal-json').textContent = data.json;
+        document.getElementById('terminal-stage-badge').innerText = `STAGE ${index + 1}/6`;
 
         // Update UI States for all buttons
         document.querySelectorAll('.pipeline-step-btn').forEach(function(btn, i) {
