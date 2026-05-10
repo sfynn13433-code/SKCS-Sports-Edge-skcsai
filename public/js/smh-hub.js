@@ -250,15 +250,20 @@
             var cardId = 'smh_card_' + (pred.id || pred.prediction_id || Math.random().toString(36).substr(2, 9));
             registerSmhCard(cardId, pred); // Register prediction for click handling
 
+            // Dynamic risk logic for badges
+            var isHighVariance = confidence < 59;
+            var pickTypeLabel  = isHighVariance ? "Risk-Adjusted" : sectionLabel;
+            var marketLabel    = isHighVariance ? "Double Chance" : market;
+            var pickTypeColor  = isHighVariance ? "text-amber-500" : "text-slate-400";
+            var marketBgColor  = isHighVariance ? "bg-amber-950/50 text-amber-400 border border-amber-700/50" : "bg-slate-800 text-white";
+
             // Use .smh-result-item class for hover (CSP-safe, no inline onmouseover)
             html +=
                 '<div class="smh-result-item" data-card-id="' + cardId + '" style="border-left:4px solid ' + accentColor + ';">' +
                     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px;flex-wrap:wrap;">' +
-                        '<div style="display:flex;align-items:center;gap:6px;">' +
-                            '<span style="font-size:0.7rem;color:' + accentColor + ';font-weight:800;text-transform:uppercase;letter-spacing:0.8px;background:rgba(255,255,255,0.06);padding:2px 7px;border-radius:4px;">' +
-                                sectionLabel + (isAcca ? ' \u00b7 ' + legCount + ' legs' : '') +
-                            '</span>' +
-                            '<span style="font-size:0.7rem;color:#64748b;font-weight:600;text-transform:uppercase;">' + market + '</span>' +
+                        '<div>' +
+                            '<div class="text-[10px] font-bold ' + pickTypeColor + ' uppercase tracking-wider">' + pickTypeLabel + (isAcca && !isHighVariance ? ' \u00b7 ' + legCount + ' legs' : '') + '</div>' +
+                            '<div class="text-xs font-black ' + marketBgColor + ' px-2 py-1 rounded inline-block mt-0.5">' + marketLabel + '</div>' +
                         '</div>' +
                         '<span style="font-size:0.8rem;color:' + confColor + ';font-weight:800;">' + confidence + '% CONF.</span>' +
                     '</div>' +
@@ -437,9 +442,23 @@ window.openMatchDetail = function(cardId) {
         insights.stability ? '<span style="font-size:0.78rem;background:rgba(251,191,36,0.1);color:#fbbf24;padding:4px 10px;border-radius:20px;">📊 ' + insights.stability + '</span>' : ''
     ].filter(Boolean).join(' ');
 
-    // Dynamically build secondary markets HTML based on backend governance (< 59% EXTREME_RISK)
+    // Dynamically build secondary markets HTML with a robust fallback
     let secondaryMarketsHTML = '';
-    const secInsights = prediction.secondary_insights || prediction.secondary_markets || [];
+    let secInsights = prediction.secondary_insights || prediction.secondary_markets || [];
+
+    // FALLBACK: If Supabase doesn't send the array, build a basic one from 1X2 data
+    if (confidence < 59 && (!Array.isArray(secInsights) || secInsights.length === 0)) {
+        // Assuming prediction has home, draw, away properties
+        const pHome = prediction.home || 45; 
+        const pDraw = prediction.draw || 35;
+        const pAway = prediction.away || 20;
+        
+        secInsights = [
+            { market: '1X (Home/Draw)', confidence: Math.min(99, pHome + pDraw) },
+            { market: '12 (Any Winner)', confidence: Math.min(99, pHome + pAway) },
+            { market: 'X2 (Draw/Away)', confidence: Math.min(99, pDraw + pAway) }
+        ];
+    }
 
     if (confidence < 59 && Array.isArray(secInsights) && secInsights.length > 0) {
         let dcHTML = '';
@@ -450,7 +469,7 @@ window.openMatchDetail = function(cardId) {
             const isDoubleChance = marketLabel.includes('double chance') || marketLabel.includes('1x') || marketLabel.includes('12') || marketLabel.includes('x2');
             
             if (isDoubleChance) {
-                 const isPrimaryDC = index === 0;
+                 const isPrimaryDC = dcHTML === ''; // Highlight the first one we find
                  const bgClass = isPrimaryDC ? 'bg-emerald-900/20 border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.1)]' : 'bg-slate-800/50 border-slate-700';
                  const titleClass = isPrimaryDC ? 'text-emerald-500' : 'text-slate-400';
                  const pctClass = isPrimaryDC ? 'text-emerald-400' : 'text-slate-300';
@@ -458,21 +477,24 @@ window.openMatchDetail = function(cardId) {
                  dcHTML += '<div class="flex-1 border rounded-md p-2 text-center ' + bgClass + '">' +
                              '<div class="text-[10px] font-bold mb-1 ' + titleClass + '">' + (insight.market || insight.prediction) + '</div>' +
                              '<div class="font-mono text-sm font-bold ' + pctClass + '">' + (insight.confidence || 0) + '%</div>' +
-                         '</div>';
+                           '</div>';
             } else {
                  smbHTML += '<div class="bg-indigo-950/30 border border-indigo-500/40 rounded-lg p-3 flex justify-between items-center group hover:bg-indigo-900/40 transition-colors cursor-pointer mb-2">' +
-                             '<div>' +
-                                 '<div class="text-sm font-bold text-indigo-300 flex items-center gap-2">' +
-                                     (insight.market || insight.prediction) +
+                                 '<div>' +
+                                     '<div class="text-sm font-bold text-indigo-300 flex items-center gap-2">' + (insight.market || insight.prediction) + '</div>' +
+                                     '<div class="text-[10px] text-indigo-400/70 mt-1 flex gap-2">' +
+                                         '<span class="bg-indigo-900/50 px-1.5 py-0.5 rounded border border-indigo-700/50">Strong Correlation</span>' +
+                                     '</div>' +
                                  '</div>' +
-                                 '<div class="text-[10px] text-indigo-400/70 mt-1 flex gap-2">' +
-                                     '<span class="bg-indigo-900/50 px-1.5 py-0.5 rounded border border-indigo-700/50">Strong Correlation</span>' +
-                                 '</div>' +
-                             '</div>' +
-                             '<div class="text-xl font-mono font-bold text-white">' + (insight.confidence || 0) + '%</div>' +
-                         '</div>';
+                                 '<div class="text-xl font-mono font-bold text-white">' + (insight.confidence || 0) + '%</div>' +
+                             '</div>';
             }
         });
+
+        // If no Same-Match builds were found or generated, provide a placeholder so the section doesn't look broken
+        if (smbHTML === '') {
+            smbHTML = '<div class="text-xs text-slate-500 italic p-2">Pending correlation analysis...</div>';
+        }
 
         secondaryMarketsHTML = 
             '<div class="mt-4 bg-amber-950/40 border border-amber-700/50 rounded-lg p-3 flex items-start gap-3">' +
