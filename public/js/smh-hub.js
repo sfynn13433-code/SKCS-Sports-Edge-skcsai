@@ -593,16 +593,16 @@ document.body.addEventListener('click', function(e) {
             
             if (i === index) {
                 // Active State
-                circle.className = "w-10 h-10 rounded-full bg-blue-500 border-4 border-slate-900 flex items-center justify-center text-white font-bold shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-all step-circle";
-                label.className = "mt-2 text-xs font-semibold text-blue-400 step-label";
+                circle.className = "w-10 h-10 rounded-full bg-blue-600 border-4 border-slate-900 flex items-center justify-center text-white font-bold shadow-[0_0_15px_rgba(37,99,235,0.6)] transition-all step-circle";
+                label.className = "absolute top-12 whitespace-nowrap text-xs font-semibold text-blue-400 step-label";
             } else if (i < index) {
                 // Completed State
-                circle.className = "w-10 h-10 rounded-full bg-blue-800 border-4 border-slate-900 flex items-center justify-center text-blue-300 transition-all step-circle";
-                label.className = "mt-2 text-xs font-semibold text-slate-500 step-label";
+                circle.className = "w-10 h-10 rounded-full bg-blue-900/50 border-4 border-slate-900 flex items-center justify-center text-blue-400 transition-all step-circle";
+                label.className = "absolute top-12 whitespace-nowrap text-xs font-semibold text-slate-400 step-label";
             } else {
                 // Future State
-                circle.className = "w-10 h-10 rounded-full bg-slate-700 border-4 border-slate-900 flex items-center justify-center text-slate-400 transition-all step-circle";
-                label.className = "mt-2 text-xs font-semibold text-slate-600 step-label";
+                circle.className = "w-10 h-10 rounded-full bg-slate-800 border-4 border-slate-900 flex items-center justify-center text-slate-400 transition-all step-circle hover:bg-slate-700";
+                label.className = "absolute top-12 whitespace-nowrap text-xs font-semibold text-slate-500 step-label";
             }
         });
     }
