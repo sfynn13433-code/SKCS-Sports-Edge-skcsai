@@ -473,34 +473,7 @@ window.openMatchDetail = function(cardId) {
                 '<div style="text-align: center;"><span style="color: #94a3b8; font-size: 12px; display: block;">D</span><strong style="color: #fff; font-size: 16px;">35%</strong></div>' +
                 '<div style="text-align: center;"><span style="color: #94a3b8; font-size: 12px; display: block;">AT</span><strong style="color: #fff; font-size: 16px;">20%</strong></div>' +
             '</div>' +
-            '<div style="display:flex;flex-direction:column;gap:10px;">' + marketsHtml + '</div>' +
-            '<div class="pipeline-container" style="padding:16px;margin-top:24px;border-top:1px solid rgba(71,85,105,0.5);padding-top:24px;">' +
-                '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:24px;">Decision Engine Pipeline (Pro View)</div>' +
-                '<div class="relative" style="border-left:2px solid #334155;margin-left:16px;space-y:24px;" id="ai-pipeline-accordion">' +
-                    '<div class="relative pl-6 pipeline-stage" data-stage="1">' +
-                        '<div class="absolute" style="left:-34px;top:4px;width:32px;height:32px;border-radius:50%;background:#2563eb;border:4px solid #0f172a;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;color:#ffffff;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);node-circle">1</div>' +
-                        '<div class="cursor-pointer" style="background:rgba(30,41,59,0.5);border:1px solid #334155;border-radius:6px;padding:12px;display:flex;justify-content:space-between;align-items:center;pipeline-toggle">' +
-                            '<span class="font-semibold" style="color:#60a5fa;display:flex;align-items:center;gap:8px;">🤖 AI Stage 1: Initial Prediction</span>' +
-                            '<span class="text-xs transform transition-transform chevron" style="color:#64748b;">▼</span>' +
-                        '</div>' +
-                        '<div class="pipeline-content block" style="background:#0f172a;border-left:1px solid #334155;border-right:1px solid #334155;border-bottom:1px solid #334155;border-radius:0 0 6px 6px;padding:16px;">' +
-                            '<p class="text-xs" style="color:#94a3b8;margin-bottom:8px;"><strong>Purpose:</strong> Baseline probability analysis</p>' +
-                            '<pre class="p-3 rounded text-[10px] font-mono overflow-x-auto border border-slate-800" style="background:#020617;color:#34d399;">{ "stage_1": { "1x2": { "home": 54, "draw": 26, "away": 20 }, "confidence": "medium" } }</pre>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="relative pl-6 pipeline-stage" data-stage="2" style="margin-top:24px;">' +
-                        '<div class="absolute" style="left:-34px;top:4px;width:32px;height:32px;border-radius:50%;background:#334155;border:4px solid #0f172a;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;color:#cbd5e1;node-circle">2</div>' +
-                        '<div class="cursor-pointer" style="background:rgba(30,41,59,0.5);border:1px solid #334155;border-radius:6px;padding:12px;display:flex;justify-content:space-between;align-items:center;pipeline-toggle">' +
-                            '<span class="font-semibold" style="color:#cbd5e1;display:flex;align-items:center;gap:8px;">🧠 AI Stage 2: Deep Context</span>' +
-                            '<span class="text-xs transform transition-transform chevron -rotate-90" style="color:#64748b;">▼</span>' +
-                        '</div>' +
-                        '<div class="pipeline-content hidden" style="background:#0f172a;border-left:1px solid #334155;border-right:1px solid #334155;border-bottom:1px solid #334155;border-radius:0 0 6px 6px;padding:16px;">' +
-                            '<p class="text-xs" style="color:#94a3b8;margin-bottom:8px;"><strong>Purpose:</strong> Team & Player Intelligence</p>' +
-                            '<pre class="p-3 rounded text-[10px] font-mono overflow-x-auto border border-slate-800" style="background:#020617;color:#34d399;">{ "stage_2": { "adjustments": { "home": -6, "draw": +3, "away": +3 }, "confidence": "medium-low" } }</pre>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>' +
-            '</div>';
+            '<div style="display:flex;flex-direction:column;gap:10px;">' + marketsHtml + '</div>';
     }
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -520,51 +493,6 @@ document.body.addEventListener('click', function(e) {
             window.closeMatchDetail();
         }
         return;
-    }
-
-    // AI Pipeline Accordion Logic
-    const toggleBtn = e.target.closest('.pipeline-toggle');
-    if (toggleBtn) {
-        const currentStage = toggleBtn.closest('.pipeline-stage');
-        const allStages = document.querySelectorAll('.pipeline-stage');
-
-        allStages.forEach(function(stage) {
-            const content = stage.querySelector('.pipeline-content');
-            const chevron = stage.querySelector('.chevron');
-            const node = stage.querySelector('.node-circle');
-            const btn = stage.querySelector('.pipeline-toggle');
-
-            if (stage === currentStage) {
-                // Toggle clicked stage
-                var isHidden = content.classList.contains('hidden');
-                if (isHidden) {
-                    content.classList.remove('hidden');
-                    content.classList.add('block');
-                    btn.style.borderRadius = '6px 6px 0 0';
-                    chevron.classList.remove('-rotate-90');
-                    node.style.background = '#2563eb';
-                    node.style.color = '#ffffff';
-                    btn.querySelector('span:first-child').style.color = '#60a5fa';
-                } else {
-                    content.classList.add('hidden');
-                    content.classList.remove('block');
-                    btn.style.borderRadius = '6px';
-                    chevron.classList.add('-rotate-90');
-                    node.style.background = '#334155';
-                    node.style.color = '#cbd5e1';
-                    btn.querySelector('span:first-child').style.color = '#cbd5e1';
-                }
-            } else {
-                // Force close all other stages
-                content.classList.add('hidden');
-                content.classList.remove('block');
-                btn.style.borderRadius = '6px';
-                chevron.classList.add('-rotate-90');
-                node.style.background = '#334155';
-                node.style.color = '#cbd5e1';
-                btn.querySelector('span:first-child').style.color = '#cbd5e1';
-            }
-        });
     }
 
     // Global Event Delegation for Pipeline Stepper
