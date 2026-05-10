@@ -43,8 +43,12 @@ const {
 
 const { getPlanCapabilities, filterPredictionsForPlan } = require('./config/subscriptionMatrix');
 const { normalizeFixtureDate, getPredictionWindow, isFixtureEligibleForPrediction } = require('./utils/dateNormalization');
+const { initCronJobs } = require('./services/cronJobs');
 
 void bootstrap().catch(err => console.error('[startup] bootstrap failed:', err.message));
+
+// Initialize cron jobs after bootstrap
+initCronJobs().catch(err => console.error('[startup] cron jobs init failed:', err.message));
 
 const isProd = process.env.NODE_ENV === 'production';
 const safeErr = (err) => isProd ? 'Internal server error' : (err?.message || 'Unknown error');
@@ -1094,6 +1098,32 @@ app.get('/api/cron/cricket-daily-fixtures', verifyCronSecret, async (req, res) =
             job: 'cron_cricket_daily_fixtures',
             message: err.message
         });
+    }
+});
+
+// AI Predictions endpoint for frontend modal
+app.get('/api/ai-predictions/:matchId', async (req, res) => {
+    try {
+        const { matchId } = req.params;
+        
+        if (!matchId) {
+            return res.status(400).json({ error: 'matchId is required' });
+        }
+
+        const result = await query(`
+            SELECT match_id, confidence_score, edgemind_feedback, value_combos, same_match_builder, updated_at
+            FROM ai_predictions
+            WHERE match_id = $1
+        `, [matchId]);
+
+        if (result.rows.length === 0) {
+            return res.json({ data: null, message: 'No AI prediction found for this match' });
+        }
+
+        res.json({ data: result.rows[0] });
+    } catch (err) {
+        console.error('[api/ai-predictions] Failed:', err.message);
+        res.status(500).json({ error: safeErr(err) });
     }
 });
 

@@ -334,6 +334,40 @@
 // Defined at top level for global scope access
 // ============================================
 
+// Helper: Update modal with AI prediction data
+window.updateModalWithAIData = function(aiPrediction) {
+    const confidenceScoreEl = document.getElementById('ai-confidence-score');
+    const edgemindFeedbackEl = document.getElementById('edgemind-feedback');
+    
+    if (confidenceScoreEl && aiPrediction.confidence_score !== undefined) {
+        confidenceScoreEl.textContent = aiPrediction.confidence_score + '%';
+        const progressBar = document.getElementById('ai-confidence-bar');
+        if (progressBar) {
+            progressBar.style.width = aiPrediction.confidence_score + '%';
+        }
+    }
+    
+    if (edgemindFeedbackEl && aiPrediction.edgemind_feedback) {
+        edgemindFeedbackEl.textContent = aiPrediction.edgemind_feedback;
+        edgemindFeedbackEl.classList.remove('text-slate-400');
+        edgemindFeedbackEl.classList.add('text-emerald-400');
+    }
+    
+    // Hide loading state
+    const loadingEl = document.getElementById('ai-loading-state');
+    if (loadingEl) {
+        loadingEl.style.display = 'none';
+    }
+};
+
+// Helper: Update modal loading state
+window.updateModalWithLoadingState = function(showLoading) {
+    const loadingEl = document.getElementById('ai-loading-state');
+    if (loadingEl) {
+        loadingEl.style.display = showLoading ? 'block' : 'none';
+    }
+};
+
 // Data source for the pipeline UI
 const SKCS_PIPELINE_DATA = [
     {
@@ -381,6 +415,41 @@ window.openMatchDetail = function(cardId) {
     const sectionType = String(prediction.section_type || prediction.type || 'direct');
     const confidence = Math.round(Number(prediction.total_confidence || 0));
     const league = leg.metadata && leg.metadata.league ? leg.metadata.league : (leg.sport || sectionType);
+
+    // SIDE-BY-SIDE: Fetch AI predictions from ai_predictions table
+    let aiPrediction = null;
+    let isCalculating = false;
+    
+    // Extract match_id for AI predictions lookup (use id_event or fixture_id if available)
+    const matchId = leg.id_event || leg.fixture_id || leg.match_id || prediction.id;
+    
+    if (matchId) {
+        // Show loading state initially
+        isCalculating = true;
+        
+        fetch(`${BACKEND_URL}/api/ai-predictions/${matchId}`, {
+            headers: { 'x-api-key': API_KEY }
+        })
+        .then(res => res.json())
+        .then(data => {
+            isCalculating = false;
+            if (data.data) {
+                aiPrediction = data.data;
+                // Update modal if it's already open
+                updateModalWithAIData(aiPrediction);
+            } else {
+                // No AI prediction available, hide loading state
+                updateModalWithLoadingState(false);
+            }
+        })
+        .catch(err => {
+            console.error('[SMH] Failed to fetch AI prediction:', err);
+            isCalculating = false;
+            updateModalWithLoadingState(false);
+        });
+    } else {
+        isCalculating = false;
+    }
 
     // Kickoff time
     const kickoffRaw = leg.commence_time || leg.match_date
@@ -573,12 +642,26 @@ window.openMatchDetail = function(cardId) {
                     <div class="text-sm font-bold text-white flex items-center gap-2">🤖 EdgeMind BOT</div>
                     <div class="bg-amber-900/30 border border-amber-500/50 text-amber-500 px-2 py-0.5 rounded text-[10px] font-bold uppercase">${confidence >= 70 ? 'High' : (confidence >= 59 ? 'Medium' : 'Low')} Viability</div>
                 </div>
+                
+                <!-- SIDE-BY-SIDE: AI Prediction Loading State -->
+                <div id="ai-loading-state" style="display:${isCalculating ? 'block' : 'none'};" class="mb-3">
+                    <div class="flex items-center gap-2 text-xs text-slate-400">
+                        <div class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        <span>Calculating AI Edge...</span>
+                    </div>
+                </div>
+                
                 <div class="w-full bg-slate-800 rounded-full h-1.5 mb-3">
-                    <div class="bg-amber-500 h-1.5 rounded-full" style="width: ${confidence}%"></div>
+                    <div id="ai-confidence-bar" class="bg-amber-500 h-1.5 rounded-full" style="width: ${confidence}%"></div>
                 </div>
                 <p class="text-[11px] text-slate-400 leading-relaxed">
                     The primary 1X2 outcome holds a <span class="text-white font-bold">${confidence}% confidence</span> rating. ${confidence < 59 ? 'Match tempo is highly unpredictable. We strongly advise utilizing a risk-adjusted secondary insight.' : 'This indicates a stable market probability.'}
                 </p>
+                
+                <!-- SIDE-BY-SIDE: AI EdgeMind Feedback -->
+                <div id="edgemind-feedback" class="mt-3 text-[11px] text-slate-400 leading-relaxed italic">
+                    ${aiPrediction ? aiPrediction.edgemind_feedback : ''}
+                </div>
             </div>
         </section>
 
