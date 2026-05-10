@@ -149,14 +149,37 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
         );
 
         // FILTER: Only show predictions matching the current sport
-        var sportLower = sport.toLowerCase();
+        var sportLower = sport.toLowerCase().trim();
+        
+        // Debug: Log sample sport property to understand data structure
+        if (allPredictions.length > 0) {
+            var sample = allPredictions[0];
+            var sampleMatch = (sample.matches && sample.matches[0]) ? sample.matches[0] : {};
+            var sampleMeta = (sampleMatch.metadata && typeof sampleMatch.metadata === 'object') ? sampleMatch.metadata : {};
+            console.log('[SMH] Sample sport property:', {
+                pred_sport: sample.sport,
+                match_sport: sampleMatch.sport,
+                meta_sport: sampleMeta.sport,
+                raw_fixtures_sport: sample.raw_fixtures?.sport,
+                sport_name: sample.sport_name
+            });
+        }
+        
+        // Sport Name Mapping: Frontend "Football" should match backend "Soccer"
+        var sportAliases = {};
+        if (sportLower === 'football') {
+            sportAliases['soccer'] = true;
+        }
+        
         var filteredPredictions = allPredictions.filter(function(pred) {
             var match = (pred.matches && pred.matches[0]) ? pred.matches[0] : {};
             var meta = (match.metadata && typeof match.metadata === 'object') ? match.metadata : {};
             
-            // Check sport in multiple possible locations
-            var predSport = (pred.sport || match.sport || meta.sport || '').toLowerCase();
-            return predSport === sportLower;
+            // Check sport in multiple possible locations (broadened property check)
+            var predSport = (pred.sport || match.sport || meta.sport || pred.raw_fixtures?.sport || pred.sport_name || '').toLowerCase().trim();
+            
+            // Match against current sport or its aliases
+            return predSport === sportLower || sportAliases[predSport] === true;
         });
 
         console.log('[SMH] ' + sport + ' payload — source_rows=' + (data.source_rows || 0) + ', buckets:', {
