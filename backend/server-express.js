@@ -48,7 +48,11 @@ const { initCronJobs } = require('./services/cronJobs');
 void bootstrap().catch(err => console.error('[startup] bootstrap failed:', err.message));
 
 // Initialize cron jobs after bootstrap
-initCronJobs().catch(err => console.error('[startup] cron jobs init failed:', err.message));
+try {
+    initCronJobs();
+} catch (err) {
+    console.error('[startup] cron jobs init failed:', err.message);
+}
 
 const isProd = process.env.NODE_ENV === 'production';
 const safeErr = (err) => isProd ? 'Internal server error' : (err?.message || 'Unknown error');

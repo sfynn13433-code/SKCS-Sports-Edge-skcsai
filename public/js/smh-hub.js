@@ -11,12 +11,15 @@
  *   acca-select            → 'ACCAs'
  */
 
+// Backend URL for API calls (defined outside IIFE for global helper function access)
+const BACKEND_URL = window.location.origin;
+const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
+
 (function () {
     'use strict';
 
     // ── Constants ──────────────────────────────────────────────────────────────
-    const BACKEND_URL = window.API_BASE_URL || 'https://skcs-sports-edge-skcsai.onrender.com';
-    const API_KEY     = window.USER_API_KEY || 'skcs_user_12345';
+    // BACKEND_URL and API_KEY are defined globally at the top of this file
 
     const SELECT_MAP = [
         { id: 'global-majors-select',   category: 'Global Majors'   },
