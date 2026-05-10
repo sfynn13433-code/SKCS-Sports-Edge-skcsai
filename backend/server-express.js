@@ -44,6 +44,7 @@ const {
 const { getPlanCapabilities, filterPredictionsForPlan } = require('./config/subscriptionMatrix');
 const { normalizeFixtureDate, getPredictionWindow, isFixtureEligibleForPrediction } = require('./utils/dateNormalization');
 const { initCronJobs } = require('./services/cronJobs');
+const { syncDailyFixtures, enrichMatchContext, generateEdgeMindInsight } = require('./services/thesportsdbPipeline');
 
 void bootstrap().catch(err => console.error('[startup] bootstrap failed:', err.message));
 
@@ -1177,6 +1178,72 @@ app.get('/api/debug/cricket-tables', async (_req, res) => {
         });
     } catch (err) {
         res.status(500).json({ ok: false, error: safeErr(err) });
+    }
+});
+
+// TEMPORARY: Admin routes for testing pipeline
+app.get('/api/admin/force-discovery', async (_req, res) => {
+    try {
+        const today = new Date().toISOString().split('T')[0];
+        console.log(`[ADMIN] Force discovery triggered for ${today}`);
+        
+        const count = await syncDailyFixtures(today);
+        
+        res.json({ success: true, message: `Daily discovery triggered for ${today}`, fixturesSynced: count });
+    } catch (err) {
+        console.error('[ADMIN] Force discovery failed:', err.message);
+        res.status(500).json({ success: false, error: safeErr(err) });
+    }
+});
+
+app.get('/api/admin/force-enrichment', async (_req, res) => {
+    try {
+        console.log('[ADMIN] Force enrichment triggered');
+        
+        // Query raw_fixtures for next 5 upcoming matches (regardless of 6-hour rule)
+        const query = `
+            SELECT id_event, start_time, home_team_id, away_team_id
+            FROM raw_fixtures
+            WHERE start_time >= NOW()
+            ORDER BY start_time ASC
+            LIMIT 5
+        `;
+        
+        const result = await db.query(query);
+        const upcomingMatches = result.rows;
+        
+        console.log(`[ADMIN] Force enrichment: Found ${upcomingMatches.length} upcoming matches`);
+        
+        let enrichedCount = 0;
+        let insightCount = 0;
+        
+        for (const match of upcomingMatches) {
+            const { id_event, start_time } = match;
+            
+            try {
+                // Enrich match context
+                const enriched = await enrichMatchContext(id_event);
+                if (enriched) enrichedCount++;
+                
+                // Generate AI insight
+                const insight = await generateEdgeMindInsight(id_event);
+                if (insight) insightCount++;
+                
+                console.log(`[ADMIN] Force enrichment: Processed ${id_event} (starts ${start_time})`);
+            } catch (err) {
+                console.error(`[ADMIN] Force enrichment: Failed to process ${id_event}:`, err.message);
+            }
+        }
+        
+        res.json({ 
+            success: true, 
+            message: `Enrichment triggered for ${upcomingMatches.length} matches`,
+            enriched: enrichedCount,
+            insights: insightCount
+        });
+    } catch (err) {
+        console.error('[ADMIN] Force enrichment failed:', err.message);
+        res.status(500).json({ success: false, error: safeErr(err) });
     }
 });
 
