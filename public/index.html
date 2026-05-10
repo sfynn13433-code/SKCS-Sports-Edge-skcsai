@@ -51,8 +51,7 @@
         #contact .form-input, #contact .form-textarea { color: #333; font-size: 16px; line-height: 1.5; }
         #contact .submit-btn { font-family: 'Segoe UI', Arial, sans-serif; letter-spacing: 0.5px; }
         #contact .form-title { font-size: 24px; color: #0d6efd; margin-bottom: 20px; text-align: center; font-weight: bold; }
-        .pipeline-section { background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%); color: white; padding: 5rem 2rem; margin: 4rem 0; position: relative; overflow: hidden; }
-        .pipeline-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" opacity="0.05"><path d="M0,0H1000V1000H0Z" stroke="none"/><path d="M250,250H750V750H250Z" stroke="white" stroke-width="2" fill="none"/></svg>'); background-size: 300px; }
+        .pipeline-section-dark { background: #020617; color: white; padding: 3rem 0; margin: 2rem 0; position: relative; }
         .pipeline-container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
         .predictions-section { max-width: 1400px; margin: 4rem auto; padding: 0 1rem; }
         .tabs-container { background: white; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); overflow: hidden; }
@@ -422,7 +421,7 @@
         </div>
     </div>
     <!-- Pipeline Section -->
-    <section id="pipeline" class="pipeline-section">
+    <section id="pipeline" class="pipeline-section-dark">
         <div class="pipeline-container">
             <div class="max-w-4xl mx-auto my-12 p-8 bg-slate-900 rounded-2xl shadow-2xl border border-slate-800" id="interactive-pipeline-section">
                 <div class="text-center mb-10">
