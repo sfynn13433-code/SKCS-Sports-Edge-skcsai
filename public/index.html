@@ -5101,11 +5101,12 @@
   #skcsModalBody::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 10px; }
 </style>
 
-<div id="skcsMatchDetailModal" data-action="close-modal-backdrop">
+<div id="skcsMatchDetailModal" class="modal-backdrop" data-action="close-modal-backdrop">
   <div id="skcsModalPanel" role="dialog" aria-modal="true" aria-labelledby="skcsModalTitle">
     <div id="skcsModalHeader">
+      <button class="close-match-modal-btn back-arrow" style="background:none; border:none; color:#38bdf8; cursor:pointer; font-weight:bold;">← Back to Fixtures</button>
       <span id="skcsModalTitle">🔍 Match Detail View</span>
-      <button id="skcsModalClose" data-action="close-modal" title="Close" aria-label="Close match detail">&times;</button>
+      <button class="close-match-modal-btn" id="skcsModalClose" data-action="close-modal" title="Close" aria-label="Close match detail">&times;</button>
     </div>
     <div id="skcsModalBody">
       <!-- Populated dynamically by window.openMatchDetail() -->
