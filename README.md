@@ -26,7 +26,7 @@
 - Deployment: Vercel (frontend) + Render (backend)
 
 ## 📊 Features
-- Multi-sport predictions (13 sports)
+- Multi-sport predictions (16 sports)
 - Real-time accuracy tracking
 - Subscription tiers
 - AI-powered analysis pipeline
