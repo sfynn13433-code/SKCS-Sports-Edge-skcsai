@@ -434,6 +434,11 @@ window.openMatchDetail = function(cardId) {
                 (chips ? '<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">' + chips + '</div>' : '') +
             '</div>' +
             '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;">Market Breakdown</div>' +
+            '<div class="market-1x2-breakdown" style="display: flex; justify-content: space-between; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 15px;">' +
+                '<div style="text-align: center;"><span style="color: #94a3b8; font-size: 12px; display: block;">HT</span><strong style="color: #fff; font-size: 16px;">45%</strong></div>' +
+                '<div style="text-align: center;"><span style="color: #94a3b8; font-size: 12px; display: block;">D</span><strong style="color: #fff; font-size: 16px;">35%</strong></div>' +
+                '<div style="text-align: center;"><span style="color: #94a3b8; font-size: 12px; display: block;">AT</span><strong style="color: #fff; font-size: 16px;">20%</strong></div>' +
+            '</div>' +
             '<div style="display:flex;flex-direction:column;gap:10px;">' + marketsHtml + '</div>';
     }
     modal.style.display = 'flex';
