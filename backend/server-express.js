@@ -1120,14 +1120,22 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
             WHERE match_id = $1
         `, [matchId]);
 
-        if (result.rows.length === 0) {
-            return res.json({ data: null, message: 'No AI prediction found for this match' });
+        if (!result || result.rows.length === 0) {
+            // Graceful response when no AI prediction exists yet
+            return res.status(404).json({ 
+                data: null, 
+                message: 'AI prediction not yet available - still calculating',
+                status: 'pending'
+            });
         }
 
-        res.json({ data: result.rows[0] });
+        res.json({ data: result.rows[0], status: 'ready' });
     } catch (err) {
-        console.error('[api/ai-predictions] Failed:', err.message);
-        res.status(500).json({ error: safeErr(err) });
+        console.error('[api/ai-predictions] Database query failed:', err.message);
+        res.status(500).json({ 
+            error: 'Failed to fetch AI prediction',
+            message: isProd ? 'Internal server error' : err.message 
+        });
     }
 });
 

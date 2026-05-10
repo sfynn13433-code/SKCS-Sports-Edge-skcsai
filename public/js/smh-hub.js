@@ -12,7 +12,7 @@
  */
 
 // Backend URL for API calls (defined outside IIFE for global helper function access)
-const BACKEND_URL = window.location.origin;
+const BACKEND_URL = "https://skcs-sports-edge-skcsai.onrender.com";
 const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
 
 (function () {
