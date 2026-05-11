@@ -1176,23 +1176,37 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
             }
         }
 
-        // If still not found, try searching in matches array for the match_id
+        // If still not found, try searching in matches array for the match_id (multiple formats)
         if (!result || result.rows.length === 0) {
             try {
-                result = await query(`
-                    SELECT id as match_id,
-                           total_confidence as confidence_score,
-                           edgemind_feedback,
-                           value_combos,
-                           same_match_builder,
-                           updated_at,
-                           matches,
-                           sport,
-                           market_type
-                    FROM direct1x2_prediction_final
-                    WHERE matches::text LIKE $1
-                    LIMIT 1
-                `, [`%"match_id":"${matchId}"%`]);
+                // Try different match_id field names in the JSON
+                const searchPatterns = [
+                    `%"match_id":"${matchId}"%`,
+                    `%"id_event":"${matchId}"%`,
+                    `%"fixture_id":"${matchId}"%`,
+                    `%"id":"${matchId}"%`
+                ];
+
+                for (const pattern of searchPatterns) {
+                    result = await query(`
+                        SELECT id as match_id,
+                               total_confidence as confidence_score,
+                               edgemind_feedback,
+                               value_combos,
+                               same_match_builder,
+                               updated_at,
+                               matches,
+                               sport,
+                               market_type
+                        FROM direct1x2_prediction_final
+                        WHERE matches::text LIKE $1
+                        LIMIT 1
+                    `, [pattern]);
+                    if (result && result.rows.length > 0) {
+                        console.log('[api/ai-predictions] direct1x2_prediction_final (matches LIKE) found with pattern:', pattern);
+                        break;
+                    }
+                }
                 console.log('[api/ai-predictions] direct1x2_prediction_final (matches LIKE) query result:', result?.rows?.length || 0, 'rows');
             } catch (err) {
                 console.error('[api/ai-predictions] direct1x2_prediction_final (matches LIKE) query failed:', err.message);
