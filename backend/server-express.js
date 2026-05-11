@@ -492,17 +492,17 @@ function requireRefreshKey(req, res, next) {
 function requireAdminKey(req, res, next) {
     const queryKey = req.query.key;
     const headerKey = req.headers['x-admin-key'];
-    const adminKey = process.env.ADMIN_API_KEY;
+    const cronSecret = process.env.CRON_SECRET;
 
     const providedKey = queryKey || headerKey;
 
-    if (!adminKey) {
-        return res.status(500).json({ error: 'ADMIN_API_KEY not configured' });
+    if (!cronSecret) {
+        return res.status(500).json({ error: 'CRON_SECRET not configured' });
     }
     if (!providedKey) {
         return res.status(401).json({ error: 'Missing admin API key' });
     }
-    if (providedKey !== adminKey) {
+    if (providedKey !== cronSecret) {
         return res.status(401).json({ error: 'Invalid admin API key' });
     }
     return next();
