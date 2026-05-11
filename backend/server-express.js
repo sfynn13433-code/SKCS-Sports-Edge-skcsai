@@ -1134,50 +1134,75 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
             return res.status(400).json({ error: 'matchId is required' });
         }
 
+        console.log('[api/ai-predictions] Fetching prediction for matchId:', matchId, 'type:', typeof matchId);
+
+        let result = null;
+        let lastError = null;
+
         // First, try to find in ai_predictions table (TheSportsDB pipeline)
-        let result = await query(`
-            SELECT match_id, confidence_score, edgemind_feedback, value_combos, same_match_builder, updated_at
-            FROM ai_predictions
-            WHERE match_id = $1
-        `, [matchId]);
+        try {
+            result = await query(`
+                SELECT match_id, confidence_score, edgemind_feedback, value_combos, same_match_builder, updated_at
+                FROM ai_predictions
+                WHERE match_id = $1
+            `, [matchId]);
+            console.log('[api/ai-predictions] ai_predictions query result:', result?.rows?.length || 0, 'rows');
+        } catch (err) {
+            console.error('[api/ai-predictions] ai_predictions query failed:', err.message);
+            lastError = err;
+        }
 
         // If not found in ai_predictions, try direct1x2_prediction_final (legacy predictions)
         if (!result || result.rows.length === 0) {
-            result = await query(`
-                SELECT id as match_id,
-                       total_confidence as confidence_score,
-                       edgemind_feedback,
-                       value_combos,
-                       same_match_builder,
-                       updated_at,
-                       matches,
-                       sport,
-                       market_type
-                FROM direct1x2_prediction_final
-                WHERE id = $1
-            `, [matchId]);
+            try {
+                // Try as text first (handles both UUID and integer strings)
+                result = await query(`
+                    SELECT id as match_id,
+                           total_confidence as confidence_score,
+                           edgemind_feedback,
+                           value_combos,
+                           same_match_builder,
+                           updated_at,
+                           matches,
+                           sport,
+                           market_type
+                    FROM direct1x2_prediction_final
+                    WHERE id::text = $1
+                `, [matchId]);
+                console.log('[api/ai-predictions] direct1x2_prediction_final (id::text) query result:', result?.rows?.length || 0, 'rows');
+            } catch (err) {
+                console.error('[api/ai-predictions] direct1x2_prediction_final (id::text) query failed:', err.message);
+                lastError = err;
+            }
         }
 
         // If still not found, try searching in matches array for the match_id
         if (!result || result.rows.length === 0) {
-            result = await query(`
-                SELECT id as match_id,
-                       total_confidence as confidence_score,
-                       edgemind_feedback,
-                       value_combos,
-                       same_match_builder,
-                       updated_at,
-                       matches,
-                       sport,
-                       market_type
-                FROM direct1x2_prediction_final
-                WHERE matches::text LIKE $1
-                LIMIT 1
-            `, [`%"match_id":"${matchId}"%`]);
+            try {
+                result = await query(`
+                    SELECT id as match_id,
+                           total_confidence as confidence_score,
+                           edgemind_feedback,
+                           value_combos,
+                           same_match_builder,
+                           updated_at,
+                           matches,
+                           sport,
+                           market_type
+                    FROM direct1x2_prediction_final
+                    WHERE matches::text LIKE $1
+                    LIMIT 1
+                `, [`%"match_id":"${matchId}"%`]);
+                console.log('[api/ai-predictions] direct1x2_prediction_final (matches LIKE) query result:', result?.rows?.length || 0, 'rows');
+            } catch (err) {
+                console.error('[api/ai-predictions] direct1x2_prediction_final (matches LIKE) query failed:', err.message);
+                lastError = err;
+            }
         }
 
         if (!result || result.rows.length === 0) {
             // Graceful response when no AI prediction exists yet
+            console.log('[api/ai-predictions] No prediction found for matchId:', matchId);
             return res.status(404).json({
                 data: null,
                 message: 'AI prediction not yet available - still calculating',
@@ -1185,12 +1210,33 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
             });
         }
 
-        res.json({ data: result.rows[0], status: 'ready' });
+        // Safely extract data with optional chaining
+        const predictionData = result.rows[0];
+        const responseData = {
+            match_id: predictionData.match_id,
+            confidence_score: predictionData.confidence_score,
+            edgemind_feedback: predictionData.edgemind_feedback,
+            value_combos: predictionData.value_combos,
+            same_match_builder: predictionData.same_match_builder,
+            updated_at: predictionData.updated_at,
+            // Optional fields that may not exist in all prediction types
+            matches: predictionData.matches,
+            sport: predictionData.sport,
+            market_type: predictionData.market_type
+        };
+
+        console.log('[api/ai-predictions] Successfully fetched prediction for matchId:', matchId);
+        res.json({ data: responseData, status: 'ready' });
     } catch (err) {
-        console.error('[api/ai-predictions] Database query failed:', err.message);
+        console.error('[api/ai-predictions] Match Detail Fetch Error:', err.message);
+        console.error('[api/ai-predictions] Full error stack:', err.stack);
         res.status(500).json({
             error: 'Failed to fetch AI prediction',
-            message: isProd ? 'Internal server error' : err.message
+            message: isProd ? 'Internal server error' : err.message,
+            details: isProd ? null : {
+                matchId: req.params.matchId,
+                errorType: err.constructor.name
+            }
         });
     }
 });
