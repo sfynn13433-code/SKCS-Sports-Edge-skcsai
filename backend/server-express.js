@@ -1129,21 +1129,57 @@ app.get('/api/cron/cricket-daily-fixtures', verifyCronSecret, async (req, res) =
 app.get('/api/ai-predictions/:matchId', async (req, res) => {
     try {
         const { matchId } = req.params;
-        
+
         if (!matchId) {
             return res.status(400).json({ error: 'matchId is required' });
         }
 
-        const result = await query(`
+        // First, try to find in ai_predictions table (TheSportsDB pipeline)
+        let result = await query(`
             SELECT match_id, confidence_score, edgemind_feedback, value_combos, same_match_builder, updated_at
             FROM ai_predictions
             WHERE match_id = $1
         `, [matchId]);
 
+        // If not found in ai_predictions, try direct1x2_prediction_final (legacy predictions)
+        if (!result || result.rows.length === 0) {
+            result = await query(`
+                SELECT id as match_id,
+                       total_confidence as confidence_score,
+                       edgemind_feedback,
+                       value_combos,
+                       same_match_builder,
+                       updated_at,
+                       matches,
+                       sport,
+                       market_type
+                FROM direct1x2_prediction_final
+                WHERE id = $1
+            `, [matchId]);
+        }
+
+        // If still not found, try searching in matches array for the match_id
+        if (!result || result.rows.length === 0) {
+            result = await query(`
+                SELECT id as match_id,
+                       total_confidence as confidence_score,
+                       edgemind_feedback,
+                       value_combos,
+                       same_match_builder,
+                       updated_at,
+                       matches,
+                       sport,
+                       market_type
+                FROM direct1x2_prediction_final
+                WHERE matches::text LIKE $1
+                LIMIT 1
+            `, [`%"match_id":"${matchId}"%`]);
+        }
+
         if (!result || result.rows.length === 0) {
             // Graceful response when no AI prediction exists yet
-            return res.status(404).json({ 
-                data: null, 
+            return res.status(404).json({
+                data: null,
                 message: 'AI prediction not yet available - still calculating',
                 status: 'pending'
             });
@@ -1152,9 +1188,9 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
         res.json({ data: result.rows[0], status: 'ready' });
     } catch (err) {
         console.error('[api/ai-predictions] Database query failed:', err.message);
-        res.status(500).json({ 
+        res.status(500).json({
             error: 'Failed to fetch AI prediction',
-            message: isProd ? 'Internal server error' : err.message 
+            message: isProd ? 'Internal server error' : err.message
         });
     }
 });
