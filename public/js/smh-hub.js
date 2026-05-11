@@ -150,12 +150,13 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
 
         // FILTER: Only show predictions matching the current sport
         var sportLower = sport.toLowerCase().trim();
-        
-        // Debug: Log sample sport property to understand data structure
+
+        // Safe stringified log before filter runs
         if (allPredictions.length > 0) {
             var sample = allPredictions[0];
             var sampleMatch = (sample.matches && sample.matches[0]) ? sample.matches[0] : {};
             var sampleMeta = (sampleMatch.metadata && typeof sampleMatch.metadata === 'object') ? sampleMatch.metadata : {};
+            console.log('[SMH] Sorting payload. Sample sport value:', typeof sample.sport, sample.sport);
             console.log('[SMH] Sample sport property:', {
                 pred_sport: sample.sport,
                 match_sport: sampleMatch.sport,
@@ -164,21 +165,59 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
                 sport_name: sample.sport_name
             });
         }
-        
+
+        // Helper: Safely extract sport string from potentially nested object or string
+        function extractSportString(sportValue) {
+            if (typeof sportValue === 'string') {
+                return sportValue.toLowerCase().trim();
+            } else if (typeof sportValue === 'object' && sportValue !== null) {
+                // Handle TheSportsDB format: { strSport: "Soccer" }
+                if (sportValue.strSport) {
+                    return String(sportValue.strSport).toLowerCase().trim();
+                }
+                // Handle other object formats with sport property
+                if (sportValue.sport) {
+                    return extractSportString(sportValue.sport);
+                }
+                // Fallback: stringify and try to extract
+                return String(JSON.stringify(sportValue)).toLowerCase().trim();
+            }
+            return '';
+        }
+
         // Sport Name Mapping: Frontend "Football" should match backend "Soccer"
         var sportAliases = {};
         if (sportLower === 'football') {
             sportAliases['soccer'] = true;
         }
-        
+
         var filteredPredictions = allPredictions.filter(function(pred) {
             var match = (pred.matches && pred.matches[0]) ? pred.matches[0] : {};
             var meta = (match.metadata && typeof match.metadata === 'object') ? match.metadata : {};
-            
-            // Check sport in multiple possible locations (broadened property check)
-            var predSport = (pred.sport || match.sport || meta.sport || pred.raw_fixtures?.sport || pred.sport_name || '').toLowerCase().trim();
-            
-            // Match against current sport or its aliases
+
+            // Safely extract sport from multiple possible locations
+            var predSportValues = [
+                pred.sport,
+                match.sport,
+                meta.sport,
+                pred.raw_fixtures?.sport,
+                pred.sport_name,
+                pred.raw_fixtures?.strSport,
+                meta.strSport,
+                match.strSport
+            ];
+
+            var predSport = '';
+            for (var i = 0; i < predSportValues.length; i++) {
+                var extracted = extractSportString(predSportValues[i]);
+                if (extracted) {
+                    predSport = extracted;
+                    break;
+                }
+            }
+
+            // Strict tab routing: Match against current sport or its aliases only
+            // No fallback that dumps unfiltered data into tabs
             return predSport === sportLower || sportAliases[predSport] === true;
         });
 
