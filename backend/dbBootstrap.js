@@ -686,6 +686,21 @@ async function bootstrap() {
             );
         `);
 
+        // Add deep_context column to match_context_data if it doesn't exist
+        await query(`
+            DO $$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1 FROM information_schema.columns
+                    WHERE table_name = 'match_context_data'
+                    AND column_name = 'deep_context'
+                ) THEN
+                    ALTER TABLE match_context_data
+                    ADD COLUMN deep_context jsonb NOT NULL DEFAULT '{}'::jsonb;
+                END IF;
+            END $$;
+        `);
+
         await query(`
             CREATE TABLE IF NOT EXISTS debug_published (
                 id bigserial PRIMARY KEY,

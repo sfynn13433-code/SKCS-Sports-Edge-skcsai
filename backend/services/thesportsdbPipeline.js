@@ -133,6 +133,8 @@ async function enrichMatchContext(idEvent) {
   const event = eventData.events?.[0] || {};
   const homeTeamId = event.idHomeTeam;
   const awayTeamId = event.idAwayTeam;
+  const leagueId = event.idLeague;
+  const season = event.strSeason || new Date().getFullYear().toString();
 
   // Fetch last 5 results for both teams
   const [homeLast5, awayLast5] = await Promise.all([
@@ -140,15 +142,91 @@ async function enrichMatchContext(idEvent) {
     apiQueue.add(() => fetchTheSportsDB(`searchlastteam.php?id=${awayTeamId}`))
   ]);
 
+  // Fetch deep context: Standings and H2H data
+  let standingsData = null;
+  let h2hData = null;
+
+  try {
+    // Fetch league standings
+    if (leagueId) {
+      standingsData = await apiQueue.add(() => fetchTheSportsDB(`lookuptable.php?l=${leagueId}&s=${season}`));
+    }
+
+    // Fetch H2H results
+    h2hData = await apiQueue.add(() => fetchTheSportsDB(`lookupeventresults.php?id=${idEvent}`));
+  } catch (err) {
+    console.warn(`[enrichMatchContext] Failed to fetch deep context for ${idEvent}:`, err.message);
+    // Continue without deep context - don't fail the entire enrichment
+  }
+
+  // Build deep_context object
+  const deepContext = {
+    standings: null,
+    h2h: null
+  };
+
+  if (standingsData && standingsData.table) {
+    const table = standingsData.table;
+    const homeTeamStanding = table.find(t => t.team_id === homeTeamId);
+    const awayTeamStanding = table.find(t => t.team_id === awayTeamId);
+
+    if (homeTeamStanding || awayTeamStanding) {
+      deepContext.standings = {
+        home: homeTeamStanding ? {
+          rank: homeTeamStanding.intRank,
+          points: homeTeamStanding.intPoints,
+          played: homeTeamStanding.intPlayed,
+          won: homeTeamStanding.intWin,
+          drawn: homeTeamStanding.intDraw,
+          lost: homeTeamStanding.intLoss,
+          goals_for: homeTeamStanding.intGoalsFor,
+          goals_against: homeTeamStanding.intGoalsAgainst,
+          goal_difference: homeTeamStanding.intGoalDifference
+        } : null,
+        away: awayTeamStanding ? {
+          rank: awayTeamStanding.intRank,
+          points: awayTeamStanding.intPoints,
+          played: awayTeamStanding.intPlayed,
+          won: awayTeamStanding.intWin,
+          drawn: awayTeamStanding.intDraw,
+          lost: awayTeamStanding.intLoss,
+          goals_for: awayTeamStanding.intGoalsFor,
+          goals_against: awayTeamStanding.intGoalsAgainst,
+          goal_difference: awayTeamStanding.intGoalDifference
+        } : null
+      };
+    }
+  }
+
+  if (h2hData && h2hData.results) {
+    const results = h2hData.results;
+    // Take last 5 H2H matches
+    const recentH2H = results.slice(0, 5);
+    
+    deepContext.h2h = {
+      total_matches: results.length,
+      recent_matches: recentH2H.map(match => ({
+        id_event: match.idEvent,
+        date_event: match.dateEvent,
+        home_team: match.strHomeTeam,
+        away_team: match.strAwayTeam,
+        home_score: match.intHomeScore,
+        away_score: match.intAwayScore,
+        winner: match.strWinner
+      }))
+    };
+  }
+
   const query = `
-    INSERT INTO match_context_data (id_event, lineups, stats, timeline, home_last_5, away_last_5)
-    VALUES ($1, $2, $3, $4, $5, $6)
+    INSERT INTO match_context_data (id_event, lineups, stats, timeline, home_last_5, away_last_5, deep_context)
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
     ON CONFLICT (id_event) DO UPDATE SET
       lineups = EXCLUDED.lineups,
       stats = EXCLUDED.stats,
       timeline = EXCLUDED.timeline,
       home_last_5 = EXCLUDED.home_last_5,
       away_last_5 = EXCLUDED.away_last_5,
+      deep_context = EXCLUDED.deep_context,
       updated_at = NOW()
   `;
 
@@ -158,7 +236,8 @@ async function enrichMatchContext(idEvent) {
     JSON.stringify(statsData),
     JSON.stringify(timelineData),
     JSON.stringify(homeLast5),
-    JSON.stringify(awayLast5)
+    JSON.stringify(awayLast5),
+    JSON.stringify(deepContext)
   ];
 
   try {
@@ -194,6 +273,7 @@ async function generateEdgeMindInsight(idEvent) {
   const stats = context.stats || {};
   const homeLast5 = context.home_last_5 || {};
   const awayLast5 = context.away_last_5 || {};
+  const deepContext = context.deep_context || {};
 
   // Calculate possession from stats (TheSportsDB returns stats as array)
   const homePossession = extractPossession(stats, 'Home');
@@ -203,22 +283,62 @@ async function generateEdgeMindInsight(idEvent) {
   const homeForm = calculateForm(homeLast5);
   const awayForm = calculateForm(awayLast5);
 
-  // EdgeMind logic: Possession dominant but lacks finishing
+  // Extract standings data from deep_context
+  const standings = deepContext.standings || {};
+  const homeStanding = standings.home || {};
+  const awayStanding = standings.away || {};
+
+  // Extract H2H data from deep_context
+  const h2h = deepContext.h2h || {};
+  const h2hMatches = h2h.recent_matches || [];
+
+  // Build AI prompt with deep context
+  const homeRank = homeStanding.rank || 'N/A';
+  const homePoints = homeStanding.points || 0;
+  const awayRank = awayStanding.rank || 'N/A';
+  const awayPoints = awayStanding.points || 0;
+
+  const homeFormStr = `${homeForm.wins}W-${homeForm.draws}D-${homeForm.losses}L`;
+  const awayFormStr = `${awayForm.wins}W-${awayForm.draws}D-${awayForm.losses}L`;
+
+  // Build H2H summary
+  let h2hSummary = 'No recent H2H data available';
+  if (h2hMatches.length > 0) {
+    const homeWins = h2hMatches.filter(m => m.winner === 'Home').length;
+    const awayWins = h2hMatches.filter(m => m.winner === 'Away').length;
+    const draws = h2hMatches.filter(m => m.winner === 'Draw').length;
+    h2hSummary = `Last ${h2hMatches.length}: Home ${homeWins}, Away ${awayWins}, Draw ${draws}`;
+  }
+
+  // Enhanced EdgeMind logic using standings and H2H
   let edgemindFeedback = 'Standard match probability.';
   let confidenceScore = 50;
 
+  // Use standings gap to inform confidence
+  const rankGap = (homeStanding.rank || 0) - (awayStanding.rank || 0);
+  const pointsGap = (homeStanding.points || 0) - (awayStanding.points || 0);
+
   if (homePossession > 60 && homeForm.losses >= 3) {
-    edgemindFeedback = 'Home team possession dominant but lacks finishing. Potential Under/Draw value.';
+    edgemindFeedback = `Home team (${homeRank}, ${homePoints}pts) has possession dominance but poor recent form (${homeFormStr}). H2H: ${h2hSummary}. Potential Under/Draw value.`;
     confidenceScore = 65;
   } else if (awayPossession > 60 && awayForm.losses >= 3) {
-    edgemindFeedback = 'Away team possession dominant but lacks finishing. Potential Under/Draw value.';
+    edgemindFeedback = `Away team (${awayRank}, ${awayPoints}pts) has possession dominance but poor recent form (${awayFormStr}). H2H: ${h2hSummary}. Potential Under/Draw value.`;
     confidenceScore = 65;
-  } else if (homePossession > 55 && homeForm.wins >= 3) {
-    edgemindFeedback = 'Home team in strong form with possession control. Solid home win probability.';
-    confidenceScore = 75;
-  } else if (awayPossession > 55 && awayForm.wins >= 3) {
-    edgemindFeedback = 'Away team in strong form with possession control. Solid away win probability.';
+  } else if (homePossession > 55 && homeForm.wins >= 3 && pointsGap > 5) {
+    edgemindFeedback = `Home team (${homeRank}, ${homePoints}pts) in strong form (${homeFormStr}) with significant table advantage over away team (${awayRank}, ${awayPoints}pts). H2H: ${h2hSummary}. Solid home win probability.`;
+    confidenceScore = 78;
+  } else if (awayPossession > 55 && awayForm.wins >= 3 && pointsGap < -5) {
+    edgemindFeedback = `Away team (${awayRank}, ${awayPoints}pts) in strong form (${awayFormStr}) with significant table advantage over home team (${homeRank}, ${homePoints}pts). H2H: ${h2hSummary}. Solid away win probability.`;
+    confidenceScore = 73;
+  } else if (rankGap > 3 && homeForm.wins >= 2) {
+    edgemindFeedback = `Home team (${homeRank}, ${homePoints}pts) significantly higher in table than away team (${awayRank}, ${awayPoints}pts). Recent form: ${homeFormStr} vs ${awayFormStr}. H2H: ${h2hSummary}. Home win favored.`;
     confidenceScore = 70;
+  } else if (rankGap < -3 && awayForm.wins >= 2) {
+    edgemindFeedback = `Away team (${awayRank}, ${awayPoints}pts) significantly higher in table than home team (${homeRank}, ${homePoints}pts). Recent form: ${awayFormStr} vs ${homeFormStr}. H2H: ${h2hSummary}. Away win favored.`;
+    confidenceScore = 68;
+  } else {
+    edgemindFeedback = `Closely matched teams. Home (${homeRank}, ${homePoints}pts, ${homeFormStr}) vs Away (${awayRank}, ${awayPoints}pts, ${awayFormStr}). H2H: ${h2hSummary}. Balanced match.`;
+    confidenceScore = 52;
   }
 
   // Generate placeholder value combos and same match builder (can be enhanced later)

@@ -462,6 +462,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
 window.updateModalWithAIData = function(aiPrediction) {
     const confidenceScoreEl = document.getElementById('ai-confidence-score');
     const edgemindFeedbackEl = document.getElementById('edgemind-feedback');
+    const valueCombosEl = document.getElementById('value-combos');
     
     if (confidenceScoreEl && aiPrediction.confidence_score !== undefined) {
         confidenceScoreEl.textContent = aiPrediction.confidence_score + '%';
@@ -476,7 +477,24 @@ window.updateModalWithAIData = function(aiPrediction) {
         edgemindFeedbackEl.classList.remove('text-slate-400');
         edgemindFeedbackEl.classList.add('text-emerald-400');
     }
-    
+
+    // Update value combos with actual data instead of "Pending"
+    if (valueCombosEl && aiPrediction.value_combos) {
+        const combos = aiPrediction.value_combos;
+        let combosHtml = '';
+        
+        if (combos.under_over) {
+            combosHtml += '<div style="margin-bottom:8px;padding:8px 12px;background:rgba(34,197,94,0.1);border-radius:6px;border:1px solid rgba(34,197,94,0.2);"><span style="font-size:0.85rem;color:#4ade80;font-weight:600;">Goals:</span> <span style="font-size:0.85rem;color:#e2e8f0;">' + combos.under_over + '</span></div>';
+        }
+        if (combos.double_chance) {
+            combosHtml += '<div style="margin-bottom:8px;padding:8px 12px;background:rgba(59,130,246,0.1);border-radius:6px;border:1px solid rgba(59,130,246,0.2);"><span style="font-size:0.85rem;color:#60a5fa;font-weight:600;">Safety:</span> <span style="font-size:0.85rem;color:#e2e8f0;">' + combos.double_chance + '</span></div>';
+        }
+        
+        if (combosHtml) {
+            valueCombosEl.innerHTML = combosHtml;
+        }
+    }
+
     // Hide loading state
     const loadingEl = document.getElementById('ai-loading-state');
     if (loadingEl) {
@@ -534,8 +552,9 @@ window.openMatchDetail = function(cardId) {
     }
 
     const leg = Array.isArray(prediction.matches) && prediction.matches[0] ? prediction.matches[0] : {};
-    const home = leg.home_team || (leg.metadata && leg.metadata.home_team) || 'Home';
-    const away = leg.away_team || (leg.metadata && leg.metadata.away_team) || 'Away';
+    // Enhanced team name extraction with multiple fallback locations
+    const home = leg.home_team || leg.strHomeTeam || (leg.metadata && leg.metadata.home_team) || (leg.metadata && leg.metadata.strHomeTeam) || 'Home';
+    const away = leg.away_team || leg.strAwayTeam || (leg.metadata && leg.metadata.away_team) || (leg.metadata && leg.metadata.strAwayTeam) || 'Away';
     const sectionType = String(prediction.section_type || prediction.type || 'direct');
     const confidence = Math.round(Number(prediction.total_confidence || 0));
     const league = leg.metadata && leg.metadata.league ? leg.metadata.league : (leg.sport || sectionType);
