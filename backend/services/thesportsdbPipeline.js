@@ -24,13 +24,34 @@ const THESPORTSDB_BASE_URL = 'https://www.thesportsdb.com/api/v1/json/3';
  */
 async function syncDailyFixtures(date) {
   const url = `${THESPORTSDB_BASE_URL}/searchevents.php?d=${date}`;
-  
+
   const response = await apiQueue.add(async () => {
     const fetch = require('node-fetch');
     const res = await fetch(url);
-    if (!res.ok) throw new Error(`TheSportsDB API error: ${res.status}`);
-    return res.json();
+    const rawText = await res.text();
+
+    if (!res.ok) {
+      console.error(`[syncDailyFixtures] TheSportsDB API error: ${res.status}`, rawText);
+      return null;
+    }
+
+    if (!rawText || rawText.trim() === '') {
+      console.error(`[syncDailyFixtures] TheSportsDB returned empty response`);
+      return null;
+    }
+
+    try {
+      return JSON.parse(rawText);
+    } catch (err) {
+      console.error(`[syncDailyFixtures] TheSportsDB returned invalid JSON:`, rawText);
+      return null;
+    }
   });
+
+  if (!response) {
+    console.error(`[syncDailyFixtures] Failed to fetch data for ${date}`);
+    return 0;
+  }
 
   const events = response.event || [];
   let syncedCount = 0;
@@ -249,8 +270,24 @@ async function fetchTheSportsDB(endpoint) {
   const fetch = require('node-fetch');
   const url = `${THESPORTSDB_BASE_URL}/${endpoint}`;
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`TheSportsDB API error: ${res.status}`);
-  return res.json();
+  const rawText = await res.text();
+
+  if (!res.ok) {
+    console.error(`[fetchTheSportsDB] TheSportsDB API error: ${res.status}`, rawText);
+    return null;
+  }
+
+  if (!rawText || rawText.trim() === '') {
+    console.error(`[fetchTheSportsDB] TheSportsDB returned empty response`);
+    return null;
+  }
+
+  try {
+    return JSON.parse(rawText);
+  } catch (err) {
+    console.error(`[fetchTheSportsDB] TheSportsDB returned invalid JSON:`, rawText);
+    return null;
+  }
 }
 
 /**
