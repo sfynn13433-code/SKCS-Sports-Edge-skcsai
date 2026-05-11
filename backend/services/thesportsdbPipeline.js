@@ -23,7 +23,7 @@ const THESPORTSDB_BASE_URL = 'https://www.thesportsdb.com/api/v1/json/3';
  * @returns {Promise<number>} - Number of fixtures synced
  */
 async function syncDailyFixtures(date) {
-  const url = `${THESPORTSDB_BASE_URL}/searchevents.php?d=${date}`;
+  const url = `${THESPORTSDB_BASE_URL}/eventsday.php?d=${date}`;
 
   const response = await apiQueue.add(async () => {
     const fetch = require('node-fetch');
@@ -53,7 +53,7 @@ async function syncDailyFixtures(date) {
     return 0;
   }
 
-  const events = response.event || [];
+  const events = response.events || response.event || [];
   let syncedCount = 0;
 
   for (const event of events) {
