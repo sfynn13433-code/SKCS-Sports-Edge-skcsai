@@ -153,17 +153,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
 
         // Safe stringified log before filter runs
         if (allPredictions.length > 0) {
-            var sample = allPredictions[0];
-            var sampleMatch = (sample.matches && sample.matches[0]) ? sample.matches[0] : {};
-            var sampleMeta = (sampleMatch.metadata && typeof sampleMatch.metadata === 'object') ? sampleMatch.metadata : {};
-            console.log('[SMH] Sorting payload. Sample sport value:', typeof sample.sport, sample.sport);
-            console.log('[SMH] Sample sport property:', {
-                pred_sport: sample.sport,
-                match_sport: sampleMatch.sport,
-                meta_sport: sampleMeta.sport,
-                raw_fixtures_sport: sample.raw_fixtures?.sport,
-                sport_name: sample.sport_name
-            });
+            console.log('[SMH] COMPLETE ROW OBJECT:', JSON.stringify(allPredictions[0], null, 2));
         }
 
         // Helper: Safely extract sport string from potentially nested object or string
