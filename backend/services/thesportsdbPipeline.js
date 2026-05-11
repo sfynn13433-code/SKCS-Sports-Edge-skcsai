@@ -113,8 +113,8 @@ async function enrichMatchContext(idEvent) {
   const now = new Date();
   const hoursUntilMatch = (startTime - now) / (1000 * 60 * 60);
 
-  // Only enrich if match is within 6 hours
-  if (hoursUntilMatch > 6) {
+  // Only enrich if match is within 24 hours
+  if (hoursUntilMatch > 24) {
     console.log(`[enrichMatchContext] Event ${idEvent} is ${hoursUntilMatch.toFixed(1)}h away. Skipping enrichment.`);
     return false;
   }
