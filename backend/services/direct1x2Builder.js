@@ -592,14 +592,36 @@ async function buildAndStoreDirect1X2(fixture, confidence, prediction, additiona
         }
 
         if (fallbackId) {
+            // Update only the fields that should change, preserving tier, type, and publish_run_id
+            const updateFields = {
+                total_confidence: row.total_confidence,
+                matches: row.matches,
+                recommendation: row.recommendation,
+                edgemind_report: row.edgemind_report,
+                secondary_insights: row.secondary_insights,
+                expires_at: row.expires_at
+            };
+            
+            // Add optional fields if they exist in the row
+            if (row.sport !== undefined) updateFields.sport = row.sport;
+            if (row.market_type !== undefined) updateFields.market_type = row.market_type;
+            if (row.prediction !== undefined) updateFields.prediction = row.prediction;
+            if (row.confidence !== undefined) updateFields.confidence = row.confidence;
+            if (row.match_date !== undefined) updateFields.match_date = row.match_date;
+            if (row.risk_tier !== undefined) updateFields.risk_tier = row.risk_tier;
+            
             const retry = await supabase
                 .from('direct1x2_prediction_final')
-                .update(row)
+                .update(updateFields)
                 .eq('id', fallbackId)
                 .select('*')
                 .single();
             data = retry.data;
             error = retry.error;
+            
+            if (!error) {
+                console.log('[direct1x2Builder] Updated existing fallback prediction instead of inserting duplicate:', fallbackId);
+            }
         }
     }
 

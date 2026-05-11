@@ -701,6 +701,21 @@ async function bootstrap() {
             END $$;
         `);
 
+        // Add composite partial unique index for fallback predictions to prevent duplicates
+        await query(`
+            CREATE UNIQUE INDEX IF NOT EXISTS uq_predictions_final_fallback
+            ON direct1x2_prediction_final (
+                LOWER(COALESCE(sport, '')),
+                LOWER(COALESCE(type, '')),
+                LOWER(COALESCE(tier, '')),
+                LOWER(COALESCE(market_type, '')),
+                LOWER(COALESCE(home_team, '')),
+                LOWER(COALESCE(away_team, '')),
+                COALESCE(matches->0->>'kickoff', created_at::date)
+            )
+            WHERE publish_run_id IS NULL;
+        `);
+
         await query(`
             CREATE TABLE IF NOT EXISTS debug_published (
                 id bigserial PRIMARY KEY,
