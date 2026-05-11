@@ -489,6 +489,25 @@ function requireRefreshKey(req, res, next) {
     return res.status(403).json({ error: 'Invalid API key' });
 }
 
+function requireAdminKey(req, res, next) {
+    const queryKey = req.query.key;
+    const headerKey = req.headers['x-admin-key'];
+    const adminKey = process.env.ADMIN_API_KEY;
+
+    const providedKey = queryKey || headerKey;
+
+    if (!adminKey) {
+        return res.status(500).json({ error: 'ADMIN_API_KEY not configured' });
+    }
+    if (!providedKey) {
+        return res.status(401).json({ error: 'Missing admin API key' });
+    }
+    if (providedKey !== adminKey) {
+        return res.status(401).json({ error: 'Invalid admin API key' });
+    }
+    return next();
+}
+
 app.post('/api/refresh-predictions', requireRefreshKey, (req, res) => {
     const sport = req.query.sport || req.body?.sport || null;
     const label = `scheduler refresh${sport ? ` (${sport})` : ''}`;
@@ -1182,7 +1201,7 @@ app.get('/api/debug/cricket-tables', async (_req, res) => {
 });
 
 // TEMPORARY: Admin routes for testing pipeline
-app.get('/api/admin/force-discovery', async (_req, res) => {
+app.get('/api/admin/force-discovery', requireAdminKey, async (_req, res) => {
     try {
         const today = new Date().toISOString().split('T')[0];
         console.log(`[ADMIN] Force discovery triggered for ${today}`);
@@ -1196,7 +1215,7 @@ app.get('/api/admin/force-discovery', async (_req, res) => {
     }
 });
 
-app.get('/api/admin/force-enrichment', async (_req, res) => {
+app.get('/api/admin/force-enrichment', requireAdminKey, async (_req, res) => {
     try {
         console.log('[ADMIN] Force enrichment triggered');
         

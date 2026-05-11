@@ -2416,6 +2416,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
 
         const enrichedPredictions = predictions.map((row) => {
             const matches = Array.isArray(row.matches) ? row.matches : [];
+            const predictionSport = row.sport || 'unknown';
             const enrichedMatches = matches.map((m) => {
                 const homeName = resolveMatchTeamName(m, 'home');
                 const awayName = resolveMatchTeamName(m, 'away');
@@ -2423,6 +2424,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                 const awayKey = awayName ? String(awayName).toLowerCase() : null;
                 return {
                     ...enrichMatchMetadata(m, row),
+                    sport: predictionSport,
                     home_team: homeName || null,
                     away_team: awayName || null,
                     home_team_name: homeName || m?.home_team_name || m?.home_name || '',
@@ -2433,6 +2435,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             });
             return {
                 ...row,
+                sport: predictionSport,
                 matches: enrichedMatches
             };
         }).map(enrichPredictionDetails);
