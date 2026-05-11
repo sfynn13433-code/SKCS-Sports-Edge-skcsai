@@ -157,7 +157,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
         }
 
         // Helper: Safely extract sport string from potentially nested object or string
-        function extractSportString(sportValue) {
+        function extractSportString(sportValue, predictionObj) {
             if (typeof sportValue === 'string') {
                 return sportValue.toLowerCase().trim();
             } else if (typeof sportValue === 'object' && sportValue !== null) {
@@ -167,12 +167,64 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
                 }
                 // Handle other object formats with sport property
                 if (sportValue.sport) {
-                    return extractSportString(sportValue.sport);
+                    return extractSportString(sportValue.sport, predictionObj);
                 }
                 // Fallback: stringify and try to extract
                 return String(JSON.stringify(sportValue)).toLowerCase().trim();
             }
-            return '';
+
+            // If no direct sport value found, try to infer from nested metadata
+            if (predictionObj && predictionObj.matches && predictionObj.matches.length > 0) {
+                var match = predictionObj.matches[0];
+                var meta = match.metadata || {};
+
+                // Check metadata.provider for sport clues (e.g., "football-data-org" -> Soccer)
+                if (meta.provider) {
+                    var providerLower = String(meta.provider).toLowerCase();
+                    if (providerLower.includes('football')) {
+                        return 'soccer';
+                    } else if (providerLower.includes('baseball')) {
+                        return 'baseball';
+                    } else if (providerLower.includes('tennis')) {
+                        return 'tennis';
+                    } else if (providerLower.includes('cricket')) {
+                        return 'cricket';
+                    } else if (providerLower.includes('basketball')) {
+                        return 'basketball';
+                    }
+                }
+
+                // Check metadata.sport or metadata.strSport
+                if (meta.sport) {
+                    return extractSportString(meta.sport, predictionObj);
+                }
+                if (meta.strSport) {
+                    return extractSportString(meta.strSport, predictionObj);
+                }
+
+                // Check match.sport or match.strSport
+                if (match.sport) {
+                    return extractSportString(match.sport, predictionObj);
+                }
+                if (match.strSport) {
+                    return extractSportString(match.strSport, predictionObj);
+                }
+
+                // Check metadata.league for sport clues
+                if (meta.league) {
+                    var leagueLower = String(meta.league).toLowerCase();
+                    if (leagueLower.includes('premier') || leagueLower.includes('la liga') || leagueLower.includes('bundesliga') || leagueLower.includes('serie') || leagueLower.includes('ligue')) {
+                        return 'soccer';
+                    } else if (leagueLower.includes('mlb')) {
+                        return 'baseball';
+                    } else if (leagueLower.includes('atp') || leagueLower.includes('wta')) {
+                        return 'tennis';
+                    }
+                }
+            }
+
+            // Safe default: return 'Unknown' instead of undefined/empty string
+            return 'unknown';
         }
 
         // Sport Name Mapping: Frontend "Football" should match backend "Soccer"
@@ -199,11 +251,16 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
 
             var predSport = '';
             for (var i = 0; i < predSportValues.length; i++) {
-                var extracted = extractSportString(predSportValues[i]);
-                if (extracted) {
+                var extracted = extractSportString(predSportValues[i], pred);
+                if (extracted && extracted !== 'unknown') {
                     predSport = extracted;
                     break;
                 }
+            }
+
+            // If still no sport found, try direct metadata inference
+            if (!predSport || predSport === 'unknown') {
+                predSport = extractSportString(null, pred);
             }
 
             // Strict tab routing: Match against current sport or its aliases only
