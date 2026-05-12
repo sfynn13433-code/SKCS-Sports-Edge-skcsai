@@ -544,7 +544,7 @@ const SKCS_PIPELINE_DATA = [
     }
 ];
 
-window.openMatchDetail = function(cardId) {
+window.openMatchDetail = async function(cardId) {
     const prediction = window.SMH_CARD_REGISTRY.get(cardId);
     if (!prediction) {
         console.error('[SMH] No prediction found for card ID:', cardId);
