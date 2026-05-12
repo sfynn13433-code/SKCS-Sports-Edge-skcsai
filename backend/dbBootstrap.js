@@ -701,6 +701,21 @@ async function bootstrap() {
             END $$;
         `);
 
+        // Add injuries column to match_context_data if it doesn't exist
+        await query(`
+            DO $$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1 FROM information_schema.columns
+                    WHERE table_name = 'match_context_data'
+                    AND column_name = 'injuries'
+                ) THEN
+                    ALTER TABLE match_context_data
+                    ADD COLUMN injuries jsonb DEFAULT '{}'::jsonb;
+                END IF;
+            END $$;
+        `);
+
         // Add composite partial unique index for fallback predictions to prevent duplicates
         await query(`
             CREATE UNIQUE INDEX IF NOT EXISTS uq_predictions_final_fallback
