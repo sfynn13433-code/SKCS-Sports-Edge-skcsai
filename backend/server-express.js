@@ -250,7 +250,7 @@ const directInsightsSupabase = DIRECT_INSIGHTS_SUPABASE_URL && DIRECT_INSIGHTS_S
 void (async () => {
     if (!directInsightsSupabase) return;
     const { error } = await directInsightsSupabase.from('match_context_data').insert({
-        match_id: 'FORCE_BOOT_TEST',
+        id_event: 'FORCE_BOOT_TEST',
         injuries: { forced: true }
     });
 

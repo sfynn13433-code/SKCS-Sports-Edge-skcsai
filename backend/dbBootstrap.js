@@ -726,7 +726,7 @@ async function bootstrap() {
                 LOWER(COALESCE(market_type, '')),
                 LOWER(COALESCE(home_team, '')),
                 LOWER(COALESCE(away_team, '')),
-                COALESCE(matches->0->>'kickoff', created_at::date::text)
+                COALESCE(matches->0->>'kickoff', created_at::text)
             )
             WHERE publish_run_id IS NULL;
         `);
