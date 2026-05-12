@@ -203,7 +203,8 @@ function buildInsightPrompt(params) {
         formData,
         h2h,
         weather,
-        absences
+        absences,
+        odds
     } = params;
 
     // AI-DISABLED: [Missing strict enforcement for exactly 4 top Secondary Insights per STRICT_RULES.md]

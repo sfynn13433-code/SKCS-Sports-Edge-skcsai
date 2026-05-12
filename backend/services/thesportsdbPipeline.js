@@ -13,7 +13,8 @@ const { apiQueue } = require('../utils/apiQueue');
 const db = require('../db'); // PostgreSQL pool
 
 // TheSportsDB API configuration
-const THESPORTSDB_BASE_URL = 'https://www.thesportsdb.com/api/v1/json/3';
+const config = require('../config');
+const THESPORTSDB_BASE_URL = `https://www.thesportsdb.com/api/v1/json/${config.theSportsDbKey || '3'}`;
 
 /**
  * syncDailyFixtures(date)
@@ -152,8 +153,19 @@ async function enrichMatchContext(idEvent) {
       standingsData = await apiQueue.add(() => fetchTheSportsDB(`lookuptable.php?l=${leagueId}&s=${season}`));
     }
 
-    // Fetch H2H results
-    h2hData = await apiQueue.add(() => fetchTheSportsDB(`lookupeventresults.php?id=${idEvent}`));
+    // Fetch H2H results using eventslast.php for both teams (lookupeventresults.php doesn't exist)
+    const [homeTeamLastEvents, awayTeamLastEvents] = await Promise.all([
+      apiQueue.add(() => fetchTheSportsDB(`eventslast.php?id=${homeTeamId}`)),
+      apiQueue.add(() => fetchTheSportsDB(`eventslast.php?id=${awayTeamId}`))
+    ]);
+    
+    // Combine both teams' recent events to simulate H2H context
+    h2hData = {
+      results: [
+        ...(homeTeamLastEvents.results || []),
+        ...(awayTeamLastEvents.results || [])
+      ].slice(0, 10) // Limit to 10 most recent matches
+    };
   } catch (err) {
     console.warn(`[enrichMatchContext] Failed to fetch deep context for ${idEvent}:`, err.message);
     // Continue without deep context - don't fail the entire enrichment
@@ -389,23 +401,25 @@ async function generateEdgeMindInsight(idEvent) {
 async function fetchTheSportsDB(endpoint) {
   const fetch = require('node-fetch');
   const url = `${THESPORTSDB_BASE_URL}/${endpoint}`;
+  console.log("[fetchTheSportsDB] Fetching URL:", url);
+  
   const res = await fetch(url);
   const rawText = await res.text();
 
   if (!res.ok) {
-    console.error(`[fetchTheSportsDB] TheSportsDB API error: ${res.status}`, rawText);
+    console.error(`[fetchTheSportsDB] TheSportsDB API error: ${res.status} for URL: ${url}`, rawText);
     return null;
   }
 
   if (!rawText || rawText.trim() === '') {
-    console.error(`[fetchTheSportsDB] TheSportsDB returned empty response`);
+    console.error(`[fetchTheSportsDB] TheSportsDB returned empty response for URL: ${url}`);
     return null;
   }
 
   try {
     return JSON.parse(rawText);
   } catch (err) {
-    console.error(`[fetchTheSportsDB] TheSportsDB returned invalid JSON:`, rawText);
+    console.error(`[fetchTheSportsDB] TheSportsDB returned invalid JSON for URL: ${url}:`, rawText);
     return null;
   }
 }

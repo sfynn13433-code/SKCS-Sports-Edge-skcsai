@@ -1,0 +1,2046 @@
+{
+  "timestamp": "2026-05-11T17:44:24.508Z",
+  "database_info": {
+    "postgresql_version": "PostgreSQL 17.6 on aarch64-unknown-linux-gnu, compiled by gcc (GCC) 13.2.0, 64-bit",
+    "database_name": "postgres",
+    "current_user": "postgres",
+    "server_ip": "2a05:d014:1c06:5f3e:3c88:d50b:f8d0:e4c5",
+    "server_port": 5432
+  },
+  "tables": [
+    {
+      "schema": "auth",
+      "name": "audit_log_entries",
+      "owner": "supabase_auth_admin",
+      "row_count": 0,
+      "total_size": "24 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "custom_oauth_providers",
+      "owner": "supabase_auth_admin",
+      "row_count": 0,
+      "total_size": "56 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "56 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "flow_state",
+      "owner": "supabase_auth_admin",
+      "row_count": 0,
+      "total_size": "40 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "40 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "identities",
+      "owner": "supabase_auth_admin",
+      "row_count": 1,
+      "total_size": "80 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "72 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "instances",
+      "owner": "supabase_auth_admin",
+      "row_count": 0,
+      "total_size": "16 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "16 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "mfa_amr_claims",
+      "owner": "supabase_auth_admin",
+      "row_count": 50,
+      "total_size": "80 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "72 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "mfa_challenges",
+      "owner": "supabase_auth_admin",
+      "row_count": 0,
+      "total_size": "24 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "mfa_factors",
+      "owner": "supabase_auth_admin",
+      "row_count": 0,
+      "total_size": "56 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "56 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "oauth_authorizations",
+      "owner": "supabase_auth_admin",
+      "row_count": 0,
+      "total_size": "40 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "40 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "oauth_client_states",
+      "owner": "supabase_auth_admin",
+      "row_count": 0,
+      "total_size": "24 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "oauth_clients",
+      "owner": "supabase_auth_admin",
+      "row_count": 0,
+      "total_size": "24 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "oauth_consents",
+      "owner": "supabase_auth_admin",
+      "row_count": 0,
+      "total_size": "48 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "48 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "one_time_tokens",
+      "owner": "supabase_auth_admin",
+      "row_count": 0,
+      "total_size": "112 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "104 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "refresh_tokens",
+      "owner": "supabase_auth_admin",
+      "row_count": 335,
+      "total_size": "256 kB",
+      "table_size": "64 kB",
+      "indexes_size": "192 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "saml_providers",
+      "owner": "supabase_auth_admin",
+      "row_count": 0,
+      "total_size": "32 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "32 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "saml_relay_states",
+      "owner": "supabase_auth_admin",
+      "row_count": 0,
+      "total_size": "40 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "40 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "schema_migrations",
+      "owner": "supabase_auth_admin",
+      "row_count": 76,
+      "total_size": "24 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "16 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "sessions",
+      "owner": "supabase_auth_admin",
+      "row_count": 50,
+      "total_size": "136 kB",
+      "table_size": "24 kB",
+      "indexes_size": "112 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "sso_domains",
+      "owner": "supabase_auth_admin",
+      "row_count": 0,
+      "total_size": "32 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "32 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "sso_providers",
+      "owner": "supabase_auth_admin",
+      "row_count": 0,
+      "total_size": "32 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "32 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "users",
+      "owner": "supabase_auth_admin",
+      "row_count": 1,
+      "total_size": "208 kB",
+      "table_size": "24 kB",
+      "indexes_size": "184 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "webauthn_challenges",
+      "owner": "supabase_auth_admin",
+      "row_count": 0,
+      "total_size": "32 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "32 kB"
+    },
+    {
+      "schema": "auth",
+      "name": "webauthn_credentials",
+      "owner": "supabase_auth_admin",
+      "row_count": 0,
+      "total_size": "32 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "32 kB"
+    },
+    {
+      "schema": "cron",
+      "name": "job",
+      "owner": "supabase_admin",
+      "row_count": 5,
+      "total_size": "48 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "40 kB"
+    },
+    {
+      "schema": "cron",
+      "name": "job_run_details",
+      "owner": "supabase_admin",
+      "row_count": 1395,
+      "total_size": "648 kB",
+      "table_size": "568 kB",
+      "indexes_size": "80 kB"
+    },
+    {
+      "schema": "net",
+      "name": "_http_response",
+      "owner": "supabase_admin",
+      "row_count": 2,
+      "total_size": "48 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "40 kB"
+    },
+    {
+      "schema": "net",
+      "name": "http_request_queue",
+      "owner": "supabase_admin",
+      "row_count": 0,
+      "total_size": "64 kB",
+      "table_size": "16 kB",
+      "indexes_size": "48 kB"
+    },
+    {
+      "schema": "public",
+      "name": "acca_rules",
+      "owner": "postgres",
+      "row_count": 8,
+      "total_size": "128 kB",
+      "table_size": "56 kB",
+      "indexes_size": "72 kB"
+    },
+    {
+      "schema": "public",
+      "name": "ai_predictions",
+      "owner": "postgres",
+      "row_count": 3,
+      "total_size": "32 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "public",
+      "name": "api_raw",
+      "owner": "postgres",
+      "row_count": 78,
+      "total_size": "72 kB",
+      "table_size": "24 kB",
+      "indexes_size": "48 kB"
+    },
+    {
+      "schema": "public",
+      "name": "bookmakers",
+      "owner": "postgres",
+      "row_count": 22,
+      "total_size": "32 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "public",
+      "name": "canonical_entities",
+      "owner": "postgres",
+      "row_count": 1716,
+      "total_size": "384 kB",
+      "table_size": "168 kB",
+      "indexes_size": "216 kB"
+    },
+    {
+      "schema": "public",
+      "name": "canonical_events",
+      "owner": "postgres",
+      "row_count": 6381,
+      "total_size": "17 MB",
+      "table_size": "16 MB",
+      "indexes_size": "1032 kB"
+    },
+    {
+      "schema": "public",
+      "name": "context_intelligence_cache",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "32 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "32 kB"
+    },
+    {
+      "schema": "public",
+      "name": "cricket_fixtures",
+      "owner": "postgres",
+      "row_count": 17,
+      "total_size": "216 kB",
+      "table_size": "104 kB",
+      "indexes_size": "112 kB"
+    },
+    {
+      "schema": "public",
+      "name": "cricket_insights_final",
+      "owner": "postgres",
+      "row_count": 79,
+      "total_size": "704 kB",
+      "table_size": "392 kB",
+      "indexes_size": "312 kB"
+    },
+    {
+      "schema": "public",
+      "name": "cricket_market_rules",
+      "owner": "postgres",
+      "row_count": 45,
+      "total_size": "48 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "40 kB"
+    },
+    {
+      "schema": "public",
+      "name": "debug_published",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "32 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "32 kB"
+    },
+    {
+      "schema": "public",
+      "name": "direct1x2_prediction_final",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "344 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "344 kB"
+    },
+    {
+      "schema": "public",
+      "name": "direct_1x2_insights",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "16 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "16 kB"
+    },
+    {
+      "schema": "public",
+      "name": "direct_1x2_stages",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "16 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "16 kB"
+    },
+    {
+      "schema": "public",
+      "name": "event_injury_snapshots",
+      "owner": "postgres",
+      "row_count": 346,
+      "total_size": "536 kB",
+      "table_size": "376 kB",
+      "indexes_size": "160 kB"
+    },
+    {
+      "schema": "public",
+      "name": "event_news_snapshots",
+      "owner": "postgres",
+      "row_count": 108,
+      "total_size": "376 kB",
+      "table_size": "184 kB",
+      "indexes_size": "192 kB"
+    },
+    {
+      "schema": "public",
+      "name": "event_weather_snapshots",
+      "owner": "postgres",
+      "row_count": 48,
+      "total_size": "208 kB",
+      "table_size": "128 kB",
+      "indexes_size": "80 kB"
+    },
+    {
+      "schema": "public",
+      "name": "events",
+      "owner": "postgres",
+      "row_count": 15302,
+      "total_size": "3056 kB",
+      "table_size": "2048 kB",
+      "indexes_size": "1008 kB"
+    },
+    {
+      "schema": "public",
+      "name": "fixture_context_cache",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "16 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "16 kB"
+    },
+    {
+      "schema": "public",
+      "name": "fixtures",
+      "owner": "postgres",
+      "row_count": 1,
+      "total_size": "48 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "40 kB"
+    },
+    {
+      "schema": "public",
+      "name": "injuries",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "16 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "16 kB"
+    },
+    {
+      "schema": "public",
+      "name": "leagues",
+      "owner": "postgres",
+      "row_count": 26,
+      "total_size": "32 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "public",
+      "name": "match_context_data",
+      "owner": "postgres",
+      "row_count": 3,
+      "total_size": "32 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "public",
+      "name": "matches",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "16 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "16 kB"
+    },
+    {
+      "schema": "public",
+      "name": "news_mentions",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "16 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "16 kB"
+    },
+    {
+      "schema": "public",
+      "name": "normalized_fixtures",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "48 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "48 kB"
+    },
+    {
+      "schema": "public",
+      "name": "odds_snapshots",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "24 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "public",
+      "name": "prediction_publish_runs",
+      "owner": "postgres",
+      "row_count": 147,
+      "total_size": "224 kB",
+      "table_size": "136 kB",
+      "indexes_size": "88 kB"
+    },
+    {
+      "schema": "public",
+      "name": "prediction_results",
+      "owner": "postgres",
+      "row_count": 8,
+      "total_size": "32 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "public",
+      "name": "predictions_accuracy",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "128 kB",
+      "table_size": "24 kB",
+      "indexes_size": "104 kB"
+    },
+    {
+      "schema": "public",
+      "name": "predictions_filtered",
+      "owner": "postgres",
+      "row_count": 106908,
+      "total_size": "15 MB",
+      "table_size": "8736 kB",
+      "indexes_size": "6600 kB"
+    },
+    {
+      "schema": "public",
+      "name": "predictions_raw",
+      "owner": "postgres",
+      "row_count": 54609,
+      "total_size": "39 MB",
+      "table_size": "33 MB",
+      "indexes_size": "5712 kB"
+    },
+    {
+      "schema": "public",
+      "name": "predictions_stage_1",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "112 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "112 kB"
+    },
+    {
+      "schema": "public",
+      "name": "predictions_stage_2",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "8192 bytes",
+      "table_size": "0 bytes",
+      "indexes_size": "8192 bytes"
+    },
+    {
+      "schema": "public",
+      "name": "predictions_stage_3",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "16 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "16 kB"
+    },
+    {
+      "schema": "public",
+      "name": "profiles",
+      "owner": "postgres",
+      "row_count": 1,
+      "total_size": "32 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "public",
+      "name": "rapidapi_cache",
+      "owner": "postgres",
+      "row_count": 45,
+      "total_size": "128 kB",
+      "table_size": "24 kB",
+      "indexes_size": "104 kB"
+    },
+    {
+      "schema": "public",
+      "name": "raw_fixtures",
+      "owner": "postgres",
+      "row_count": 3,
+      "total_size": "240 kB",
+      "table_size": "184 kB",
+      "indexes_size": "56 kB"
+    },
+    {
+      "schema": "public",
+      "name": "scheduler_run_locks",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "24 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "public",
+      "name": "scheduling_logs",
+      "owner": "postgres",
+      "row_count": 15,
+      "total_size": "64 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "56 kB"
+    },
+    {
+      "schema": "public",
+      "name": "secondary_market_allowlist",
+      "owner": "postgres",
+      "row_count": 32,
+      "total_size": "32 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "public",
+      "name": "sports",
+      "owner": "postgres",
+      "row_count": 59,
+      "total_size": "64 kB",
+      "table_size": "16 kB",
+      "indexes_size": "48 kB"
+    },
+    {
+      "schema": "public",
+      "name": "subscription_plans",
+      "owner": "postgres",
+      "row_count": 8,
+      "total_size": "64 kB",
+      "table_size": "16 kB",
+      "indexes_size": "48 kB"
+    },
+    {
+      "schema": "public",
+      "name": "subscriptions",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "24 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "public",
+      "name": "table_lifecycle_registry",
+      "owner": "postgres",
+      "row_count": 12,
+      "total_size": "352 kB",
+      "table_size": "296 kB",
+      "indexes_size": "56 kB"
+    },
+    {
+      "schema": "public",
+      "name": "team_stats",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "16 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "16 kB"
+    },
+    {
+      "schema": "public",
+      "name": "team_week_locks",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "24 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "public",
+      "name": "teams",
+      "owner": "postgres",
+      "row_count": 0,
+      "total_size": "16 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "16 kB"
+    },
+    {
+      "schema": "public",
+      "name": "tier_rules",
+      "owner": "postgres",
+      "row_count": 2,
+      "total_size": "96 kB",
+      "table_size": "40 kB",
+      "indexes_size": "56 kB"
+    },
+    {
+      "schema": "public",
+      "name": "zz_archive_matches",
+      "owner": "postgres",
+      "row_count": 5,
+      "total_size": "128 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "120 kB"
+    },
+    {
+      "schema": "realtime",
+      "name": "messages",
+      "owner": "supabase_realtime_admin",
+      "row_count": 0,
+      "total_size": "0 bytes",
+      "table_size": "0 bytes",
+      "indexes_size": "0 bytes"
+    },
+    {
+      "schema": "realtime",
+      "name": "schema_migrations",
+      "owner": "supabase_admin",
+      "row_count": 69,
+      "total_size": "24 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "16 kB"
+    },
+    {
+      "schema": "realtime",
+      "name": "subscription",
+      "owner": "supabase_admin",
+      "row_count": 0,
+      "total_size": "32 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "32 kB"
+    },
+    {
+      "schema": "storage",
+      "name": "buckets",
+      "owner": "supabase_storage_admin",
+      "row_count": 0,
+      "total_size": "24 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "storage",
+      "name": "buckets_analytics",
+      "owner": "supabase_storage_admin",
+      "row_count": 0,
+      "total_size": "24 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "storage",
+      "name": "buckets_vectors",
+      "owner": "supabase_storage_admin",
+      "row_count": 0,
+      "total_size": "16 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "16 kB"
+    },
+    {
+      "schema": "storage",
+      "name": "migrations",
+      "owner": "supabase_storage_admin",
+      "row_count": 61,
+      "total_size": "40 kB",
+      "table_size": "8192 bytes",
+      "indexes_size": "32 kB"
+    },
+    {
+      "schema": "storage",
+      "name": "objects",
+      "owner": "supabase_storage_admin",
+      "row_count": 0,
+      "total_size": "48 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "48 kB"
+    },
+    {
+      "schema": "storage",
+      "name": "s3_multipart_uploads",
+      "owner": "supabase_storage_admin",
+      "row_count": 0,
+      "total_size": "24 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "storage",
+      "name": "s3_multipart_uploads_parts",
+      "owner": "supabase_storage_admin",
+      "row_count": 0,
+      "total_size": "16 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "16 kB"
+    },
+    {
+      "schema": "storage",
+      "name": "vector_indexes",
+      "owner": "supabase_storage_admin",
+      "row_count": 0,
+      "total_size": "24 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "24 kB"
+    },
+    {
+      "schema": "vault",
+      "name": "secrets",
+      "owner": "supabase_admin",
+      "row_count": 0,
+      "total_size": "24 kB",
+      "table_size": "0 bytes",
+      "indexes_size": "24 kB"
+    }
+  ],
+  "duplicates": {
+    "predictions_raw": {
+      "duplicate_groups": 1203,
+      "comparison_columns": [
+        "match_id",
+        "sport",
+        "market",
+        "prediction",
+        "confidence",
+        "volatility",
+        "odds",
+        "metadata"
+      ]
+    }
+  },
+  "constraints": {
+    "acca_rules": [
+      {
+        "name": "acca_rules_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "acca_rules",
+        "foreign_column": "id"
+      },
+      {
+        "name": "acca_rules_rule_name_key",
+        "type": "UNIQUE",
+        "column": "rule_name",
+        "foreign_table": "acca_rules",
+        "foreign_column": "rule_name"
+      }
+    ],
+    "ai_predictions": [
+      {
+        "name": "ai_predictions_match_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "match_id",
+        "foreign_table": "raw_fixtures",
+        "foreign_column": "id_event"
+      },
+      {
+        "name": "ai_predictions_pkey",
+        "type": "PRIMARY KEY",
+        "column": "match_id",
+        "foreign_table": "ai_predictions",
+        "foreign_column": "match_id"
+      }
+    ],
+    "api_raw": [
+      {
+        "name": "api_raw_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "api_raw",
+        "foreign_column": "id"
+      }
+    ],
+    "bookmakers": [
+      {
+        "name": "bookmakers_pkey",
+        "type": "PRIMARY KEY",
+        "column": "bookmaker_key",
+        "foreign_table": "bookmakers",
+        "foreign_column": "bookmaker_key"
+      }
+    ],
+    "canonical_entities": [
+      {
+        "name": "canonical_entities_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "canonical_entities",
+        "foreign_column": "id"
+      },
+      {
+        "name": "canonical_entities_provider_id_sport_key",
+        "type": "UNIQUE",
+        "column": "provider_id",
+        "foreign_table": "canonical_entities",
+        "foreign_column": "sport"
+      },
+      {
+        "name": "canonical_entities_provider_id_sport_key",
+        "type": "UNIQUE",
+        "column": "sport",
+        "foreign_table": "canonical_entities",
+        "foreign_column": "sport"
+      },
+      {
+        "name": "canonical_entities_provider_id_sport_key",
+        "type": "UNIQUE",
+        "column": "sport",
+        "foreign_table": "canonical_entities",
+        "foreign_column": "provider_id"
+      },
+      {
+        "name": "canonical_entities_provider_id_sport_key",
+        "type": "UNIQUE",
+        "column": "provider_id",
+        "foreign_table": "canonical_entities",
+        "foreign_column": "provider_id"
+      }
+    ],
+    "canonical_events": [
+      {
+        "name": "canonical_events_away_entity_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "away_entity_id",
+        "foreign_table": "canonical_entities",
+        "foreign_column": "id"
+      },
+      {
+        "name": "canonical_events_home_entity_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "home_entity_id",
+        "foreign_table": "canonical_entities",
+        "foreign_column": "id"
+      },
+      {
+        "name": "canonical_events_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "canonical_events",
+        "foreign_column": "id"
+      }
+    ],
+    "context_intelligence_cache": [
+      {
+        "name": "context_intelligence_cache_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "context_intelligence_cache",
+        "foreign_column": "id"
+      },
+      {
+        "name": "context_intelligence_cache_cache_key_key",
+        "type": "UNIQUE",
+        "column": "cache_key",
+        "foreign_table": "context_intelligence_cache",
+        "foreign_column": "cache_key"
+      }
+    ],
+    "cricket_fixtures": [
+      {
+        "name": "cricket_fixtures_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "cricket_fixtures",
+        "foreign_column": "id"
+      },
+      {
+        "name": "cricket_fixtures_provider_provider_match_id_key",
+        "type": "UNIQUE",
+        "column": "provider_match_id",
+        "foreign_table": "cricket_fixtures",
+        "foreign_column": "provider_match_id"
+      },
+      {
+        "name": "cricket_fixtures_provider_provider_match_id_key",
+        "type": "UNIQUE",
+        "column": "provider_match_id",
+        "foreign_table": "cricket_fixtures",
+        "foreign_column": "provider"
+      },
+      {
+        "name": "cricket_fixtures_provider_provider_match_id_key",
+        "type": "UNIQUE",
+        "column": "provider",
+        "foreign_table": "cricket_fixtures",
+        "foreign_column": "provider_match_id"
+      },
+      {
+        "name": "cricket_fixtures_provider_provider_match_id_key",
+        "type": "UNIQUE",
+        "column": "provider",
+        "foreign_table": "cricket_fixtures",
+        "foreign_column": "provider"
+      }
+    ],
+    "cricket_insights_final": [
+      {
+        "name": "cricket_insights_final_fixture_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "fixture_id",
+        "foreign_table": "cricket_fixtures",
+        "foreign_column": "id"
+      },
+      {
+        "name": "cricket_insights_final_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "cricket_insights_final",
+        "foreign_column": "id"
+      }
+    ],
+    "cricket_market_rules": [
+      {
+        "name": "cricket_market_rules_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "cricket_market_rules",
+        "foreign_column": "id"
+      },
+      {
+        "name": "cricket_market_rules_market_key_key",
+        "type": "UNIQUE",
+        "column": "market_key",
+        "foreign_table": "cricket_market_rules",
+        "foreign_column": "market_key"
+      }
+    ],
+    "debug_published": [
+      {
+        "name": "debug_published_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "debug_published",
+        "foreign_column": "id"
+      }
+    ],
+    "direct1x2_prediction_final": [
+      {
+        "name": "direct1x2_prediction_final_publish_run_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "publish_run_id",
+        "foreign_table": "prediction_publish_runs",
+        "foreign_column": "id"
+      },
+      {
+        "name": "direct1x2_prediction_final_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "direct1x2_prediction_final",
+        "foreign_column": "id"
+      }
+    ],
+    "direct_1x2_insights": [
+      {
+        "name": "direct_1x2_insights_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "direct_1x2_insights",
+        "foreign_column": "id"
+      }
+    ],
+    "direct_1x2_stages": [
+      {
+        "name": "direct_1x2_stages_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "direct_1x2_stages",
+        "foreign_column": "id"
+      }
+    ],
+    "event_injury_snapshots": [
+      {
+        "name": "event_injury_snapshots_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "id"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "player_provider_id",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "status_reason"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "player_provider_id",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "player_provider_id"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "player_provider_id",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "event_id"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "status_type",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "status_type"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "status_type",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "team_provider_id"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "team_provider_id",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "team_provider_id"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "status_reason",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "event_id"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "status_reason",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "player_provider_id"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "status_type",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "event_id"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "team_provider_id",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "status_type"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "team_provider_id",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "status_reason"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "team_provider_id",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "player_provider_id"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "team_provider_id",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "event_id"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "event_id",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "team_provider_id"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "event_id",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "status_type"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "event_id",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "status_reason"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "event_id",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "player_provider_id"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "event_id",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "event_id"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "status_reason",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "status_reason"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "status_reason",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "status_type"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "status_reason",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "team_provider_id"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "status_type",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "status_reason"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "player_provider_id",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "status_type"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "player_provider_id",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "team_provider_id"
+      },
+      {
+        "name": "event_injury_snapshots_event_id_team_provider_id_player_pro_key",
+        "type": "UNIQUE",
+        "column": "status_type",
+        "foreign_table": "event_injury_snapshots",
+        "foreign_column": "player_provider_id"
+      }
+    ],
+    "event_news_snapshots": [
+      {
+        "name": "event_news_snapshots_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "id"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "article_title",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "team_name"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "event_id",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "article_title"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "event_id",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "article_url"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "event_id",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "event_id"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "event_id",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "signal_type"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "event_id",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "team_name"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "team_name",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "article_title"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "team_name",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "article_url"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "team_name",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "event_id"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "team_name",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "signal_type"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "team_name",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "team_name"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "signal_type",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "article_title"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "signal_type",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "article_url"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "signal_type",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "event_id"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "signal_type",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "signal_type"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "signal_type",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "team_name"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "article_title",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "article_title"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "article_title",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "article_url"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "article_title",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "event_id"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "article_title",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "signal_type"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "article_url",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "article_title"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "article_url",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "article_url"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "article_url",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "event_id"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "article_url",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "signal_type"
+      },
+      {
+        "name": "event_news_snapshots_event_id_team_name_signal_type_article_key",
+        "type": "UNIQUE",
+        "column": "article_url",
+        "foreign_table": "event_news_snapshots",
+        "foreign_column": "team_name"
+      }
+    ],
+    "event_weather_snapshots": [
+      {
+        "name": "event_weather_snapshots_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "event_weather_snapshots",
+        "foreign_column": "id"
+      },
+      {
+        "name": "event_weather_snapshots_event_id_key",
+        "type": "UNIQUE",
+        "column": "event_id",
+        "foreign_table": "event_weather_snapshots",
+        "foreign_column": "event_id"
+      }
+    ],
+    "events": [
+      {
+        "name": "events_sport_key_fkey",
+        "type": "FOREIGN KEY",
+        "column": "sport_key",
+        "foreign_table": "sports",
+        "foreign_column": "sport_key"
+      },
+      {
+        "name": "events_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "events",
+        "foreign_column": "id"
+      }
+    ],
+    "fixture_context_cache": [
+      {
+        "name": "fixture_context_cache_pkey",
+        "type": "PRIMARY KEY",
+        "column": "fixture_id",
+        "foreign_table": "fixture_context_cache",
+        "foreign_column": "fixture_id"
+      }
+    ],
+    "fixtures": [
+      {
+        "name": "fixtures_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "fixtures",
+        "foreign_column": "id"
+      },
+      {
+        "name": "fixtures_fixture_id_key",
+        "type": "UNIQUE",
+        "column": "fixture_id",
+        "foreign_table": "fixtures",
+        "foreign_column": "fixture_id"
+      }
+    ],
+    "injuries": [
+      {
+        "name": "injuries_team_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "team_id",
+        "foreign_table": "teams",
+        "foreign_column": "id"
+      },
+      {
+        "name": "injuries_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "injuries",
+        "foreign_column": "id"
+      }
+    ],
+    "leagues": [
+      {
+        "name": "leagues_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "leagues",
+        "foreign_column": "id"
+      }
+    ],
+    "match_context_data": [
+      {
+        "name": "match_context_data_id_event_fkey",
+        "type": "FOREIGN KEY",
+        "column": "id_event",
+        "foreign_table": "raw_fixtures",
+        "foreign_column": "id_event"
+      },
+      {
+        "name": "match_context_data_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id_event",
+        "foreign_table": "match_context_data",
+        "foreign_column": "id_event"
+      }
+    ],
+    "matches": [
+      {
+        "name": "matches_away_team_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "away_team_id",
+        "foreign_table": "teams",
+        "foreign_column": "id"
+      },
+      {
+        "name": "matches_home_team_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "home_team_id",
+        "foreign_table": "teams",
+        "foreign_column": "id"
+      },
+      {
+        "name": "matches_league_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "league_id",
+        "foreign_table": "leagues",
+        "foreign_column": "id"
+      },
+      {
+        "name": "matches_pkey1",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "matches",
+        "foreign_column": "id"
+      }
+    ],
+    "news_mentions": [
+      {
+        "name": "news_mentions_team_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "team_id",
+        "foreign_table": "teams",
+        "foreign_column": "id"
+      },
+      {
+        "name": "news_mentions_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "news_mentions",
+        "foreign_column": "id"
+      }
+    ],
+    "normalized_fixtures": [
+      {
+        "name": "normalized_fixtures_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "normalized_fixtures",
+        "foreign_column": "id"
+      },
+      {
+        "name": "normalized_fixtures_sport_provider_fixture_id_key",
+        "type": "UNIQUE",
+        "column": "sport",
+        "foreign_table": "normalized_fixtures",
+        "foreign_column": "sport"
+      },
+      {
+        "name": "normalized_fixtures_sport_provider_fixture_id_key",
+        "type": "UNIQUE",
+        "column": "provider_fixture_id",
+        "foreign_table": "normalized_fixtures",
+        "foreign_column": "provider_fixture_id"
+      },
+      {
+        "name": "normalized_fixtures_sport_provider_fixture_id_key",
+        "type": "UNIQUE",
+        "column": "sport",
+        "foreign_table": "normalized_fixtures",
+        "foreign_column": "provider_fixture_id"
+      },
+      {
+        "name": "normalized_fixtures_sport_provider_fixture_id_key",
+        "type": "UNIQUE",
+        "column": "provider_fixture_id",
+        "foreign_table": "normalized_fixtures",
+        "foreign_column": "sport"
+      }
+    ],
+    "odds_snapshots": [
+      {
+        "name": "odds_snapshots_bookmaker_key_fkey",
+        "type": "FOREIGN KEY",
+        "column": "bookmaker_key",
+        "foreign_table": "bookmakers",
+        "foreign_column": "bookmaker_key"
+      },
+      {
+        "name": "odds_snapshots_event_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "event_id",
+        "foreign_table": "events",
+        "foreign_column": "id"
+      },
+      {
+        "name": "odds_snapshots_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "odds_snapshots",
+        "foreign_column": "id"
+      }
+    ],
+    "prediction_publish_runs": [
+      {
+        "name": "prediction_publish_runs_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "prediction_publish_runs",
+        "foreign_column": "id"
+      }
+    ],
+    "prediction_results": [
+      {
+        "name": "prediction_results_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "prediction_results",
+        "foreign_column": "id"
+      }
+    ],
+    "predictions_accuracy": [
+      {
+        "name": "predictions_accuracy_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "predictions_accuracy",
+        "foreign_column": "id"
+      },
+      {
+        "name": "predictions_accuracy_prediction_final_id_prediction_match_i_key",
+        "type": "UNIQUE",
+        "column": "prediction_match_index",
+        "foreign_table": "predictions_accuracy",
+        "foreign_column": "prediction_final_id"
+      },
+      {
+        "name": "predictions_accuracy_prediction_final_id_prediction_match_i_key",
+        "type": "UNIQUE",
+        "column": "prediction_final_id",
+        "foreign_table": "predictions_accuracy",
+        "foreign_column": "prediction_final_id"
+      },
+      {
+        "name": "predictions_accuracy_prediction_final_id_prediction_match_i_key",
+        "type": "UNIQUE",
+        "column": "prediction_match_index",
+        "foreign_table": "predictions_accuracy",
+        "foreign_column": "prediction_match_index"
+      },
+      {
+        "name": "predictions_accuracy_prediction_final_id_prediction_match_i_key",
+        "type": "UNIQUE",
+        "column": "prediction_final_id",
+        "foreign_table": "predictions_accuracy",
+        "foreign_column": "prediction_match_index"
+      }
+    ],
+    "predictions_filtered": [
+      {
+        "name": "predictions_filtered_raw_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "raw_id",
+        "foreign_table": "predictions_raw",
+        "foreign_column": "id"
+      },
+      {
+        "name": "predictions_filtered_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "predictions_filtered",
+        "foreign_column": "id"
+      },
+      {
+        "name": "predictions_filtered_raw_id_tier_key",
+        "type": "UNIQUE",
+        "column": "raw_id",
+        "foreign_table": "predictions_filtered",
+        "foreign_column": "tier"
+      },
+      {
+        "name": "predictions_filtered_raw_id_tier_key",
+        "type": "UNIQUE",
+        "column": "tier",
+        "foreign_table": "predictions_filtered",
+        "foreign_column": "tier"
+      },
+      {
+        "name": "predictions_filtered_raw_id_tier_key",
+        "type": "UNIQUE",
+        "column": "raw_id",
+        "foreign_table": "predictions_filtered",
+        "foreign_column": "raw_id"
+      },
+      {
+        "name": "predictions_filtered_raw_id_tier_key",
+        "type": "UNIQUE",
+        "column": "tier",
+        "foreign_table": "predictions_filtered",
+        "foreign_column": "raw_id"
+      }
+    ],
+    "predictions_raw": [
+      {
+        "name": "predictions_raw_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "predictions_raw",
+        "foreign_column": "id"
+      }
+    ],
+    "predictions_stage_1": [
+      {
+        "name": "predictions_stage_1_fixture_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "fixture_id",
+        "foreign_table": "normalized_fixtures",
+        "foreign_column": "id"
+      },
+      {
+        "name": "predictions_stage_1_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "predictions_stage_1",
+        "foreign_column": "id"
+      }
+    ],
+    "predictions_stage_2": [
+      {
+        "name": "predictions_stage_2_fixture_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "fixture_id",
+        "foreign_table": "normalized_fixtures",
+        "foreign_column": "id"
+      },
+      {
+        "name": "predictions_stage_2_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "predictions_stage_2",
+        "foreign_column": "id"
+      }
+    ],
+    "predictions_stage_3": [
+      {
+        "name": "predictions_stage_3_fixture_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "fixture_id",
+        "foreign_table": "normalized_fixtures",
+        "foreign_column": "id"
+      },
+      {
+        "name": "predictions_stage_3_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "predictions_stage_3",
+        "foreign_column": "id"
+      }
+    ],
+    "profiles": [
+      {
+        "name": "profiles_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "id",
+        "foreign_table": null,
+        "foreign_column": null
+      },
+      {
+        "name": "profiles_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "profiles",
+        "foreign_column": "id"
+      }
+    ],
+    "rapidapi_cache": [
+      {
+        "name": "rapidapi_cache_pkey",
+        "type": "PRIMARY KEY",
+        "column": "cache_key",
+        "foreign_table": "rapidapi_cache",
+        "foreign_column": "cache_key"
+      }
+    ],
+    "raw_fixtures": [
+      {
+        "name": "raw_fixtures_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id_event",
+        "foreign_table": "raw_fixtures",
+        "foreign_column": "id_event"
+      }
+    ],
+    "scheduler_run_locks": [
+      {
+        "name": "scheduler_run_locks_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "scheduler_run_locks",
+        "foreign_column": "id"
+      },
+      {
+        "name": "scheduler_run_locks_publish_window_key",
+        "type": "UNIQUE",
+        "column": "publish_window",
+        "foreign_table": "scheduler_run_locks",
+        "foreign_column": "publish_window"
+      }
+    ],
+    "scheduling_logs": [
+      {
+        "name": "scheduling_logs_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "scheduling_logs",
+        "foreign_column": "id"
+      }
+    ],
+    "secondary_market_allowlist": [
+      {
+        "name": "secondary_market_allowlist_pkey",
+        "type": "PRIMARY KEY",
+        "column": "market_key",
+        "foreign_table": "secondary_market_allowlist",
+        "foreign_column": "market_key"
+      }
+    ],
+    "sports": [
+      {
+        "name": "sports_pkey",
+        "type": "PRIMARY KEY",
+        "column": "sport_key",
+        "foreign_table": "sports",
+        "foreign_column": "sport_key"
+      }
+    ],
+    "subscription_plans": [
+      {
+        "name": "subscription_plans_pkey",
+        "type": "PRIMARY KEY",
+        "column": "plan_id",
+        "foreign_table": "subscription_plans",
+        "foreign_column": "plan_id"
+      }
+    ],
+    "subscriptions": [
+      {
+        "name": "subscriptions_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "subscriptions",
+        "foreign_column": "id"
+      }
+    ],
+    "table_lifecycle_registry": [
+      {
+        "name": "table_lifecycle_registry_pkey",
+        "type": "PRIMARY KEY",
+        "column": "table_name",
+        "foreign_table": "table_lifecycle_registry",
+        "foreign_column": "table_name"
+      }
+    ],
+    "team_stats": [
+      {
+        "name": "team_stats_team_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "team_id",
+        "foreign_table": "teams",
+        "foreign_column": "id"
+      },
+      {
+        "name": "team_stats_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "team_stats",
+        "foreign_column": "id"
+      }
+    ],
+    "team_week_locks": [
+      {
+        "name": "team_week_locks_publish_run_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "publish_run_id",
+        "foreign_table": "prediction_publish_runs",
+        "foreign_column": "id"
+      },
+      {
+        "name": "team_week_locks_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "team_week_locks",
+        "foreign_column": "id"
+      },
+      {
+        "name": "team_week_locks_week_key_team_key_competition_key_key",
+        "type": "UNIQUE",
+        "column": "competition_key",
+        "foreign_table": "team_week_locks",
+        "foreign_column": "competition_key"
+      },
+      {
+        "name": "team_week_locks_week_key_team_key_competition_key_key",
+        "type": "UNIQUE",
+        "column": "team_key",
+        "foreign_table": "team_week_locks",
+        "foreign_column": "week_key"
+      },
+      {
+        "name": "team_week_locks_week_key_team_key_competition_key_key",
+        "type": "UNIQUE",
+        "column": "competition_key",
+        "foreign_table": "team_week_locks",
+        "foreign_column": "week_key"
+      },
+      {
+        "name": "team_week_locks_week_key_team_key_competition_key_key",
+        "type": "UNIQUE",
+        "column": "week_key",
+        "foreign_table": "team_week_locks",
+        "foreign_column": "team_key"
+      },
+      {
+        "name": "team_week_locks_week_key_team_key_competition_key_key",
+        "type": "UNIQUE",
+        "column": "week_key",
+        "foreign_table": "team_week_locks",
+        "foreign_column": "week_key"
+      },
+      {
+        "name": "team_week_locks_week_key_team_key_competition_key_key",
+        "type": "UNIQUE",
+        "column": "team_key",
+        "foreign_table": "team_week_locks",
+        "foreign_column": "competition_key"
+      },
+      {
+        "name": "team_week_locks_week_key_team_key_competition_key_key",
+        "type": "UNIQUE",
+        "column": "team_key",
+        "foreign_table": "team_week_locks",
+        "foreign_column": "team_key"
+      },
+      {
+        "name": "team_week_locks_week_key_team_key_competition_key_key",
+        "type": "UNIQUE",
+        "column": "competition_key",
+        "foreign_table": "team_week_locks",
+        "foreign_column": "team_key"
+      },
+      {
+        "name": "team_week_locks_week_key_team_key_competition_key_key",
+        "type": "UNIQUE",
+        "column": "week_key",
+        "foreign_table": "team_week_locks",
+        "foreign_column": "competition_key"
+      }
+    ],
+    "teams": [
+      {
+        "name": "teams_league_id_fkey",
+        "type": "FOREIGN KEY",
+        "column": "league_id",
+        "foreign_table": "leagues",
+        "foreign_column": "id"
+      },
+      {
+        "name": "teams_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "teams",
+        "foreign_column": "id"
+      }
+    ],
+    "tier_rules": [
+      {
+        "name": "tier_rules_pkey",
+        "type": "PRIMARY KEY",
+        "column": "tier",
+        "foreign_table": "tier_rules",
+        "foreign_column": "tier"
+      }
+    ],
+    "zz_archive_matches": [
+      {
+        "name": "matches_pkey",
+        "type": "PRIMARY KEY",
+        "column": "id",
+        "foreign_table": "zz_archive_matches",
+        "foreign_column": "id"
+      }
+    ]
+  },
+  "rules": {},
+  "recommendations": [
+    {
+      "table": "predictions_raw",
+      "issue": "Duplicate records found",
+      "duplicate_groups": 1203,
+      "potential_space_saved": 54563.64368770764,
+      "action": "Consider deduplication using latest record per group"
+    },
+    {
+      "table": "predictions_filtered",
+      "issue": "Large table",
+      "row_count": 106908,
+      "size": "15 MB",
+      "action": "Consider partitioning or archiving old data"
+    }
+  ]
+}
