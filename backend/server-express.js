@@ -45,108 +45,6 @@ const { getPlanCapabilities, filterPredictionsForPlan } = require('./config/subs
 const { normalizeFixtureDate, getPredictionWindow, isFixtureEligibleForPrediction } = require('./utils/dateNormalization');
 const { initCronJobs } = require('./services/cronJobs');
 
-// Internal endpoint for fixture fetching by sport
-app.post('/api/internal/fetch-fixtures', async (req, res) => {
-  try {
-    const { sport, start, end, publishRunId } = req.body;
-    
-    if (!sport || !start || !end || !publishRunId) {
-      return res.status(400).json({ 
-        error: 'Missing required fields: sport, start, end, publishRunId' 
-      });
-    }
-
-    console.log(`[internal/fetch-fixtures] Processing ${sport} for run ${publishRunId}`);
-    
-    // Get sport configuration to find adapter name
-    const { rows: sportConfigs } = await query(`
-      SELECT adapter_name FROM sport_sync WHERE sport = $1
-    `, [sport]);
-    
-    if (sportConfigs.length === 0) {
-      return res.status(404).json({ 
-        error: `Sport ${sport} not found in configuration` 
-      });
-    }
-    
-    const adapterName = sportConfigs[0].adapter_name;
-    console.log(`[internal/fetch-fixtures] Loading adapter: ${adapterName}`);
-    
-    // Load the adapter dynamically
-    let adapter;
-    try {
-      adapter = require(`./adapters/${adapterName}`);
-    } catch (err) {
-      console.error(`[internal/fetch-fixtures] Failed to load adapter ${adapterName}:`, err.message);
-      return res.status(500).json({ 
-        error: `Failed to load adapter ${adapterName}: ${err.message}` 
-      });
-    }
-    
-    // Call adapter to fetch fixtures
-    const fixtures = await adapter.fetchFixtures(new Date(start), new Date(end));
-    console.log(`[internal/fetch-fixtures] Fetched ${fixtures.length} fixtures for ${sport}`);
-    
-    // Upsert each fixture with telemetry
-    const results = [];
-    for (const fixture of fixtures) {
-      try {
-        const { rows: [upsertResult] } = await query(`
-          SELECT * FROM upsert_raw_fixture(
-            $1, $2, $3, $4, $5, $6
-          )
-        `, [
-          fixture.id_event,
-          fixture.sport || sport,
-          fixture.league_id,
-          fixture.home_team_id,
-          fixture.away_team_id,
-          fixture.start_time,
-          fixture.raw_json || JSON.stringify(fixture)
-        ]);
-        
-        // Log telemetry for ingestion completion
-        await query(`
-          SELECT update_fixture_processing_log(
-            $1, $2, 'ingestion_completed', NULL, NULL, $3
-          )
-        `, [
-          fixture.id_event,
-          publishRunId,
-          sport
-        ]);
-        
-        results.push(upsertResult);
-        
-      } catch (err) {
-        console.error(`[internal/fetch-fixtures] Failed to upsert fixture ${fixture.id_event}:`, err.message);
-        results.push({
-          action: 'ERROR',
-          id_event: fixture.id_event,
-          error_message: err.message
-        });
-      }
-    }
-    
-    const successCount = results.filter(r => r.action !== 'ERROR').length;
-    const errorCount = results.filter(r => r.action === 'ERROR').length;
-    
-    console.log(`[internal/fetch-fixtures] Completed: ${successCount} successful, ${errorCount} errors`);
-    
-    res.json({ 
-      success: true, 
-      sport,
-      total: fixtures.length,
-      successful: successCount,
-      errors: errorCount,
-      results 
-    });
-    
-  } catch (err) {
-    console.error('[internal/fetch-fixtures] Error:', err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
 const { syncDailyFixtures, enrichMatchContext, generateEdgeMindInsight } = require('./services/thesportsdbPipeline');
 
 // Pipeline trigger endpoint for enrichment and AI processing
@@ -477,6 +375,109 @@ if (process.env.NODE_ENV !== 'test') {
 
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 app.use(express.static(PUBLIC_DIR));
+
+// Internal endpoint for fixture fetching by sport
+app.post('/api/internal/fetch-fixtures', async (req, res) => {
+  try {
+    const { sport, start, end, publishRunId } = req.body;
+    
+    if (!sport || !start || !end || !publishRunId) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: sport, start, end, publishRunId' 
+      });
+    }
+
+    console.log(`[internal/fetch-fixtures] Processing ${sport} for run ${publishRunId}`);
+    
+    // Get sport configuration to find adapter name
+    const { rows: sportConfigs } = await query(`
+      SELECT adapter_name FROM sport_sync WHERE sport = $1
+    `, [sport]);
+    
+    if (sportConfigs.length === 0) {
+      return res.status(404).json({ 
+        error: `Sport ${sport} not found in configuration` 
+      });
+    }
+    
+    const adapterName = sportConfigs[0].adapter_name;
+    console.log(`[internal/fetch-fixtures] Loading adapter: ${adapterName}`);
+    
+    // Load the adapter dynamically
+    let adapter;
+    try {
+      adapter = require(`./adapters/${adapterName}`);
+    } catch (err) {
+      console.error(`[internal/fetch-fixtures] Failed to load adapter ${adapterName}:`, err.message);
+      return res.status(500).json({ 
+        error: `Failed to load adapter ${adapterName}: ${err.message}` 
+      });
+    }
+    
+    // Call adapter to fetch fixtures
+    const fixtures = await adapter.fetchFixtures(new Date(start), new Date(end));
+    console.log(`[internal/fetch-fixtures] Fetched ${fixtures.length} fixtures for ${sport}`);
+    
+    // Upsert each fixture with telemetry
+    const results = [];
+    for (const fixture of fixtures) {
+      try {
+        const { rows: [upsertResult] } = await query(`
+          SELECT * FROM upsert_raw_fixture(
+            $1, $2, $3, $4, $5, $6
+          )
+        `, [
+          fixture.id_event,
+          fixture.sport || sport,
+          fixture.league_id,
+          fixture.home_team_id,
+          fixture.away_team_id,
+          fixture.start_time,
+          fixture.raw_json || JSON.stringify(fixture)
+        ]);
+        
+        // Log telemetry for ingestion completion
+        await query(`
+          SELECT update_fixture_processing_log(
+            $1, $2, 'ingestion_completed', NULL, NULL, $3
+          )
+        `, [
+          fixture.id_event,
+          publishRunId,
+          sport
+        ]);
+        
+        results.push(upsertResult);
+        
+      } catch (err) {
+        console.error(`[internal/fetch-fixtures] Failed to upsert fixture ${fixture.id_event}:`, err.message);
+        results.push({
+          action: 'ERROR',
+          id_event: fixture.id_event,
+          error_message: err.message
+        });
+      }
+    }
+    
+    const successCount = results.filter(r => r.action !== 'ERROR').length;
+    const errorCount = results.filter(r => r.action === 'ERROR').length;
+    
+    console.log(`[internal/fetch-fixtures] Completed: ${successCount} successful, ${errorCount} errors`);
+    
+    res.json({ 
+      success: true, 
+      sport,
+      total: fixtures.length,
+      successful: successCount,
+      errors: errorCount,
+      results 
+    });
+    
+  } catch (err) {
+    console.error('[internal/fetch-fixtures] Error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 app.get('/api/health', (_req, res) => {
   res.json({
