@@ -573,12 +573,18 @@ window.openMatchDetail = function(cardId) {
         // Show loading state initially
         isCalculating = true;
         
-        fetch(`${BACKEND_URL}/api/ai-predictions/${matchId}`, {
-            headers: { 'x-api-key': API_KEY }
-        })
-        .then(res => res.json())
-        .then(data => {
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/ai-predictions/${matchId}`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
             isCalculating = false;
+            
             if (data.data) {
                 aiPrediction = data.data;
                 // Update modal if it's already open
@@ -587,12 +593,16 @@ window.openMatchDetail = function(cardId) {
                 // No AI prediction available, hide loading state
                 updateModalWithLoadingState(false);
             }
-        })
-        .catch(err => {
-            console.error('[SMH] Failed to fetch AI prediction:', err);
+        } catch (err) {
+            // Silently handle 404s - prediction not yet available
+            if (err.message.includes('404')) {
+                console.log(`[SMH] AI prediction not yet available for match ${matchId}`);
+            } else {
+                console.error('[SMH] Failed to fetch AI prediction:', err);
+            }
             isCalculating = false;
             updateModalWithLoadingState(false);
-        });
+        }
     } else {
         isCalculating = false;
     }

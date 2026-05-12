@@ -44,7 +44,203 @@ const {
 const { getPlanCapabilities, filterPredictionsForPlan } = require('./config/subscriptionMatrix');
 const { normalizeFixtureDate, getPredictionWindow, isFixtureEligibleForPrediction } = require('./utils/dateNormalization');
 const { initCronJobs } = require('./services/cronJobs');
+
+// Internal endpoint for fixture fetching by sport
+app.post('/api/internal/fetch-fixtures', async (req, res) => {
+  try {
+    const { sport, start, end, publishRunId } = req.body;
+    
+    if (!sport || !start || !end || !publishRunId) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: sport, start, end, publishRunId' 
+      });
+    }
+
+    console.log(`[internal/fetch-fixtures] Processing ${sport} for run ${publishRunId}`);
+    
+    // Get sport configuration to find adapter name
+    const { rows: sportConfigs } = await query(`
+      SELECT adapter_name FROM sport_sync WHERE sport = $1
+    `, [sport]);
+    
+    if (sportConfigs.length === 0) {
+      return res.status(404).json({ 
+        error: `Sport ${sport} not found in configuration` 
+      });
+    }
+    
+    const adapterName = sportConfigs[0].adapter_name;
+    console.log(`[internal/fetch-fixtures] Loading adapter: ${adapterName}`);
+    
+    // Load the adapter dynamically
+    let adapter;
+    try {
+      adapter = require(`./adapters/${adapterName}`);
+    } catch (err) {
+      console.error(`[internal/fetch-fixtures] Failed to load adapter ${adapterName}:`, err.message);
+      return res.status(500).json({ 
+        error: `Failed to load adapter ${adapterName}: ${err.message}` 
+      });
+    }
+    
+    // Call adapter to fetch fixtures
+    const fixtures = await adapter.fetchFixtures(new Date(start), new Date(end));
+    console.log(`[internal/fetch-fixtures] Fetched ${fixtures.length} fixtures for ${sport}`);
+    
+    // Upsert each fixture with telemetry
+    const results = [];
+    for (const fixture of fixtures) {
+      try {
+        const { rows: [upsertResult] } = await query(`
+          SELECT * FROM upsert_raw_fixture(
+            $1, $2, $3, $4, $5, $6
+          )
+        `, [
+          fixture.id_event,
+          fixture.sport || sport,
+          fixture.league_id,
+          fixture.home_team_id,
+          fixture.away_team_id,
+          fixture.start_time,
+          fixture.raw_json || JSON.stringify(fixture)
+        ]);
+        
+        // Log telemetry for ingestion completion
+        await query(`
+          SELECT update_fixture_processing_log(
+            $1, $2, 'ingestion_completed', NULL, NULL, $3
+          )
+        `, [
+          fixture.id_event,
+          publishRunId,
+          sport
+        ]);
+        
+        results.push(upsertResult);
+        
+      } catch (err) {
+        console.error(`[internal/fetch-fixtures] Failed to upsert fixture ${fixture.id_event}:`, err.message);
+        results.push({
+          action: 'ERROR',
+          id_event: fixture.id_event,
+          error_message: err.message
+        });
+      }
+    }
+    
+    const successCount = results.filter(r => r.action !== 'ERROR').length;
+    const errorCount = results.filter(r => r.action === 'ERROR').length;
+    
+    console.log(`[internal/fetch-fixtures] Completed: ${successCount} successful, ${errorCount} errors`);
+    
+    res.json({ 
+      success: true, 
+      sport,
+      total: fixtures.length,
+      successful: successCount,
+      errors: errorCount,
+      results 
+    });
+    
+  } catch (err) {
+    console.error('[internal/fetch-fixtures] Error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
 const { syncDailyFixtures, enrichMatchContext, generateEdgeMindInsight } = require('./services/thesportsdbPipeline');
+
+// Pipeline trigger endpoint for enrichment and AI processing
+app.post('/api/pipeline/trigger', async (req, res) => {
+  try {
+    const { publishRunId } = req.body;
+    
+    if (!publishRunId) {
+      return res.status(400).json({ 
+        error: 'publishRunId is required' 
+      });
+    }
+
+    console.log(`[pipeline/trigger] Starting pipeline for run ${publishRunId}`);
+    
+    // 1. Context Enrichment
+    console.log('[pipeline/trigger] Starting context enrichment...');
+    try {
+      // Get fixtures that need enrichment (no enrichment completed yet)
+      const { rows: fixturesToEnrich } = await query(`
+        SELECT rf.id_event, rf.sport
+        FROM raw_fixtures rf
+        LEFT JOIN fixture_processing_log fpl ON rf.id_event = fpl.id_event AND fpl.publish_run_id = $1
+        WHERE fpl.enrichment_completed_at IS NULL
+          AND rf.start_time >= NOW()
+          AND rf.start_time <= NOW() + INTERVAL '7 days'
+      `, [publishRunId]);
+      
+      console.log(`[pipeline/trigger] Found ${fixturesToEnrich.length} fixtures to enrich`);
+      
+      for (const fixture of fixturesToEnrich) {
+        try {
+          // Call context enrichment service
+          const contextEnrichmentService = require('./services/contextEnrichmentService');
+          await contextEnrichmentService.enrichFixture(fixture.id_event, fixture.sport);
+          
+          // Log enrichment completion
+          await query(`
+            SELECT update_fixture_processing_log(
+              $1, $2, 'enrichment_completed', NULL, NULL, $3
+            )
+          `, [fixture.id_event, publishRunId, fixture.sport]);
+          
+        } catch (err) {
+          console.error(`[pipeline/trigger] Enrichment failed for ${fixture.id_event}:`, err.message);
+          
+          // Log enrichment failure
+          await query(`
+            SELECT update_fixture_processing_log(
+              $1, $2, 'enrichment_completed', NULL, $3, $4
+            )
+          `, [fixture.id_event, publishRunId, fixture.sport, err.message]);
+        }
+      }
+      
+    } catch (err) {
+      console.error('[pipeline/trigger] Context enrichment failed:', err.message);
+    }
+    
+    // 2. AI Pipeline Processing
+    console.log('[pipeline/trigger] Starting AI pipeline processing...');
+    try {
+      const aiPipelineOrchestrator = require('./services/aiPipelineOrchestrator');
+      const result = await aiPipelineOrchestrator.runFullPipeline(null, 'UPCOMING_7_DAYS', publishRunId);
+      
+      console.log(`[pipeline/trigger] AI pipeline completed:`, result);
+      
+      res.json({ 
+        success: true, 
+        publishRunId,
+        result 
+      });
+      
+    } catch (err) {
+      console.error('[pipeline/trigger] AI pipeline failed:', err.message);
+      
+      // Update publish run with error
+      await query(`
+        UPDATE prediction_publish_runs 
+        SET error_message = $1, status = 'failed'
+        WHERE id = $2
+      `, [err.message, publishRunId]);
+      
+      res.status(500).json({ 
+        error: err.message,
+        publishRunId 
+      });
+    }
+    
+  } catch (err) {
+    console.error('[pipeline/trigger] Pipeline trigger error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 void bootstrap().catch(err => console.error('[startup] bootstrap failed:', err.message));
 
@@ -1136,20 +1332,14 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
 
         console.log('[api/ai-predictions] Fetching prediction for matchId:', matchId, 'type:', typeof matchId);
 
-        let result = null;
-        let lastError = null;
+        // Use the new RPC function for efficient JSONB search
+        const { data, error } = await query(`
+            SELECT * FROM get_prediction_by_match_id($1)
+        `, [matchId]);
 
-        // First, try to find in ai_predictions table (TheSportsDB pipeline)
-        try {
-            result = await query(`
-                SELECT match_id, confidence_score, edgemind_feedback, value_combos, same_match_builder, updated_at
-                FROM ai_predictions
-                WHERE match_id = $1
-            `, [matchId]);
-            console.log('[api/ai-predictions] ai_predictions query result:', result?.rows?.length || 0, 'rows');
-        } catch (err) {
-            console.error('[api/ai-predictions] ai_predictions query failed:', err.message);
-            lastError = err;
+        if (error) {
+            console.error('[api/ai-predictions] RPC query failed:', error);
+            throw error;
         }
 
         // If not found in ai_predictions, try direct1x2_prediction_final (legacy predictions)
@@ -1214,7 +1404,7 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
             }
         }
 
-        if (!result || result.rows.length === 0) {
+        if (!data || data.length === 0) {
             // Graceful response when no AI prediction exists yet
             console.log('[api/ai-predictions] No prediction found for matchId:', matchId);
             return res.status(404).json({
@@ -1225,10 +1415,10 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
         }
 
         // Safely extract data with optional chaining
-        const predictionData = result.rows[0];
+        const predictionData = data[0];
         const responseData = {
-            match_id: predictionData.match_id,
-            confidence_score: predictionData.confidence_score,
+            match_id: predictionData.match_id || predictionData.id,
+            confidence_score: predictionData.confidence_score || predictionData.total_confidence,
             edgemind_feedback: predictionData.edgemind_feedback,
             value_combos: predictionData.value_combos,
             same_match_builder: predictionData.same_match_builder,
