@@ -551,6 +551,9 @@ window.openMatchDetail = function(cardId) {
         return;
     }
 
+    // CRITICAL DIRECTIVE: Console.log the incoming data object to verify JSON paths
+    console.log('[SMH] COMPLETE PREDICTION DATA OBJECT:', JSON.stringify(prediction, null, 2));
+
     const leg = Array.isArray(prediction.matches) && prediction.matches[0] ? prediction.matches[0] : {};
     // Enhanced team name extraction with multiple fallback locations
     const home = leg.home_team || leg.strHomeTeam || (leg.metadata && leg.metadata.home_team) || (leg.metadata && leg.metadata.strHomeTeam) || 'Home';
@@ -755,13 +758,12 @@ window.openMatchDetail = function(cardId) {
         <div class="flex justify-between items-start mb-4">
             <div>
                 <div class="text-[10px] uppercase tracking-widest text-slate-400 mb-1 flex items-center gap-2">
-                    <span>${prediction.country || 'Global'}</span> <span class="w-1 h-1 bg-slate-600 rounded-full"></span> <span>${prediction.league || 'League'}</span>
+                    <span>${leg.metadata?.country || 'Global'}</span> <span class="w-1 h-1 bg-slate-600 rounded-full"></span> <span>${league || 'League'}</span>
                 </div>
-                <h2 class="text-2xl font-bold text-white tracking-tight">${prediction.homeTeam || 'Home Team'} <span class="text-slate-500 font-normal text-lg mx-1">vs</span> ${prediction.awayTeam || 'Away Team'}</h2>
+                <h2 class="text-2xl font-bold text-white tracking-tight">${home || 'Home Team'} <span class="text-slate-500 font-normal text-lg mx-1">vs</span> ${away || 'Away Team'}</h2>
             </div>
             <div class="text-right">
-                <div class="text-xs font-mono text-slate-400">${prediction.date || 'TBD'}</div>
-                <div class="text-sm font-bold text-slate-300">${prediction.time || 'TBD'}</div>
+                <div class="text-xs font-mono text-slate-400">${kickoffStr}</div>
             </div>
         </div>
         <div class="flex gap-2">
@@ -801,6 +803,11 @@ window.openMatchDetail = function(cardId) {
                     The primary 1X2 outcome holds a <span class="text-white font-bold">${confidence}% confidence</span> rating. ${confidence < 59 ? 'Match tempo is highly unpredictable. We strongly advise utilizing a risk-adjusted secondary insight.' : 'This indicates a stable market probability.'}
                 </p>
                 
+                <!-- AI Reasoning from Backend -->
+                <div class="mt-3 text-[11px] text-slate-300 leading-relaxed">
+                    ${leg.metadata?.ai_reasoning || leg.metadata?.edgeMind_analysis || prediction.ai_reasoning || prediction.engine_log || 'AI analysis is being processed...'}
+                </div>
+                
                 <!-- SIDE-BY-SIDE: AI EdgeMind Feedback -->
                 <div id="edgemind-feedback" class="mt-3 text-[11px] text-slate-400 leading-relaxed italic">
                     ${aiPrediction ? aiPrediction.edgemind_feedback : ''}
@@ -821,15 +828,18 @@ window.openMatchDetail = function(cardId) {
             <h3 class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3 flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-purple-500"></span> Value Combos
             </h3>
-            <div class="space-y-2">
-                <div class="bg-slate-800/40 border border-slate-700 rounded-lg p-3 flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <span class="bg-slate-900 border border-slate-600 px-2 py-1 rounded text-xs font-bold text-white">1X</span>
-                        <span class="text-slate-500 text-xs">+</span>
-                        <span class="bg-slate-900 border border-slate-600 px-2 py-1 rounded text-xs font-bold text-white">Over 1.5 Goals</span>
-                    </div>
-                    <div class="font-mono font-bold text-purple-400">Pending Data</div>
-                </div>
+            <div id="value-combos" class="space-y-2">
+                ${prediction.value_combos ? 
+                    Object.entries(prediction.value_combos).map(([key, value]) => 
+                        `<div class="bg-slate-800/40 border border-slate-700 rounded-lg p-3 flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <span class="bg-purple-900/30 border border-purple-700/50 px-2 py-1 rounded text-xs font-bold text-purple-400">${key.replace(/_/g, ' ').toUpperCase()}</span>
+                            </div>
+                            <div class="font-mono text-xs text-slate-300">${value}</div>
+                        </div>`
+                    ).join('') : 
+                    '<div class="text-xs text-slate-500 italic text-center py-4">No value combinations available</div>'
+                }
             </div>
         </section>
 
@@ -838,7 +848,7 @@ window.openMatchDetail = function(cardId) {
                 <span class="w-2 h-2 rounded-full bg-indigo-500"></span> Same Match Builder
             </h3>
             <div class="bg-indigo-950/20 border border-indigo-900/50 rounded-lg overflow-hidden p-2">
-                ${smbHTML || '<div class="text-xs text-slate-500 italic">Pending correlation analysis...</div>'}
+                ${smbHTML && smbHTML.includes('Pending correlation analysis') === false ? smbHTML : '<div class="text-xs text-slate-500 italic text-center py-4">No same match combinations available</div>'}
             </div>
         </section>
     </div>
