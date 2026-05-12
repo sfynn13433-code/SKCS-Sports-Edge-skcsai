@@ -1332,12 +1332,18 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
             return res.status(400).json({ error: 'matchId is required' });
         }
 
-        console.log('[api/ai-predictions] Fetching prediction for matchId:', matchId, 'type:', typeof matchId);
+        // Convert matchId to integer for proper database function matching
+        const matchIdInt = parseInt(matchId, 10);
+        if (isNaN(matchIdInt)) {
+            return res.status(400).json({ error: 'matchId must be a valid integer' });
+        }
+
+        console.log('[api/ai-predictions] Fetching prediction for matchId:', matchIdInt, 'type:', typeof matchIdInt);
 
         // Use the new RPC function for efficient JSONB search
         const { data, error } = await query(`
             SELECT * FROM get_prediction_by_match_id($1)
-        `, [matchId]);
+        `, [matchIdInt]);
 
         if (error) {
             console.error('[api/ai-predictions] RPC query failed:', error);
@@ -1408,7 +1414,7 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
 
         if (!data || data.length === 0) {
             // Graceful response when no AI prediction exists yet
-            console.log('[api/ai-predictions] No prediction found for matchId:', matchId);
+            console.log('[api/ai-predictions] No prediction found for matchId:', matchIdInt);
             return res.status(404).json({
                 data: null,
                 message: 'AI prediction not yet available - still calculating',
@@ -1431,7 +1437,7 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
             market_type: predictionData.market_type
         };
 
-        console.log('[api/ai-predictions] Successfully fetched prediction for matchId:', matchId);
+        console.log('[api/ai-predictions] Successfully fetched prediction for matchId:', matchIdInt);
         res.json({ data: responseData, status: 'ready' });
     } catch (err) {
         console.error('[api/ai-predictions] Match Detail Fetch Error:', err.message);

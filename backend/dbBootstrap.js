@@ -290,7 +290,7 @@ async function bootstrap() {
                     NULLIF(BTRIM(matches->0->>'match_date'), '')::timestamptz,
                     NULLIF(BTRIM(matches->0->>'commence_time'), '')::timestamptz,
                     NULLIF(BTRIM(matches->0->>'date'), '')::timestamptz,
-                    created_at
+                    created_at::timestamptz
                 )
             WHERE
                 fixture_id IS NULL
