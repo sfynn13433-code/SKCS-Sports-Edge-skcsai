@@ -726,7 +726,7 @@ async function bootstrap() {
                 LOWER(COALESCE(market_type, '')),
                 LOWER(COALESCE(home_team, '')),
                 LOWER(COALESCE(away_team, '')),
-                COALESCE(matches->0->>'kickoff', created_at::text)
+                COALESCE(matches->0->>'kickoff', to_char(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'))
             )
             WHERE publish_run_id IS NULL;
         `);
