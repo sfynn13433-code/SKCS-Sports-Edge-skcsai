@@ -47,6 +47,9 @@ const { initCronJobs } = require('./services/cronJobs');
 
 const { syncDailyFixtures, enrichMatchContext, generateEdgeMindInsight } = require('./services/thesportsdbPipeline');
 
+// Initialize Express app BEFORE using it
+const app = express();
+
 // Pipeline trigger endpoint for enrichment and AI processing
 app.post('/api/pipeline/trigger', async (req, res) => {
   try {
@@ -257,8 +260,6 @@ void (async () => {
         console.log('[boot-force-insert] inserted FORCE_BOOT_TEST');
     }
 })();
-
-const app = express();
 
 app.disable('x-powered-by');
 
