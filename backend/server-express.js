@@ -180,7 +180,7 @@ app.post('/api/pipeline/trigger', async (req, res) => {
       for (const fixture of fixturesToEnrich) {
         try {
           // Call context enrichment service
-          const contextEnrichmentService = require('./services/contextEnrichmentService');
+          const contextEnrichmentService = require('./services/contextEnrichmentService.js');
           await contextEnrichmentService.enrichFixture(fixture.id_event, fixture.sport);
           
           // Log enrichment completion
