@@ -57,28 +57,8 @@ function isTier1PrioritySport(sport) {
  *  - Anything else (upcoming, within grace window) → accept.
  */
 function isMatchWithinGraceWindow(normalizedMatch) {
-    const mi = isObject(normalizedMatch?.match_info) ? normalizedMatch.match_info : {};
-    const rawKickoff =
-        mi.kickoff ||
-        mi.match_time ||
-        mi.kickoff_time ||
-        mi.commence_time ||
-        normalizedMatch?.kickoff ||
-        normalizedMatch?.match_time ||
-        null;
-
-    if (!rawKickoff) return true; // no kickoff → pass through, let downstream decide
-
-    const kickoffMs = new Date(rawKickoff).getTime();
-    if (!Number.isFinite(kickoffMs)) return true; // unparseable → pass through
-
-    const nowMs = Date.now();
-    const graceCutoffMs = nowMs - SYNC_GRACE_MINUTES * 60 * 1000;
-    const futureCapMs   = nowMs + SYNC_FUTURE_DAYS * 24 * 60 * 60 * 1000;
-
-    if (kickoffMs < graceCutoffMs) return false; // past the grace window → stale, reject
-    if (kickoffMs > futureCapMs)   return false; // beyond 7-day horizon → reject
-    return true; // within [grace cutoff … +7 days] → accept
+    console.log("VIP Bypass: Allowing match regardless of time.");
+    return true;
 }
 
 function toNormalizationInput(rawMatch) {
