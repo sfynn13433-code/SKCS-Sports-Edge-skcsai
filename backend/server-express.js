@@ -1323,6 +1323,156 @@ app.get('/api/cron/cricket-daily-fixtures', verifyCronSecret, async (req, res) =
     }
 });
 
+// ESPN CDN Live Odds Monitoring Endpoint
+app.get('/api/admin/cdn-live-loop', requireAdminKey, async (req, res) => {
+    try {
+        const { key } = req.query;
+        
+        if (!key || key !== process.env.ADMIN_API_KEY) {
+            return res.status(401).json({ error: 'Invalid or missing admin key' });
+        }
+        
+        console.log('[cdn-live-loop] Starting ESPN CDN live odds monitoring...');
+        
+        // Initialize state tracker and aiohttp for async requests
+        const startTime = Math.floor(Date.now() / 1000);
+        const maxRunTime = 25; // 25 seconds maximum
+        
+        // Query Supabase for in-progress events
+        const { rows: inProgressEvents } = await query(`
+            SELECT espn_id, sport FROM events 
+            WHERE status = 'in-progress' 
+            LIMIT 10
+        `);
+        
+        // Load previous momentum values from database
+        const eventIds = inProgressEvents.map(event => event.espn_id);
+        const { rows: previousMomentum } = await query(`
+            SELECT espn_entity_id, live_momentum 
+            FROM public_intelligence 
+            WHERE espn_entity_id = ANY($1::text[])
+            ORDER BY created_at DESC 
+            LIMIT 5
+        `, [eventIds]);
+        
+        // Initialize state tracker with previous values
+        const stateTracker = {};
+        previousMomentum.forEach(row => {
+            stateTracker[row.espns_entity_id] = row.live_momentum;
+        });
+        
+        if (!inProgressEvents || inProgressEvents.length === 0) {
+            return res.status(200).json({ 
+                status: 'success', 
+                message: 'No in-progress events found' 
+            });
+        }
+        
+        const axios = require('axios');
+        
+        // 25-second burst polling loop
+        const pollInterval = setInterval(async () => {
+            const currentTime = Math.floor(Date.now() / 1000);
+            
+            if (currentTime - startTime >= maxRunTime) {
+                clearInterval(pollInterval);
+                console.log('[cdn-live-loop] Burst complete - stopping after 25 seconds');
+                return res.status(200).json({ 
+                    status: 'success', 
+                    message: 'Burst complete' 
+                });
+            }
+            
+            // Poll all in-progress events
+            const pollPromises = inProgressEvents.map(async (event) => {
+                try {
+                    const espn_id = event.espn_id;
+                    const sport = event.sport;
+                    
+                    // Poll ESPN CDN for live odds
+                    const cdnUrl = `https://cdn.espn.com/core/${sport}/game?xhr=1&gameId=${espn_id}`;
+                    const response = await axios.get(cdnUrl, { timeout: 5000 });
+                    
+                    if (response.data && response.data.length > 0) {
+                        const gameData = response.data[0];
+                        const winProbability = gameData.winProbability || 0;
+                        const providerOdds = gameData.odds?.find(odd => odd.id === 37) || gameData.odds?.find(odd => odd.id === 41);
+                        
+                        if (!stateTracker[espn_id]) {
+                            stateTracker[espn_id] = {
+                                winProbability: winProbability,
+                                providerOdds: providerOdds
+                            };
+                        }
+                        
+                        // Check for significant changes
+                        const winProbChange = Math.abs(winProbability - stateTracker[espn_id].winProbability);
+                        const oddsChange = providerOdds && stateTracker[espn_id].providerOdds ? 
+                            Math.abs((providerOdds.value - stateTracker[espn_id].providerOdds.value) / stateTracker[espn_id].providerOdds.value * 100) : 0;
+                        
+                        let flagsTriggered = false;
+                        
+                        if (winProbChange > 0.05) { // Win probability shift > 5%
+                            console.log(`[cdn-live-loop] FLAG: Win probability shift detected for ${espn_id}: ${winProbability} -> ${stateTracker[espn_id].winProbability}`);
+                            flagsTriggered = true;
+                        }
+                        
+                        if (oddsChange > 0.03) { // Odds shift > 3%
+                            console.log(`[cdn-live-loop] FLAG: Odds shift detected for ${espn_id}: ${providerOdds?.value} -> ${stateTracker[espn_id].providerOdds?.value}`);
+                            flagsTriggered = true;
+                        }
+                        
+                        // Update state tracker
+                        stateTracker[espn_id].winProbability = winProbability;
+                        stateTracker[espn_id].providerOdds = providerOdds;
+                        
+                        // Batch UPSERT to Supabase if flags triggered
+                        if (flagsTriggered) {
+                            await query(`
+                                INSERT INTO public_intelligence (
+                                    espn_entity_id, news_timestamp, headline, description, 
+                                    live_momentum, created_at
+                                ) VALUES (
+                                    $1, NOW(), $2, $3, $4, NOW()
+                                )
+                                ON CONFLICT (espn_entity_id) DO UPDATE SET
+                                    live_momentum = EXCLUDED.live_momentum,
+                                    news_timestamp = NOW()
+                            `, [
+                                espn_id,
+                                `Live odds movement detected: Win prob ${(winProbability * 100).toFixed(1)}%, Odds change ${oddsChange.toFixed(1)}%`,
+                                `Significant odds movement detected for ${sport} event ${espn_id}`,
+                                JSON.stringify({
+                                    winProbability: winProbability,
+                                    previousWinProbability: stateTracker[espn_id].winProbability,
+                                    providerOdds: providerOdds,
+                                    oddsChange: oddsChange
+                                })
+                            ]);
+                        }
+                    }
+                } catch (error) {
+                    console.error(`[cdn-live-loop] Error polling ${espn_id}:`, error.message);
+                }
+            });
+            
+            // Wait 5 seconds between iterations
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            
+        }, 5000); // 5 second intervals
+        
+        // Start polling
+        pollInterval();
+        
+    } catch (error) {
+        console.error('[cdn-live-loop] Error:', error.message);
+        return res.status(500).json({ 
+            error: 'Internal server error', 
+            message: error.message 
+        });
+    }
+});
+
 // AI Predictions endpoint for frontend modal
 app.get('/api/ai-predictions/:matchId', async (req, res) => {
     try {

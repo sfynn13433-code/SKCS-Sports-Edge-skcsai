@@ -1,0 +1,96 @@
+{
+    "version": "1.0",
+    "name": "EdgeMind Logic Manifest",
+    "description": "Comprehensive logic mapping for SKCS EdgeMind AI confidence scoring",
+    "data_sources": {
+        "weather": {
+            "api": "openweathermap.org",
+            "table": "edge_data",
+            "field": "weather_conditions",
+            "weight": 0.15,
+            "description": "Weather impacts scoring and player performance"
+        },
+        "injuries": {
+            "api": "espn.now.core",
+            "table": "edge_data",
+            "field": "injury_report",
+            "weight": 0.25,
+            "description": "Player availability affects win probability"
+        },
+        "momentum": {
+            "api": "espn.cdn.core",
+            "table": "live_momentum",
+            "field": "odds_velocity",
+            "weight": 0.20,
+            "description": "Live odds movement indicates market sentiment"
+        },
+        "news_sentiment": {
+            "api": "espn.now.core",
+            "table": "edge_data",
+            "field": "news_sentiment_score",
+            "weight": 0.10,
+            "description": "Breaking news affects team confidence"
+        }
+    },
+    "confidence_formula": {
+        "base_confidence": 0.60,
+        "weather_adjustment": "WEIGHT(weather_conditions) * ADJUSTMENT_FACTOR",
+        "injury_adjustment": "WEIGHT(injury_report) * ADJUSTMENT_FACTOR", 
+        "momentum_adjustment": "WEIGHT(odds_velocity) * ADJUSTMENT_FACTOR",
+        "news_adjustment": "WEIGHT(news_sentiment_score) * ADJUSTMENT_FACTOR",
+        "max_adjustment": 0.30,
+        "final_confidence": "MIN(1.0, base_confidence + SUM(all_adjustments))"
+    },
+    "calculation_rules": {
+        "weather_impact": {
+            "clear": 0.0,
+            "cloudy": -0.05,
+            "rain": -0.10,
+            "snow": -0.15,
+            "extreme": -0.20
+        },
+        "injury_impact": {
+            "no_injuries": 0.0,
+            "minor_injuries": -0.10,
+            "key_player_injured": -0.20,
+            "multiple_injuries": -0.25,
+            "team_crisis": -0.30
+        },
+        "momentum_impact": {
+            "stable_odds": 0.0,
+            "minor_movement": 0.05,
+            "significant_movement": 0.15,
+            "major_shift": 0.25
+        },
+        "news_sentiment_impact": {
+            "positive_news": 0.05,
+            "neutral_news": 0.0,
+            "negative_news": -0.10,
+            "breaking_negative": -0.20
+        }
+    },
+    "access_requirements": {
+        "required_tables": [
+            "edge_data",
+            "live_momentum",
+            "public_intelligence"
+        ],
+        "required_fields": {
+            "weather_conditions": "TEXT",
+            "injury_report": "JSONB",
+            "odds_velocity": "NUMERIC",
+            "news_sentiment_score": "NUMERIC"
+        },
+    "output_format": {
+            "confidence_score": "NUMERIC(3,2) CHECK (confidence_score >= 0 AND confidence_score <= 100)",
+            "adjustment_breakdown": "JSONB",
+            "calculation_log": "TEXT"
+        }
+    },
+    "integration_points": [
+        "EdgeMind must have read access to all required tables",
+        "Confidence scores must be calculated using the exact weight formula",
+        "All adjustments must be logged with calculation details",
+        "Final confidence cannot exceed 1.0 or be negative"
+    ]
+}
