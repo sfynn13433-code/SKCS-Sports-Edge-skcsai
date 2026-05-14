@@ -432,6 +432,163 @@ function extractTeamNamesFromGameId(gameId) {
 }
 
 /**
+ * AI PREDICTIONS: Get AI prediction data for specific match
+ * Endpoint: /api/ai-predictions/:matchId
+ * Cache: 15 minutes for AI predictions
+ */
+router.get('/api/ai-predictions/:matchId', async (req, res) => {
+  const { matchId } = req.params;
+  const cacheKey = `ai_prediction_${matchId}`;
+  
+  if (!matchId) {
+    return res.status(400).json({
+      success: false,
+      error: 'Match ID is required'
+    });
+  }
+  
+  try {
+    // Check cache first
+    const cachedData = dataCache.get(cacheKey);
+    if (cachedData) {
+      return res.json({
+        success: true,
+        data: cachedData,
+        cached: true
+      });
+    }
+    
+    // Try to get prediction from database first
+    const db = require('../db');
+    const predictionResult = await db.query(`
+      SELECT 
+        id,
+        match_id,
+        home_team,
+        away_team,
+        prediction,
+        confidence,
+        edgemind_feedback,
+        value_combos,
+        same_match_builder,
+        created_at,
+        updated_at
+      FROM ai_predictions 
+      WHERE match_id = $1
+      ORDER BY created_at DESC
+      LIMIT 1
+    `, [matchId]);
+    
+    if (predictionResult.rows.length > 0) {
+      const prediction = predictionResult.rows[0];
+      const aiData = {
+        id: prediction.id,
+        match_id: prediction.match_id,
+        home_team: prediction.home_team,
+        away_team: prediction.away_team,
+        primary_prediction: {
+          market: "1X2",
+          prediction: prediction.prediction,
+          confidence: prediction.confidence
+        },
+        edgemind_feedback: prediction.edgemind_feedback,
+        value_combos: JSON.parse(prediction.value_combos || '{}'),
+        same_match_builder: JSON.parse(prediction.same_match_builder || '{}'),
+        created_at: prediction.created_at,
+        source: 'database'
+      };
+      
+      // Cache for 15 minutes
+      dataCache.set(cacheKey, aiData, 900);
+      
+      return res.json({
+        success: true,
+        data: aiData,
+        cached: false
+      });
+    }
+    
+    // Fallback to enhanced match details service
+    console.log(`[AI-Predictions] No database data for ${matchId}, using enhanced service`);
+    
+    // Extract team names from matchId
+    const teamNames = extractTeamNamesFromGameId(matchId);
+    const enhancedData = await getEnhancedMatchDetails(
+      matchId, 
+      teamNames.homeTeam, 
+      teamNames.awayTeam, 
+      'Ligue 1',
+      new Date().toISOString()
+    );
+    
+    if (enhancedData && enhancedData.aiPrediction) {
+      const aiData = {
+        id: matchId,
+        match_id: matchId,
+        home_team: enhancedData.homeTeam,
+        away_team: enhancedData.awayTeam,
+        primary_prediction: enhancedData.aiPrediction.primary || {
+          market: "1X2",
+          prediction: "X",
+          confidence: 50
+        },
+        edgemind_feedback: enhancedData.aiPrediction.analysis || 'Enhanced AI analysis generated',
+        value_combos: enhancedData.aiPrediction.valueCombos || {},
+        same_match_builder: enhancedData.aiPrediction.sameMatchBuilder || {},
+        created_at: new Date().toISOString(),
+        source: enhancedData.source || 'enhanced_template'
+      };
+      
+      // Cache enhanced result for 10 minutes
+      dataCache.set(cacheKey, aiData, 600);
+      
+      return res.json({
+        success: true,
+        data: aiData,
+        cached: false,
+        fallback: true
+      });
+    }
+    
+    // Last resort: return basic template
+    const basicAiData = {
+      id: matchId,
+      match_id: matchId,
+      home_team: teamNames.homeTeam || 'Home Team',
+      away_team: teamNames.awayTeam || 'Away Team',
+      primary_prediction: {
+        market: "1X2",
+        prediction: "X",
+        confidence: 50
+      },
+      edgemind_feedback: 'Basic AI prediction - no enhanced data available',
+      value_combos: {},
+      same_match_builder: {},
+      created_at: new Date().toISOString(),
+      source: 'basic_template'
+    };
+    
+    // Cache basic result for 5 minutes
+    dataCache.set(cacheKey, basicAiData, 300);
+    
+    return res.json({
+      success: false,
+      data: basicAiData,
+      cached: false,
+      fallback: true,
+      error: 'No AI prediction data available'
+    });
+    
+  } catch (error) {
+    console.error(`Error fetching AI prediction for ${matchId}:`, error.message);
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to retrieve AI prediction'
+    });
+  }
+});
+
+/**
  * SPORTS NEWS: News feed
  * Endpoint: /news?sports=1
  * Cache: 1 hour for news
