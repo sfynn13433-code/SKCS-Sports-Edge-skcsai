@@ -95,31 +95,79 @@ async function bandwidthAwareCall(apiFunction, ...args) {
 }
 
 /**
- * Live Scores Sync (Every 60 seconds)
+ * Live Scores Sync (Every 30 minutes - optimized for Basic plan)
  * Updates the homepage slate with current game data
+ * Hybrid approach: ESPN → TheSportsDB → Free Livescore → Pro Football
+ * Note: Reduced frequency to stay within rate limits
  */
 async function syncLiveScores() {
-  console.log('[Heartbeat] Syncing live scores...');
+  console.log('[Heartbeat] Syncing live scores using hybrid approach (30min interval)...');
   
   try {
-    // Get homepage slate with bandwidth filtering
-    const slateData = await bandwidthAwareCall(proFootballService.getHomepageSlate);
+    // Import hybrid service to avoid circular dependency
+    const { getLiveScores } = require('./hybridSportsDataService');
     
-    if (slateData) {
-      // Apply selective filtering for bandwidth management
-      const filteredData = filterForHomepage(slateData);
+    // Use hybrid sports data service with optimal rate limit strategy
+    const hybridResult = await getLiveScores();
+    
+    if (hybridResult && hybridResult.data) {
+      const syncData = {
+        allGames: hybridResult.data.allGames || hybridResult.data,
+        featured: hybridResult.data.featured || hybridResult.data.slice?.(0, 5) || [],
+        totalLiveGames: hybridResult.data.totalLiveGames || (hybridResult.data.length || 0),
+        timestamp: new Date().toISOString(),
+        source: hybridResult.source,
+        fallback: hybridResult.fallback,
+        apiNote: `Hybrid approach - Using ${hybridResult.source} (${hybridResult.fallback ? 'fallback' : 'primary'})`
+      };
       
-      // Update cache/store (this would integrate with your existing cache system)
-      // For now, we'll just log the summary
-      console.log(`[Heartbeat] Live scores updated: ${filteredData.allGames?.length || 0} games, ${filteredData.featured?.length || 0} featured`);
-      
+      console.log(`[Heartbeat] Live scores updated: ${syncData.totalLiveGames} live games from ${syncData.source}`);
       heartbeatState.lastSync.liveScores = new Date().toISOString();
       
-      return filteredData;
+      return syncData;
+    } else {
+      console.warn('[Heartbeat] Hybrid service returned no data');
+      heartbeatState.stats.errors++;
     }
   } catch (error) {
-    console.error('[Heartbeat] Live scores sync failed:', error.message);
+    console.error('[Heartbeat] Hybrid live scores sync failed:', error.message);
     heartbeatState.stats.errors++;
+    
+    // Fallback to Pro Football competitions if hybrid fails
+    try {
+      console.log('[Heartbeat] Falling back to Pro Football competitions...');
+      const response = await fetch(`https://sportsapi-pro-football-data.p.rapidapi.com/competitions?sport=1`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-rapidapi-host': 'sportsapi-pro-football-data.p.rapidapi.com',
+          'x-rapidapi-key': '61fb6ae19emshbc93fdce17fd87fp1ee5fajsnac7912504616'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const liveCompetitions = (data.competitions || [])
+          .filter(comp => comp.sportId === 1 && comp.liveGames > 0)
+          .slice(0, 10);
+        
+        const fallbackData = {
+          allGames: liveCompetitions,
+          featured: liveCompetitions.slice(0, 5),
+          totalLiveGames: liveCompetitions.reduce((sum, comp) => sum + comp.liveGames, 0),
+          timestamp: new Date().toISOString(),
+          source: 'profootball',
+          fallback: true,
+          apiNote: 'Fallback to Pro Football competitions'
+        };
+        
+        console.log(`[Heartbeat] Fallback successful: ${fallbackData.totalLiveGames} live games`);
+        heartbeatState.lastSync.liveScores = new Date().toISOString();
+        
+        return fallbackData;
+      }
+    } catch (fallbackError) {
+      console.error('[Heartbeat] Even fallback failed:', fallbackError.message);
+    }
   }
   
   return null;
@@ -201,10 +249,10 @@ async function startSKCSHeartbeat() {
   
   // Set up intervals
   
-  // Every minute: Update Live Scores
+  // Every 30 minutes: Update Live Scores (Basic Plan optimization)
   heartbeatState.liveScoresInterval = setInterval(async () => {
     await syncLiveScores();
-  }, 60000); // 60 seconds
+  }, 1800000); // 30 minutes (1,800,000 ms)
   
   // Every hour: Update Trends and News
   heartbeatState.trendsInterval = setInterval(async () => {

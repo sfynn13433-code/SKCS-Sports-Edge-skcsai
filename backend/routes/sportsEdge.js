@@ -11,6 +11,9 @@ const NodeCache = require('node-cache');
 
 const router = express.Router();
 
+// Import hybrid sports data service
+const { getFeaturedGames, getLiveScores, healthCheck } = require('../services/hybridSportsDataService');
+
 // API Governor: 6500ms to stay strictly under 10 RPM
 const apiGovernor = new Bottleneck({
   minTime: 6500, 
@@ -91,39 +94,73 @@ const fetchFromRapidAPI = apiGovernor.wrap(async (endpoint, params, cacheKey, tt
 
 /**
  * FEATURED GAMES: Hero Carousel
- * Endpoint: /web/games?games=1
- * Cache: 5 minutes for live data
+ * Hybrid approach: ESPN → TheSportsDB → Free Livescore → Pro Football
+ * Cache: 5 minutes for live data, 1 hour for fixtures
  */
 router.get('/api/featured-games', async (req, res) => {
   const cacheKey = 'featured_games';
   try {
-    const data = await fetchFromRapidAPI('/web/games', { games: '1' }, cacheKey, 300); // 5 min cache
+    // Check cache first
+    const cachedData = dataCache.get(cacheKey);
+    if (cachedData) {
+      cacheStats.hits++;
+      return res.json({
+        success: true,
+        data: cachedData,
+        cached: true,
+        timestamp: new Date().toISOString()
+      });
+    }
     
-    // Apply bandwidth filtering for frontend
-    const filteredData = {
-      ...data,
-      suggestedGames: (data.suggestedGames || []).slice(0, 5).map(game => ({
-        gameId: game.id || game.gameId,
-        homeTeamName: game.homeTeam?.name || game.homeTeam,
-        awayTeamName: game.awayTeam?.name || game.awayTeam,
-        tournamentName: game.tournament?.name || game.competition,
-        tournamentColor: game.tournament?.color || '#121417',
-        startTime: game.startTime,
-        status: game.status,
-        importance: game.importance || 1,
-        isLive: game.status === 'LIVE' || game.status === 'IN_PROGRESS'
-      }))
-    };
+    cacheStats.misses++;
     
-    res.json({
-      success: true,
-      data: filteredData,
-      cached: dataCache.has(cacheKey),
-      timestamp: new Date().toISOString()
-    });
+    // Use hybrid sports data service with optimal rate limit strategy
+    const hybridResult = await getFeaturedGames();
+    
+    if (hybridResult && hybridResult.data && hybridResult.data.length > 0) {
+      // Cache the successful result
+      const cacheData = {
+        suggestedGames: hybridResult.data,
+        source: hybridResult.source,
+        fallback: hybridResult.fallback,
+        totalSources: hybridResult.totalSources,
+        rateLimit: hybridResult.rateLimit,
+        priority: hybridResult.priority,
+        apiNote: `Using ${hybridResult.source} (${hybridResult.rateLimit})`
+      };
+      
+      // Cache for 5 minutes if live data, 1 hour if fixtures
+      const cacheTTL = hybridResult.data.some(game => game.isLive) ? 300 : 3600;
+      dataCache.set(cacheKey, cacheData, cacheTTL);
+      
+      res.json({
+        success: true,
+        data: cacheData,
+        cached: false,
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      // Fallback to empty response with error info
+      const fallbackData = {
+        suggestedGames: [],
+        source: hybridResult?.source || 'none',
+        fallback: true,
+        error: hybridResult?.error || 'No data available'
+      };
+      
+      dataCache.set(cacheKey, fallbackData, 300); // Cache empty result for 5 minutes
+      
+      res.json({
+        success: false,
+        data: fallbackData,
+        cached: false,
+        timestamp: new Date().toISOString()
+      });
+    }
     
   } catch (error) {
-    console.error('Error fetching featured games:', error.message);
+    cacheStats.errors++;
+    console.error('[Hybrid] Error fetching featured games:', error.message);
     res.status(500).json({ 
       success: false,
       error: 'Failed to retrieve featured games',

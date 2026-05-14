@@ -18,9 +18,9 @@ const limiter = new Bottleneck({
 });
 
 const api = axios.create({
-  baseURL: 'https://api-football-v1.p.rapidapi.com/v3',
+  baseURL: 'https://sportsapi-pro-football-data.p.rapidapi.com',
   headers: {
-    'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
+    'x-rapidapi-host': 'sportsapi-pro-football-data.p.rapidapi.com',
     'x-rapidapi-key': '61fb6ae19emshbc93fdce17fd87fp1ee5fajsnac7912504616'
   }
 });
