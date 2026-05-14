@@ -1476,14 +1476,31 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
         // The function expects TEXT parameter, so keep as string
         console.log('[api/ai-predictions] Fetching prediction for matchId:', matchId, 'type:', typeof matchId);
 
-        // Use the new RPC function for efficient JSONB search
-        const { data, error } = await query(`
-            SELECT * FROM get_prediction_by_match_id($1)
-        `, [matchId]);
-
-        if (error) {
-            console.error('[api/ai-predictions] RPC query failed:', error);
-            throw error;
+        // Try ai_predictions table first (new system)
+        let result;
+        let lastError = null;
+        try {
+            result = await query(`
+                SELECT 
+                    id,
+                    match_id,
+                    home_team,
+                    away_team,
+                    prediction,
+                    confidence,
+                    edgemind_feedback,
+                    value_combos,
+                    same_match_builder,
+                    created_at,
+                    updated_at
+                FROM ai_predictions 
+                WHERE match_id = $1
+                ORDER BY created_at DESC
+                LIMIT 1
+            `, [matchId]);
+            console.log('[api/ai-predictions] ai_predictions query result:', result?.rows?.length || 0, 'rows');
+        } catch (err) {
+            console.error('[api/ai-predictions] ai_predictions query failed:', err.message);
         }
 
         // If not found in ai_predictions, try direct1x2_prediction_final (legacy predictions)
@@ -1548,7 +1565,7 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
             }
         }
 
-        if (!data || data.length === 0) {
+        if (!result || result.rows.length === 0) {
             // Graceful response when no AI prediction exists yet
             console.log('[api/ai-predictions] No prediction found for matchId:', matchId);
             return res.status(404).json({
@@ -1559,7 +1576,7 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
         }
 
         // Safely extract data with optional chaining
-        const predictionData = data[0];
+        const predictionData = result.rows[0];
         const responseData = {
             match_id: predictionData.match_id || predictionData.id,
             confidence_score: predictionData.confidence_score || predictionData.total_confidence,
