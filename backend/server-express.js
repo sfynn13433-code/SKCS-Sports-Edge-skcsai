@@ -1516,8 +1516,7 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
                            created_at,
                            matches,
                            sport,
-                           market_type,
-                           updated_at
+                           market_type
                     FROM direct1x2_prediction_final
                     WHERE id::text = $1
                 `, [matchId]);
@@ -1546,7 +1545,7 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
                                edgemind_report as edgemind_feedback,
                                secondary_insights as value_combos,
                                secondary_markets as same_match_builder,
-                               updated_at,
+                               created_at,
                                matches,
                                sport,
                                market_type
@@ -1584,7 +1583,7 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
             edgemind_feedback: predictionData.edgemind_feedback,
             value_combos: predictionData.value_combos,
             same_match_builder: predictionData.same_match_builder,
-            updated_at: predictionData.updated_at,
+            updated_at: predictionData.updated_at || predictionData.created_at,
             // Optional fields that may not exist in all prediction types
             matches: predictionData.matches,
             sport: predictionData.sport,
