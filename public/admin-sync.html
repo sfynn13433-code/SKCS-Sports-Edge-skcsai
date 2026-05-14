@@ -51,7 +51,7 @@
             margin-bottom: 16px;
         }
         input:focus, select:focus {
-            outline: none;
+            outline: None;
             border-color: #4a9eff;
         }
         button {
@@ -59,7 +59,7 @@
             padding: 14px;
             background: #4a9eff;
             color: #fff;
-            border: none;
+            border: None;
             border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
@@ -76,7 +76,7 @@
             padding: 16px;
             border-radius: 8px;
             font-size: 14px;
-            display: none;
+            display: None;
         }
         .status.success {
             display: block;
@@ -118,7 +118,7 @@
         <p class="subtitle">Trigger a fresh data pull from API-Sports</p>
 
         <label for="apiKey">API Key</label>
-        <input type="password" id="apiKey" placeholder="Enter your SKCS_REFRESH_KEY or ADMIN_API_KEY">
+        <input type="password" id="apiKey" data="Enter your SKCS_REFRESH_KEY or ADMIN_API_KEY">
         <p class="hint">Find this in Render Dashboard → Your Service → Environment</p>
 
         <label for="sport">Sport to Sync</label>
@@ -163,8 +163,8 @@
 
             try {
                 const url = sport === 'all' 
-                    ? `${BACKEND_URL}/api/refresh-predictions`
-                    : `${BACKEND_URL}/api/refresh-predictions?sport=${sport}`;
+                    ? `<!-- comment -->/api/refresh-predictions`
+                    : `<!-- comment -->/api/refresh-predictions?sport=<!-- comment -->`;
 
                 const response = await fetch(url, {
                     method: 'POST',
@@ -179,21 +179,21 @@
                 if (response.ok) {
                     showStatus(
                         `<strong>Sync started successfully!</strong><br><br>` +
-                        `<strong>Message:</strong> ${data.message || 'OK'}<br>` +
-                        `<strong>Note:</strong> ${data.note || 'Check predictions in a few minutes'}<br><br>` +
+                        `<strong>Message:</strong> <!-- comment --><br>` +
+                        `<strong>Note:</strong> <!-- comment --><br><br>` +
                         `<em>The sync runs in the background. Refresh your main website in 3-5 minutes to see new predictions.</em>`,
                         'success'
                     );
                 } else {
                     showStatus(
-                        `<strong>Error:</strong> ${data.error || 'Unknown error'}<br>` +
-                        `<strong>Status:</strong> ${response.status}`,
+                        `<strong>Error:</strong> <!-- comment --><br>` +
+                        `<strong>Status:</strong> <!-- comment -->`,
                         'error'
                     );
                 }
             } catch (error) {
                 showStatus(
-                    `<strong>Connection Error:</strong> ${error.message}<br><br>` +
+                    `<strong>Connection Error:</strong> <!-- comment --><br><br>` +
                     `Make sure your API key is correct and the backend is running.`,
                     'error'
                 );

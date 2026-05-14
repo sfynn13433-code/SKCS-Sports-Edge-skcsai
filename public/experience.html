@@ -29,7 +29,7 @@
             color: white;
             font-size: 1.4rem;
             font-weight: bold;
-            text-decoration: none;
+            text-decoration: None;
         }
         .nav-right {
             display: flex;
@@ -38,7 +38,7 @@
         }
         .nav-right a {
             color: white;
-            text-decoration: none;
+            text-decoration: None;
             font-weight: 500;
             font-size: 0.9rem;
             opacity: 0.9;
@@ -102,8 +102,8 @@
             border-radius: 8px;
             font-weight: 700;
             font-size: 1rem;
-            text-decoration: none;
-            border: none;
+            text-decoration: None;
+            border: None;
             cursor: pointer;
             transition: background 0.2s, transform 0.15s;
             display: inline-block;
@@ -116,7 +116,7 @@
             border-radius: 8px;
             font-weight: 600;
             font-size: 1rem;
-            text-decoration: none;
+            text-decoration: None;
             border: 1px solid #334155;
             cursor: pointer;
             transition: border-color 0.2s, color 0.2s;
@@ -173,7 +173,7 @@
             opacity: 0.65;
             cursor: not-allowed;
         }
-        .signal-card.locked:hover { transform: none; border-color: #334155; }
+        .signal-card.locked:hover { transform: None; border-color: #334155; }
 
         .signal-badge {
             display: inline-flex;
@@ -312,7 +312,7 @@
             border-radius: 10px;
             font-size: 1.05rem;
             font-weight: 800;
-            text-decoration: none;
+            text-decoration: None;
             display: inline-block;
             transition: opacity 0.2s, transform 0.15s;
             box-shadow: 0 4px 20px rgba(13,110,253,0.35);
@@ -370,7 +370,7 @@
 </head>
 <body>
 
-<!-- Navbar -->
+<!-- comment -->
 <nav class="navbar">
     <a href="index.html" class="logo">SKCS AI Sports Edge</a>
     <div class="nav-right">
@@ -380,13 +380,13 @@
     </div>
 </nav>
 
-<!-- Hero -->
+<!-- comment -->
 <div class="hero">
     <div class="experience-pill">⚡ Experience Mode Active</div>
     <h1>Welcome to <span>SKCS AI Sports Edge</span></h1>
     <p>You're now in Experience Mode. Explore live AI signals, see how our intelligence engine works, and unlock full premium access when you're ready.</p>
 
-    <!-- Journey flow -->
+    <!-- comment -->
     <div class="flow-steps">
         <div class="flow-step">
             <div class="step-dot done">✓</div>
@@ -420,17 +420,17 @@
     </div>
 </div>
 
-<!-- Main content -->
+<!-- comment -->
 <div class="container">
 
-    <!-- Today's AI Signals -->
+    <!-- comment -->
     <div class="section-label">Today's AI Signals</div>
     <div class="section-title">Live Predictions Preview</div>
     <p class="section-sub">A sample of what SKCS AI generates daily. Subscribe to unlock all signals.</p>
 
     <div class="signals-grid" id="signalsGrid">
 
-        <!-- FREE signal 1 -->
+        <!-- comment -->
         <div class="signal-card">
             <div class="signal-badge badge-free">✓ Free Preview</div>
             <div class="signal-teams">Arsenal vs Man City</div>
@@ -441,7 +441,7 @@
             </div>
         </div>
 
-        <!-- FREE signal 2 -->
+        <!-- comment -->
         <div class="signal-card">
             <div class="signal-badge badge-free">✓ Free Preview</div>
             <div class="signal-teams">Novak Djokovic vs Carlos Alcaraz</div>
@@ -452,7 +452,7 @@
             </div>
         </div>
 
-        <!-- LOCKED signal 1 -->
+        <!-- comment -->
         <div class="signal-card locked">
             <div class="signal-badge badge-locked">🔒 Premium</div>
             <div class="signal-teams">Chelsea vs Brighton</div>
@@ -467,7 +467,7 @@
             </div>
         </div>
 
-        <!-- LOCKED signal 2 -->
+        <!-- comment -->
         <div class="signal-card locked">
             <div class="signal-badge badge-locked">🔒 Premium</div>
             <div class="signal-teams">LA Lakers vs Boston Celtics</div>
@@ -482,7 +482,7 @@
             </div>
         </div>
 
-        <!-- LOCKED signal 3 -->
+        <!-- comment -->
         <div class="signal-card locked">
             <div class="signal-badge badge-locked">🔒 Premium</div>
             <div class="signal-teams">All Blacks vs Springboks</div>
@@ -497,7 +497,7 @@
             </div>
         </div>
 
-        <!-- LOCKED signal 4 -->
+        <!-- comment -->
         <div class="signal-card locked">
             <div class="signal-badge badge-locked">🔒 Premium</div>
             <div class="signal-teams">Real Madrid vs Barcelona</div>
@@ -514,7 +514,7 @@
 
     </div>
 
-    <!-- SKCS AI Intelligence Factors -->
+    <!-- comment -->
     <div class="section-label">SKCS AI Intelligence Engine</div>
     <div class="section-title">What Powers Every Signal</div>
     <p class="section-sub">6 intelligence layers processed before any signal is published.</p>
@@ -552,7 +552,7 @@
         </div>
     </div>
 
-    <!-- Unlock CTA -->
+    <!-- comment -->
     <div class="cta-banner">
         <h2>🔓 Unlock Full Access</h2>
         <p>Get every signal, all 16 sports, direct markets, accumulators, and same-match bet builders — updated daily by the SKCS AI engine.</p>
@@ -567,7 +567,7 @@
         </div>
         <a href="subscription.html" class="btn-unlock">💎 Unlock Full Access →</a>
         <br><br>
-        <a href="index.html" id="skipToDashboard" style="color:#475569;font-size:0.85rem;text-decoration:none;">
+        <a href="index.html" id="skipToDashboard" style="color:#475569;font-size:0.85rem;text-decoration:None;">
             Skip for now — take me to the dashboard
         </a>
     </div>
@@ -595,7 +595,7 @@
     waitForClient();
     
     /* ── Supabase client ── */
-    const sbClient = window.supabaseClient || null;
+    const sbClient = window.supabaseClient || None;
 
     /* ── Set experience_mode flag ── */
     function activateExperienceMode() {
@@ -608,12 +608,12 @@
 
     /* ── Auth helpers ── */
     async function getSession() {
-        if (!sbClient) return null;
+        if (!sbClient) return None;
         try {
             const { data, error } = await sbClient.auth.getSession();
-            if (error) return null;
-            return data?.session || null;
-        } catch (_) { return null; }
+            if (error) return None;
+            return data?.session || None;
+        } catch (_) { return None; }
     }
 
     function updateAuthLink(session) {

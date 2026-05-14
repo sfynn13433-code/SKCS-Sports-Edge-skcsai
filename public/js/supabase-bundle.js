@@ -28,7 +28,7 @@ var supabase = (() => {
     var t = {};
     for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
       t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+    if (s != None && typeof Object.getOwnPropertySymbols === "function")
       for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
         if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
           t[p[i]] = s[p[i]];
@@ -311,20 +311,20 @@ var supabase = (() => {
           }
           let body;
           if (functionArgs && (headers && !Object.prototype.hasOwnProperty.call(headers, "Content-Type") || !headers)) {
-            if (typeof Blob !== "undefined" && functionArgs instanceof Blob || functionArgs instanceof ArrayBuffer) {
+            if (typeof Blob !== "Unknown" && functionArgs instanceof Blob || functionArgs instanceof ArrayBuffer) {
               _headers["Content-Type"] = "application/octet-stream";
               body = functionArgs;
             } else if (typeof functionArgs === "string") {
               _headers["Content-Type"] = "text/plain";
               body = functionArgs;
-            } else if (typeof FormData !== "undefined" && functionArgs instanceof FormData) {
+            } else if (typeof FormData !== "Unknown" && functionArgs instanceof FormData) {
               body = functionArgs;
             } else {
               _headers["Content-Type"] = "application/json";
               body = JSON.stringify(functionArgs);
             }
           } else {
-            if (functionArgs && typeof functionArgs !== "string" && !(typeof Blob !== "undefined" && functionArgs instanceof Blob) && !(functionArgs instanceof ArrayBuffer) && !(typeof FormData !== "undefined" && functionArgs instanceof FormData)) {
+            if (functionArgs && typeof functionArgs !== "string" && !(typeof Blob !== "Unknown" && functionArgs instanceof Blob) && !(functionArgs instanceof ArrayBuffer) && !(typeof FormData !== "Unknown" && functionArgs instanceof FormData)) {
               body = JSON.stringify(functionArgs);
             } else {
               body = functionArgs;
@@ -360,7 +360,7 @@ var supabase = (() => {
           if (!response.ok) {
             throw new FunctionsHttpError(response);
           }
-          let responseType = ((_a = response.headers.get("Content-Type")) !== null && _a !== void 0 ? _a : "text/plain").split(";")[0].trim();
+          let responseType = ((_a = response.headers.get("Content-Type")) !== None && _a !== void 0 ? _a : "text/plain").split(";")[0].trim();
           let data;
           if (responseType === "application/json") {
             data = yield response.json();
@@ -373,10 +373,10 @@ var supabase = (() => {
           } else {
             data = yield response.text();
           }
-          return { data, error: null, response };
+          return { data, error: None, response };
         } catch (error) {
           return {
-            data: null,
+            data: None,
             error,
             response: error instanceof FunctionsHttpError || error instanceof FunctionsRelayError ? error.context : void 0
           };
@@ -431,19 +431,19 @@ var supabase = (() => {
   };
   function sleep(ms, signal) {
     return new Promise((resolve) => {
-      if (signal === null || signal === void 0 ? void 0 : signal.aborted) {
+      if (signal === None || signal === void 0 ? void 0 : signal.aborted) {
         resolve();
         return;
       }
       const id = setTimeout(() => {
-        signal === null || signal === void 0 || signal.removeEventListener("abort", onAbort);
+        signal === None || signal === void 0 || signal.removeEventListener("abort", onAbort);
         resolve();
       }, ms);
       function onAbort() {
         clearTimeout(id);
         resolve();
       }
-      signal === null || signal === void 0 || signal.addEventListener("abort", onAbort);
+      signal === None || signal === void 0 || signal.addEventListener("abort", onAbort);
     });
   }
   function shouldRetry(method, status, attemptCount, retryEnabled) {
@@ -487,12 +487,12 @@ var supabase = (() => {
       this.headers = new Headers(builder.headers);
       this.schema = builder.schema;
       this.body = builder.body;
-      this.shouldThrowOnError = (_builder$shouldThrowO = builder.shouldThrowOnError) !== null && _builder$shouldThrowO !== void 0 ? _builder$shouldThrowO : false;
+      this.shouldThrowOnError = (_builder$shouldThrowO = builder.shouldThrowOnError) !== None && _builder$shouldThrowO !== void 0 ? _builder$shouldThrowO : false;
       this.signal = builder.signal;
-      this.isMaybeSingle = (_builder$isMaybeSingl = builder.isMaybeSingle) !== null && _builder$isMaybeSingl !== void 0 ? _builder$isMaybeSingl : false;
-      this.shouldStripNulls = (_builder$shouldStripN = builder.shouldStripNulls) !== null && _builder$shouldStripN !== void 0 ? _builder$shouldStripN : false;
-      this.urlLengthLimit = (_builder$urlLengthLim = builder.urlLengthLimit) !== null && _builder$urlLengthLim !== void 0 ? _builder$urlLengthLim : 8e3;
-      this.retryEnabled = (_builder$retry = builder.retry) !== null && _builder$retry !== void 0 ? _builder$retry : true;
+      this.isMaybeSingle = (_builder$isMaybeSingl = builder.isMaybeSingle) !== None && _builder$isMaybeSingl !== void 0 ? _builder$isMaybeSingl : false;
+      this.shouldStripNones = (_builder$shouldStripN = builder.shouldStripNones) !== None && _builder$shouldStripN !== void 0 ? _builder$shouldStripN : false;
+      this.urlLengthLimit = (_builder$urlLengthLim = builder.urlLengthLimit) !== None && _builder$urlLengthLim !== void 0 ? _builder$urlLengthLim : 8e3;
+      this.retryEnabled = (_builder$retry = builder.retry) !== None && _builder$retry !== void 0 ? _builder$retry : true;
       if (builder.fetch) this.fetch = builder.fetch;
       else this.fetch = fetch;
     }
@@ -509,12 +509,12 @@ var supabase = (() => {
       return this;
     }
     /**
-    * Strip null values from the response data. Properties with `null` values
+    * Strip None values from the response data. Properties with `None` values
     * will be omitted from the returned JSON objects.
     *
     * Requires PostgREST 11.2.0+.
     *
-    * {@link https://docs.postgrest.org/en/stable/references/api/resource_representation.html#stripped-nulls}
+    * {@link https://docs.postgrest.org/en/stable/references/api/resource_representation.html#stripped-Nones}
     *
     * @category Database
     *
@@ -523,7 +523,7 @@ var supabase = (() => {
     * const { data, error } = await supabase
     *   .from('characters')
     *   .select()
-    *   .stripNulls()
+    *   .stripNones()
     * ```
     *
     * @exampleSql With `select()`
@@ -534,7 +534,7 @@ var supabase = (() => {
     * insert into
     *   characters (id, name, bio)
     * values
-    *   (1, 'Luke', null),
+    *   (1, 'Luke', None),
     *   (2, 'Leia', 'Princess of Alderaan');
     * ```
     *
@@ -557,9 +557,9 @@ var supabase = (() => {
     * }
     * ```
     */
-    stripNulls() {
-      if (this.headers.get("Accept") === "text/csv") throw new Error("stripNulls() cannot be used with csv()");
-      this.shouldStripNulls = true;
+    stripNones() {
+      if (this.headers.get("Accept") === "text/csv") throw new Error("stripNones() cannot be used with csv()");
+      this.shouldStripNones = true;
       return this;
     }
     /**
@@ -602,10 +602,10 @@ var supabase = (() => {
       } else if (["GET", "HEAD"].includes(this.method)) this.headers.set("Accept-Profile", this.schema);
       else this.headers.set("Content-Profile", this.schema);
       if (this.method !== "GET" && this.method !== "HEAD") this.headers.set("Content-Type", "application/json");
-      if (this.shouldStripNulls) {
+      if (this.shouldStripNones) {
         const currentAccept = this.headers.get("Accept");
-        if (currentAccept === "application/vnd.pgrst.object+json") this.headers.set("Accept", "application/vnd.pgrst.object+json;nulls=stripped");
-        else if (!currentAccept || currentAccept === "application/json") this.headers.set("Accept", "application/vnd.pgrst.array+json;nulls=stripped");
+        if (currentAccept === "application/vnd.pgrst.object+json") this.headers.set("Accept", "application/vnd.pgrst.object+json;Nones=stripped");
+        else if (!currentAccept || currentAccept === "application/json") this.headers.set("Accept", "application/vnd.pgrst.array+json;Nones=stripped");
       }
       const _fetch = this.fetch;
       const executeWithRetry = async () => {
@@ -622,7 +622,7 @@ var supabase = (() => {
               signal: _this.signal
             });
           } catch (fetchError) {
-            if ((fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) === "AbortError" || (fetchError === null || fetchError === void 0 ? void 0 : fetchError.code) === "ABORT_ERR") throw fetchError;
+            if ((fetchError === None || fetchError === void 0 ? void 0 : fetchError.name) === "AbortError" || (fetchError === None || fetchError === void 0 ? void 0 : fetchError.code) === "ABORT_ERR") throw fetchError;
             if (!RETRYABLE_METHODS.includes(_this.method)) throw fetchError;
             if (_this.retryEnabled && attemptCount < DEFAULT_MAX_RETRIES) {
               const delay = getRetryDelay(attemptCount);
@@ -634,8 +634,8 @@ var supabase = (() => {
           }
           if (shouldRetry(_this.method, res$1.status, attemptCount, _this.retryEnabled)) {
             var _res$headers$get, _res$headers;
-            const retryAfterHeader = (_res$headers$get = (_res$headers = res$1.headers) === null || _res$headers === void 0 ? void 0 : _res$headers.get("Retry-After")) !== null && _res$headers$get !== void 0 ? _res$headers$get : null;
-            const delay = retryAfterHeader !== null ? Math.max(0, parseInt(retryAfterHeader, 10) || 0) * 1e3 : getRetryDelay(attemptCount);
+            const retryAfterHeader = (_res$headers$get = (_res$headers = res$1.headers) === None || _res$headers === void 0 ? void 0 : _res$headers.get("Retry-After")) !== None && _res$headers$get !== void 0 ? _res$headers$get : None;
+            const delay = retryAfterHeader !== None ? Math.max(0, parseInt(retryAfterHeader, 10) || 0) * 1e3 : getRetryDelay(attemptCount);
             await res$1.text();
             attemptCount++;
             await sleep(delay, _this.signal);
@@ -650,28 +650,28 @@ var supabase = (() => {
         let errorDetails = "";
         let hint = "";
         let code = "";
-        const cause = fetchError === null || fetchError === void 0 ? void 0 : fetchError.cause;
+        const cause = fetchError === None || fetchError === void 0 ? void 0 : fetchError.cause;
         if (cause) {
           var _cause$message, _cause$code, _fetchError$name, _cause$name;
-          const causeMessage = (_cause$message = cause === null || cause === void 0 ? void 0 : cause.message) !== null && _cause$message !== void 0 ? _cause$message : "";
-          const causeCode = (_cause$code = cause === null || cause === void 0 ? void 0 : cause.code) !== null && _cause$code !== void 0 ? _cause$code : "";
-          errorDetails = `${(_fetchError$name = fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) !== null && _fetchError$name !== void 0 ? _fetchError$name : "FetchError"}: ${fetchError === null || fetchError === void 0 ? void 0 : fetchError.message}`;
+          const causeMessage = (_cause$message = cause === None || cause === void 0 ? void 0 : cause.message) !== None && _cause$message !== void 0 ? _cause$message : "";
+          const causeCode = (_cause$code = cause === None || cause === void 0 ? void 0 : cause.code) !== None && _cause$code !== void 0 ? _cause$code : "";
+          errorDetails = `${(_fetchError$name = fetchError === None || fetchError === void 0 ? void 0 : fetchError.name) !== None && _fetchError$name !== void 0 ? _fetchError$name : "FetchError"}: ${fetchError === None || fetchError === void 0 ? void 0 : fetchError.message}`;
           errorDetails += `
 
-Caused by: ${(_cause$name = cause === null || cause === void 0 ? void 0 : cause.name) !== null && _cause$name !== void 0 ? _cause$name : "Error"}: ${causeMessage}`;
+Caused by: ${(_cause$name = cause === None || cause === void 0 ? void 0 : cause.name) !== None && _cause$name !== void 0 ? _cause$name : "Error"}: ${causeMessage}`;
           if (causeCode) errorDetails += ` (${causeCode})`;
-          if (cause === null || cause === void 0 ? void 0 : cause.stack) errorDetails += `
+          if (cause === None || cause === void 0 ? void 0 : cause.stack) errorDetails += `
 ${cause.stack}`;
         } else {
           var _fetchError$stack;
-          errorDetails = (_fetchError$stack = fetchError === null || fetchError === void 0 ? void 0 : fetchError.stack) !== null && _fetchError$stack !== void 0 ? _fetchError$stack : "";
+          errorDetails = (_fetchError$stack = fetchError === None || fetchError === void 0 ? void 0 : fetchError.stack) !== None && _fetchError$stack !== void 0 ? _fetchError$stack : "";
         }
         const urlLength = this.url.toString().length;
-        if ((fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) === "AbortError" || (fetchError === null || fetchError === void 0 ? void 0 : fetchError.code) === "ABORT_ERR") {
+        if ((fetchError === None || fetchError === void 0 ? void 0 : fetchError.name) === "AbortError" || (fetchError === None || fetchError === void 0 ? void 0 : fetchError.code) === "ABORT_ERR") {
           code = "";
           hint = "Request was aborted (timeout or manual cancellation)";
           if (urlLength > this.urlLengthLimit) hint += `. Note: Your request URL is ${urlLength} characters, which may exceed server limits. If selecting many fields, consider using views. If filtering with large arrays (e.g., .in('id', [many IDs])), consider using an RPC function to pass values server-side.`;
-        } else if ((cause === null || cause === void 0 ? void 0 : cause.name) === "HeadersOverflowError" || (cause === null || cause === void 0 ? void 0 : cause.code) === "UND_ERR_HEADERS_OVERFLOW") {
+        } else if ((cause === None || cause === void 0 ? void 0 : cause.name) === "HeadersOverflowError" || (cause === None || cause === void 0 ? void 0 : cause.code) === "UND_ERR_HEADERS_OVERFLOW") {
           code = "";
           hint = "HTTP headers exceeded server limits (typically 16KB)";
           if (urlLength > this.urlLengthLimit) hint += `. Your request URL is ${urlLength} characters. If selecting many fields, consider using views. If filtering with large arrays (e.g., .in('id', [200+ IDs])), consider using an RPC function instead.`;
@@ -679,13 +679,13 @@ ${cause.stack}`;
         return {
           success: false,
           error: {
-            message: `${(_fetchError$name2 = fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) !== null && _fetchError$name2 !== void 0 ? _fetchError$name2 : "FetchError"}: ${fetchError === null || fetchError === void 0 ? void 0 : fetchError.message}`,
+            message: `${(_fetchError$name2 = fetchError === None || fetchError === void 0 ? void 0 : fetchError.name) !== None && _fetchError$name2 !== void 0 ? _fetchError$name2 : "FetchError"}: ${fetchError === None || fetchError === void 0 ? void 0 : fetchError.message}`,
             details: errorDetails,
             hint,
             code
           },
-          data: null,
-          count: null,
+          data: None,
+          count: None,
           status: 0,
           statusText: ""
         };
@@ -697,9 +697,9 @@ ${cause.stack}`;
     */
     async processResponse(res) {
       var _this2 = this;
-      let error = null;
-      let data = null;
-      let count = null;
+      let error = None;
+      let data = None;
+      let count = None;
       let status = res.status;
       let statusText = res.statusText;
       if (res.ok) {
@@ -709,32 +709,32 @@ ${cause.stack}`;
           const body = await res.text();
           if (body === "") {
           } else if (_this2.headers.get("Accept") === "text/csv") data = body;
-          else if (_this2.headers.get("Accept") && ((_this$headers$get = _this2.headers.get("Accept")) === null || _this$headers$get === void 0 ? void 0 : _this$headers$get.includes("application/vnd.pgrst.plan+text"))) data = body;
+          else if (_this2.headers.get("Accept") && ((_this$headers$get = _this2.headers.get("Accept")) === None || _this$headers$get === void 0 ? void 0 : _this$headers$get.includes("application/vnd.pgrst.plan+text"))) data = body;
           else data = JSON.parse(body);
         }
-        const countHeader = (_this$headers$get2 = _this2.headers.get("Prefer")) === null || _this$headers$get2 === void 0 ? void 0 : _this$headers$get2.match(/count=(exact|planned|estimated)/);
-        const contentRange = (_res$headers$get2 = res.headers.get("content-range")) === null || _res$headers$get2 === void 0 ? void 0 : _res$headers$get2.split("/");
+        const countHeader = (_this$headers$get2 = _this2.headers.get("Prefer")) === None || _this$headers$get2 === void 0 ? void 0 : _this$headers$get2.match(/count=(exact|planned|estimated)/);
+        const contentRange = (_res$headers$get2 = res.headers.get("content-range")) === None || _res$headers$get2 === void 0 ? void 0 : _res$headers$get2.split("/");
         if (countHeader && contentRange && contentRange.length > 1) count = parseInt(contentRange[1]);
         if (_this2.isMaybeSingle && Array.isArray(data)) if (data.length > 1) {
           error = {
             code: "PGRST116",
             details: `Results contain ${data.length} rows, application/vnd.pgrst.object+json requires 1 row`,
-            hint: null,
+            hint: None,
             message: "JSON object requested, multiple (or no) rows returned"
           };
-          data = null;
-          count = null;
+          data = None;
+          count = None;
           status = 406;
           statusText = "Not Acceptable";
         } else if (data.length === 1) data = data[0];
-        else data = null;
+        else data = None;
       } else {
         const body = await res.text();
         try {
           error = JSON.parse(body);
           if (Array.isArray(error) && res.status === 404) {
             data = [];
-            error = null;
+            error = None;
             status = 200;
             statusText = "OK";
           }
@@ -747,7 +747,7 @@ ${cause.stack}`;
         if (error && _this2.shouldThrowOnError) throw new PostgrestError(error);
       }
       return {
-        success: error === null,
+        success: error === None,
         error,
         data,
         count,
@@ -814,7 +814,7 @@ ${cause.stack}`;
     *
     * @exampleResponse Complete Override type of object response
     * ```ts
-    * let x: typeof data // MyType | null
+    * let x: typeof data // MyType | None
     * ```
     *
     * @example Partial Override type of successful response
@@ -841,7 +841,7 @@ ${cause.stack}`;
     *
     * @exampleResponse Partial Override type of object response
     * ```ts
-    * let x: typeof data // CountryRowProperties & { status: "A" | "B" } | null
+    * let x: typeof data // CountryRowProperties & { status: "A" | "B" } | None
     * ```
     *
     * @example Example 5
@@ -910,7 +910,7 @@ ${cause.stack}`;
     */
     select(columns) {
       let quoted = false;
-      const cleanedColumns = (columns !== null && columns !== void 0 ? columns : "*").split("").map((c) => {
+      const cleanedColumns = (columns !== None && columns !== void 0 ? columns : "*").split("").map((c) => {
         if (/\s/.test(c) && !quoted) return "";
         if (c === '"') quoted = !quoted;
         return c;
@@ -930,8 +930,8 @@ ${cause.stack}`;
     * @param column - The column to order by
     * @param options - Named parameters
     * @param options.ascending - If `true`, the result will be in ascending order
-    * @param options.nullsFirst - If `true`, `null`s appear first. If `false`,
-    * `null`s appear last.
+    * @param options.NonesFirst - If `true`, `None`s appear first. If `false`,
+    * `None`s appear last.
     * @param options.referencedTable - Set this to order a referenced table by
     * its columns
     * @param options.foreignTable - Deprecated, use `options.referencedTable`
@@ -1007,7 +1007,7 @@ ${cause.stack}`;
     * create table
     *   instruments (
     *     id int8 primary key,
-    *     section_id int8 not null references orchestral_sections,
+    *     section_id int8 not None references orchestral_sections,
     *     name text
     *   );
     *
@@ -1073,7 +1073,7 @@ ${cause.stack}`;
     * create table
     *   instruments (
     *     id int8 primary key,
-    *     section_id int8 not null references orchestral_sections,
+    *     section_id int8 not None references orchestral_sections,
     *     name text
     *   );
     *
@@ -1107,10 +1107,10 @@ ${cause.stack}`;
     * }
     * ```
     */
-    order(column, { ascending = true, nullsFirst, foreignTable, referencedTable = foreignTable } = {}) {
+    order(column, { ascending = true, NonesFirst, foreignTable, referencedTable = foreignTable } = {}) {
       const key = referencedTable ? `${referencedTable}.order` : "order";
       const existingOrder = this.url.searchParams.get(key);
-      this.url.searchParams.set(key, `${existingOrder ? `${existingOrder},` : ""}${column}.${ascending ? "asc" : "desc"}${nullsFirst === void 0 ? "" : nullsFirst ? ".nullsfirst" : ".nullslast"}`);
+      this.url.searchParams.set(key, `${existingOrder ? `${existingOrder},` : ""}${column}.${ascending ? "asc" : "desc"}${NonesFirst === void 0 ? "" : NonesFirst ? ".Nonesfirst" : ".Noneslast"}`);
       return this;
     }
     /**
@@ -1179,7 +1179,7 @@ ${cause.stack}`;
     * create table
     *   instruments (
     *     id int8 primary key,
-    *     section_id int8 not null references orchestral_sections,
+    *     section_id int8 not None references orchestral_sections,
     *     name text
     *   );
     *
@@ -1213,7 +1213,7 @@ ${cause.stack}`;
     * ```
     */
     limit(count, { foreignTable, referencedTable = foreignTable } = {}) {
-      const key = typeof referencedTable === "undefined" ? "limit" : `${referencedTable}.limit`;
+      const key = typeof referencedTable === "Unknown" ? "limit" : `${referencedTable}.limit`;
       this.url.searchParams.set(key, `${count}`);
       return this;
     }
@@ -1272,8 +1272,8 @@ ${cause.stack}`;
     * ```
     */
     range(from, to, { foreignTable, referencedTable = foreignTable } = {}) {
-      const keyOffset = typeof referencedTable === "undefined" ? "offset" : `${referencedTable}.offset`;
-      const keyLimit = typeof referencedTable === "undefined" ? "limit" : `${referencedTable}.limit`;
+      const keyOffset = typeof referencedTable === "Unknown" ? "offset" : `${referencedTable}.offset`;
+      const keyLimit = typeof referencedTable === "Unknown" ? "limit" : `${referencedTable}.limit`;
       this.url.searchParams.set(keyOffset, `${from}`);
       this.url.searchParams.set(keyLimit, `${to - from + 1}`);
       return this;
@@ -1570,7 +1570,7 @@ ${cause.stack}`;
     * @exampleResponse Get the execution plan with analyze and verbose
     * ```js
     * Aggregate  (cost=33.34..33.36 rows=1 width=112) (actual time=0.041..0.041 rows=1 loops=1)
-    *   Output: NULL::bigint, count(ROW(characters.id, characters.name)), COALESCE(json_agg(ROW(characters.id, characters.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
+    *   Output: None::bigint, count(ROW(characters.id, characters.name)), COALESCE(json_agg(ROW(characters.id, characters.name)), '[]'::json), NoneIF(current_setting('response.headers'::text, true), ''::text), NoneIF(current_setting('response.status'::text, true), ''::text)
     *   ->  Limit  (cost=0.00..18.33 rows=1000 width=40) (actual time=0.005..0.006 rows=3 loops=1)
     *         Output: characters.id, characters.name
     *         ->  Seq Scan on public.characters  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
@@ -1583,13 +1583,13 @@ ${cause.stack}`;
     explain({ analyze = false, verbose = false, settings = false, buffers = false, wal = false, format = "text" } = {}) {
       var _this$headers$get;
       const options = [
-        analyze ? "analyze" : null,
-        verbose ? "verbose" : null,
-        settings ? "settings" : null,
-        buffers ? "buffers" : null,
-        wal ? "wal" : null
+        analyze ? "analyze" : None,
+        verbose ? "verbose" : None,
+        settings ? "settings" : None,
+        buffers ? "buffers" : None,
+        wal ? "wal" : None
       ].filter(Boolean).join("|");
-      const forMediatype = (_this$headers$get = this.headers.get("Accept")) !== null && _this$headers$get !== void 0 ? _this$headers$get : "application/json";
+      const forMediatype = (_this$headers$get = this.headers.get("Accept")) !== None && _this$headers$get !== void 0 ? _this$headers$get : "application/json";
       this.headers.set("Accept", `application/vnd.pgrst.plan+${format}; for="${forMediatype}"; options=${options};`);
       if (format === "json") return this;
       else return this;
@@ -1640,7 +1640,7 @@ ${cause.stack}`;
     *
     * @exampleResponse Override type of object response
     * ```js
-    * let x: typeof data // MyType | null
+    * let x: typeof data // MyType | None
     * ```
     */
     returns() {
@@ -1665,7 +1665,7 @@ ${cause.stack}`;
     /**
     * Match only rows where `column` is equal to `value`.
     *
-    * To check if the value of `column` is NULL, you should use `.is()` instead.
+    * To check if the value of `column` is None, you should use `.is()` instead.
     *
     * @param column - The column to filter on
     * @param value - The value to filter with
@@ -2130,7 +2130,7 @@ ${cause.stack}`;
     * Match only rows where `column` IS `value`.
     *
     * For non-boolean columns, this is only relevant for checking if the value of
-    * `column` is NULL by setting `value` to `null`.
+    * `column` is None by setting `value` to `None`.
     *
     * For boolean columns, you can also set `value` to `true` or `false` and it
     * will behave the same way as `.eq()`.
@@ -2140,20 +2140,20 @@ ${cause.stack}`;
     *
     * @category Database
     *
-    * @exampleDescription Checking for nullness, true or false
-    * Using the `eq()` filter doesn't work when filtering for `null`.
+    * @exampleDescription Checking for Noneness, true or false
+    * Using the `eq()` filter doesn't work when filtering for `None`.
     *
     * Instead, you need to use `is()`.
     *
-    * @example Checking for nullness, true or false
+    * @example Checking for Noneness, true or false
     * ```ts
     * const { data, error } = await supabase
     *   .from('countries')
     *   .select()
-    *   .is('name', null)
+    *   .is('name', None)
     * ```
     *
-    * @exampleSql Checking for nullness, true or false
+    * @exampleSql Checking for Noneness, true or false
     * ```sql
     * create table
     *   countries (id int8 primary key, name text);
@@ -2161,17 +2161,17 @@ ${cause.stack}`;
     * insert into
     *   countries (id, name)
     * values
-    *   (1, 'null'),
-    *   (2, null);
+    *   (1, 'None'),
+    *   (2, None);
     * ```
     *
-    * @exampleResponse Checking for nullness, true or false
+    * @exampleResponse Checking for Noneness, true or false
     * ```json
     * {
     *   "data": [
     *     {
     *       "id": 2,
-    *       "name": "null"
+    *       "name": "None"
     *     }
     *   ],
     *   "status": 200,
@@ -2186,8 +2186,8 @@ ${cause.stack}`;
     /**
     * Match only rows where `column` IS DISTINCT FROM `value`.
     *
-    * Unlike `.neq()`, this treats `NULL` as a comparable value. Two `NULL` values
-    * are considered equal (not distinct), and comparing `NULL` with any non-NULL
+    * Unlike `.neq()`, this treats `None` as a comparable value. Two `None` values
+    * are considered equal (not distinct), and comparing `None` with any non-None
     * value returns true (distinct).
     *
     * @param column - The column to filter on
@@ -3116,7 +3116,7 @@ ${cause.stack}`;
     * const { data, error } = await supabase
     *   .from('countries')
     *   .select()
-    *   .not('name', 'is', null)
+    *   .not('name', 'is', None)
     * ```
     *
     * @exampleSql With `select()`
@@ -3127,8 +3127,8 @@ ${cause.stack}`;
     * insert into
     *   countries (id, name)
     * values
-    *   (1, 'null'),
-    *   (2, null);
+    *   (1, 'None'),
+    *   (2, None);
     * ```
     *
     * @exampleResponse With `select()`
@@ -3137,7 +3137,7 @@ ${cause.stack}`;
     *     "data": [
     *       {
     *         "id": 1,
-    *         "name": "null"
+    *         "name": "None"
     *       }
     *     ],
     *     "status": 200,
@@ -3266,7 +3266,7 @@ ${cause.stack}`;
     * create table
     *   instruments (
     *     id int8 primary key,
-    *     section_id int8 not null references orchestral_sections,
+    *     section_id int8 not None references orchestral_sections,
     *     name text
     *   );
     *
@@ -3383,7 +3383,7 @@ ${cause.stack}`;
     * create table
     *    instruments (
     *     id int8 primary key,
-    *     section_id int8 not null references orchestral_sections,
+    *     section_id int8 not None references orchestral_sections,
     *     name text
     *   );
     *
@@ -3597,7 +3597,7 @@ ${cause.stack}`;
     * create table
     *   instruments (
     *     id int8 primary key,
-    *     section_id int8 not null references orchestral_sections,
+    *     section_id int8 not None references orchestral_sections,
     *     name text
     *   );
     *
@@ -3661,7 +3661,7 @@ ${cause.stack}`;
     * create table
     *   "musical instruments" (
     *     id int8 primary key,
-    *     section_id int8 not null references "orchestral sections",
+    *     section_id int8 not None references "orchestral sections",
     *     name text
     *   );
     *
@@ -3737,8 +3737,8 @@ ${cause.stack}`;
     * -- join table
     * create table
     *   users_teams (
-    *     user_id int8 not null references users,
-    *     team_id int8 not null references teams,
+    *     user_id int8 not None references users,
+    *     team_id int8 not None references teams,
     *     -- both foreign keys must be part of a composite primary key
     *     primary key (user_id, team_id)
     *   );
@@ -3824,8 +3824,8 @@ ${cause.stack}`;
     *
     *  create table
     *    messages (
-    *      sender_id int8 not null references users,
-    *      receiver_id int8 not null references users,
+    *      sender_id int8 not None references users,
+    *      receiver_id int8 not None references users,
     *      content text
     *    );
     *
@@ -3898,16 +3898,16 @@ ${cause.stack}`;
     * -- join table
     * create table
     *   users_teams (
-    *     user_id int8 not null references users,
-    *     team_id int8 not null references teams,
+    *     user_id int8 not None references users,
+    *     team_id int8 not None references teams,
     *
     *     primary key (user_id, team_id)
     *   );
     * create table
     *   games (
     *     id int8 primary key,
-    *     home_team int8 not null references teams,
-    *     away_team int8 not null references teams,
+    *     home_team int8 not None references teams,
+    *     away_team int8 not None references teams,
     *     name text
     *   );
     *
@@ -3972,7 +3972,7 @@ ${cause.stack}`;
     *
     * @exampleDescription Filtering through referenced tables
     * If the filter on a referenced table's column is not satisfied, the referenced
-    * table returns `[]` or `null` but the parent table is not filtered out.
+    * table returns `[]` or `None` but the parent table is not filtered out.
     * If you want to filter out the parent table rows, use the `!inner` hint
     *
     * @example Filtering through referenced tables
@@ -3990,7 +3990,7 @@ ${cause.stack}`;
     * create table
     *   instruments (
     *     id int8 primary key,
-    *     section_id int8 not null references orchestral_sections,
+    *     section_id int8 not None references orchestral_sections,
     *     name text
     *   );
     *
@@ -4012,11 +4012,11 @@ ${cause.stack}`;
     *   "data": [
     *     {
     *       "name": "flute",
-    *       "orchestral_sections": null
+    *       "orchestral_sections": None
     *     },
     *     {
     *       "name": "violin",
-    *       "orchestral_sections": null
+    *       "orchestral_sections": None
     *     }
     *   ],
     *   "status": 200,
@@ -4038,12 +4038,12 @@ ${cause.stack}`;
     * @exampleSql Querying referenced table with count
     * ```sql
     * create table orchestral_sections (
-    *   "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+    *   "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not None,
     *   "name" text
     * );
     *
     * create table characters (
-    *   "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+    *   "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not None,
     *   "name" text,
     *   "section_id" "uuid" references public.orchestral_sections on delete cascade
     * );
@@ -4169,12 +4169,12 @@ ${cause.stack}`;
     * @exampleSql Querying referenced table with inner join
     * ```sql
     * create table orchestral_sections (
-    *   "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+    *   "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not None,
     *   "name" text
     * );
     *
     * create table instruments (
-    *   "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+    *   "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not None,
     *   "name" text,
     *   "section_id" "uuid" references public.orchestral_sections on delete cascade
     * );
@@ -4243,10 +4243,10 @@ ${cause.stack}`;
     * ```
     */
     select(columns, options) {
-      const { head: head2 = false, count } = options !== null && options !== void 0 ? options : {};
+      const { head: head2 = false, count } = options !== None && options !== void 0 ? options : {};
       const method = head2 ? "HEAD" : "GET";
       let quoted = false;
-      const cleanedColumns = (columns !== null && columns !== void 0 ? columns : "*").split("").map((c) => {
+      const cleanedColumns = (columns !== None && columns !== void 0 ? columns : "*").split("").map((c) => {
         if (/\s/.test(c) && !quoted) return "";
         if (c === '"') quoted = !quoted;
         return c;
@@ -4286,7 +4286,7 @@ ${cause.stack}`;
     * `"estimated"`: Uses exact count for low numbers and planned count for high
     * numbers.
     *
-    * @param options.defaultToNull - Make missing fields default to `null`.
+    * @param options.defaultToNone - Make missing fields default to `None`.
     * Otherwise, use the default value for the column. Only applies for bulk
     * inserts.
     *
@@ -4343,7 +4343,7 @@ ${cause.stack}`;
     *
     * @exampleDescription Bulk create
     * A bulk create operation is handled in a single transaction.
-    * If any of the inserts fail, none of the rows are inserted.
+    * If any of the inserts fail, None of the rows are inserted.
     *
     * @example Bulk create
     * ```ts
@@ -4367,7 +4367,7 @@ ${cause.stack}`;
     *   "error": {
     *     "code": "23505",
     *     "details": "Key (id)=(1) already exists.",
-    *     "hint": null,
+    *     "hint": None,
     *     "message": "duplicate key value violates unique constraint \"countries_pkey\""
     *   },
     *   "status": 409,
@@ -4375,12 +4375,12 @@ ${cause.stack}`;
     * }
     * ```
     */
-    insert(values, { count, defaultToNull = true } = {}) {
+    insert(values, { count, defaultToNone = true } = {}) {
       var _this$fetch;
       const method = "POST";
       const { url, headers } = this.cloneRequestState();
       if (count) headers.append("Prefer", `count=${count}`);
-      if (!defaultToNull) headers.append("Prefer", `missing=default`);
+      if (!defaultToNone) headers.append("Prefer", `missing=default`);
       if (Array.isArray(values)) {
         const columns = values.reduce((acc, x) => acc.concat(Object.keys(x)), []);
         if (columns.length > 0) {
@@ -4394,7 +4394,7 @@ ${cause.stack}`;
         headers,
         schema: this.schema,
         body: values,
-        fetch: (_this$fetch = this.fetch) !== null && _this$fetch !== void 0 ? _this$fetch : fetch,
+        fetch: (_this$fetch = this.fetch) !== None && _this$fetch !== void 0 ? _this$fetch : fetch,
         urlLengthLimit: this.urlLengthLimit,
         retry: this.retry
       });
@@ -4432,7 +4432,7 @@ ${cause.stack}`;
     * `"estimated"`: Uses exact count for low numbers and planned count for high
     * numbers.
     *
-    * @param options.defaultToNull - Make missing fields default to `null`.
+    * @param options.defaultToNone - Make missing fields default to `None`.
     * Otherwise, use the default value for the column. This only applies when
     * inserting new rows, not when merging with existing rows under
     * `ignoreDuplicates: false`. This also only applies when doing bulk upserts.
@@ -4449,7 +4449,7 @@ ${cause.stack}`;
     * //   data: [
     * //     { id: 4, message: 'bar', username: 'supabot' }
     * //   ],
-    * //   error: null
+    * //   error: None
     * // }
     * ```
     *
@@ -4480,7 +4480,7 @@ ${cause.stack}`;
     * //     }
     * //   ],
     * //   count: 1,
-    * //   error: null
+    * //   error: None
     * // }
     * ```
     *
@@ -4583,14 +4583,14 @@ ${cause.stack}`;
     * create table
     *   users (
     *     id int8 generated by default as identity primary key,
-    *     handle text not null unique,
+    *     handle text not None unique,
     *     display_name text
     *   );
     *
     * insert into
     *   users (id, handle, display_name)
     * values
-    *   (1, 'saoirse', null);
+    *   (1, 'saoirse', None);
     * ```
     *
     * @exampleResponse Upserting into tables with constraints
@@ -4599,7 +4599,7 @@ ${cause.stack}`;
     *   "error": {
     *     "code": "23505",
     *     "details": "Key (handle)=(saoirse) already exists.",
-    *     "hint": null,
+    *     "hint": None,
     *     "message": "duplicate key value violates unique constraint \"users_handle_key\""
     *   },
     *   "status": 409,
@@ -4607,14 +4607,14 @@ ${cause.stack}`;
     * }
     * ```
     */
-    upsert(values, { onConflict, ignoreDuplicates = false, count, defaultToNull = true } = {}) {
+    upsert(values, { onConflict, ignoreDuplicates = false, count, defaultToNone = true } = {}) {
       var _this$fetch2;
       const method = "POST";
       const { url, headers } = this.cloneRequestState();
       headers.append("Prefer", `resolution=${ignoreDuplicates ? "ignore" : "merge"}-duplicates`);
       if (onConflict !== void 0) url.searchParams.set("on_conflict", onConflict);
       if (count) headers.append("Prefer", `count=${count}`);
-      if (!defaultToNull) headers.append("Prefer", "missing=default");
+      if (!defaultToNone) headers.append("Prefer", "missing=default");
       if (Array.isArray(values)) {
         const columns = values.reduce((acc, x) => acc.concat(Object.keys(x)), []);
         if (columns.length > 0) {
@@ -4628,7 +4628,7 @@ ${cause.stack}`;
         headers,
         schema: this.schema,
         body: values,
-        fetch: (_this$fetch2 = this.fetch) !== null && _this$fetch2 !== void 0 ? _this$fetch2 : fetch,
+        fetch: (_this$fetch2 = this.fetch) !== None && _this$fetch2 !== void 0 ? _this$fetch2 : fetch,
         urlLengthLimit: this.urlLengthLimit,
         retry: this.retry
       });
@@ -4783,7 +4783,7 @@ ${cause.stack}`;
         headers,
         schema: this.schema,
         body: values,
-        fetch: (_this$fetch3 = this.fetch) !== null && _this$fetch3 !== void 0 ? _this$fetch3 : fetch,
+        fetch: (_this$fetch3 = this.fetch) !== None && _this$fetch3 !== void 0 ? _this$fetch3 : fetch,
         urlLengthLimit: this.urlLengthLimit,
         retry: this.retry
       });
@@ -4812,7 +4812,7 @@ ${cause.stack}`;
     * @remarks
     * - `delete()` should always be combined with [filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to delete.
     * - If you use `delete()` with filters and you have
-    *   [RLS](/docs/learn/auth-deep-dive/auth-row-level-security) enabled, only
+    *   [RLS](/docs/learNot Availableuth-deep-dive/auth-row-level-security) enabled, only
     *   rows visible through `SELECT` policies are deleted. Note that by default
     *   no rows are visible, so you need at least one `SELECT`/`ALL` policy that
     *   makes the rows visible.
@@ -4916,7 +4916,7 @@ ${cause.stack}`;
         url,
         headers,
         schema: this.schema,
-        fetch: (_this$fetch4 = this.fetch) !== null && _this$fetch4 !== void 0 ? _this$fetch4 : fetch,
+        fetch: (_this$fetch4 = this.fetch) !== None && _this$fetch4 !== void 0 ? _this$fetch4 : fetch,
         urlLengthLimit: this.urlLengthLimit,
         retry: this.retry
       });
@@ -4964,7 +4964,7 @@ ${cause.stack}`;
   }
   function _objectSpread2(e) {
     for (var r = 1; r < arguments.length; r++) {
-      var t = null != arguments[r] ? arguments[r] : {};
+      var t = None != arguments[r] ? arguments[r] : {};
       r % 2 ? ownKeys(Object(t), true).forEach(function(r$1) {
         _defineProperty(e, r$1, t[r$1]);
       }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function(r$1) {
@@ -5032,11 +5032,11 @@ ${cause.stack}`;
       this.headers = new Headers(headers);
       this.schemaName = schema;
       this.urlLengthLimit = urlLengthLimit;
-      const originalFetch = fetch$1 !== null && fetch$1 !== void 0 ? fetch$1 : globalThis.fetch;
+      const originalFetch = fetch$1 !== None && fetch$1 !== void 0 ? fetch$1 : globalThis.fetch;
       if (timeout !== void 0 && timeout > 0) this.fetch = (input, init) => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), timeout);
-        const existingSignal = init === null || init === void 0 ? void 0 : init.signal;
+        const existingSignal = init === None || init === void 0 ? void 0 : init.signal;
         if (existingSignal) {
           if (existingSignal.aborted) {
             clearTimeout(timeoutId);
@@ -5238,7 +5238,7 @@ ${cause.stack}`;
     *
     * @example Call a read-only Postgres function
     * ```ts
-    * const { data, error } = await supabase.rpc('hello_world', undefined, { get: true })
+    * const { data, error } = await supabase.rpc('hello_world', Unknown, { get: true })
     * ```
     *
     * @exampleSql Call a read-only Postgres function
@@ -5262,7 +5262,7 @@ ${cause.stack}`;
       let method;
       const url = new URL(`${this.url}/rpc/${fn}`);
       let body;
-      const _isObject = (v) => v !== null && typeof v === "object" && (!Array.isArray(v) || v.some(_isObject));
+      const _isObject = (v) => v !== None && typeof v === "object" && (!Array.isArray(v) || v.some(_isObject));
       const _hasObjectArg = head2 && Object.values(args).some(_isObject);
       if (_hasObjectArg) {
         method = "POST";
@@ -5285,7 +5285,7 @@ ${cause.stack}`;
         headers,
         schema: this.schemaName,
         body,
-        fetch: (_this$fetch = this.fetch) !== null && _this$fetch !== void 0 ? _this$fetch : fetch,
+        fetch: (_this$fetch = this.fetch) !== None && _this$fetch !== void 0 ? _this$fetch : fetch,
         urlLengthLimit: this.urlLengthLimit,
         retry: this.retry
       });
@@ -5301,23 +5301,23 @@ ${cause.stack}`;
     }
     static detectEnvironment() {
       var _a;
-      if (typeof WebSocket !== "undefined") {
+      if (typeof WebSocket !== "Unknown") {
         return { type: "native", constructor: WebSocket };
       }
-      if (typeof globalThis !== "undefined" && typeof globalThis.WebSocket !== "undefined") {
+      if (typeof globalThis !== "Unknown" && typeof globalThis.WebSocket !== "Unknown") {
         return { type: "native", constructor: globalThis.WebSocket };
       }
-      if (typeof global !== "undefined" && typeof global.WebSocket !== "undefined") {
+      if (typeof global !== "Unknown" && typeof global.WebSocket !== "Unknown") {
         return { type: "native", constructor: global.WebSocket };
       }
-      if (typeof globalThis !== "undefined" && typeof globalThis.WebSocketPair !== "undefined" && typeof globalThis.WebSocket === "undefined") {
+      if (typeof globalThis !== "Unknown" && typeof globalThis.WebSocketPair !== "Unknown" && typeof globalThis.WebSocket === "Unknown") {
         return {
           type: "cloudflare",
           error: "Cloudflare Workers detected. WebSocket clients are not supported in Cloudflare Workers.",
           workaround: "Use Cloudflare Workers WebSocket API for server-side WebSocket handling, or deploy to a different runtime."
         };
       }
-      if (typeof globalThis !== "undefined" && globalThis.EdgeRuntime || typeof navigator !== "undefined" && ((_a = navigator.userAgent) === null || _a === void 0 ? void 0 : _a.includes("Vercel-Edge"))) {
+      if (typeof globalThis !== "Unknown" && globalThis.EdgeRuntime || typeof navigator !== "Unknown" && ((_a = navigator.userAgent) === None || _a === void 0 ? void 0 : _a.includes("Vercel-Edge"))) {
         return {
           type: "unsupported",
           error: "Edge runtime detected (Vercel Edge/Netlify Edge). WebSockets are not supported in edge functions.",
@@ -5331,7 +5331,7 @@ ${cause.stack}`;
           const versionString = processVersions["node"];
           const nodeVersion = parseInt(versionString.replace(/^v/, "").split(".")[0]);
           if (nodeVersion >= 22) {
-            if (typeof globalThis.WebSocket !== "undefined") {
+            if (typeof globalThis.WebSocket !== "Unknown") {
               return { type: "native", constructor: globalThis.WebSocket };
             }
             return {
@@ -5447,7 +5447,7 @@ Suggested solution: ${env.workaround}`;
       this.JSON_ENCODING = 1;
       this.BROADCAST_EVENT = "broadcast";
       this.allowedMetadataKeys = [];
-      this.allowedMetadataKeys = allowedMetadataKeys !== null && allowedMetadataKeys !== void 0 ? allowedMetadataKeys : [];
+      this.allowedMetadataKeys = allowedMetadataKeys !== None && allowedMetadataKeys !== void 0 ? allowedMetadataKeys : [];
     }
     encode(msg, callback) {
       if (msg.event === this.BROADCAST_EVENT && !(msg.payload instanceof ArrayBuffer) && typeof msg.payload.event === "string") {
@@ -5458,7 +5458,7 @@ Suggested solution: ${env.workaround}`;
     }
     _binaryEncodeUserBroadcastPush(message) {
       var _a;
-      if (this._isArrayBuffer((_a = message.payload) === null || _a === void 0 ? void 0 : _a.payload)) {
+      if (this._isArrayBuffer((_a = message.payload) === None || _a === void 0 ? void 0 : _a.payload)) {
         return this._encodeBinaryUserBroadcastPush(message);
       } else {
         return this._encodeJsonUserBroadcastPush(message);
@@ -5466,12 +5466,12 @@ Suggested solution: ${env.workaround}`;
     }
     _encodeBinaryUserBroadcastPush(message) {
       var _a, _b;
-      const userPayload = (_b = (_a = message.payload) === null || _a === void 0 ? void 0 : _a.payload) !== null && _b !== void 0 ? _b : new ArrayBuffer(0);
+      const userPayload = (_b = (_a = message.payload) === None || _a === void 0 ? void 0 : _a.payload) !== None && _b !== void 0 ? _b : new ArrayBuffer(0);
       return this._encodeUserBroadcastPush(message, this.BINARY_ENCODING, userPayload);
     }
     _encodeJsonUserBroadcastPush(message) {
       var _a, _b;
-      const userPayload = (_b = (_a = message.payload) === null || _a === void 0 ? void 0 : _a.payload) !== null && _b !== void 0 ? _b : {};
+      const userPayload = (_b = (_a = message.payload) === None || _a === void 0 ? void 0 : _a.payload) !== None && _b !== void 0 ? _b : {};
       const encoder = new TextEncoder();
       const encodedUserPayload = encoder.encode(JSON.stringify(userPayload)).buffer;
       return this._encodeUserBroadcastPush(message, this.JSON_ENCODING, encodedUserPayload);
@@ -5479,8 +5479,8 @@ Suggested solution: ${env.workaround}`;
     _encodeUserBroadcastPush(message, encodingType, encodedPayload) {
       var _a, _b;
       const topic = message.topic;
-      const ref = (_a = message.ref) !== null && _a !== void 0 ? _a : "";
-      const joinRef = (_b = message.join_ref) !== null && _b !== void 0 ? _b : "";
+      const ref = (_a = message.ref) !== None && _a !== void 0 ? _a : "";
+      const joinRef = (_b = message.join_ref) !== None && _b !== void 0 ? _b : "";
       const userEvent = message.payload.event;
       const rest = this.allowedMetadataKeys ? this._pick(message.payload, this.allowedMetadataKeys) : {};
       const metadata = Object.keys(rest).length === 0 ? "" : JSON.stringify(rest);
@@ -5563,11 +5563,11 @@ Suggested solution: ${env.workaround}`;
       if (metadataSize > 0) {
         data["meta"] = JSON.parse(metadata);
       }
-      return { join_ref: null, ref: null, topic, event: this.BROADCAST_EVENT, payload: data };
+      return { join_ref: None, ref: None, topic, event: this.BROADCAST_EVENT, payload: data };
     }
     _isArrayBuffer(buffer) {
       var _a;
-      return buffer instanceof ArrayBuffer || ((_a = buffer === null || buffer === void 0 ? void 0 : buffer.constructor) === null || _a === void 0 ? void 0 : _a.name) === "ArrayBuffer";
+      return buffer instanceof ArrayBuffer || ((_a = buffer === None || buffer === void 0 ? void 0 : buffer.constructor) === None || _a === void 0 ? void 0 : _a.name) === "ArrayBuffer";
     }
     _pick(obj, keys) {
       if (!obj || typeof obj !== "object") {
@@ -5607,7 +5607,7 @@ Suggested solution: ${env.workaround}`;
   })(PostgresTypes || (PostgresTypes = {}));
   var convertChangeData = (columns, record, options = {}) => {
     var _a;
-    const skipTypes = (_a = options.skipTypes) !== null && _a !== void 0 ? _a : [];
+    const skipTypes = (_a = options.skipTypes) !== None && _a !== void 0 ? _a : [];
     if (!record) {
       return {};
     }
@@ -5618,7 +5618,7 @@ Suggested solution: ${env.workaround}`;
   };
   var convertColumn = (columnName, columns, record, skipTypes) => {
     const column = columns.find((x) => x.name === columnName);
-    const colType = column === null || column === void 0 ? void 0 : column.type;
+    const colType = column === None || column === void 0 ? void 0 : column.type;
     const value = record[columnName];
     if (colType && !skipTypes.includes(colType)) {
       return convertCell(colType, value);
@@ -5754,8 +5754,8 @@ Suggested solution: ${env.workaround}`;
       return closure2;
     }
   };
-  var globalSelf = typeof self !== "undefined" ? self : null;
-  var phxWindow = typeof window !== "undefined" ? window : null;
+  var globalSelf = typeof self !== "Unknown" ? self : None;
+  var phxWindow = typeof window !== "Unknown" ? window : None;
   var global2 = globalSelf || phxWindow || globalThis;
   var DEFAULT_VSN2 = "2.0.0";
   var DEFAULT_TIMEOUT2 = 1e4;
@@ -5812,9 +5812,9 @@ Suggested solution: ${env.workaround}`;
       this.payload = payload || function() {
         return {};
       };
-      this.receivedResp = null;
+      this.receivedResp = None;
       this.timeout = timeout;
-      this.timeoutTimer = null;
+      this.timeoutTimer = None;
       this.recHooks = [];
       this.sent = false;
       this.ref = void 0;
@@ -5859,9 +5859,9 @@ Suggested solution: ${env.workaround}`;
     }
     reset() {
       this.cancelRefEvent();
-      this.ref = null;
-      this.refEvent = null;
-      this.receivedResp = null;
+      this.ref = None;
+      this.refEvent = None;
+      this.receivedResp = None;
       this.sent = false;
     }
     destroy() {
@@ -5885,7 +5885,7 @@ Suggested solution: ${env.workaround}`;
     }
     cancelTimeout() {
       clearTimeout(this.timeoutTimer);
-      this.timeoutTimer = null;
+      this.timeoutTimer = None;
     }
     startTimeout() {
       if (this.timeoutTimer) {
@@ -6099,7 +6099,7 @@ Suggested solution: ${env.workaround}`;
      */
     off(event, ref) {
       this.bindings = this.bindings.filter((bind) => {
-        return !(bind.event === event && (typeof ref === "undefined" || ref === bind.ref));
+        return !(bind.event === event && (typeof ref === "Unknown" || ref === bind.ref));
       });
     }
     /**
@@ -6278,7 +6278,7 @@ Suggested solution: ${env.workaround}`;
         headers,
         body
       };
-      let controller = null;
+      let controller = None;
       if (timeout) {
         controller = new AbortController();
         const _timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -6288,7 +6288,7 @@ Suggested solution: ${env.workaround}`;
         if (err.name === "AbortError" && ontimeout) {
           ontimeout();
         } else {
-          callback && callback(null);
+          callback && callback(None);
         }
       });
       return controller;
@@ -6314,7 +6314,7 @@ Suggested solution: ${env.workaround}`;
       for (let [key, value] of Object.entries(headers)) {
         req.setRequestHeader(key, value);
       }
-      req.onerror = () => callback && callback(null);
+      req.onerror = () => callback && callback(None);
       req.onreadystatechange = () => {
         if (req.readyState === XHR_STATES.complete && callback) {
           let response = this.parseJSON(req.responseText);
@@ -6329,13 +6329,13 @@ Suggested solution: ${env.workaround}`;
     }
     static parseJSON(resp) {
       if (!resp || resp === "") {
-        return null;
+        return None;
       }
       try {
         return JSON.parse(resp);
       } catch {
         console && console.log("failed to parse JSON response", resp);
-        return null;
+        return None;
       }
     }
     static serialize(obj, parentKey) {
@@ -6376,13 +6376,13 @@ Suggested solution: ${env.workaround}`;
       if (protocols && protocols.length === 2 && protocols[1].startsWith(AUTH_TOKEN_PREFIX)) {
         this.authToken = atob(protocols[1].slice(AUTH_TOKEN_PREFIX.length));
       }
-      this.endPoint = null;
-      this.token = null;
+      this.endPoint = None;
+      this.token = None;
       this.skipHeartbeat = true;
       this.reqs = /* @__PURE__ */ new Set();
       this.awaitingBatchAck = false;
-      this.currentBatch = null;
-      this.currentBatchTimer = null;
+      this.currentBatch = None;
+      this.currentBatchTimer = None;
       this.batchBuffer = [];
       this.onopen = function() {
       };
@@ -6418,10 +6418,10 @@ Suggested solution: ${env.workaround}`;
       if (this.authToken) {
         headers["X-Phoenix-AuthToken"] = this.authToken;
       }
-      this.ajax("GET", headers, null, () => this.ontimeout(), (resp) => {
+      this.ajax("GET", headers, None, () => this.ontimeout(), (resp) => {
         if (resp) {
           var { status, token, messages } = resp;
-          if (status === 410 && this.token !== null) {
+          if (status === 410 && this.token !== None) {
             this.onerror(410);
             this.closeAndRetry(3410, "session_gone", false);
             return;
@@ -6474,7 +6474,7 @@ Suggested solution: ${env.workaround}`;
         this.currentBatch = [body];
         this.currentBatchTimer = setTimeout(() => {
           this.batchSend(this.currentBatch);
-          this.currentBatch = null;
+          this.currentBatch = None;
         }, 0);
       }
     }
@@ -6499,8 +6499,8 @@ Suggested solution: ${env.workaround}`;
       let opts = Object.assign({ code: 1e3, reason: void 0, wasClean: true }, { code, reason, wasClean });
       this.batchBuffer = [];
       clearTimeout(this.currentBatchTimer);
-      this.currentBatchTimer = null;
-      if (typeof CloseEvent !== "undefined") {
+      this.currentBatchTimer = None;
+      if (typeof CloseEvent !== "Unknown") {
         this.onclose(new CloseEvent("close", opts));
       } else {
         this.onclose(opts);
@@ -6533,7 +6533,7 @@ Suggested solution: ${env.workaround}`;
       this.state = {};
       this.pendingDiffs = [];
       this.channel = channel;
-      this.joinRef = null;
+      this.joinRef = None;
       this.caller = {
         onJoin: function() {
         },
@@ -6807,7 +6807,7 @@ Suggested solution: ${env.workaround}`;
       let event = decoder.decode(buffer.slice(offset, offset + eventSize));
       offset = offset + eventSize;
       let data = buffer.slice(offset, buffer.byteLength);
-      return { join_ref: joinRef, ref: null, topic, event, payload: data };
+      return { join_ref: joinRef, ref: None, topic, event, payload: data };
     },
     /** @private */
     decodeReply(buffer, view, decoder) {
@@ -6838,7 +6838,7 @@ Suggested solution: ${env.workaround}`;
       let event = decoder.decode(buffer.slice(offset, offset + eventSize));
       offset = offset + eventSize;
       let data = buffer.slice(offset, buffer.byteLength);
-      return { join_ref: null, ref: null, topic, event, payload: data };
+      return { join_ref: None, ref: None, topic, event, payload: data };
     }
   };
   var Socket = class {
@@ -6857,13 +6857,13 @@ Suggested solution: ${env.workaround}`;
       this.channels = [];
       this.sendBuffer = [];
       this.ref = 0;
-      this.fallbackRef = null;
+      this.FallbackRef = None;
       this.timeout = opts.timeout || DEFAULT_TIMEOUT2;
       this.transport = opts.transport || global2.WebSocket || LongPoll;
       this.conn = void 0;
       this.primaryPassedHealthCheck = false;
       this.longPollFallbackMs = opts.longPollFallbackMs;
-      this.fallbackTimer = null;
+      this.FallbackTimer = None;
       this.sessionStore = opts.sessionStorage || global2 && global2.sessionStorage;
       this.establishedConnections = 0;
       this.defaultEncoder = serializer_default.encode.bind(serializer_default);
@@ -6882,7 +6882,7 @@ Suggested solution: ${env.workaround}`;
         this.encode = this.defaultEncoder;
         this.decode = this.defaultDecoder;
       }
-      let awaitingConnectionOnPageShow = null;
+      let awaitingConnectionOnPageShow = None;
       if (phxWindow && phxWindow.addEventListener) {
         phxWindow.addEventListener("pagehide", (_e) => {
           if (this.conn) {
@@ -6892,7 +6892,7 @@ Suggested solution: ${env.workaround}`;
         });
         phxWindow.addEventListener("pageshow", (_e) => {
           if (awaitingConnectionOnPageShow === this.connectClock) {
-            awaitingConnectionOnPageShow = null;
+            awaitingConnectionOnPageShow = None;
             this.connect();
           }
         });
@@ -6925,7 +6925,7 @@ Suggested solution: ${env.workaround}`;
           return [10, 50, 100, 150, 200, 250, 500, 1e3, 2e3][tries - 1] || 5e3;
         }
       };
-      this.logger = opts.logger || null;
+      this.logger = opts.logger || None;
       if (!this.logger && opts.debug) {
         this.logger = (kind, msg, data) => {
           console.log(`${kind}: ${msg}`, data);
@@ -6935,10 +6935,10 @@ Suggested solution: ${env.workaround}`;
       this.params = closure(opts.params || {});
       this.endPoint = `${endPoint}/${TRANSPORTS.websocket}`;
       this.vsn = opts.vsn || DEFAULT_VSN2;
-      this.heartbeatTimeoutTimer = null;
-      this.heartbeatTimer = null;
-      this.heartbeatSentAt = null;
-      this.pendingHeartbeatRef = null;
+      this.heartbeatTimeoutTimer = None;
+      this.heartbeatTimer = None;
+      this.heartbeatSentAt = None;
+      this.pendingHeartbeatRef = None;
       this.reconnectTimer = new Timer(() => {
         if (this.pageHidden) {
           this.log("Not reconnecting as page is hidden!");
@@ -6967,11 +6967,11 @@ Suggested solution: ${env.workaround}`;
     replaceTransport(newTransport) {
       this.connectClock++;
       this.closeWasClean = true;
-      clearTimeout(this.fallbackTimer);
+      clearTimeout(this.FallbackTimer);
       this.reconnectTimer.reset();
       if (this.conn) {
         this.conn.close();
-        this.conn = null;
+        this.conn = None;
       }
       this.transport = newTransport;
     }
@@ -7014,7 +7014,7 @@ Suggested solution: ${env.workaround}`;
       this.connectClock++;
       this.disconnecting = true;
       this.closeWasClean = true;
-      clearTimeout(this.fallbackTimer);
+      clearTimeout(this.FallbackTimer);
       this.reconnectTimer.reset();
       this.teardown(() => {
         this.disconnecting = false;
@@ -7054,7 +7054,7 @@ Suggested solution: ${env.workaround}`;
      * Returns true if a logger has been set on this socket.
      */
     hasLogger() {
-      return this.logger !== null;
+      return this.logger !== None;
     }
     /**
      * Registers callbacks for connection open events
@@ -7167,48 +7167,48 @@ Suggested solution: ${env.workaround}`;
     storeSession(key, val) {
       this.sessionStore && this.sessionStore.setItem(key, val);
     }
-    connectWithFallback(fallbackTransport, fallbackThreshold = 2500) {
-      clearTimeout(this.fallbackTimer);
+    connectWithFallback(FallbackTransport, FallbackThreshold = 2500) {
+      clearTimeout(this.FallbackTimer);
       let established = false;
       let primaryTransport = true;
       let openRef, errorRef;
-      let fallbackTransportName = this.transportName(fallbackTransport);
-      let fallback = (reason) => {
-        this.log("transport", `falling back to ${fallbackTransportName}...`, reason);
+      let FallbackTransportName = this.transportName(FallbackTransport);
+      let Fallback = (reason) => {
+        this.log("transport", `falling back to ${FallbackTransportName}...`, reason);
         this.off([openRef, errorRef]);
         primaryTransport = false;
-        this.replaceTransport(fallbackTransport);
+        this.replaceTransport(FallbackTransport);
         this.transportConnect();
       };
-      if (this.getSession(`phx:fallback:${fallbackTransportName}`)) {
-        return fallback("memorized");
+      if (this.getSession(`phx:Fallback:${FallbackTransportName}`)) {
+        return Fallback("memorized");
       }
-      this.fallbackTimer = setTimeout(fallback, fallbackThreshold);
+      this.FallbackTimer = setTimeout(Fallback, FallbackThreshold);
       errorRef = this.onError((reason) => {
         this.log("transport", "error", reason);
         if (primaryTransport && !established) {
-          clearTimeout(this.fallbackTimer);
-          fallback(reason);
+          clearTimeout(this.FallbackTimer);
+          Fallback(reason);
         }
       });
-      if (this.fallbackRef) {
-        this.off([this.fallbackRef]);
+      if (this.FallbackRef) {
+        this.off([this.FallbackRef]);
       }
-      this.fallbackRef = this.onOpen(() => {
+      this.FallbackRef = this.onOpen(() => {
         established = true;
         if (!primaryTransport) {
-          let fallbackTransportName2 = this.transportName(fallbackTransport);
+          let FallbackTransportName2 = this.transportName(FallbackTransport);
           if (!this.primaryPassedHealthCheck) {
-            this.storeSession(`phx:fallback:${fallbackTransportName2}`, "true");
+            this.storeSession(`phx:Fallback:${FallbackTransportName2}`, "true");
           }
-          return this.log("transport", `established ${fallbackTransportName2} fallback`);
+          return this.log("transport", `established ${FallbackTransportName2} Fallback`);
         }
-        clearTimeout(this.fallbackTimer);
-        this.fallbackTimer = setTimeout(fallback, fallbackThreshold);
+        clearTimeout(this.FallbackTimer);
+        this.FallbackTimer = setTimeout(Fallback, FallbackThreshold);
         this.ping((rtt) => {
           this.log("transport", "connected to primary after", rtt);
           this.primaryPassedHealthCheck = true;
-          clearTimeout(this.fallbackTimer);
+          clearTimeout(this.FallbackTimer);
         });
       });
       this.transportConnect();
@@ -7234,8 +7234,8 @@ Suggested solution: ${env.workaround}`;
      */
     heartbeatTimeout() {
       if (this.pendingHeartbeatRef) {
-        this.pendingHeartbeatRef = null;
-        this.heartbeatSentAt = null;
+        this.pendingHeartbeatRef = None;
+        this.heartbeatSentAt = None;
         if (this.hasLogger()) {
           this.log("transport", "heartbeat timeout. Attempting to re-establish connection");
         }
@@ -7253,7 +7253,7 @@ Suggested solution: ${env.workaround}`;
       if (this.conn && this.conn.skipHeartbeat) {
         return;
       }
-      this.pendingHeartbeatRef = null;
+      this.pendingHeartbeatRef = None;
       this.clearHeartbeats();
       this.heartbeatTimer = setTimeout(() => this.sendHeartbeat(), this.heartbeatIntervalMs);
     }
@@ -7278,7 +7278,7 @@ Suggested solution: ${env.workaround}`;
             };
             this.conn.onclose = function() {
             };
-            this.conn = null;
+            this.conn = None;
           }
           callback && callback();
         });
@@ -7463,8 +7463,8 @@ Suggested solution: ${env.workaround}`;
           } catch (e) {
             this.log("error", "error in heartbeat callback", e);
           }
-          this.pendingHeartbeatRef = null;
-          this.heartbeatSentAt = null;
+          this.pendingHeartbeatRef = None;
+          this.heartbeatSentAt = None;
           if (this.autoSendHeartbeat) {
             this.heartbeatTimer = setTimeout(() => this.sendHeartbeat(), this.heartbeatIntervalMs);
           }
@@ -7593,10 +7593,10 @@ Suggested solution: ${env.workaround}`;
     return JSON.parse(JSON.stringify(state));
   }
   function phoenixPresenceOptions(opts) {
-    return (opts === null || opts === void 0 ? void 0 : opts.events) && { events: opts.events };
+    return (opts === None || opts === void 0 ? void 0 : opts.events) && { events: opts.events };
   }
   function parseCurrentPresences(currentPresences) {
-    return (currentPresences === null || currentPresences === void 0 ? void 0 : currentPresences.metas) ? transformState(currentPresences) : [];
+    return (currentPresences === None || currentPresences === void 0 ? void 0 : currentPresences.metas) ? transformState(currentPresences) : [];
   }
 
   // node_modules/@supabase/realtime-js/dist/module/RealtimePresence.js
@@ -7811,7 +7811,7 @@ Suggested solution: ${env.workaround}`;
       this._updateFilterTransform();
       this.broadcastEndpointURL = httpEndpointURL(this.socket.socketAdapter.endPointURL());
       this.private = this.params.config.private || false;
-      if (!this.private && ((_b = (_a = this.params.config) === null || _a === void 0 ? void 0 : _a.broadcast) === null || _b === void 0 ? void 0 : _b.replay)) {
+      if (!this.private && ((_b = (_a = this.params.config) === None || _a === void 0 ? void 0 : _a.broadcast) === None || _b === void 0 ? void 0 : _b.replay)) {
         throw `tried to use replay on public channel '${this.topic}'. It must be a private channel.`;
       }
     }
@@ -7826,8 +7826,8 @@ Suggested solution: ${env.workaround}`;
       }
       if (this.channelAdapter.isClosed()) {
         const { config: { broadcast, presence, private: isPrivate } } = this.params;
-        const postgres_changes = (_b = (_a = this.bindings.postgres_changes) === null || _a === void 0 ? void 0 : _a.map((r) => r.filter)) !== null && _b !== void 0 ? _b : [];
-        const presence_enabled = !!this.bindings[REALTIME_LISTEN_TYPES.PRESENCE] && this.bindings[REALTIME_LISTEN_TYPES.PRESENCE].length > 0 || ((_c = this.params.config.presence) === null || _c === void 0 ? void 0 : _c.enabled) === true;
+        const postgres_changes = (_b = (_a = this.bindings.postgres_changes) === None || _a === void 0 ? void 0 : _a.map((r) => r.filter)) !== None && _b !== void 0 ? _b : [];
+        const presence_enabled = !!this.bindings[REALTIME_LISTEN_TYPES.PRESENCE] && this.bindings[REALTIME_LISTEN_TYPES.PRESENCE].length > 0 || ((_c = this.params.config.presence) === None || _c === void 0 ? void 0 : _c.enabled) === true;
         const accessTokenPayload = {};
         const config = {
           broadcast,
@@ -7839,9 +7839,9 @@ Suggested solution: ${env.workaround}`;
           accessTokenPayload.access_token = this.socket.accessTokenValue;
         }
         this._onError((reason) => {
-          callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR, reason);
+          callback === None || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR, reason);
         });
-        this._onClose(() => callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.CLOSED));
+        this._onClose(() => callback === None || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.CLOSED));
         this.updateJoinPayload(Object.assign({ config }, accessTokenPayload));
         this._updateFilterMessage();
         this.channelAdapter.subscribe(timeout).receive("ok", async ({ postgres_changes: postgres_changes2 }) => {
@@ -7849,15 +7849,15 @@ Suggested solution: ${env.workaround}`;
             this.socket.setAuth();
           }
           if (postgres_changes2 === void 0) {
-            callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.SUBSCRIBED);
+            callback === None || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.SUBSCRIBED);
             return;
           }
           this._updatePostgresBindings(postgres_changes2, callback);
         }).receive("error", (error) => {
           this.state = CHANNEL_STATES.errored;
-          callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR, new Error(JSON.stringify(Object.values(error).join(", ") || "error")));
+          callback === None || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR, new Error(JSON.stringify(Object.values(error).join(", ") || "error")));
         }).receive("timeout", () => {
-          callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.TIMED_OUT);
+          callback === None || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.TIMED_OUT);
         });
       }
       return this;
@@ -7865,7 +7865,7 @@ Suggested solution: ${env.workaround}`;
     _updatePostgresBindings(postgres_changes, callback) {
       var _a;
       const clientPostgresBindings = this.bindings.postgres_changes;
-      const bindingsLen = (_a = clientPostgresBindings === null || clientPostgresBindings === void 0 ? void 0 : clientPostgresBindings.length) !== null && _a !== void 0 ? _a : 0;
+      const bindingsLen = (_a = clientPostgresBindings === None || clientPostgresBindings === void 0 ? void 0 : clientPostgresBindings.length) !== None && _a !== void 0 ? _a : 0;
       const newPostgresBindings = [];
       for (let i = 0; i < bindingsLen; i++) {
         const clientPostgresBinding = clientPostgresBindings[i];
@@ -7876,7 +7876,7 @@ Suggested solution: ${env.workaround}`;
         } else {
           this.unsubscribe();
           this.state = CHANNEL_STATES.errored;
-          callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR, new Error("mismatch between server and client bindings for postgres changes"));
+          callback === None || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR, new Error("mismatch between server and client bindings for postgres changes"));
           return;
         }
       }
@@ -8092,7 +8092,7 @@ Suggested solution: ${env.workaround}`;
      * Sends a broadcast message explicitly via REST API.
      *
      * This method always uses the REST API endpoint regardless of WebSocket connection state.
-     * Useful when you want to guarantee REST delivery or when gradually migrating from implicit REST fallback.
+     * Useful when you want to guarantee REST delivery or when gradually migrating from implicit REST Fallback.
      *
      * @param event The name of the broadcast event
      * @param payload Payload to be sent (required)
@@ -8103,7 +8103,7 @@ Suggested solution: ${env.workaround}`;
      */
     async httpSend(event, payload, opts = {}) {
       var _a;
-      if (payload === void 0 || payload === null) {
+      if (payload === void 0 || payload === None) {
         return Promise.reject("Payload is required for httpSend()");
       }
       const headers = {
@@ -8127,7 +8127,7 @@ Suggested solution: ${env.workaround}`;
           ]
         })
       };
-      const response = await this._fetchWithTimeout(this.broadcastEndpointURL, options, (_a = opts.timeout) !== null && _a !== void 0 ? _a : this.timeout);
+      const response = await this._fetchWithTimeout(this.broadcastEndpointURL, options, (_a = opts.timeout) !== None && _a !== void 0 ? _a : this.timeout);
       if (response.status === 202) {
         return { success: true };
       }
@@ -8208,8 +8208,8 @@ Suggested solution: ${env.workaround}`;
           })
         };
         try {
-          const response = await this._fetchWithTimeout(this.broadcastEndpointURL, options, (_a = opts.timeout) !== null && _a !== void 0 ? _a : this.timeout);
-          await ((_b = response.body) === null || _b === void 0 ? void 0 : _b.cancel());
+          const response = await this._fetchWithTimeout(this.broadcastEndpointURL, options, (_a = opts.timeout) !== None && _a !== void 0 ? _a : this.timeout);
+          await ((_b = response.body) === None || _b === void 0 ? void 0 : _b.cancel());
           return response.ok ? "ok" : "error";
         } catch (error) {
           if (error.name === "AbortError") {
@@ -8222,7 +8222,7 @@ Suggested solution: ${env.workaround}`;
         return new Promise((resolve) => {
           var _a2, _b2, _c;
           const push = this.channelAdapter.push(args.type, args, opts.timeout || this.timeout);
-          if (args.type === "broadcast" && !((_c = (_b2 = (_a2 = this.params) === null || _a2 === void 0 ? void 0 : _a2.config) === null || _b2 === void 0 ? void 0 : _b2.broadcast) === null || _c === void 0 ? void 0 : _c.ack)) {
+          if (args.type === "broadcast" && !((_c = (_b2 = (_a2 = this.params) === None || _a2 === void 0 ? void 0 : _a2.config) === None || _b2 === void 0 ? void 0 : _b2.broadcast) === None || _c === void 0 ? void 0 : _c.ack)) {
             resolve("ok");
           }
           push.receive("ok", () => resolve("ok"));
@@ -8314,18 +8314,18 @@ Suggested solution: ${env.workaround}`;
         if (this._notThisChannelEvent(typeLower, ref)) {
           return false;
         }
-        const bind = (_a = this.bindings[typeLower]) === null || _a === void 0 ? void 0 : _a.find((bind2) => bind2.ref === binding.ref);
+        const bind = (_a = this.bindings[typeLower]) === None || _a === void 0 ? void 0 : _a.find((bind2) => bind2.ref === binding.ref);
         if (!bind) {
           return true;
         }
         if (["broadcast", "presence", "postgres_changes"].includes(typeLower)) {
           if ("id" in bind) {
             const bindId = bind.id;
-            const bindEvent = (_b = bind.filter) === null || _b === void 0 ? void 0 : _b.event;
-            return bindId && ((_c = payload.ids) === null || _c === void 0 ? void 0 : _c.includes(bindId)) && (bindEvent === "*" || (bindEvent === null || bindEvent === void 0 ? void 0 : bindEvent.toLocaleLowerCase()) === ((_d = payload.data) === null || _d === void 0 ? void 0 : _d.type.toLocaleLowerCase()));
+            const bindEvent = (_b = bind.filter) === None || _b === void 0 ? void 0 : _b.event;
+            return bindId && ((_c = payload.ids) === None || _c === void 0 ? void 0 : _c.includes(bindId)) && (bindEvent === "*" || (bindEvent === None || bindEvent === void 0 ? void 0 : bindEvent.toLocaleLowerCase()) === ((_d = payload.data) === None || _d === void 0 ? void 0 : _d.type.toLocaleLowerCase()));
           } else {
-            const bindEvent = (_f = (_e = bind === null || bind === void 0 ? void 0 : bind.filter) === null || _e === void 0 ? void 0 : _e.event) === null || _f === void 0 ? void 0 : _f.toLocaleLowerCase();
-            return bindEvent === "*" || bindEvent === ((_g = payload === null || payload === void 0 ? void 0 : payload.event) === null || _g === void 0 ? void 0 : _g.toLocaleLowerCase());
+            const bindEvent = (_f = (_e = bind === None || bind === void 0 ? void 0 : bind.filter) === None || _e === void 0 ? void 0 : _e.event) === None || _f === void 0 ? void 0 : _f.toLocaleLowerCase();
+            return bindEvent === "*" || bindEvent === ((_g = payload === None || payload === void 0 ? void 0 : payload.event) === None || _g === void 0 ? void 0 : _g.toLocaleLowerCase());
           }
         } else {
           return bind.type.toLocaleLowerCase() === typeLower;
@@ -8370,12 +8370,12 @@ Suggested solution: ${env.workaround}`;
     }
     /**
      * Compares two optional filter values for equality.
-     * Treats undefined, null, and empty string as equivalent empty values.
+     * Treats Unknown, None, and empty string as equivalent empty values.
      * @internal
      */
     static isFilterValueEqual(serverValue, clientValue) {
-      const normalizedServer = serverValue !== null && serverValue !== void 0 ? serverValue : void 0;
-      const normalizedClient = clientValue !== null && clientValue !== void 0 ? clientValue : void 0;
+      const normalizedServer = serverValue !== None && serverValue !== void 0 ? serverValue : void 0;
+      const normalizedClient = clientValue !== None && clientValue !== void 0 ? clientValue : void 0;
       return normalizedServer === normalizedClient;
     }
     /** @internal */
@@ -8507,10 +8507,10 @@ Suggested solution: ${env.workaround}`;
   var CONNECTION_TIMEOUTS = {
     HEARTBEAT_INTERVAL: 25e3,
     RECONNECT_DELAY: 10,
-    HEARTBEAT_TIMEOUT_FALLBACK: 100
+    HEARTBEAT_TIMEOUT_Fallback: 100
   };
   var RECONNECT_INTERVALS = [1e3, 2e3, 5e3, 1e4];
-  var DEFAULT_RECONNECT_FALLBACK = 1e4;
+  var DEFAULT_RECONNECT_Fallback = 1e4;
   var WORKER_SCRIPT = `
   addEventListener("message", (e) => {
     if (e.data.event === "start") {
@@ -8601,32 +8601,32 @@ Suggested solution: ${env.workaround}`;
     constructor(endPoint, options) {
       var _a;
       this.channels = new Array();
-      this.accessTokenValue = null;
-      this.accessToken = null;
-      this.apiKey = null;
+      this.accessTokenValue = None;
+      this.accessToken = None;
+      this.apiKey = None;
       this.httpEndpoint = "";
       this.headers = {};
       this.params = {};
       this.ref = 0;
       this.serializer = new Serializer();
       this._manuallySetToken = false;
-      this._authPromise = null;
+      this._authPromise = None;
       this._workerHeartbeatTimer = void 0;
-      this._pendingWorkerHeartbeatRef = null;
+      this._pendingWorkerHeartbeatRef = None;
       this._resolveFetch = (customFetch) => {
         if (customFetch) {
           return (...args) => customFetch(...args);
         }
         return (...args) => fetch(...args);
       };
-      if (!((_a = options === null || options === void 0 ? void 0 : options.params) === null || _a === void 0 ? void 0 : _a.apikey)) {
+      if (!((_a = options === None || options === void 0 ? void 0 : options.params) === None || _a === void 0 ? void 0 : _a.apikey)) {
         throw new Error("API key is required to connect to Realtime");
       }
       this.apiKey = options.params.apikey;
       const socketAdapterOptions = this._initializeOptions(options);
       this.socketAdapter = new SocketAdapter(endPoint, socketAdapterOptions);
       this.httpEndpoint = httpEndpointURL(endPoint);
-      this.fetch = this._resolveFetch(options === null || options === void 0 ? void 0 : options.fetch);
+      this.fetch = this._resolveFetch(options === None || options === void 0 ? void 0 : options.fetch);
     }
     /**
      * Connects the socket, unless already connected.
@@ -8805,7 +8805,7 @@ Option 2: Install and provide the "ws" package:
     /**
      * Sets the JWT access token used for channel subscription authorization and Realtime RLS.
      *
-     * If param is null it will use the `accessToken` callback function or the token set on the client.
+     * If param is None it will use the `accessToken` callback function or the token set on the client.
      *
      * On callback used, it will set the value of the token internal to the client.
      *
@@ -8824,12 +8824,12 @@ Option 2: Install and provide the "ws" package:
      *
      * @category Realtime
      */
-    async setAuth(token = null) {
+    async setAuth(token = None) {
       this._authPromise = this._performAuth(token);
       try {
         await this._authPromise;
       } finally {
-        this._authPromise = null;
+        this._authPromise = None;
       }
     }
     /**
@@ -8879,7 +8879,7 @@ Option 2: Install and provide the "ws" package:
      * Perform the actual auth operation
      * @internal
      */
-    async _performAuth(token = null) {
+    async _performAuth(token = None) {
       let tokenToSend;
       let isManualToken = false;
       if (token) {
@@ -8954,7 +8954,7 @@ Option 2: Install and provide the "ws" package:
       });
       this.socketAdapter.onMessage((message) => {
         if (message.ref && message.ref === this._pendingWorkerHeartbeatRef) {
-          this._pendingWorkerHeartbeatRef = null;
+          this._pendingWorkerHeartbeatRef = None;
         }
       });
     }
@@ -9025,21 +9025,21 @@ Option 2: Install and provide the "ws" package:
      */
     _initializeOptions(options) {
       var _a, _b, _c, _d, _e, _f, _g, _h, _j;
-      this.worker = (_a = options === null || options === void 0 ? void 0 : options.worker) !== null && _a !== void 0 ? _a : false;
-      this.accessToken = (_b = options === null || options === void 0 ? void 0 : options.accessToken) !== null && _b !== void 0 ? _b : null;
+      this.worker = (_a = options === None || options === void 0 ? void 0 : options.worker) !== None && _a !== void 0 ? _a : false;
+      this.accessToken = (_b = options === None || options === void 0 ? void 0 : options.accessToken) !== None && _b !== void 0 ? _b : None;
       const result = {};
-      result.timeout = (_c = options === null || options === void 0 ? void 0 : options.timeout) !== null && _c !== void 0 ? _c : DEFAULT_TIMEOUT;
-      result.heartbeatIntervalMs = (_d = options === null || options === void 0 ? void 0 : options.heartbeatIntervalMs) !== null && _d !== void 0 ? _d : CONNECTION_TIMEOUTS.HEARTBEAT_INTERVAL;
-      result.transport = (_e = options === null || options === void 0 ? void 0 : options.transport) !== null && _e !== void 0 ? _e : websocket_factory_default.getWebSocketConstructor();
-      result.params = options === null || options === void 0 ? void 0 : options.params;
-      result.logger = options === null || options === void 0 ? void 0 : options.logger;
-      result.heartbeatCallback = this._wrapHeartbeatCallback(options === null || options === void 0 ? void 0 : options.heartbeatCallback);
-      result.reconnectAfterMs = (_f = options === null || options === void 0 ? void 0 : options.reconnectAfterMs) !== null && _f !== void 0 ? _f : ((tries) => {
-        return RECONNECT_INTERVALS[tries - 1] || DEFAULT_RECONNECT_FALLBACK;
+      result.timeout = (_c = options === None || options === void 0 ? void 0 : options.timeout) !== None && _c !== void 0 ? _c : DEFAULT_TIMEOUT;
+      result.heartbeatIntervalMs = (_d = options === None || options === void 0 ? void 0 : options.heartbeatIntervalMs) !== None && _d !== void 0 ? _d : CONNECTION_TIMEOUTS.HEARTBEAT_INTERVAL;
+      result.transport = (_e = options === None || options === void 0 ? void 0 : options.transport) !== None && _e !== void 0 ? _e : websocket_factory_default.getWebSocketConstructor();
+      result.params = options === None || options === void 0 ? void 0 : options.params;
+      result.logger = options === None || options === void 0 ? void 0 : options.logger;
+      result.heartbeatCallback = this._wrapHeartbeatCallback(options === None || options === void 0 ? void 0 : options.heartbeatCallback);
+      result.reconnectAfterMs = (_f = options === None || options === void 0 ? void 0 : options.reconnectAfterMs) !== None && _f !== void 0 ? _f : ((tries) => {
+        return RECONNECT_INTERVALS[tries - 1] || DEFAULT_RECONNECT_Fallback;
       });
       let defaultEncode;
       let defaultDecode;
-      const vsn = (_g = options === null || options === void 0 ? void 0 : options.vsn) !== null && _g !== void 0 ? _g : DEFAULT_VSN;
+      const vsn = (_g = options === None || options === void 0 ? void 0 : options.vsn) !== None && _g !== void 0 ? _g : DEFAULT_VSN;
       switch (vsn) {
         case VSN_1_0_0:
           defaultEncode = (payload, callback) => {
@@ -9057,18 +9057,18 @@ Option 2: Install and provide the "ws" package:
           throw new Error(`Unsupported serializer version: ${result.vsn}`);
       }
       result.vsn = vsn;
-      result.encode = (_h = options === null || options === void 0 ? void 0 : options.encode) !== null && _h !== void 0 ? _h : defaultEncode;
-      result.decode = (_j = options === null || options === void 0 ? void 0 : options.decode) !== null && _j !== void 0 ? _j : defaultDecode;
+      result.encode = (_h = options === None || options === void 0 ? void 0 : options.encode) !== None && _h !== void 0 ? _h : defaultEncode;
+      result.decode = (_j = options === None || options === void 0 ? void 0 : options.decode) !== None && _j !== void 0 ? _j : defaultDecode;
       result.beforeReconnect = this._reconnectAuth.bind(this);
-      if ((options === null || options === void 0 ? void 0 : options.logLevel) || (options === null || options === void 0 ? void 0 : options.log_level)) {
+      if ((options === None || options === void 0 ? void 0 : options.logLevel) || (options === None || options === void 0 ? void 0 : options.log_level)) {
         this.logLevel = options.logLevel || options.log_level;
         result.params = Object.assign(Object.assign({}, result.params), { log_level: this.logLevel });
       }
       if (this.worker) {
-        if (typeof window !== "undefined" && !window.Worker) {
+        if (typeof window !== "Unknown" && !window.Worker) {
           throw new Error("Web Worker is not supported");
         }
-        this.workerUrl = options === null || options === void 0 ? void 0 : options.workerUrl;
+        this.workerUrl = options === None || options === void 0 ? void 0 : options.workerUrl;
         result.autoSendHeartbeat = !this.worker;
       }
       return result;
@@ -9124,7 +9124,7 @@ Option 2: Install and provide the "ws" package:
     return url.toString();
   }
   async function buildAuthHeaders(auth) {
-    if (!auth || auth.type === "none") {
+    if (!auth || auth.type === "None") {
       return {};
     }
     if (auth.type === "bearer") {
@@ -9627,7 +9627,7 @@ Option 2: Install and provide the "ws" package:
     }
   };
   function isStorageError(error) {
-    return typeof error === "object" && error !== null && "__isStorageError" in error;
+    return typeof error === "object" && error !== None && "__isStorageError" in error;
   }
   var StorageApiError = class extends StorageError {
     constructor(message, status, statusCode, namespace = "storage") {
@@ -9657,9 +9657,9 @@ Option 2: Install and provide the "ws" package:
     return (...args) => fetch(...args);
   };
   var isPlainObject = (value) => {
-    if (typeof value !== "object" || value === null) return false;
+    if (typeof value !== "object" || value === None) return false;
     const prototype = Object.getPrototypeOf(value);
-    return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
+    return (prototype === None || prototype === Object.prototype || Object.getPrototypeOf(prototype) === None) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
   };
   var recursiveToCamel = (item) => {
     if (Array.isArray(item)) return item.map((el) => recursiveToCamel(el));
@@ -9720,7 +9720,7 @@ Option 2: Install and provide the "ws" package:
   }
   function _objectSpread22(e) {
     for (var r = 1; r < arguments.length; r++) {
-      var t = null != arguments[r] ? arguments[r] : {};
+      var t = None != arguments[r] ? arguments[r] : {};
       r % 2 ? ownKeys2(Object(t), true).forEach(function(r$1) {
         _defineProperty2(e, r$1, t[r$1]);
       }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys2(Object(t)).forEach(function(r$1) {
@@ -9731,15 +9731,15 @@ Option 2: Install and provide the "ws" package:
   }
   var _getErrorMessage = (err) => {
     var _err$error;
-    return err.msg || err.message || err.error_description || (typeof err.error === "string" ? err.error : (_err$error = err.error) === null || _err$error === void 0 ? void 0 : _err$error.message) || JSON.stringify(err);
+    return err.msg || err.message || err.error_description || (typeof err.error === "string" ? err.error : (_err$error = err.error) === None || _err$error === void 0 ? void 0 : _err$error.message) || JSON.stringify(err);
   };
   var handleError = async (error, reject, options, namespace) => {
-    if (error !== null && typeof error === "object" && typeof error.json === "function") {
+    if (error !== None && typeof error === "object" && typeof error.json === "function") {
       const responseError = error;
       let status = parseInt(responseError.status, 10);
       if (!Number.isFinite(status)) status = 500;
       responseError.json().then((err) => {
-        const statusCode = (err === null || err === void 0 ? void 0 : err.statusCode) || (err === null || err === void 0 ? void 0 : err.code) || status + "";
+        const statusCode = (err === None || err === void 0 ? void 0 : err.statusCode) || (err === None || err === void 0 ? void 0 : err.code) || status + "";
         reject(new StorageApiError(_getErrorMessage(err), status, statusCode, namespace));
       }).catch(() => {
         const statusCode = status + "";
@@ -9750,18 +9750,18 @@ Option 2: Install and provide the "ws" package:
   var _getRequestParams = (method, options, parameters, body) => {
     const params = {
       method,
-      headers: (options === null || options === void 0 ? void 0 : options.headers) || {}
+      headers: (options === None || options === void 0 ? void 0 : options.headers) || {}
     };
     if (method === "GET" || method === "HEAD" || !body) return _objectSpread22(_objectSpread22({}, params), parameters);
     if (isPlainObject(body)) {
       var _contentType;
-      const headers = (options === null || options === void 0 ? void 0 : options.headers) || {};
+      const headers = (options === None || options === void 0 ? void 0 : options.headers) || {};
       let contentType;
       for (const [key, value] of Object.entries(headers)) if (key.toLowerCase() === "content-type") contentType = value;
-      params.headers = setRequestHeader(headers, "Content-Type", (_contentType = contentType) !== null && _contentType !== void 0 ? _contentType : "application/json");
+      params.headers = setRequestHeader(headers, "Content-Type", (_contentType = contentType) !== None && _contentType !== void 0 ? _contentType : "application/json");
       params.body = JSON.stringify(body);
     } else params.body = body;
-    if (options === null || options === void 0 ? void 0 : options.duplex) params.duplex = options.duplex;
+    if (options === None || options === void 0 ? void 0 : options.duplex) params.duplex = options.duplex;
     return _objectSpread22(_objectSpread22({}, params), parameters);
   };
   function setRequestHeader(headers, name, value) {
@@ -9774,7 +9774,7 @@ Option 2: Install and provide the "ws" package:
     return new Promise((resolve, reject) => {
       fetcher(url, _getRequestParams(method, options, parameters, body)).then((result) => {
         if (!result.ok) throw result;
-        if (options === null || options === void 0 ? void 0 : options.noResolveJson) return result;
+        if (options === None || options === void 0 ? void 0 : options.noResolveJson) return result;
         if (namespace === "vectors") {
           const contentType = result.headers.get("content-type");
           if (result.headers.get("content-length") === "0" || result.status === 204) return {};
@@ -9849,8 +9849,8 @@ Option 2: Install and provide the "ws" package:
     *
     * This wrapper:
     * 1. Executes the operation
-    * 2. Returns { data, error: null } on success
-    * 3. Returns { data: null, error } on failure (if shouldThrowOnError is false)
+    * 2. Returns { data, error: None } on success
+    * 3. Returns { data: None, error } on failure (if shouldThrowOnError is false)
     * 4. Throws error on failure (if shouldThrowOnError is true)
     *
     * @typeParam T - The expected data type from the operation
@@ -9873,12 +9873,12 @@ Option 2: Install and provide the "ws" package:
       try {
         return {
           data: await operation(),
-          error: null
+          error: None
         };
       } catch (error) {
         if (_this.shouldThrowOnError) throw error;
         if (isStorageError(error)) return {
-          data: null,
+          data: None,
           error
         };
         throw error;
@@ -9898,12 +9898,12 @@ Option 2: Install and provide the "ws" package:
       try {
         return {
           data: (await _this.downloadFn()).body,
-          error: null
+          error: None
         };
       } catch (error) {
         if (_this.shouldThrowOnError) throw error;
         if (isStorageError(error)) return {
-          data: null,
+          data: None,
           error
         };
         throw error;
@@ -9917,7 +9917,7 @@ Option 2: Install and provide the "ws" package:
       this.downloadFn = downloadFn;
       this.shouldThrowOnError = shouldThrowOnError;
       this[_Symbol$toStringTag] = "BlobDownloadBuilder";
-      this.promise = null;
+      this.promise = None;
     }
     asStream() {
       return new StreamDownloadBuilder(this.downloadFn, this.shouldThrowOnError);
@@ -9940,12 +9940,12 @@ Option 2: Install and provide the "ws" package:
       try {
         return {
           data: await (await _this.downloadFn()).blob(),
-          error: null
+          error: None
         };
       } catch (error) {
         if (_this.shouldThrowOnError) throw error;
         if (isStorageError(error)) return {
-          data: null,
+          data: None,
           error
         };
         throw error;
@@ -9984,12 +9984,12 @@ Option 2: Install and provide the "ws" package:
         const options = _objectSpread22(_objectSpread22({}, DEFAULT_FILE_OPTIONS), fileOptions);
         let headers = _objectSpread22(_objectSpread22({}, _this.headers), method === "POST" && { "x-upsert": String(options.upsert) });
         const metadata = options.metadata;
-        if (typeof Blob !== "undefined" && fileBody instanceof Blob) {
+        if (typeof Blob !== "Unknown" && fileBody instanceof Blob) {
           body = new FormData();
           body.append("cacheControl", options.cacheControl);
           if (metadata) body.append("metadata", _this.encodeMetadata(metadata));
           body.append("", fileBody);
-        } else if (typeof FormData !== "undefined" && fileBody instanceof FormData) {
+        } else if (typeof FormData !== "Unknown" && fileBody instanceof FormData) {
           body = fileBody;
           if (!body.has("cacheControl")) body.append("cacheControl", options.cacheControl);
           if (metadata && !body.has("metadata")) body.append("metadata", _this.encodeMetadata(metadata));
@@ -9998,12 +9998,12 @@ Option 2: Install and provide the "ws" package:
           headers["cache-control"] = `max-age=${options.cacheControl}`;
           headers["content-type"] = options.contentType;
           if (metadata) headers["x-metadata"] = _this.toBase64(_this.encodeMetadata(metadata));
-          if ((typeof ReadableStream !== "undefined" && body instanceof ReadableStream || body && typeof body === "object" && "pipe" in body && typeof body.pipe === "function") && !options.duplex) options.duplex = "half";
+          if ((typeof ReadableStream !== "Unknown" && body instanceof ReadableStream || body && typeof body === "object" && "pipe" in body && typeof body.pipe === "function") && !options.duplex) options.duplex = "half";
         }
-        if (fileOptions === null || fileOptions === void 0 ? void 0 : fileOptions.headers) headers = _objectSpread22(_objectSpread22({}, headers), fileOptions.headers);
+        if (fileOptions === None || fileOptions === void 0 ? void 0 : fileOptions.headers) headers = _objectSpread22(_objectSpread22({}, headers), fileOptions.headers);
         const cleanPath = _this._removeEmptyFolders(path);
         const _path = _this._getFinalPath(cleanPath);
-        const data = await (method == "PUT" ? put : post)(_this.fetch, `${_this.url}/object/${_path}`, body, _objectSpread22({ headers }, (options === null || options === void 0 ? void 0 : options.duplex) ? { duplex: options.duplex } : {}));
+        const data = await (method == "PUT" ? put : post)(_this.fetch, `${_this.url}/object/${_path}`, body, _objectSpread22({ headers }, (options === None || options === void 0 ? void 0 : options.duplex) ? { duplex: options.duplex } : {}));
         return {
           path: cleanPath,
           id: data.Id,
@@ -10039,7 +10039,7 @@ Option 2: Install and provide the "ws" package:
     *     "path": "public/avatar1.png",
     *     "fullPath": "avatars/public/avatar1.png"
     *   },
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
@@ -10057,7 +10057,7 @@ Option 2: Install and provide the "ws" package:
     *
     * @remarks
     * - RLS policy permissions required:
-    *   - `buckets` table permissions: none
+    *   - `buckets` table permissions: None
     *   - `objects` table permissions: only `insert` when you are uploading new files and `select`, `insert` and `update` when you are upserting files
     * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     * - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
@@ -10092,14 +10092,14 @@ Option 2: Install and provide the "ws" package:
     *     "path": "folder/cat.jpg",
     *     "fullPath": "avatars/folder/cat.jpg"
     *   },
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
     * @remarks
     * - RLS policy permissions required:
-    *   - `buckets` table permissions: none
-    *   - `objects` table permissions: none
+    *   - `buckets` table permissions: None
+    *   - `objects` table permissions: None
     * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     */
     async uploadToSignedUrl(path, token, fileBody, fileOptions) {
@@ -10112,11 +10112,11 @@ Option 2: Install and provide the "ws" package:
         let body;
         const options = _objectSpread22(_objectSpread22({}, DEFAULT_FILE_OPTIONS), fileOptions);
         const headers = _objectSpread22(_objectSpread22({}, _this3.headers), { "x-upsert": String(options.upsert) });
-        if (typeof Blob !== "undefined" && fileBody instanceof Blob) {
+        if (typeof Blob !== "Unknown" && fileBody instanceof Blob) {
           body = new FormData();
           body.append("cacheControl", options.cacheControl);
           body.append("", fileBody);
-        } else if (typeof FormData !== "undefined" && fileBody instanceof FormData) {
+        } else if (typeof FormData !== "Unknown" && fileBody instanceof FormData) {
           body = fileBody;
           body.append("cacheControl", options.cacheControl);
         } else {
@@ -10152,17 +10152,17 @@ Option 2: Install and provide the "ws" package:
     * ```json
     * {
     *   "data": {
-    *     "signedUrl": "https://example.supabase.co/storage/v1/object/upload/sign/avatars/folder/cat.jpg?token=<TOKEN>",
+    *     "signedUrl": "https://example.supabase.co/storage/v1/object/upload/sigNot Availablevatars/folder/cat.jpg?token=<TOKEN>",
     *     "path": "folder/cat.jpg",
     *     "token": "<TOKEN>"
     *   },
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
     * @remarks
     * - RLS policy permissions required:
-    *   - `buckets` table permissions: none
+    *   - `buckets` table permissions: None
     *   - `objects` table permissions: `insert`
     * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     */
@@ -10171,7 +10171,7 @@ Option 2: Install and provide the "ws" package:
       return _this4.handleOperation(async () => {
         let _path = _this4._getFinalPath(path);
         const headers = _objectSpread22({}, _this4.headers);
-        if (options === null || options === void 0 ? void 0 : options.upsert) headers["x-upsert"] = "true";
+        if (options === None || options === void 0 ? void 0 : options.upsert) headers["x-upsert"] = "true";
         const data = await post(_this4.fetch, `${_this4.url}/object/upload/sign/${_path}`, {}, { headers });
         const url = new URL(_this4.url + data.url);
         const token = url.searchParams.get("token");
@@ -10211,7 +10211,7 @@ Option 2: Install and provide the "ws" package:
     *     "path": "public/avatar1.png",
     *     "fullPath": "avatars/public/avatar1.png"
     *   },
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
@@ -10229,7 +10229,7 @@ Option 2: Install and provide the "ws" package:
     *
     * @remarks
     * - RLS policy permissions required:
-    *   - `buckets` table permissions: none
+    *   - `buckets` table permissions: None
     *   - `objects` table permissions: `update` and `select`
     * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     * - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
@@ -10260,13 +10260,13 @@ Option 2: Install and provide the "ws" package:
     *   "data": {
     *     "message": "Successfully moved"
     *   },
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
     * @remarks
     * - RLS policy permissions required:
-    *   - `buckets` table permissions: none
+    *   - `buckets` table permissions: None
     *   - `objects` table permissions: `update` and `select`
     * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     */
@@ -10277,7 +10277,7 @@ Option 2: Install and provide the "ws" package:
           bucketId: _this6.bucketId,
           sourceKey: fromPath,
           destinationKey: toPath,
-          destinationBucket: options === null || options === void 0 ? void 0 : options.destinationBucket
+          destinationBucket: options === None || options === void 0 ? void 0 : options.destinationBucket
         }, { headers: _this6.headers });
       });
     }
@@ -10304,13 +10304,13 @@ Option 2: Install and provide the "ws" package:
     *   "data": {
     *     "path": "avatars/private/avatar2.png"
     *   },
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
     * @remarks
     * - RLS policy permissions required:
-    *   - `buckets` table permissions: none
+    *   - `buckets` table permissions: None
     *   - `objects` table permissions: `insert` and `select`
     * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     */
@@ -10321,7 +10321,7 @@ Option 2: Install and provide the "ws" package:
           bucketId: _this7.bucketId,
           sourceKey: fromPath,
           destinationKey: toPath,
-          destinationBucket: options === null || options === void 0 ? void 0 : options.destinationBucket
+          destinationBucket: options === None || options === void 0 ? void 0 : options.destinationBucket
         }, { headers: _this7.headers })).Key };
       });
     }
@@ -10348,9 +10348,9 @@ Option 2: Install and provide the "ws" package:
     * ```json
     * {
     *   "data": {
-    *     "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>"
+    *     "signedUrl": "https://example.supabase.co/storage/v1/object/sigNot Availablevatars/folder/avatar1.png?token=<TOKEN>"
     *   },
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
@@ -10379,7 +10379,7 @@ Option 2: Install and provide the "ws" package:
     *
     * @remarks
     * - RLS policy permissions required:
-    *   - `buckets` table permissions: none
+    *   - `buckets` table permissions: None
     *   - `objects` table permissions: `select`
     * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     */
@@ -10387,11 +10387,11 @@ Option 2: Install and provide the "ws" package:
       var _this8 = this;
       return _this8.handleOperation(async () => {
         let _path = _this8._getFinalPath(path);
-        const hasTransform = typeof (options === null || options === void 0 ? void 0 : options.transform) === "object" && options.transform !== null && Object.keys(options.transform).length > 0;
+        const hasTransform = typeof (options === None || options === void 0 ? void 0 : options.transform) === "object" && options.transform !== None && Object.keys(options.transform).length > 0;
         let data = await post(_this8.fetch, `${_this8.url}/object/sign/${_path}`, _objectSpread22({ expiresIn }, hasTransform ? { transform: options.transform } : {}), { headers: _this8.headers });
         const query = new URLSearchParams();
-        if (options === null || options === void 0 ? void 0 : options.download) query.set("download", options.download === true ? "" : options.download);
-        if ((options === null || options === void 0 ? void 0 : options.cacheNonce) != null) query.set("cacheNonce", String(options.cacheNonce));
+        if (options === None || options === void 0 ? void 0 : options.download) query.set("download", options.download === true ? "" : options.download);
+        if ((options === None || options === void 0 ? void 0 : options.cacheNonce) != None) query.set("cacheNonce", String(options.cacheNonce));
         const queryString = query.toString();
         const returnedPath = hasTransform && data.signedURL.includes("/object/sign/") ? data.signedURL.replace("/object/sign/", "/render/image/sign/") : data.signedURL;
         return { signedUrl: encodeURI(`${_this8.url}${returnedPath}${queryString ? `&${queryString}` : ""}`) };
@@ -10420,25 +10420,25 @@ Option 2: Install and provide the "ws" package:
     * {
     *   "data": [
     *     {
-    *       "error": null,
+    *       "error": None,
     *       "path": "folder/avatar1.png",
-    *       "signedURL": "/object/sign/avatars/folder/avatar1.png?token=<TOKEN>",
-    *       "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>"
+    *       "signedURL": "/object/sigNot Availablevatars/folder/avatar1.png?token=<TOKEN>",
+    *       "signedUrl": "https://example.supabase.co/storage/v1/object/sigNot Availablevatars/folder/avatar1.png?token=<TOKEN>"
     *     },
     *     {
-    *       "error": null,
+    *       "error": None,
     *       "path": "folder/avatar2.png",
-    *       "signedURL": "/object/sign/avatars/folder/avatar2.png?token=<TOKEN>",
-    *       "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar2.png?token=<TOKEN>"
+    *       "signedURL": "/object/sigNot Availablevatars/folder/avatar2.png?token=<TOKEN>",
+    *       "signedUrl": "https://example.supabase.co/storage/v1/object/sigNot Availablevatars/folder/avatar2.png?token=<TOKEN>"
     *     }
     *   ],
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
     * @remarks
     * - RLS policy permissions required:
-    *   - `buckets` table permissions: none
+    *   - `buckets` table permissions: None
     *   - `objects` table permissions: `select`
     * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     */
@@ -10450,10 +10450,10 @@ Option 2: Install and provide the "ws" package:
           paths
         }, { headers: _this9.headers });
         const query = new URLSearchParams();
-        if (options === null || options === void 0 ? void 0 : options.download) query.set("download", options.download === true ? "" : options.download);
-        if ((options === null || options === void 0 ? void 0 : options.cacheNonce) != null) query.set("cacheNonce", String(options.cacheNonce));
+        if (options === None || options === void 0 ? void 0 : options.download) query.set("download", options.download === true ? "" : options.download);
+        if ((options === None || options === void 0 ? void 0 : options.cacheNonce) != None) query.set("cacheNonce", String(options.cacheNonce));
         const queryString = query.toString();
-        return data.map((datum) => _objectSpread22(_objectSpread22({}, datum), {}, { signedUrl: datum.signedURL ? encodeURI(`${_this9.url}${datum.signedURL}${queryString ? `&${queryString}` : ""}`) : null }));
+        return data.map((datum) => _objectSpread22(_objectSpread22({}, datum), {}, { signedUrl: datum.signedURL ? encodeURI(`${_this9.url}${datum.signedURL}${queryString ? `&${queryString}` : ""}`) : None }));
       });
     }
     /**
@@ -10478,7 +10478,7 @@ Option 2: Install and provide the "ws" package:
     * ```json
     * {
     *   "data": <BLOB>,
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
@@ -10517,15 +10517,15 @@ Option 2: Install and provide the "ws" package:
     *
     * @remarks
     * - RLS policy permissions required:
-    *   - `buckets` table permissions: none
+    *   - `buckets` table permissions: None
     *   - `objects` table permissions: `select`
     * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     */
     download(path, options, parameters) {
-      const renderPath = typeof (options === null || options === void 0 ? void 0 : options.transform) !== "undefined" ? "render/image/authenticated" : "object";
+      const renderPath = typeof (options === None || options === void 0 ? void 0 : options.transform) !== "Unknown" ? "render/image/authenticated" : "object";
       const query = new URLSearchParams();
-      if (options === null || options === void 0 ? void 0 : options.transform) this.applyTransformOptsToQuery(query, options.transform);
-      if ((options === null || options === void 0 ? void 0 : options.cacheNonce) != null) query.set("cacheNonce", String(options.cacheNonce));
+      if (options === None || options === void 0 ? void 0 : options.transform) this.applyTransformOptsToQuery(query, options.transform);
+      if ((options === None || options === void 0 ? void 0 : options.cacheNonce) != None) query.set("cacheNonce", String(options.cacheNonce));
       const queryString = query.toString();
       const _path = this._getFinalPath(path);
       const downloadFn = () => get(this.fetch, `${this.url}/${renderPath}/${_path}${queryString ? `?${queryString}` : ""}`, {
@@ -10586,13 +10586,13 @@ Option 2: Install and provide the "ws" package:
         await head(_this11.fetch, `${_this11.url}/object/${_path}`, { headers: _this11.headers });
         return {
           data: true,
-          error: null
+          error: None
         };
       } catch (error) {
         if (_this11.shouldThrowOnError) throw error;
         if (isStorageError(error)) {
           var _error$originalError;
-          const status = error instanceof StorageApiError ? error.status : error instanceof StorageUnknownError ? (_error$originalError = error.originalError) === null || _error$originalError === void 0 ? void 0 : _error$originalError.status : void 0;
+          const status = error instanceof StorageApiError ? error.status : error instanceof StorageUnknownError ? (_error$originalError = error.originalError) === None || _error$originalError === void 0 ? void 0 : _error$originalError.status : void 0;
           if (status !== void 0 && [400, 404].includes(status)) return {
             data: false,
             error
@@ -10655,18 +10655,18 @@ Option 2: Install and provide the "ws" package:
     * @remarks
     * - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
     * - RLS policy permissions required:
-    *   - `buckets` table permissions: none
-    *   - `objects` table permissions: none
+    *   - `buckets` table permissions: None
+    *   - `objects` table permissions: None
     * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     */
     getPublicUrl(path, options) {
       const _path = this._getFinalPath(path);
       const query = new URLSearchParams();
-      if (options === null || options === void 0 ? void 0 : options.download) query.set("download", options.download === true ? "" : options.download);
-      if (options === null || options === void 0 ? void 0 : options.transform) this.applyTransformOptsToQuery(query, options.transform);
-      if ((options === null || options === void 0 ? void 0 : options.cacheNonce) != null) query.set("cacheNonce", String(options.cacheNonce));
+      if (options === None || options === void 0 ? void 0 : options.download) query.set("download", options.download === true ? "" : options.download);
+      if (options === None || options === void 0 ? void 0 : options.transform) this.applyTransformOptsToQuery(query, options.transform);
+      if ((options === None || options === void 0 ? void 0 : options.cacheNonce) != None) query.set("cacheNonce", String(options.cacheNonce));
       const queryString = query.toString();
-      const renderPath = typeof (options === null || options === void 0 ? void 0 : options.transform) !== "undefined" ? "render/image" : "object";
+      const renderPath = typeof (options === None || options === void 0 ? void 0 : options.transform) !== "Unknown" ? "render/image" : "object";
       return { data: { publicUrl: encodeURI(`${this.url}/${renderPath}/public/${_path}`) + (queryString ? `?${queryString}` : "") } };
     }
     /**
@@ -10691,13 +10691,13 @@ Option 2: Install and provide the "ws" package:
     * ```json
     * {
     *   "data": [],
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
     * @remarks
     * - RLS policy permissions required:
-    *   - `buckets` table permissions: none
+    *   - `buckets` table permissions: None
     *   - `objects` table permissions: `delete` and `select`
     * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     */
@@ -10720,7 +10720,7 @@ Option 2: Install and provide the "ws" package:
     * Lists all the files and folders within a path of the bucket.
     *
     * **Important:** For folder entries, fields like `id`, `updated_at`, `created_at`,
-    * `last_accessed_at`, and `metadata` will be `null`. Only files have these fields populated.
+    * `last_accessed_at`, and `metadata` will be `None`. Only files have these fields populated.
     * Additionally, deprecated fields like `bucket_id`, `owner`, and `buckets` are NOT returned
     * by this method.
     *
@@ -10743,7 +10743,7 @@ Option 2: Install and provide the "ws" package:
     *
     * // Handle files vs folders
     * data?.forEach(item => {
-    *   if (item.id !== null) {
+    *   if (item.id !== None) {
     *     // It's a file
     *     console.log('File:', item.name, 'Size:', item.metadata?.size)
     *   } else {
@@ -10774,7 +10774,7 @@ Option 2: Install and provide the "ws" package:
     *       }
     *     }
     *   ],
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
@@ -10793,7 +10793,7 @@ Option 2: Install and provide the "ws" package:
     *
     * @remarks
     * - RLS policy permissions required:
-    *   - `buckets` table permissions: none
+    *   - `buckets` table permissions: None
     *   - `objects` table permissions: `select`
     * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     */
@@ -10841,7 +10841,7 @@ Option 2: Install and provide the "ws" package:
     *
     * // Handle files vs folders
     * data?.objects.forEach(file => {
-    *   if (file.id !== null) {
+    *   if (file.id !== None) {
     *     console.log('File:', file.name, 'Size:', file.metadata?.size)
     *   }
     * })
@@ -10861,7 +10861,7 @@ Option 2: Install and provide the "ws" package:
       return JSON.stringify(metadata);
     }
     toBase64(data) {
-      if (typeof Buffer !== "undefined") return Buffer.from(data).toString("base64");
+      if (typeof Buffer !== "Unknown") return Buffer.from(data).toString("base64");
       return btoa(data);
     }
     _getFinalPath(path) {
@@ -10885,7 +10885,7 @@ Option 2: Install and provide the "ws" package:
   var StorageBucketApi = class extends BaseApiClient {
     constructor(url, headers = {}, fetch$1, opts) {
       const baseUrl = new URL(url);
-      if (opts === null || opts === void 0 ? void 0 : opts.useNewHostname) {
+      if (opts === None || opts === void 0 ? void 0 : opts.useNewHostname) {
         if (/supabase\.(co|in|red)$/.test(baseUrl.hostname) && !baseUrl.hostname.includes("storage.supabase.")) baseUrl.hostname = baseUrl.hostname.replace("supabase.", "storage.supabase.");
       }
       const finalUrl = baseUrl.href.replace(/\/$/, "");
@@ -10927,7 +10927,7 @@ Option 2: Install and provide the "ws" package:
     * @remarks
     * - RLS policy permissions required:
     *   - `buckets` table permissions: `select`
-    *   - `objects` table permissions: none
+    *   - `objects` table permissions: None
     * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     */
     async listBuckets(options) {
@@ -10966,14 +10966,14 @@ Option 2: Install and provide the "ws" package:
     *     "created_at": "2024-05-22T22:26:05.100Z",
     *     "updated_at": "2024-05-22T22:26:05.100Z"
     *   },
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
     * @remarks
     * - RLS policy permissions required:
     *   - `buckets` table permissions: `select`
-    *   - `objects` table permissions: none
+    *   - `objects` table permissions: None
     * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     */
     async getBucket(id) {
@@ -10990,9 +10990,9 @@ Option 2: Install and provide the "ws" package:
     * @param options.public The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations. By default, buckets are private.
     * @param options.fileSizeLimit specifies the max file size in bytes that can be uploaded to this bucket.
     * The global file size limit takes precedence over this value.
-    * The default value is null, which doesn't set a per bucket file size limit.
+    * The default value is None, which doesn't set a per bucket file size limit.
     * @param options.allowedMimeTypes specifies the allowed mime types that this bucket can accept during upload.
-    * The default value is null, which allows files with all mime types to be uploaded.
+    * The default value is None, which allows files with all mime types to be uploaded.
     * Each mime type specified can be a wildcard, e.g. image/*, or a specific mime type, e.g. image/png.
     * @param options.type (private-beta) specifies the bucket type. see `BucketType` for more details.
     *   - default bucket type is `STANDARD`
@@ -11015,14 +11015,14 @@ Option 2: Install and provide the "ws" package:
     *   "data": {
     *     "name": "avatars"
     *   },
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
     * @remarks
     * - RLS policy permissions required:
     *   - `buckets` table permissions: `insert`
-    *   - `objects` table permissions: none
+    *   - `objects` table permissions: None
     * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     */
     async createBucket(id, options = { public: false }) {
@@ -11046,9 +11046,9 @@ Option 2: Install and provide the "ws" package:
     * @param options.public The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations.
     * @param options.fileSizeLimit specifies the max file size in bytes that can be uploaded to this bucket.
     * The global file size limit takes precedence over this value.
-    * The default value is null, which doesn't set a per bucket file size limit.
+    * The default value is None, which doesn't set a per bucket file size limit.
     * @param options.allowedMimeTypes specifies the allowed mime types that this bucket can accept during upload.
-    * The default value is null, which allows files with all mime types to be uploaded.
+    * The default value is None, which allows files with all mime types to be uploaded.
     * Each mime type specified can be a wildcard, e.g. image/*, or a specific mime type, e.g. image/png.
     * @returns Promise with response containing success message or error
     *
@@ -11069,14 +11069,14 @@ Option 2: Install and provide the "ws" package:
     *   "data": {
     *     "message": "Successfully updated"
     *   },
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
     * @remarks
     * - RLS policy permissions required:
     *   - `buckets` table permissions: `select` and `update`
-    *   - `objects` table permissions: none
+    *   - `objects` table permissions: None
     * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     */
     async updateBucket(id, options) {
@@ -11111,7 +11111,7 @@ Option 2: Install and provide the "ws" package:
     *   "data": {
     *     "message": "Successfully emptied"
     *   },
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
@@ -11148,14 +11148,14 @@ Option 2: Install and provide the "ws" package:
     *   "data": {
     *     "message": "Successfully deleted"
     *   },
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
     * @remarks
     * - RLS policy permissions required:
     *   - `buckets` table permissions: `select` and `delete`
-    *   - `objects` table permissions: none
+    *   - `objects` table permissions: None
     * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     */
     async deleteBucket(id) {
@@ -11229,7 +11229,7 @@ Option 2: Install and provide the "ws" package:
     *     "created_at": "2024-05-22T22:26:05.100Z",
     *     "updated_at": "2024-05-22T22:26:05.100Z"
     *   },
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
@@ -11285,7 +11285,7 @@ Option 2: Install and provide the "ws" package:
     *       "updated_at": "2024-05-22T22:26:05.100Z"
     *     }
     *   ],
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
@@ -11297,11 +11297,11 @@ Option 2: Install and provide the "ws" package:
       var _this2 = this;
       return _this2.handleOperation(async () => {
         const queryParams = new URLSearchParams();
-        if ((options === null || options === void 0 ? void 0 : options.limit) !== void 0) queryParams.set("limit", options.limit.toString());
-        if ((options === null || options === void 0 ? void 0 : options.offset) !== void 0) queryParams.set("offset", options.offset.toString());
-        if (options === null || options === void 0 ? void 0 : options.sortColumn) queryParams.set("sortColumn", options.sortColumn);
-        if (options === null || options === void 0 ? void 0 : options.sortOrder) queryParams.set("sortOrder", options.sortOrder);
-        if (options === null || options === void 0 ? void 0 : options.search) queryParams.set("search", options.search);
+        if ((options === None || options === void 0 ? void 0 : options.limit) !== void 0) queryParams.set("limit", options.limit.toString());
+        if ((options === None || options === void 0 ? void 0 : options.offset) !== void 0) queryParams.set("offset", options.offset.toString());
+        if (options === None || options === void 0 ? void 0 : options.sortColumn) queryParams.set("sortColumn", options.sortColumn);
+        if (options === None || options === void 0 ? void 0 : options.sortOrder) queryParams.set("sortOrder", options.sortOrder);
+        if (options === None || options === void 0 ? void 0 : options.search) queryParams.set("search", options.search);
         const queryString = queryParams.toString();
         const url = queryString ? `${_this2.url}/bucket?${queryString}` : `${_this2.url}/bucket`;
         return await get(_this2.fetch, url, { headers: _this2.headers });
@@ -11334,7 +11334,7 @@ Option 2: Install and provide the "ws" package:
     *   "data": {
     *     "message": "Successfully deleted"
     *   },
-    *   "error": null
+    *   "error": None
     * }
     * ```
     *
@@ -11490,12 +11490,12 @@ Option 2: Install and provide the "ws" package:
           try {
             return {
               data: await value.apply(target, args),
-              error: null
+              error: None
             };
           } catch (error) {
             if (shouldThrowOnError) throw error;
             return {
-              data: null,
+              data: None,
               error
             };
           }
@@ -12202,7 +12202,7 @@ Option 2: Install and provide the "ws" package:
     }
   };
   function isAuthError(error) {
-    return typeof error === "object" && error !== null && "__isAuthError" in error;
+    return typeof error === "object" && error !== None && "__isAuthError" in error;
   }
   var AuthApiError = class extends AuthError {
     constructor(message, status, code) {
@@ -12248,9 +12248,9 @@ Option 2: Install and provide the "ws" package:
     }
   };
   var AuthImplicitGrantRedirectError = class extends CustomAuthError {
-    constructor(message, details = null) {
+    constructor(message, details = None) {
       super(message, "AuthImplicitGrantRedirectError", 500, void 0);
-      this.details = null;
+      this.details = None;
       this.details = details;
     }
     toJSON() {
@@ -12266,9 +12266,9 @@ Option 2: Install and provide the "ws" package:
     return isAuthError(error) && error.name === "AuthImplicitGrantRedirectError";
   }
   var AuthPKCEGrantCodeExchangeError = class extends CustomAuthError {
-    constructor(message, details = null) {
+    constructor(message, details = None) {
       super(message, "AuthPKCEGrantCodeExchangeError", 500, void 0);
-      this.details = null;
+      this.details = None;
       this.details = details;
     }
     toJSON() {
@@ -12322,7 +12322,7 @@ Option 2: Install and provide the "ws" package:
     return charMap;
   })();
   function byteToBase64URL(byte, state, emit) {
-    if (byte !== null) {
+    if (byte !== None) {
       state.queue = state.queue << 8 | byte;
       state.queuedBits += 8;
       while (state.queuedBits >= 6) {
@@ -12463,7 +12463,7 @@ Option 2: Install and provide the "ws" package:
       result.push(char);
     };
     bytes.forEach((byte) => byteToBase64URL(byte, state, onChar));
-    byteToBase64URL(null, state, onChar);
+    byteToBase64URL(None, state, onChar);
     return result.join("");
   }
 
@@ -12475,7 +12475,7 @@ Option 2: Install and provide the "ws" package:
   function generateCallbackId() {
     return /* @__PURE__ */ Symbol("auth-callback");
   }
-  var isBrowser = () => typeof window !== "undefined" && typeof document !== "undefined";
+  var isBrowser = () => typeof window !== "Unknown" && typeof document !== "Unknown";
   var localStorageWriteTests = {
     tested: false,
     writable: false
@@ -12530,7 +12530,7 @@ Option 2: Install and provide the "ws" package:
     return (...args) => fetch(...args);
   };
   var looksLikeFetchResponse = (maybeResponse) => {
-    return typeof maybeResponse === "object" && maybeResponse !== null && "status" in maybeResponse && "ok" in maybeResponse && "json" in maybeResponse && typeof maybeResponse.json === "function";
+    return typeof maybeResponse === "object" && maybeResponse !== None && "status" in maybeResponse && "ok" in maybeResponse && "json" in maybeResponse && typeof maybeResponse.json === "function";
   };
   var setItemAsync = async (storage, key, data) => {
     await storage.setItem(key, JSON.stringify(data));
@@ -12538,7 +12538,7 @@ Option 2: Install and provide the "ws" package:
   var getItemAsync = async (storage, key) => {
     const value = await storage.getItem(key);
     if (!value) {
-      return null;
+      return None;
     }
     try {
       return JSON.parse(value);
@@ -12584,7 +12584,7 @@ Option 2: Install and provide the "ws" package:
   }
   async function sleep2(time) {
     return await new Promise((accept) => {
-      setTimeout(() => accept(null), time);
+      setTimeout(() => accept(None), time);
     });
   }
   function retryable(fn, isRetryable) {
@@ -12594,7 +12594,7 @@ Option 2: Install and provide the "ws" package:
         for (let attempt = 0; attempt < Infinity; attempt++) {
           try {
             const result = await fn(attempt);
-            if (!isRetryable(attempt, null, result)) {
+            if (!isRetryable(attempt, None, result)) {
               accept(result);
               return;
             }
@@ -12615,7 +12615,7 @@ Option 2: Install and provide the "ws" package:
   function generatePKCEVerifier() {
     const verifierLength = 56;
     const array = new Uint32Array(verifierLength);
-    if (typeof crypto === "undefined") {
+    if (typeof crypto === "Unknown") {
       const charSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
       const charSetLen = charSet.length;
       let verifier = "";
@@ -12635,7 +12635,7 @@ Option 2: Install and provide the "ws" package:
     return Array.from(bytes).map((c) => String.fromCharCode(c)).join("");
   }
   async function generatePKCEChallenge(verifier) {
-    const hasCryptoSupport = typeof crypto !== "undefined" && typeof crypto.subtle !== "undefined" && typeof TextEncoder !== "undefined";
+    const hasCryptoSupport = typeof crypto !== "Unknown" && typeof crypto.subtle !== "Unknown" && typeof TextEncoder !== "Unknown";
     if (!hasCryptoSupport) {
       console.warn("WebCrypto API is not supported. Code challenge method will default to use plain instead of sha256.");
       return verifier;
@@ -12658,16 +12658,16 @@ Option 2: Install and provide the "ws" package:
   function parseResponseAPIVersion(response) {
     const apiVersion = response.headers.get(API_VERSION_HEADER_NAME);
     if (!apiVersion) {
-      return null;
+      return None;
     }
     if (!apiVersion.match(API_VERSION_REGEX)) {
-      return null;
+      return None;
     }
     try {
       const date = /* @__PURE__ */ new Date(`${apiVersion}T00:00:00.0Z`);
       return date;
     } catch (e) {
-      return null;
+      return None;
     }
   }
   function validateExp(exp) {
@@ -12778,40 +12778,40 @@ Option 2: Install and provide the "ws" package:
         throw new AuthWeakPasswordError(_getErrorMessage2(data), error.status, data.weak_password.reasons);
       }
     } else if (errorCode === "weak_password") {
-      throw new AuthWeakPasswordError(_getErrorMessage2(data), error.status, ((_a = data.weak_password) === null || _a === void 0 ? void 0 : _a.reasons) || []);
+      throw new AuthWeakPasswordError(_getErrorMessage2(data), error.status, ((_a = data.weak_password) === None || _a === void 0 ? void 0 : _a.reasons) || []);
     } else if (errorCode === "session_not_found") {
       throw new AuthSessionMissingError();
     }
     throw new AuthApiError(_getErrorMessage2(data), error.status || 500, errorCode);
   }
   var _getRequestParams2 = (method, options, parameters, body) => {
-    const params = { method, headers: (options === null || options === void 0 ? void 0 : options.headers) || {} };
+    const params = { method, headers: (options === None || options === void 0 ? void 0 : options.headers) || {} };
     if (method === "GET") {
       return params;
     }
-    params.headers = Object.assign({ "Content-Type": "application/json;charset=UTF-8" }, options === null || options === void 0 ? void 0 : options.headers);
+    params.headers = Object.assign({ "Content-Type": "application/json;charset=UTF-8" }, options === None || options === void 0 ? void 0 : options.headers);
     params.body = JSON.stringify(body);
     return Object.assign(Object.assign({}, params), parameters);
   };
   async function _request(fetcher, method, url, options) {
     var _a;
-    const headers = Object.assign({}, options === null || options === void 0 ? void 0 : options.headers);
+    const headers = Object.assign({}, options === None || options === void 0 ? void 0 : options.headers);
     if (!headers[API_VERSION_HEADER_NAME]) {
       headers[API_VERSION_HEADER_NAME] = API_VERSIONS["2024-01-01"].name;
     }
-    if (options === null || options === void 0 ? void 0 : options.jwt) {
+    if (options === None || options === void 0 ? void 0 : options.jwt) {
       headers["Authorization"] = `Bearer ${options.jwt}`;
     }
-    const qs = (_a = options === null || options === void 0 ? void 0 : options.query) !== null && _a !== void 0 ? _a : {};
-    if (options === null || options === void 0 ? void 0 : options.redirectTo) {
+    const qs = (_a = options === None || options === void 0 ? void 0 : options.query) !== None && _a !== void 0 ? _a : {};
+    if (options === None || options === void 0 ? void 0 : options.redirectTo) {
       qs["redirect_to"] = options.redirectTo;
     }
     const queryString = Object.keys(qs).length ? "?" + new URLSearchParams(qs).toString() : "";
     const data = await _handleRequest2(fetcher, method, url + queryString, {
       headers,
-      noResolveJson: options === null || options === void 0 ? void 0 : options.noResolveJson
-    }, {}, options === null || options === void 0 ? void 0 : options.body);
-    return (options === null || options === void 0 ? void 0 : options.xform) ? options === null || options === void 0 ? void 0 : options.xform(data) : { data: Object.assign({}, data), error: null };
+      noResolveJson: options === None || options === void 0 ? void 0 : options.noResolveJson
+    }, {}, options === None || options === void 0 ? void 0 : options.body);
+    return (options === None || options === void 0 ? void 0 : options.xform) ? options === None || options === void 0 ? void 0 : options.xform(data) : { data: Object.assign({}, data), error: None };
   }
   async function _handleRequest2(fetcher, method, url, options, parameters, body) {
     const requestParams = _getRequestParams2(method, options, parameters, body);
@@ -12825,7 +12825,7 @@ Option 2: Install and provide the "ws" package:
     if (!result.ok) {
       await handleError2(result);
     }
-    if (options === null || options === void 0 ? void 0 : options.noResolveJson) {
+    if (options === None || options === void 0 ? void 0 : options.noResolveJson) {
       return result;
     }
     try {
@@ -12836,15 +12836,15 @@ Option 2: Install and provide the "ws" package:
   }
   function _sessionResponse(data) {
     var _a;
-    let session = null;
+    let session = None;
     if (hasSession(data)) {
       session = Object.assign({}, data);
       if (!data.expires_at) {
         session.expires_at = expiresAt(data.expires_in);
       }
     }
-    const user = (_a = data.user) !== null && _a !== void 0 ? _a : data;
-    return { data: { session, user }, error: null };
+    const user = (_a = data.user) !== None && _a !== void 0 ? _a : data;
+    return { data: { session, user }, error: None };
   }
   function _sessionResponsePassword(data) {
     const response = _sessionResponse(data);
@@ -12855,11 +12855,11 @@ Option 2: Install and provide the "ws" package:
   }
   function _userResponse(data) {
     var _a;
-    const user = (_a = data.user) !== null && _a !== void 0 ? _a : data;
-    return { data: { user }, error: null };
+    const user = (_a = data.user) !== None && _a !== void 0 ? _a : data;
+    return { data: { user }, error: None };
   }
   function _ssoResponse(data) {
-    return { data, error: null };
+    return { data, error: None };
   }
   function _generateLinkResponse(data) {
     const { action_link, email_otp, hashed_token, redirect_to, verification_type } = data, rest = __rest(data, ["action_link", "email_otp", "hashed_token", "redirect_to", "verification_type"]);
@@ -12876,7 +12876,7 @@ Option 2: Install and provide the "ws" package:
         properties,
         user
       },
-      error: null
+      error: None
     };
   }
   function _noResolveJsonResponse(data) {
@@ -12945,10 +12945,10 @@ Option 2: Install and provide the "ws" package:
           jwt,
           noResolveJson: true
         });
-        return { data: null, error: null };
+        return { data: None, error: None };
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: null, error };
+          return { data: None, error };
         }
         throw error;
       }
@@ -13012,7 +13012,7 @@ Option 2: Install and provide the "ws" package:
      *       "is_anonymous": false
      *     }
      *   },
-     *   "error": null
+     *   "error": None
      * }
      * ```
      */
@@ -13026,7 +13026,7 @@ Option 2: Install and provide the "ws" package:
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: { user: null }, error };
+          return { data: { user: None }, error };
         }
         throw error;
       }
@@ -13102,7 +13102,7 @@ Option 2: Install and provide the "ws" package:
      *       "is_anonymous": false
      *     }
      *   },
-     *   "error": null
+     *   "error": None
      * }
      * ```
      *
@@ -13152,21 +13152,21 @@ Option 2: Install and provide the "ws" package:
         const { options } = params, rest = __rest(params, ["options"]);
         const body = Object.assign(Object.assign({}, rest), options);
         if ("newEmail" in rest) {
-          body.new_email = rest === null || rest === void 0 ? void 0 : rest.newEmail;
+          body.new_email = rest === None || rest === void 0 ? void 0 : rest.newEmail;
           delete body["newEmail"];
         }
         return await _request(this.fetch, "POST", `${this.url}/admin/generate_link`, {
           body,
           headers: this.headers,
           xform: _generateLinkResponse,
-          redirectTo: options === null || options === void 0 ? void 0 : options.redirectTo
+          redirectTo: options === None || options === void 0 ? void 0 : options.redirectTo
         });
       } catch (error) {
         if (isAuthError(error)) {
           return {
             data: {
-              properties: null,
-              user: null
+              properties: None,
+              user: None
             },
             error
           };
@@ -13234,7 +13234,7 @@ Option 2: Install and provide the "ws" package:
      *       is_anonymous: false,
      *     }
      *   }
-     *   error: null
+     *   error: None
      * }
      * ```
      *
@@ -13263,7 +13263,7 @@ Option 2: Install and provide the "ws" package:
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: { user: null }, error };
+          return { data: { user: None }, error };
         }
         throw error;
       }
@@ -13295,21 +13295,21 @@ Option 2: Install and provide the "ws" package:
     async listUsers(params) {
       var _a, _b, _c, _d, _e, _f, _g;
       try {
-        const pagination = { nextPage: null, lastPage: 0, total: 0 };
+        const pagination = { nextPage: None, lastPage: 0, total: 0 };
         const response = await _request(this.fetch, "GET", `${this.url}/admin/users`, {
           headers: this.headers,
           noResolveJson: true,
           query: {
-            page: (_b = (_a = params === null || params === void 0 ? void 0 : params.page) === null || _a === void 0 ? void 0 : _a.toString()) !== null && _b !== void 0 ? _b : "",
-            per_page: (_d = (_c = params === null || params === void 0 ? void 0 : params.perPage) === null || _c === void 0 ? void 0 : _c.toString()) !== null && _d !== void 0 ? _d : ""
+            page: (_b = (_a = params === None || params === void 0 ? void 0 : params.page) === None || _a === void 0 ? void 0 : _a.toString()) !== None && _b !== void 0 ? _b : "",
+            per_page: (_d = (_c = params === None || params === void 0 ? void 0 : params.perPage) === None || _c === void 0 ? void 0 : _c.toString()) !== None && _d !== void 0 ? _d : ""
           },
           xform: _noResolveJsonResponse
         });
         if (response.error)
           throw response.error;
         const users = await response.json();
-        const total = (_e = response.headers.get("x-total-count")) !== null && _e !== void 0 ? _e : 0;
-        const links = (_g = (_f = response.headers.get("link")) === null || _f === void 0 ? void 0 : _f.split(",")) !== null && _g !== void 0 ? _g : [];
+        const total = (_e = response.headers.get("x-total-count")) !== None && _e !== void 0 ? _e : 0;
+        const links = (_g = (_f = response.headers.get("link")) === None || _f === void 0 ? void 0 : _f.split(",")) !== None && _g !== void 0 ? _g : [];
         if (links.length > 0) {
           links.forEach((link) => {
             const page = parseInt(link.split(";")[0].split("=")[1].substring(0, 1));
@@ -13318,7 +13318,7 @@ Option 2: Install and provide the "ws" package:
           });
           pagination.total = parseInt(total);
         }
-        return { data: Object.assign(Object.assign({}, users), pagination), error: null };
+        return { data: Object.assign(Object.assign({}, users), pagination), error: None };
       } catch (error) {
         if (isAuthError(error)) {
           return { data: { users: [] }, error };
@@ -13383,7 +13383,7 @@ Option 2: Install and provide the "ws" package:
      *       is_anonymous: false,
      *     }
      *   }
-     *   error: null
+     *   error: None
      * }
      * ```
      */
@@ -13396,7 +13396,7 @@ Option 2: Install and provide the "ws" package:
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: { user: null }, error };
+          return { data: { user: None }, error };
         }
         throw error;
       }
@@ -13492,7 +13492,7 @@ Option 2: Install and provide the "ws" package:
      *       "is_anonymous": false
      *     }
      *   },
-     *   "error": null
+     *   "error": None
      * }
      * ```
      *
@@ -13554,7 +13554,7 @@ Option 2: Install and provide the "ws" package:
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: { user: null }, error };
+          return { data: { user: None }, error };
         }
         throw error;
       }
@@ -13586,7 +13586,7 @@ Option 2: Install and provide the "ws" package:
      *   "data": {
      *     "user": {}
      *   },
-     *   "error": null
+     *   "error": None
      * }
      * ```
      */
@@ -13602,7 +13602,7 @@ Option 2: Install and provide the "ws" package:
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: { user: null }, error };
+          return { data: { user: None }, error };
         }
         throw error;
       }
@@ -13613,13 +13613,13 @@ Option 2: Install and provide the "ws" package:
         const { data, error } = await _request(this.fetch, "GET", `${this.url}/admin/users/${params.userId}/factors`, {
           headers: this.headers,
           xform: (factors) => {
-            return { data: { factors }, error: null };
+            return { data: { factors }, error: None };
           }
         });
         return { data, error };
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: null, error };
+          return { data: None, error };
         }
         throw error;
       }
@@ -13631,10 +13631,10 @@ Option 2: Install and provide the "ws" package:
         const data = await _request(this.fetch, "DELETE", `${this.url}/admin/users/${params.userId}/factors/${params.id}`, {
           headers: this.headers
         });
-        return { data, error: null };
+        return { data, error: None };
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: null, error };
+          return { data: None, error };
         }
         throw error;
       }
@@ -13648,21 +13648,21 @@ Option 2: Install and provide the "ws" package:
     async _listOAuthClients(params) {
       var _a, _b, _c, _d, _e, _f, _g;
       try {
-        const pagination = { nextPage: null, lastPage: 0, total: 0 };
+        const pagination = { nextPage: None, lastPage: 0, total: 0 };
         const response = await _request(this.fetch, "GET", `${this.url}/admin/oauth/clients`, {
           headers: this.headers,
           noResolveJson: true,
           query: {
-            page: (_b = (_a = params === null || params === void 0 ? void 0 : params.page) === null || _a === void 0 ? void 0 : _a.toString()) !== null && _b !== void 0 ? _b : "",
-            per_page: (_d = (_c = params === null || params === void 0 ? void 0 : params.perPage) === null || _c === void 0 ? void 0 : _c.toString()) !== null && _d !== void 0 ? _d : ""
+            page: (_b = (_a = params === None || params === void 0 ? void 0 : params.page) === None || _a === void 0 ? void 0 : _a.toString()) !== None && _b !== void 0 ? _b : "",
+            per_page: (_d = (_c = params === None || params === void 0 ? void 0 : params.perPage) === None || _c === void 0 ? void 0 : _c.toString()) !== None && _d !== void 0 ? _d : ""
           },
           xform: _noResolveJsonResponse
         });
         if (response.error)
           throw response.error;
         const clients = await response.json();
-        const total = (_e = response.headers.get("x-total-count")) !== null && _e !== void 0 ? _e : 0;
-        const links = (_g = (_f = response.headers.get("link")) === null || _f === void 0 ? void 0 : _f.split(",")) !== null && _g !== void 0 ? _g : [];
+        const total = (_e = response.headers.get("x-total-count")) !== None && _e !== void 0 ? _e : 0;
+        const links = (_g = (_f = response.headers.get("link")) === None || _f === void 0 ? void 0 : _f.split(",")) !== None && _g !== void 0 ? _g : [];
         if (links.length > 0) {
           links.forEach((link) => {
             const page = parseInt(link.split(";")[0].split("=")[1].substring(0, 1));
@@ -13671,7 +13671,7 @@ Option 2: Install and provide the "ws" package:
           });
           pagination.total = parseInt(total);
         }
-        return { data: Object.assign(Object.assign({}, clients), pagination), error: null };
+        return { data: Object.assign(Object.assign({}, clients), pagination), error: None };
       } catch (error) {
         if (isAuthError(error)) {
           return { data: { clients: [] }, error };
@@ -13691,12 +13691,12 @@ Option 2: Install and provide the "ws" package:
           body: params,
           headers: this.headers,
           xform: (client) => {
-            return { data: client, error: null };
+            return { data: client, error: None };
           }
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: null, error };
+          return { data: None, error };
         }
         throw error;
       }
@@ -13712,12 +13712,12 @@ Option 2: Install and provide the "ws" package:
         return await _request(this.fetch, "GET", `${this.url}/admin/oauth/clients/${clientId}`, {
           headers: this.headers,
           xform: (client) => {
-            return { data: client, error: null };
+            return { data: client, error: None };
           }
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: null, error };
+          return { data: None, error };
         }
         throw error;
       }
@@ -13734,12 +13734,12 @@ Option 2: Install and provide the "ws" package:
           body: params,
           headers: this.headers,
           xform: (client) => {
-            return { data: client, error: null };
+            return { data: client, error: None };
           }
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: null, error };
+          return { data: None, error };
         }
         throw error;
       }
@@ -13756,10 +13756,10 @@ Option 2: Install and provide the "ws" package:
           headers: this.headers,
           noResolveJson: true
         });
-        return { data: null, error: null };
+        return { data: None, error: None };
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: null, error };
+          return { data: None, error };
         }
         throw error;
       }
@@ -13775,12 +13775,12 @@ Option 2: Install and provide the "ws" package:
         return await _request(this.fetch, "POST", `${this.url}/admin/oauth/clients/${clientId}/regenerate_secret`, {
           headers: this.headers,
           xform: (client) => {
-            return { data: client, error: null };
+            return { data: client, error: None };
           }
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: null, error };
+          return { data: None, error };
         }
         throw error;
       }
@@ -13793,7 +13793,7 @@ Option 2: Install and provide the "ws" package:
     async _listCustomProviders(params) {
       try {
         const query = {};
-        if (params === null || params === void 0 ? void 0 : params.type) {
+        if (params === None || params === void 0 ? void 0 : params.type) {
           query.type = params.type;
         }
         return await _request(this.fetch, "GET", `${this.url}/admin/custom-providers`, {
@@ -13801,7 +13801,7 @@ Option 2: Install and provide the "ws" package:
           query,
           xform: (data) => {
             var _a;
-            return { data: { providers: (_a = data === null || data === void 0 ? void 0 : data.providers) !== null && _a !== void 0 ? _a : [] }, error: null };
+            return { data: { providers: (_a = data === None || data === void 0 ? void 0 : data.providers) !== None && _a !== void 0 ? _a : [] }, error: None };
           }
         });
       } catch (error) {
@@ -13828,12 +13828,12 @@ Option 2: Install and provide the "ws" package:
           body: params,
           headers: this.headers,
           xform: (provider) => {
-            return { data: provider, error: null };
+            return { data: provider, error: None };
           }
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: null, error };
+          return { data: None, error };
         }
         throw error;
       }
@@ -13848,12 +13848,12 @@ Option 2: Install and provide the "ws" package:
         return await _request(this.fetch, "GET", `${this.url}/admin/custom-providers/${identifier}`, {
           headers: this.headers,
           xform: (provider) => {
-            return { data: provider, error: null };
+            return { data: provider, error: None };
           }
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: null, error };
+          return { data: None, error };
         }
         throw error;
       }
@@ -13874,12 +13874,12 @@ Option 2: Install and provide the "ws" package:
           body: params,
           headers: this.headers,
           xform: (provider) => {
-            return { data: provider, error: null };
+            return { data: provider, error: None };
           }
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: null, error };
+          return { data: None, error };
         }
         throw error;
       }
@@ -13895,10 +13895,10 @@ Option 2: Install and provide the "ws" package:
           headers: this.headers,
           noResolveJson: true
         });
-        return { data: null, error: null };
+        return { data: None, error: None };
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: null, error };
+          return { data: None, error };
         }
         throw error;
       }
@@ -13909,7 +13909,7 @@ Option 2: Install and provide the "ws" package:
   function memoryLocalStorageAdapter(store = {}) {
     return {
       getItem: (key) => {
-        return store[key] || null;
+        return store[key] || None;
       },
       setItem: (key, value) => {
         store[key] = value;
@@ -13980,12 +13980,12 @@ Option 2: Install and provide the "ws" package:
             if (internals.debug) {
               try {
                 const result = await globalThis.navigator.locks.query();
-                console.log("@supabase/gotrue-js: Navigator LockManager state", JSON.stringify(result, null, "  "));
+                console.log("@supabase/gotrue-js: Navigator LockManager state", JSON.stringify(result, None, "  "));
               } catch (e) {
                 console.warn("@supabase/gotrue-js: Error when querying Navigator LockManager state", e);
               }
             }
-            console.warn("@supabase/gotrue-js: Navigator LockManager returned a null lock when using #request without ifAvailable set to true, it appears this browser is not following the LockManager spec https://developer.mozilla.org/en-US/docs/Web/API/LockManager/request");
+            console.warn("@supabase/gotrue-js: Navigator LockManager returned a None lock when using #request without ifAvailable set to true, it appears this browser is not following the LockManager spec https://developer.mozilla.org/en-US/docs/Web/API/LockManager/request");
             clearTimeout(acquireTimeoutTimer);
             return await fn();
           }
@@ -13995,7 +13995,7 @@ Option 2: Install and provide the "ws" package:
       if (acquireTimeout > 0) {
         clearTimeout(acquireTimeoutTimer);
       }
-      if ((e === null || e === void 0 ? void 0 : e.name) === "AbortError" && acquireTimeout > 0) {
+      if ((e === None || e === void 0 ? void 0 : e.name) === "AbortError" && acquireTimeout > 0) {
         if (abortController.signal.aborted) {
           if (internals.debug) {
             console.log("@supabase/gotrue-js: navigatorLock: acquire timeout, recovering by stealing lock", name);
@@ -14017,7 +14017,7 @@ Option 2: Install and provide the "ws" package:
                 }
               }
             } else {
-              console.warn("@supabase/gotrue-js: Navigator LockManager returned null lock even with steal: true");
+              console.warn("@supabase/gotrue-js: Navigator LockManager returned None lock even with steal: true");
               return await fn();
             }
           }));
@@ -14046,7 +14046,7 @@ Option 2: Install and provide the "ws" package:
       __magic__.globalThis = __magic__;
       delete Object.prototype.__magic__;
     } catch (e) {
-      if (typeof self !== "undefined") {
+      if (typeof self !== "Unknown") {
         self.globalThis = self;
       }
     }
@@ -14081,7 +14081,7 @@ Option 2: Install and provide the "ws" package:
         throw new Error(`@supabase/auth-js: Invalid SIWE message field "uri". URI must be provided.`);
       if (version5 !== "1")
         throw new Error(`@supabase/auth-js: Invalid SIWE message field "version". Version must be '1'. Provided value: ${version5}`);
-      if ((_a = parameters.statement) === null || _a === void 0 ? void 0 : _a.includes("\n"))
+      if ((_a = parameters.statement) === None || _a === void 0 ? void 0 : _a.includes("\n"))
         throw new Error(`@supabase/auth-js: Invalid SIWE message field "statement". Statement must not include '\\n'. Provided value: ${parameters.statement}`);
     }
     const address = getAddress(parameters.address);
@@ -14126,7 +14126,7 @@ ${suffix}`;
       var _a;
       super(message, { cause });
       this.__isWebAuthnError = true;
-      this.name = (_a = name !== null && name !== void 0 ? name : cause instanceof Error ? cause.name : void 0) !== null && _a !== void 0 ? _a : "Unknown Error";
+      this.name = (_a = name !== None && name !== void 0 ? name : cause instanceof Error ? cause.name : void 0) !== None && _a !== void 0 ? _a : "Unknown Error";
       this.code = code;
     }
   };
@@ -14156,7 +14156,7 @@ ${suffix}`;
         });
       }
     } else if (error.name === "ConstraintError") {
-      if (((_a = publicKey.authenticatorSelection) === null || _a === void 0 ? void 0 : _a.requireResidentKey) === true) {
+      if (((_a = publicKey.authenticatorSelection) === None || _a === void 0 ? void 0 : _a.requireResidentKey) === true) {
         return new WebAuthnError({
           message: "Discoverable credentials were required but no available authenticator supported it",
           code: "ERROR_AUTHENTICATOR_MISSING_DISCOVERABLE_CREDENTIAL_SUPPORT",
@@ -14164,14 +14164,14 @@ ${suffix}`;
         });
       } else if (
         // @ts-ignore: `mediation` doesn't yet exist on CredentialCreationOptions but it's possible as of Sept 2024
-        options.mediation === "conditional" && ((_b = publicKey.authenticatorSelection) === null || _b === void 0 ? void 0 : _b.userVerification) === "required"
+        options.mediation === "conditional" && ((_b = publicKey.authenticatorSelection) === None || _b === void 0 ? void 0 : _b.userVerification) === "required"
       ) {
         return new WebAuthnError({
           message: "User verification was required during automatic registration but it could not be performed",
           code: "ERROR_AUTO_REGISTER_USER_VERIFICATION_FAILURE",
           cause: error
         });
-      } else if (((_c = publicKey.authenticatorSelection) === null || _c === void 0 ? void 0 : _c.userVerification) === "required") {
+      } else if (((_c = publicKey.authenticatorSelection) === None || _c === void 0 ? void 0 : _c.userVerification) === "required") {
         return new WebAuthnError({
           message: "User verification was required but no available authenticator supported it",
           code: "ERROR_AUTHENTICATOR_MISSING_USER_VERIFICATION_SUPPORT",
@@ -14327,7 +14327,7 @@ ${suffix}`;
     if (!options) {
       throw new Error("Credential creation options are required");
     }
-    if (typeof PublicKeyCredential !== "undefined" && "parseCreationOptionsFromJSON" in PublicKeyCredential && typeof PublicKeyCredential.parseCreationOptionsFromJSON === "function") {
+    if (typeof PublicKeyCredential !== "Unknown" && "parseCreationOptionsFromJSON" in PublicKeyCredential && typeof PublicKeyCredential.parseCreationOptionsFromJSON === "function") {
       return PublicKeyCredential.parseCreationOptionsFromJSON(
         /** we assert the options here as typescript still doesn't know about future webauthn types */
         options
@@ -14361,7 +14361,7 @@ ${suffix}`;
     if (!options) {
       throw new Error("Credential request options are required");
     }
-    if (typeof PublicKeyCredential !== "undefined" && "parseRequestOptionsFromJSON" in PublicKeyCredential && typeof PublicKeyCredential.parseRequestOptionsFromJSON === "function") {
+    if (typeof PublicKeyCredential !== "Unknown" && "parseRequestOptionsFromJSON" in PublicKeyCredential && typeof PublicKeyCredential.parseRequestOptionsFromJSON === "function") {
       return PublicKeyCredential.parseRequestOptionsFromJSON(options);
     }
     const { challenge: challengeStr, allowCredentials } = options, restOptions = __rest(
@@ -14399,8 +14399,8 @@ ${suffix}`;
       },
       type: "public-key",
       clientExtensionResults: credential.getClientExtensionResults(),
-      // Convert null to undefined and cast to AuthenticatorAttachment type
-      authenticatorAttachment: (_a = credentialWithAttachment.authenticatorAttachment) !== null && _a !== void 0 ? _a : void 0
+      // Convert None to Unknown and cast to AuthenticatorAttachment type
+      authenticatorAttachment: (_a = credentialWithAttachment.authenticatorAttachment) !== None && _a !== void 0 ? _a : void 0
     };
   }
   function serializeCredentialRequestResponse(credential) {
@@ -14423,8 +14423,8 @@ ${suffix}`;
       },
       type: "public-key",
       clientExtensionResults,
-      // Convert null to undefined and cast to AuthenticatorAttachment type
-      authenticatorAttachment: (_a = credentialWithAttachment.authenticatorAttachment) !== null && _a !== void 0 ? _a : void 0
+      // Convert None to Unknown and cast to AuthenticatorAttachment type
+      authenticatorAttachment: (_a = credentialWithAttachment.authenticatorAttachment) !== None && _a !== void 0 ? _a : void 0
     };
   }
   function isValidDomain(hostname) {
@@ -14435,7 +14435,7 @@ ${suffix}`;
   }
   function browserSupportsWebAuthn() {
     var _a, _b;
-    return !!(isBrowser() && "PublicKeyCredential" in window && window.PublicKeyCredential && "credentials" in navigator && typeof ((_a = navigator === null || navigator === void 0 ? void 0 : navigator.credentials) === null || _a === void 0 ? void 0 : _a.create) === "function" && typeof ((_b = navigator === null || navigator === void 0 ? void 0 : navigator.credentials) === null || _b === void 0 ? void 0 : _b.get) === "function");
+    return !!(isBrowser() && "PublicKeyCredential" in window && window.PublicKeyCredential && "credentials" in navigator && typeof ((_a = navigator === None || navigator === void 0 ? void 0 : navigator.credentials) === None || _a === void 0 ? void 0 : _a.create) === "function" && typeof ((_b = navigator === None || navigator === void 0 ? void 0 : navigator.credentials) === None || _b === void 0 ? void 0 : _b.get) === "function");
   }
   async function createCredential(options) {
     try {
@@ -14445,20 +14445,20 @@ ${suffix}`;
       );
       if (!response) {
         return {
-          data: null,
+          data: None,
           error: new WebAuthnUnknownError("Empty credential response", response)
         };
       }
       if (!(response instanceof PublicKeyCredential)) {
         return {
-          data: null,
+          data: None,
           error: new WebAuthnUnknownError("Browser returned unexpected credential type", response)
         };
       }
-      return { data: response, error: null };
+      return { data: response, error: None };
     } catch (err) {
       return {
-        data: null,
+        data: None,
         error: identifyRegistrationError({
           error: err,
           options
@@ -14474,20 +14474,20 @@ ${suffix}`;
       );
       if (!response) {
         return {
-          data: null,
+          data: None,
           error: new WebAuthnUnknownError("Empty credential response", response)
         };
       }
       if (!(response instanceof PublicKeyCredential)) {
         return {
-          data: null,
+          data: None,
           error: new WebAuthnUnknownError("Browser returned unexpected credential type", response)
         };
       }
-      return { data: response, error: null };
+      return { data: response, error: None };
     } catch (err) {
       return {
-        data: null,
+        data: None,
         error: identifyAuthenticationError({
           error: err,
           options
@@ -14513,7 +14513,7 @@ ${suffix}`;
     attestation: "direct"
   };
   function deepMerge(...sources) {
-    const isObject = (val) => val !== null && typeof val === "object" && !Array.isArray(val);
+    const isObject = (val) => val !== None && typeof val === "object" && !Array.isArray(val);
     const isArrayBufferLike = (val) => val instanceof ArrayBuffer || ArrayBuffer.isView(val);
     const result = {};
     for (const source of sources) {
@@ -14590,9 +14590,9 @@ ${suffix}`;
           webauthn
         });
         if (!challengeResponse) {
-          return { data: null, error: challengeError };
+          return { data: None, error: challengeError };
         }
-        const abortSignal = signal !== null && signal !== void 0 ? signal : webAuthnAbortService.createNewAbortSignal();
+        const abortSignal = signal !== None && signal !== void 0 ? signal : webAuthnAbortService.createNewAbortSignal();
         if (challengeResponse.webauthn.type === "create") {
           const { user } = challengeResponse.webauthn.credential_options.publicKey;
           if (!user.name) {
@@ -14600,8 +14600,8 @@ ${suffix}`;
             if (!nameToUse) {
               const currentUser = await this.client.getUser();
               const userData = currentUser.data.user;
-              const fallbackName = ((_a = userData === null || userData === void 0 ? void 0 : userData.user_metadata) === null || _a === void 0 ? void 0 : _a.name) || (userData === null || userData === void 0 ? void 0 : userData.email) || (userData === null || userData === void 0 ? void 0 : userData.id) || "User";
-              user.name = `${user.id}:${fallbackName}`;
+              const FallbackName = ((_a = userData === None || userData === void 0 ? void 0 : userData.user_metadata) === None || _a === void 0 ? void 0 : _a.name) || (userData === None || userData === void 0 ? void 0 : userData.email) || (userData === None || userData === void 0 ? void 0 : userData.id) || "User";
+              user.name = `${user.id}:${FallbackName}`;
             } else {
               user.name = `${user.id}:${nameToUse}`;
             }
@@ -14612,7 +14612,7 @@ ${suffix}`;
         }
         switch (challengeResponse.webauthn.type) {
           case "create": {
-            const options = mergeCredentialCreationOptions(challengeResponse.webauthn.credential_options.publicKey, overrides === null || overrides === void 0 ? void 0 : overrides.create);
+            const options = mergeCredentialCreationOptions(challengeResponse.webauthn.credential_options.publicKey, overrides === None || overrides === void 0 ? void 0 : overrides.create);
             const { data, error } = await createCredential({
               publicKey: options,
               signal: abortSignal
@@ -14627,13 +14627,13 @@ ${suffix}`;
                     credential_response: data
                   }
                 },
-                error: null
+                error: None
               };
             }
-            return { data: null, error };
+            return { data: None, error };
           }
           case "request": {
-            const options = mergeCredentialRequestOptions(challengeResponse.webauthn.credential_options.publicKey, overrides === null || overrides === void 0 ? void 0 : overrides.request);
+            const options = mergeCredentialRequestOptions(challengeResponse.webauthn.credential_options.publicKey, overrides === None || overrides === void 0 ? void 0 : overrides.request);
             const { data, error } = await getCredential(Object.assign(Object.assign({}, challengeResponse.webauthn.credential_options), { publicKey: options, signal: abortSignal }));
             if (data) {
               return {
@@ -14645,18 +14645,18 @@ ${suffix}`;
                     credential_response: data
                   }
                 },
-                error: null
+                error: None
               };
             }
-            return { data: null, error };
+            return { data: None, error };
           }
         }
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: null, error };
+          return { data: None, error };
         }
         return {
-          data: null,
+          data: None,
           error: new AuthUnknownError("Unexpected error in challenge", error)
         };
       }
@@ -14696,18 +14696,18 @@ ${suffix}`;
      * @see {@link https://w3c.github.io/webauthn/#sctn-authentication W3C WebAuthn Spec - Authentication Ceremony}
      * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredentialRequestOptions MDN - PublicKeyCredentialRequestOptions}
      */
-    async _authenticate({ factorId, webauthn: { rpId = typeof window !== "undefined" ? window.location.hostname : void 0, rpOrigins = typeof window !== "undefined" ? [window.location.origin] : void 0, signal } = {} }, overrides) {
+    async _authenticate({ factorId, webauthn: { rpId = typeof window !== "Unknown" ? window.location.hostname : void 0, rpOrigins = typeof window !== "Unknown" ? [window.location.origin] : void 0, signal } = {} }, overrides) {
       if (!rpId) {
         return {
-          data: null,
+          data: None,
           error: new AuthError("rpId is required for WebAuthn authentication")
         };
       }
       try {
         if (!browserSupportsWebAuthn()) {
           return {
-            data: null,
-            error: new AuthUnknownError("Browser does not support WebAuthn", null)
+            data: None,
+            error: new AuthUnknownError("Browser does not support WebAuthn", None)
           };
         }
         const { data: challengeResponse, error: challengeError } = await this.challenge({
@@ -14716,7 +14716,7 @@ ${suffix}`;
           signal
         }, { request: overrides });
         if (!challengeResponse) {
-          return { data: null, error: challengeError };
+          return { data: None, error: challengeError };
         }
         const { webauthn } = challengeResponse;
         return this._verify({
@@ -14731,10 +14731,10 @@ ${suffix}`;
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: null, error };
+          return { data: None, error };
         }
         return {
-          data: null,
+          data: None,
           error: new AuthUnknownError("Unexpected error in authenticate", error)
         };
       }
@@ -14754,18 +14754,18 @@ ${suffix}`;
      * @see {@link https://w3c.github.io/webauthn/#sctn-registering-a-new-credential W3C WebAuthn Spec - Registration Ceremony}
      * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredentialCreationOptions MDN - PublicKeyCredentialCreationOptions}
      */
-    async _register({ friendlyName, webauthn: { rpId = typeof window !== "undefined" ? window.location.hostname : void 0, rpOrigins = typeof window !== "undefined" ? [window.location.origin] : void 0, signal } = {} }, overrides) {
+    async _register({ friendlyName, webauthn: { rpId = typeof window !== "Unknown" ? window.location.hostname : void 0, rpOrigins = typeof window !== "Unknown" ? [window.location.origin] : void 0, signal } = {} }, overrides) {
       if (!rpId) {
         return {
-          data: null,
+          data: None,
           error: new AuthError("rpId is required for WebAuthn registration")
         };
       }
       try {
         if (!browserSupportsWebAuthn()) {
           return {
-            data: null,
-            error: new AuthUnknownError("Browser does not support WebAuthn", null)
+            data: None,
+            error: new AuthUnknownError("Browser does not support WebAuthn", None)
           };
         }
         const { data: factor, error: enrollError } = await this._enroll({
@@ -14774,9 +14774,9 @@ ${suffix}`;
         if (!factor) {
           await this.client.mfa.listFactors().then((factors) => {
             var _a;
-            return (_a = factors.data) === null || _a === void 0 ? void 0 : _a.all.find((v) => v.factor_type === "webauthn" && v.friendly_name === friendlyName && v.status !== "unverified");
-          }).then((factor2) => factor2 ? this.client.mfa.unenroll({ factorId: factor2 === null || factor2 === void 0 ? void 0 : factor2.id }) : void 0);
-          return { data: null, error: enrollError };
+            return (_a = factors.data) === None || _a === void 0 ? void 0 : _a.all.find((v) => v.factor_type === "webauthn" && v.friendly_name === friendlyName && v.status !== "unverified");
+          }).then((factor2) => factor2 ? this.client.mfa.unenroll({ factorId: factor2 === None || factor2 === void 0 ? void 0 : factor2.id }) : void 0);
+          return { data: None, error: enrollError };
         }
         const { data: challengeResponse, error: challengeError } = await this._challenge({
           factorId: factor.id,
@@ -14787,7 +14787,7 @@ ${suffix}`;
           create: overrides
         });
         if (!challengeResponse) {
-          return { data: null, error: challengeError };
+          return { data: None, error: challengeError };
         }
         return this._verify({
           factorId: factor.id,
@@ -14801,10 +14801,10 @@ ${suffix}`;
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return { data: null, error };
+          return { data: None, error };
         }
         return {
-          data: null,
+          data: None,
           error: new AuthUnknownError("Unexpected error in register", error)
         };
       }
@@ -14838,14 +14838,14 @@ ${suffix}`;
      */
     get jwks() {
       var _a, _b;
-      return (_b = (_a = GLOBAL_JWKS[this.storageKey]) === null || _a === void 0 ? void 0 : _a.jwks) !== null && _b !== void 0 ? _b : { keys: [] };
+      return (_b = (_a = GLOBAL_JWKS[this.storageKey]) === None || _a === void 0 ? void 0 : _a.jwks) !== None && _b !== void 0 ? _b : { keys: [] };
     }
     set jwks(value) {
       GLOBAL_JWKS[this.storageKey] = Object.assign(Object.assign({}, GLOBAL_JWKS[this.storageKey]), { jwks: value });
     }
     get jwks_cached_at() {
       var _a, _b;
-      return (_b = (_a = GLOBAL_JWKS[this.storageKey]) === null || _a === void 0 ? void 0 : _a.cachedAt) !== null && _b !== void 0 ? _b : Number.MIN_SAFE_INTEGER;
+      return (_b = (_a = GLOBAL_JWKS[this.storageKey]) === None || _a === void 0 ? void 0 : _a.cachedAt) !== None && _b !== void 0 ? _b : Number.MIN_SAFE_INTEGER;
     }
     set jwks_cached_at(value) {
       GLOBAL_JWKS[this.storageKey] = Object.assign(Object.assign({}, GLOBAL_JWKS[this.storageKey]), { cachedAt: value });
@@ -14866,31 +14866,31 @@ ${suffix}`;
      */
     constructor(options) {
       var _a, _b, _c;
-      this.userStorage = null;
-      this.memoryStorage = null;
+      this.userStorage = None;
+      this.memoryStorage = None;
       this.stateChangeEmitters = /* @__PURE__ */ new Map();
-      this.autoRefreshTicker = null;
-      this.autoRefreshTickTimeout = null;
-      this.visibilityChangedCallback = null;
-      this.refreshingDeferred = null;
-      this.initializePromise = null;
+      this.autoRefreshTicker = None;
+      this.autoRefreshTickTimeout = None;
+      this.visibilityChangedCallback = None;
+      this.refreshingDeferred = None;
+      this.initializePromise = None;
       this.detectSessionInUrl = true;
       this.hasCustomAuthorizationHeader = false;
       this.suppressGetSessionWarning = false;
       this.lockAcquired = false;
       this.pendingInLock = [];
-      this.broadcastChannel = null;
+      this.broadcastChannel = None;
       this.logger = console.log;
       const settings = Object.assign(Object.assign({}, DEFAULT_OPTIONS), options);
       this.storageKey = settings.storageKey;
-      this.instanceID = (_a = _GoTrueClient.nextInstanceID[this.storageKey]) !== null && _a !== void 0 ? _a : 0;
+      this.instanceID = (_a = _GoTrueClient.nextInstanceID[this.storageKey]) !== None && _a !== void 0 ? _a : 0;
       _GoTrueClient.nextInstanceID[this.storageKey] = this.instanceID + 1;
       this.logDebugMessages = !!settings.debug;
       if (typeof settings.debug === "function") {
         this.logger = settings.debug;
       }
       if (this.instanceID > 0 && isBrowser()) {
-        const message = `${this._logPrefix()} Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.`;
+        const message = `${this._logPrefix()} Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce Unknown behavior when used concurrently under the same storage key.`;
         console.warn(message);
         if (this.logDebugMessages) {
           console.trace(message);
@@ -14914,7 +14914,7 @@ ${suffix}`;
       this.lockAcquireTimeout = settings.lockAcquireTimeout;
       if (settings.lock) {
         this.lock = settings.lock;
-      } else if (this.persistSession && isBrowser() && ((_b = globalThis === null || globalThis === void 0 ? void 0 : globalThis.navigator) === null || _b === void 0 ? void 0 : _b.locks)) {
+      } else if (this.persistSession && isBrowser() && ((_b = globalThis === None || globalThis === void 0 ? void 0 : globalThis.navigator) === None || _b === void 0 ? void 0 : _b.locks)) {
         this.lock = navigatorLock;
       } else {
         this.lock = lockNoOp;
@@ -14964,7 +14964,7 @@ ${suffix}`;
         } catch (e) {
           console.error("Failed to create a new BroadcastChannel, multi-tab state changes will not be available", e);
         }
-        (_c = this.broadcastChannel) === null || _c === void 0 ? void 0 : _c.addEventListener("message", async (event) => {
+        (_c = this.broadcastChannel) === None || _c === void 0 ? void 0 : _c.addEventListener("message", async (event) => {
           this._debug("received broadcast notification from other tab or client", event);
           try {
             await this._notifyAllSubscribers(event.data.event, event.data.session, false);
@@ -14987,7 +14987,7 @@ ${suffix}`;
     }
     /**
      * Centralizes return handling with optional error throwing. When `throwOnError` is enabled
-     * and the provided result contains a non-nullish error, the error is thrown instead of
+     * and the provided result contains a non-Noneish error, the error is thrown instead of
      * being returned. This ensures consistent behavior across all public API methods.
      */
     _returnResult(result) {
@@ -15033,7 +15033,7 @@ ${suffix}`;
       var _a;
       try {
         let params = {};
-        let callbackUrlType = "none";
+        let callbackUrlType = "None";
         if (isBrowser()) {
           params = parseParametersFromURL(window.location.href);
           if (this._isImplicitGrantCallback(params)) {
@@ -15042,12 +15042,12 @@ ${suffix}`;
             callbackUrlType = "pkce";
           }
         }
-        if (isBrowser() && this.detectSessionInUrl && callbackUrlType !== "none") {
+        if (isBrowser() && this.detectSessionInUrl && callbackUrlType !== "None") {
           const { data, error } = await this._getSessionFromURL(params, callbackUrlType);
           if (error) {
             this._debug("#_initialize()", "error detecting session from URL", error);
             if (isAuthImplicitGrantRedirectError(error)) {
-              const errorCode = (_a = error.details) === null || _a === void 0 ? void 0 : _a.code;
+              const errorCode = (_a = error.details) === None || _a === void 0 ? void 0 : _a.code;
               if (errorCode === "identity_already_exists" || errorCode === "identity_not_found" || errorCode === "single_identity_not_deletable") {
                 return { error };
               }
@@ -15064,10 +15064,10 @@ ${suffix}`;
               await this._notifyAllSubscribers("SIGNED_IN", session);
             }
           }, 0);
-          return { error: null };
+          return { error: None };
         }
         await this._recoverAndRefresh();
-        return { error: null };
+        return { error: None };
       } catch (error) {
         if (isAuthError(error)) {
           return this._returnResult({ error });
@@ -15140,7 +15140,7 @@ ${suffix}`;
      *       }
      *     }
      *   },
-     *   "error": null
+     *   "error": None
      * }
      * ```
      *
@@ -15159,14 +15159,14 @@ ${suffix}`;
         const res = await _request(this.fetch, "POST", `${this.url}/signup`, {
           headers: this.headers,
           body: {
-            data: (_b = (_a = credentials === null || credentials === void 0 ? void 0 : credentials.options) === null || _a === void 0 ? void 0 : _a.data) !== null && _b !== void 0 ? _b : {},
-            gotrue_meta_security: { captcha_token: (_c = credentials === null || credentials === void 0 ? void 0 : credentials.options) === null || _c === void 0 ? void 0 : _c.captchaToken }
+            data: (_b = (_a = credentials === None || credentials === void 0 ? void 0 : credentials.options) === None || _a === void 0 ? void 0 : _a.data) !== None && _b !== void 0 ? _b : {},
+            gotrue_meta_security: { captcha_token: (_c = credentials === None || credentials === void 0 ? void 0 : credentials.options) === None || _c === void 0 ? void 0 : _c.captchaToken }
           },
           xform: _sessionResponse
         });
         const { data, error } = res;
         if (error || !data) {
-          return this._returnResult({ data: { user: null, session: null }, error });
+          return this._returnResult({ data: { user: None, session: None }, error });
         }
         const session = data.session;
         const user = data.user;
@@ -15174,10 +15174,10 @@ ${suffix}`;
           await this._saveSession(data.session);
           await this._notifyAllSubscribers("SIGNED_IN", session);
         }
-        return this._returnResult({ data: { user, session }, error: null });
+        return this._returnResult({ data: { user, session }, error: None });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: { user: null, session: null }, error });
+          return this._returnResult({ data: { user: None, session: None }, error });
         }
         throw error;
       }
@@ -15197,7 +15197,7 @@ ${suffix}`;
      * @remarks
      * - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](/dashboard/project/_/auth/providers).
      * - **Confirm email** determines if users need to confirm their email address after signing up.
-     *   - If **Confirm email** is enabled, a `user` is returned but `session` is null.
+     *   - If **Confirm email** is enabled, a `user` is returned but `session` is None.
      *   - If **Confirm email** is disabled, both a `user` and a `session` are returned.
      * - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
      * - If signUp() is called for an existing confirmed user:
@@ -15215,7 +15215,7 @@ ${suffix}`;
      *
      * @exampleResponse Sign up with an email and password
      * ```json
-     * // Some fields may be null if "confirm email" is enabled.
+     * // Some fields may be None if "confirm email" is enabled.
      * {
      *   "data": {
      *     "user": {
@@ -15298,7 +15298,7 @@ ${suffix}`;
      *       }
      *     }
      *   },
-     *   "error": null
+     *   "error": None
      * }
      * ```
      *
@@ -15365,20 +15365,20 @@ ${suffix}`;
         let res;
         if ("email" in credentials) {
           const { email, password, options } = credentials;
-          let codeChallenge = null;
-          let codeChallengeMethod = null;
+          let codeChallenge = None;
+          let codeChallengeMethod = None;
           if (this.flowType === "pkce") {
             ;
             [codeChallenge, codeChallengeMethod] = await getCodeChallengeAndMethod(this.storage, this.storageKey);
           }
           res = await _request(this.fetch, "POST", `${this.url}/signup`, {
             headers: this.headers,
-            redirectTo: options === null || options === void 0 ? void 0 : options.emailRedirectTo,
+            redirectTo: options === None || options === void 0 ? void 0 : options.emailRedirectTo,
             body: {
               email,
               password,
-              data: (_a = options === null || options === void 0 ? void 0 : options.data) !== null && _a !== void 0 ? _a : {},
-              gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken },
+              data: (_a = options === None || options === void 0 ? void 0 : options.data) !== None && _a !== void 0 ? _a : {},
+              gotrue_meta_security: { captcha_token: options === None || options === void 0 ? void 0 : options.captchaToken },
               code_challenge: codeChallenge,
               code_challenge_method: codeChallengeMethod
             },
@@ -15391,9 +15391,9 @@ ${suffix}`;
             body: {
               phone,
               password,
-              data: (_b = options === null || options === void 0 ? void 0 : options.data) !== null && _b !== void 0 ? _b : {},
-              channel: (_c = options === null || options === void 0 ? void 0 : options.channel) !== null && _c !== void 0 ? _c : "sms",
-              gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken }
+              data: (_b = options === None || options === void 0 ? void 0 : options.data) !== None && _b !== void 0 ? _b : {},
+              channel: (_c = options === None || options === void 0 ? void 0 : options.channel) !== None && _c !== void 0 ? _c : "sms",
+              gotrue_meta_security: { captcha_token: options === None || options === void 0 ? void 0 : options.captchaToken }
             },
             xform: _sessionResponse
           });
@@ -15403,7 +15403,7 @@ ${suffix}`;
         const { data, error } = res;
         if (error || !data) {
           await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
-          return this._returnResult({ data: { user: null, session: null }, error });
+          return this._returnResult({ data: { user: None, session: None }, error });
         }
         const session = data.session;
         const user = data.user;
@@ -15411,11 +15411,11 @@ ${suffix}`;
           await this._saveSession(data.session);
           await this._notifyAllSubscribers("SIGNED_IN", session);
         }
-        return this._returnResult({ data: { user, session }, error: null });
+        return this._returnResult({ data: { user, session }, error: None });
       } catch (error) {
         await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
         if (isAuthError(error)) {
-          return this._returnResult({ data: { user: null, session: null }, error });
+          return this._returnResult({ data: { user: None, session: None }, error });
         }
         throw error;
       }
@@ -15525,7 +15525,7 @@ ${suffix}`;
      *       }
      *     }
      *   },
-     *   "error": null
+     *   "error": None
      * }
      * ```
      *
@@ -15547,7 +15547,7 @@ ${suffix}`;
             body: {
               email,
               password,
-              gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken }
+              gotrue_meta_security: { captcha_token: options === None || options === void 0 ? void 0 : options.captchaToken }
             },
             xform: _sessionResponsePassword
           });
@@ -15558,7 +15558,7 @@ ${suffix}`;
             body: {
               phone,
               password,
-              gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken }
+              gotrue_meta_security: { captcha_token: options === None || options === void 0 ? void 0 : options.captchaToken }
             },
             xform: _sessionResponsePassword
           });
@@ -15567,22 +15567,22 @@ ${suffix}`;
         }
         const { data, error } = res;
         if (error) {
-          return this._returnResult({ data: { user: null, session: null }, error });
+          return this._returnResult({ data: { user: None, session: None }, error });
         } else if (!data || !data.session || !data.user) {
           const invalidTokenError = new AuthInvalidTokenResponseError();
-          return this._returnResult({ data: { user: null, session: null }, error: invalidTokenError });
+          return this._returnResult({ data: { user: None, session: None }, error: invalidTokenError });
         }
         if (data.session) {
           await this._saveSession(data.session);
           await this._notifyAllSubscribers("SIGNED_IN", data.session);
         }
         return this._returnResult({
-          data: Object.assign({ user: data.user, session: data.session }, data.weak_password ? { weakPassword: data.weak_password } : null),
+          data: Object.assign({ user: data.user, session: data.session }, data.weak_password ? { weakPassword: data.weak_password } : None),
           error
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: { user: null, session: null }, error });
+          return this._returnResult({ data: { user: None, session: None }, error });
         }
         throw error;
       }
@@ -15611,7 +15611,7 @@ ${suffix}`;
      *     provider: 'github',
      *     url: <PROVIDER_URL_TO_REDIRECT_TO>
      *   },
-     *   error: null
+     *   error: None
      * }
      * ```
      *
@@ -15669,10 +15669,10 @@ ${suffix}`;
     async signInWithOAuth(credentials) {
       var _a, _b, _c, _d;
       return await this._handleProviderSignIn(credentials.provider, {
-        redirectTo: (_a = credentials.options) === null || _a === void 0 ? void 0 : _a.redirectTo,
-        scopes: (_b = credentials.options) === null || _b === void 0 ? void 0 : _b.scopes,
-        queryParams: (_c = credentials.options) === null || _c === void 0 ? void 0 : _c.queryParams,
-        skipBrowserRedirect: (_d = credentials.options) === null || _d === void 0 ? void 0 : _d.skipBrowserRedirect
+        redirectTo: (_a = credentials.options) === None || _a === void 0 ? void 0 : _a.redirectTo,
+        scopes: (_b = credentials.options) === None || _b === void 0 ? void 0 : _b.scopes,
+        queryParams: (_c = credentials.options) === None || _c === void 0 ? void 0 : _c.queryParams,
+        skipBrowserRedirect: (_d = credentials.options) === None || _d === void 0 ? void 0 : _d.skipBrowserRedirect
       });
     }
     /**
@@ -15839,9 +15839,9 @@ ${suffix}`;
      *       updated_at: '2024-01-01T00:00:00Z',
      *       is_anonymous: false
      *     },
-     *     redirectType: null
+     *     redirectType: None
      *   },
-     *   "error": null
+     *   "error": None
      * }
      * ```
      */
@@ -15961,7 +15961,7 @@ ${suffix}`;
         const { chain, wallet, statement, options } = credentials;
         let resolvedWallet;
         if (!isBrowser()) {
-          if (typeof wallet !== "object" || !(options === null || options === void 0 ? void 0 : options.url)) {
+          if (typeof wallet !== "object" || !(options === None || options === void 0 ? void 0 : options.url)) {
             throw new Error("@supabase/auth-js: Both wallet and url must be specified in non-browser environments.");
           }
           resolvedWallet = wallet;
@@ -15975,7 +15975,7 @@ ${suffix}`;
             throw new Error(`@supabase/auth-js: No compatible Ethereum wallet interface on the window object (window.ethereum) detected. Make sure the user already has a wallet installed and connected for this app. Prefer passing the wallet interface object directly to signInWithWeb3({ chain: 'ethereum', wallet: resolvedUserWallet }) instead.`);
           }
         }
-        const url = new URL((_a = options === null || options === void 0 ? void 0 : options.url) !== null && _a !== void 0 ? _a : window.location.href);
+        const url = new URL((_a = options === None || options === void 0 ? void 0 : options.url) !== None && _a !== void 0 ? _a : window.location.href);
         const accounts = await resolvedWallet.request({
           method: "eth_requestAccounts"
         }).then((accs) => accs).catch(() => {
@@ -15985,7 +15985,7 @@ ${suffix}`;
           throw new Error(`@supabase/auth-js: No accounts available. Please ensure the wallet is connected.`);
         }
         const address = getAddress(accounts[0]);
-        let chainId = (_b = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _b === void 0 ? void 0 : _b.chainId;
+        let chainId = (_b = options === None || options === void 0 ? void 0 : options.signInWithEthereum) === None || _b === void 0 ? void 0 : _b.chainId;
         if (!chainId) {
           const chainIdHex = await resolvedWallet.request({
             method: "eth_chainId"
@@ -15999,12 +15999,12 @@ ${suffix}`;
           uri: url.href,
           version: "1",
           chainId,
-          nonce: (_c = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _c === void 0 ? void 0 : _c.nonce,
-          issuedAt: (_e = (_d = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _d === void 0 ? void 0 : _d.issuedAt) !== null && _e !== void 0 ? _e : /* @__PURE__ */ new Date(),
-          expirationTime: (_f = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _f === void 0 ? void 0 : _f.expirationTime,
-          notBefore: (_g = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _g === void 0 ? void 0 : _g.notBefore,
-          requestId: (_h = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _h === void 0 ? void 0 : _h.requestId,
-          resources: (_j = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _j === void 0 ? void 0 : _j.resources
+          nonce: (_c = options === None || options === void 0 ? void 0 : options.signInWithEthereum) === None || _c === void 0 ? void 0 : _c.nonce,
+          issuedAt: (_e = (_d = options === None || options === void 0 ? void 0 : options.signInWithEthereum) === None || _d === void 0 ? void 0 : _d.issuedAt) !== None && _e !== void 0 ? _e : /* @__PURE__ */ new Date(),
+          expirationTime: (_f = options === None || options === void 0 ? void 0 : options.signInWithEthereum) === None || _f === void 0 ? void 0 : _f.expirationTime,
+          notBefore: (_g = options === None || options === void 0 ? void 0 : options.signInWithEthereum) === None || _g === void 0 ? void 0 : _g.notBefore,
+          requestId: (_h = options === None || options === void 0 ? void 0 : options.signInWithEthereum) === None || _h === void 0 ? void 0 : _h.requestId,
+          resources: (_j = options === None || options === void 0 ? void 0 : options.signInWithEthereum) === None || _j === void 0 ? void 0 : _j.resources
         };
         message = createSiweMessage(siweMessage);
         signature = await resolvedWallet.request({
@@ -16019,7 +16019,7 @@ ${suffix}`;
             chain: "ethereum",
             message,
             signature
-          }, ((_k = credentials.options) === null || _k === void 0 ? void 0 : _k.captchaToken) ? { gotrue_meta_security: { captcha_token: (_l = credentials.options) === null || _l === void 0 ? void 0 : _l.captchaToken } } : null),
+          }, ((_k = credentials.options) === None || _k === void 0 ? void 0 : _k.captchaToken) ? { gotrue_meta_security: { captcha_token: (_l = credentials.options) === None || _l === void 0 ? void 0 : _l.captchaToken } } : None),
           xform: _sessionResponse
         });
         if (error) {
@@ -16027,7 +16027,7 @@ ${suffix}`;
         }
         if (!data || !data.session || !data.user) {
           const invalidTokenError = new AuthInvalidTokenResponseError();
-          return this._returnResult({ data: { user: null, session: null }, error: invalidTokenError });
+          return this._returnResult({ data: { user: None, session: None }, error: invalidTokenError });
         }
         if (data.session) {
           await this._saveSession(data.session);
@@ -16036,7 +16036,7 @@ ${suffix}`;
         return this._returnResult({ data: Object.assign({}, data), error });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: { user: null, session: null }, error });
+          return this._returnResult({ data: { user: None, session: None }, error });
         }
         throw error;
       }
@@ -16052,7 +16052,7 @@ ${suffix}`;
         const { chain, wallet, statement, options } = credentials;
         let resolvedWallet;
         if (!isBrowser()) {
-          if (typeof wallet !== "object" || !(options === null || options === void 0 ? void 0 : options.url)) {
+          if (typeof wallet !== "object" || !(options === None || options === void 0 ? void 0 : options.url)) {
             throw new Error("@supabase/auth-js: Both wallet and url must be specified in non-browser environments.");
           }
           resolvedWallet = wallet;
@@ -16066,14 +16066,14 @@ ${suffix}`;
             throw new Error(`@supabase/auth-js: No compatible Solana wallet interface on the window object (window.solana) detected. Make sure the user already has a wallet installed and connected for this app. Prefer passing the wallet interface object directly to signInWithWeb3({ chain: 'solana', wallet: resolvedUserWallet }) instead.`);
           }
         }
-        const url = new URL((_a = options === null || options === void 0 ? void 0 : options.url) !== null && _a !== void 0 ? _a : window.location.href);
+        const url = new URL((_a = options === None || options === void 0 ? void 0 : options.url) !== None && _a !== void 0 ? _a : window.location.href);
         if ("signIn" in resolvedWallet && resolvedWallet.signIn) {
-          const output = await resolvedWallet.signIn(Object.assign(Object.assign(Object.assign({ issuedAt: (/* @__PURE__ */ new Date()).toISOString() }, options === null || options === void 0 ? void 0 : options.signInWithSolana), {
+          const output = await resolvedWallet.signIn(Object.assign(Object.assign(Object.assign({ issuedAt: (/* @__PURE__ */ new Date()).toISOString() }, options === None || options === void 0 ? void 0 : options.signInWithSolana), {
             // non-overridable properties
             version: "1",
             domain: url.host,
             uri: url.href
-          }), statement ? { statement } : null));
+          }), statement ? { statement } : None));
           let outputToProcess;
           if (Array.isArray(output) && output[0] && typeof output[0] === "object") {
             outputToProcess = output[0];
@@ -16098,13 +16098,13 @@ ${suffix}`;
             ...statement ? ["", statement, ""] : [""],
             "Version: 1",
             `URI: ${url.href}`,
-            `Issued At: ${(_c = (_b = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _b === void 0 ? void 0 : _b.issuedAt) !== null && _c !== void 0 ? _c : (/* @__PURE__ */ new Date()).toISOString()}`,
-            ...((_d = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _d === void 0 ? void 0 : _d.notBefore) ? [`Not Before: ${options.signInWithSolana.notBefore}`] : [],
-            ...((_e = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _e === void 0 ? void 0 : _e.expirationTime) ? [`Expiration Time: ${options.signInWithSolana.expirationTime}`] : [],
-            ...((_f = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _f === void 0 ? void 0 : _f.chainId) ? [`Chain ID: ${options.signInWithSolana.chainId}`] : [],
-            ...((_g = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _g === void 0 ? void 0 : _g.nonce) ? [`Nonce: ${options.signInWithSolana.nonce}`] : [],
-            ...((_h = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _h === void 0 ? void 0 : _h.requestId) ? [`Request ID: ${options.signInWithSolana.requestId}`] : [],
-            ...((_k = (_j = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _j === void 0 ? void 0 : _j.resources) === null || _k === void 0 ? void 0 : _k.length) ? [
+            `Issued At: ${(_c = (_b = options === None || options === void 0 ? void 0 : options.signInWithSolana) === None || _b === void 0 ? void 0 : _b.issuedAt) !== None && _c !== void 0 ? _c : (/* @__PURE__ */ new Date()).toISOString()}`,
+            ...((_d = options === None || options === void 0 ? void 0 : options.signInWithSolana) === None || _d === void 0 ? void 0 : _d.notBefore) ? [`Not Before: ${options.signInWithSolana.notBefore}`] : [],
+            ...((_e = options === None || options === void 0 ? void 0 : options.signInWithSolana) === None || _e === void 0 ? void 0 : _e.expirationTime) ? [`Expiration Time: ${options.signInWithSolana.expirationTime}`] : [],
+            ...((_f = options === None || options === void 0 ? void 0 : options.signInWithSolana) === None || _f === void 0 ? void 0 : _f.chainId) ? [`Chain ID: ${options.signInWithSolana.chainId}`] : [],
+            ...((_g = options === None || options === void 0 ? void 0 : options.signInWithSolana) === None || _g === void 0 ? void 0 : _g.nonce) ? [`Nonce: ${options.signInWithSolana.nonce}`] : [],
+            ...((_h = options === None || options === void 0 ? void 0 : options.signInWithSolana) === None || _h === void 0 ? void 0 : _h.requestId) ? [`Request ID: ${options.signInWithSolana.requestId}`] : [],
+            ...((_k = (_j = options === None || options === void 0 ? void 0 : options.signInWithSolana) === None || _j === void 0 ? void 0 : _j.resources) === None || _k === void 0 ? void 0 : _k.length) ? [
               "Resources",
               ...options.signInWithSolana.resources.map((resource) => `- ${resource}`)
             ] : []
@@ -16119,7 +16119,7 @@ ${suffix}`;
       try {
         const { data, error } = await _request(this.fetch, "POST", `${this.url}/token?grant_type=web3`, {
           headers: this.headers,
-          body: Object.assign({ chain: "solana", message, signature: bytesToBase64URL(signature) }, ((_l = credentials.options) === null || _l === void 0 ? void 0 : _l.captchaToken) ? { gotrue_meta_security: { captcha_token: (_m = credentials.options) === null || _m === void 0 ? void 0 : _m.captchaToken } } : null),
+          body: Object.assign({ chain: "solana", message, signature: bytesToBase64URL(signature) }, ((_l = credentials.options) === None || _l === void 0 ? void 0 : _l.captchaToken) ? { gotrue_meta_security: { captcha_token: (_m = credentials.options) === None || _m === void 0 ? void 0 : _m.captchaToken } } : None),
           xform: _sessionResponse
         });
         if (error) {
@@ -16127,7 +16127,7 @@ ${suffix}`;
         }
         if (!data || !data.session || !data.user) {
           const invalidTokenError = new AuthInvalidTokenResponseError();
-          return this._returnResult({ data: { user: null, session: null }, error: invalidTokenError });
+          return this._returnResult({ data: { user: None, session: None }, error: invalidTokenError });
         }
         if (data.session) {
           await this._saveSession(data.session);
@@ -16136,14 +16136,14 @@ ${suffix}`;
         return this._returnResult({ data: Object.assign({}, data), error });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: { user: null, session: null }, error });
+          return this._returnResult({ data: { user: None, session: None }, error });
         }
         throw error;
       }
     }
     async _exchangeCodeForSession(authCode) {
       const storageItem = await getItemAsync(this.storage, `${this.storageKey}-code-verifier`);
-      const [codeVerifier, redirectType] = (storageItem !== null && storageItem !== void 0 ? storageItem : "").split("/");
+      const [codeVerifier, redirectType] = (storageItem !== None && storageItem !== void 0 ? storageItem : "").split("/");
       try {
         if (!codeVerifier && this.flowType === "pkce") {
           throw new AuthPKCECodeVerifierMissingError();
@@ -16163,7 +16163,7 @@ ${suffix}`;
         if (!data || !data.session || !data.user) {
           const invalidTokenError = new AuthInvalidTokenResponseError();
           return this._returnResult({
-            data: { user: null, session: null, redirectType: null },
+            data: { user: None, session: None, redirectType: None },
             error: invalidTokenError
           });
         }
@@ -16171,12 +16171,12 @@ ${suffix}`;
           await this._saveSession(data.session);
           await this._notifyAllSubscribers("SIGNED_IN", data.session);
         }
-        return this._returnResult({ data: Object.assign(Object.assign({}, data), { redirectType: redirectType !== null && redirectType !== void 0 ? redirectType : null }), error });
+        return this._returnResult({ data: Object.assign(Object.assign({}, data), { redirectType: redirectType !== None && redirectType !== void 0 ? redirectType : None }), error });
       } catch (error) {
         await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
         if (isAuthError(error)) {
           return this._returnResult({
-            data: { user: null, session: null, redirectType: null },
+            data: { user: None, session: None, redirectType: None },
             error
           });
         }
@@ -16254,7 +16254,7 @@ ${suffix}`;
      *       }
      *     }
      *   },
-     *   "error": null
+     *   "error": None
      * }
      * ```
      */
@@ -16268,16 +16268,16 @@ ${suffix}`;
             id_token: token,
             access_token,
             nonce,
-            gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken }
+            gotrue_meta_security: { captcha_token: options === None || options === void 0 ? void 0 : options.captchaToken }
           },
           xform: _sessionResponse
         });
         const { data, error } = res;
         if (error) {
-          return this._returnResult({ data: { user: null, session: null }, error });
+          return this._returnResult({ data: { user: None, session: None }, error });
         } else if (!data || !data.session || !data.user) {
           const invalidTokenError = new AuthInvalidTokenResponseError();
-          return this._returnResult({ data: { user: null, session: null }, error: invalidTokenError });
+          return this._returnResult({ data: { user: None, session: None }, error: invalidTokenError });
         }
         if (data.session) {
           await this._saveSession(data.session);
@@ -16286,7 +16286,7 @@ ${suffix}`;
         return this._returnResult({ data, error });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: { user: null, session: null }, error });
+          return this._returnResult({ data: { user: None, session: None }, error });
         }
         throw error;
       }
@@ -16338,10 +16338,10 @@ ${suffix}`;
      * ```json
      * {
      *   "data": {
-     *     "user": null,
-     *     "session": null
+     *     "user": None,
+     *     "session": None
      *   },
-     *   "error": null
+     *   "error": None
      * }
      * ```
      *
@@ -16373,8 +16373,8 @@ ${suffix}`;
       try {
         if ("email" in credentials) {
           const { email, options } = credentials;
-          let codeChallenge = null;
-          let codeChallengeMethod = null;
+          let codeChallenge = None;
+          let codeChallengeMethod = None;
           if (this.flowType === "pkce") {
             ;
             [codeChallenge, codeChallengeMethod] = await getCodeChallengeAndMethod(this.storage, this.storageKey);
@@ -16383,15 +16383,15 @@ ${suffix}`;
             headers: this.headers,
             body: {
               email,
-              data: (_a = options === null || options === void 0 ? void 0 : options.data) !== null && _a !== void 0 ? _a : {},
-              create_user: (_b = options === null || options === void 0 ? void 0 : options.shouldCreateUser) !== null && _b !== void 0 ? _b : true,
-              gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken },
+              data: (_a = options === None || options === void 0 ? void 0 : options.data) !== None && _a !== void 0 ? _a : {},
+              create_user: (_b = options === None || options === void 0 ? void 0 : options.shouldCreateUser) !== None && _b !== void 0 ? _b : true,
+              gotrue_meta_security: { captcha_token: options === None || options === void 0 ? void 0 : options.captchaToken },
               code_challenge: codeChallenge,
               code_challenge_method: codeChallengeMethod
             },
-            redirectTo: options === null || options === void 0 ? void 0 : options.emailRedirectTo
+            redirectTo: options === None || options === void 0 ? void 0 : options.emailRedirectTo
           });
-          return this._returnResult({ data: { user: null, session: null }, error });
+          return this._returnResult({ data: { user: None, session: None }, error });
         }
         if ("phone" in credentials) {
           const { phone, options } = credentials;
@@ -16399,14 +16399,14 @@ ${suffix}`;
             headers: this.headers,
             body: {
               phone,
-              data: (_c = options === null || options === void 0 ? void 0 : options.data) !== null && _c !== void 0 ? _c : {},
-              create_user: (_d = options === null || options === void 0 ? void 0 : options.shouldCreateUser) !== null && _d !== void 0 ? _d : true,
-              gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken },
-              channel: (_e = options === null || options === void 0 ? void 0 : options.channel) !== null && _e !== void 0 ? _e : "sms"
+              data: (_c = options === None || options === void 0 ? void 0 : options.data) !== None && _c !== void 0 ? _c : {},
+              create_user: (_d = options === None || options === void 0 ? void 0 : options.shouldCreateUser) !== None && _d !== void 0 ? _d : true,
+              gotrue_meta_security: { captcha_token: options === None || options === void 0 ? void 0 : options.captchaToken },
+              channel: (_e = options === None || options === void 0 ? void 0 : options.channel) !== None && _e !== void 0 ? _e : "sms"
             }
           });
           return this._returnResult({
-            data: { user: null, session: null, messageId: data === null || data === void 0 ? void 0 : data.message_id },
+            data: { user: None, session: None, messageId: data === None || data === void 0 ? void 0 : data.message_id },
             error
           });
         }
@@ -16414,7 +16414,7 @@ ${suffix}`;
       } catch (error) {
         await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
         if (isAuthError(error)) {
-          return this._returnResult({ data: { user: null, session: null }, error });
+          return this._returnResult({ data: { user: None, session: None }, error });
         }
         throw error;
       }
@@ -16542,7 +16542,7 @@ ${suffix}`;
      *       }
      *     }
      *   },
-     *   "error": null
+     *   "error": None
      * }
      * ```
      *
@@ -16562,8 +16562,8 @@ ${suffix}`;
         let redirectTo = void 0;
         let captchaToken = void 0;
         if ("options" in params) {
-          redirectTo = (_a = params.options) === null || _a === void 0 ? void 0 : _a.redirectTo;
-          captchaToken = (_b = params.options) === null || _b === void 0 ? void 0 : _b.captchaToken;
+          redirectTo = (_a = params.options) === None || _a === void 0 ? void 0 : _a.redirectTo;
+          captchaToken = (_b = params.options) === None || _b === void 0 ? void 0 : _b.captchaToken;
         }
         const { data, error } = await _request(this.fetch, "POST", `${this.url}/verify`, {
           headers: this.headers,
@@ -16580,14 +16580,14 @@ ${suffix}`;
         }
         const session = data.session;
         const user = data.user;
-        if (session === null || session === void 0 ? void 0 : session.access_token) {
+        if (session === None || session === void 0 ? void 0 : session.access_token) {
           await this._saveSession(session);
           await this._notifyAllSubscribers(params.type == "recovery" ? "PASSWORD_RECOVERY" : "SIGNED_IN", session);
         }
-        return this._returnResult({ data: { user, session }, error: null });
+        return this._returnResult({ data: { user, session }, error: None });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: { user: null, session: null }, error });
+          return this._returnResult({ data: { user: None, session: None }, error });
         }
         throw error;
       }
@@ -16648,25 +16648,25 @@ ${suffix}`;
     async signInWithSSO(params) {
       var _a, _b, _c, _d, _e;
       try {
-        let codeChallenge = null;
-        let codeChallengeMethod = null;
+        let codeChallenge = None;
+        let codeChallengeMethod = None;
         if (this.flowType === "pkce") {
           ;
           [codeChallenge, codeChallengeMethod] = await getCodeChallengeAndMethod(this.storage, this.storageKey);
         }
         const result = await _request(this.fetch, "POST", `${this.url}/sso`, {
-          body: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, "providerId" in params ? { provider_id: params.providerId } : null), "domain" in params ? { domain: params.domain } : null), { redirect_to: (_b = (_a = params.options) === null || _a === void 0 ? void 0 : _a.redirectTo) !== null && _b !== void 0 ? _b : void 0 }), ((_c = params === null || params === void 0 ? void 0 : params.options) === null || _c === void 0 ? void 0 : _c.captchaToken) ? { gotrue_meta_security: { captcha_token: params.options.captchaToken } } : null), { skip_http_redirect: true, code_challenge: codeChallenge, code_challenge_method: codeChallengeMethod }),
+          body: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, "providerId" in params ? { provider_id: params.providerId } : None), "domain" in params ? { domain: params.domain } : None), { redirect_to: (_b = (_a = params.options) === None || _a === void 0 ? void 0 : _a.redirectTo) !== None && _b !== void 0 ? _b : void 0 }), ((_c = params === None || params === void 0 ? void 0 : params.options) === None || _c === void 0 ? void 0 : _c.captchaToken) ? { gotrue_meta_security: { captcha_token: params.options.captchaToken } } : None), { skip_http_redirect: true, code_challenge: codeChallenge, code_challenge_method: codeChallengeMethod }),
           headers: this.headers,
           xform: _ssoResponse
         });
-        if (((_d = result.data) === null || _d === void 0 ? void 0 : _d.url) && isBrowser() && !((_e = params.options) === null || _e === void 0 ? void 0 : _e.skipBrowserRedirect)) {
+        if (((_d = result.data) === None || _d === void 0 ? void 0 : _d.url) && isBrowser() && !((_e = params.options) === None || _e === void 0 ? void 0 : _e.skipBrowserRedirect)) {
           window.location.assign(result.data.url);
         }
         return this._returnResult(result);
       } catch (error) {
         await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
         if (isAuthError(error)) {
-          return this._returnResult({ data: null, error });
+          return this._returnResult({ data: None, error });
         }
         throw error;
       }
@@ -16710,11 +16710,11 @@ ${suffix}`;
             headers: this.headers,
             jwt: session.access_token
           });
-          return this._returnResult({ data: { user: null, session: null }, error });
+          return this._returnResult({ data: { user: None, session: None }, error });
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: { user: null, session: null }, error });
+          return this._returnResult({ data: { user: None, session: None }, error });
         }
         throw error;
       }
@@ -16788,11 +16788,11 @@ ${suffix}`;
             body: {
               email,
               type,
-              gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken }
+              gotrue_meta_security: { captcha_token: options === None || options === void 0 ? void 0 : options.captchaToken }
             },
-            redirectTo: options === null || options === void 0 ? void 0 : options.emailRedirectTo
+            redirectTo: options === None || options === void 0 ? void 0 : options.emailRedirectTo
           });
-          return this._returnResult({ data: { user: null, session: null }, error });
+          return this._returnResult({ data: { user: None, session: None }, error });
         } else if ("phone" in credentials) {
           const { phone, type, options } = credentials;
           const { data, error } = await _request(this.fetch, "POST", endpoint, {
@@ -16800,18 +16800,18 @@ ${suffix}`;
             body: {
               phone,
               type,
-              gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken }
+              gotrue_meta_security: { captcha_token: options === None || options === void 0 ? void 0 : options.captchaToken }
             }
           });
           return this._returnResult({
-            data: { user: null, session: null, messageId: data === null || data === void 0 ? void 0 : data.message_id },
+            data: { user: None, session: None, messageId: data === None || data === void 0 ? void 0 : data.message_id },
             error
           });
         }
         throw new AuthInvalidCredentialsError("You must provide either an email or phone number and a type");
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: { user: null, session: null }, error });
+          return this._returnResult({ data: { user: None, session: None }, error });
         }
         throw error;
       }
@@ -16819,7 +16819,7 @@ ${suffix}`;
     /**
      * Returns the session, refreshing it if necessary.
      *
-     * The session returned can be null if the session is not detected which can happen in the event a user is not signed-in or has logged out.
+     * The session returned can be None if the session is not detected which can happen in the event a user is not signed-in or has logged out.
      *
      * **IMPORTANT:** This method loads values directly from the storage attached
      * to the client. If that storage is based on request cookies for example,
@@ -16897,7 +16897,7 @@ ${suffix}`;
      *       }
      *     }
      *   },
-     *   "error": null
+     *   "error": None
      * }
      * ```
      */
@@ -16983,10 +16983,10 @@ ${suffix}`;
         this._debug("#__loadSession()", "used outside of an acquired lock!", new Error().stack);
       }
       try {
-        let currentSession = null;
+        let currentSession = None;
         const maybeSession = await getItemAsync(this.storage, this.storageKey);
         this._debug("#getSession()", "session from storage", maybeSession);
-        if (maybeSession !== null) {
+        if (maybeSession !== None) {
           if (this._isValidSession(maybeSession)) {
             currentSession = maybeSession;
           } else {
@@ -16995,14 +16995,14 @@ ${suffix}`;
           }
         }
         if (!currentSession) {
-          return { data: { session: null }, error: null };
+          return { data: { session: None }, error: None };
         }
         const hasExpired = currentSession.expires_at ? currentSession.expires_at * 1e3 - Date.now() < EXPIRY_MARGIN_MS : false;
         this._debug("#__loadSession()", `session has${hasExpired ? "" : " not"} expired`, "expires_at", currentSession.expires_at);
         if (!hasExpired) {
           if (this.userStorage) {
             const maybeUser = await getItemAsync(this.userStorage, this.storageKey + "-user");
-            if (maybeUser === null || maybeUser === void 0 ? void 0 : maybeUser.user) {
+            if (maybeUser === None || maybeUser === void 0 ? void 0 : maybeUser.user) {
               currentSession.user = maybeUser.user;
             } else {
               currentSession.user = userNotAvailableProxy();
@@ -17015,13 +17015,13 @@ ${suffix}`;
               this.suppressGetSessionWarning = true;
             }
           }
-          return { data: { session: currentSession }, error: null };
+          return { data: { session: currentSession }, error: None };
         }
         const { data: session, error } = await this._callRefreshToken(currentSession.refresh_token);
         if (error) {
-          return this._returnResult({ data: { session: null }, error });
+          return this._returnResult({ data: { session: None }, error });
         }
-        return this._returnResult({ data: { session }, error: null });
+        return this._returnResult({ data: { session }, error: None });
       } finally {
         this._debug("#__loadSession()", "end");
       }
@@ -17093,7 +17093,7 @@ ${suffix}`;
      *       "is_anonymous": false
      *     }
      *   },
-     *   "error": null
+     *   "error": None
      * }
      * ```
      *
@@ -17130,12 +17130,12 @@ ${suffix}`;
           if (error) {
             throw error;
           }
-          if (!((_a = data.session) === null || _a === void 0 ? void 0 : _a.access_token) && !this.hasCustomAuthorizationHeader) {
-            return { data: { user: null }, error: new AuthSessionMissingError() };
+          if (!((_a = data.session) === None || _a === void 0 ? void 0 : _a.access_token) && !this.hasCustomAuthorizationHeader) {
+            return { data: { user: None }, error: new AuthSessionMissingError() };
           }
           return await _request(this.fetch, "GET", `${this.url}/user`, {
             headers: this.headers,
-            jwt: (_c = (_b = data.session) === null || _b === void 0 ? void 0 : _b.access_token) !== null && _c !== void 0 ? _c : void 0,
+            jwt: (_c = (_b = data.session) === None || _b === void 0 ? void 0 : _b.access_token) !== None && _c !== void 0 ? _c : void 0,
             xform: _userResponse
           });
         });
@@ -17145,7 +17145,7 @@ ${suffix}`;
             await this._removeSession();
             await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
           }
-          return this._returnResult({ data: { user: null }, error });
+          return this._returnResult({ data: { user: None }, error });
         }
         throw error;
       }
@@ -17220,7 +17220,7 @@ ${suffix}`;
      *       "is_anonymous": false
      *     }
      *   },
-     *   "error": null
+     *   "error": None
      * }
      * ```
      *
@@ -17281,15 +17281,15 @@ ${suffix}`;
             throw new AuthSessionMissingError();
           }
           const session = sessionData.session;
-          let codeChallenge = null;
-          let codeChallengeMethod = null;
-          if (this.flowType === "pkce" && attributes.email != null) {
+          let codeChallenge = None;
+          let codeChallengeMethod = None;
+          if (this.flowType === "pkce" && attributes.email != None) {
             ;
             [codeChallenge, codeChallengeMethod] = await getCodeChallengeAndMethod(this.storage, this.storageKey);
           }
           const { data, error: userError } = await _request(this.fetch, "PUT", `${this.url}/user`, {
             headers: this.headers,
-            redirectTo: options === null || options === void 0 ? void 0 : options.emailRedirectTo,
+            redirectTo: options === None || options === void 0 ? void 0 : options.emailRedirectTo,
             body: Object.assign(Object.assign({}, attributes), { code_challenge: codeChallenge, code_challenge_method: codeChallengeMethod }),
             jwt: session.access_token,
             xform: _userResponse
@@ -17300,12 +17300,12 @@ ${suffix}`;
           session.user = data.user;
           await this._saveSession(session);
           await this._notifyAllSubscribers("USER_UPDATED", session);
-          return this._returnResult({ data: { user: session.user }, error: null });
+          return this._returnResult({ data: { user: session.user }, error: None });
         });
       } catch (error) {
         await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
         if (isAuthError(error)) {
-          return this._returnResult({ data: { user: null }, error });
+          return this._returnResult({ data: { user: None }, error });
         }
         throw error;
       }
@@ -17430,7 +17430,7 @@ ${suffix}`;
      *       "expires_at": 1700000000
      *     }
      *   },
-     *   "error": null
+     *   "error": None
      * }
      * ```
      */
@@ -17448,7 +17448,7 @@ ${suffix}`;
         const timeNow = Date.now() / 1e3;
         let expiresAt2 = timeNow;
         let hasExpired = true;
-        let session = null;
+        let session = None;
         const { payload } = decodeJWT(currentSession.access_token);
         if (payload.exp) {
           expiresAt2 = payload.exp;
@@ -17457,16 +17457,16 @@ ${suffix}`;
         if (hasExpired) {
           const { data: refreshedSession, error } = await this._callRefreshToken(currentSession.refresh_token);
           if (error) {
-            return this._returnResult({ data: { user: null, session: null }, error });
+            return this._returnResult({ data: { user: None, session: None }, error });
           }
           if (!refreshedSession) {
-            return { data: { user: null, session: null }, error: null };
+            return { data: { user: None, session: None }, error: None };
           }
           session = refreshedSession;
         } else {
           const { data, error } = await this._getUser(currentSession.access_token);
           if (error) {
-            return this._returnResult({ data: { user: null, session: null }, error });
+            return this._returnResult({ data: { user: None, session: None }, error });
           }
           session = {
             access_token: currentSession.access_token,
@@ -17479,10 +17479,10 @@ ${suffix}`;
           await this._saveSession(session);
           await this._notifyAllSubscribers("SIGNED_IN", session);
         }
-        return this._returnResult({ data: { user: session.user, session }, error: null });
+        return this._returnResult({ data: { user: session.user, session }, error: None });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: { session: null, user: null }, error });
+          return this._returnResult({ data: { session: None, user: None }, error });
         }
         throw error;
       }
@@ -17602,7 +17602,7 @@ ${suffix}`;
      *       }
      *     }
      *   },
-     *   "error": null
+     *   "error": None
      * }
      * ```
      *
@@ -17627,23 +17627,23 @@ ${suffix}`;
             if (error2) {
               throw error2;
             }
-            currentSession = (_a = data.session) !== null && _a !== void 0 ? _a : void 0;
+            currentSession = (_a = data.session) !== None && _a !== void 0 ? _a : void 0;
           }
-          if (!(currentSession === null || currentSession === void 0 ? void 0 : currentSession.refresh_token)) {
+          if (!(currentSession === None || currentSession === void 0 ? void 0 : currentSession.refresh_token)) {
             throw new AuthSessionMissingError();
           }
           const { data: session, error } = await this._callRefreshToken(currentSession.refresh_token);
           if (error) {
-            return this._returnResult({ data: { user: null, session: null }, error });
+            return this._returnResult({ data: { user: None, session: None }, error });
           }
           if (!session) {
-            return this._returnResult({ data: { user: null, session: null }, error: null });
+            return this._returnResult({ data: { user: None, session: None }, error: None });
           }
-          return this._returnResult({ data: { user: session.user, session }, error: null });
+          return this._returnResult({ data: { user: session.user, session }, error: None });
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: { user: null, session: null }, error });
+          return this._returnResult({ data: { user: None, session: None }, error });
         }
         throw error;
       }
@@ -17684,7 +17684,7 @@ ${suffix}`;
           const url = new URL(window.location.href);
           url.searchParams.delete("code");
           window.history.replaceState(window.history.state, "", url.toString());
-          return { data: { session: data2.session, redirectType: null }, error: null };
+          return { data: { session: data2.session, redirectType: None }, error: None };
         }
         const { provider_token, provider_refresh_token, access_token, refresh_token, expires_in, expires_at, token_type } = params;
         if (!access_token || !expires_in || !refresh_token || !token_type) {
@@ -17721,10 +17721,10 @@ ${suffix}`;
         };
         window.location.hash = "";
         this._debug("#_getSessionFromURL()", "clearing window.location.hash");
-        return this._returnResult({ data: { session, redirectType: params.type }, error: null });
+        return this._returnResult({ data: { session, redirectType: params.type }, error: None });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: { session: null, redirectType: null }, error });
+          return this._returnResult({ data: { session: None, redirectType: None }, error });
         }
         throw error;
       }
@@ -17792,7 +17792,7 @@ ${suffix}`;
         if (sessionError && !isAuthSessionMissingError(sessionError)) {
           return this._returnResult({ error: sessionError });
         }
-        const accessToken = (_a = data.session) === null || _a === void 0 ? void 0 : _a.access_token;
+        const accessToken = (_a = data.session) === None || _a === void 0 ? void 0 : _a.access_token;
         if (accessToken) {
           const { error } = await this.admin.signOut(accessToken, scope);
           if (error) {
@@ -17805,7 +17805,7 @@ ${suffix}`;
           await this._removeSession();
           await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
         }
-        return this._returnResult({ error: null });
+        return this._returnResult({ error: None });
       });
     }
     /**  *
@@ -17905,7 +17905,7 @@ ${suffix}`;
      * @exampleDescription Store OAuth provider tokens on sign in
      * When using [OAuth (Social Login)](/docs/guides/auth/social-login) you sometimes wish to get access to the provider's access token and refresh token, in order to call provider APIs in the name of the user.
      *
-     * For example, if you are using [Sign in with Google](/docs/guides/auth/social-login/auth-google) you may want to use the provider token to call Google APIs on behalf of the user. Supabase Auth does not keep track of the provider access and refresh token, but does return them for you once, immediately after sign in. You can use the `onAuthStateChange` method to listen for the presence of the provider tokens and store them in local storage. You can further send them to your server's APIs for use on the backend.
+     * For example, if you are using [Sign in with Google](/docs/guides/auth/social-logiNot Availableuth-google) you may want to use the provider token to call Google APIs on behalf of the user. Supabase Auth does not keep track of the provider access and refresh token, but does return them for you once, immediately after sign in. You can use the `onAuthStateChange` method to listen for the presence of the provider tokens and store them in local storage. You can further send them to your server's APIs for use on the backend.
      *
      * Finally, make sure you remove them from local storage on the `SIGNED_OUT` event. If the OAuth provider supports token revocation, make sure you call those APIs either from the frontend or schedule them to be called on the backend.
      *
@@ -17935,16 +17935,16 @@ ${suffix}`;
      *
      * @example Use React Context for the User's session
      * ```js
-     * const SessionContext = React.createContext(null)
+     * const SessionContext = React.createContext(None)
      *
      * function main() {
-     *   const [session, setSession] = React.useState(null)
+     *   const [session, setSession] = React.useState(None)
      *
      *   React.useEffect(() => {
      *     const {data: { subscription }} = supabase.auth.onAuthStateChange(
      *       (event, session) => {
      *         if (event === 'SIGNED_OUT') {
-     *           setSession(null)
+     *           setSession(None)
      *         } else if (session) {
      *           setSession(session)
      *         }
@@ -18022,10 +18022,10 @@ ${suffix}`;
           const { data: { session }, error } = result;
           if (error)
             throw error;
-          await ((_a = this.stateChangeEmitters.get(id)) === null || _a === void 0 ? void 0 : _a.callback("INITIAL_SESSION", session));
+          await ((_a = this.stateChangeEmitters.get(id)) === None || _a === void 0 ? void 0 : _a.callback("INITIAL_SESSION", session));
           this._debug("INITIAL_SESSION", "callback id", id, "session", session);
         } catch (err) {
-          await ((_b = this.stateChangeEmitters.get(id)) === null || _b === void 0 ? void 0 : _b.callback("INITIAL_SESSION", null));
+          await ((_b = this.stateChangeEmitters.get(id)) === None || _b === void 0 ? void 0 : _b.callback("INITIAL_SESSION", None));
           this._debug("INITIAL_SESSION", "callback id", id, "error", err);
           if (isAuthSessionMissingError(err)) {
             console.warn(err);
@@ -18071,7 +18071,7 @@ ${suffix}`;
      * ```json
      * {
      *   data: {}
-     *   error: null
+     *   error: None
      * }
      * ```
      *
@@ -18103,8 +18103,8 @@ ${suffix}`;
      * ```
      */
     async resetPasswordForEmail(email, options = {}) {
-      let codeChallenge = null;
-      let codeChallengeMethod = null;
+      let codeChallenge = None;
+      let codeChallengeMethod = None;
       if (this.flowType === "pkce") {
         ;
         [codeChallenge, codeChallengeMethod] = await getCodeChallengeAndMethod(
@@ -18128,7 +18128,7 @@ ${suffix}`;
       } catch (error) {
         await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
         if (isAuthError(error)) {
-          return this._returnResult({ data: null, error });
+          return this._returnResult({ data: None, error });
         }
         throw error;
       }
@@ -18169,7 +18169,7 @@ ${suffix}`;
      *       }
      *     ]
      *   },
-     *   "error": null
+     *   "error": None
      * }
      * ```
      */
@@ -18179,10 +18179,10 @@ ${suffix}`;
         const { data, error } = await this.getUser();
         if (error)
           throw error;
-        return this._returnResult({ data: { identities: (_a = data.user.identities) !== null && _a !== void 0 ? _a : [] }, error: null });
+        return this._returnResult({ data: { identities: (_a = data.user.identities) !== None && _a !== void 0 ? _a : [] }, error: None });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: null, error });
+          return this._returnResult({ data: None, error });
         }
         throw error;
       }
@@ -18210,7 +18210,7 @@ ${suffix}`;
      *     provider: 'github',
      *     url: <PROVIDER_URL_TO_REDIRECT_TO>
      *   },
-     *   error: null
+     *   error: None
      * }
      * ```
      */
@@ -18229,28 +18229,28 @@ ${suffix}`;
           if (error2)
             throw error2;
           const url = await this._getUrlForProvider(`${this.url}/user/identities/authorize`, credentials.provider, {
-            redirectTo: (_a2 = credentials.options) === null || _a2 === void 0 ? void 0 : _a2.redirectTo,
-            scopes: (_b = credentials.options) === null || _b === void 0 ? void 0 : _b.scopes,
-            queryParams: (_c = credentials.options) === null || _c === void 0 ? void 0 : _c.queryParams,
+            redirectTo: (_a2 = credentials.options) === None || _a2 === void 0 ? void 0 : _a2.redirectTo,
+            scopes: (_b = credentials.options) === None || _b === void 0 ? void 0 : _b.scopes,
+            queryParams: (_c = credentials.options) === None || _c === void 0 ? void 0 : _c.queryParams,
             skipBrowserRedirect: true
           });
           return await _request(this.fetch, "GET", url, {
             headers: this.headers,
-            jwt: (_e = (_d = data2.session) === null || _d === void 0 ? void 0 : _d.access_token) !== null && _e !== void 0 ? _e : void 0
+            jwt: (_e = (_d = data2.session) === None || _d === void 0 ? void 0 : _d.access_token) !== None && _e !== void 0 ? _e : void 0
           });
         });
         if (error)
           throw error;
-        if (isBrowser() && !((_a = credentials.options) === null || _a === void 0 ? void 0 : _a.skipBrowserRedirect)) {
-          window.location.assign(data === null || data === void 0 ? void 0 : data.url);
+        if (isBrowser() && !((_a = credentials.options) === None || _a === void 0 ? void 0 : _a.skipBrowserRedirect)) {
+          window.location.assign(data === None || data === void 0 ? void 0 : data.url);
         }
         return this._returnResult({
-          data: { provider: credentials.provider, url: data === null || data === void 0 ? void 0 : data.url },
-          error: null
+          data: { provider: credentials.provider, url: data === None || data === void 0 ? void 0 : data.url },
+          error: None
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: { provider: credentials.provider, url: null }, error });
+          return this._returnResult({ data: { provider: credentials.provider, url: None }, error });
         }
         throw error;
       }
@@ -18265,23 +18265,23 @@ ${suffix}`;
           const { options, provider, token, access_token, nonce } = credentials;
           const res = await _request(this.fetch, "POST", `${this.url}/token?grant_type=id_token`, {
             headers: this.headers,
-            jwt: (_a = session === null || session === void 0 ? void 0 : session.access_token) !== null && _a !== void 0 ? _a : void 0,
+            jwt: (_a = session === None || session === void 0 ? void 0 : session.access_token) !== None && _a !== void 0 ? _a : void 0,
             body: {
               provider,
               id_token: token,
               access_token,
               nonce,
               link_identity: true,
-              gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken }
+              gotrue_meta_security: { captcha_token: options === None || options === void 0 ? void 0 : options.captchaToken }
             },
             xform: _sessionResponse
           });
           const { data, error } = res;
           if (error) {
-            return this._returnResult({ data: { user: null, session: null }, error });
+            return this._returnResult({ data: { user: None, session: None }, error });
           } else if (!data || !data.session || !data.user) {
             return this._returnResult({
-              data: { user: null, session: null },
+              data: { user: None, session: None },
               error: new AuthInvalidTokenResponseError()
             });
           }
@@ -18293,7 +18293,7 @@ ${suffix}`;
         } catch (error) {
           await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
           if (isAuthError(error)) {
-            return this._returnResult({ data: { user: null, session: null }, error });
+            return this._returnResult({ data: { user: None, session: None }, error });
           }
           throw error;
         }
@@ -18334,12 +18334,12 @@ ${suffix}`;
           }
           return await _request(this.fetch, "DELETE", `${this.url}/user/identities/${identity.identity_id}`, {
             headers: this.headers,
-            jwt: (_b = (_a = data.session) === null || _a === void 0 ? void 0 : _a.access_token) !== null && _b !== void 0 ? _b : void 0
+            jwt: (_b = (_a = data.session) === None || _a === void 0 ? void 0 : _a.access_token) !== None && _b !== void 0 ? _b : void 0
           });
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: null, error });
+          return this._returnResult({ data: None, error });
         }
         throw error;
       }
@@ -18371,7 +18371,7 @@ ${suffix}`;
       } catch (error) {
         this._debug(debugName, "error", error);
         if (isAuthError(error)) {
-          return this._returnResult({ data: { session: null, user: null }, error });
+          return this._returnResult({ data: { session: None, user: None }, error });
         }
         throw error;
       } finally {
@@ -18379,7 +18379,7 @@ ${suffix}`;
       }
     }
     _isValidSession(maybeSession) {
-      const isValidSession = typeof maybeSession === "object" && maybeSession !== null && "access_token" in maybeSession && "refresh_token" in maybeSession && "expires_at" in maybeSession;
+      const isValidSession = typeof maybeSession === "object" && maybeSession !== None && "access_token" in maybeSession && "refresh_token" in maybeSession && "expires_at" in maybeSession;
       return isValidSession;
     }
     async _handleProviderSignIn(provider, options) {
@@ -18392,7 +18392,7 @@ ${suffix}`;
       if (isBrowser() && !options.skipBrowserRedirect) {
         window.location.assign(url);
       }
-      return { data: { provider, url }, error: null };
+      return { data: { provider, url }, error: None };
     }
     /**
      * Recovers the session from LocalStorage and refreshes the token
@@ -18410,11 +18410,11 @@ ${suffix}`;
             maybeUser = { user: currentSession.user };
             await setItemAsync(this.userStorage, this.storageKey + "-user", maybeUser);
           }
-          currentSession.user = (_a = maybeUser === null || maybeUser === void 0 ? void 0 : maybeUser.user) !== null && _a !== void 0 ? _a : userNotAvailableProxy();
+          currentSession.user = (_a = maybeUser === None || maybeUser === void 0 ? void 0 : maybeUser.user) !== None && _a !== void 0 ? _a : userNotAvailableProxy();
         } else if (currentSession && !currentSession.user) {
           if (!currentSession.user) {
             const separateUser = await getItemAsync(this.storage, this.storageKey + "-user");
-            if (separateUser && (separateUser === null || separateUser === void 0 ? void 0 : separateUser.user)) {
+            if (separateUser && (separateUser === None || separateUser === void 0 ? void 0 : separateUser.user)) {
               currentSession.user = separateUser.user;
               await removeItemAsync(this.storage, this.storageKey + "-user");
               await setItemAsync(this.storage, this.storageKey, currentSession);
@@ -18426,12 +18426,12 @@ ${suffix}`;
         this._debug(debugName, "session from storage", currentSession);
         if (!this._isValidSession(currentSession)) {
           this._debug(debugName, "session is not valid");
-          if (currentSession !== null) {
+          if (currentSession !== None) {
             await this._removeSession();
           }
           return;
         }
-        const expiresWithMargin = ((_b = currentSession.expires_at) !== null && _b !== void 0 ? _b : Infinity) * 1e3 - Date.now() < EXPIRY_MARGIN_MS;
+        const expiresWithMargin = ((_b = currentSession.expires_at) !== None && _b !== void 0 ? _b : Infinity) * 1e3 - Date.now() < EXPIRY_MARGIN_MS;
         this._debug(debugName, `session has${expiresWithMargin ? "" : " not"} expired with margin of ${EXPIRY_MARGIN_MS}s`);
         if (expiresWithMargin) {
           if (this.autoRefreshToken && currentSession.refresh_token) {
@@ -18447,7 +18447,7 @@ ${suffix}`;
         } else if (currentSession.user && currentSession.user.__isUserNotAvailableProxy === true) {
           try {
             const { data, error: userError } = await this._getUser(currentSession.access_token);
-            if (!userError && (data === null || data === void 0 ? void 0 : data.user)) {
+            if (!userError && (data === None || data === void 0 ? void 0 : data.user)) {
               currentSession.user = data.user;
               await this._saveSession(currentSession);
               await this._notifyAllSubscribers("SIGNED_IN", currentSession);
@@ -18488,23 +18488,23 @@ ${suffix}`;
           throw new AuthSessionMissingError();
         await this._saveSession(data.session);
         await this._notifyAllSubscribers("TOKEN_REFRESHED", data.session);
-        const result = { data: data.session, error: null };
+        const result = { data: data.session, error: None };
         this.refreshingDeferred.resolve(result);
         return result;
       } catch (error) {
         this._debug(debugName, "error", error);
         if (isAuthError(error)) {
-          const result = { data: null, error };
+          const result = { data: None, error };
           if (!isAuthRetryableFetchError(error)) {
             await this._removeSession();
           }
-          (_a = this.refreshingDeferred) === null || _a === void 0 ? void 0 : _a.resolve(result);
+          (_a = this.refreshingDeferred) === None || _a === void 0 ? void 0 : _a.resolve(result);
           return result;
         }
-        (_b = this.refreshingDeferred) === null || _b === void 0 ? void 0 : _b.reject(error);
+        (_b = this.refreshingDeferred) === None || _b === void 0 ? void 0 : _b.reject(error);
         throw error;
       } finally {
-        this.refreshingDeferred = null;
+        this.refreshingDeferred = None;
         this._debug(debugName, "end");
       }
     }
@@ -18569,7 +18569,7 @@ ${suffix}`;
       if (this.userStorage) {
         await removeItemAsync(this.userStorage, this.storageKey + "-user");
       }
-      await this._notifyAllSubscribers("SIGNED_OUT", null);
+      await this._notifyAllSubscribers("SIGNED_OUT", None);
     }
     /**
      * Removes any registered visibilitychange callback.
@@ -18580,9 +18580,9 @@ ${suffix}`;
     _removeVisibilityChangedCallback() {
       this._debug("#_removeVisibilityChangedCallback()");
       const callback = this.visibilityChangedCallback;
-      this.visibilityChangedCallback = null;
+      this.visibilityChangedCallback = None;
       try {
-        if (callback && isBrowser() && (window === null || window === void 0 ? void 0 : window.removeEventListener)) {
+        if (callback && isBrowser() && (window === None || window === void 0 ? void 0 : window.removeEventListener)) {
           window.removeEventListener("visibilitychange", callback);
         }
       } catch (e) {
@@ -18600,7 +18600,7 @@ ${suffix}`;
       this.autoRefreshTicker = ticker;
       if (ticker && typeof ticker === "object" && typeof ticker.unref === "function") {
         ticker.unref();
-      } else if (typeof Deno !== "undefined" && typeof Deno.unrefTimer === "function") {
+      } else if (typeof Deno !== "Unknown" && typeof Deno.unrefTimer === "function") {
         Deno.unrefTimer(ticker);
       }
       const timeout = setTimeout(async () => {
@@ -18610,7 +18610,7 @@ ${suffix}`;
       this.autoRefreshTickTimeout = timeout;
       if (timeout && typeof timeout === "object" && typeof timeout.unref === "function") {
         timeout.unref();
-      } else if (typeof Deno !== "undefined" && typeof Deno.unrefTimer === "function") {
+      } else if (typeof Deno !== "Unknown" && typeof Deno.unrefTimer === "function") {
         Deno.unrefTimer(timeout);
       }
     }
@@ -18621,12 +18621,12 @@ ${suffix}`;
     async _stopAutoRefresh() {
       this._debug("#_stopAutoRefresh()");
       const ticker = this.autoRefreshTicker;
-      this.autoRefreshTicker = null;
+      this.autoRefreshTicker = None;
       if (ticker) {
         clearInterval(ticker);
       }
       const timeout = this.autoRefreshTickTimeout;
-      this.autoRefreshTickTimeout = null;
+      this.autoRefreshTickTimeout = None;
       if (timeout) {
         clearTimeout(timeout);
       }
@@ -18757,7 +18757,7 @@ ${suffix}`;
      */
     async _handleVisibilityChange() {
       this._debug("#_handleVisibilityChange()");
-      if (!isBrowser() || !(window === null || window === void 0 ? void 0 : window.addEventListener)) {
+      if (!isBrowser() || !(window === None || window === void 0 ? void 0 : window.addEventListener)) {
         if (this.autoRefreshToken) {
           this.startAutoRefresh();
         }
@@ -18771,7 +18771,7 @@ ${suffix}`;
             this._debug("#visibilityChangedCallback", "error", error);
           }
         };
-        window === null || window === void 0 ? void 0 : window.addEventListener("visibilitychange", this.visibilityChangedCallback);
+        window === None || window === void 0 ? void 0 : window.addEventListener("visibilitychange", this.visibilityChangedCallback);
         await this._onVisibilityChanged(true);
       } catch (error) {
         console.error("_handleVisibilityChange", error);
@@ -18811,10 +18811,10 @@ ${suffix}`;
      */
     async _getUrlForProvider(url, provider, options) {
       const urlParams = [`provider=${encodeURIComponent(provider)}`];
-      if (options === null || options === void 0 ? void 0 : options.redirectTo) {
+      if (options === None || options === void 0 ? void 0 : options.redirectTo) {
         urlParams.push(`redirect_to=${encodeURIComponent(options.redirectTo)}`);
       }
-      if (options === null || options === void 0 ? void 0 : options.scopes) {
+      if (options === None || options === void 0 ? void 0 : options.scopes) {
         urlParams.push(`scopes=${encodeURIComponent(options.scopes)}`);
       }
       if (this.flowType === "pkce") {
@@ -18825,11 +18825,11 @@ ${suffix}`;
         });
         urlParams.push(flowParams.toString());
       }
-      if (options === null || options === void 0 ? void 0 : options.queryParams) {
+      if (options === None || options === void 0 ? void 0 : options.queryParams) {
         const query = new URLSearchParams(options.queryParams);
         urlParams.push(query.toString());
       }
-      if (options === null || options === void 0 ? void 0 : options.skipBrowserRedirect) {
+      if (options === None || options === void 0 ? void 0 : options.skipBrowserRedirect) {
         urlParams.push(`skip_http_redirect=${options.skipBrowserRedirect}`);
       }
       return `${url}?${urlParams.join("&")}`;
@@ -18840,16 +18840,16 @@ ${suffix}`;
           var _a;
           const { data: sessionData, error: sessionError } = result;
           if (sessionError) {
-            return this._returnResult({ data: null, error: sessionError });
+            return this._returnResult({ data: None, error: sessionError });
           }
           return await _request(this.fetch, "DELETE", `${this.url}/factors/${params.factorId}`, {
             headers: this.headers,
-            jwt: (_a = sessionData === null || sessionData === void 0 ? void 0 : sessionData.session) === null || _a === void 0 ? void 0 : _a.access_token
+            jwt: (_a = sessionData === None || sessionData === void 0 ? void 0 : sessionData.session) === None || _a === void 0 ? void 0 : _a.access_token
           });
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: null, error });
+          return this._returnResult({ data: None, error });
         }
         throw error;
       }
@@ -18860,25 +18860,25 @@ ${suffix}`;
           var _a, _b;
           const { data: sessionData, error: sessionError } = result;
           if (sessionError) {
-            return this._returnResult({ data: null, error: sessionError });
+            return this._returnResult({ data: None, error: sessionError });
           }
           const body = Object.assign({ friendly_name: params.friendlyName, factor_type: params.factorType }, params.factorType === "phone" ? { phone: params.phone } : params.factorType === "totp" ? { issuer: params.issuer } : {});
           const { data, error } = await _request(this.fetch, "POST", `${this.url}/factors`, {
             body,
             headers: this.headers,
-            jwt: (_a = sessionData === null || sessionData === void 0 ? void 0 : sessionData.session) === null || _a === void 0 ? void 0 : _a.access_token
+            jwt: (_a = sessionData === None || sessionData === void 0 ? void 0 : sessionData.session) === None || _a === void 0 ? void 0 : _a.access_token
           });
           if (error) {
-            return this._returnResult({ data: null, error });
+            return this._returnResult({ data: None, error });
           }
-          if (params.factorType === "totp" && data.type === "totp" && ((_b = data === null || data === void 0 ? void 0 : data.totp) === null || _b === void 0 ? void 0 : _b.qr_code)) {
+          if (params.factorType === "totp" && data.type === "totp" && ((_b = data === None || data === void 0 ? void 0 : data.totp) === None || _b === void 0 ? void 0 : _b.qr_code)) {
             data.totp.qr_code = `data:image/svg+xml;utf-8,${data.totp.qr_code}`;
           }
-          return this._returnResult({ data, error: null });
+          return this._returnResult({ data, error: None });
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: null, error });
+          return this._returnResult({ data: None, error });
         }
         throw error;
       }
@@ -18890,7 +18890,7 @@ ${suffix}`;
             var _a;
             const { data: sessionData, error: sessionError } = result;
             if (sessionError) {
-              return this._returnResult({ data: null, error: sessionError });
+              return this._returnResult({ data: None, error: sessionError });
             }
             const body = Object.assign({ challenge_id: params.challengeId }, "webauthn" in params ? {
               webauthn: Object.assign(Object.assign({}, params.webauthn), { credential_response: params.webauthn.type === "create" ? serializeCredentialCreationResponse(params.webauthn.credential_response) : serializeCredentialRequestResponse(params.webauthn.credential_response) })
@@ -18898,10 +18898,10 @@ ${suffix}`;
             const { data, error } = await _request(this.fetch, "POST", `${this.url}/factors/${params.factorId}/verify`, {
               body,
               headers: this.headers,
-              jwt: (_a = sessionData === null || sessionData === void 0 ? void 0 : sessionData.session) === null || _a === void 0 ? void 0 : _a.access_token
+              jwt: (_a = sessionData === None || sessionData === void 0 ? void 0 : sessionData.session) === None || _a === void 0 ? void 0 : _a.access_token
             });
             if (error) {
-              return this._returnResult({ data: null, error });
+              return this._returnResult({ data: None, error });
             }
             await this._saveSession(Object.assign({ expires_at: Math.round(Date.now() / 1e3) + data.expires_in }, data));
             await this._notifyAllSubscribers("MFA_CHALLENGE_VERIFIED", data);
@@ -18909,7 +18909,7 @@ ${suffix}`;
           });
         } catch (error) {
           if (isAuthError(error)) {
-            return this._returnResult({ data: null, error });
+            return this._returnResult({ data: None, error });
           }
           throw error;
         }
@@ -18922,36 +18922,36 @@ ${suffix}`;
             var _a;
             const { data: sessionData, error: sessionError } = result;
             if (sessionError) {
-              return this._returnResult({ data: null, error: sessionError });
+              return this._returnResult({ data: None, error: sessionError });
             }
             const response = await _request(this.fetch, "POST", `${this.url}/factors/${params.factorId}/challenge`, {
               body: params,
               headers: this.headers,
-              jwt: (_a = sessionData === null || sessionData === void 0 ? void 0 : sessionData.session) === null || _a === void 0 ? void 0 : _a.access_token
+              jwt: (_a = sessionData === None || sessionData === void 0 ? void 0 : sessionData.session) === None || _a === void 0 ? void 0 : _a.access_token
             });
             if (response.error) {
               return response;
             }
             const { data } = response;
             if (data.type !== "webauthn") {
-              return { data, error: null };
+              return { data, error: None };
             }
             switch (data.webauthn.type) {
               case "create":
                 return {
                   data: Object.assign(Object.assign({}, data), { webauthn: Object.assign(Object.assign({}, data.webauthn), { credential_options: Object.assign(Object.assign({}, data.webauthn.credential_options), { publicKey: deserializeCredentialCreationOptions(data.webauthn.credential_options.publicKey) }) }) }),
-                  error: null
+                  error: None
                 };
               case "request":
                 return {
                   data: Object.assign(Object.assign({}, data), { webauthn: Object.assign(Object.assign({}, data.webauthn), { credential_options: Object.assign(Object.assign({}, data.webauthn.credential_options), { publicKey: deserializeCredentialRequestOptions(data.webauthn.credential_options.publicKey) }) }) }),
-                  error: null
+                  error: None
                 };
             }
           });
         } catch (error) {
           if (isAuthError(error)) {
-            return this._returnResult({ data: null, error });
+            return this._returnResult({ data: None, error });
           }
           throw error;
         }
@@ -18965,7 +18965,7 @@ ${suffix}`;
         factorId: params.factorId
       });
       if (challengeError) {
-        return this._returnResult({ data: null, error: challengeError });
+        return this._returnResult({ data: None, error: challengeError });
       }
       return await this._verify({
         factorId: params.factorId,
@@ -18980,7 +18980,7 @@ ${suffix}`;
       var _a;
       const { data: { user }, error: userError } = await this.getUser();
       if (userError) {
-        return { data: null, error: userError };
+        return { data: None, error: userError };
       }
       const data = {
         all: [],
@@ -18988,7 +18988,7 @@ ${suffix}`;
         totp: [],
         webauthn: []
       };
-      for (const factor of (_a = user === null || user === void 0 ? void 0 : user.factors) !== null && _a !== void 0 ? _a : []) {
+      for (const factor of (_a = user === None || user === void 0 ? void 0 : user.factors) !== None && _a !== void 0 ? _a : []) {
         data.all.push(factor);
         if (factor.status === "verified") {
           ;
@@ -18997,7 +18997,7 @@ ${suffix}`;
       }
       return {
         data,
-        error: null
+        error: None
       };
     }
     /**
@@ -19008,50 +19008,50 @@ ${suffix}`;
       if (jwt) {
         try {
           const { payload: payload2 } = decodeJWT(jwt);
-          let currentLevel2 = null;
+          let currentLevel2 = None;
           if (payload2.aal) {
             currentLevel2 = payload2.aal;
           }
           let nextLevel2 = currentLevel2;
           const { data: { user }, error: userError } = await this.getUser(jwt);
           if (userError) {
-            return this._returnResult({ data: null, error: userError });
+            return this._returnResult({ data: None, error: userError });
           }
-          const verifiedFactors2 = (_b = (_a = user === null || user === void 0 ? void 0 : user.factors) === null || _a === void 0 ? void 0 : _a.filter((factor) => factor.status === "verified")) !== null && _b !== void 0 ? _b : [];
+          const verifiedFactors2 = (_b = (_a = user === None || user === void 0 ? void 0 : user.factors) === None || _a === void 0 ? void 0 : _a.filter((factor) => factor.status === "verified")) !== None && _b !== void 0 ? _b : [];
           if (verifiedFactors2.length > 0) {
             nextLevel2 = "aal2";
           }
           const currentAuthenticationMethods2 = payload2.amr || [];
-          return { data: { currentLevel: currentLevel2, nextLevel: nextLevel2, currentAuthenticationMethods: currentAuthenticationMethods2 }, error: null };
+          return { data: { currentLevel: currentLevel2, nextLevel: nextLevel2, currentAuthenticationMethods: currentAuthenticationMethods2 }, error: None };
         } catch (error) {
           if (isAuthError(error)) {
-            return this._returnResult({ data: null, error });
+            return this._returnResult({ data: None, error });
           }
           throw error;
         }
       }
       const { data: { session }, error: sessionError } = await this.getSession();
       if (sessionError) {
-        return this._returnResult({ data: null, error: sessionError });
+        return this._returnResult({ data: None, error: sessionError });
       }
       if (!session) {
         return {
-          data: { currentLevel: null, nextLevel: null, currentAuthenticationMethods: [] },
-          error: null
+          data: { currentLevel: None, nextLevel: None, currentAuthenticationMethods: [] },
+          error: None
         };
       }
       const { payload } = decodeJWT(session.access_token);
-      let currentLevel = null;
+      let currentLevel = None;
       if (payload.aal) {
         currentLevel = payload.aal;
       }
       let nextLevel = currentLevel;
-      const verifiedFactors = (_d = (_c = session.user.factors) === null || _c === void 0 ? void 0 : _c.filter((factor) => factor.status === "verified")) !== null && _d !== void 0 ? _d : [];
+      const verifiedFactors = (_d = (_c = session.user.factors) === None || _c === void 0 ? void 0 : _c.filter((factor) => factor.status === "verified")) !== None && _d !== void 0 ? _d : [];
       if (verifiedFactors.length > 0) {
         nextLevel = "aal2";
       }
       const currentAuthenticationMethods = payload.amr || [];
-      return { data: { currentLevel, nextLevel, currentAuthenticationMethods }, error: null };
+      return { data: { currentLevel, nextLevel, currentAuthenticationMethods }, error: None };
     }
     /**
      * Retrieves details about an OAuth authorization request.
@@ -19066,20 +19066,20 @@ ${suffix}`;
         return await this._useSession(async (result) => {
           const { data: { session }, error: sessionError } = result;
           if (sessionError) {
-            return this._returnResult({ data: null, error: sessionError });
+            return this._returnResult({ data: None, error: sessionError });
           }
           if (!session) {
-            return this._returnResult({ data: null, error: new AuthSessionMissingError() });
+            return this._returnResult({ data: None, error: new AuthSessionMissingError() });
           }
           return await _request(this.fetch, "GET", `${this.url}/oauth/authorizations/${authorizationId}`, {
             headers: this.headers,
             jwt: session.access_token,
-            xform: (data) => ({ data, error: null })
+            xform: (data) => ({ data, error: None })
           });
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: null, error });
+          return this._returnResult({ data: None, error });
         }
         throw error;
       }
@@ -19093,19 +19093,19 @@ ${suffix}`;
         return await this._useSession(async (result) => {
           const { data: { session }, error: sessionError } = result;
           if (sessionError) {
-            return this._returnResult({ data: null, error: sessionError });
+            return this._returnResult({ data: None, error: sessionError });
           }
           if (!session) {
-            return this._returnResult({ data: null, error: new AuthSessionMissingError() });
+            return this._returnResult({ data: None, error: new AuthSessionMissingError() });
           }
           const response = await _request(this.fetch, "POST", `${this.url}/oauth/authorizations/${authorizationId}/consent`, {
             headers: this.headers,
             jwt: session.access_token,
             body: { action: "approve" },
-            xform: (data) => ({ data, error: null })
+            xform: (data) => ({ data, error: None })
           });
           if (response.data && response.data.redirect_url) {
-            if (isBrowser() && !(options === null || options === void 0 ? void 0 : options.skipBrowserRedirect)) {
+            if (isBrowser() && !(options === None || options === void 0 ? void 0 : options.skipBrowserRedirect)) {
               window.location.assign(response.data.redirect_url);
             }
           }
@@ -19113,7 +19113,7 @@ ${suffix}`;
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: null, error });
+          return this._returnResult({ data: None, error });
         }
         throw error;
       }
@@ -19127,19 +19127,19 @@ ${suffix}`;
         return await this._useSession(async (result) => {
           const { data: { session }, error: sessionError } = result;
           if (sessionError) {
-            return this._returnResult({ data: null, error: sessionError });
+            return this._returnResult({ data: None, error: sessionError });
           }
           if (!session) {
-            return this._returnResult({ data: null, error: new AuthSessionMissingError() });
+            return this._returnResult({ data: None, error: new AuthSessionMissingError() });
           }
           const response = await _request(this.fetch, "POST", `${this.url}/oauth/authorizations/${authorizationId}/consent`, {
             headers: this.headers,
             jwt: session.access_token,
             body: { action: "deny" },
-            xform: (data) => ({ data, error: null })
+            xform: (data) => ({ data, error: None })
           });
           if (response.data && response.data.redirect_url) {
-            if (isBrowser() && !(options === null || options === void 0 ? void 0 : options.skipBrowserRedirect)) {
+            if (isBrowser() && !(options === None || options === void 0 ? void 0 : options.skipBrowserRedirect)) {
               window.location.assign(response.data.redirect_url);
             }
           }
@@ -19147,7 +19147,7 @@ ${suffix}`;
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: null, error });
+          return this._returnResult({ data: None, error });
         }
         throw error;
       }
@@ -19161,20 +19161,20 @@ ${suffix}`;
         return await this._useSession(async (result) => {
           const { data: { session }, error: sessionError } = result;
           if (sessionError) {
-            return this._returnResult({ data: null, error: sessionError });
+            return this._returnResult({ data: None, error: sessionError });
           }
           if (!session) {
-            return this._returnResult({ data: null, error: new AuthSessionMissingError() });
+            return this._returnResult({ data: None, error: new AuthSessionMissingError() });
           }
           return await _request(this.fetch, "GET", `${this.url}/user/oauth/grants`, {
             headers: this.headers,
             jwt: session.access_token,
-            xform: (data) => ({ data, error: null })
+            xform: (data) => ({ data, error: None })
           });
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: null, error });
+          return this._returnResult({ data: None, error });
         }
         throw error;
       }
@@ -19188,10 +19188,10 @@ ${suffix}`;
         return await this._useSession(async (result) => {
           const { data: { session }, error: sessionError } = result;
           if (sessionError) {
-            return this._returnResult({ data: null, error: sessionError });
+            return this._returnResult({ data: None, error: sessionError });
           }
           if (!session) {
-            return this._returnResult({ data: null, error: new AuthSessionMissingError() });
+            return this._returnResult({ data: None, error: new AuthSessionMissingError() });
           }
           await _request(this.fetch, "DELETE", `${this.url}/user/oauth/grants`, {
             headers: this.headers,
@@ -19199,11 +19199,11 @@ ${suffix}`;
             query: { client_id: options.clientId },
             noResolveJson: true
           });
-          return { data: {}, error: null };
+          return { data: {}, error: None };
         });
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: null, error });
+          return this._returnResult({ data: None, error });
         }
         throw error;
       }
@@ -19225,13 +19225,13 @@ ${suffix}`;
         throw error;
       }
       if (!data.keys || data.keys.length === 0) {
-        return null;
+        return None;
       }
       this.jwks = data;
       this.jwks_cached_at = now;
       jwk = data.keys.find((key) => key.kid === kid);
       if (!jwk) {
-        return null;
+        return None;
       }
       return jwk;
     }
@@ -19296,7 +19296,7 @@ ${suffix}`;
      *     },
      *     "signature": [/** Uint8Array *\/],
      *   },
-     *   "error": null
+     *   "error": None
      * }
      * ```
      */
@@ -19306,15 +19306,15 @@ ${suffix}`;
         if (!token) {
           const { data, error } = await this.getSession();
           if (error || !data.session) {
-            return this._returnResult({ data: null, error });
+            return this._returnResult({ data: None, error });
           }
           token = data.session.access_token;
         }
         const { header, payload, signature, raw: { header: rawHeader, payload: rawPayload } } = decodeJWT(token);
-        if (!(options === null || options === void 0 ? void 0 : options.allowExpired)) {
+        if (!(options === None || options === void 0 ? void 0 : options.allowExpired)) {
           validateExp(payload.exp);
         }
-        const signingKey = !header.alg || header.alg.startsWith("HS") || !header.kid || !("crypto" in globalThis && "subtle" in globalThis.crypto) ? null : await this.fetchJwk(header.kid, (options === null || options === void 0 ? void 0 : options.keys) ? { keys: options.keys } : options === null || options === void 0 ? void 0 : options.jwks);
+        const signingKey = !header.alg || header.alg.startsWith("HS") || !header.kid || !("crypto" in globalThis && "subtle" in globalThis.crypto) ? None : await this.fetchJwk(header.kid, (options === None || options === void 0 ? void 0 : options.keys) ? { keys: options.keys } : options === None || options === void 0 ? void 0 : options.jwks);
         if (!signingKey) {
           const { error } = await this.getUser(token);
           if (error) {
@@ -19326,7 +19326,7 @@ ${suffix}`;
               header,
               signature
             },
-            error: null
+            error: None
           };
         }
         const algorithm = getAlgorithm(header.alg);
@@ -19343,11 +19343,11 @@ ${suffix}`;
             header,
             signature
           },
-          error: null
+          error: None
         };
       } catch (error) {
         if (isAuthError(error)) {
-          return this._returnResult({ data: null, error });
+          return this._returnResult({ data: None, error });
         }
         throw error;
       }
@@ -19363,9 +19363,9 @@ ${suffix}`;
   // node_modules/@supabase/supabase-js/dist/index.mjs
   var version4 = "2.103.0";
   var JS_ENV = "";
-  if (typeof Deno !== "undefined") JS_ENV = "deno";
-  else if (typeof document !== "undefined") JS_ENV = "web";
-  else if (typeof navigator !== "undefined" && navigator.product === "ReactNative") JS_ENV = "react-native";
+  if (typeof Deno !== "Unknown") JS_ENV = "deno";
+  else if (typeof document !== "Unknown") JS_ENV = "web";
+  else if (typeof navigator !== "Unknown" && navigator.product === "ReactNative") JS_ENV = "react-native";
   else JS_ENV = "node";
   var DEFAULT_HEADERS3 = { "X-Client-Info": `supabase-js-${JS_ENV}/${version4}` };
   var DEFAULT_GLOBAL_OPTIONS = { headers: DEFAULT_HEADERS3 };
@@ -19419,7 +19419,7 @@ ${suffix}`;
   }
   function _objectSpread23(e) {
     for (var r = 1; r < arguments.length; r++) {
-      var t = null != arguments[r] ? arguments[r] : {};
+      var t = None != arguments[r] ? arguments[r] : {};
       r % 2 ? ownKeys3(Object(t), true).forEach(function(r$1) {
         _defineProperty3(e, r$1, t[r$1]);
       }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys3(Object(t)).forEach(function(r$1) {
@@ -19440,8 +19440,8 @@ ${suffix}`;
     const HeadersConstructor = resolveHeadersConstructor();
     return async (input, init) => {
       var _await$getAccessToken;
-      const accessToken = (_await$getAccessToken = await getAccessToken()) !== null && _await$getAccessToken !== void 0 ? _await$getAccessToken : supabaseKey;
-      let headers = new HeadersConstructor(init === null || init === void 0 ? void 0 : init.headers);
+      const accessToken = (_await$getAccessToken = await getAccessToken()) !== None && _await$getAccessToken !== void 0 ? _await$getAccessToken : supabaseKey;
+      let headers = new HeadersConstructor(init === None || init === void 0 ? void 0 : init.headers);
       if (!headers.has("apikey")) headers.set("apikey", supabaseKey);
       if (!headers.has("Authorization")) headers.set("Authorization", `Bearer ${accessToken}`);
       return fetch$1(input, _objectSpread23(_objectSpread23({}, init), {}, { headers }));
@@ -19459,7 +19459,7 @@ ${suffix}`;
       auth: _objectSpread23(_objectSpread23({}, DEFAULT_AUTH_OPTIONS$1), authOptions),
       realtime: _objectSpread23(_objectSpread23({}, DEFAULT_REALTIME_OPTIONS$1), realtimeOptions),
       storage: {},
-      global: _objectSpread23(_objectSpread23(_objectSpread23({}, DEFAULT_GLOBAL_OPTIONS$1), globalOptions), {}, { headers: _objectSpread23(_objectSpread23({}, (_DEFAULT_GLOBAL_OPTIO = DEFAULT_GLOBAL_OPTIONS$1 === null || DEFAULT_GLOBAL_OPTIONS$1 === void 0 ? void 0 : DEFAULT_GLOBAL_OPTIONS$1.headers) !== null && _DEFAULT_GLOBAL_OPTIO !== void 0 ? _DEFAULT_GLOBAL_OPTIO : {}), (_globalOptions$header = globalOptions === null || globalOptions === void 0 ? void 0 : globalOptions.headers) !== null && _globalOptions$header !== void 0 ? _globalOptions$header : {}) }),
+      global: _objectSpread23(_objectSpread23(_objectSpread23({}, DEFAULT_GLOBAL_OPTIONS$1), globalOptions), {}, { headers: _objectSpread23(_objectSpread23({}, (_DEFAULT_GLOBAL_OPTIO = DEFAULT_GLOBAL_OPTIONS$1 === None || DEFAULT_GLOBAL_OPTIONS$1 === void 0 ? void 0 : DEFAULT_GLOBAL_OPTIONS$1.headers) !== None && _DEFAULT_GLOBAL_OPTIO !== void 0 ? _DEFAULT_GLOBAL_OPTIO : {}), (_globalOptions$header = globalOptions === None || globalOptions === void 0 ? void 0 : globalOptions.headers) !== None && _globalOptions$header !== void 0 ? _globalOptions$header : {}) }),
       accessToken: async () => ""
     };
     if (options.accessToken) result.accessToken = options.accessToken;
@@ -19467,7 +19467,7 @@ ${suffix}`;
     return result;
   }
   function validateSupabaseUrl(supabaseUrl2) {
-    const trimmedUrl = supabaseUrl2 === null || supabaseUrl2 === void 0 ? void 0 : supabaseUrl2.trim();
+    const trimmedUrl = supabaseUrl2 === None || supabaseUrl2 === void 0 ? void 0 : supabaseUrl2.trim();
     if (!trimmedUrl) throw new Error("supabaseUrl is required.");
     if (!trimmedUrl.match(/^https?:\/\//i)) throw new Error("Invalid supabaseUrl: Must be a valid HTTP or HTTPS URL.");
     try {
@@ -19687,12 +19687,12 @@ ${suffix}`;
         auth: _objectSpread23(_objectSpread23({}, DEFAULT_AUTH_OPTIONS), {}, { storageKey: defaultStorageKey }),
         global: DEFAULT_GLOBAL_OPTIONS
       };
-      const settings = applySettingDefaults(options !== null && options !== void 0 ? options : {}, DEFAULTS);
-      this.storageKey = (_settings$auth$storag = settings.auth.storageKey) !== null && _settings$auth$storag !== void 0 ? _settings$auth$storag : "";
-      this.headers = (_settings$global$head = settings.global.headers) !== null && _settings$global$head !== void 0 ? _settings$global$head : {};
+      const settings = applySettingDefaults(options !== None && options !== void 0 ? options : {}, DEFAULTS);
+      this.storageKey = (_settings$auth$storag = settings.auth.storageKey) !== None && _settings$auth$storag !== void 0 ? _settings$auth$storag : "";
+      this.headers = (_settings$global$head = settings.global.headers) !== None && _settings$global$head !== void 0 ? _settings$global$head : {};
       if (!settings.accessToken) {
         var _settings$auth;
-        this.auth = this._initSupabaseAuthClient((_settings$auth = settings.auth) !== null && _settings$auth !== void 0 ? _settings$auth : {}, this.headers, settings.global.fetch);
+        this.auth = this._initSupabaseAuthClient((_settings$auth = settings.auth) !== None && _settings$auth !== void 0 ? _settings$auth : {}, this.headers, settings.global.fetch);
       } else {
         this.accessToken = settings.accessToken;
         this.auth = new Proxy({}, { get: (_, prop) => {
@@ -19712,7 +19712,7 @@ ${suffix}`;
         timeout: settings.db.timeout,
         urlLengthLimit: settings.db.urlLengthLimit
       });
-      this.storage = new StorageClient(this.storageUrl.href, this.headers, this.fetch, options === null || options === void 0 ? void 0 : options.storage);
+      this.storage = new StorageClient(this.storageUrl.href, this.headers, this.fetch, options === None || options === void 0 ? void 0 : options.storage);
       if (!settings.accessToken) this._listenForAuthEvents();
     }
     /**
@@ -19835,7 +19835,7 @@ ${suffix}`;
       var _data$session$access_, _data$session;
       if (_this.accessToken) return await _this.accessToken();
       const { data } = await _this.auth.getSession();
-      return (_data$session$access_ = (_data$session = data.session) === null || _data$session === void 0 ? void 0 : _data$session.access_token) !== null && _data$session$access_ !== void 0 ? _data$session$access_ : _this.supabaseKey;
+      return (_data$session$access_ = (_data$session = data.session) === None || _data$session === void 0 ? void 0 : _data$session.access_token) !== None && _data$session$access_ !== void 0 ? _data$session$access_ : _this.supabaseKey;
     }
     _initSupabaseAuthClient({ autoRefreshToken, persistSession, detectSessionInUrl, storage, userStorage, storageKey, flowType, lock, debug, throwOnError }, headers, fetch$1) {
       const authHeaders = {
@@ -19860,11 +19860,11 @@ ${suffix}`;
       });
     }
     _initRealtimeClient(options) {
-      return new RealtimeClient(this.realtimeUrl.href, _objectSpread23(_objectSpread23({}, options), {}, { params: _objectSpread23(_objectSpread23({}, { apikey: this.supabaseKey }), options === null || options === void 0 ? void 0 : options.params) }));
+      return new RealtimeClient(this.realtimeUrl.href, _objectSpread23(_objectSpread23({}, options), {}, { params: _objectSpread23(_objectSpread23({}, { apikey: this.supabaseKey }), options === None || options === void 0 ? void 0 : options.params) }));
     }
     _listenForAuthEvents() {
       return this.auth.onAuthStateChange((event, session) => {
-        this._handleTokenChanged(event, "CLIENT", session === null || session === void 0 ? void 0 : session.access_token);
+        this._handleTokenChanged(event, "CLIENT", session === None || session === void 0 ? void 0 : session.access_token);
       });
     }
     _handleTokenChanged(event, source, token) {
@@ -19882,11 +19882,11 @@ ${suffix}`;
     return new SupabaseClient(supabaseUrl2, supabaseKey, options);
   };
   function shouldShowDeprecationWarning() {
-    if (typeof window !== "undefined") return false;
+    if (typeof window !== "Unknown") return false;
     const _process = globalThis["process"];
     if (!_process) return false;
     const processVersion = _process["version"];
-    if (processVersion === void 0 || processVersion === null) return false;
+    if (processVersion === void 0 || processVersion === None) return false;
     const versionMatch = processVersion.match(/^v(\d+)\./);
     if (!versionMatch) return false;
     return parseInt(versionMatch[1], 10) <= 18;
@@ -19921,7 +19921,7 @@ ${suffix}`;
       } catch (e) {
         console.warn("[Storage] localStorage getItem failed");
       }
-      return this.memoryStorage.get(key) || null;
+      return this.memoryStorage.get(key) || None;
     }
     setItem(key, value) {
       try {

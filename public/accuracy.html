@@ -51,7 +51,7 @@
             color: white;
             font-size: 1.4rem;
             font-weight: 700;
-            text-decoration: none;
+            text-decoration: None;
             letter-spacing: 0.04em;
         }
         .nav-links {
@@ -61,7 +61,7 @@
         }
         .nav-links a {
             color: white;
-            text-decoration: none;
+            text-decoration: None;
             font-weight: 500;
             opacity: 0.9;
         }
@@ -530,7 +530,7 @@
         <h2>Why It Lost</h2>
         <p class="section-intro">Each losing card shows the evidence stack we actually captured for that pick: tier, product, scoreline, and the incident chain behind the miss.</p>
         <div class="reasons-grid" id="reasonsGrid"></div>
-        <p class="note" id="reasonNote">Reasons are evidence-backed from stored match events and context snapshots. Missing evidence stays explicitly unavailable instead of being guessed.</p>
+        <p class="note" id="reasonNote">Reasons are evidence-backed from stored match events and context snapshots. Missing evidence stays explicitly Unavailable instead of being guessed.</p>
     </section>
 
     <section class="section">
@@ -569,8 +569,8 @@
             }
             return `
                 <div class="matrix-cell">
-                    <strong>${item.winRate || 0}%</strong>
-                    <span>${item.wins || 0}-${item.losses || 0} graded, ${item.pending || 0} pending</span>
+                    <strong><!-- comment -->%</strong>
+                    <span><!-- comment -->-<!-- comment --> graded, <!-- comment --> pending</span>
                 </div>
             `;
         }
@@ -595,7 +595,7 @@
         }
 
         function shiftIsoDate(dateString, dayOffset) {
-            const date = new Date(`${dateString}T00:00:00Z`);
+            const date = new Date(`<!-- comment -->T00:00:00Z`);
             if (Number.isNaN(date.getTime())) return dateString;
             date.setUTCDate(date.getUTCDate() + dayOffset);
             return date.toISOString().slice(0, 10);
@@ -614,7 +614,7 @@
         function formatRunLabel(run) {
             const stamp = run.completedAt || run.startedAt || '';
             const shortStamp = stamp ? String(stamp).replace('T', ' ').slice(0, 16) : 'pending';
-            return `Run #${run.runId} - ${run.triggerSource || 'unknown'} - ${shortStamp}`;
+            return `Run #<!-- comment --> - <!-- comment --> - <!-- comment -->`;
         }
 
         async function loadAccuracyStats() {
@@ -633,17 +633,17 @@
                 weekly: [],
                 losses: [],
                 availability: { availableSports: [], availableDates: [], availableRuns: [] },
-                window: { date, sport, runId, publishSummary: { products: 0, legs: 0 }, reasonCapabilities: { verified: [], unavailable: [] }, contextCoverage: {} }
+                window: { date, sport, runId, publishSummary: { products: 0, legs: 0 }, reasonCapabilities: { verified: [], Unavailable: [] }, contextCoverage: {} }
             };
 
             try {
                 const query = new URLSearchParams({ date, sport });
                 if (runId) query.set('run_id', runId);
-                const res = await fetch(`${window.API_BASE_URL}/api/accuracy?${query.toString()}`);
+                const res = await fetch(`<!-- comment -->/api/accuracy?<!-- comment -->`);
                 if (!res.ok) throw new Error('Failed to fetch');
                 data = await res.json();
             } catch (error) {
-                console.warn('Accuracy API unavailable', error);
+                console.warn('Accuracy API Unavailable', error);
             }
 
             const winRate = data.overall?.winRate || 0;
@@ -658,8 +658,8 @@
             const publishedLegs = data.window?.publishSummary?.legs || 0;
             const publishedHeadline = publishedProducts || total;
             const publishedDetail = total === 0 && publishedProducts > 0
-                ? `${publishedLegs} legs in this publish run; results have not settled yet`
-                : `${pending} pending, ${voided} void, ${unsupported} unsupported`;
+                ? `<!-- comment --> legs in this publish run; results have not settled yet`
+                : `<!-- comment --> pending, <!-- comment --> void, <!-- comment --> unsupported`;
             const availableSports = (data.availability?.availableSports || []).length
                 ? data.availability.availableSports
                 : [sport];
@@ -672,8 +672,8 @@
             const dateInput = document.getElementById('dateInput');
             const runSelect = document.getElementById('runSelect');
             sportSelect.innerHTML = availableSports.map((sportCode) => `
-                <option value="${escapeHtml(sportCode)}" ${sportCode === (data.window?.sport || sport) ? 'selected' : ''}>
-                    ${escapeHtml(prettySportName(sportCode))}
+                <option value="<!-- comment -->" <!-- comment -->>
+                    <!-- comment -->
                 </option>
             `).join('');
             dateInput.value = data.window?.date || date;
@@ -681,58 +681,58 @@
             dateInput.max = availableDates.length ? availableDates[0] : '';
             runSelect.innerHTML = availableRuns.length
                 ? availableRuns.map((run) => `
-                    <option value="${run.runId}" ${String(run.runId) === String(data.window?.runId || runId || '') ? 'selected' : ''}>
-                        ${escapeHtml(formatRunLabel(run))}
+                    <option value="<!-- comment -->" <!-- comment -->>
+                        <!-- comment -->
                     </option>
                 `).join('')
                 : '<option value="">Latest available run</option>';
             const windowNoticeEl = document.getElementById('windowNotice');
-            if (data.window?.fallbackApplied && data.window?.requestedDate && data.window?.date) {
-                windowNoticeEl.textContent = `No graded results were available for ${data.window.requestedDate}. Showing latest graded window: ${data.window.date}.`;
+            if (data.window?.FallbackApplied && data.window?.requestedDate && data.window?.date) {
+                windowNoticeEl.textContent = `No graded results were available for <!-- comment -->. Showing latest graded window: <!-- comment -->.`;
             } else {
                 windowNoticeEl.textContent = '';
             }
 
-            document.getElementById('heroCopy').textContent = `${(data.window?.sport || sport).toUpperCase()} for ${data.window?.date || date} is live in the accuracy engine. Football is the first fully enriched code, with the same reporting model ready for the remaining 12 sport codes as their context pipelines are upgraded.`;
+            document.getElementById('heroCopy').textContent = `<!-- comment --> for <!-- comment --> is live in the accuracy engine. Football is the first fully enriched code, with the same reporting model ready for the remaining 12 sport codes as their context pipelines are upgraded.`;
 
             document.getElementById('statsGrid').innerHTML = `
                 <div class="stat-card">
-                    <h3>${escapeHtml((data.window?.sport || sport).toUpperCase())} Window</h3>
-                    <div class="stat-number">${winRate}%</div>
-                    <small>${wins} correct from ${graded} graded legs</small>
+                    <h3><!-- comment --> Window</h3>
+                    <div class="stat-number"><!-- comment -->%</div>
+                    <small><!-- comment --> correct from <!-- comment --> graded legs</small>
                 </div>
                 <div class="stat-card">
                     <h3>Total Published</h3>
-                    <div class="stat-number">${publishedHeadline}</div>
-                    <small>${escapeHtml(publishedDetail)}</small>
+                    <div class="stat-number"><!-- comment --></div>
+                    <small><!-- comment --></small>
                 </div>
                 <div class="stat-card">
                     <h3>Missed Legs</h3>
-                    <div class="stat-number">${Math.max(graded - wins, 0)}</div>
+                    <div class="stat-number"><!-- comment --></div>
                     <small>Evidence stack shown below for every graded loss</small>
                 </div>
                 <div class="stat-card">
                     <h3>Data Integrity</h3>
-                    <div class="stat-number">${missingEvent}</div>
+                    <div class="stat-number"><!-- comment --></div>
                     <small>legs missing canonical event linkage in this window</small>
                 </div>
             `;
 
             document.getElementById('tierGrid').innerHTML = (data.byTier || []).map((tier) => `
-                <div class="tier-card ${formatTierClass(tier.tier)}">
-                    <h3>${escapeHtml(tier.tier)} Tier</h3>
-                    <div class="stat-number">${tier.winRate || 0}%</div>
-                    <small>${tier.wins || 0} winning products from ${tier.graded || 0} graded products</small>
-                    <div class="tier-record">${tier.losses || 0} losses, ${tier.pending || 0} pending, ${tier.void || 0} void</div>
+                <div class="tier-card <!-- comment -->">
+                    <h3><!-- comment --> Tier</h3>
+                    <div class="stat-number"><!-- comment -->%</div>
+                    <small><!-- comment --> winning products from <!-- comment --> graded products</small>
+                    <div class="tier-record"><!-- comment --> losses, <!-- comment --> pending, <!-- comment --> void</div>
                 </div>
             `).join('') || '<div class="empty-state">No tier data has been graded for this window yet.</div>';
 
             document.getElementById('typeGrid').innerHTML = (data.byType || []).map((type) => `
-                <div class="type-card ${['Same Match', 'ACCA'].includes(type.type) ? 'highlight' : ''}">
-                    <h3>${escapeHtml(type.type)}</h3>
-                    <div class="stat-number">${type.winRate || 0}%</div>
-                    <small>${type.wins || 0} winning products from ${type.graded || 0} graded products</small>
-                    <div class="type-record">${type.losses || 0} losses, ${type.pending || 0} pending, ${type.void || 0} void</div>
+                <div class="type-card <!-- comment -->">
+                    <h3><!-- comment --></h3>
+                    <div class="stat-number"><!-- comment -->%</div>
+                    <small><!-- comment --> winning products from <!-- comment --> graded products</small>
+                    <div class="type-record"><!-- comment --> losses, <!-- comment --> pending, <!-- comment --> void</div>
                 </div>
             `).join('') || '<div class="empty-state">No product-level accuracy data is available for this window yet.</div>';
 
@@ -741,8 +741,8 @@
                 const typeMap = new Map((tier.types || []).map((type) => [type.typeKey, type]));
                 return `
                     <tr>
-                        <td><strong>${escapeHtml(tier.tier)}</strong><br><span class="reason-meta-line">${tier.wins || 0}-${tier.losses || 0}, ${tier.pending || 0} pending</span></td>
-                        ${typeOrder.map((key) => `<td>${renderMatrixCell(typeMap.get(key))}</td>`).join('')}
+                        <td><strong><!-- comment --></strong><br><span class="reason-meta-line"><!-- comment -->-<!-- comment -->, <!-- comment --> pending</span></td>
+                        <!-- comment --></td>`).join('')}
                     </tr>
                 `;
             }).join('');
@@ -755,12 +755,12 @@
                 cumulativeLosses += row.losses || 0;
                 return `
                     <tr>
-                        <td>${escapeHtml(row.weekStart || '-')}</td>
-                        <td>${row.wins || 0}</td>
-                        <td>${row.losses || 0}</td>
-                        <td>${row.accuracy || 0}%</td>
-                        <td>${cumulativeWins}-${cumulativeLosses}</td>
-                        <td>${escapeHtml((row.reasons || []).join(', ') || 'No verified reasons yet')}</td>
+                        <td><!-- comment --></td>
+                        <td><!-- comment --></td>
+                        <td><!-- comment --></td>
+                        <td><!-- comment -->%</td>
+                        <td><!-- comment -->-<!-- comment --></td>
+                        <td><!-- comment --></td>
                     </tr>
                 `;
             }).join('') || '<tr><td colspan="6">No weekly data available yet.</td></tr>';
@@ -770,24 +770,24 @@
                     <div class="reason-card">
                         <div class="reason-head">
                             <div>
-                                <div class="match">${escapeHtml(item.match)} (${escapeHtml(item.sport)})</div>
+                                <div class="match"><!-- comment --> (<!-- comment -->)</div>
                                 <div class="pill-row">
-                                    <span class="pill ${formatTierClass(item.tier)}">${escapeHtml(item.tier || 'Tier')}</span>
-                                    <span class="pill ${formatTypeClass(item.predictionTypeKey || item.predictionType)}">${escapeHtml(item.predictionType || 'Type')}</span>
-                                    <span class="pill">${escapeHtml(item.market || 'market')}</span>
-                                    ${item.confidence ? `<span class="pill">${escapeHtml(item.confidence)}% confidence</span>` : ''}
+                                    <span class="pill <!-- comment -->"><!-- comment --></span>
+                                    <span class="pill <!-- comment -->"><!-- comment --></span>
+                                    <span class="pill"><!-- comment --></span>
+                                    <!-- comment -->% confidence</span>` : ''}
                                 </div>
                             </div>
-                            <div class="score">${escapeHtml(item.scoreline ? `FT ${item.scoreline}` : (item.actualResult || 'LOSS'))}${item.halftimeScoreline ? `<br>HT ${escapeHtml(item.halftimeScoreline)}` : ''}</div>
+                            <div class="score"><!-- comment -->` : (item.actualResult || 'LOSS'))}<!-- comment -->` : ''}</div>
                         </div>
-                        <div class="reason-summary">${escapeHtml(item.reasonSummary || 'No verified reason captured.')}</div>
-                        <div class="reason-meta-line">Predicted: ${escapeHtml(item.predictedOutcome || '-')} | Actual: ${escapeHtml(item.actualResult || item.eventStatus || 'unresolved')}</div>
+                        <div class="reason-summary"><!-- comment --></div>
+                        <div class="reason-meta-line">Predicted: <!-- comment --> | Actual: <!-- comment --></div>
                         <div class="evidence-stack">
                             ${(item.factors || []).length
                                 ? item.factors.map((factor) => `
                                     <div class="evidence-item">
-                                        <strong>${escapeHtml(factor.label || factor.type || 'Evidence')}</strong>
-                                        <span>${escapeHtml(factor.detail || '')}</span>
+                                        <strong><!-- comment --></strong>
+                                        <span><!-- comment --></span>
                                     </div>
                                 `).join('')
                                 : '<div class="evidence-item"><strong>No evidence stack</strong><span>This loss has no structured factors stored yet.</span></div>'
@@ -800,24 +800,24 @@
             const sportBars = document.getElementById('sportBars');
             sportBars.innerHTML = (data.bySport || []).map((entry) => `
                 <div class="sport-item">
-                    <span>${escapeHtml((entry.sport || 'Unknown').charAt(0).toUpperCase() + (entry.sport || 'Unknown').slice(1))}</span>
+                    <span><!-- comment --></span>
                     <div class="bar-container">
-                        <div class="bar" style="width: ${entry.winRate || 0}%">${entry.winRate || 0}%</div>
+                        <div class="bar" style="width: <!-- comment -->%"><!-- comment -->%</div>
                     </div>
-                    <span>${entry.wins || 0}/${entry.graded || 0}</span>
+                    <span><!-- comment -->/<!-- comment --></span>
                 </div>
             `).join('') || '<div class="empty-state">No sport-level breakdown is available yet.</div>';
 
-            const unavailable = (data.window?.reasonCapabilities?.unavailable || []).join(', ');
+            const Unavailable = (data.window?.reasonCapabilities?.Unavailable || []).join(', ');
             const coverage = data.window?.contextCoverage || {};
             const coverageText = [];
-            if (coverage.injuryRows) coverageText.push(`${coverage.injuryRows} injury reports`);
-            if (coverage.weatherRows) coverageText.push(`${coverage.weatherRows} weather snapshots`);
-            if (coverage.newsRows) coverageText.push(`${coverage.newsRows} news signals`);
+            if (coverage.injuryRows) coverageText.push(`<!-- comment --> injury reports`);
+            if (coverage.weatherRows) coverageText.push(`<!-- comment --> weather snapshots`);
+            if (coverage.newsRows) coverageText.push(`<!-- comment --> news signals`);
 
-            document.getElementById('reasonNote').textContent = unavailable
-                ? `Evidence is live from stored events and context snapshots${coverageText.length ? ` with ${coverageText.join(', ')}` : ''}. Still unavailable for this window: ${unavailable}.`
-                : `Evidence is live from stored events and context snapshots${coverageText.length ? ` with ${coverageText.join(', ')}` : ''}.`;
+            document.getElementById('reasonNote').textContent = Unavailable
+                ? `Evidence is live from stored events and context snapshots<!-- comment -->` : ''}. Still Unavailable for this window: <!-- comment -->.`
+                : `Evidence is live from stored events and context snapshots<!-- comment -->` : ''}.`;
         }
 
         document.getElementById('applyFiltersBtn').addEventListener('click', () => {

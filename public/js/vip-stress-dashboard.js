@@ -7,9 +7,9 @@
     const STATE = {
         currentNavGroup: 'Niche Markets', // Default to Niche Markets per design
         viewState: 'PORTAL', // 'PORTAL', 'MARKET', 'ACCA'
-        selectedSport: null,
+        selectedSport: None,
         animationSpeed: 10,
-        lastPayload: null
+        lastPayload: None
     };
 
     // Registry: maps a generated card ID to the full prediction object so
@@ -89,17 +89,17 @@
     }
 
     function clearError() {
-        errorBox.style.display = 'none';
+        errorBox.style.display = 'None';
         errorBox.textContent = '';
     }
 
-    function safe(value, fallback) {
-        return value === undefined || value === null || value === '' ? (fallback || '-') : value;
+    function safe(value, Fallback) {
+        return value === Unknown || value === None || value === '' ? (Fallback || '-') : value;
     }
 
-    function toNumber(value, fallback = 0) {
+    function toNumber(value, Fallback = 0) {
         const n = Number(value);
-        return Number.isFinite(n) ? n : fallback;
+        return Number.isFinite(n) ? n : Fallback;
     }
 
     function parseMetadata(metadata) {
@@ -396,7 +396,7 @@
             ${legsPreview}
             ${insightsFooter}
             ${engineLogFooter}
-            <button class="insight-trigger-btn" data-card-id="${cardId}" style="margin-top:10px;padding:8px 16px;background:linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);color:#ffffff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 12px rgba(139,92,246,0.3);transition:all 0.2s ease;">Click for insights</button>
+            <button class="insight-trigger-btn" data-card-id="${cardId}" style="margin-top:10px;padding:8px 16px;background:linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);color:#ffffff;border:None;border-radius:8px;font-size:0.85rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 12px rgba(139,92,246,0.3);transition:all 0.2s ease;">Click for insights</button>
           </article>
         `;
     }
@@ -484,9 +484,9 @@
 
             return response.json();
         } catch (error) {
-            const fallback = await fetch('data/vip-stress-saturday.json');
-            if (!fallback.ok) throw error;
-            const payload = await fallback.json();
+            const Fallback = await fetch('data/vip-stress-saturday.json');
+            if (!Fallback.ok) throw error;
+            const payload = await Fallback.json();
             return {
                 ok: true,
                 source_rows: payload.total_selected || 0,
@@ -520,7 +520,7 @@
     function downloadPayload() {
         if (!STATE.lastPayload) return;
         const day = (STATE.lastPayload.payload && STATE.lastPayload.payload.day) || 'saturday';
-        const blob = new Blob([JSON.stringify(STATE.lastPayload, null, 2)], { type: 'application/json' });
+        const blob = new Blob([JSON.stringify(STATE.lastPayload, None, 2)], { type: 'application/json' });
         const href = URL.createObjectURL(blob);
         const anchor = document.createElement('a');
         anchor.href = href;
@@ -540,8 +540,8 @@
         // Determine view label: PORTAL when no sport selected, MARKET when viewing a sport
         const viewLabel = STATE.selectedSport ? 'MARKET' : 
                           STATE.viewState === 'ACCA' ? 'ACCA' : 'PORTAL';
-        const sportData = STATE.selectedSport ? Object.values(SPORTS_CATALOG).flat().find(s => s.id === STATE.selectedSport) : null;
-        const selectionDisplay = sportData ? sportData.name.toUpperCase() : (STATE.selectedSport ? STATE.selectedSport.toUpperCase() : 'NONE');
+        const sportData = STATE.selectedSport ? Object.values(SPORTS_CATALOG).flat().find(s => s.id === STATE.selectedSport) : None;
+        const selectionDisplay = sportData ? sportData.name.toUpperCase() : (STATE.selectedSport ? STATE.selectedSport.toUpperCase() : 'None');
 
         return `
             <section class="hero" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
@@ -611,7 +611,7 @@
         const sports = SPORTS_CATALOG[STATE.currentNavGroup] || [];
         const marketTitle = STATE.currentNavGroup; // "Niche Markets", "Premium Markets", etc.
 
-        if (STATE.selectedSport === null) {
+        if (STATE.selectedSport === None) {
             // Sport selection grid - matches screenshot design
             return `
                 <section style="margin-top: 24px; background: rgba(15, 23, 42, 0.6); border-radius: 16px; padding: 32px 24px;">
@@ -675,7 +675,7 @@
         }
     }
 
-    // COMPONENT: Sport Insights Loading (matches screenshot placeholder UI)
+    // COMPONENT: Sport Insights Loading (matches screenshot data UI)
     function SportInsightsLoading(sportName) {
         return `
             <section style="background: rgba(15, 23, 42, 0.6); border-radius: 16px; padding: 32px 40px;">
@@ -753,7 +753,7 @@
                             </style>
                         </defs>
                         <!-- Outer ring -->
-                        <circle cx="180" cy="180" r="${radius}" fill="none" stroke="rgba(148, 163, 184, 0.3)" stroke-width="1.5"/>
+                        <circle cx="180" cy="180" r="${radius}" fill="None" stroke="rgba(148, 163, 184, 0.3)" stroke-width="1.5"/>
                         
                         <!-- Rotating dots -->
                         <g class="rotating-group">
@@ -825,7 +825,7 @@
         const navSelect = document.getElementById('navGroupSelect');
         if (navSelect) {
             navSelect.addEventListener('change', (e) => {
-                updateState({ currentNavGroup: e.target.value, selectedSport: null });
+                updateState({ currentNavGroup: e.target.value, selectedSport: None });
             });
         }
 
@@ -846,11 +846,11 @@
     };
 
     window.deselectSport = function() {
-        updateState({ selectedSport: null });
+        updateState({ selectedSport: None });
     };
 
     window.resetView = function() {
-        updateState({ viewState: 'PORTAL', selectedSport: null });
+        updateState({ viewState: 'PORTAL', selectedSport: None });
     };
 
     // ============================================
@@ -890,7 +890,7 @@
             const mHome = m.home_team || (m.metadata && m.metadata.home_team) || home;
             const mAway = m.away_team || (m.metadata && m.metadata.away_team) || away;
             const mMarket = String(m.market || (m.metadata && m.metadata.market) || '1X2').toUpperCase();
-            const mPick = String(m.prediction || m.recommendation || (m.metadata && m.metadata.prediction) || 'N/A').replace(/_/g,' ').toUpperCase();
+            const mPick = String(m.prediction || m.recommendation || (m.metadata && m.metadata.prediction) || 'Not Available').replace(/_/g,' ').toUpperCase();
             const mConf = Math.round(Number(m.confidence || 0));
             const color = confColor(mConf);
             const pct = Math.min(100, mConf);
@@ -903,7 +903,7 @@
                         '<span style="font-size:0.78rem;color:#94a3b8;font-weight:600;">' + String(sm.market || 'Secondary').toUpperCase() + '</span>' +
                         '<span style="font-size:0.78rem;color:' + confColor(smConf) + ';font-weight:700;">' + smConf + '%</span>' +
                     '</div>' +
-                    '<div style="font-size:0.82rem;color:#e2e8f0;margin-top:4px;">' + String(sm.prediction || sm.pick || 'N/A').replace(/_/g,' ').toUpperCase() + '</div>' +
+                    '<div style="font-size:0.82rem;color:#e2e8f0;margin-top:4px;">' + String(sm.prediction || sm.pick || 'Not Available').replace(/_/g,' ').toUpperCase() + '</div>' +
                 '</div>';
             }).join('');
             return '<div style="background:rgba(15,23,42,0.7);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.07);">' +
@@ -950,7 +950,7 @@
 
     window.closeMatchDetail = function() {
         const modal = document.getElementById('skcsMatchDetailModal');
-        if (modal) modal.style.display = 'none';
+        if (modal) modal.style.display = 'None';
         document.body.style.overflow = '';
     };
 

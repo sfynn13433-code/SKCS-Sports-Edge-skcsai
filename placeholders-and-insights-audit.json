@@ -1,0 +1,680 @@
+{
+  "placeholders": [
+    {
+      "table": "ai_predictions_backup_phase3",
+      "id": "unknown",
+      "field": "edgemind_feedback",
+      "value": "Closely matched teams. Home (N/A, 0pts, 0W-0D-0L) vs Away (N/A, 0pts, 0W-0D-0L). H2H: Last 2: Home 0, Away 0, Draw 0. Balanced match.",
+      "pattern": "N/A"
+    },
+    {
+      "table": "ai_predictions_backup_phase3",
+      "id": "unknown",
+      "field": "edgemind_feedback",
+      "value": "Closely matched teams. Home (N/A, 0pts, 1W-0D-0L) vs Away (N/A, 0pts, 1W-0D-0L). H2H: Last 2: Home 0, Away 0, Draw 0. Balanced match.",
+      "pattern": "N/A"
+    },
+    {
+      "table": "ai_predictions_backup_phase3",
+      "id": "unknown",
+      "field": "edgemind_feedback",
+      "value": "Closely matched teams. Home (N/A, 0pts, 0W-0D-0L) vs Away (N/A, 0pts, 0W-0D-0L). H2H: No recent H2H data available. Balanced match.",
+      "pattern": "N/A"
+    },
+    {
+      "table": "ai_predictions_backup_phase3",
+      "id": "unknown",
+      "field": "edgemind_feedback",
+      "value": "Closely matched teams. Home (N/A, 0pts, 0W-0D-0L) vs Away (N/A, 0pts, 0W-0D-0L). H2H: Last 2: Home 0, Away 0, Draw 0. Balanced match.",
+      "pattern": "N/A"
+    },
+    {
+      "table": "ai_predictions_backup_phase3",
+      "id": "unknown",
+      "field": "edgemind_feedback",
+      "value": "Closely matched teams. Home (N/A, 0pts, 0W-0D-1L) vs Away (N/A, 0pts, 1W-0D-0L). H2H: Last 2: Home 0, Away 0, Draw 0. Balanced match.",
+      "pattern": "N/A"
+    },
+    {
+      "table": "ai_predictions_backup_phase3",
+      "id": "unknown",
+      "field": "edgemind_feedback",
+      "value": "Closely matched teams. Home (N/A, 0pts, 0W-0D-0L) vs Away (N/A, 0pts, 0W-0D-0L). H2H: No recent H2H data available. Balanced match.",
+      "pattern": "N/A"
+    },
+    {
+      "table": "ai_predictions_backup_phase3",
+      "id": "unknown",
+      "field": "edgemind_feedback",
+      "value": "Closely matched teams. Home (N/A, 0pts, 1W-0D-0L) vs Away (N/A, 0pts, 1W-0D-0L). H2H: Last 2: Home 0, Away 0, Draw 0. Balanced match.",
+      "pattern": "N/A"
+    },
+    {
+      "table": "ai_predictions_backup_phase3",
+      "id": "unknown",
+      "field": "edgemind_feedback",
+      "value": "Closely matched teams. Home (N/A, 0pts, 0W-0D-0L) vs Away (N/A, 0pts, 0W-0D-0L). H2H: No recent H2H data available. Balanced match.",
+      "pattern": "N/A"
+    },
+    {
+      "table": "ai_predictions_backup_phase3",
+      "id": "unknown",
+      "field": "edgemind_feedback",
+      "value": "Closely matched teams. Home (N/A, 0pts, 0W-0D-0L) vs Away (N/A, 0pts, 0W-0D-0L). H2H: Last 2: Home 0, Away 0, Draw 0. Balanced match.",
+      "pattern": "N/A"
+    }
+  ],
+  "missingInsights": [
+    {
+      "table": "direct1x2_prediction_final",
+      "id": "76412",
+      "field": "secondary_insights",
+      "value": []
+    },
+    {
+      "table": "predictions_unified",
+      "id": 1,
+      "field": "secondary_insights",
+      "value": []
+    }
+  ],
+  "emptyFields": [],
+  "templateText": [
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\config.js",
+      "pattern": "test",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\config.js",
+      "pattern": "TEST",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\config.js",
+      "pattern": "...",
+      "count": 516
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\hero-carousel.js",
+      "pattern": "null",
+      "count": 5
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\hero-carousel.js",
+      "pattern": "undefined",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\hero-carousel.js",
+      "pattern": "None",
+      "count": 9
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\hero-carousel.js",
+      "pattern": "none",
+      "count": 9
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\hero-carousel.js",
+      "pattern": "TBD",
+      "count": 2
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\hero-carousel.js",
+      "pattern": "tbd",
+      "count": 2
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\hero-carousel.js",
+      "pattern": "...",
+      "count": 4470
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\smh-hub.js",
+      "pattern": "placeholder",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\smh-hub.js",
+      "pattern": "PLACEHOLDER",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\smh-hub.js",
+      "pattern": "N/A",
+      "count": 3
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\smh-hub.js",
+      "pattern": "null",
+      "count": 6
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\smh-hub.js",
+      "pattern": "undefined",
+      "count": 2
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\smh-hub.js",
+      "pattern": "None",
+      "count": 12
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\smh-hub.js",
+      "pattern": "none",
+      "count": 12
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\smh-hub.js",
+      "pattern": "...",
+      "count": 16069
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\supabase-bundle.js",
+      "pattern": "test",
+      "count": 42
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\supabase-bundle.js",
+      "pattern": "TEST",
+      "count": 42
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\supabase-bundle.js",
+      "pattern": "example",
+      "count": 706
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\supabase-bundle.js",
+      "pattern": "EXAMPLE",
+      "count": 706
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\supabase-bundle.js",
+      "pattern": "N/A",
+      "count": 8
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\supabase-bundle.js",
+      "pattern": "null",
+      "count": 935
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\supabase-bundle.js",
+      "pattern": "undefined",
+      "count": 55
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\supabase-bundle.js",
+      "pattern": "None",
+      "count": 23
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\supabase-bundle.js",
+      "pattern": "none",
+      "count": 23
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\supabase-bundle.js",
+      "pattern": "...",
+      "count": 228167
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\supabase-init.js",
+      "pattern": "test",
+      "count": 5
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\supabase-init.js",
+      "pattern": "TEST",
+      "count": 5
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\supabase-init.js",
+      "pattern": "null",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\supabase-init.js",
+      "pattern": "...",
+      "count": 1402
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\vip-stress-dashboard.js",
+      "pattern": "placeholder",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\vip-stress-dashboard.js",
+      "pattern": "PLACEHOLDER",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\vip-stress-dashboard.js",
+      "pattern": "test",
+      "count": 6
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\vip-stress-dashboard.js",
+      "pattern": "TEST",
+      "count": 6
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\vip-stress-dashboard.js",
+      "pattern": "N/A",
+      "count": 2
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\vip-stress-dashboard.js",
+      "pattern": "null",
+      "count": 9
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\vip-stress-dashboard.js",
+      "pattern": "undefined",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\vip-stress-dashboard.js",
+      "pattern": "None",
+      "count": 5
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\vip-stress-dashboard.js",
+      "pattern": "none",
+      "count": 5
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\js\\vip-stress-dashboard.js",
+      "pattern": "...",
+      "count": 15637
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\accuracy.html",
+      "pattern": "test",
+      "count": 5
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\accuracy.html",
+      "pattern": "TEST",
+      "count": 5
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\accuracy.html",
+      "pattern": "None",
+      "count": 2
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\accuracy.html",
+      "pattern": "none",
+      "count": 2
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\accuracy.html",
+      "pattern": "...",
+      "count": 11271
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\admin-sync.html",
+      "pattern": "placeholder",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\admin-sync.html",
+      "pattern": "PLACEHOLDER",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\admin-sync.html",
+      "pattern": "None",
+      "count": 3
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\admin-sync.html",
+      "pattern": "none",
+      "count": 3
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\admin-sync.html",
+      "pattern": "...",
+      "count": 2137
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\direct-markets.html",
+      "pattern": "None",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\direct-markets.html",
+      "pattern": "none",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\direct-markets.html",
+      "pattern": "...",
+      "count": 663
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\experience.html",
+      "pattern": "sample",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\experience.html",
+      "pattern": "SAMPLE",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\experience.html",
+      "pattern": "null",
+      "count": 5
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\experience.html",
+      "pattern": "None",
+      "count": 8
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\experience.html",
+      "pattern": "none",
+      "count": 8
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\experience.html",
+      "pattern": "...",
+      "count": 7675
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\index.html",
+      "pattern": "placeholder",
+      "count": 17
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\index.html",
+      "pattern": "PLACEHOLDER",
+      "count": 17
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\index.html",
+      "pattern": "sample",
+      "count": 2
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\index.html",
+      "pattern": "SAMPLE",
+      "count": 2
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\index.html",
+      "pattern": "test",
+      "count": 37
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\index.html",
+      "pattern": "TEST",
+      "count": 37
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\index.html",
+      "pattern": "N/A",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\index.html",
+      "pattern": "null",
+      "count": 83
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\index.html",
+      "pattern": "undefined",
+      "count": 7
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\index.html",
+      "pattern": "None",
+      "count": 55
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\index.html",
+      "pattern": "none",
+      "count": 55
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\index.html",
+      "pattern": "TBD",
+      "count": 4
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\index.html",
+      "pattern": "tbd",
+      "count": 4
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\index.html",
+      "pattern": "coming soon",
+      "count": 2
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\index.html",
+      "pattern": "Coming Soon",
+      "count": 2
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\index.html",
+      "pattern": "...",
+      "count": 80012
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\language-switch.html",
+      "pattern": "None",
+      "count": 4
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\language-switch.html",
+      "pattern": "none",
+      "count": 4
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\language-switch.html",
+      "pattern": "...",
+      "count": 1499
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\login.html",
+      "pattern": "placeholder",
+      "count": 10
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\login.html",
+      "pattern": "PLACEHOLDER",
+      "count": 10
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\login.html",
+      "pattern": "null",
+      "count": 3
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\login.html",
+      "pattern": "None",
+      "count": 6
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\login.html",
+      "pattern": "none",
+      "count": 6
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\login.html",
+      "pattern": "...",
+      "count": 5383
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\market-explorer.html",
+      "pattern": "None",
+      "count": 3
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\market-explorer.html",
+      "pattern": "none",
+      "count": 3
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\market-explorer.html",
+      "pattern": "...",
+      "count": 1912
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\payment.html",
+      "pattern": "placeholder",
+      "count": 5
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\payment.html",
+      "pattern": "PLACEHOLDER",
+      "count": 5
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\payment.html",
+      "pattern": "null",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\payment.html",
+      "pattern": "None",
+      "count": 4
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\payment.html",
+      "pattern": "none",
+      "count": 4
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\payment.html",
+      "pattern": "coming soon",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\payment.html",
+      "pattern": "Coming Soon",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\payment.html",
+      "pattern": "...",
+      "count": 1814
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\privacy.html",
+      "pattern": "None",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\privacy.html",
+      "pattern": "none",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\privacy.html",
+      "pattern": "...",
+      "count": 2777
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\subscribe\\index.html",
+      "pattern": "...",
+      "count": 749
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\subscription.html",
+      "pattern": "placeholder",
+      "count": 9
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\subscription.html",
+      "pattern": "PLACEHOLDER",
+      "count": 9
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\subscription.html",
+      "pattern": "test",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\subscription.html",
+      "pattern": "TEST",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\subscription.html",
+      "pattern": "null",
+      "count": 2
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\subscription.html",
+      "pattern": "None",
+      "count": 8
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\subscription.html",
+      "pattern": "none",
+      "count": 8
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\subscription.html",
+      "pattern": "coming soon",
+      "count": 5
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\subscription.html",
+      "pattern": "Coming Soon",
+      "count": 5
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\subscription.html",
+      "pattern": "...",
+      "count": 9976
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\terms.html",
+      "pattern": "None",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\terms.html",
+      "pattern": "none",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\terms.html",
+      "pattern": "...",
+      "count": 816
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\vip-stress-dashboard.html",
+      "pattern": "placeholder",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\vip-stress-dashboard.html",
+      "pattern": "PLACEHOLDER",
+      "count": 1
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\vip-stress-dashboard.html",
+      "pattern": "None",
+      "count": 4
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\vip-stress-dashboard.html",
+      "pattern": "none",
+      "count": 4
+    },
+    {
+      "file": "C:\\Users\\user\\Desktop\\Stephen Fynn\\SKCS-test\\public\\vip-stress-dashboard.html",
+      "pattern": "...",
+      "count": 2744
+    }
+  ],
+  "brokenData": []
+}

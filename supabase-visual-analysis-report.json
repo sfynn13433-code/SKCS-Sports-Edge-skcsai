@@ -1,0 +1,347 @@
+{
+  "summary": {
+    "totalTables": 14,
+    "duplicateGroups": 1,
+    "ruleTables": 3,
+    "mergeOpportunities": 3,
+    "dataDuplication": 3
+  },
+  "tables": {
+    "cricket_fixtures": {
+      "columns": [
+        "away_team",
+        "created_at",
+        "home_team",
+        "id",
+        "league",
+        "match_date",
+        "match_id",
+        "match_time",
+        "status",
+        "venue"
+      ],
+      "purpose": "Cricket match fixtures data",
+      "rowCount": "Visible data shows multiple cricket matches"
+    },
+    "cricket_insights_final": {
+      "columns": [
+        "id",
+        "match_id",
+        "home_team",
+        "away_team",
+        "prediction",
+        "confidence",
+        "insights",
+        "created_at"
+      ],
+      "purpose": "Cricket match predictions and insights",
+      "rowCount": "Visible data shows cricket predictions"
+    },
+    "cricket_market_rules": {
+      "columns": [
+        "id",
+        "market_type",
+        "allowed_markets",
+        "min_confidence",
+        "max_confidence",
+        "tier",
+        "created_at"
+      ],
+      "purpose": "Cricket market rules and restrictions",
+      "rowCount": "Shows market rules for different tiers"
+    },
+    "fixtures": {
+      "columns": [
+        "away_team",
+        "created_at",
+        "home_team",
+        "id",
+        "league",
+        "match_date",
+        "match_id",
+        "match_time",
+        "status",
+        "venue"
+      ],
+      "purpose": "Football match fixtures data",
+      "rowCount": "Visible data shows football matches"
+    },
+    "predictions_raw": {
+      "columns": [
+        "away_team",
+        "confidence",
+        "created_at",
+        "home_team",
+        "id",
+        "match_id",
+        "metadata",
+        "prediction"
+      ],
+      "purpose": "Raw football predictions before filtering",
+      "rowCount": "Shows raw prediction data"
+    },
+    "predictions_filtered": {
+      "columns": [
+        "away_team",
+        "confidence",
+        "created_at",
+        "filter_reason",
+        "home_team",
+        "id",
+        "match_id",
+        "prediction"
+      ],
+      "purpose": "Filtered football predictions after tier rules",
+      "rowCount": "Shows filtered predictions"
+    },
+    "direct1x2_prediction_final": {
+      "columns": [
+        "away_team",
+        "confidence",
+        "created_at",
+        "home_team",
+        "id",
+        "market_type",
+        "match_id",
+        "matches",
+        "prediction",
+        "sport"
+      ],
+      "purpose": "Final football predictions for 1X2 markets",
+      "rowCount": "Shows final predictions"
+    },
+    "profiles": {
+      "columns": [
+        "id",
+        "user_id",
+        "email",
+        "name",
+        "subscription_tier",
+        "created_at",
+        "updated_at"
+      ],
+      "purpose": "User profiles and subscription information",
+      "rowCount": "Shows user profiles"
+    },
+    "subscriptions": {
+      "columns": [
+        "id",
+        "user_id",
+        "plan_id",
+        "status",
+        "start_date",
+        "end_date",
+        "created_at"
+      ],
+      "purpose": "User subscription details",
+      "rowCount": "Shows subscription records"
+    },
+    "tier_rules": {
+      "columns": [
+        "id",
+        "tier",
+        "allowed_volatility",
+        "min_confidence",
+        "max_predictions",
+        "features",
+        "created_at"
+      ],
+      "purpose": "Tier-based rules and limits",
+      "rowCount": "Shows rules for different tiers"
+    },
+    "subscription_plans": {
+      "columns": [
+        "id",
+        "plan_id",
+        "name",
+        "price",
+        "duration",
+        "features",
+        "created_at"
+      ],
+      "purpose": "Subscription plan definitions",
+      "rowCount": "Shows available plans"
+    },
+    "raw_fixtures": {
+      "columns": [
+        "id_event",
+        "start_time",
+        "home_team_id",
+        "away_team_id",
+        "home_team",
+        "away_team",
+        "venue",
+        "league",
+        "created_at"
+      ],
+      "purpose": "Raw fixture data from external APIs",
+      "rowCount": "Shows raw fixture imports"
+    },
+    "ai_predictions": {
+      "columns": [
+        "ai_model",
+        "away_team",
+        "confidence",
+        "created_at",
+        "home_team",
+        "id",
+        "match_id",
+        "prediction"
+      ],
+      "purpose": "AI-generated predictions",
+      "rowCount": "Shows AI predictions"
+    },
+    "public_intelligence": {
+      "columns": [
+        "id",
+        "espn_entity_id",
+        "news_timestamp",
+        "headline",
+        "description",
+        "created_at"
+      ],
+      "purpose": "Public intelligence and news data",
+      "rowCount": "Shows intelligence records"
+    }
+  },
+  "duplicates": [
+    {
+      "tables": [
+        "cricket_fixtures",
+        "fixtures"
+      ],
+      "reason": "Identical column structure",
+      "recommendation": "Merge into single fixtures table with sport discriminator"
+    }
+  ],
+  "mergeOpportunities": [
+    {
+      "tables": [
+        "cricket_fixtures",
+        "fixtures"
+      ],
+      "confidence": 0.95,
+      "reason": "Identical structure, different sports only",
+      "suggestedName": "fixtures",
+      "migrationPlan": "Add sport column, migrate cricket_fixtures data, drop cricket_fixtures",
+      "risks": [
+        "Need to update queries to filter by sport",
+        "Potential data conflicts if match_id overlaps"
+      ]
+    },
+    {
+      "tables": [
+        "predictions_raw",
+        "predictions_filtered"
+      ],
+      "confidence": 0.85,
+      "reason": "Similar structure, different processing stages",
+      "suggestedName": "predictions",
+      "migrationPlan": "Add status column (raw/filtered), combine data, maintain filter_reason",
+      "risks": [
+        "Need to update filtering logic",
+        "Potential performance impact"
+      ]
+    },
+    {
+      "tables": [
+        "tier_rules",
+        "cricket_market_rules"
+      ],
+      "confidence": 0.75,
+      "reason": "Both define tier-based restrictions",
+      "suggestedName": "market_rules",
+      "migrationPlan": "Add sport column, unify rule structure",
+      "risks": [
+        "Different rule formats",
+        "Need to handle sport-specific rules"
+      ]
+    }
+  ],
+  "dataDuplication": [
+    {
+      "tables": [
+        "cricket_fixtures",
+        "fixtures"
+      ],
+      "type": "Structural duplication",
+      "impact": "High - same data structure for different sports",
+      "recommendation": "Merge with sport discriminator"
+    },
+    {
+      "tables": [
+        "predictions_raw",
+        "predictions_filtered",
+        "direct1x2_prediction_final"
+      ],
+      "type": "Processing pipeline duplication",
+      "impact": "Medium - same data at different stages",
+      "recommendation": "Consolidate with status tracking"
+    },
+    {
+      "tables": [
+        "tier_rules",
+        "cricket_market_rules"
+      ],
+      "type": "Rule duplication",
+      "impact": "High - conflicting rule definitions",
+      "recommendation": "Unify rule system"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "URGENT",
+      "action": "Merge cricket_fixtures and fixtures",
+      "reason": "Exact structural duplication causing maintenance overhead",
+      "impact": "Reduces table count, simplifies queries, prevents data inconsistency",
+      "effort": "Medium - requires sport column addition and query updates"
+    },
+    {
+      "priority": "HIGH",
+      "action": "Unify rule tables (tier_rules, cricket_market_rules)",
+      "reason": "Conflicting rule definitions across sports",
+      "impact": "Consistent rule enforcement, easier maintenance",
+      "effort": "High - requires rule format standardization"
+    },
+    {
+      "priority": "MEDIUM",
+      "action": "Consolidate prediction tables",
+      "reason": "Multiple tables for same data at different stages",
+      "impact": "Simpler data flow, easier debugging",
+      "effort": "Medium - requires status tracking and pipeline updates"
+    },
+    {
+      "priority": "LOW",
+      "action": "Review and standardize column naming",
+      "reason": "Inconsistent naming conventions across tables",
+      "impact": "Better developer experience, clearer data model",
+      "effort": "Low - mostly cosmetic changes"
+    }
+  ],
+  "risks": [
+    {
+      "risk": "Data loss during migration",
+      "probability": "Medium",
+      "impact": "High",
+      "mitigation": "Full backup before any merge operations, test migrations in staging"
+    },
+    {
+      "risk": "Application breaks due to table changes",
+      "probability": "High",
+      "impact": "High",
+      "mitigation": "Comprehensive code review, update all references, gradual migration"
+    },
+    {
+      "risk": "Performance degradation",
+      "probability": "Medium",
+      "impact": "Medium",
+      "mitigation": "Proper indexing, query optimization, performance testing"
+    },
+    {
+      "risk": "Rule conflicts causing user issues",
+      "probability": "Medium",
+      "impact": "High",
+      "mitigation": "Careful rule mapping, user communication, rollback plan"
+    }
+  ]
+}

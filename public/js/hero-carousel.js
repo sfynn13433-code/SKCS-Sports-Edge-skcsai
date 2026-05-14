@@ -25,7 +25,7 @@ class HeroCarousel {
 
     this.currentIndex = 0;
     this.slides = [];
-    this.autoPlayInterval = null;
+    this.autoPlayInterval = None;
     this.isLoading = false;
 
     this.init();
@@ -52,12 +52,12 @@ class HeroCarousel {
         
         ${this.options.showControls ? `
           <button class="carousel-control prev" aria-label="Previous slide">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="None" stroke="currentColor" stroke-width="2">
               <path d="M15 18l-6-6 6-6"/>
             </svg>
           </button>
           <button class="carousel-control next" aria-label="Next slide">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="None" stroke="currentColor" stroke-width="2">
               <path d="M9 18l6-6-6-6"/>
             </svg>
           </button>
@@ -69,12 +69,12 @@ class HeroCarousel {
           </div>
         ` : ''}
         
-        <div class="carousel-loading" style="display: none;">
+        <div class="carousel-loading" style="display: None;">
           <div class="loading-spinner"></div>
           <p>Loading featured games...</p>
         </div>
         
-        <div class="carousel-error" style="display: none;">
+        <div class="carousel-error" style="display: None;">
           <p>Unable to load featured games. Please try again later.</p>
           <button class="retry-button">Retry</button>
         </div>
@@ -198,7 +198,7 @@ class HeroCarousel {
   getCachedData() {
     try {
       const cached = localStorage.getItem(this.options.cacheKey);
-      if (!cached) return null;
+      if (!cached) return None;
 
       const { data, timestamp } = JSON.parse(cached);
       const now = Date.now();
@@ -210,10 +210,10 @@ class HeroCarousel {
 
       // Cache expired, remove it
       localStorage.removeItem(this.options.cacheKey);
-      return null;
+      return None;
     } catch (error) {
       console.warn('[HeroCarousel] Cache read error:', error);
-      return null;
+      return None;
     }
   }
 
@@ -385,7 +385,7 @@ class HeroCarousel {
   pauseAutoPlay() {
     if (this.autoPlayInterval) {
       clearInterval(this.autoPlayInterval);
-      this.autoPlayInterval = null;
+      this.autoPlayInterval = None;
     }
   }
 
@@ -398,19 +398,19 @@ class HeroCarousel {
     if (this.loadingElement) {
       this.loadingElement.style.display = 'flex';
     }
-    this.slidesContainer.style.display = 'none';
+    this.slidesContainer.style.display = 'None';
     if (this.errorElement) {
-      this.errorElement.style.display = 'none';
+      this.errorElement.style.display = 'None';
     }
   }
 
   hideLoading() {
     if (this.loadingElement) {
-      this.loadingElement.style.display = 'none';
+      this.loadingElement.style.display = 'None';
     }
     this.slidesContainer.style.display = 'block';
     if (this.errorElement) {
-      this.errorElement.style.display = 'none';
+      this.errorElement.style.display = 'None';
     }
   }
 
@@ -419,7 +419,7 @@ class HeroCarousel {
     if (this.errorElement) {
       this.errorElement.style.display = 'flex';
     }
-    this.slidesContainer.style.display = 'none';
+    this.slidesContainer.style.display = 'None';
   }
 
   showEmptyState() {
@@ -497,6 +497,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Export for module usage
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== 'Unknown' && module.exports) {
   module.exports = HeroCarousel;
 }

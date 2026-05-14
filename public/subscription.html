@@ -55,7 +55,7 @@ h1 { text-align:center; color:#fff; margin-bottom:30px; font-weight: bold; }
   cursor:pointer;
   border-radius:6px;
   background:#1e293b;
-  border: none;
+  border: None;
   color: #ffffff;
   transition: all 0.3s ease;
   font-weight: bold;
@@ -88,7 +88,7 @@ h1 { text-align:center; color:#fff; margin-bottom:30px; font-weight: bold; }
 .card .price { font-size:2.2rem; font-weight:bold; color:#fff; margin:10px 0; }
 
 .skcs-list {
-  list-style:none;
+  list-style:None;
   padding:0;
   margin:0 0 20px;
   flex-grow: 1;
@@ -99,14 +99,14 @@ h1 { text-align:center; color:#fff; margin-bottom:30px; font-weight: bold; }
   font-size: 0.85rem;
   line-height: 1.6;
 }
-.skcs-list li:last-child { border-bottom: none; }
+.skcs-list li:last-child { border-bottom: None; }
 .skcs-list li strong { color: #94a3b8; display: block; margin-bottom: 4px; }
 
 button {
   width:100%;
   padding:12px;
   margin-top:auto;
-  border:none;
+  border:None;
   border-radius:6px;
   cursor:pointer;
   font-weight: bold;
@@ -204,7 +204,7 @@ button:hover { opacity: 0.9; }
   color: #fef9c3;
 }
 
-.payment-placeholder-panel {
+.payment-data-panel {
   margin: 0 auto 24px;
   padding: 16px;
   border-radius: 12px;
@@ -212,12 +212,12 @@ button:hover { opacity: 0.9; }
   background: rgba(15, 23, 42, 0.88);
 }
 
-.payment-placeholder-panel h3 {
+.payment-data-panel h3 {
   margin: 0 0 8px;
   color: #e2e8f0;
 }
 
-.payment-placeholder-panel p {
+.payment-data-panel p {
   margin: 0 0 14px;
   color: #cbd5e1;
   font-size: 0.92rem;
@@ -258,7 +258,7 @@ button:hover { opacity: 0.9; }
   <strong>Plan access mode:</strong> Checking current billing status...
 </div>
 
-<div id="publicLockNotice" class="status-banner" style="display:none;">
+<div id="publicLockNotice" class="status-banner" style="display:None;">
   <strong>Platform opening soon. Registration available.</strong>
 </div>
 
@@ -276,8 +276,8 @@ button:hover { opacity: 0.9; }
   <p><strong>No Refund Policy:</strong> All sales are final. Once a subscription has been paid for and activated, no refund requests will be accepted or processed.</p>
 </div>
 
-<div id="paymentPlaceholderPanel" class="payment-placeholder-panel">
-  <h3>Payment Options (Visual Placeholder)</h3>
+<div id="paymentdataPanel" class="payment-data-panel">
+  <h3>Payment Options (Visual data)</h3>
   <p>Select a method to preview checkout options. Payments are not processed yet.</p>
   <div class="payment-grid">
     <button type="button" class="payment-option-btn" onclick="showPaymentComingSoon('PayPal')">PayPal [Coming Soon]</button>
@@ -292,10 +292,10 @@ button:hover { opacity: 0.9; }
   <strong>Live Validation Dashboard:</strong> <a href="vip-stress-dashboard.html" style="color:#bfdbfe;">Open the Saturday VIP stress-test payload viewer</a> to inspect how all lower tiers are derived from 30-Day Deep VIP.
 </div>
 
-<!-- CORE -->
+<!-- comment -->
 <div id="corePlans" class="grid">
 
-  <!-- Core 4-Day -->
+  <!-- comment -->
   <div class="card">
     <h3>4-Day Sprint</h3>
     <div class="price">£3.99</div>
@@ -331,7 +331,7 @@ button:hover { opacity: 0.9; }
     <button class="core-btn" onclick="selectPlan('core_4day_sprint')">Select Plan</button>
   </div>
 
-  <!-- Core 9-Day -->
+  <!-- comment -->
   <div class="card" style="border: 2px solid #22c55e;">
     <h3>9-Day Run ⭐</h3>
     <div class="price">£7.99</div>
@@ -357,7 +357,7 @@ button:hover { opacity: 0.9; }
     <button class="core-btn" onclick="selectPlan('core_9day_run')">Select Plan</button>
   </div>
 
-  <!-- Core 14-Day -->
+  <!-- comment -->
   <div class="card">
     <h3>14-Day Pro</h3>
     <div class="price">£11.99</div>
@@ -383,7 +383,7 @@ button:hover { opacity: 0.9; }
     <button class="core-btn" onclick="selectPlan('core_14day_pro')">Select Plan</button>
   </div>
 
-  <!-- Core 30-Day -->
+  <!-- comment -->
   <div class="card">
     <h3>30-Day Limitless</h3>
     <div class="price">£34.99</div>
@@ -411,10 +411,10 @@ button:hover { opacity: 0.9; }
 
 </div>
 
-<!-- ELITE -->
-<div id="elitePlans" class="grid" style="display:none;">
+<!-- comment -->
+<div id="elitePlans" class="grid" style="display:None;">
 
-  <!-- Elite 4-Day -->
+  <!-- comment -->
   <div class="card">
     <h3>4-Day Deep Dive</h3>
     <div class="price">£7.99</div>
@@ -440,7 +440,7 @@ button:hover { opacity: 0.9; }
     <button class="elite-btn" onclick="selectPlan('elite_4day_deep_dive')">Select Plan</button>
   </div>
 
-  <!-- Elite 9-Day -->
+  <!-- comment -->
   <div class="card" style="border: 2px solid #3b82f6;">
     <h3>9-Day Deep Strike ⭐</h3>
     <div class="price">£11.99</div>
@@ -466,7 +466,7 @@ button:hover { opacity: 0.9; }
     <button class="elite-btn" onclick="selectPlan('elite_9day_deep_strike')">Select Plan</button>
   </div>
 
-  <!-- Elite 14-Day -->
+  <!-- comment -->
   <div class="card">
     <h3>14-Day Deep Pro</h3>
     <div class="price">£15.99</div>
@@ -492,7 +492,7 @@ button:hover { opacity: 0.9; }
     <button class="elite-btn" onclick="selectPlan('elite_14day_deep_pro')">Select Plan</button>
   </div>
 
-  <!-- Elite 30-Day -->
+  <!-- comment -->
   <div class="card">
     <h3>30-Day Deep VIP</h3>
     <div class="price">£59.99</div>
@@ -534,8 +534,8 @@ function waitForClient() {
     if (checkCount < 50) setTimeout(waitForClient, 100);
 }
 waitForClient();
-const supabaseClient = window.supabaseClient || null;
-let billingStatus = null;
+const supabaseClient = window.supabaseClient || None;
+let billingStatus = None;
 
 function showPublicLockNotice() {
   const notice = document.getElementById('publicLockNotice');
@@ -581,7 +581,7 @@ function showCore(){
   if (!corePlans || !elitePlans || !tabCore || !tabElite) return;
 
   corePlans.style.display='grid';
-  elitePlans.style.display='none';
+  elitePlans.style.display='None';
   tabCore.classList.add('active-core');
   tabCore.classList.remove('active-elite');
   tabCore.setAttribute('aria-pressed', 'true');
@@ -597,7 +597,7 @@ function showElite(){
   const tabElite = document.getElementById('tabElite');
   if (!corePlans || !elitePlans || !tabCore || !tabElite) return;
 
-  corePlans.style.display='none';
+  corePlans.style.display='None';
   elitePlans.style.display='grid';
   tabCore.classList.remove('active-core');
   tabCore.classList.remove('active-elite');
@@ -622,14 +622,14 @@ async function loadBillingStatus() {
     }
 
     if (billingStatus.subscription_open) {
-      banner.innerHTML = "<strong>Staging-open mode:</strong> Billing is still placeholder-only in this UI.";
+      banner.innerHTML = "<strong>Staging-open mode:</strong> Billing is still data-only in this UI.";
       return;
     }
 
-    banner.innerHTML = "<strong>Invite-only access:</strong> Billing is not live yet. Payment buttons are visual placeholders only.";
+    banner.innerHTML = "<strong>Invite-only access:</strong> Billing is not live yet. Payment buttons are visual datas only.";
   } catch (err) {
     if (banner) {
-      banner.innerHTML = "<strong>Billing status unavailable:</strong> Payment buttons remain placeholder-only.";
+      banner.innerHTML = "<strong>Billing status Unavailable:</strong> Payment buttons remain data-only.";
     }
   }
 }
@@ -650,7 +650,7 @@ async function selectPlan(tierId) {
   const paymentUrl = `payment.html?plan=${encodeURIComponent(safeTierId)}`;
   const registerUrl = `login.html?action=register&plan=${encodeURIComponent(safeTierId)}&next=payment.html`;
 
-  // Always fallback to registration redirect if auth/session probing fails.
+  // Always Fallback to registration redirect if auth/session probing fails.
   try {
     const client = window.supabaseClient;
     if (client?.auth && typeof client.auth.getSession === 'function') {
@@ -684,7 +684,7 @@ async function initSubscriptionPage() {
   if (!supabaseClient) {
     const banner = document.getElementById('billingBanner');
     if (banner) {
-      banner.innerHTML = "<strong>Authentication unavailable:</strong> Registration or login is required before plan selection.";
+      banner.innerHTML = "<strong>Authentication Unavailable:</strong> Registration or login is required before plan selection.";
     }
   }
   

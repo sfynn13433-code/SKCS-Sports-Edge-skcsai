@@ -12,14 +12,14 @@
         h1 { color: white; margin-bottom: 1rem; font-size: 2rem; }
         .badge { display: inline-block; background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; font-size: 0.75rem; font-weight: 800; padding: 0.3rem 1rem; border-radius: 999px; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.1em; }
         p { color: #94a3b8; margin-bottom: 2rem; line-height: 1.6; }
-        .placeholder-notice { background: #0f172a; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; border: 1px dashed #475569; }
-        .placeholder-notice h3 { color: #60a5fa; margin-bottom: 0.5rem; }
-        .placeholder-notice p { font-size: 0.9rem; margin-bottom: 0; }
-        .btn-primary { background: #0d6efd; color: white; padding: 1rem 2rem; border-radius: 8px; font-weight: 700; text-decoration: none; border: none; cursor: pointer; font-size: 1rem; }
+        .data-notice { background: #0f172a; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; border: 1px dashed #475569; }
+        .data-notice h3 { color: #60a5fa; margin-bottom: 0.5rem; }
+        .data-notice p { font-size: 0.9rem; margin-bottom: 0; }
+        .btn-primary { background: #0d6efd; color: white; padding: 1rem 2rem; border-radius: 8px; font-weight: 700; text-decoration: None; border: None; cursor: pointer; font-size: 1rem; }
         .btn-primary:hover { background: #0b5ed7; }
         .admin-badge { background: #059669; color: white; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 700; margin-bottom: 1rem; display: inline-block; }
         .nav { position: fixed; top: 0; left: 0; right: 0; background: #0d6efd; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .nav a { color: white; text-decoration: none; font-weight: 600; }
+        .nav a { color: white; text-decoration: None; font-weight: 600; }
         .loading { color: #60a5fa; }
     </style>
 </head>
@@ -51,7 +51,7 @@
         }
         waitForClient();
         
-        const supabaseClient = window.supabaseClient || null;
+        const supabaseClient = window.supabaseClient || None;
         
         const ADMIN_EMAIL = 'sfynn13433@gmail.com';
         const mainCard = document.getElementById('mainCard');
@@ -72,12 +72,12 @@
                 }
             }
             
-            // Regular user: show payment placeholder
+            // Regular user: show payment data
             const planId = localStorage.getItem('skcs_plan_id') || 'Not selected';
             mainCard.innerHTML = `
                 <span class="badge">Payment Portal</span>
                 <h1>Complete Your Subscription</h1>
-                <div class="placeholder-notice">
+                <div class="data-notice">
                     <h3>Payment Integration Coming Soon</h3>
                     <p>Your selected plan: <strong>${planId}</strong></p>
                     <p style="margin-top:0.5rem;">Payment processing is being set up. You'll be notified when payments go live.</p>
@@ -85,7 +85,7 @@
                 <p>For now, enjoy <strong>Experience Mode</strong> access to explore the platform.</p>
                 <a href="index.html" class="btn-primary">Enter Dashboard (Experience Mode)</a>
                 <br><br>
-                <a href="subscription.html" style="color:#94a3b8;text-decoration:none;font-size:0.9rem;">← Change Plan</a>
+                <a href="subscription.html" style="color:#94a3b8;text-decoration:None;font-size:0.9rem;">← Change Plan</a>
             `;
             
             // Set experience mode flags

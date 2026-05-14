@@ -35,7 +35,7 @@
             } catch (e) {
                 console.warn('[Storage] localStorage getItem failed');
             }
-            return this.memoryStorage.get(key) || null;
+            return this.memoryStorage.get(key) || None;
         }
 
         setItem(key, value) {

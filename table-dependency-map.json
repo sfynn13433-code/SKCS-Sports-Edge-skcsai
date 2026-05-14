@@ -1,0 +1,547 @@
+{
+  "tables": [
+    "cricket_fixtures",
+    "fixtures",
+    "predictions_raw",
+    "predictions_filtered",
+    "ai_predictions",
+    "tier_rules",
+    "cricket_market_rules"
+  ],
+  "dependencies": {
+    "cricket_fixtures": {
+      "directReferences": [
+        {
+          "file": "backend\\server-express.js",
+          "pattern": "'cricket_fixtures'",
+          "line": 1624
+        },
+        {
+          "file": "scripts\\analyze-supabase-visual.js",
+          "pattern": "'cricket_fixtures'",
+          "line": 10
+        },
+        {
+          "file": "scripts\\audit-cricket-tables.js",
+          "pattern": "'cricket_fixtures'",
+          "line": 10
+        },
+        {
+          "file": "scripts\\create-migration-plan.js",
+          "pattern": "FROM cricket_fixtures",
+          "line": 21
+        },
+        {
+          "file": "scripts\\create-migration-plan.js",
+          "pattern": "FROM cricket_fixtures",
+          "line": 21
+        },
+        {
+          "file": "scripts\\create-migration-plan.js",
+          "pattern": "CREATE TABLE cricket_fixtures",
+          "line": 21
+        },
+        {
+          "file": "scripts\\create-migration-plan.js",
+          "pattern": "DROP TABLE cricket_fixtures",
+          "line": 64
+        },
+        {
+          "file": "scripts\\create-migration-plan.js",
+          "pattern": "'cricket_fixtures'",
+          "line": 14
+        },
+        {
+          "file": "scripts\\debug-cricket-insights-schema.js",
+          "pattern": "FROM cricket_fixtures",
+          "line": 111
+        },
+        {
+          "file": "scripts\\debug-cricket-insights-schema.js",
+          "pattern": "FROM cricket_fixtures",
+          "line": 111
+        },
+        {
+          "file": "scripts\\debug-cricket-insights-schema.js",
+          "pattern": "'cricket_fixtures'",
+          "line": 99
+        },
+        {
+          "file": "scripts\\debug-cricket-simple.js",
+          "pattern": "FROM cricket_fixtures",
+          "line": 65
+        },
+        {
+          "file": "scripts\\debug-cricket-simple.js",
+          "pattern": "FROM cricket_fixtures",
+          "line": 65
+        },
+        {
+          "file": "scripts\\debug-cricket-simple.js",
+          "pattern": "'cricket_fixtures'",
+          "line": 53
+        },
+        {
+          "file": "scripts\\map-table-dependencies.js",
+          "pattern": "'cricket_fixtures'",
+          "line": 9
+        },
+        {
+          "file": "scripts\\publish-cricbuzz-cricket.js",
+          "pattern": "'cricket_fixtures'",
+          "line": 446
+        }
+      ],
+      "indirectReferences": [],
+      "apiEndpoints": [],
+      "services": [],
+      "frontendFiles": [],
+      "criticality": "HIGH"
+    },
+    "fixtures": {
+      "directReferences": [
+        {
+          "file": "backend\\apiClients.js",
+          "pattern": "'fixtures'",
+          "line": 146
+        },
+        {
+          "file": "backend\\dbBootstrap.js",
+          "pattern": "FROM fixtures",
+          "line": 33
+        },
+        {
+          "file": "backend\\dbBootstrap.js",
+          "pattern": "FROM fixtures",
+          "line": 33
+        },
+        {
+          "file": "backend\\dbBootstrap.js",
+          "pattern": "DELETE FROM fixtures",
+          "line": 33
+        },
+        {
+          "file": "backend\\dbBootstrap.js",
+          "pattern": "'fixtures'",
+          "line": 17
+        },
+        {
+          "file": "backend\\services\\rateLimitsAnalysis.js",
+          "pattern": "'fixtures'",
+          "line": 158
+        },
+        {
+          "file": "backend\\services\\sportsApiProFootballExtractor.js",
+          "pattern": "'fixtures'",
+          "line": 198
+        },
+        {
+          "file": "backend\\utils\\apiCache.js",
+          "pattern": "'fixtures'",
+          "line": 28
+        },
+        {
+          "file": "scripts\\audit-cricket-final-tables.js",
+          "pattern": "'fixtures'",
+          "line": 12
+        },
+        {
+          "file": "scripts\\audit-cricket-rules.js",
+          "pattern": "'fixtures'",
+          "line": 17
+        },
+        {
+          "file": "scripts\\audit-cricket-storage.js",
+          "pattern": "'fixtures'",
+          "line": 12
+        },
+        {
+          "file": "scripts\\import-today-snapshot-pipeline.js",
+          "pattern": "'fixtures'",
+          "line": 47
+        }
+      ],
+      "indirectReferences": [],
+      "apiEndpoints": [],
+      "services": [],
+      "frontendFiles": [],
+      "criticality": "HIGH"
+    },
+    "predictions_raw": {
+      "directReferences": [
+        {
+          "file": "backend\\database.js",
+          "pattern": "'predictions_raw'",
+          "line": 517
+        },
+        {
+          "file": "backend\\routes\\pipeline.js",
+          "pattern": "'predictions_raw'",
+          "line": 225
+        },
+        {
+          "file": "backend\\utils\\purgeStaleData.js",
+          "pattern": "FROM predictions_raw",
+          "line": 67
+        },
+        {
+          "file": "backend\\utils\\purgeStaleData.js",
+          "pattern": "FROM predictions_raw",
+          "line": 67
+        },
+        {
+          "file": "backend\\utils\\purgeStaleData.js",
+          "pattern": "DELETE FROM predictions_raw",
+          "line": 67
+        },
+        {
+          "file": "scripts\\check-final-table-schema.js",
+          "pattern": "FROM predictions_raw",
+          "line": 51
+        },
+        {
+          "file": "scripts\\check-final-table-schema.js",
+          "pattern": "FROM predictions_raw",
+          "line": 51
+        },
+        {
+          "file": "scripts\\check-match-id-mapping.js",
+          "pattern": "FROM predictions_raw",
+          "line": 71
+        },
+        {
+          "file": "scripts\\check-match-id-mapping.js",
+          "pattern": "FROM predictions_raw",
+          "line": 71
+        },
+        {
+          "file": "scripts\\check-raw-prediction-structure.js",
+          "pattern": "FROM predictions_raw",
+          "line": 9
+        },
+        {
+          "file": "scripts\\check-raw-prediction-structure.js",
+          "pattern": "FROM predictions_raw",
+          "line": 9
+        },
+        {
+          "file": "scripts\\check-timestamp-cols.js",
+          "pattern": "'predictions_raw'",
+          "line": 6
+        },
+        {
+          "file": "scripts\\db-cleanup.js",
+          "pattern": "FROM predictions_raw",
+          "line": 92
+        },
+        {
+          "file": "scripts\\db-cleanup.js",
+          "pattern": "FROM predictions_raw",
+          "line": 92
+        },
+        {
+          "file": "scripts\\db-cleanup.js",
+          "pattern": "DELETE FROM predictions_raw",
+          "line": 99
+        },
+        {
+          "file": "scripts\\examine-prediction-76412.js",
+          "pattern": "FROM predictions_raw",
+          "line": 9
+        },
+        {
+          "file": "scripts\\examine-prediction-76412.js",
+          "pattern": "FROM predictions_raw",
+          "line": 9
+        },
+        {
+          "file": "scripts\\examine-tier-rules.js",
+          "pattern": "FROM predictions_raw",
+          "line": 32
+        },
+        {
+          "file": "scripts\\examine-tier-rules.js",
+          "pattern": "FROM predictions_raw",
+          "line": 32
+        },
+        {
+          "file": "scripts\\publish-prediction-76412.js",
+          "pattern": "FROM predictions_raw",
+          "line": 10
+        },
+        {
+          "file": "scripts\\publish-prediction-76412.js",
+          "pattern": "FROM predictions_raw",
+          "line": 10
+        },
+        {
+          "file": "scripts\\trace-filtering-rules.js",
+          "pattern": "FROM predictions_raw",
+          "line": 126
+        },
+        {
+          "file": "scripts\\trace-filtering-rules.js",
+          "pattern": "FROM predictions_raw",
+          "line": 126
+        },
+        {
+          "file": "scripts\\trace-filtering-timestamp.js",
+          "pattern": "FROM predictions_raw",
+          "line": 36
+        },
+        {
+          "file": "scripts\\trace-filtering-timestamp.js",
+          "pattern": "FROM predictions_raw",
+          "line": 36
+        },
+        {
+          "file": "scripts\\trigger-publication.js",
+          "pattern": "FROM predictions_raw",
+          "line": 112
+        },
+        {
+          "file": "scripts\\trigger-publication.js",
+          "pattern": "FROM predictions_raw",
+          "line": 112
+        }
+      ],
+      "indirectReferences": [],
+      "apiEndpoints": [],
+      "services": [],
+      "frontendFiles": [],
+      "criticality": "HIGH"
+    },
+    "predictions_filtered": {
+      "directReferences": [
+        {
+          "file": "backend\\routes\\predictions_enhanced.js",
+          "pattern": "FROM predictions_filtered",
+          "line": 104
+        },
+        {
+          "file": "backend\\routes\\predictions_enhanced.js",
+          "pattern": "FROM predictions_filtered",
+          "line": 104
+        },
+        {
+          "file": "scripts\\check-acca-data.js",
+          "pattern": "FROM predictions_filtered",
+          "line": 7
+        },
+        {
+          "file": "scripts\\check-acca-data.js",
+          "pattern": "FROM predictions_filtered",
+          "line": 7
+        },
+        {
+          "file": "scripts\\check-filtered-schema.js",
+          "pattern": "'predictions_filtered'",
+          "line": 6
+        },
+        {
+          "file": "scripts\\create-indexes.js",
+          "pattern": "'predictions_filtered'",
+          "line": 15
+        }
+      ],
+      "indirectReferences": [],
+      "apiEndpoints": [],
+      "services": [],
+      "frontendFiles": [],
+      "criticality": "HIGH"
+    },
+    "ai_predictions": {
+      "directReferences": [
+        {
+          "file": "scripts\\fix-ai-predictions-endpoint.js",
+          "pattern": "FROM ai_predictions",
+          "line": 34
+        },
+        {
+          "file": "scripts\\fix-ai-predictions-endpoint.js",
+          "pattern": "FROM ai_predictions",
+          "line": 34
+        },
+        {
+          "file": "scripts\\fix-matches-structure.js",
+          "pattern": "FROM ai_predictions",
+          "line": 94
+        },
+        {
+          "file": "scripts\\fix-matches-structure.js",
+          "pattern": "FROM ai_predictions",
+          "line": 94
+        },
+        {
+          "file": "scripts\\test-fixed-endpoint.js",
+          "pattern": "FROM ai_predictions",
+          "line": 29
+        },
+        {
+          "file": "scripts\\test-fixed-endpoint.js",
+          "pattern": "FROM ai_predictions",
+          "line": 29
+        }
+      ],
+      "indirectReferences": [],
+      "apiEndpoints": [],
+      "services": [],
+      "frontendFiles": [],
+      "criticality": "HIGH"
+    },
+    "tier_rules": {
+      "directReferences": [
+        {
+          "file": "scripts\\check-supabase-vs-pg-tiers.js",
+          "pattern": "FROM tier_rules",
+          "line": 14
+        },
+        {
+          "file": "scripts\\check-supabase-vs-pg-tiers.js",
+          "pattern": "FROM tier_rules",
+          "line": 14
+        },
+        {
+          "file": "scripts\\check-supabase-vs-pg-tiers.js",
+          "pattern": "'tier_rules'",
+          "line": 43
+        },
+        {
+          "file": "scripts\\master-qa.js",
+          "pattern": "FROM tier_rules",
+          "line": 100
+        },
+        {
+          "file": "scripts\\master-qa.js",
+          "pattern": "FROM tier_rules",
+          "line": 100
+        }
+      ],
+      "indirectReferences": [],
+      "apiEndpoints": [],
+      "services": [],
+      "frontendFiles": [],
+      "criticality": "HIGH"
+    },
+    "cricket_market_rules": {
+      "directReferences": [],
+      "indirectReferences": [],
+      "apiEndpoints": [],
+      "services": [],
+      "frontendFiles": [],
+      "criticality": "HIGH"
+    }
+  },
+  "riskAssessment": {
+    "highRisk": [
+      {
+        "table": "cricket_fixtures",
+        "riskLevel": "HIGH",
+        "riskFactors": [
+          "High number of direct references"
+        ],
+        "totalReferences": 16,
+        "criticalFiles": []
+      },
+      {
+        "table": "fixtures",
+        "riskLevel": "HIGH",
+        "riskFactors": [
+          "High number of direct references"
+        ],
+        "totalReferences": 12,
+        "criticalFiles": []
+      },
+      {
+        "table": "predictions_raw",
+        "riskLevel": "HIGH",
+        "riskFactors": [
+          "High number of direct references"
+        ],
+        "totalReferences": 27,
+        "criticalFiles": []
+      }
+    ],
+    "mediumRisk": [
+      {
+        "table": "predictions_filtered",
+        "riskLevel": "MEDIUM",
+        "riskFactors": [
+          "Moderate number of direct references"
+        ],
+        "totalReferences": 6,
+        "criticalFiles": []
+      },
+      {
+        "table": "ai_predictions",
+        "riskLevel": "MEDIUM",
+        "riskFactors": [
+          "Moderate number of direct references"
+        ],
+        "totalReferences": 6,
+        "criticalFiles": []
+      }
+    ],
+    "lowRisk": [
+      {
+        "table": "tier_rules",
+        "riskLevel": "LOW",
+        "riskFactors": [],
+        "totalReferences": 5,
+        "criticalFiles": []
+      },
+      {
+        "table": "cricket_market_rules",
+        "riskLevel": "LOW",
+        "riskFactors": [],
+        "totalReferences": 0,
+        "criticalFiles": []
+      }
+    ]
+  },
+  "migrationStrategy": {
+    "phases": [
+      {
+        "phase": 1,
+        "tables": [
+          "tier_rules",
+          "cricket_market_rules"
+        ],
+        "description": "Low-risk table consolidations",
+        "estimatedTime": "2-4 hours"
+      },
+      {
+        "phase": 2,
+        "tables": [
+          "predictions_filtered",
+          "ai_predictions"
+        ],
+        "description": "Medium-risk table consolidations",
+        "estimatedTime": "4-6 hours"
+      },
+      {
+        "phase": 3,
+        "tables": [
+          "cricket_fixtures",
+          "fixtures",
+          "predictions_raw"
+        ],
+        "description": "High-risk table consolidations",
+        "estimatedTime": "6-8 hours"
+      }
+    ],
+    "precautions": [
+      "Create full database backups before each phase",
+      "Test in staging environment before production",
+      "Update all code references before dropping tables",
+      "Monitor application performance during migration",
+      "Have rollback procedures ready for each phase"
+    ],
+    "rollbackPlan": [
+      "Restore tables from backups",
+      "Revert code changes",
+      "Restart application services",
+      "Verify all functionality works"
+    ]
+  }
+}

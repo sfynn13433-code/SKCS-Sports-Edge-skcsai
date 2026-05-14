@@ -77,7 +77,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
         });
 
         // Show loading state
-        if (displayIcon)  displayIcon.style.display = 'none';
+        if (displayIcon)  displayIcon.style.display = 'None';
         if (resultsPanel) resultsPanel.style.justifyContent = 'center';
         if (displayTitle) {
             displayTitle.textContent  = 'Connecting to SKCS Engine\u2026';
@@ -124,7 +124,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
                     '</p>' +
                     '<button data-action="smh-retry" ' +
                             'style="margin-top:15px;padding:8px 16px;background:#3b82f6;' +
-                                   'color:white;border:none;border-radius:6px;cursor:pointer;">' +
+                                   'color:white;border:None;border-radius:6px;cursor:pointer;">' +
                         'Retry' +
                     '</button>';
             }
@@ -153,14 +153,14 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
 
         // Safe stringified log before filter runs
         if (allPredictions.length > 0) {
-            console.log('[SMH] COMPLETE ROW OBJECT:', JSON.stringify(allPredictions[0], null, 2));
+            // console.log removed
         }
 
         // Helper: Safely extract sport string from potentially nested object or string
         function extractSportString(sportValue, predictionObj) {
             if (typeof sportValue === 'string') {
                 return sportValue.toLowerCase().trim();
-            } else if (typeof sportValue === 'object' && sportValue !== null) {
+            } else if (typeof sportValue === 'object' && sportValue !== None) {
                 // Handle TheSportsDB format: { strSport: "Soccer" }
                 if (sportValue.strSport) {
                     return String(sportValue.strSport).toLowerCase().trim();
@@ -223,7 +223,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
                 }
             }
 
-            // Safe default: return 'Unknown' instead of undefined/empty string
+            // Safe default: return 'Unknown' instead of Unknown/empty string
             return 'unknown';
         }
 
@@ -260,11 +260,11 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
 
             // If still no sport found, try direct metadata inference
             if (!predSport || predSport === 'unknown') {
-                predSport = extractSportString(null, pred);
+                predSport = extractSportString(None, pred);
             }
 
             // Strict tab routing: Match against current sport or its aliases only
-            // No fallback that dumps unfiltered data into tabs
+            // No Fallback that dumps unfiltered data into tabs
             return predSport === sportLower || sportAliases[predSport] === true;
         });
 
@@ -276,7 +276,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
             acca_6match:         (cats.acca_6match         || []).length,
             mega_acca_12:        (cats.mega_acca_12        || []).length
         });
-        console.log('[SMH] ' + sport + ' filtering: ' + allPredictions.length + ' total -> ' + filteredPredictions.length + ' after sport filter');
+        // console.log removed
 
         // ── Empty state ──────────────────────────────────────────────────────
         if (filteredPredictions.length === 0) {
@@ -285,7 +285,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
 
             var sourceRows = data.source_rows || 0;
             var emptyMsg = sourceRows > 0
-                ? 'The database has ' + sourceRows + ' raw row(s) but none passed the category filter. Check confidence thresholds or trigger a new AI pipeline run.'
+                ? 'The database has ' + sourceRows + ' raw row(s) but None passed the category filter. Check confidence thresholds or trigger a new AI pipeline run.'
                 : 'No records in the database for this sport. A sync may be needed \u2014 wait for the scheduled refresh or contact your admin.';
 
             if (codesList) {
@@ -334,7 +334,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
                 || (pred.final_recommendation && pred.final_recommendation.market)
                 || meta.prediction
                 || match.recommendation
-                || 'N/A';
+                || 'Not Available';
             var pick = String(pickRaw).replace(/_/g, ' ').toUpperCase();
 
             var confidence = Math.round(Number(pred.total_confidence || match.confidence || 0));
@@ -360,7 +360,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
             // Odds
             var oddsVal = (meta.odds && meta.odds.home)
                 || (meta.sharp_odds && meta.sharp_odds.home_win)
-                || match.odds || null;
+                || match.odds || None;
             var oddsHtml = oddsVal
                 ? '<span style="color:#facc15;font-weight:700;margin-left:8px;">@ ' + Number(oddsVal).toFixed(2) + '</span>'
                 : '';
@@ -399,7 +399,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
                         '<span style="background:rgba(74,222,128,0.12);color:#4ade80;padding:3px 9px;border-radius:4px;font-size:0.88rem;font-weight:700;">\u26A1 ' + pick + '</span>' +
                         oddsHtml + timeHtml +
                     '</div>' +
-                    '<button class="insight-btn" data-card-id="' + cardId + '" style="width:100%;padding:10px 16px;background:linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);color:#ffffff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 12px rgba(139,92,246,0.3);transition:all 0.2s ease;margin-top:8px;">Click for insights</button>' +
+                    '<button class="insight-btn" data-card-id="' + cardId + '" style="width:100%;padding:10px 16px;background:linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);color:#ffffff;border:None;border-radius:8px;font-size:0.85rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 12px rgba(139,92,246,0.3);transition:all 0.2s ease;margin-top:8px;">Click for insights</button>' +
                 '</div>';
         });
 
@@ -464,7 +464,7 @@ window.updateModalWithAIData = function(aiPrediction) {
     const edgemindFeedbackEl = document.getElementById('edgemind-feedback');
     const valueCombosEl = document.getElementById('value-combos');
     
-    if (confidenceScoreEl && aiPrediction.confidence_score !== undefined) {
+    if (confidenceScoreEl && aiPrediction.confidence_score !== Unknown) {
         confidenceScoreEl.textContent = aiPrediction.confidence_score + '%';
         const progressBar = document.getElementById('ai-confidence-bar');
         if (progressBar) {
@@ -498,7 +498,7 @@ window.updateModalWithAIData = function(aiPrediction) {
     // Hide loading state
     const loadingEl = document.getElementById('ai-loading-state');
     if (loadingEl) {
-        loadingEl.style.display = 'none';
+        loadingEl.style.display = 'None';
     }
 };
 
@@ -506,7 +506,7 @@ window.updateModalWithAIData = function(aiPrediction) {
 window.updateModalWithLoadingState = function(showLoading) {
     const loadingEl = document.getElementById('ai-loading-state');
     if (loadingEl) {
-        loadingEl.style.display = showLoading ? 'block' : 'none';
+        loadingEl.style.display = showLoading ? 'block' : 'None';
     }
 };
 
@@ -552,10 +552,10 @@ window.openMatchDetail = async function(cardId) {
     }
 
     // CRITICAL DIRECTIVE: Console.log the incoming data object to verify JSON paths
-    console.log('[SMH] COMPLETE PREDICTION DATA OBJECT:', JSON.stringify(prediction, null, 2));
+    // console.log removed
 
     const leg = Array.isArray(prediction.matches) && prediction.matches[0] ? prediction.matches[0] : {};
-    // Enhanced team name extraction with multiple fallback locations
+    // Enhanced team name extraction with multiple Fallback locations
     const home = leg.home_team || leg.strHomeTeam || (leg.metadata && leg.metadata.home_team) || (leg.metadata && leg.metadata.strHomeTeam) || 'Home';
     const away = leg.away_team || leg.strAwayTeam || (leg.metadata && leg.metadata.away_team) || (leg.metadata && leg.metadata.strAwayTeam) || 'Away';
     const sectionType = String(prediction.section_type || prediction.type || 'direct');
@@ -563,7 +563,7 @@ window.openMatchDetail = async function(cardId) {
     const league = leg.metadata && leg.metadata.league ? leg.metadata.league : (leg.sport || sectionType);
 
     // SIDE-BY-SIDE: Fetch AI predictions from ai_predictions table
-    let aiPrediction = null;
+    let aiPrediction = None;
     let isCalculating = false;
     
     // Extract match_id for AI predictions lookup (use id_event or fixture_id if available)
@@ -628,7 +628,7 @@ window.openMatchDetail = async function(cardId) {
         const mHome = m.home_team || (m.metadata && m.metadata.home_team) || home;
         const mAway = m.away_team || (m.metadata && m.metadata.away_team) || away;
         const mMarket = String(m.market || (m.metadata && m.metadata.market) || '1X2').toUpperCase();
-        const mPick = String(m.prediction || m.recommendation || (m.metadata && m.metadata.prediction) || 'N/A').replace(/_/g,' ').toUpperCase();
+        const mPick = String(m.prediction || m.recommendation || (m.metadata && m.metadata.prediction) || 'Not Available').replace(/_/g,' ').toUpperCase();
         const mConf = Math.round(Number(m.confidence || 0));
         const color = confColor(mConf);
         const pct = Math.min(100, mConf);
@@ -641,7 +641,7 @@ window.openMatchDetail = async function(cardId) {
                     '<span style="font-size:0.78rem;color:#94a3b8;font-weight:600;">' + String(sm.market || 'Secondary').toUpperCase() + '</span>' +
                     '<span style="font-size:0.78rem;color:' + confColor(smConf) + ';font-weight:700;">' + smConf + '%</span>' +
                 '</div>' +
-                '<div style="font-size:0.82rem;color:#e2e8f0;margin-top:4px;">' + String(sm.prediction || sm.pick || 'N/A').replace(/_/g,' ').toUpperCase() + '</div>' +
+                '<div style="font-size:0.82rem;color:#e2e8f0;margin-top:4px;">' + String(sm.prediction || sm.pick || 'Not Available').replace(/_/g,' ').toUpperCase() + '</div>' +
             '</div>';
         }).join('');
         return '<div style="background:rgba(15,23,42,0.7);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.07);">' +
@@ -667,13 +667,13 @@ window.openMatchDetail = async function(cardId) {
         insights.stability ? '<span style="font-size:0.78rem;background:rgba(251,191,36,0.1);color:#fbbf24;padding:4px 10px;border-radius:20px;">📊 ' + insights.stability + '</span>' : ''
     ].filter(Boolean).join(' ');
 
-    // Dynamically build secondary markets HTML with a robust fallback
+    // Dynamically build secondary markets HTML with a robust Fallback
     let secondaryMarketsHTML = '';
     let secInsights = prediction.secondary_insights || prediction.secondary_markets || [];
     let dcHTML = '';
     let smbHTML = '';
 
-    // FALLBACK: If Supabase doesn't send the array, build a basic one from 1X2 data
+    // Fallback: If Supabase doesn't send the array, build a basic one from 1X2 data
     if (confidence < 59 && (!Array.isArray(secInsights) || secInsights.length === 0)) {
         // Assuming prediction has home, draw, away properties
         const pHome = prediction.home || 45; 
@@ -711,7 +711,7 @@ window.openMatchDetail = async function(cardId) {
             }
         });
 
-        // If no Same-Match builds were found or generated, provide a placeholder so the section doesn't look broken
+        // If no Same-Match builds were found or generated, provide a data so the section doesn't look broken
         if (smbHTML === '') {
             smbHTML = '<tr class="hover:bg-slate-800/30"><td class="py-2 px-4 text-xs text-slate-500 italic" colspan="2">Pending correlation analysis...</td></tr>';
         }
@@ -748,12 +748,12 @@ window.openMatchDetail = async function(cardId) {
         modal = document.createElement('div');
         modal.id = 'skcsMatchDetailModal';
         modal.className = 'modal-backdrop';
-        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:10000;padding:20px;';
+        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:None;justify-content:center;align-items:center;z-index:10000;padding:20px;';
         modal.innerHTML =
             '<div style="background:#1c1f26;border-radius:16px;padding:24px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 60px rgba(0,0,0,0.5);">' +
                 '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
-                    '<button class="close-match-modal-btn" style="background:transparent;border:none;color:#3b82f6;font-size:0.95rem;font-weight:600;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;transition:color 0.2s;">← Back to Fixtures</button>' +
-                    '<button class="close-match-modal-btn" style="background:none;border:none;color:#94a3b8;font-size:1.5rem;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:background 0.2s;">&times;</button>' +
+                    '<button class="close-match-modal-btn" style="background:transparent;border:None;color:#3b82f6;font-size:0.95rem;font-weight:600;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;transition:color 0.2s;">← Back to Fixtures</button>' +
+                    '<button class="close-match-modal-btn" style="background:None;border:None;color:#94a3b8;font-size:1.5rem;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:background 0.2s;">&times;</button>' +
                 '</div>' +
                 '<div id="skcsModalBody"></div>' +
             '</div>';
@@ -799,7 +799,7 @@ window.openMatchDetail = async function(cardId) {
                 </div>
                 
                 <!-- SIDE-BY-SIDE: AI Prediction Loading State -->
-                <div id="ai-loading-state" style="display:${isCalculating ? 'block' : 'none'};" class="mb-3">
+                <div id="ai-loading-state" style="display:${isCalculating ? 'block' : 'None'};" class="mb-3">
                     <div class="flex items-center gap-2 text-xs text-slate-400">
                         <div class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                         <span>Calculating AI Edge...</span>
@@ -871,7 +871,7 @@ window.openMatchDetail = async function(cardId) {
 
 window.closeMatchDetail = function() {
     const modal = document.getElementById('skcsMatchDetailModal');
-    if (modal) modal.style.display = 'none';
+    if (modal) modal.style.display = 'None';
     document.body.style.overflow = '';
 };
 
