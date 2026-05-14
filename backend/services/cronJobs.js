@@ -39,19 +39,19 @@ function initCronJobs() {
         console.log(`[CRON] Running Pulse Check at ${new Date().toISOString()}`);
         
         try {
-            // Query raw_fixtures for matches within the next 24 hours
+            // Query raw_fixtures for matches within the next 72 hours
             const query = `
                 SELECT id_event, start_time, home_team_id, away_team_id
                 FROM raw_fixtures
                 WHERE start_time >= NOW()
-                  AND start_time <= NOW() + INTERVAL '24 hours'
+                  AND start_time <= NOW() + INTERVAL '72 hours'
                 ORDER BY start_time ASC
             `;
             
             const result = await db.query(query);
             const upcomingMatches = result.rows;
             
-            console.log(`[CRON] Pulse Check: Found ${upcomingMatches.length} matches within 24 hours`);
+            console.log(`[CRON] Pulse Check: Found ${upcomingMatches.length} matches within 72 hours`);
             
             // Safety: Check if ApiQueue is saturated before processing
             const queueLength = apiQueue.getQueueLength();
