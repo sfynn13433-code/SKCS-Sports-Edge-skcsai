@@ -1510,9 +1510,9 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
                 result = await query(`
                     SELECT id as match_id,
                            total_confidence as confidence_score,
-                           edgemind_feedback,
-                           value_combos,
-                           same_match_builder,
+                           edgemind_report as edgemind_feedback,
+                           secondary_insights as value_combos,
+                           secondary_markets as same_match_builder,
                            updated_at,
                            matches,
                            sport,
@@ -1535,22 +1535,22 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
                     `%"match_id":"${matchId}"%`,
                     `%"id_event":"${matchId}"%`,
                     `%"fixture_id":"${matchId}"%`,
-                    `%"id":"${matchId}"%`
+                    `%"id":"${matchId}%`
                 ];
 
                 for (const pattern of searchPatterns) {
                     result = await query(`
                         SELECT id as match_id,
                                total_confidence as confidence_score,
-                               edgemind_feedback,
-                               value_combos,
-                               same_match_builder,
+                               edgemind_report as edgemind_feedback,
+                               secondary_insights as value_combos,
+                               secondary_markets as same_match_builder,
                                updated_at,
                                matches,
                                sport,
                                market_type
                         FROM direct1x2_prediction_final
-                        WHERE matches::text LIKE $1
+                        WHERE matches::textb::text LIKE $1
                         LIMIT 1
                     `, [pattern]);
                     if (result && result.rows.length > 0) {
