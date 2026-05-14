@@ -31,9 +31,11 @@ const PROVIDER_CONFIG = Object.freeze({
     nfl_api: { hostEnv: 'RAPIDAPI_HOST_NFL', cacheDurationMinutes: 1440 },
     f1_motorsport: { hostEnv: 'RAPIDAPI_HOST_F1', cacheDurationMinutes: 1440 },
     wec_news: { hostEnv: 'RAPIDAPI_HOST_WEC_NEWS', cacheDurationMinutes: 1440 },
-    espn: { hostEnv: 'RAPIDAPI_HOST_ESPN', cacheDurationMinutes: 1440 },
+    // ESPN removed - now using espnHiddenApiService.js
     os_sports_perform: { hostEnv: 'RAPIDAPI_HOST_OS_SPORTS_PERFORM', cacheDurationMinutes: 1440 },
-    football_news_api: { hostEnv: 'RAPIDAPI_HOST_FOOTBALL_NEWS', cacheDurationMinutes: 1440 }
+    football_news_api: { hostEnv: 'RAPIDAPI_HOST_FOOTBALL_NEWS', cacheDurationMinutes: 1440 },
+    // Pro Football Data API - High efficiency proxy with rate limiting
+    pro_football_data: { hostEnv: 'PRO_FOOTBALL_DATA_API', cacheDurationMinutes: 10 }
 });
 
 const SPORT_PROVIDER_MAP = Object.freeze({
@@ -50,7 +52,9 @@ const SPORT_PROVIDER_MAP = Object.freeze({
     Handball: 'allsportsapi',
     Volleyball: 'allsportsapi',
     AFL: 'allsportsapi',
-    MMA: 'allsportsapi'
+    MMA: 'allsportsapi',
+    // Pro Football Data API as alternative for Football
+    ProFootball: 'pro_football_data'
 });
 
 const FOOTBALL_NEWS_FALLBACK_LEAGUE = String(

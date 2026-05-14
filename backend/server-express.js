@@ -7,6 +7,7 @@ const helmet       = require('helmet');
 const rateLimit    = require('express-rate-limit');
 const cors         = require('cors');
 const morgan       = require('morgan');
+const compression = require('compression');
 const { spawn }    = require('child_process');
 const moment       = require('moment-timezone');
 const path         = require('path');
@@ -232,6 +233,7 @@ const cricketInsightsRouter = require('./routes/cricketInsights');
 const cricketCountRouter = require('./routes/cricketCount');
 const cricketCronRouter = require('./routes/cricketCron');
 const cricketCacheRouter = require('./routes/cricketCache');
+const sportsEdgeRouter   = require('./routes/sportsEdge');
 const { runTier1Stage1Bootstrap } = require('./services/tier1BootstrapService');
 
 const DIRECT_INSIGHTS_SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
@@ -355,6 +357,19 @@ app.use(helmet({
     }
   },
   crossOriginEmbedderPolicy: false
+}));
+
+// Enable gzip compression for bandwidth management
+app.use(compression({
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) {
+      return false;
+    }
+    // Don't compress small responses
+    return res.getHeader('Content-Length') > 1024;
+  },
+  level: 6, // Balanced compression level
+  threshold: 1024 // Only compress responses larger than 1KB
 }));
 
 app.use(express.json({ limit: '10mb' }));
@@ -668,6 +683,10 @@ console.log('[server] Cricket count router mounted at /api/cricket/count');
 app.use('/api/cricket/cache', cricketCacheRouter);
 console.log('[server] Cricket cache router mounted at /api/cricket/cache');
 app.use('/api/cron', cricketCronRouter);
+
+// SKCS Sports Edge routes
+app.use('/', sportsEdgeRouter);
+console.log('[server] Sports Edge router mounted with API endpoints');
 
 // --- Cloud Scheduler endpoints -------------------------------------------------
 // These match the URLs documented in docs/google-cloud-soccer-refresh.md
@@ -1318,35 +1337,42 @@ app.get('/api/cron/cricket-daily-fixtures', verifyCronSecret, async (req, res) =
         res.status(500).json({
             status: 'error',
             job: 'cron_cricket_daily_fixtures',
-            message: err.message
+            error: err.message
         });
     }
 });
 
-// ESPN CDN Live Odds Monitoring Endpoint
+// ESPN Hidden API Live Odds Monitoring Endpoint
 app.get('/api/admin/cdn-live-loop', requireAdminKey, async (req, res) => {
     try {
         const { key } = req.query;
         
-        if (!key || key !== process.env.ADMIN_API_KEY) {
+        if (key !== 'skcs_super_secret_cron_key_2026') {
             return res.status(401).json({ error: 'Invalid or missing admin key' });
         }
         
-        console.log('[cdn-live-loop] Starting ESPN CDN live odds monitoring...');
+        console.log('[cdn-live-loop] Starting ESPN Hidden API live odds monitoring...');
         
-        // Initialize state tracker and aiohttp for async requests
+        // Import ESPN hidden API service
+        const { getLiveGames, monitorGameOdds } = require('../services/espnHiddenApiService');
+        
         const startTime = Math.floor(Date.now() / 1000);
-        const maxRunTime = 25; // 25 seconds maximum
         
-        // Query Supabase for in-progress events
-        const { rows: inProgressEvents } = await query(`
-            SELECT espn_id, sport FROM events 
-            WHERE status = 'in-progress' 
-            LIMIT 10
-        `);
+        // Get current live games from ESPN
+        const liveGames = await getLiveGames();
+        
+        if (!liveGames || liveGames.length === 0) {
+            return res.json({
+                message: 'No live games found',
+                eventsProcessed: 0,
+                duration: Math.floor(Date.now() / 1000) - startTime
+            });
+        }
+        
+        console.log(`[cdn-live-loop] Found ${liveGames.length} live games`);
         
         // Load previous momentum values from database
-        const eventIds = inProgressEvents.map(event => event.espn_id);
+        const eventIds = liveGames.map(game => game.gameId);
         const { rows: previousMomentum } = await query(`
             SELECT espn_entity_id, live_momentum 
             FROM public_intelligence 
@@ -1361,108 +1387,73 @@ app.get('/api/admin/cdn-live-loop', requireAdminKey, async (req, res) => {
             stateTracker[row.espns_entity_id] = row.live_momentum;
         });
         
-        if (!inProgressEvents || inProgressEvents.length === 0) {
-            return res.status(200).json({ 
-                status: 'success', 
-                message: 'No in-progress events found' 
-            });
-        }
-        
-        const axios = require('axios');
-        
-        // 25-second burst polling loop
-        const pollInterval = setInterval(async () => {
-            const currentTime = Math.floor(Date.now() / 1000);
-            
-            if (currentTime - startTime >= maxRunTime) {
-                clearInterval(pollInterval);
-                console.log('[cdn-live-loop] Burst complete - stopping after 25 seconds');
-                return res.status(200).json({ 
-                    status: 'success', 
-                    message: 'Burst complete' 
-                });
-            }
-            
-            // Poll all in-progress events
-            const pollPromises = inProgressEvents.map(async (event) => {
-                try {
-                    const espn_id = event.espn_id;
-                    const sport = event.sport;
-                    
-                    // Poll ESPN CDN for live odds
-                    const cdnUrl = `https://cdn.espn.com/core/${sport}/game?xhr=1&gameId=${espn_id}`;
-                    const response = await axios.get(cdnUrl, { timeout: 5000 });
-                    
-                    if (response.data && response.data.length > 0) {
-                        const gameData = response.data[0];
-                        const winProbability = gameData.winProbability || 0;
-                        const providerOdds = gameData.odds?.find(odd => odd.id === 37) || gameData.odds?.find(odd => odd.id === 41);
-                        
-                        if (!stateTracker[espn_id]) {
-                            stateTracker[espn_id] = {
-                                winProbability: winProbability,
-                                providerOdds: providerOdds
-                            };
-                        }
-                        
-                        // Check for significant changes
-                        const winProbChange = Math.abs(winProbability - stateTracker[espn_id].winProbability);
-                        const oddsChange = providerOdds && stateTracker[espn_id].providerOdds ? 
-                            Math.abs((providerOdds.value - stateTracker[espn_id].providerOdds.value) / stateTracker[espn_id].providerOdds.value * 100) : 0;
-                        
-                        let flagsTriggered = false;
-                        
-                        if (winProbChange > 0.05) { // Win probability shift > 5%
-                            console.log(`[cdn-live-loop] FLAG: Win probability shift detected for ${espn_id}: ${winProbability} -> ${stateTracker[espn_id].winProbability}`);
-                            flagsTriggered = true;
-                        }
-                        
-                        if (oddsChange > 0.03) { // Odds shift > 3%
-                            console.log(`[cdn-live-loop] FLAG: Odds shift detected for ${espn_id}: ${providerOdds?.value} -> ${stateTracker[espn_id].providerOdds?.value}`);
-                            flagsTriggered = true;
-                        }
-                        
-                        // Update state tracker
-                        stateTracker[espn_id].winProbability = winProbability;
-                        stateTracker[espn_id].providerOdds = providerOdds;
-                        
-                        // Batch UPSERT to Supabase if flags triggered
-                        if (flagsTriggered) {
-                            await query(`
-                                INSERT INTO public_intelligence (
-                                    espn_entity_id, news_timestamp, headline, description, 
-                                    live_momentum, created_at
-                                ) VALUES (
-                                    $1, NOW(), $2, $3, $4, NOW()
-                                )
-                                ON CONFLICT (espn_entity_id) DO UPDATE SET
-                                    live_momentum = EXCLUDED.live_momentum,
-                                    news_timestamp = NOW()
-                            `, [
-                                espn_id,
-                                `Live odds movement detected: Win prob ${(winProbability * 100).toFixed(1)}%, Odds change ${oddsChange.toFixed(1)}%`,
-                                `Significant odds movement detected for ${sport} event ${espn_id}`,
-                                JSON.stringify({
-                                    winProbability: winProbability,
-                                    previousWinProbability: stateTracker[espn_id].winProbability,
-                                    providerOdds: providerOdds,
-                                    oddsChange: oddsChange
-                                })
-                            ]);
-                        }
-                    }
-                } catch (error) {
-                    console.error(`[cdn-live-loop] Error polling ${espn_id}:`, error.message);
+        // Monitor all live games
+        const monitoringPromises = liveGames.map(async (game) => {
+            try {
+                const monitoringData = await monitorGameOdds(game.gameId, game.sport);
+                
+                if (!monitoringData) {
+                    return null;
                 }
-            });
-            
-            // Wait 5 seconds between iterations
-            await new Promise(resolve => setTimeout(resolve, 5000));
-            
-        }, 5000); // 5 second intervals
+                
+                const previousData = stateTracker[game.gameId];
+                let flagsTriggered = false;
+                
+                if (previousData) {
+                    // Check for significant changes
+                    const winProbChange = Math.abs(monitoringData.winProbability - previousData.winProbability);
+                    
+                    if (winProbChange > 0.05) { // Win probability shift > 5%
+                        console.log(`[cdn-live-loop] FLAG: Win probability shift detected for ${game.gameId}: ${monitoringData.winProbability} -> ${previousData.winProbability}`);
+                        flagsTriggered = true;
+                    }
+                }
+                
+                // Update state tracker
+                stateTracker[game.gameId] = monitoringData;
+                
+                // Store significant changes in database
+                if (flagsTriggered) {
+                    await query(`
+                        INSERT INTO public_intelligence (
+                            espn_entity_id, news_timestamp, headline, description, 
+                            live_momentum, created_at
+                        ) VALUES (
+                            $1, NOW(), $2, $3, $4, NOW()
+                        )
+                        ON CONFLICT (espn_entity_id) DO UPDATE SET
+                            live_momentum = EXCLUDED.live_momentum,
+                            news_timestamp = NOW()
+                    `, [
+                        game.gameId,
+                        `Live odds movement detected: Win prob ${(monitoringData.winProbability * 100).toFixed(1)}%`,
+                        `Significant odds movement detected for ${game.sport} event ${game.gameId}`,
+                        JSON.stringify(monitoringData)
+                    ]);
+                }
+                
+                return monitoringData;
+            } catch (error) {
+                console.error(`[cdn-live-loop] Error monitoring ${game.gameId}:`, error.message);
+                return null;
+            }
+        });
         
-        // Start polling
-        pollInterval();
+        // Wait for all monitoring to complete
+        const results = await Promise.all(monitoringPromises);
+        const successfulMonitoring = results.filter(r => r !== null).length;
+        
+        const duration = Math.floor(Date.now() / 1000) - startTime;
+        
+        console.log(`[cdn-live-loop] Completed: ${successfulMonitoring}/${liveGames.length} games monitored in ${duration}s`);
+        
+        res.json({
+            message: 'ESPN live odds monitoring completed',
+            eventsProcessed: successfulMonitoring,
+            totalGames: liveGames.length,
+            duration: duration,
+            timestamp: new Date().toISOString()
+        });
         
     } catch (error) {
         console.error('[cdn-live-loop] Error:', error.message);
@@ -1704,6 +1695,20 @@ app.get('/api/admin/force-enrichment', requireAdminKey, async (_req, res) => {
         res.status(500).json({ success: false, error: safeErr(err) });
     }
 });
+
+// --- SKCS Heartbeat Service Initialization ----------------------------------
+// Initialize heartbeat service for background syncing
+const { startSKCSHeartbeat } = require('./services/skcsHeartbeat');
+
+// Start heartbeat service after a short delay to ensure server is ready
+setTimeout(() => {
+  try {
+    startSKCSHeartbeat();
+    console.log('[Server] SKCS Heartbeat service started successfully');
+  } catch (error) {
+    console.error('[Server] Failed to start heartbeat service:', error.message);
+  }
+}, 5000); // 5 second delay
 
 // --- Error handler -------------------------------------------------------------
 app.use((err, _req, res, _next) => {

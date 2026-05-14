@@ -28,7 +28,7 @@ const TIER_2_HOSTS = [
 const TIER_3_HOSTS = [
     'football-news.p.rapidapi.com',
     'newsnow.p.rapidapi.com',
-    'espn.p.rapidapi.com',
+    // ESPN removed - now using espnHiddenApiService.js
     'sport-radar-api.p.rapidapi.com',
     'mma-rankings.p.rapidapi.com'
 ];

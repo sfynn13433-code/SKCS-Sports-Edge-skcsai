@@ -137,10 +137,10 @@ async function enrichMatchContext(idEvent) {
   const leagueId = event.idLeague;
   const season = event.strSeason || new Date().getFullYear().toString();
 
-  // Fetch last 5 results for both teams
+  // Fetch last 5 results for both teams (using eventslast.php which exists)
   const [homeLast5, awayLast5] = await Promise.all([
-    apiQueue.add(() => fetchTheSportsDB(`searchlastteam.php?id=${homeTeamId}`)),
-    apiQueue.add(() => fetchTheSportsDB(`searchlastteam.php?id=${awayTeamId}`))
+    apiQueue.add(() => fetchTheSportsDB(`eventslast.php?id=${homeTeamId}`)),
+    apiQueue.add(() => fetchTheSportsDB(`eventslast.php?id=${awayTeamId}`))
   ]);
 
   // Fetch deep context: Standings and H2H data
@@ -151,6 +151,9 @@ async function enrichMatchContext(idEvent) {
     // Fetch league standings
     if (leagueId) {
       standingsData = await apiQueue.add(() => fetchTheSportsDB(`lookuptable.php?l=${leagueId}&s=${season}`));
+      if (!standingsData) {
+        console.warn(`[enrichMatchContext] No standings data available for league ${leagueId}, season ${season}`);
+      }
     }
 
     // Fetch H2H results using eventslast.php for both teams (lookupeventresults.php doesn't exist)
@@ -166,6 +169,10 @@ async function enrichMatchContext(idEvent) {
         ...(awayTeamLastEvents.results || [])
       ].slice(0, 10) // Limit to 10 most recent matches
     };
+    
+    if (h2hData.results.length === 0) {
+      console.warn(`[enrichMatchContext] No H2H data available for teams ${homeTeamId} and ${awayTeamId}`);
+    }
   } catch (err) {
     console.warn(`[enrichMatchContext] Failed to fetch deep context for ${idEvent}:`, err.message);
     // Continue without deep context - don't fail the entire enrichment
