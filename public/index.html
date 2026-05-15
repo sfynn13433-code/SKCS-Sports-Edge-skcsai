@@ -3246,13 +3246,9 @@
             });
 
             // Clear stale data on 401 - prevent showing old sport data
-            if (response.status === 401) {
-                console.warn('[SKCS] 401 - clearing', requestSport, 'container');
-                if (container) container.innerHTML = '<p style="text-align:center;color:#dc2626;padding:20px;">Session expired. Please log in again.</p>';
-                if (!window.SKCS_ADMIN_UNLOCKED) {
-                    redirectToSubscribeLocked();
-                }
-                return;
+            if (response.status === 401 && !window.SKCS_ADMIN_UNLOCKED) {
+                console.warn('[SKCS] Backend returned 401 – using Supabase fallback');
+                // Don't redirect, just let the function continue to the Supabase section
             }
 
             let data = null;
@@ -3286,8 +3282,8 @@
                 });
                 // Only check 401 for non-admin
                 if (r2.status === 401 && !window.SKCS_ADMIN_UNLOCKED) {
-                    redirectToSubscribeLocked();
-                    return;
+                    console.warn('[SKCS] Fallback returned 401 – continuing to Supabase');
+                    // Don't redirect, let it continue to Supabase fallback
                 }
                 let d2 = null;
                 try { d2 = await r2.json(); } catch (e) { d2 = null; }

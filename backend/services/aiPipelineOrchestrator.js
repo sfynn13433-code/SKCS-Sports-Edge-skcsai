@@ -445,13 +445,13 @@ class AIPipelineOrchestrator {
     console.log('Building ACCAs from high-confidence predictions...');
     
     try {
-      // Get high-confidence predictions from this run
+      // Get high-confidence predictions from this run (Master Rulebook: >=55% for ACCA)
       const { rows: predictions } = await query(`
         SELECT * FROM direct1x2_prediction_final 
         WHERE publish_run_id = $1 
           AND type = 'direct' 
-          AND confidence >= 70
-          AND risk_tier IN ('HIGH_CONFIDENCE', 'MODERATE_RISK')
+          AND confidence >= 55
+          AND risk_tier IN ('LOW_RISK', 'MEDIUM_RISK')
         ORDER BY confidence DESC
       `, [publishRunId]);
 

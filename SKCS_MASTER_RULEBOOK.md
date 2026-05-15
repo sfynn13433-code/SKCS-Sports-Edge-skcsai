@@ -243,4 +243,80 @@ def validate_acca_legs(legs: list) -> bool:
 
 ---
 
+## 11. SAME MATCH BUILDER (SMB) v2.0
+
+### 11.1 Gulf in Class Calculation
+- **Expected Goals Formula**: 
+  - Home: λ = α_home × β_away × γ
+  - Away: μ = α_away × β_home
+  - Gulf: λ - μ (expected goal difference)
+- **Fallback Parameters**: League average home 1.513, away 1.091, γ=1.0
+
+### 11.2 Maximum Legs Allowed
+- **winProb <50% OR goalDiff <1.0**: max 2 legs
+- **winProb 50-65% OR goalDiff 1.0-2.5**: max 4 legs  
+- **winProb 65-80% OR goalDiff 2.5-4.0**: max 6 legs
+- **winProb >80% OR goalDiff >4.0**: max 8 legs
+
+### 11.3 Prebuilt SMB Templates
+**4-Leg**: Favourite Win + Over 1.5 Team Goals + Over 4.5 Corners + Lead Striker 1+ SOT
+
+**6-Leg**: Win + Over 2.5 Goals + Over 5.5 Corners + Striker 1+ SOT + Lead at HT + Opponent Keeper 2+ Saves
+
+**8-Leg**: Win + Over 3.5 Goals + Over 2.5 Team Goals + Over 6.5 Corners + Striker 1+ SOT + Win Both Halves + Opponent Keeper 3+ Saves + Clean Sheet (or BTTS No if unavailable)
+
+### 11.4 SMB Confidence Calculation
+- **2-3 legs**: Pairwise iterative formula with minimum ρ
+- **4+ legs**: Gaussian copula method with multivariate normal CDF
+- **H2H Decay**: ρ × 0.8 if H2H matches <5
+
+### 11.5 SMB Correlation Matrix (ρ values)
+- Favourite Win & Over 2.5 Goals: 0.28
+- Favourite Win & Lead Striker 1+ SOT: 0.35
+- Over 2.5 & BTTS Yes: 0.25
+- Favourite Win & Over 4.5 Corners: 0.20
+- Lead Striker SOT & Opponent Keeper Saves: 0.15
+- All other related markets: 0.10
+- Negative pairs (Win & Opponent RB yards): -0.30
+- All player props vs match markets initially: 0.10 unless specified
+
+### 11.6 SMB Contradiction Validation
+**RED (Block) Pairs**:
+- Over 2.5 ↔ Under 1.5
+- BTTS Yes ↔ Home Win to Nil
+- Home Win ↔ Away Clean Sheet
+- Away Win ↔ Home Clean Sheet
+- Draw ↔ Any Clean Sheet
+- Over 1.5 FH ↔ Under 0.5 FH
+- Player to Score ↔ 0-0 Correct Score
+- Interval overlap conflicts
+
+**AMBER (Warn) Pairs**:
+- Joint probability <2% based on historical data
+- Favourite Win 3-0 Correct Score ↔ Underdog Striker 2+ SOT
+
+### 11.7 SMB Tier Classification
+- **Tier 1**: ≥25% (green) - Statistical Edge
+- **Tier 2**: 15-24% (yellow) - Speculative territory
+- **Tier 3**: 8-14% (orange) - Lottery ticket zone
+- **Suppressed**: <8%
+
+### 11.8 EdgeMind SMB Phrases
+- **Gulf unlocked**: "Gulf in Class Detected. Expected goal difference >4.0. Extreme 8‑leg story unlocked."
+- **Tier 1**: "Statistical Edge — this story holds up. All legs positively correlated."
+- **Tier 2**: "Speculative territory. Your narrative is intact, but variance is high."
+- **Tier 3**: "Lottery ticket zone. ~[X]% historical hit rate. Entertainment only — stake accordingly."
+- **Leg 7/8 added**: "You're in extreme territory. This combo hits roughly as often as flipping heads 5 times in a row (~3%). Know the odds."
+- **Contradiction blocked**: "[Leg Y] breaks the story. We suggest [Z] instead."
+- **Near-contradiction**: "These two almost never happen together. Want to pivot to a stronger narrative?"
+
+### 11.9 SMB UI Requirements
+- Tabbed interface: 4-Leg, 6-Leg, 8-Leg
+- Grey out unavailable tabs with dominance gap tooltip
+- Show top 3 prebuilt combos per active tab
+- Live bet slip drawer for custom builds
+- Real-time contradiction validation
+
+---
+
 *End of rulebook.*
