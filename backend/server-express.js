@@ -251,15 +251,48 @@ const directInsightsSupabase = DIRECT_INSIGHTS_SUPABASE_URL && DIRECT_INSIGHTS_S
 
 void (async () => {
     if (!directInsightsSupabase) return;
-    const { error } = await directInsightsSupabase.from('match_context_data').insert({
-        id_event: 'FORCE_BOOT_TEST',
-        injuries: { forced: true }
-    });
+    
+    // First check if raw_fixtures table exists and has the test record
+    try {
+        const { data: fixtureCheck, error: fixtureError } = await directInsightsSupabase
+            .from('raw_fixtures')
+            .select('id_event')
+            .eq('id_event', 'FORCE_BOOT_TEST')
+            .single();
+            
+        if (fixtureError || !fixtureCheck) {
+            // Create the test fixture first to satisfy foreign key constraint
+            const { error: insertError } = await directInsightsSupabase
+                .from('raw_fixtures')
+                .insert({
+                    id_event: 'FORCE_BOOT_TEST',
+                    sport: 'Football',
+                    league_id: 'test_league',
+                    home_team_id: 'test_home',
+                    away_team_id: 'test_away',
+                    start_time: new Date().toISOString(),
+                    raw_json: { test: true }
+                });
+                
+            if (insertError) {
+                console.error('[boot-force-insert] failed to create test fixture:', insertError.message);
+                return;
+            }
+        }
+        
+        // Now insert the match_context_data record
+        const { error } = await directInsightsSupabase.from('match_context_data').insert({
+            id_event: 'FORCE_BOOT_TEST',
+            injuries: { forced: true }
+        });
 
-    if (error) {
-        console.error('[boot-force-insert] failed:', error.message);
-    } else {
-        console.log('[boot-force-insert] inserted FORCE_BOOT_TEST');
+        if (error) {
+            console.error('[boot-force-insert] failed:', error.message);
+        } else {
+            console.log('[boot-force-insert] inserted FORCE_BOOT_TEST');
+        }
+    } catch (err) {
+        console.error('[boot-force-insert] failed with exception:', err.message);
     }
 })();
 

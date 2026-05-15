@@ -90,7 +90,8 @@ async function getTopScorers(leagueId = 39, season = 2025) {
 // Strategy: Call this once per day. It maps IDs like 11 to LaLiga.
 async function getMetadata() {
   const cacheKey = 'metadata_map';
-  return await callEdgeAPI('/web/games/filters', {}, cacheKey, 86400); // Cache 24h
+  // Try the correct endpoint for ProFootballAPI
+  return await callEdgeAPI('/leagues', {}, cacheKey, 86400); // Cache 24h
 }
 
 // B. The AI Betting Trends (The "Edge")
