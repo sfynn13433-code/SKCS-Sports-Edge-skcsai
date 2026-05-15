@@ -584,10 +584,24 @@ router.get('/api/ai-predictions/:matchId', async (req, res) => {
     });
     
   } catch (error) {
-    console.error(`Error fetching AI prediction for ${matchId}:`, error.message);
+    console.error(`Error fetching AI prediction for ${matchId}:`, error);
+    console.error(`Stack trace:`, error.stack);
+    
+    // Check for specific error types
+    let errorMessage = 'Failed to retrieve AI prediction';
+    if (error.message.includes('database') || error.message.includes('connection')) {
+      errorMessage = 'Database connection error';
+    } else if (error.message.includes('timeout')) {
+      errorMessage = 'Service timeout error';
+    } else if (error.message.includes('ENOTFOUND') || error.message.includes('ECONNREFUSED')) {
+      errorMessage = 'Network connectivity error';
+    }
+    
     res.status(500).json({ 
       success: false,
-      error: 'Failed to retrieve AI prediction'
+      error: errorMessage,
+      details: error.message,
+      matchId: matchId
     });
   }
 });

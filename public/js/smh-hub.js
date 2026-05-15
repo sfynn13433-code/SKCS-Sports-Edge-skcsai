@@ -594,11 +594,26 @@ window.openMatchDetail = async function(cardId) {
                 updateModalWithLoadingState(false);
             }
         } catch (err) {
-            // Silently handle 404s - prediction not yet available
+            // Handle specific HTTP status codes
             if (err.message.includes('404')) {
                 console.log(`[SMH] AI prediction not yet available for match ${matchId}`);
+            } else if (err.message.includes('500')) {
+                // Handle server-side crashes specifically
+                console.error(`[SMH] Server error (500) while fetching prediction for ${matchId}. Check backend logs.`);
+                
+                // Try to parse error response for more details
+                try {
+                    const errorResponse = await err.response?.json();
+                    if (errorResponse?.details) {
+                        console.error(`[SMH] Server error details:`, errorResponse.details);
+                    }
+                } catch (parseErr) {
+                    // Ignore parsing errors
+                }
+            } else if (err.message.includes('timeout')) {
+                console.error(`[SMH] Request timeout for match ${matchId}`);
             } else {
-                console.error('[SMH] Failed to fetch AI prediction:', err);
+                console.error('[SMH] Unexpected error fetching AI prediction:', err);
             }
             isCalculating = false;
             updateModalWithLoadingState(false);

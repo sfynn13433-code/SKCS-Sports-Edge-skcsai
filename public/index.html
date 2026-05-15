@@ -3750,7 +3750,7 @@
                     Decision Waterfall Log
                 </div>
                 <ul style="margin:0;padding-left:18px;color:#334155;font-size:0.82rem;line-height:1.55;">
-                    <!-- comment --></li>`).join('')}
+                    ${entries.map(entry => `<li>${entry}</li>`).join('')}
                 </ul>
             </div>
         `;
