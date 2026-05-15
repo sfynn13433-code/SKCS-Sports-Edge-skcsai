@@ -463,18 +463,16 @@ router.get('/api/ai-predictions/:matchId', async (req, res) => {
     const predictionResult = await db.query(`
       SELECT 
         id,
-        match_id,
-        home_team,
-        away_team,
-        prediction,
-        confidence,
-        edgemind_feedback,
-        value_combos,
-        same_match_builder,
+        total_confidence as confidence,
+        edgemind_report as edgemind_feedback,
+        secondary_insights as value_combos,
+        secondary_markets as same_match_builder,
         created_at,
-        updated_at
-      FROM ai_predictions 
-      WHERE match_id = $1
+        matches,
+        sport,
+        market_type
+      FROM direct1x2_prediction_final 
+      WHERE id::text = $1
       ORDER BY created_at DESC
       LIMIT 1
     `, [matchId]);
@@ -483,18 +481,20 @@ router.get('/api/ai-predictions/:matchId', async (req, res) => {
       const prediction = predictionResult.rows[0];
       const aiData = {
         id: prediction.id,
-        match_id: prediction.match_id,
-        home_team: prediction.home_team,
-        away_team: prediction.away_team,
+        match_id: prediction.id,
+        confidence_score: prediction.confidence,
+        edgemind_feedback: prediction.edgemind_feedback,
+        value_combos: prediction.value_combos,
+        same_match_builder: prediction.same_match_builder,
+        created_at: prediction.created_at,
+        matches: prediction.matches,
+        sport: prediction.sport,
+        market_type: prediction.market_type,
         primary_prediction: {
           market: "1X2",
-          prediction: prediction.prediction,
+          prediction: prediction.matches?.[0]?.prediction || 'unknown',
           confidence: prediction.confidence
         },
-        edgemind_feedback: prediction.edgemind_feedback,
-        value_combos: JSON.parse(prediction.value_combos || '{}'),
-        same_match_builder: JSON.parse(prediction.same_match_builder || '{}'),
-        created_at: prediction.created_at,
         source: 'database'
       };
       

@@ -1534,6 +1534,12 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
             console.log('[api/ai-predictions] ai_predictions query result:', result?.rows?.length || 0, 'rows');
         } catch (err) {
             console.error('[api/ai-predictions] ai_predictions query failed:', err.message);
+            // If table doesn't exist, continue to fallback
+            if (err.message.includes('does not exist') || err.message.includes('relation')) {
+                console.log('[api/ai-predictions] ai_predictions table does not exist, using fallback');
+            } else {
+                lastError = err;
+            }
         }
 
         // If not found in ai_predictions, try direct1x2_prediction_final (legacy predictions)
@@ -1556,7 +1562,12 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
                 console.log('[api/ai-predictions] direct1x2_prediction_final (id::text) query result:', result?.rows?.length || 0, 'rows');
             } catch (err) {
                 console.error('[api/ai-predictions] direct1x2_prediction_final (id::text) query failed:', err.message);
-                lastError = err;
+                // If table doesn't exist, continue to next fallback
+                if (err.message.includes('does not exist') || err.message.includes('relation')) {
+                    console.log('[api/ai-predictions] direct1x2_prediction_final table does not exist, using next fallback');
+                } else {
+                    lastError = err;
+                }
             }
         }
 
@@ -1594,7 +1605,12 @@ app.get('/api/ai-predictions/:matchId', async (req, res) => {
                 console.log('[api/ai-predictions] direct1x2_prediction_final (matches LIKE) query result:', result?.rows?.length || 0, 'rows');
             } catch (err) {
                 console.error('[api/ai-predictions] direct1x2_prediction_final (matches LIKE) query failed:', err.message);
-                lastError = err;
+                // If table doesn't exist, continue to graceful fallback
+                if (err.message.includes('does not exist') || err.message.includes('relation')) {
+                    console.log('[api/ai-predictions] direct1x2_prediction_final table does not exist, using graceful fallback');
+                } else {
+                    lastError = err;
+                }
             }
         }
 

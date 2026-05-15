@@ -524,7 +524,7 @@ window.updateModalWithAIData = function(aiPrediction) {
     const edgemindFeedbackEl = document.getElementById('edgemind-feedback');
     const valueCombosEl = document.getElementById('value-combos');
     
-    if (confidenceScoreEl && aiPrediction.confidence_score !== Unknown) {
+    if (confidenceScoreEl && aiPrediction.confidence_score !== undefined) {
         confidenceScoreEl.textContent = aiPrediction.confidence_score + '%';
         const progressBar = document.getElementById('ai-confidence-bar');
         if (progressBar) {
@@ -658,6 +658,13 @@ window.openMatchDetail = async function(cardId) {
             if (err.message.includes('404')) {
                 console.log(`[SMH] AI prediction not yet available for match ${matchId}`);
                 showNotification("AI prediction not yet available for this match", "info");
+                // Update modal with placeholder content
+                const edgemindFeedbackEl = document.getElementById('edgemind-feedback');
+                if (edgemindFeedbackEl) {
+                    edgemindFeedbackEl.textContent = 'AI analysis is still being calculated for this match. Please check back later.';
+                    edgemindFeedbackEl.classList.remove('text-slate-400');
+                    edgemindFeedbackEl.classList.add('text-amber-400');
+                }
             } else if (err.message.includes('500')) {
                 // Handle server-side crashes specifically
                 console.error(`[SMH] Server error (500) while fetching prediction for ${matchId}. Check backend logs.`);
@@ -672,12 +679,33 @@ window.openMatchDetail = async function(cardId) {
                     // Ignore parsing errors
                 }
                 showNotification("Prediction service temporarily unavailable", "error");
+                // Update modal with error message
+                const edgemindFeedbackEl = document.getElementById('edgemind-feedback');
+                if (edgemindFeedbackEl) {
+                    edgemindFeedbackEl.textContent = 'Prediction service is temporarily unavailable. Please try again later.';
+                    edgemindFeedbackEl.classList.remove('text-slate-400');
+                    edgemindFeedbackEl.classList.add('text-red-400');
+                }
             } else if (err.message.includes('timeout')) {
                 console.error(`[SMH] Request timeout for match ${matchId}`);
                 showNotification("Request timeout. Please try again", "warning");
+                // Update modal with timeout message
+                const edgemindFeedbackEl = document.getElementById('edgemind-feedback');
+                if (edgemindFeedbackEl) {
+                    edgemindFeedbackEl.textContent = 'Request timed out. Please check your connection and try again.';
+                    edgemindFeedbackEl.classList.remove('text-slate-400');
+                    edgemindFeedbackEl.classList.add('text-amber-400');
+                }
             } else {
                 console.error('[SMH] Unexpected error fetching AI prediction:', err);
                 showNotification("Failed to fetch prediction data", "error");
+                // Update modal with generic error message
+                const edgemindFeedbackEl = document.getElementById('edgemind-feedback');
+                if (edgemindFeedbackEl) {
+                    edgemindFeedbackEl.textContent = 'Unable to fetch prediction data. Please try again later.';
+                    edgemindFeedbackEl.classList.remove('text-slate-400');
+                    edgemindFeedbackEl.classList.add('text-red-400');
+                }
             }
             isCalculating = false;
             updateModalWithLoadingState(false);

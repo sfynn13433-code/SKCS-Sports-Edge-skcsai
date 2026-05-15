@@ -2736,6 +2736,13 @@
                 return;
             }
 
+            if (!response.ok) {
+                console.warn('Cricket count API not available:', response.status, response.statusText);
+                const directCricketMenu = document.getElementById('direct-cricket-count');
+                if (directCricketMenu) directCricketMenu.textContent = '(0)';
+                return;
+            }
+
             const data = await response.json();
             if (data.ok) {
                 const cricketCount = Number(data.direct_count || 0);
@@ -2744,6 +2751,8 @@
             }
         } catch (err) {
             console.warn('Failed to update cricket count:', err);
+            const directCricketMenu = document.getElementById('direct-cricket-count');
+            if (directCricketMenu) directCricketMenu.textContent = '(0)';
         }
     }
 
