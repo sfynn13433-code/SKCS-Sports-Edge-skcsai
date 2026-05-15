@@ -15,6 +15,57 @@
 const BACKEND_URL = "https://skcs-sports-edge-skcsai.onrender.com";
 const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
 
+// Simple notification system
+function showNotification(message, type = 'info') {
+    // Remove any existing notifications
+    const existing = document.querySelector('.smh-notification');
+    if (existing) existing.remove();
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `smh-notification smh-notification-${type}`;
+    notification.textContent = message;
+    
+    // Style the notification
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 600;
+        z-index: 10000;
+        max-width: 300px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
+        transform: translateX(100%);
+    `;
+    
+    // Set background color based on type
+    const colors = {
+        info: '#3b82f6',
+        success: '#22c55e',
+        warning: '#f59e0b',
+        error: '#ef4444'
+    };
+    notification.style.backgroundColor = colors[type] || colors.info;
+    
+    // Add to DOM
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => notification.remove(), 300);
+    }, 5000);
+}
+
 (function () {
     'use strict';
 
@@ -442,10 +493,19 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
                 var cardId = insightBtn.getAttribute('data-card-id');
                 console.log("[Trigger] Button clicked! Match ID:", cardId);
 
+                // Wait a moment for the function to be available if script is still loading
                 if (typeof window.openMatchDetail === 'function') {
                     window.openMatchDetail(cardId);
                 } else {
-                    console.error("[Error] openMatchDetail function is missing or not in scope!");
+                    // Retry after a short delay
+                    setTimeout(function() {
+                        if (typeof window.openMatchDetail === 'function') {
+                            window.openMatchDetail(cardId);
+                        } else {
+                            console.error("[Error] openMatchDetail function is missing or not in scope!");
+                            showNotification("Match details not available yet. Please try again.", "warning");
+                        }
+                    }, 100);
                 }
             }
         });
@@ -597,6 +657,7 @@ window.openMatchDetail = async function(cardId) {
             // Handle specific HTTP status codes
             if (err.message.includes('404')) {
                 console.log(`[SMH] AI prediction not yet available for match ${matchId}`);
+                showNotification("AI prediction not yet available for this match", "info");
             } else if (err.message.includes('500')) {
                 // Handle server-side crashes specifically
                 console.error(`[SMH] Server error (500) while fetching prediction for ${matchId}. Check backend logs.`);
@@ -610,10 +671,13 @@ window.openMatchDetail = async function(cardId) {
                 } catch (parseErr) {
                     // Ignore parsing errors
                 }
+                showNotification("Prediction service temporarily unavailable", "error");
             } else if (err.message.includes('timeout')) {
                 console.error(`[SMH] Request timeout for match ${matchId}`);
+                showNotification("Request timeout. Please try again", "warning");
             } else {
                 console.error('[SMH] Unexpected error fetching AI prediction:', err);
+                showNotification("Failed to fetch prediction data", "error");
             }
             isCalculating = false;
             updateModalWithLoadingState(false);
