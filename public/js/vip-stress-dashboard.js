@@ -7,9 +7,9 @@
     const STATE = {
         currentNavGroup: 'Niche Markets', // Default to Niche Markets per design
         viewState: 'PORTAL', // 'PORTAL', 'MARKET', 'ACCA'
-        selectedSport: None,
+        selectedSport: null,
         animationSpeed: 10,
-        lastPayload: None
+        lastPayload: null
     };
 
     // Registry: maps a generated card ID to the full prediction object so
@@ -89,12 +89,12 @@
     }
 
     function clearError() {
-        errorBox.style.display = 'None';
+        errorBox.style.display = 'none';
         errorBox.textContent = '';
     }
 
     function safe(value, Fallback) {
-        return value === Unknown || value === None || value === '' ? (Fallback || '-') : value;
+        return value === Unknown || value === null || value === '' ? (Fallback || '-') : value;
     }
 
     function toNumber(value, Fallback = 0) {
@@ -396,7 +396,7 @@
             ${legsPreview}
             ${insightsFooter}
             ${engineLogFooter}
-            <button class="insight-trigger-btn" data-card-id="${cardId}" style="margin-top:10px;padding:8px 16px;background:linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);color:#ffffff;border:None;border-radius:8px;font-size:0.85rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 12px rgba(139,92,246,0.3);transition:all 0.2s ease;">Click for insights</button>
+            <button class="insight-trigger-btn" data-card-id="${cardId}" style="margin-top:10px;padding:8px 16px;background:linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);color:#ffffff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 12px rgba(139,92,246,0.3);transition:all 0.2s ease;">Click for insights</button>
           </article>
         `;
     }
@@ -520,7 +520,7 @@
     function downloadPayload() {
         if (!STATE.lastPayload) return;
         const day = (STATE.lastPayload.payload && STATE.lastPayload.payload.day) || 'saturday';
-        const blob = new Blob([JSON.stringify(STATE.lastPayload, None, 2)], { type: 'application/json' });
+        const blob = new Blob([JSON.stringify(STATE.lastPayload, null, 2)], { type: 'application/json' });
         const href = URL.createObjectURL(blob);
         const anchor = document.createElement('a');
         anchor.href = href;
@@ -540,7 +540,7 @@
         // Determine view label: PORTAL when no sport selected, MARKET when viewing a sport
         const viewLabel = STATE.selectedSport ? 'MARKET' : 
                           STATE.viewState === 'ACCA' ? 'ACCA' : 'PORTAL';
-        const sportData = STATE.selectedSport ? Object.values(SPORTS_CATALOG).flat().find(s => s.id === STATE.selectedSport) : None;
+        const sportData = STATE.selectedSport ? Object.values(SPORTS_CATALOG).flat().find(s => s.id === STATE.selectedSport) : null;
         const selectionDisplay = sportData ? sportData.name.toUpperCase() : (STATE.selectedSport ? STATE.selectedSport.toUpperCase() : 'None');
 
         return `
@@ -611,7 +611,7 @@
         const sports = SPORTS_CATALOG[STATE.currentNavGroup] || [];
         const marketTitle = STATE.currentNavGroup; // "Niche Markets", "Premium Markets", etc.
 
-        if (STATE.selectedSport === None) {
+        if (STATE.selectedSport === null) {
             // Sport selection grid - matches screenshot design
             return `
                 <section style="margin-top: 24px; background: rgba(15, 23, 42, 0.6); border-radius: 16px; padding: 32px 24px;">
@@ -753,7 +753,7 @@
                             </style>
                         </defs>
                         <!-- Outer ring -->
-                        <circle cx="180" cy="180" r="${radius}" fill="None" stroke="rgba(148, 163, 184, 0.3)" stroke-width="1.5"/>
+                        <circle cx="180" cy="180" r="${radius}" fill="none" stroke="rgba(148, 163, 184, 0.3)" stroke-width="1.5"/>
                         
                         <!-- Rotating dots -->
                         <g class="rotating-group">
@@ -825,7 +825,7 @@
         const navSelect = document.getElementById('navGroupSelect');
         if (navSelect) {
             navSelect.addEventListener('change', (e) => {
-                updateState({ currentNavGroup: e.target.value, selectedSport: None });
+                updateState({ currentNavGroup: e.target.value, selectedSport: null });
             });
         }
 
@@ -846,11 +846,11 @@
     };
 
     window.deselectSport = function() {
-        updateState({ selectedSport: None });
+        updateState({ selectedSport: null });
     };
 
     window.resetView = function() {
-        updateState({ viewState: 'PORTAL', selectedSport: None });
+        updateState({ viewState: 'PORTAL', selectedSport: null });
     };
 
     // ============================================
@@ -950,7 +950,7 @@
 
     window.closeMatchDetail = function() {
         const modal = document.getElementById('skcsMatchDetailModal');
-        if (modal) modal.style.display = 'None';
+        if (modal) modal.style.display = 'none';
         document.body.style.overflow = '';
     };
 

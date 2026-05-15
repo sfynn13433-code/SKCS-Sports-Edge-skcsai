@@ -125,7 +125,7 @@ async function enrichMatchContext(idEvent) {
   // Fetch all required data via API queue
   const [eventData, lineupData, statsData, timelineData] = await Promise.all([
     apiQueue.add(() => fetchTheSportsDB(`lookupevent.php?id=${idEvent}`)),
-    apiQueue.add(() => fetchTheSportsDB(`lookupeventlineup.php?id=${idEvent}`)),
+    apiQueue.add(() => fetchTheSportsDB(`lookuplineup.php?id=${idEvent}`)),
     apiQueue.add(() => fetchTheSportsDB(`lookupeventstats.php?id=${idEvent}`)),
     apiQueue.add(() => fetchTheSportsDB(`lookuptimeline.php?id=${idEvent}`))
   ]);
@@ -414,17 +414,24 @@ async function fetchTheSportsDB(endpoint) {
   const rawText = await res.text();
 
   if (!res.ok) {
+    // Handle 404 errors gracefully - these endpoints may not exist or have no data
+    if (res.status === 404) {
+      console.warn(`[fetchTheSportsDB] Endpoint not found (404) for URL: ${url} - returning empty data`);
+      return {};
+    }
+    
     console.error(`[fetchTheSportsDB] TheSportsDB API error: ${res.status} for URL: ${url}`, rawText);
     return null;
   }
 
   if (!rawText || rawText.trim() === '') {
-    console.error(`[fetchTheSportsDB] TheSportsDB returned empty response for URL: ${url}`);
-    return null;
+    console.warn(`[fetchTheSportsDB] TheSportsDB returned empty response for URL: ${url} - returning empty data`);
+    return {};
   }
 
   try {
-    return JSON.parse(rawText);
+    const data = JSON.parse(rawText);
+    return data;
   } catch (err) {
     console.error(`[fetchTheSportsDB] TheSportsDB returned invalid JSON for URL: ${url}:`, rawText);
     return null;

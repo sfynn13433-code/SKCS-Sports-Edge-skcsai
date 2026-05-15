@@ -77,7 +77,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
         });
 
         // Show loading state
-        if (displayIcon)  displayIcon.style.display = 'None';
+        if (displayIcon)  displayIcon.style.display = 'none';
         if (resultsPanel) resultsPanel.style.justifyContent = 'center';
         if (displayTitle) {
             displayTitle.textContent  = 'Connecting to SKCS Engine\u2026';
@@ -124,7 +124,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
                     '</p>' +
                     '<button data-action="smh-retry" ' +
                             'style="margin-top:15px;padding:8px 16px;background:#3b82f6;' +
-                                   'color:white;border:None;border-radius:6px;cursor:pointer;">' +
+                                   'color:white;border:none;border-radius:6px;cursor:pointer;">' +
                         'Retry' +
                     '</button>';
             }
@@ -160,7 +160,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
         function extractSportString(sportValue, predictionObj) {
             if (typeof sportValue === 'string') {
                 return sportValue.toLowerCase().trim();
-            } else if (typeof sportValue === 'object' && sportValue !== None) {
+            } else if (typeof sportValue === 'object' && sportValue !== null) {
                 // Handle TheSportsDB format: { strSport: "Soccer" }
                 if (sportValue.strSport) {
                     return String(sportValue.strSport).toLowerCase().trim();
@@ -260,7 +260,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
 
             // If still no sport found, try direct metadata inference
             if (!predSport || predSport === 'unknown') {
-                predSport = extractSportString(None, pred);
+                predSport = extractSportString(null, pred);
             }
 
             // Strict tab routing: Match against current sport or its aliases only
@@ -285,7 +285,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
 
             var sourceRows = data.source_rows || 0;
             var emptyMsg = sourceRows > 0
-                ? 'The database has ' + sourceRows + ' raw row(s) but None passed the category filter. Check confidence thresholds or trigger a new AI pipeline run.'
+                ? 'The database has ' + sourceRows + ' raw row(s) but none passed the category filter. Check confidence thresholds or trigger a new AI pipeline run.'
                 : 'No records in the database for this sport. A sync may be needed \u2014 wait for the scheduled refresh or contact your admin.';
 
             if (codesList) {
@@ -360,7 +360,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
             // Odds
             var oddsVal = (meta.odds && meta.odds.home)
                 || (meta.sharp_odds && meta.sharp_odds.home_win)
-                || match.odds || None;
+                || match.odds || null;
             var oddsHtml = oddsVal
                 ? '<span style="color:#facc15;font-weight:700;margin-left:8px;">@ ' + Number(oddsVal).toFixed(2) + '</span>'
                 : '';
@@ -399,7 +399,7 @@ const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
                         '<span style="background:rgba(74,222,128,0.12);color:#4ade80;padding:3px 9px;border-radius:4px;font-size:0.88rem;font-weight:700;">\u26A1 ' + pick + '</span>' +
                         oddsHtml + timeHtml +
                     '</div>' +
-                    '<button class="insight-btn" data-card-id="' + cardId + '" style="width:100%;padding:10px 16px;background:linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);color:#ffffff;border:None;border-radius:8px;font-size:0.85rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 12px rgba(139,92,246,0.3);transition:all 0.2s ease;margin-top:8px;">Click for insights</button>' +
+                    '<button class="insight-btn" data-card-id="' + cardId + '" style="width:100%;padding:10px 16px;background:linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);color:#ffffff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 12px rgba(139,92,246,0.3);transition:all 0.2s ease;margin-top:8px;">Click for insights</button>' +
                 '</div>';
         });
 
@@ -498,7 +498,7 @@ window.updateModalWithAIData = function(aiPrediction) {
     // Hide loading state
     const loadingEl = document.getElementById('ai-loading-state');
     if (loadingEl) {
-        loadingEl.style.display = 'None';
+        loadingEl.style.display = 'none';
     }
 };
 
@@ -506,7 +506,7 @@ window.updateModalWithAIData = function(aiPrediction) {
 window.updateModalWithLoadingState = function(showLoading) {
     const loadingEl = document.getElementById('ai-loading-state');
     if (loadingEl) {
-        loadingEl.style.display = showLoading ? 'block' : 'None';
+        loadingEl.style.display = showLoading ? 'block' : 'none';
     }
 };
 
@@ -563,7 +563,7 @@ window.openMatchDetail = async function(cardId) {
     const league = leg.metadata && leg.metadata.league ? leg.metadata.league : (leg.sport || sectionType);
 
     // SIDE-BY-SIDE: Fetch AI predictions from ai_predictions table
-    let aiPrediction = None;
+    let aiPrediction = null;
     let isCalculating = false;
     
     // Extract match_id for AI predictions lookup (use id_event or fixture_id if available)
@@ -748,12 +748,12 @@ window.openMatchDetail = async function(cardId) {
         modal = document.createElement('div');
         modal.id = 'skcsMatchDetailModal';
         modal.className = 'modal-backdrop';
-        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:None;justify-content:center;align-items:center;z-index:10000;padding:20px;';
+        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:10000;padding:20px;';
         modal.innerHTML =
             '<div style="background:#1c1f26;border-radius:16px;padding:24px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 60px rgba(0,0,0,0.5);">' +
                 '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
-                    '<button class="close-match-modal-btn" style="background:transparent;border:None;color:#3b82f6;font-size:0.95rem;font-weight:600;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;transition:color 0.2s;">← Back to Fixtures</button>' +
-                    '<button class="close-match-modal-btn" style="background:None;border:None;color:#94a3b8;font-size:1.5rem;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:background 0.2s;">&times;</button>' +
+                    '<button class="close-match-modal-btn" style="background:transparent;border:none;color:#3b82f6;font-size:0.95rem;font-weight:600;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;transition:color 0.2s;">← Back to Fixtures</button>' +
+                    '<button class="close-match-modal-btn" style="background:none;border:none;color:#94a3b8;font-size:1.5rem;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:background 0.2s;">&times;</button>' +
                 '</div>' +
                 '<div id="skcsModalBody"></div>' +
             '</div>';
@@ -799,7 +799,7 @@ window.openMatchDetail = async function(cardId) {
                 </div>
                 
                 <!-- SIDE-BY-SIDE: AI Prediction Loading State -->
-                <div id="ai-loading-state" style="display:${isCalculating ? 'block' : 'None'};" class="mb-3">
+                <div id="ai-loading-state" style="display:${isCalculating ? 'block' : 'none'};" class="mb-3">
                     <div class="flex items-center gap-2 text-xs text-slate-400">
                         <div class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                         <span>Calculating AI Edge...</span>
@@ -871,7 +871,7 @@ window.openMatchDetail = async function(cardId) {
 
 window.closeMatchDetail = function() {
     const modal = document.getElementById('skcsMatchDetailModal');
-    if (modal) modal.style.display = 'None';
+    if (modal) modal.style.display = 'none';
     document.body.style.overflow = '';
 };
 
