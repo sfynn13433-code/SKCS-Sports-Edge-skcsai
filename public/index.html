@@ -2964,11 +2964,9 @@
                     
                     html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem; padding:0.25rem 0;">
                         <div style="flex:1;">
-                            <div style="font-size:0.9rem; color:#374151;"><!-- comment --> — <!-- comment --></div>
-                            <!-- comment -->
-                            <!-- comment --></p>` : ''}
+                            <div style="font-size:0.9rem; color:#374151;">${selectionLabel}</div>
                         </div>
-                        <div style="background:<!-- comment -->; color:white; padding:0.2rem 0.5rem; border-radius:12px; font-size:0.8rem; font-weight:600;"><!-- comment -->%</div>
+                        <div style="background:#${confidenceColor}; color:white; padding:0.2rem 0.5rem; border-radius:12px; font-size:0.8rem; font-weight:600;">${confidence}%</div>
                     </div>`;
                 }
                 html += `</div>`;
