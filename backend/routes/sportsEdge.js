@@ -511,43 +511,47 @@ router.get('/api/ai-predictions/:matchId', async (req, res) => {
     // Fallback to enhanced match details service
     console.log(`[AI-Predictions] No database data for ${matchId}, using enhanced service`);
     
-    // Extract team names from matchId
-    const teamNames = extractTeamNamesFromGameId(matchId);
-    const enhancedData = await getEnhancedMatchDetails(
-      matchId, 
-      teamNames.homeTeam, 
-      teamNames.awayTeam, 
-      'Ligue 1',
-      new Date().toISOString()
-    );
-    
-    if (enhancedData && enhancedData.aiPrediction) {
-      const aiData = {
-        id: matchId,
-        match_id: matchId,
-        home_team: enhancedData.homeTeam,
-        away_team: enhancedData.awayTeam,
-        primary_prediction: enhancedData.aiPrediction.primary || {
-          market: "1X2",
-          prediction: "X",
-          confidence: 50
-        },
-        edgemind_feedback: enhancedData.aiPrediction.analysis || 'Enhanced AI analysis generated',
-        value_combos: enhancedData.aiPrediction.valueCombos || {},
-        same_match_builder: enhancedData.aiPrediction.sameMatchBuilder || {},
-        created_at: new Date().toISOString(),
-        source: enhancedData.source || 'enhanced_template'
-      };
+    try {
+      // Extract team names from matchId
+      const teamNames = extractTeamNamesFromGameId(matchId);
+      const enhancedData = await getEnhancedMatchDetails(
+        matchId, 
+        teamNames.homeTeam, 
+        teamNames.awayTeam, 
+        'Ligue 1',
+        new Date().toISOString()
+      );
       
-      // Cache enhanced result for 10 minutes
-      dataCache.set(cacheKey, aiData, 600);
-      
-      return res.json({
-        success: true,
-        data: aiData,
-        cached: false,
-        fallback: true
-      });
+      if (enhancedData && enhancedData.aiPrediction) {
+        const aiData = {
+          id: matchId,
+          match_id: matchId,
+          home_team: enhancedData.homeTeam,
+          away_team: enhancedData.awayTeam,
+          primary_prediction: enhancedData.aiPrediction.primary || {
+            market: "1X2",
+            prediction: "X",
+            confidence: 50
+          },
+          edgemind_feedback: enhancedData.aiPrediction.analysis || 'Enhanced AI analysis generated',
+          value_combos: enhancedData.aiPrediction.valueCombos || {},
+          same_match_builder: enhancedData.aiPrediction.sameMatchBuilder || {},
+          created_at: new Date().toISOString(),
+          source: enhancedData.source || 'enhanced_template'
+        };
+        
+        // Cache enhanced result for 10 minutes
+        dataCache.set(cacheKey, aiData, 600);
+        
+        return res.json({
+          success: true,
+          data: aiData,
+          cached: false,
+          fallback: true
+        });
+      }
+    } catch (enhancedError) {
+      console.error(`[AI-Predictions] Enhanced service failed for ${matchId}:`, enhancedError.message);
     }
     
     // Last resort: return basic template
