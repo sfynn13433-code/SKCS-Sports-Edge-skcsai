@@ -32,6 +32,10 @@
   ],
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
       "source": "/subscribe",
       "destination": "/subscribe/index.html"
     },
@@ -45,7 +49,7 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/$1"
+      "destination": "/index.html"
     }
   ]
 }

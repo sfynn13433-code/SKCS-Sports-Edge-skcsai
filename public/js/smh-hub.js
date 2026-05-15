@@ -547,6 +547,13 @@ function showNotification(message, type = 'info') {
 
 // Helper: Update modal with AI prediction data
 window.updateModalWithAIData = function(aiPrediction) {
+    // Check if modal exists before proceeding
+    const modal = document.getElementById('skcsMatchDetailModal');
+    if (!modal) {
+        console.warn('[SMH] Modal not found - cannot update AI data');
+        return;
+    }
+    
     const confidenceScoreEl = document.getElementById('ai-confidence-score');
     const edgemindFeedbackEl = document.getElementById('edgemind-feedback');
     const valueCombosEl = document.getElementById('value-combos');
@@ -557,12 +564,16 @@ window.updateModalWithAIData = function(aiPrediction) {
         if (progressBar) {
             progressBar.style.width = aiPrediction.confidence_score + '%';
         }
+    } else {
+        console.warn('[SMH] AI confidence score elements not found');
     }
     
     if (edgemindFeedbackEl && aiPrediction.edgemind_feedback) {
         edgemindFeedbackEl.textContent = aiPrediction.edgemind_feedback;
         edgemindFeedbackEl.classList.remove('text-slate-400');
         edgemindFeedbackEl.classList.add('text-emerald-400');
+    } else {
+        console.warn('[SMH] EdgeMind feedback element not found');
     }
 
     // Update value combos with actual data instead of "Pending"
@@ -580,6 +591,8 @@ window.updateModalWithAIData = function(aiPrediction) {
         if (combosHtml) {
             valueCombosEl.innerHTML = combosHtml;
         }
+    } else {
+        console.warn('[SMH] Value combos element not found');
     }
 
     // Hide loading state
@@ -661,8 +674,13 @@ window.openMatchDetail = async function(cardId) {
         isCalculating = true;
         
         try {
-            const response = await fetch(`${BACKEND_URL}/api/ai-predictions/${matchId}`, {
-                headers: { 'x-api-key': API_KEY }
+            const timestamp = Date.now();
+            const response = await fetch(`${BACKEND_URL}/api/ai-predictions/${matchId}?t=${timestamp}`, {
+                headers: { 
+                    'x-api-key': API_KEY,
+                    'Cache-Control': 'no-cache'
+                },
+                cache: 'no-store'
             });
             
             if (!response.ok) {
