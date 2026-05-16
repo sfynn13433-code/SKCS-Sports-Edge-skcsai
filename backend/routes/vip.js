@@ -302,6 +302,22 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
             latestPublishRunId = latestRunRes.rows.length ? latestRunRes.rows[0].id : null;
         }
 
+        // Fallback: if latest_publish_run_id is null, use most recent predictions
+        if (!latestPublishRunId && !includeAll) {
+            console.warn('[vip/stress-payload] latest_publish_run_id is null, using fallback to most recent predictions');
+            // Fallback to most recent predictions instead of filtering by tier
+            const queryText = `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
+               FROM direct1x2_prediction_final
+               WHERE COALESCE(sport, 'Football') = ANY($1::text[])
+               ORDER BY created_at DESC
+               LIMIT 100`;
+            const fallbackRes = await query(queryText, [sportAliases]);
+            if (fallbackRes.rows.length > 0) {
+                latestPublishRunId = fallbackRes.rows[0].publish_run_id;
+                console.log('[vip/stress-payload] fallback: using publish_run_id=%s from most recent prediction', latestPublishRunId);
+            }
+        }
+
         console.log('[vip/stress-payload] latest_publish_run_id=%s include_all=%s', latestPublishRunId, includeAll ? '1' : '0');
 
         // Build a sport alias array to catch all case/prefix variants stored in the DB

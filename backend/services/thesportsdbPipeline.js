@@ -217,22 +217,36 @@ async function enrichMatchContext(idEvent) {
     }
   }
 
+  // Normalize H2H event scores to handle multiple API field names
+  function normalizeEvent(event) {
+    const homeScore = event.intHomeScore ?? event.homeScore ?? event.score?.home ?? event.event?.homeScore ?? -1;
+    const awayScore = event.intAwayScore ?? event.awayScore ?? event.score?.away ?? event.event?.awayScore ?? -1;
+    return {
+      homeScore: Number.isFinite(homeScore) ? homeScore : -1,
+      awayScore: Number.isFinite(awayScore) ? awayScore : -1
+    };
+  }
+
   if (h2hData && h2hData.results) {
     const results = h2hData.results;
+    console.log("H2H raw events sample:", JSON.stringify(results.slice(0, 3)));
     // Take last 5 H2H matches
     const recentH2H = results.slice(0, 5);
-    
+
     deepContext.h2h = {
       total_matches: results.length,
-      recent_matches: recentH2H.map(match => ({
-        id_event: match.idEvent,
-        date_event: match.dateEvent,
-        home_team: match.strHomeTeam,
-        away_team: match.strAwayTeam,
-        home_score: match.intHomeScore,
-        away_score: match.intAwayScore,
-        winner: match.strWinner
-      }))
+      recent_matches: recentH2H.map(match => {
+        const normalizedScores = normalizeEvent(match);
+        return {
+          id_event: match.idEvent,
+          date_event: match.dateEvent,
+          home_team: match.strHomeTeam,
+          away_team: match.strAwayTeam,
+          home_score: normalizedScores.homeScore,
+          away_score: normalizedScores.awayScore,
+          winner: match.strWinner
+        };
+      })
     };
   }
 

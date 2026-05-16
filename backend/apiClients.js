@@ -13,6 +13,24 @@ const {
     recordSuccess: circuitRecordSuccess
 } = require('./utils/providerCircuitBreaker');
 
+// In-memory request cache for TheSportsDB and ESPN calls
+const requestCache = new Map();
+
+async function cachedFetch(url, options = {}) {
+    if (requestCache.has(url)) {
+        return requestCache.get(url);
+    }
+    const response = await axios.get(url, options);
+    const data = response.data;
+    requestCache.set(url, data);
+    setTimeout(() => requestCache.delete(url), 5 * 60 * 1000); // 5-minute TTL
+    return data;
+}
+
+function clearRequestCache() {
+    requestCache.clear();
+}
+
 class APISportsClient {
     constructor() {
         this.apiKey = config.apiSportsKey;
@@ -697,4 +715,4 @@ class CricketDataClient {
     }
 }
 
-module.exports = { APISportsClient, OddsAPIClient, SportsDataOrgClient, SportsDataIOClient, RapidAPIClient, CricketDataClient };
+module.exports = { APISportsClient, OddsAPIClient, SportsDataOrgClient, SportsDataIOClient, RapidAPIClient, CricketDataClient, cachedFetch, clearRequestCache };
