@@ -1814,7 +1814,21 @@ async function buildLiveData(options = {}) {
     }
 
     if (aggregated.length > 0) {
-        console.log(`[dataProvider] ${sport}: all sources complete, returning aggregated ${aggregated.length} fixtures`);
+        // Remove duplicate fixtures (same teams, keep earliest date)
+        aggregated = Object.values(
+            aggregated.reduce((acc, event) => {
+                const homeTeam = event.home_team || event.homeTeam || '';
+                const awayTeam = event.away_team || event.awayTeam || '';
+                const key = `${homeTeam}||${awayTeam}`;
+                const eventTime = new Date(event.commence_time || event.date || event.commenceTime || 0).getTime();
+                const existingTime = acc[key] ? new Date(acc[key].commence_time || acc[key].date || acc[key].commenceTime || 0).getTime() : Infinity;
+                if (!acc[key] || eventTime < existingTime) {
+                    acc[key] = event;
+                }
+                return acc;
+            }, {})
+        );
+        console.log(`[dataProvider] ${sport}: after deduplication, returning aggregated ${aggregated.length} fixtures`);
         return aggregated;
     }
 
