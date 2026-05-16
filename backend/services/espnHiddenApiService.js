@@ -21,7 +21,9 @@ async function getScoreboard(sport, league, date = null) {
   if (date) {
     url += `?dates=${date}`;
   }
-  
+
+  console.log(`[espnHiddenApi] Fetching ESPN URL: ${url} (sport=${sport}, league=${league}, date=${date})`);
+
   try {
     const response = await fetch(url);
     if (!response.ok) {
