@@ -435,6 +435,11 @@ router.get('/api/ai-predictions/:matchId', async (req, res) => {
   const cacheKey = `ai_prediction_${matchId}`;
   const bypassCache = req.query.nocache === '1' || req.query.refresh === '1';
   
+  // Prevent browser and edge caching
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  
   if (!matchId) {
     return res.status(400).json({
       success: false,
