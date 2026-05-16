@@ -433,6 +433,7 @@ function extractTeamNamesFromGameId(gameId) {
 router.get('/api/ai-predictions/:matchId', async (req, res) => {
   const { matchId } = req.params;
   const cacheKey = `ai_prediction_${matchId}`;
+  const bypassCache = req.query.nocache === '1' || req.query.refresh === '1';
   
   if (!matchId) {
     return res.status(400).json({
@@ -442,14 +443,20 @@ router.get('/api/ai-predictions/:matchId', async (req, res) => {
   }
   
   try {
-    // Check cache first
-    const cachedData = dataCache.get(cacheKey);
-    if (cachedData) {
-      return res.json({
-        success: true,
-        data: cachedData,
-        cached: true
-      });
+    // Check cache first (unless bypass requested)
+    if (!bypassCache) {
+      const cachedData = dataCache.get(cacheKey);
+      if (cachedData) {
+        return res.json({
+          success: true,
+          data: cachedData,
+          cached: true
+        });
+      }
+    } else {
+      console.log(`[AI-Predictions] Cache bypass requested for ${matchId}`);
+      // Clear existing cache for this key
+      dataCache.del(cacheKey);
     }
     
     // Try to get prediction from database first
@@ -492,13 +499,16 @@ router.get('/api/ai-predictions/:matchId', async (req, res) => {
         source: 'database'
       };
       
-      // Cache for 15 minutes
-      dataCache.set(cacheKey, aiData, 900);
+      // Cache for 15 minutes (unless bypass requested)
+      if (!bypassCache) {
+        dataCache.set(cacheKey, aiData, 900);
+      }
       
       return res.json({
         success: true,
         data: aiData,
-        cached: false
+        cached: false,
+        bypassed: bypassCache || false
       });
     }
     

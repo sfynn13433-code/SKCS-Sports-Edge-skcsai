@@ -725,7 +725,7 @@ window.openMatchDetail = async function(cardId) {
         
         try {
             const timestamp = Date.now();
-            const response = await fetch(`${BACKEND_URL}/api/ai-predictions/${matchId}?t=${timestamp}`, {
+            const response = await fetch(`${BACKEND_URL}/api/ai-predictions/${matchId}?t=${timestamp}&nocache=1`, {
                 headers: { 
                     'x-api-key': API_KEY,
                     'Cache-Control': 'no-cache'
