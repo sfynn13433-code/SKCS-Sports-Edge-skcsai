@@ -1497,6 +1497,17 @@ async function buildLiveData(options = {}) {
         ? parsePositiveInt(requestedWindowDays, 3, 1, 14)
         : 3;
     const windowEnd = futureStr(windowDays);
+
+    // ── DIAGNOSTIC LOGGING ─────────────────────────────────────────────
+    console.log(`[DIAG] buildLiveData START — sport=${sport} leagueId=${leagueId} season=${season} dateRange=${today}→${windowEnd} windowDays=${windowDays}`);
+    console.log(`[DIAG] API Keys status: X_APISPORTS_KEY=${process.env.X_APISPORTS_KEY ? 'SET(' + process.env.X_APISPORTS_KEY.slice(0,6) + '...)' : 'MISSING'}`);
+    console.log(`[DIAG] API Keys status: THESPORTSDB_KEY=${process.env.THESPORTSDB_KEY ? 'SET(' + process.env.THESPORTSDB_KEY.slice(0,4) + '...)' : 'MISSING'}`);
+    console.log(`[DIAG] API Keys status: ODDS_API_KEY=${process.env.ODDS_API_KEY ? 'SET(' + process.env.ODDS_API_KEY.slice(0,4) + '...)' : 'MISSING'}`);
+    console.log(`[DIAG] API Keys status: RAPIDAPI_KEY=${process.env.RAPIDAPI_KEY ? 'SET(' + process.env.RAPIDAPI_KEY.slice(0,6) + '...)' : 'MISSING'}`);
+    console.log(`[DIAG] API Keys status: X_AUTH_TOKEN=${process.env.X_AUTH_TOKEN ? 'SET' : 'MISSING'}`);
+    console.log(`[DIAG] API Keys status: SPORTSDATA_IO_KEY=${process.env.SPORTSDATA_IO_KEY ? 'SET' : 'MISSING'}`);
+    console.log(`[DIAG] DATA_MODE=${process.env.DATA_MODE || 'default'}`);
+    // ────────────────────────────────────────────────────────────────────
     const maxFixturesPerSource = parsePositiveInt(
         process.env.LIVE_MAX_FIXTURES_PER_SOURCE,
         600,
@@ -1535,6 +1546,7 @@ async function buildLiveData(options = {}) {
     };
 
     // --- Source 0: TheSportsDB (primary for supported multi-league ingestion) ---
+    console.log(`[DIAG] TheSportsDB check: requestedLeagueId=${requestedLeagueId} isSupported=${isSupportedLeagueId} shouldFetchAll=${shouldFetchAllLeagues} useTheSportsDb=${useTheSportsDbForSport} leagueIdsForSportsDb=[${leagueIdsForSportsDb.join(',')}]`);
     if (leagueIdsForSportsDb.length > 0) {
         try {
             console.log(`[dataProvider] ${sport}: fetching TheSportsDB leagues=${leagueIdsForSportsDb.join(',')}`);
@@ -1576,8 +1588,10 @@ async function buildLiveData(options = {}) {
         const queryOpts = { from: today, to: windowEnd };
 
         console.log(`[dataProvider] ${sport}: Fetching fixtures for league=${leagueId}, season=${season}, dateRange=${today} to ${windowEnd} (${windowDays * 24}h window)`);
+        console.log(`[DIAG] API-Sports URL: ${client.getBaseUrl(sport)}/fixtures?league=${leagueId}&season=${season}&from=${today}&to=${windowEnd}`);
         
         let data = await client.getFixtures(leagueId, season, queryOpts, sport);
+        console.log(`[DIAG] API-Sports raw response: data=${data ? 'received' : 'NULL'} results=${data?.results ?? 'N/A'} responseLength=${data?.response?.length ?? 'N/A'} errors=${JSON.stringify(data?.errors || {})}`);
         let fixtures = data?.response || [];
 
         if (fixtures.length === 0 && sport !== 'football') {

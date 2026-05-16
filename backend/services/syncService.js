@@ -420,12 +420,14 @@ async function syncSports(options = {}) {
                     continue;
                 }
                 console.log(`[syncService] Fetching REAL matches for: ${item.sport} (tier: ${item.leagueTier || 3}, league: ${item.leagueId || 'all'}, season: ${item.season})...`);
+                console.log(`[DIAG] syncSports calling buildLiveData for sport=${item.sport} leagueId=${item.leagueId} season=${item.season} oddsKey=${item.oddsKey || 'none'}`);
 
                 const rawMatches = await buildLiveData({
                     ...item,
                     windowDays: DEFAULT_SYNC_WINDOW_DAYS
                 });
                 const rawMatchesList = Array.isArray(rawMatches) ? rawMatches : [];
+                console.log(`[DIAG] syncSports buildLiveData returned ${rawMatchesList.length} raw matches for ${item.sport}/${item.leagueId}`);
                 pipelineLogger.stageAdd({
                     run_id: telemetryRunId,
                     sport: item.sport,
@@ -604,6 +606,7 @@ async function syncSports(options = {}) {
             };
         } else {
             console.warn('[syncService] Sync finished but 0 real matches were found. Check your API Keys and season configuration.');
+            console.log(`[DIAG] FINAL SUMMARY: totalMatchesProcessed=0 perSport=${JSON.stringify(Array.from(perSport.entries()))} errors=${JSON.stringify(Array.from(perSportErrors.entries()))}`);
             const report = pipelineLogger.finishRun({
                 run_id: telemetryRunId,
                 status: 'completed',

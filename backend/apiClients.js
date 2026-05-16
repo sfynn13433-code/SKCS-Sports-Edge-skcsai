@@ -99,10 +99,12 @@ class APISportsClient {
             };
 
             try {
+                console.log(`[DIAG] API-Sports HTTP request: ${baseUrl}/${endpoint} params=${JSON.stringify(params)} key=${maskKey(key)}`);
                 const response = await axios.get(`${baseUrl}/${endpoint}`, {
                     headers,
                     params
                 });
+                console.log(`[DIAG] API-Sports HTTP response: status=${response.status} results=${response.data?.results ?? 'N/A'} errors=${JSON.stringify(response.data?.errors || {})}`);
 
                 if (this.hasQuotaErrorPayload(response.data)) {
                     console.warn(`[API-Sports] ${sport} key ${i + 1}/${keys.length} (${maskKey(key)}) exhausted. Rotating...`);
