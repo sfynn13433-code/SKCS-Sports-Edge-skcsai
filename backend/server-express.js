@@ -281,11 +281,14 @@ void (async () => {
             }
         }
         
-        // Now insert the match_context_data record
-        const { error } = await directInsightsSupabase.from('match_context_data').insert({
-            id_event: 'FORCE_BOOT_TEST',
-            injuries: { forced: true }
-        });
+        // Now insert the match_context_data record (use upsert to avoid duplicate key error)
+        const { error } = await directInsightsSupabase.from('match_context_data')
+            .upsert({
+                id_event: 'FORCE_BOOT_TEST',
+                injuries: { forced: true }
+            }, {
+                onConflict: 'id_event'
+            });
 
         if (error) {
             console.error('[boot-force-insert] failed:', error.message);

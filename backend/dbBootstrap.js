@@ -749,6 +749,7 @@ async function bootstrap() {
         `);
 
         // Add composite partial unique index for fallback predictions to prevent duplicates
+        // Note: Removed timezone conversion from index to avoid immutable function error
         await query(`
             CREATE UNIQUE INDEX IF NOT EXISTS uq_predictions_final_fallback
             ON direct1x2_prediction_final (
@@ -758,7 +759,7 @@ async function bootstrap() {
                 LOWER(COALESCE(market_type, '')),
                 LOWER(COALESCE(home_team, '')),
                 LOWER(COALESCE(away_team, '')),
-                COALESCE(matches->0->>'kickoff', to_char(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'))
+                COALESCE(matches->0->>'kickoff', created_at::text)
             )
             WHERE publish_run_id IS NULL;
         `);

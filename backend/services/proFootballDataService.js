@@ -91,7 +91,12 @@ async function getTopScorers(leagueId = 39, season = 2025) {
 async function getMetadata() {
   const cacheKey = 'metadata_map';
   // Try the correct endpoint for ProFootballAPI
-  return await callEdgeAPI('/leagues', {}, cacheKey, 86400); // Cache 24h
+  try {
+    return await callEdgeAPI('/leagues', {}, cacheKey, 86400); // Cache 24h
+  } catch (err) {
+    console.warn('[ProFootballAPI] /leagues endpoint not supported by this provider, skipping metadata fetch');
+    return null;
+  }
 }
 
 // B. The AI Betting Trends (The "Edge")
@@ -161,7 +166,12 @@ async function getSportsNews(sportId = 1) {
 // F. League Information Cache
 async function getLeagueInfo(leagueId) {
   const cacheKey = `league_info_${leagueId}`;
-  return await callEdgeAPI('/leagues', { id: leagueId }, cacheKey, 86400); // Cache 24h
+  try {
+    return await callEdgeAPI('/leagues', { id: leagueId }, cacheKey, 86400); // Cache 24h
+  } catch (err) {
+    console.warn('[ProFootballAPI] /leagues endpoint not supported by this provider, skipping league info fetch');
+    return null;
+  }
 }
 
 // G. Team Information Cache

@@ -236,7 +236,7 @@ async function getLiveScores() {
   try {
     // Primary: Try TheSportsDB for live events
     const theSportsDbData = await getTheSportsDbLiveEvents();
-    
+
     if (theSportsDbData && theSportsDbData.length > 0) {
       console.log(`[Hybrid] TheSportsDB returned ${theSportsDbData.length} live events`);
       return {
@@ -245,19 +245,19 @@ async function getLiveScores() {
         fallback: false
       };
     }
-    
+
     // Fallback: Use Pro Football competitions with live games
-    console.log('[Hybrid] TheSportsDB live failed, falling back to Pro Football API');
+    console.log('[Hybrid] TheSportsDB live failed (no data returned), falling back to Pro Football API');
     const proFootballData = await getProFootballLiveCompetitions();
-    
+
     return {
       source: 'profootball',
       data: proFootballData,
       fallback: true
     };
-    
+
   } catch (error) {
-    console.error('[Hybrid] Live scores failed:', error.message);
+    console.error('[Hybrid] Live scores failed:', error.message, error.response?.data || error.stack);
     return {
       source: 'none',
       data: [],
