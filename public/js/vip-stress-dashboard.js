@@ -943,16 +943,16 @@
                 '</div>' +
                 '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;">Market Breakdown</div>' +
                 '<div style="display:flex;flex-direction:column;gap:10px;">' + marketsHtml + '</div>' +
-                '<div id="ai-loading-state" style="margin-top:20px;padding:16px;background:rgba(59,130,246,0.05);border-radius:10px;border:1px solid rgba(59,130,246,0.15);text-align:center;">' +
+                '<div id="ai-loading-state" style="text-align:center;padding:16px;">' +
                     '<div class="loading-spinner"></div>' +
-                    '<p style="color:#60a5fa;font-size:0.85rem;margin-top:8px;">Fetching AI prediction data\u2026</p>' +
+                    '<p style="color:#3b82f6;font-weight:600;">Loading AI analysis…</p>' +
                 '</div>' +
-                '<div id="ai-confidence-score" style="margin-top:16px;font-size:1.2rem;font-weight:700;color:#4ade80;"></div>' +
-                '<div id="ai-confidence-bar" style="margin-top:6px;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;width:100%;">' +
-                    '<div style="height:100%;width:0%;background:#4ade80;border-radius:3px;transition:width 0.6s ease;"></div>' +
+                '<div id="ai-confidence-score" style="font-size:2rem;font-weight:700;text-align:center;color:#22c55e;display:none;"></div>' +
+                '<div id="ai-confidence-bar" style="width:100%;height:6px;background:#334155;border-radius:3px;margin:8px 0;display:none;">' +
+                    '<div style="height:100%;width:0%;background:#22c55e;border-radius:3px;transition:width 0.5s;"></div>' +
                 '</div>' +
-                '<div id="edgemind-feedback" style="margin-top:14px;padding:12px 16px;background:rgba(74,222,128,0.05);border-radius:8px;border:1px solid rgba(74,222,128,0.15);font-size:0.9rem;color:#94a3b8;line-height:1.5;"></div>' +
-                '<div id="value-combos" style="margin-top:14px;display:flex;flex-direction:column;gap:8px;"></div>';
+                '<div id="edgemind-feedback" style="padding:12px;color:#94a3b8;font-style:italic;display:none;"></div>' +
+                '<div id="value-combos" style="margin-top:16px;"></div>';
         }
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
