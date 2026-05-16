@@ -733,6 +733,21 @@ async function bootstrap() {
             END $$;
         `);
 
+        // Add match_id column to match_context_data if it doesn't exist (for ESPN and other non-TheSportsDB sources)
+        await query(`
+            DO $$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1 FROM information_schema.columns
+                    WHERE table_name = 'match_context_data'
+                    AND column_name = 'match_id'
+                ) THEN
+                    ALTER TABLE match_context_data
+                    ADD COLUMN match_id text;
+                END IF;
+            END $$;
+        `);
+
         // Add composite partial unique index for fallback predictions to prevent duplicates
         await query(`
             CREATE UNIQUE INDEX IF NOT EXISTS uq_predictions_final_fallback
