@@ -234,6 +234,7 @@ const cricketCountRouter = require('./routes/cricketCount');
 const cricketCronRouter = require('./routes/cricketCron');
 const cricketCacheRouter = require('./routes/cricketCache');
 const sportsEdgeRouter   = require('./routes/sportsEdge');
+const schedulerRouter   = require('./routes/scheduler');
 const { runTier1Stage1Bootstrap } = require('./services/tier1BootstrapService');
 
 const DIRECT_INSIGHTS_SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
@@ -716,6 +717,7 @@ console.log('[server] Cricket count router mounted at /api/cricket/count');
 app.use('/api/cricket/cache', cricketCacheRouter);
 console.log('[server] Cricket cache router mounted at /api/cricket/cache');
 app.use('/api/cron', cricketCronRouter);
+app.use('/api/scheduler', schedulerRouter);
 
 // SKCS Sports Edge routes
 app.use('/', sportsEdgeRouter);

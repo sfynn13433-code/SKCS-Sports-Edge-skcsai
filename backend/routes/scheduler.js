@@ -1,6 +1,7 @@
 const express = require('express');
 const aiPipelineOrchestrator = require('../services/aiPipelineOrchestrator');
 const contextEnrichmentService = require('../services/contextEnrichmentService');
+const { requireSupabaseUser } = require('../middleware/supabaseJwt');
 
 const router = express.Router();
 
@@ -57,20 +58,20 @@ router.post('/trigger-context-enrichment', async (req, res) => {
 });
 
 // Trigger full AI pipeline
-router.post('/trigger-ai-pipeline', async (req, res) => {
+router.post('/trigger-ai-pipeline', requireSupabaseUser, async (req, res) => {
   try {
     const { requestedSports, runScope } = req.body;
-    
+
     console.log(`AI pipeline triggered for sports: ${requestedSports || 'ALL'}, scope: ${runScope || 'UPCOMING_7_DAYS'}`);
-    
+
     const result = await aiPipelineOrchestrator.runFullPipeline(requestedSports, runScope);
-    
+
     res.json({
       success: true,
       message: 'AI pipeline triggered',
       result
     });
-    
+
   } catch (error) {
     console.error('AI pipeline trigger error:', error);
     res.status(500).json({
