@@ -952,7 +952,10 @@
                     '<div style="height:100%;width:0%;background:#22c55e;border-radius:3px;transition:width 0.5s;"></div>' +
                 '</div>' +
                 '<div id="edgemind-feedback" style="padding:12px;color:#94a3b8;font-style:italic;display:none;"></div>' +
-                '<div id="value-combos" style="margin-top:16px;"></div>';
+                '<div id="value-combos" style="margin-top:16px;"></div>' +
+                '<div id="secondary-markets" style="margin-top:16px;"></div>' +
+                '<div id="double-chance-combos" style="margin-top:16px;"></div>' +
+                '<div id="smb-builder" style="margin-top:16px;"></div>';
         }
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
@@ -977,21 +980,40 @@
             }
         }
 
-        // Render SMB v2.0 widget into value-combos section
+        // Render secondary markets (Safe Haven fallback, etc.)
+        if (typeof selectSecondaryMarkets === 'function') {
+            const secondaryContainer = document.getElementById('secondary-markets');
+            if (secondaryContainer) {
+                secondaryContainer.innerHTML = selectSecondaryMarkets(prediction);
+            }
+        }
+
+        // Render Double Chance combos
+        if (typeof selectDoubleChanceCombos === 'function') {
+            const dcContainer = document.getElementById('double-chance-combos');
+            if (dcContainer) {
+                dcContainer.innerHTML = selectDoubleChanceCombos(prediction);
+            }
+        }
+
+        // Render Same Match Builder (Gulf in Class, tier tabs)
         if (typeof renderSMBWidget === 'function') {
-            var smbMatch = {
-                homeTeam: home,
-                awayTeam: away,
-                homeTeamAlpha: prediction.homeTeamAlpha || 1.513,
-                awayTeamBeta: prediction.awayTeamBeta || 1.091,
-                awayTeamAlpha: prediction.awayTeamAlpha || 1.513,
-                homeTeamBeta: prediction.homeTeamBeta || 1.091,
-                gamma: prediction.gamma || 1.0,
-                winProb: (prediction.total_confidence || confidence) / 100,
-                h2hSampleSize: prediction.h2hSampleSize || 10,
-                availableMarkets: prediction.availableMarkets || []
-            };
-            renderSMBWidget(smbMatch);
+            const smbContainer = document.getElementById('smb-builder');
+            if (smbContainer) {
+                // Build a match object from the prediction data (fallback defaults if missing)
+                const match = {
+                    homeTeam: prediction.homeTeam || prediction.home || home,
+                    awayTeam: prediction.awayTeam || prediction.away || away,
+                    homeAlpha: prediction.homeAlpha || prediction.homeTeamAlpha || 1.0,
+                    homeBeta: prediction.homeBeta || prediction.homeTeamBeta || 1.0,
+                    awayAlpha: prediction.awayAlpha || prediction.awayTeamAlpha || 1.0,
+                    awayBeta: prediction.awayBeta || prediction.awayTeamBeta || 1.0,
+                    winProb: prediction.winProb || prediction.probability || (prediction.total_confidence || confidence) / 100,
+                    h2hSampleSize: prediction.h2hSampleSize || 10,
+                    availableMarkets: prediction.availableMarkets || []
+                };
+                renderSMBWidget(match, '#smb-builder');
+            }
         }
     };
 
