@@ -88,11 +88,10 @@ function httpRequest(url, options, postData) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': ADMIN_KEY
+                'x-admin-key': ADMIN_KEY
             }
         }, JSON.stringify({
-            requestedSports: sport ? [sport] : null,
-            runScope: 'UPCOMING_7_DAYS'
+            sport: sport || null
         }));
 
         if (aiRes.status === 200) {
