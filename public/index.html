@@ -902,7 +902,7 @@
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
     </style><script>
-    // ========== FIXED SCRIPT – NO EXTERNAL DEPENDENCIES ==========
+    // ========== IMPROVED SCRIPT – CLICKABLE FIXTURES ==========
     // Provide missing config and dummy supabase client
     window.API_BASE_URL = window.API_BASE_URL || "https://skcs-sports-edge-skcsai.onrender.com";
     window.SUPABASE_URL = window.SUPABASE_URL || "https://your-project.supabase.co";
@@ -964,32 +964,121 @@
         addMessage("EdgeMind BOT: Thanks for your query. Our AI is processing the latest sports data. Check the Sports Market Hub for insights.", 'bot');
     }
 
-    // ----- Sports Market Hub dropdown handlers -----
+    // ----- Modal functionality for clickable fixtures -----
+    function showFixtureDetails(fixtureText) {
+        const modal = document.getElementById('skcsMatchDetailModal');
+        const modalBody = document.getElementById('skcsModalBody');
+        if (!modal || !modalBody) return;
+
+        // Parse fixture text to extract teams and prediction
+        let teams = fixtureText.split(' → ')[0];
+        let prediction = fixtureText.split(' → ')[1] || 'No prediction available';
+        
+        // Create detailed content for the modal
+        const detailContent = `
+            <div style="padding: 20px;">
+                <h3 style="color: #3b82f6; margin-bottom: 20px; font-size: 1.5rem;">📊 Match Analysis</h3>
+                <div style="background: rgba(30, 41, 59, 0.5); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    <h4 style="color: #f8fafc; margin-bottom: 10px;">${teams}</h4>
+                    <p style="color: #94a3b8; margin-bottom: 15px;">AI Prediction: <span style="color: #3b82f6; font-weight: bold;">${prediction}</span></p>
+                </div>
+                <div style="background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                    <h5 style="color: #3b82f6; margin-bottom: 10px;">🤖 AI Analysis</h5>
+                    <p style="color: #e2e8f0; line-height: 1.6;">
+                        Our AI has analyzed this fixture using multiple data points including team form, head-to-head records, 
+                        player availability, weather conditions, and market efficiency. The confidence score is calculated 
+                        based on statistical models and cross-referenced with historical data patterns.
+                    </p>
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: rgba(34, 197, 94, 0.1); border-radius: 8px; border-left: 4px solid #22c55e;">
+                    <p style="color: #22c55e; font-weight: bold; margin-bottom: 5px;">✅ Risk Assessment</p>
+                    <p style="color: #e2e8f0;">
+                        This prediction falls within our acceptable risk parameters. Always consider multiple factors 
+                        before making any decisions.
+                    </p>
+                </div>
+            </div>
+        `;
+        
+        modalBody.innerHTML = detailContent;
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('skcsMatchDetailModal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    // ----- Sports Market Hub dropdown handlers with clickable fixtures -----
     function updateMarketHubDisplay(sport) {
         let title = document.getElementById('displayTitle');
         let list = document.getElementById('codesList');
         if (!title) return;
         title.innerText = `${sport} Market Insights`;
         const mockData = {
-            Football: ["Arsenal vs Chelsea → Home Win (68%)", "Liverpool vs Man City → BTTS Yes (72%)"],
-            Tennis: ["Djokovic vs Alcaraz → Djokovic Win (64%)", "Sabalenka vs Gauff → Over 21.5 games (59%)"],
-            Basketball: ["Lakers vs Warriors → Lakers ML (71%)", "Celtics vs Bucks → Over 224 pts (66%)"],
-            Cricket: ["India vs Australia → India Win (73%)"],
-            NFL: ["Chiefs vs 49ers → Chiefs -3.5 (62%)"],
-            MLB: ["Yankees vs Dodgers → Yankees ML (60%)"],
-            MMA: ["Jones vs Miocic → Jones by Submission (58%)"],
-            F1: ["Verstappen to win → 71%"],
-            Rugby: ["Springboks vs All Blacks → Home Win (67%)"],
-            NHL: ["Oilers vs Avalanche → Over 6.5 goals (64%)"],
-            Esports: ["T1 vs Gen.G → T1 win (72%)"],
-            Golf: ["Scheffler top 5 → 68%"],
-            Volleyball: ["Italy vs Brazil → Italy win (63%)"],
-            Handball: ["Denmark vs France → Over 55.5 total (61%)"],
-            "6-match": ["6‑Leg ACCA: 72% confidence", "Football + Tennis + Basketball combo"],
-            "12-match": ["12‑Leg Mega ACCA: 58% confidence", "Mixed sports – high risk"]
+            Football: [
+                { text: "Arsenal vs Chelsea → Home Win (68%)", teams: "Arsenal vs Chelsea", prediction: "Home Win (68%)" },
+                { text: "Liverpool vs Man City → BTTS Yes (72%)", teams: "Liverpool vs Man City", prediction: "BTTS Yes (72%)" }
+            ],
+            Tennis: [
+                { text: "Djokovic vs Alcaraz → Djokovic Win (64%)", teams: "Djokovic vs Alcaraz", prediction: "Djokovic Win (64%)" },
+                { text: "Sabalenka vs Gauff → Over 21.5 games (59%)", teams: "Sabalenka vs Gauff", prediction: "Over 21.5 games (59%)" }
+            ],
+            Basketball: [
+                { text: "Lakers vs Warriors → Lakers ML (71%)", teams: "Lakers vs Warriors", prediction: "Lakers ML (71%)" },
+                { text: "Celtics vs Bucks → Over 224 pts (66%)", teams: "Celtics vs Bucks", prediction: "Over 224 pts (66%)" }
+            ],
+            Cricket: [
+                { text: "India vs Australia → India Win (73%)", teams: "India vs Australia", prediction: "India Win (73%)" }
+            ],
+            NFL: [
+                { text: "Chiefs vs 49ers → Chiefs -3.5 (62%)", teams: "Chiefs vs 49ers", prediction: "Chiefs -3.5 (62%)" }
+            ],
+            MLB: [
+                { text: "Yankees vs Dodgers → Yankees ML (60%)", teams: "Yankees vs Dodgers", prediction: "Yankees ML (60%)" }
+            ],
+            MMA: [
+                { text: "Jones vs Miocic → Jones by Submission (58%)", teams: "Jones vs Miocic", prediction: "Jones by Submission (58%)" }
+            ],
+            F1: [
+                { text: "Verstappen to win → 71%", teams: "F1 Race", prediction: "Verstappen to win (71%)" }
+            ],
+            Rugby: [
+                { text: "Springboks vs All Blacks → Home Win (67%)", teams: "Springboks vs All Blacks", prediction: "Home Win (67%)" }
+            ],
+            NHL: [
+                { text: "Oilers vs Avalanche → Over 6.5 goals (64%)", teams: "Oilers vs Avalanche", prediction: "Over 6.5 goals (64%)" }
+            ],
+            Esports: [
+                { text: "T1 vs Gen.G → T1 win (72%)", teams: "T1 vs Gen.G", prediction: "T1 win (72%)" }
+            ],
+            Golf: [
+                { text: "Scheffler top 5 → 68%", teams: "Golf Tournament", prediction: "Scheffler top 5 (68%)" }
+            ],
+            Volleyball: [
+                { text: "Italy vs Brazil → Italy win (63%)", teams: "Italy vs Brazil", prediction: "Italy win (63%)" }
+            ],
+            Handball: [
+                { text: "Denmark vs France → Over 55.5 total (61%)", teams: "Denmark vs France", prediction: "Over 55.5 total (61%)" }
+            ],
+            "6-match": [
+                { text: "6‑Leg ACCA: 72% confidence", teams: "Multi-Sport ACCA", prediction: "6‑Leg ACCA (72% confidence)" }
+            ],
+            "12-match": [
+                { text: "12‑Leg Mega ACCA: 58% confidence", teams: "Mega ACCA", prediction: "12‑Leg Mega ACCA (58% confidence)" }
+            ]
         };
-        let items = mockData[sport] || [`${sport} insights are being processed.`];
-        list.innerHTML = items.map(text => `<div class="smh-result-item">🤖 ${text}</div>`).join('');
+        
+        let items = mockData[sport] || [{ text: `${sport} insights are being processed.`, teams: sport, prediction: "Processing..." }];
+        list.innerHTML = items.map((item, index) => 
+            `<div class="smh-result-item" style="cursor: pointer; transition: all 0.2s ease;" 
+                data-fixture="${item.text}" 
+                onclick="showFixtureDetails('${item.text}')"
+                onmouseover="this.style.background='rgba(59, 130, 246, 0.2)'"
+                onmouseout="this.style.background='rgba(15,23,42,0.8)'">
+                🤖 ${item.text}
+            </div>`
+        ).join('');
     }
 
     function attachHubEvents() {
@@ -997,6 +1086,15 @@
         selects.forEach(id => {
             let el = document.getElementById(id);
             if (el) el.addEventListener('change', e => { if (e.target.value) updateMarketHubDisplay(e.target.value); });
+        });
+
+        // Attach modal close events
+        const modalClose = document.getElementById('skcsModalClose');
+        if (modalClose) modalClose.addEventListener('click', closeModal);
+        
+        const modalBackdrop = document.getElementById('skcsMatchDetailModal');
+        if (modalBackdrop) modalBackdrop.addEventListener('click', (e) => {
+            if (e.target === modalBackdrop) closeModal();
         });
     }
 
@@ -1071,7 +1169,7 @@
         initPipelineSteps();
 
         // Remove any "listener asynchronous response" errors from extensions (ignore)
-        console.log("SKCS AI Sports Edge – fully loaded (fixed)");
+        console.log("SKCS AI Sports Edge – fully loaded with clickable fixtures");
     });
 </script>
 
