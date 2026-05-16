@@ -5,6 +5,7 @@ const { requireSupabaseUser } = require('../middleware/supabaseJwt');
 const { runPipelineForMatches } = require('../services/aiPipeline');
 const { buildLiveData } = require('../services/dataProvider');
 const { upsertCanonicalEvents } = require('../services/canonicalEvents');
+const { resolveActiveDeploymentSports } = require('../config/activeSports');
 
 const router = express.Router();
 
@@ -149,15 +150,9 @@ router.post('/trigger-ai-pipeline', requireAdminKey, async (req, res) => {
   }
 });
 
-// Helper function to get active sports (copied from aiPipelineOrchestrator)
-async function getActiveSports() {
-  const { query } = require('../database');
-  const { rows } = await query(`
-    SELECT DISTINCT sport
-    FROM raw_fixtures
-    WHERE start_time > NOW() - INTERVAL '1 day'
-  `);
-  return rows.map(r => r.sport);
+// Helper function to get active sports (use configured sports instead of database query)
+function getActiveSports() {
+  return Array.from(resolveActiveDeploymentSports());
 }
 
 // Get scheduler status
