@@ -585,9 +585,64 @@ function showNotification(message, type = 'info') {
                     }, 100);
                 }
             }
+
+            // Modal close button (×)
+            if (e.target.matches('#skcsModalClose') || e.target.closest('[data-action="close-modal"]')) {
+                if (typeof window.closeMatchDetail === 'function') {
+                    window.closeMatchDetail();
+                }
+            }
+            // Back to Fixtures button
+            if (e.target.closest('.back-arrow') || e.target.closest('[data-action="back-to-fixtures"]')) {
+                if (typeof window.closeMatchDetail === 'function') {
+                    window.closeMatchDetail();
+                }
+            }
+            // Modal backdrop click
+            if (e.target.matches('[data-action="close-modal-backdrop"]')) {
+                if (typeof window.closeMatchDetail === 'function') {
+                    window.closeMatchDetail();
+                }
+            }
         });
     });
 
+})();
+
+// ============================================
+// AUTH UI UPDATE
+// ============================================
+(function initAuthUI() {
+    if (!window.supabaseClient) {
+        setTimeout(initAuthUI, 200);
+        return;
+    }
+    window.supabaseClient.auth.getSession().then(function(result) {
+        var session = result.data && result.data.session;
+        var authLink = document.getElementById('authLink');
+        var greet = document.getElementById('subscriptionGreeting');
+
+        if (authLink) {
+            if (session && session.user) {
+                authLink.textContent = 'Logout';
+                authLink.href = '#';
+                authLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.supabaseClient.auth.signOut().then(function() {
+                        window.location.reload();
+                    });
+                });
+            } else {
+                authLink.textContent = 'Login';
+                authLink.href = '/login.html';
+            }
+        }
+        if (greet && session && session.user) {
+            greet.textContent = 'Welcome, ' + (session.user.email || 'User');
+        }
+    }).catch(function(err) {
+        console.warn('[Auth] Session check failed:', err.message);
+    });
 })();
 
 // ============================================

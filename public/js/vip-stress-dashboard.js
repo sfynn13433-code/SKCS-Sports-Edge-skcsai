@@ -856,7 +856,7 @@
     // ============================================
     // MATCH DETAIL MODAL
     // ============================================
-    window.openMatchDetail = function(cardId) {
+    window.openMatchDetail = async function(cardId) {
         const prediction = CARD_REGISTRY.get(cardId);
         if (!prediction) return;
         const modal = document.getElementById('skcsMatchDetailModal');
@@ -956,6 +956,43 @@
         }
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+
+        // Fetch AI prediction data and update modal sections
+        const matchId = leg.id_event || leg.fixture_id || leg.match_id || prediction.id;
+        if (matchId && typeof updateModalWithAIData === 'function') {
+            try {
+                const timestamp = Date.now();
+                const response = await fetch(API_BASE + '/api/ai-predictions/' + matchId + '?t=' + timestamp + '&nocache=1', {
+                    headers: { 'x-api-key': API_KEY, 'Cache-Control': 'no-cache' },
+                    cache: 'no-store'
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.data) {
+                        updateModalWithAIData(data.data);
+                    }
+                }
+            } catch (err) {
+                console.warn('[SKCS] AI prediction fetch failed:', err.message);
+            }
+        }
+
+        // Render SMB v2.0 widget into value-combos section
+        if (typeof renderSMBWidget === 'function') {
+            var smbMatch = {
+                homeTeam: home,
+                awayTeam: away,
+                homeTeamAlpha: prediction.homeTeamAlpha || 1.513,
+                awayTeamBeta: prediction.awayTeamBeta || 1.091,
+                awayTeamAlpha: prediction.awayTeamAlpha || 1.513,
+                homeTeamBeta: prediction.homeTeamBeta || 1.091,
+                gamma: prediction.gamma || 1.0,
+                winProb: (prediction.total_confidence || confidence) / 100,
+                h2hSampleSize: prediction.h2hSampleSize || 10,
+                availableMarkets: prediction.availableMarkets || []
+            };
+            renderSMBWidget(smbMatch);
+        }
     };
 
     window.closeMatchDetail = function() {
