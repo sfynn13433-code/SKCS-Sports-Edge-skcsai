@@ -416,13 +416,7 @@ function extractTeamNamesFromGameId(gameId) {
     };
   }
   
-  // Fallback for FC Lorient vs Le Havre AC specifically
-  if (gameId.toLowerCase().includes('lorient') && gameId.toLowerCase().includes('havre')) {
-    return {
-      homeTeam: 'FC Lorient',
-      awayTeam: 'Le Havre AC'
-    };
-  }
+  // Removed hardcoded FC Lorient fallback - was causing stale data
   
   // Default fallback
   return {

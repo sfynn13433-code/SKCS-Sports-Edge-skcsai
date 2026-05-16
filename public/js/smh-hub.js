@@ -147,17 +147,37 @@ function showNotification(message, type = 'info') {
         const normalizedSport = sport.charAt(0).toUpperCase() + sport.slice(1);
 
         try {
+            // Add cache-busting timestamp to prevent stale responses
+            const timestamp = Date.now();
             const url = BACKEND_URL + '/api/vip/stress-payload' +
                         '?sport=' + encodeURIComponent(normalizedSport) +
-                        '&include_all=true';
+                        '&include_all=true' +
+                        '&t=' + timestamp;
 
             const response = await fetch(url, {
-                headers: { 'x-api-key': API_KEY }
+                headers: { 
+                    'x-api-key': API_KEY,
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                },
+                cache: 'no-store'
             });
+
+            // Check if response is HTML (routing issue) instead of JSON
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('text/html')) {
+                throw new Error('API returned HTML - routing issue detected');
+            }
 
             if (!response.ok) throw new Error('Fetch failed: ' + response.status);
 
             const data = await response.json();
+            
+            // Validate response structure
+            if (!data || typeof data !== 'object') {
+                throw new Error('Invalid response data structure');
+            }
+            
             renderResultsInPanel(data, normalizedSport, category);
 
             // Bridge to existing showSportInsights if present
@@ -166,17 +186,29 @@ function showNotification(message, type = 'info') {
             }
         } catch (err) {
             console.error('[SMH] Error fetching sport data:', err);
+            console.error('[SMH] URL attempted:', url);
+            console.error('[SMH] Response status:', err.response?.status || 'No response');
 
             if (displayTitle) displayTitle.textContent = 'Connection Error';
             if (codesList) {
+                const errorDetails = err.message.includes('HTML') 
+                    ? '<p style="color:#f59e0b;font-size:0.85rem;">API routing issue - check Vercel configuration</p>'
+                    : '<p style="color:#ef4444;font-size:0.85rem;">Error: ' + err.message + '</p>';
+                    
                 codesList.innerHTML =
                     '<p style="color:#ef4444;font-size:1rem;font-weight:600;">' +
                         'Could not retrieve ' + sport + ' data.' +
                     '</p>' +
+                    errorDetails +
                     '<button data-action="smh-retry" ' +
                             'style="margin-top:15px;padding:8px 16px;background:#3b82f6;' +
                                    'color:white;border:none;border-radius:6px;cursor:pointer;">' +
                         'Retry' +
+                    '</button>' +
+                    '<button data-action="smh-clear-cache" ' +
+                            'style="margin-top:10px;padding:6px 12px;background:#64748b;' +
+                                   'color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.8rem;">' +
+                        'Clear Cache & Retry' +
                     '</button>';
             }
         }
@@ -502,13 +534,31 @@ function showNotification(message, type = 'info') {
             });
         });
 
-        // Delegated click for the dynamically injected Retry button
+        // Delegated click for the dynamically injected Retry and Clear Cache buttons
         // (avoids the need for an onclick attribute on the button)
         var codesList = el('codesList');
         if (codesList) {
             codesList.addEventListener('click', function (e) {
-                var btn = e.target.closest('[data-action="smh-retry"]');
-                if (btn) location.reload();
+                var retryBtn = e.target.closest('[data-action="smh-retry"]');
+                if (retryBtn) location.reload();
+                
+                var clearCacheBtn = e.target.closest('[data-action="smh-clear-cache"]');
+                if (clearCacheBtn) {
+                    // Clear all caches and reload
+                    if ('caches' in window) {
+                        caches.keys().then(function(names) {
+                            names.forEach(function(name) {
+                                caches.delete(name);
+                            });
+                        });
+                    }
+                    // Clear localStorage
+                    localStorage.clear();
+                    // Clear sessionStorage
+                    sessionStorage.clear();
+                    // Reload with cache-busting
+                    window.location.href = window.location.href + '?nocache=' + Date.now();
+                }
             });
         }
 
