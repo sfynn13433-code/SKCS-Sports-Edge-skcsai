@@ -857,7 +857,7 @@
     // MATCH DETAIL MODAL
     // ============================================
     window.openMatchDetail = async function(cardId) {
-        const prediction = CARD_REGISTRY.get(cardId);
+        const prediction = window.SMH_CARD_REGISTRY.get(cardId);
         if (!prediction) return;
         const modal = document.getElementById('skcsMatchDetailModal');
         if (!modal) { console.warn('[SKCS] Match detail modal not found in DOM'); return; }
