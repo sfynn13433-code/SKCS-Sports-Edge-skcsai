@@ -3,6 +3,7 @@
 const axios = require('axios');
 const config = require('../config');
 const { APISportsClient, OddsAPIClient, SportsDataOrgClient, SportsDataIOClient, RapidAPIClient, CricketDataClient } = require('../apiClients');
+const { getScoreboard } = require('./espnHiddenApiService');
 
 const SUPPORTED_LEAGUES = ['4328', '4332', '4331', '4335', '4334', '4387', '4424', '4380', '4391'];
 const LEAGUE_SPORT_MAP = {
@@ -1713,6 +1714,103 @@ async function buildLiveData(options = {}) {
         } catch (cricketErr) {
             console.error(`[dataProvider] cricket: CricketData API fallback failed:`, cricketErr.message);
         }
+    }
+
+    // --- Source 7: ESPN Hidden API (free fallback, no API key required) ---
+    // ESPN integration added as final fallback when all other sources return zero.
+    // Maps SKCS sports to ESPN identifiers and uses site.api.espn.com endpoints.
+    try {
+        console.log(`[dataProvider] ${sport}: trying ESPN Hidden API fallback (free, no key required)`);
+        
+        // Map SKCS sport names to ESPN sport/league identifiers
+        const espnSportMap = {
+            'Football': { sport: 'soccer', leagues: ['eng.1', 'esp.1', 'ita.1', 'ger.1', 'fra.1'] }, // EPL, La Liga, Serie A, Bundesliga, Ligue 1
+            'Basketball': { sport: 'basketball', leagues: ['nba'] },
+            'NFL': { sport: 'football', leagues: ['nfl'] },
+            'NHL': { sport: 'hockey', leagues: ['nhl'] },
+            'MLB': { sport: 'baseball', leagues: ['mlb'] },
+            'MMA': { sport: 'mma', leagues: ['ufc'] },
+            'Tennis': { sport: 'tennis', leagues: ['atp'] },
+            'Cricket': { sport: 'cricket', leagues: ['icc.t20'] }
+        };
+        
+        const espnConfig = espnSportMap[requestedSport] || espnSportMap[sport];
+        
+        if (espnConfig) {
+            const espnFixtures = [];
+            
+            for (const league of espnConfig.leagues) {
+                try {
+                    const espnData = await getScoreboard(espnConfig.sport, league);
+                    
+                    if (espnData && espnData.events && Array.isArray(espnData.events)) {
+                        // Transform ESPN events to match fixture format
+                        const transformed = espnData.events
+                            .filter(event => {
+                                // Filter out completed games, keep upcoming and in-progress
+                                const status = event.status?.type?.state || 'post';
+                                return status === 'pre' || status === 'in';
+                            })
+                            .map(event => {
+                                const competitors = event.competitions?.[0]?.competitors || [];
+                                const homeTeam = competitors.find(c => c.homeAway === 'home')?.team?.displayName || 'Unknown';
+                                const awayTeam = competitors.find(c => c.homeAway === 'away')?.team?.displayName || 'Unknown';
+                                const date = event.date || event.competitions?.[0]?.date;
+                                
+                                return {
+                                    match_id: `espn-${event.id}`,
+                                    sport: sport,
+                                    home_team: homeTeam,
+                                    away_team: awayTeam,
+                                    date: date,
+                                    status: event.status?.type?.state === 'in' ? 'LIVE' : 'NS',
+                                    league: event.league?.name || league,
+                                    country: event.league?.country || null,
+                                    venue: event.competitions?.[0]?.venue?.fullName || null,
+                                    provider: 'espn_hidden_api',
+                                    provider_name: 'ESPN Hidden API',
+                                    raw_provider_data: event
+                                };
+                            });
+                        
+                        espnFixtures.push(...transformed);
+                    }
+                } catch (leagueErr) {
+                    console.warn(`[dataProvider] ESPN ${espnConfig.sport}/${league} failed:`, leagueErr.message);
+                }
+            }
+            
+            if (espnFixtures.length > 0) {
+                // Deduplicate against existing aggregated fixtures
+                const existingKeys = new Set(
+                    aggregated.map(f => `${f.home_team}|${f.away_team}|${f.date}`)
+                );
+                const newFixtures = espnFixtures.filter(f => {
+                    const key = `${f.home_team}|${f.away_team}|${f.date}`;
+                    return !existingKeys.has(key);
+                });
+                
+                if (newFixtures.length > 0) {
+                    const out = applyCompetitionAllowlist(
+                        dedupePredictionInputs(newFixtures),
+                        requestedSport || sport
+                    );
+                    console.log(`[dataProvider] ${sport}: ESPN Hidden API contributed ${out.length} fixtures (from ${espnFixtures.length} total, ${newFixtures.length} unique)`);
+                    if (out.length > 0 && appendAggregated(out, 'ESPN Hidden API')) {
+                        return aggregated;
+                    }
+                } else {
+                    console.log(`[dataProvider] ${sport}: ESPN returned ${espnFixtures.length} fixtures but all were duplicates`);
+                }
+            } else {
+                console.log(`[dataProvider] ${sport}: ESPN returned 0 fixtures`);
+            }
+        } else {
+            console.log(`[dataProvider] ${sport}: ESPN not configured for this sport, skipping`);
+        }
+    } catch (espnErr) {
+        console.error(`[dataProvider] ${sport}: ESPN Hidden API fallback failed:`, espnErr.message);
+        // Never crash the sync - log and continue
     }
 
     if (aggregated.length > 0) {
