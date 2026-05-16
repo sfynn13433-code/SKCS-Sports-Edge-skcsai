@@ -155,7 +155,7 @@ async function getActiveSports() {
   const { rows } = await query(`
     SELECT DISTINCT sport
     FROM raw_fixtures
-    WHERE commence_time > NOW() - INTERVAL '1 day'
+    WHERE start_time > NOW() - INTERVAL '1 day'
   `);
   return rows.map(r => r.sport);
 }
