@@ -974,6 +974,29 @@
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
 
+        // Show AI layers
+        if (typeof updateModalWithAIData === 'function') updateModalWithAIData(prediction);
+        if (typeof selectSecondaryMarkets === 'function') {
+            document.getElementById('secondary-markets').innerHTML = selectSecondaryMarkets(prediction);
+        }
+        if (typeof selectDoubleChanceCombos === 'function') {
+            document.getElementById('double-chance-combos').innerHTML = selectDoubleChanceCombos(prediction);
+        }
+        if (typeof renderSMBWidget === 'function') {
+            const match = {
+                homeTeam: prediction.homeTeam || prediction.home,
+                awayTeam: prediction.awayTeam || prediction.away,
+                homeAlpha: prediction.homeAlpha || 1.0,
+                homeBeta: prediction.homeBeta || 1.0,
+                awayAlpha: prediction.awayAlpha || 1.0,
+                awayBeta: prediction.awayBeta || 1.0,
+                winProb: prediction.winProb || prediction.probability || 0.5,
+                h2hSampleSize: prediction.h2hSampleSize || 10,
+                availableMarkets: prediction.availableMarkets || []
+            };
+            renderSMBWidget(match, '#smb-builder');
+        }
+
         // Fetch AI prediction data and update modal sections
         const matchId = leg.id_event || leg.fixture_id || leg.match_id || prediction.id;
         if (matchId && typeof updateModalWithAIData === 'function') {
