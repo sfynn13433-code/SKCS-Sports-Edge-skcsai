@@ -1171,6 +1171,78 @@
         // Remove any "listener asynchronous response" errors from extensions (ignore)
         console.log("SKCS AI Sports Edge – fully loaded with clickable fixtures");
     });
+
+    // ----- FAIL-SAFE CLICK HANDLERS FOR BACK TO FIXTURES AND CLOSE BUTTONS -----
+    document.addEventListener('click', function(e) {
+        // Handle "Back to Fixtures" button
+        if (e.target.matches('.back-arrow, .close-match-modal-btn.back-arrow, button[class*="back-arrow"]')) {
+            console.log('Back to Fixtures clicked');
+            
+            // Hide the detail view
+            const modal = document.getElementById('skcsMatchDetailModal');
+            if (modal) {
+                modal.style.display = 'none';
+                console.log('Modal hidden');
+            }
+            
+            // Show the fixture list
+            const fixtureList = document.getElementById('codesList');
+            if (fixtureList) {
+                fixtureList.style.display = 'block';
+                console.log('Fixture list shown');
+            }
+            
+            // If the list was cleared, re-render it
+            if (typeof updateMarketHubDisplay === 'function') {
+                const currentSport = document.getElementById('global-majors-select')?.value || 
+                                   document.getElementById('premium-markets-select')?.value || 
+                                   document.getElementById('niche-markets-select')?.value || 
+                                   document.getElementById('acca-select')?.value || 'Football';
+                updateMarketHubDisplay(currentSport);
+                console.log('Fixture list re-rendered for:', currentSport);
+            }
+        }
+        
+        // Handle close button (×)
+        if (e.target.matches('#skcsModalClose, .close-match-modal-btn:not(.back-arrow), button[data-action="close-modal"]')) {
+            console.log('Close button clicked');
+            
+            // Hide the detail view
+            const modal = document.getElementById('skcsMatchDetailModal');
+            if (modal) {
+                modal.style.display = 'none';
+                console.log('Modal hidden via close button');
+            }
+            
+            // Show the fixture list
+            const fixtureList = document.getElementById('codesList');
+            if (fixtureList) {
+                fixtureList.style.display = 'block';
+                console.log('Fixture list shown via close button');
+            }
+        }
+        
+        // Handle modal backdrop click
+        if (e.target.matches('#skcsMatchDetailModal, [data-action="close-modal-backdrop"]')) {
+            if (e.target.id === 'skcsMatchDetailModal' || e.target.dataset.action === 'close-modal-backdrop') {
+                console.log('Modal backdrop clicked');
+                
+                // Hide the detail view
+                const modal = document.getElementById('skcsMatchDetailModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                    console.log('Modal hidden via backdrop click');
+                }
+                
+                // Show the fixture list
+                const fixtureList = document.getElementById('codesList');
+                if (fixtureList) {
+                    fixtureList.style.display = 'block';
+                    console.log('Fixture list shown via backdrop click');
+                }
+            }
+        }
+    });
 </script>
 
 <style>
