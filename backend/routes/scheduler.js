@@ -2,6 +2,9 @@ const express = require('express');
 const aiPipelineOrchestrator = require('../services/aiPipelineOrchestrator');
 const contextEnrichmentService = require('../services/contextEnrichmentService');
 const { requireSupabaseUser } = require('../middleware/supabaseJwt');
+const { runPipelineForMatches } = require('../services/aiPipeline');
+const { buildLiveData } = require('../services/dataProvider');
+const { upsertCanonicalEvents } = require('../services/canonicalEvents');
 
 const router = express.Router();
 
@@ -57,19 +60,84 @@ router.post('/trigger-context-enrichment', async (req, res) => {
   }
 });
 
-// Trigger full AI pipeline
-router.post('/trigger-ai-pipeline', requireSupabaseUser, async (req, res) => {
+// Admin key validation middleware
+const requireAdminKey = (req, res, next) => {
+  const adminKey = req.headers['x-admin-key'];
+  const validKey = process.env.ADMIN_API_KEY;
+
+  if (!adminKey) {
+    return res.status(401).json({ error: 'Missing x-admin-key header' });
+  }
+
+  if (adminKey !== validKey) {
+    return res.status(403).json({ error: 'Invalid admin key' });
+  }
+
+  next();
+};
+
+// Trigger full AI pipeline (using same function as syncService)
+router.post('/trigger-ai-pipeline', requireAdminKey, async (req, res) => {
   try {
-    const { requestedSports, runScope } = req.body;
+    const { sport } = req.body;
 
-    console.log(`AI pipeline triggered for sports: ${requestedSports || 'ALL'}, scope: ${runScope || 'UPCOMING_7_DAYS'}`);
+    console.log(`AI pipeline triggered via scheduler${sport ? ` for sport: ${sport}` : ' for all sports'}`);
 
-    const result = await aiPipelineOrchestrator.runFullPipeline(requestedSports, runScope);
+    const sportsToProcess = sport ? [sport] : await getActiveSports();
+    const results = [];
+
+    for (const currentSport of sportsToProcess) {
+      try {
+        console.log(`[scheduler] Processing sport: ${currentSport}`);
+
+        // Fetch fixtures (same as syncService)
+        const rawMatches = await buildLiveData({
+          sport: currentSport,
+          windowDays: 7
+        });
+
+        if (!rawMatches || rawMatches.length === 0) {
+          console.log(`[scheduler] No fixtures found for ${currentSport}`);
+          results.push({ sport: currentSport, status: 'no_fixtures', matchesProcessed: 0 });
+          continue;
+        }
+
+        // Upsert canonical events (same as syncService)
+        await upsertCanonicalEvents(rawMatches);
+
+        console.log(`[scheduler] Found ${rawMatches.length} matches for ${currentSport}. Running AI Analysis...`);
+
+        // Run AI pipeline (same function syncService uses)
+        const pipelineResult = await runPipelineForMatches({
+          matches: rawMatches,
+          telemetry: {
+            run_id: Date.now(),
+            sport: currentSport,
+            trigger_source: 'scheduler_api'
+          }
+        });
+
+        results.push({
+          sport: currentSport,
+          status: 'success',
+          matchesProcessed: rawMatches.length,
+          pipelineResult
+        });
+
+      } catch (sportError) {
+        console.error(`[scheduler] Failed to process ${currentSport}:`, sportError.message);
+        results.push({
+          sport: currentSport,
+          status: 'error',
+          error: sportError.message
+        });
+      }
+    }
 
     res.json({
       success: true,
-      message: 'AI pipeline triggered',
-      result
+      message: 'AI pipeline completed',
+      sportsProcessed: results
     });
 
   } catch (error) {
@@ -80,6 +148,17 @@ router.post('/trigger-ai-pipeline', requireSupabaseUser, async (req, res) => {
     });
   }
 });
+
+// Helper function to get active sports (copied from aiPipelineOrchestrator)
+async function getActiveSports() {
+  const { query } = require('../database');
+  const { rows } = await query(`
+    SELECT DISTINCT sport
+    FROM raw_fixtures
+    WHERE commence_time > NOW() - INTERVAL '1 day'
+  `);
+  return rows.map(r => r.sport);
+}
 
 // Get scheduler status
 router.get('/status', async (req, res) => {
