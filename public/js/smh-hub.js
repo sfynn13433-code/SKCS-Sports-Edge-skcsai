@@ -611,8 +611,8 @@ window.updateModalWithAIData = function(aiPrediction) {
     if (confidenceScoreEl && aiPrediction.confidence_score !== undefined) {
         confidenceScoreEl.textContent = aiPrediction.confidence_score + '%';
         const progressBar = document.getElementById('ai-confidence-bar');
-        if (progressBar) {
-            progressBar.style.width = aiPrediction.confidence_score + '%';
+        if (progressBar && progressBar.firstElementChild) {
+            progressBar.firstElementChild.style.width = aiPrediction.confidence_score + '%';
         }
     } else {
         console.warn('[SMH] AI confidence score elements not found');

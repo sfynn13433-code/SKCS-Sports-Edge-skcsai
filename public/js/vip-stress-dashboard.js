@@ -942,7 +942,17 @@
                     (chips ? '<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">' + chips + '</div>' : '') +
                 '</div>' +
                 '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;">Market Breakdown</div>' +
-                '<div style="display:flex;flex-direction:column;gap:10px;">' + marketsHtml + '</div>';
+                '<div style="display:flex;flex-direction:column;gap:10px;">' + marketsHtml + '</div>' +
+                '<div id="ai-loading-state" style="margin-top:20px;padding:16px;background:rgba(59,130,246,0.05);border-radius:10px;border:1px solid rgba(59,130,246,0.15);text-align:center;">' +
+                    '<div class="loading-spinner"></div>' +
+                    '<p style="color:#60a5fa;font-size:0.85rem;margin-top:8px;">Fetching AI prediction data\u2026</p>' +
+                '</div>' +
+                '<div id="ai-confidence-score" style="margin-top:16px;font-size:1.2rem;font-weight:700;color:#4ade80;"></div>' +
+                '<div id="ai-confidence-bar" style="margin-top:6px;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;width:100%;">' +
+                    '<div style="height:100%;width:0%;background:#4ade80;border-radius:3px;transition:width 0.6s ease;"></div>' +
+                '</div>' +
+                '<div id="edgemind-feedback" style="margin-top:14px;padding:12px 16px;background:rgba(74,222,128,0.05);border-radius:8px;border:1px solid rgba(74,222,128,0.15);font-size:0.9rem;color:#94a3b8;line-height:1.5;"></div>' +
+                '<div id="value-combos" style="margin-top:14px;display:flex;flex-direction:column;gap:8px;"></div>';
         }
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
