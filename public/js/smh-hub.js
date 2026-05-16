@@ -651,6 +651,17 @@ function showNotification(message, type = 'info') {
 // ============================================
 
 // Helper: Update modal with AI prediction data
+// Helper: Ensure DOM element exists, create if missing
+function ensureElement(id, tag = 'div', parent) {
+    let el = document.getElementById(id);
+    if (!el && parent) {
+        el = document.createElement(tag);
+        el.id = id;
+        parent.appendChild(el);
+    }
+    return el;
+}
+
 window.updateModalWithAIData = function(aiPrediction) {
     // Check if modal exists before proceeding
     const modal = document.getElementById('skcsMatchDetailModal');
@@ -658,31 +669,52 @@ window.updateModalWithAIData = function(aiPrediction) {
         console.warn('[SMH] Modal not found - cannot update AI data');
         return;
     }
-    
-    const confidenceScoreEl = document.getElementById('ai-confidence-score');
-    const edgemindFeedbackEl = document.getElementById('edgemind-feedback');
-    const valueCombosEl = document.getElementById('value-combos');
-    
-    if (confidenceScoreEl && aiPrediction.confidence_score !== undefined) {
-        confidenceScoreEl.textContent = aiPrediction.confidence_score + '%';
-        const progressBar = document.getElementById('ai-confidence-bar');
-        if (progressBar && progressBar.firstElementChild) {
-            progressBar.firstElementChild.style.width = aiPrediction.confidence_score + '%';
-        }
-    } else {
-        console.warn('[SMH] AI confidence score elements not found');
-    }
-    
-    if (edgemindFeedbackEl && aiPrediction.edgemind_feedback) {
-        edgemindFeedbackEl.textContent = aiPrediction.edgemind_feedback;
-        edgemindFeedbackEl.classList.remove('text-slate-400');
-        edgemindFeedbackEl.classList.add('text-emerald-400');
-    } else {
-        console.warn('[SMH] EdgeMind feedback element not found');
+
+    const modalBody = document.getElementById('skcsModalBody');
+    if (!modalBody) {
+        console.warn('[SMH] Modal body not found');
+        return;
     }
 
-    // Update value combos with actual data instead of "Pending"
-    if (valueCombosEl && aiPrediction.value_combos) {
+    // Ensure all required containers exist
+    const loadingEl = ensureElement('ai-loading-state', 'div', modalBody);
+    const confidenceScoreEl = ensureElement('ai-confidence-score', 'div', modalBody);
+    const confidenceBarEl = ensureElement('ai-confidence-bar', 'div', modalBody);
+    const edgemindFeedbackEl = ensureElement('edgemind-feedback', 'div', modalBody);
+    const valueCombosEl = ensureElement('value-combos', 'div', modalBody);
+    const secondaryMarketsEl = ensureElement('secondary-markets', 'div', modalBody);
+    const doubleChanceCombosEl = ensureElement('double-chance-combos', 'div', modalBody);
+    const smbBuilderEl = ensureElement('smb-builder', 'div', modalBody);
+
+    // Update AI confidence score with risk tier badge
+    if (aiPrediction.confidence_score !== undefined) {
+        confidenceScoreEl.textContent = aiPrediction.confidence_score + '%';
+        confidenceScoreEl.style.display = 'block';
+        
+        // Set color based on risk tier
+        const score = aiPrediction.confidence_score;
+        let color = '#ef4444'; // Red (0-58% Extreme Risk)
+        if (score >= 80) color = '#22c55e'; // Green (80-100% High Confidence)
+        else if (score >= 70) color = '#3b82f6'; // Blue (70-79% Moderate Risk)
+        else if (score >= 59) color = '#f97316'; // Orange (59-69% High Risk)
+        confidenceScoreEl.style.color = color;
+
+        // Update progress bar
+        if (confidenceBarEl && confidenceBarEl.firstElementChild) {
+            confidenceBarEl.style.display = 'block';
+            confidenceBarEl.firstElementChild.style.width = score + '%';
+            confidenceBarEl.firstElementChild.style.background = color;
+        }
+    }
+
+    // Update EdgeMind feedback
+    if (aiPrediction.edgemind_feedback) {
+        edgemindFeedbackEl.textContent = aiPrediction.edgemind_feedback;
+        edgemindFeedbackEl.style.display = 'block';
+    }
+
+    // Update value combos
+    if (aiPrediction.value_combos) {
         const combos = aiPrediction.value_combos;
         let combosHtml = '';
         
@@ -693,15 +725,59 @@ window.updateModalWithAIData = function(aiPrediction) {
             combosHtml += '<div style="margin-bottom:8px;padding:8px 12px;background:rgba(59,130,246,0.1);border-radius:6px;border:1px solid rgba(59,130,246,0.2);"><span style="font-size:0.85rem;color:#60a5fa;font-weight:600;">Safety:</span> <span style="font-size:0.85rem;color:#e2e8f0;">' + combos.double_chance + '</span></div>';
         }
         
-        if (combosHtml) {
-            valueCombosEl.innerHTML = combosHtml;
+        valueCombosEl.innerHTML = combosHtml;
+    }
+
+    // Populate secondary markets
+    if (typeof selectSecondaryMarkets === 'function') {
+        const mainConfidence = aiPrediction.total_confidence || aiPrediction.confidence || 0;
+        const allMarkets = aiPrediction.secondary_markets || aiPrediction.secondary_insights || [];
+        const result = selectSecondaryMarkets(mainConfidence, allMarkets);
+        if (result && result.markets && result.markets.length > 0) {
+            secondaryMarketsEl.innerHTML = '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;">Secondary Markets</div>' +
+                result.markets.map(m => `<div style="margin-top:8px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+                    <div style="display:flex;justify-content:space-between;"><span style="font-size:0.78rem;color:#94a3b8;font-weight:600;">${m.market || m.prediction}</span><span style="font-size:0.78rem;color:#4ade80;font-weight:700;">${m.confidence}%</span></div>
+                </div>`).join('');
         }
-    } else {
-        console.warn('[SMH] Value combos element not found');
+    }
+
+    // Populate Double Chance combos
+    if (typeof selectDoubleChanceCombos === 'function') {
+        const result = selectDoubleChanceCombos(
+            { home: aiPrediction.home_win_prob || 0.5, draw: aiPrediction.draw_prob || 0, away: aiPrediction.away_win_prob || 0 },
+            { home: aiPrediction.home_win_prob || 0.5, draw: aiPrediction.draw_prob || 0, away: aiPrediction.away_win_prob || 0 },
+            { over: aiPrediction.over_1_5_prob || 0 },
+            { over: aiPrediction.over_2_5_prob || 0 },
+            { under: aiPrediction.under_2_5_prob || 0 },
+            { yes: aiPrediction.btts_yes_prob || 0 },
+            { no: aiPrediction.btts_no_prob || 0 }
+        );
+        if (result && result.combos && result.combos.length > 0) {
+            doubleChanceCombosEl.innerHTML = '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;">Double Chance Combos</div>' +
+                result.combos.map(c => `<div style="margin-top:8px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+                    <div style="font-size:0.85rem;color:#e2e8f0;font-weight:700;">${c.combo}</div>
+                    <div style="font-size:0.75rem;color:#94a3b8;margin-top:4px;">Joint: ${c.jointProbability}% | Risk: ${c.risk}</div>
+                </div>`).join('');
+        }
+    }
+
+    // Populate SMB builder
+    if (typeof renderSMBWidget === 'function') {
+        const match = {
+            homeTeam: aiPrediction.homeTeam || aiPrediction.home || 'Home',
+            awayTeam: aiPrediction.awayTeam || aiPrediction.away || 'Away',
+            homeAlpha: aiPrediction.homeAlpha || aiPrediction.homeTeamAlpha || 1.0,
+            homeBeta: aiPrediction.homeBeta || aiPrediction.homeTeamBeta || 1.0,
+            awayAlpha: aiPrediction.awayAlpha || aiPrediction.awayTeamAlpha || 1.0,
+            awayBeta: aiPrediction.awayBeta || aiPrediction.awayTeamBeta || 1.0,
+            winProb: aiPrediction.winProb || aiPrediction.probability || (aiPrediction.total_confidence || 0) / 100,
+            h2hSampleSize: aiPrediction.h2hSampleSize || 10,
+            availableMarkets: aiPrediction.availableMarkets || []
+        };
+        renderSMBWidget(match, '#smb-builder');
     }
 
     // Hide loading state
-    const loadingEl = document.getElementById('ai-loading-state');
     if (loadingEl) {
         loadingEl.style.display = 'none';
     }

@@ -857,8 +857,22 @@
     // MATCH DETAIL MODAL
     // ============================================
     window.openMatchDetail = async function(cardId) {
+        // If cardId is an event, extract it from target's data attribute
+        if (cardId && typeof cardId === 'object' && cardId.target) {
+            const button = cardId.target.closest('[data-card-id]');
+            cardId = button ? button.getAttribute('data-card-id') : null;
+        }
+
+        if (!cardId) {
+            console.warn('[SKCS] No card ID provided');
+            return;
+        }
+
         const prediction = window.SMH_CARD_REGISTRY.get(cardId);
-        if (!prediction) return;
+        if (!prediction) {
+            console.warn('[SKCS] Prediction not found for card ID:', cardId);
+            return;
+        }
         const modal = document.getElementById('skcsMatchDetailModal');
         if (!modal) { console.warn('[SKCS] Match detail modal not found in DOM'); return; }
 
@@ -977,65 +991,6 @@
                 }
             } catch (err) {
                 console.warn('[SKCS] AI prediction fetch failed:', err.message);
-            }
-        }
-
-        // Render secondary markets (Safe Haven fallback, etc.)
-        if (typeof selectSecondaryMarkets === 'function') {
-            const secondaryContainer = document.getElementById('secondary-markets');
-            if (secondaryContainer) {
-                const mainConfidence = prediction.total_confidence || prediction.confidence || 0;
-                const allMarkets = prediction.secondary_markets || prediction.secondary_insights || [];
-                const result = selectSecondaryMarkets(mainConfidence, allMarkets);
-                if (result && result.markets && result.markets.length > 0) {
-                    secondaryContainer.innerHTML = '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;">Secondary Markets</div>' +
-                        result.markets.map(m => `<div style="margin-top:8px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
-                            <div style="display:flex;justify-content:space-between;"><span style="font-size:0.78rem;color:#94a3b8;font-weight:600;">${m.market || m.prediction}</span><span style="font-size:0.78rem;color:#4ade80;font-weight:700;">${m.confidence}%</span></div>
-                        </div>`).join('');
-                }
-            }
-        }
-
-        // Render Double Chance combos
-        if (typeof selectDoubleChanceCombos === 'function') {
-            const dcContainer = document.getElementById('double-chance-combos');
-            if (dcContainer) {
-                const result = selectDoubleChanceCombos(
-                    { home: prediction.home_win_prob || 0.5, draw: prediction.draw_prob || 0, away: prediction.away_win_prob || 0 },
-                    { home: prediction.home_win_prob || 0.5, draw: prediction.draw_prob || 0, away: prediction.away_win_prob || 0 },
-                    { over: prediction.over_1_5_prob || 0 },
-                    { over: prediction.over_2_5_prob || 0 },
-                    { under: prediction.under_2_5_prob || 0 },
-                    { yes: prediction.btts_yes_prob || 0 },
-                    { no: prediction.btts_no_prob || 0 }
-                );
-                if (result && result.combos && result.combos.length > 0) {
-                    dcContainer.innerHTML = '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;">Double Chance Combos</div>' +
-                        result.combos.map(c => `<div style="margin-top:8px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
-                            <div style="font-size:0.85rem;color:#e2e8f0;font-weight:700;">${c.combo}</div>
-                            <div style="font-size:0.75rem;color:#94a3b8;margin-top:4px;">Joint: ${c.jointProbability}% | Risk: ${c.risk}</div>
-                        </div>`).join('');
-                }
-            }
-        }
-
-        // Render Same Match Builder (Gulf in Class, tier tabs)
-        if (typeof renderSMBWidget === 'function') {
-            const smbContainer = document.getElementById('smb-builder');
-            if (smbContainer) {
-                // Build a match object from the prediction data (fallback defaults if missing)
-                const match = {
-                    homeTeam: prediction.homeTeam || prediction.home || home,
-                    awayTeam: prediction.awayTeam || prediction.away || away,
-                    homeAlpha: prediction.homeAlpha || prediction.homeTeamAlpha || 1.0,
-                    homeBeta: prediction.homeBeta || prediction.homeTeamBeta || 1.0,
-                    awayAlpha: prediction.awayAlpha || prediction.awayTeamAlpha || 1.0,
-                    awayBeta: prediction.awayBeta || prediction.awayTeamBeta || 1.0,
-                    winProb: prediction.winProb || prediction.probability || (prediction.total_confidence || confidence) / 100,
-                    h2hSampleSize: prediction.h2hSampleSize || 10,
-                    availableMarkets: prediction.availableMarkets || []
-                };
-                renderSMBWidget(match, '#smb-builder');
             }
         }
     };
