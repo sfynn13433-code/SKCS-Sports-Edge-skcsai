@@ -20,11 +20,11 @@ class AIPipelineOrchestrator {
         INSERT INTO prediction_publish_runs (
           trigger_source, run_scope, requested_sports, status, metadata
         ) VALUES (
-          'scheduled', $1, $2, 'running', $3
+          'scheduled', $1, $2::text[], 'running', $3
         ) RETURNING id
       `, [
         runScope,
-        requestedSports ? JSON.stringify(requestedSports) : '[]',
+        requestedSports || [],
         JSON.stringify({
           started_at: new Date().toISOString(),
           pipeline_version: '2.0'
