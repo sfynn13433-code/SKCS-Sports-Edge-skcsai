@@ -1,0 +1,637 @@
+{
+  "sports": {
+    "Football (Soccer)": {
+      "rawSport": "Soccer",
+      "leagues": [
+        {
+          "id": "4753",
+          "name": "Algerian Ligue 1",
+          "alternate": "Championnat National de Première Division",
+          "country": "Algeria",
+          "priority": "high"
+        },
+        {
+          "id": "4907",
+          "name": "Albanian Kategoria e Parë",
+          "alternate": "Albanian Second Division",
+          "country": "Albania",
+          "priority": "low"
+        },
+        {
+          "id": "4617",
+          "name": "Albanian Superliga",
+          "alternate": "Superliga, Kategoria Superiore",
+          "country": "Albania",
+          "priority": "low"
+        },
+        {
+          "id": "4618",
+          "name": "Andorran 1a Divisió",
+          "alternate": "",
+          "country": "Andorra",
+          "priority": "low"
+        },
+        {
+          "id": "4904",
+          "name": "Andorran Segona Divisió",
+          "alternate": "Andorran 2a Divisió, Andorran Second Division, Lliga UNIDA",
+          "country": "Andorra",
+          "priority": "low"
+        }
+      ]
+    },
+    "NFL": {
+      "rawSport": "American Football",
+      "leagues": [
+        {
+          "id": "4405",
+          "name": "CFL",
+          "alternate": "",
+          "country": "Canada",
+          "priority": "high"
+        },
+        {
+          "id": "5877",
+          "name": "American Football League Europe",
+          "alternate": "AFLE",
+          "country": "Europe",
+          "priority": "medium"
+        },
+        {
+          "id": "5876",
+          "name": "European Football Alliance",
+          "alternate": "EFA",
+          "country": "Europe",
+          "priority": "medium"
+        },
+        {
+          "id": "5063",
+          "name": "European League of Football",
+          "alternate": "ELF",
+          "country": "Europe",
+          "priority": "medium"
+        },
+        {
+          "id": "5350",
+          "name": "U Sports Football League",
+          "alternate": "",
+          "country": "Canada",
+          "priority": "low"
+        }
+      ]
+    },
+    "NBA": {
+      "rawSport": "Basketball",
+      "leagues": [
+        {
+          "id": "4734",
+          "name": "Argentine LNB",
+          "alternate": "Liga Nacional de Básquet",
+          "country": "Argentina",
+          "priority": "low"
+        },
+        {
+          "id": "4434",
+          "name": "Australian NBL",
+          "alternate": "",
+          "country": "Australia",
+          "priority": "low"
+        },
+        {
+          "id": "5113",
+          "name": "Australian WNBL",
+          "alternate": "Women",
+          "country": "Australia",
+          "priority": "low"
+        },
+        {
+          "id": "5667",
+          "name": "NBL1 Central",
+          "alternate": "",
+          "country": "Australia",
+          "priority": "low"
+        },
+        {
+          "id": "5351",
+          "name": "NBL1 West",
+          "alternate": "",
+          "country": "Australia",
+          "priority": "low"
+        }
+      ]
+    },
+    "MLB": {
+      "rawSport": "Baseball",
+      "leagues": [
+        {
+          "id": "5107",
+          "name": "Australian Baseball League",
+          "alternate": "",
+          "country": "Australia",
+          "priority": "low"
+        },
+        {
+          "id": "5833",
+          "name": "Caribbean Series",
+          "alternate": "Serie del Caribe",
+          "country": "International",
+          "priority": "low"
+        },
+        {
+          "id": "5108",
+          "name": "Cuban National Series",
+          "alternate": "",
+          "country": "Cuba",
+          "priority": "low"
+        },
+        {
+          "id": "4591",
+          "name": "Nippon Baseball League",
+          "alternate": "",
+          "country": "Japan",
+          "priority": "low"
+        }
+      ]
+    },
+    "NHL": {
+      "rawSport": "Ice Hockey",
+      "leagues": [
+        {
+          "id": "4933",
+          "name": "Austrian ICE Hockey League",
+          "alternate": "bet-at-home ICE Hockey League ",
+          "country": "Austria",
+          "priority": "low"
+        },
+        {
+          "id": "4924",
+          "name": "Belarusian Extraleague",
+          "alternate": "Belarusian Open Championship",
+          "country": "Belarus",
+          "priority": "low"
+        },
+        {
+          "id": "5159",
+          "name": "Canadian OHL",
+          "alternate": "",
+          "country": "Canada",
+          "priority": "low"
+        },
+        {
+          "id": "5161",
+          "name": "Canadian QMJHL",
+          "alternate": "Quebec Major Junior Hockey League, Ligue de hockey junior majeur du Québec, LHJMQ",
+          "country": "Canada",
+          "priority": "low"
+        }
+      ]
+    },
+    "MMA (UFC)": {
+      "rawSport": "MMA",
+      "leagues": []
+    },
+    "Boxing": {
+      "rawSport": "Boxing",
+      "leagues": []
+    },
+    "F1": {
+      "rawSport": "Motorsport",
+      "leagues": [
+        {
+          "id": "4410",
+          "name": "British GT Championship",
+          "alternate": "",
+          "country": "England",
+          "priority": "low"
+        },
+        {
+          "id": "4372",
+          "name": "BTCC",
+          "alternate": "British Touring Car Championship",
+          "country": "England",
+          "priority": "low"
+        },
+        {
+          "id": "4489",
+          "name": "V8 Supercars",
+          "alternate": "Supercars Championship, Repco Supercars Championship, Supercars",
+          "country": "Australia",
+          "priority": "low"
+        },
+        {
+          "id": "4730",
+          "name": "World Rallycross Championship",
+          "alternate": "European Rallycross Championship",
+          "country": "Europe",
+          "priority": "low"
+        },
+        {
+          "id": "5873",
+          "name": "WorldSSP",
+          "alternate": "Supersport World Championship",
+          "country": "International",
+          "priority": "low"
+        }
+      ]
+    },
+    "Tennis": {
+      "rawSport": "Tennis",
+      "leagues": [
+        {
+          "id": "4464",
+          "name": "ATP World Tour",
+          "alternate": "Association of Tennis Professionals",
+          "country": "Worldwide",
+          "priority": "high"
+        },
+        {
+          "id": "4517",
+          "name": "WTA Tour",
+          "alternate": "Womens Tennis Association",
+          "country": "Worldwide",
+          "priority": "high"
+        },
+        {
+          "id": "4581",
+          "name": "Laver Cup",
+          "alternate": "",
+          "country": "Worldwide",
+          "priority": "low"
+        },
+        {
+          "id": "5040",
+          "name": "Olympics Tennis",
+          "alternate": "",
+          "country": "Worldwide",
+          "priority": "low"
+        },
+        {
+          "id": "5872",
+          "name": "United Cup",
+          "alternate": "",
+          "country": "Australia",
+          "priority": "low"
+        }
+      ]
+    },
+    "Cricket": {
+      "rawSport": "Cricket",
+      "leagues": [
+        {
+          "id": "4461",
+          "name": "Australian Big Bash League",
+          "alternate": "KFC Big Bash League",
+          "country": "Australia",
+          "priority": "high"
+        },
+        {
+          "id": "5529",
+          "name": "Bangladesh Premier League",
+          "alternate": "Dutch-Bangla Bank BPL",
+          "country": "Bangladesh",
+          "priority": "low"
+        },
+        {
+          "id": "5176",
+          "name": "Caribbean Premier League",
+          "alternate": "",
+          "country": "Barbados",
+          "priority": "low"
+        },
+        {
+          "id": "5530",
+          "name": "Sheffield Shield",
+          "alternate": "",
+          "country": "Australia",
+          "priority": "low"
+        },
+        {
+          "id": "5534",
+          "name": "Shpageeza Cricket League",
+          "alternate": "SCL,  X-Bull Energy Shpageeza Cricket League, Etisalat Sixes T20, شپږیزه کرکټ لیګ",
+          "country": "Afghanistan",
+          "priority": "low"
+        }
+      ]
+    },
+    "eSports": {
+      "rawSport": "eSports",
+      "leagues": [
+        {
+          "id": "5875",
+          "name": "LCK Challengers League",
+          "alternate": "",
+          "country": "South Korea",
+          "priority": "high"
+        },
+        {
+          "id": "5421",
+          "name": "Rocket League Championship Series",
+          "alternate": "",
+          "country": "Europe",
+          "priority": "low"
+        }
+      ]
+    },
+    "Golf": {
+      "rawSport": "Golf",
+      "leagues": [
+        {
+          "id": "4765",
+          "name": "PGA Tour Canada",
+          "alternate": "PGA Tour Canada",
+          "country": "Canada",
+          "priority": "high"
+        },
+        {
+          "id": "4774",
+          "name": "PGA Tour China",
+          "alternate": "PGA Tour China",
+          "country": "China",
+          "priority": "high"
+        },
+        {
+          "id": "4761",
+          "name": "PGA Tour of Australasia",
+          "alternate": "PGA Tour of Australasia",
+          "country": "Australia",
+          "priority": "high"
+        },
+        {
+          "id": "5557",
+          "name": "China Tour",
+          "alternate": "Moutai 1935 China Tour",
+          "country": "China",
+          "priority": "low"
+        },
+        {
+          "id": "4758",
+          "name": "European Challenge Tour",
+          "alternate": "Challenge Tour",
+          "country": "Europe",
+          "priority": "low"
+        }
+      ]
+    },
+    "AFL": {
+      "rawSport": "Australian Football",
+      "leagues": [
+        {
+          "id": "5311",
+          "name": "AFL Womens",
+          "alternate": "AFLW",
+          "country": "Australia",
+          "priority": "high"
+        },
+        {
+          "id": "4456",
+          "name": "Australian AFL",
+          "alternate": "Australian rules football",
+          "country": "Australia",
+          "priority": "high"
+        }
+      ]
+    },
+    "Rugby": {
+      "rawSport": "Rugby Union",
+      "leagues": []
+    },
+    "Volleyball": {
+      "rawSport": "Volleyball",
+      "leagues": [
+        {
+          "id": "5614",
+          "name": "CEV Challenge Cup",
+          "alternate": "",
+          "country": "Europe",
+          "priority": "low"
+        },
+        {
+          "id": "5848",
+          "name": "Mens European Volleyball League",
+          "alternate": "Volleyball-Europaliga, Liga Europea de Voleibol, Ligue européenne masculine de volley-ball, ",
+          "country": "Europe",
+          "priority": "low"
+        },
+        {
+          "id": "5617",
+          "name": "Volleyliga Belgium",
+          "alternate": "Lotto Volley League",
+          "country": "Belgium",
+          "priority": "low"
+        },
+        {
+          "id": "5849",
+          "name": "Womens European Volleyball League",
+          "alternate": "Ligue européenne féminine de volley-ball",
+          "country": "Europe",
+          "priority": "low"
+        }
+      ]
+    },
+    "Handball": {
+      "rawSport": "Handball",
+      "leagues": [
+        {
+          "id": "5135",
+          "name": "Danish Mens Handball League",
+          "alternate": "Herreligaen",
+          "country": "Denmark",
+          "priority": "low"
+        },
+        {
+          "id": "4980",
+          "name": "EHF Champions League",
+          "alternate": "EHF Champions League Men",
+          "country": "Europe",
+          "priority": "low"
+        },
+        {
+          "id": "5275",
+          "name": "EHF European League",
+          "alternate": "",
+          "country": "Europe",
+          "priority": "low"
+        },
+        {
+          "id": "4536",
+          "name": "French LNH Division 1",
+          "alternate": "Lidl Star Ligue",
+          "country": "France",
+          "priority": "low"
+        }
+      ]
+    },
+    "Formula E": {
+      "rawSport": "Formula E",
+      "leagues": []
+    },
+    "Athletics": {
+      "rawSport": "Athletics",
+      "leagues": [
+        {
+          "id": "5008",
+          "name": "Commonwealth Games Athletics",
+          "alternate": "",
+          "country": "Worldwide",
+          "priority": "low"
+        },
+        {
+          "id": "5286",
+          "name": "European Athletics Indoor Championships",
+          "alternate": "",
+          "country": "Europe",
+          "priority": "low"
+        },
+        {
+          "id": "5007",
+          "name": "World Athletics Championships",
+          "alternate": "",
+          "country": "Worldwide",
+          "priority": "low"
+        },
+        {
+          "id": "5785",
+          "name": "World Athletics Indoor Tour Gold",
+          "alternate": "",
+          "country": "International",
+          "priority": "low"
+        },
+        {
+          "id": "5788",
+          "name": "World Athletics Ultimate Championship",
+          "alternate": "",
+          "country": "International",
+          "priority": "low"
+        }
+      ]
+    },
+    "Cycling": {
+      "rawSport": "Cycling",
+      "leagues": [
+        {
+          "id": "4465",
+          "name": "UCI World Tour",
+          "alternate": "",
+          "country": "Worldwide",
+          "priority": "low"
+        }
+      ]
+    },
+    "Darts": {
+      "rawSport": "Darts",
+      "leagues": [
+        {
+          "id": "4554",
+          "name": "PDC Darts",
+          "alternate": "",
+          "country": "Worldwide",
+          "priority": "low"
+        }
+      ]
+    },
+    "Snooker": {
+      "rawSport": "Snooker",
+      "leagues": [
+        {
+          "id": "4555",
+          "name": "World Snooker",
+          "alternate": "",
+          "country": "Worldwide",
+          "priority": "low"
+        }
+      ]
+    },
+    "Table Tennis": {
+      "rawSport": "Table Tennis",
+      "leagues": []
+    },
+    "Badminton": {
+      "rawSport": "Badminton",
+      "leagues": [
+        {
+          "id": "5646",
+          "name": "BWF World Tour",
+          "alternate": "",
+          "country": "Worldwide",
+          "priority": "low"
+        }
+      ]
+    },
+    "Hockey": {
+      "rawSport": "Hockey",
+      "leagues": []
+    },
+    "Lacrosse": {
+      "rawSport": "Lacrosse",
+      "leagues": [
+        {
+          "id": "5338",
+          "name": "National Lacrosse League",
+          "alternate": "NLL",
+          "country": "United States",
+          "priority": "low"
+        },
+        {
+          "id": "5337",
+          "name": "Premier Lacrosse League",
+          "alternate": "PLL",
+          "country": "United States",
+          "priority": "low"
+        }
+      ]
+    },
+    "Netball": {
+      "rawSport": "Netball",
+      "leagues": [
+        {
+          "id": "4540",
+          "name": "Australian Super Netball League",
+          "alternate": "",
+          "country": "Australia",
+          "priority": "low"
+        },
+        {
+          "id": "5791",
+          "name": "Celtic Cup",
+          "alternate": "",
+          "country": "Scotland",
+          "priority": "low"
+        },
+        {
+          "id": "5793",
+          "name": "Constellation Cup",
+          "alternate": "",
+          "country": "International",
+          "priority": "low"
+        },
+        {
+          "id": "4538",
+          "name": "New Zealand Netball League",
+          "alternate": "ANZ Premiership",
+          "country": "New Zealand",
+          "priority": "low"
+        },
+        {
+          "id": "5794",
+          "name": "Taini Jamison Trophy",
+          "alternate": "Taini Jamison Trophy Series",
+          "country": "International",
+          "priority": "low"
+        }
+      ]
+    },
+    "Squash": {
+      "rawSport": "Squash",
+      "leagues": []
+    },
+    "Swimming": {
+      "rawSport": "Swimming",
+      "leagues": []
+    }
+  },
+  "_meta": {
+    "generated": "2026-05-17T07:45:37.474Z",
+    "source": "TheSportsDB free tier"
+  }
+}
