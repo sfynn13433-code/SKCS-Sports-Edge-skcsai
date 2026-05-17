@@ -16,6 +16,8 @@ const { enrichWithWeather } = require('../utils/weather');
 const { enrichWithAvailability } = require('../utils/availability');
 const { filterPredictionsByUsagePolicy, markFixtureUsed } = require('../utils/insightUsage');
 const moment = require('moment-timezone');
+const { normalizeActiveSportToken } = require('../config/activeSports');
+const { getRiskColor, getRiskTierLabel } = require('../services/masterRulebookRiskClassification');
 
 const ACTIVE_DEPLOYMENT_SPORT = 'Football';
 
@@ -78,6 +80,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             includeAll = false,
             isAdminAudit = false
         } = req.query;
+        const requestedSport = normalizeActiveSportToken(req.query?.sport || ACTIVE_DEPLOYMENT_SPORT);
 
         const planId = normalizePlanId(req.query?.plan_id || req.user?.plan_id || 'core_30day');
         const plan = getPlan(planId);
@@ -105,7 +108,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             LEFT JOIN public_intelligence pi ON p.espn_entity_id = pi.espns_entity_id
             WHERE p.sport = $1
             ORDER BY p.created_at DESC
-        `, [ACTIVE_DEPLOYMENT_SPORT]);
+        `, [requestedSport]);
 
         console.log(`[predictions-enhanced] Found ${predictions.length} predictions with intelligence data`);
 
@@ -129,6 +132,19 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         const scopedWithTiming = predictionsWithIntelligence.map((prediction) => 
             decoratePredictionWithTiming(prediction, now));
 
+        const stageCounts = {
+            hydrated_rows: predictions.length,
+            sport_filtered_rows: predictions.length, // sport filtered in SQL
+            display_filtered_rows: predictions.length, // no extra display filter here
+            upcoming_gate_rows: predictions.length,
+            stale_gate_rows: predictions.length,
+            window_gate_rows: predictions.length,
+            scoped_rows: scopedWithTiming.length,
+            plan_filtered_rows: 0,
+            subscription_tier_filtered_rows: 0,
+            elite_floor_rows: 0
+        };
+
         const planFilteredPredictions = (includeAll || isAdminAudit)
             ? scopedWithTiming.slice(0, 2500)
             : filterPredictionsForPlan(
@@ -148,9 +164,37 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             ? planFilteredPredictions
             : planFilteredPredictions.filter((prediction) => isTierVisibleForView(prediction.tier, req.user?.access_tiers || []));
 
+        stageCounts.subscription_tier_filtered_rows = subscriptionTierFilteredPredictions.length;
+
+        const displayFloor = 30;
+        const displayFilteredPredictions = subscriptionTierFilteredPredictions.filter((p) => {
+            const t = String(p?.section_type || p?.type || '').toLowerCase();
+            const conf = Number.isFinite(p?.confidence)
+                ? Number(p.confidence)
+                : (Number.isFinite(p?.total_confidence)
+                    ? Number(p.total_confidence)
+                    : (Array.isArray(p?.matches) && p.matches.length
+                        ? Number(p.matches[0]?.confidence)
+                        : NaN));
+            if (t === 'secondary') return true;
+            if (t === 'direct' || t === 'single' || !t) return !Number.isNaN(conf) ? conf >= displayFloor : true;
+            return true;
+        });
+        stageCounts.display_filtered_rows = displayFilteredPredictions.length;
+
         // Apply weather and availability enrichment
-        const predictionsWithWeather = await enrichWithWeather(subscriptionTierFilteredPredictions);
+        const predictionsWithWeather = await enrichWithWeather(displayFilteredPredictions);
         const predictionsEnriched = await enrichWithAvailability(predictionsWithWeather);
+
+        const finalPredictions = predictionsEnriched.map((p) => {
+            const t = String(p?.section_type || p?.type || '').toLowerCase();
+            let conf = Number.isFinite(p?.confidence) ? Number(p.confidence) : NaN;
+            if (!Number.isFinite(conf) && Number.isFinite(p?.total_confidence)) conf = Number(p.total_confidence);
+            if (!Number.isFinite(conf) && Array.isArray(p?.matches) && p.matches.length) conf = Number(p.matches[0]?.confidence);
+            const risk_label_ui = getRiskTierLabel(conf);
+            const risk_color_ui = getRiskColor(conf);
+            return { ...p, risk_label_ui, risk_color_ui };
+        });
 
         const todayName = moment.tz('Africa/Johannesburg').format('dddd').toLowerCase();
         const dailyLimits = calculateDailyAllocations(planId, todayName, {
@@ -172,7 +216,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         // Enhanced response structure with intelligence fields
         const response = {
             plan_id: planId,
-            sport: ACTIVE_DEPLOYMENT_SPORT,
+            sport: requestedSport,
             source: 'enhanced_predictions_with_intelligence',
             publish_run_source: null,
             include_all: includeAll,
@@ -198,7 +242,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                 server_now_sast: moment.tz(now, 'Africa/Johannesburg').format(),
                 include_all: includeAll,
                 gate_config: {
-                    upcoming_grace_minutes: 60,
+                    upcoming_grace_minutes: 15,
                     acca_started_lookback_hours: 6,
                     acca_window_lookback_hours: 72,
                     acca_window_lookback_hours: 168,
@@ -212,8 +256,8 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                 stage_counts: stageCounts,
                 drop_counts: dropCounts
             },
-            count: predictionsEnriched.length,
-            predictions: predictionsEnriched
+            count: finalPredictions.length,
+            predictions: finalPredictions
         };
 
         res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');

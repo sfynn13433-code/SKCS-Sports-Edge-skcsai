@@ -5,6 +5,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../../db');
 const { selectSecondaryMarkets } = require('../../services/safeHavenSelector');
+const { filterMarketsByMainPick, validateSMBCLegs } = require('../../services/contradictionGovernance');
 const { requireSupabaseUser } = require('../../middleware/supabaseJwt');
 
 /**
@@ -66,6 +67,25 @@ router.get('/matches/:match_id/predictions', requireSupabaseUser, async (req, re
         
         // Select secondary markets using Safe Haven logic
         const secondarySelection = selectSecondaryMarkets(main.confidence, allMarkets);
+
+        const mainPickRaw = String(main.prediction || '').trim().toLowerCase();
+        let mainPickToken = null;
+        if (mainPickRaw === '1' || mainPickRaw.includes('home')) mainPickToken = '1';
+        else if (mainPickRaw === 'x' || mainPickRaw.includes('draw')) mainPickToken = 'X';
+        else if (mainPickRaw === '2' || mainPickRaw.includes('away')) mainPickToken = '2';
+
+        const secondaryLegs = secondarySelection.secondary.map(m => ({
+            market: m.market_type || m.market,
+            prediction: m.prediction,
+            confidence: m.confidence
+        }));
+        let filteredSecondaryLegs = secondaryLegs;
+        let removedLegs = [];
+        if (mainPickToken) {
+            const verdict = validateSMBCLegs(secondaryLegs, mainPickToken);
+            filteredSecondaryLegs = verdict.legs;
+            removedLegs = verdict.removed;
+        }
         
         // Format response
         const response = {
@@ -76,18 +96,21 @@ router.get('/matches/:match_id/predictions', requireSupabaseUser, async (req, re
                 confidence: Number(main.confidence),
                 risk_tier: main.risk_tier,
                 color: getRiskColor(main.confidence),
+                label: getRiskLevel(main.confidence),
                 edgemind_report: main.edgemind_report,
                 created_at: main.created_at
             },
-            secondary: secondarySelection.secondary.map(market => ({
-                market: market.market_type || market.market,
+            secondary: filteredSecondaryLegs.map(market => ({
+                market: market.market,
                 prediction: market.prediction,
                 confidence: Number(market.confidence),
                 risk_tier: getRiskLevel(market.confidence),
                 color: getRiskColor(market.confidence),
+                label: getRiskLevel(market.confidence),
                 source: market.source || 'database'
             })),
             safe_haven_fallback_triggered: secondarySelection.safeHavenTriggered,
+            secondary_removed: removedLegs,
             fallback_message: secondarySelection.fallbackMessage,
             metadata: {
                 total_markets_analyzed: allMarkets.length,
@@ -176,6 +199,23 @@ router.get('/predictions/batch', requireSupabaseUser, async (req, res) => {
                 
                 // Select secondary markets
                 const secondarySelection = selectSecondaryMarkets(main.confidence, allMarkets);
+
+                const mainPickRaw = String(main.prediction || '').trim().toLowerCase();
+                let mainPickToken = null;
+                if (mainPickRaw === '1' || mainPickRaw.includes('home')) mainPickToken = '1';
+                else if (mainPickRaw === 'x' || mainPickRaw.includes('draw')) mainPickToken = 'X';
+                else if (mainPickRaw === '2' || mainPickRaw.includes('away')) mainPickToken = '2';
+
+                const secondaryLegs = secondarySelection.secondary.map(m => ({
+                    market: m.market_type || m.market,
+                    prediction: m.prediction,
+                    confidence: m.confidence
+                }));
+                let filteredSecondaryLegs = secondaryLegs;
+                if (mainPickToken) {
+                    const verdict = validateSMBCLegs(secondaryLegs, mainPickToken);
+                    filteredSecondaryLegs = verdict.legs;
+                }
                 
                 results[matchId] = {
                     main: {
@@ -183,14 +223,16 @@ router.get('/predictions/batch', requireSupabaseUser, async (req, res) => {
                         prediction: main.prediction,
                         confidence: Number(main.confidence),
                         risk_tier: main.risk_tier,
-                        color: getRiskColor(main.confidence)
+                        color: getRiskColor(main.confidence),
+                        label: getRiskLevel(main.confidence)
                     },
-                    secondary: secondarySelection.secondary.map(market => ({
-                        market: market.market_type || market.market,
+                    secondary: filteredSecondaryLegs.map(market => ({
+                        market: market.market,
                         prediction: market.prediction,
                         confidence: Number(market.confidence),
                         risk_tier: getRiskLevel(market.confidence),
-                        color: getRiskColor(market.confidence)
+                        color: getRiskColor(market.confidence),
+                        label: getRiskLevel(market.confidence)
                     })),
                     safe_haven_fallback_triggered: secondarySelection.safeHavenTriggered,
                     status: 'available'

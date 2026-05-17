@@ -19,6 +19,8 @@ const { buildContextInsightsFromMetadata } = require('../utils/contextInsights')
 const { enrichWithWeather } = require('../utils/weather');
 const { enrichWithAvailability } = require('../utils/availability');
 const { filterPredictionsByUsagePolicy, markFixtureUsed } = require('../utils/insightUsage');
+const { getRiskColor, getRiskTierLabel } = require('../services/masterRulebookRiskClassification');
+const { filterMarketsByMainPick, validateSMBCLegs } = require('../services/contradictionGovernance');
 
 const router = express.Router();
 const ACTIVE_DEPLOYMENT_SPORT = 'Football';
@@ -289,6 +291,7 @@ function extractPredictionPrimaryMarket(prediction) {
 }
 
 function shapePredictionOutputContract(prediction) {
+    const conf = inferPredictionOutputConfidence(prediction);
     return {
         ...prediction,
         source_tier: String(prediction?.tier || '').trim().toLowerCase() || null,
@@ -296,7 +299,9 @@ function shapePredictionOutputContract(prediction) {
         tier: inferPredictionOutputTier(prediction),
         section: inferPredictionOutputSection(prediction),
         sport: inferPredictionOutputSport(prediction),
-        confidence: inferPredictionOutputConfidence(prediction),
+        confidence: conf,
+        risk_label_ui: getRiskTierLabel(conf),
+        risk_color_ui: getRiskColor(conf),
         match_id: extractPredictionPrimaryMatchId(prediction),
         market: extractPredictionPrimaryMarket(prediction)
     };
@@ -2149,7 +2154,13 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         }
 
         const requestedSport = req.query.sport;
-        const sport = ACTIVE_DEPLOYMENT_SPORT;
+        let sport = ACTIVE_DEPLOYMENT_SPORT;
+        if (requestedSport) {
+            const normalizedSport = normalizePredictionSportKey(requestedSport);
+            if (normalizedSport && normalizedSport !== 'unknown') {
+                sport = normalizedSport;
+            }
+        }
         const isAdminAudit = req.user?.is_admin === true || req.user?.isAdmin === true || isHardcodedAdmin;
         const subscriptionViewTier = resolveRequestedSubscriptionViewTier(req, req.user);
         if (!isHardcodedAdmin && !canAccessSubscriptionViewTier(req.user, subscriptionViewTier)) {
@@ -2175,9 +2186,6 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             `[PREDICTIONS] Request for Plan: ${planId}, Sport: ${sport || 'all'}, include_all=${includeAll ? '1' : '0'}, ` +
             `view_tier=${subscriptionViewTier}, admin_audit=${isAdminAudit ? '1' : '0'}`
         );
-        if (requestedSport && normalizePredictionSportKey(requestedSport) !== ACTIVE_DEPLOYMENT_SPORT) {
-            console.log('[predictions] blocked non-football sport request: %s', requestedSport);
-        }
 
         // Get plan capabilities from subscription matrix
         const planCapabilities = getPlanCapabilities(planId);
@@ -2191,7 +2199,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         let latestPublishRunId = null;
         let publishRunSource = includeAll ? 'include_all_bypass' : 'completed_publish_run';
         if (!includeAll) {
-            latestPublishRunId = await getLatestRelevantPublishRunId(ACTIVE_DEPLOYMENT_SPORT);
+            latestPublishRunId = await getLatestRelevantPublishRunId(sport);
             if (!latestPublishRunId) {
                 latestPublishRunId = await getLatestPublishRunIdFromFinalTable();
                 if (latestPublishRunId) {
@@ -2471,7 +2479,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                 return isDisplayFriendlySecondaryMarket(firstMatch?.market);
             }
             if (sectionType === 'direct') {
-                return getPredictionConfidencePercent(prediction) >= 45;
+                return getPredictionConfidencePercent(prediction) >= 30;
             }
             return true;
         });
@@ -2523,7 +2531,28 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             : planFilteredPredictions;
         stageCounts.elite_floor_rows = eliteFloorPredictions.length;
 
-        const contractShapedPredictions = eliteFloorPredictions.map(shapePredictionOutputContract);
+        const contractShapedPredictions = eliteFloorPredictions.map((p) => {
+            const shaped = shapePredictionOutputContract(p);
+            if (shaped.section === 'secondary') {
+                const rawPred = String(shaped?.matches?.[0]?.prediction || shaped?.prediction || '').trim().toLowerCase();
+                let mainPickToken = null;
+                if (rawPred === '1' || rawPred.includes('home')) mainPickToken = '1';
+                else if (rawPred === 'x' || rawPred.includes('draw')) mainPickToken = 'X';
+                else if (rawPred === '2' || rawPred.includes('away')) mainPickToken = '2';
+
+                const markets = Array.isArray(shaped?.matches) ? shaped.matches : [];
+                if (mainPickToken) {
+                    const verdict = validateSMBCLegs(markets, mainPickToken);
+                    const out = { ...shaped, matches: verdict.legs };
+                    if (isAdminAudit || includeAll) {
+                        out.secondary_removed = verdict.removed;
+                    }
+                    return out;
+                }
+                return { ...shaped, matches: markets };
+            }
+            return shaped;
+        });
         const subscriptionTierFilteredPredictions = (isAdminAudit || includeAll)
             ? contractShapedPredictions
             : contractShapedPredictions.filter((prediction) => isTierVisibleForView(prediction.tier, subscriptionViewTier));
@@ -2556,7 +2585,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
 
         return sendPredictionsSuccess(res, {
             plan_id: planId,
-            sport: ACTIVE_DEPLOYMENT_SPORT,
+            sport,
             source: DEFAULT_PREDICTIONS_SOURCE,
             publish_run_source: publishRunSource,
             include_all: includeAll,

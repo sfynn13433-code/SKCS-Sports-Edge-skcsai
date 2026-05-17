@@ -2,10 +2,10 @@
 
 const FOOTBALL_RULES = {
     confidenceBands: {
-        highConfidence: { min: 80, label: 'HIGH_CONFIDENCE' },
-        moderateRisk: { min: 70, max: 79, label: 'MODERATE_RISK' },
-        highRisk: { min: 59, max: 69, label: 'HIGH_RISK' },
-        extremeRisk: { max: 58, label: 'EXTREME_RISK' }
+        highConfidence: { min: 75, label: 'HIGH_CONFIDENCE' },
+        moderateRisk: { min: 55, max: 74, label: 'MODERATE_RISK' },
+        highRisk: { min: 30, max: 54, label: 'HIGH_RISK' },
+        extremeRisk: { max: 29, label: 'EXTREME_RISK' }
     },
 
     direct: {
@@ -16,7 +16,7 @@ const FOOTBALL_RULES = {
     },
 
     secondary: {
-        minConfidence: 76,
+        minConfidence: 75,
         maxItems: 4,
         diversityCaps: {
             goals: 2,

@@ -197,7 +197,7 @@ function getContradictionWarning(marketName, mainPick) {
  * @param {string} mainPick - The main 1X2 pick for the match
  * @returns {Object} {valid: boolean, legs: Array, removed: Array}
  */
-function validateSMBC legs(legs, mainPick) {
+function validateSMBCLegs(legs, mainPick) {
   if (!mainPick || !Array.isArray(legs)) {
     return { valid: true, legs: legs, removed: [] };
   }
@@ -271,6 +271,6 @@ module.exports = {
   extractDCOutcome,
   getCompatibleDCOutcomes,
   getContradictionWarning,
-  validateSMBC legs,
+  validateSMBCLegs,
   validateACCALegs
 };

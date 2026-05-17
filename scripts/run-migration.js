@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
@@ -17,12 +18,20 @@ class MigrationRunner {
     try {
       await this.pool.connect();
       
-      // Run migrations in order
-      const migrations = [
-        '20260512000003_create_sport_sync_table.sql',
-        '20260512000004_create_upsert_raw_fixture_rpc.sql',
-        '20260512000005_create_context_enrichment_trigger.sql'
-      ];
+      // Allow passing migration filenames as CLI args; otherwise run defaults
+      const args = process.argv.slice(2).filter(Boolean);
+      let migrations;
+      if (args.length > 0) {
+        migrations = args.map((p) => path.basename(p));
+      } else {
+        // Default small set plus DB rule alignment
+        migrations = [
+          '20260512000003_create_sport_sync_table.sql',
+          '20260512000004_create_upsert_raw_fixture_rpc.sql',
+          '20260512000005_create_context_enrichment_trigger.sql',
+          '20260718000001_db_rule_alignment_75_55_30.sql'
+        ];
+      }
       
       for (const migration of migrations) {
         await this.runMigration(migration);
