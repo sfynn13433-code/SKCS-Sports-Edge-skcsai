@@ -1583,6 +1583,7 @@ async function buildLiveData(options = {}) {
     }
 
     // --- Source 1: API-Sports (primary) ---
+    if (String(process.env.DISABLE_APISPORTS || '').toLowerCase() !== 'true') {
     try {
         const queryOpts = { from: today, to: windowEnd };
 
@@ -1615,6 +1616,9 @@ async function buildLiveData(options = {}) {
         console.warn(`[dataProvider] ${sport}: 0 fixtures from API-Sports`);
     } catch (error) {
         console.error(`[dataProvider] ${sport}: API-Sports ERROR:`, error.message);
+    }
+    } else {
+        console.warn(`[dataProvider] ${sport}: API-Sports disabled by DISABLE_APISPORTS`);
     }
 
     // --- Source 2: Odds API (fallback) ---
@@ -1659,6 +1663,7 @@ async function buildLiveData(options = {}) {
     }
 
     // --- Source 4: SportsData.io (fallback) ---
+    if (String(process.env.DISABLE_SPORTSDATA_IO || '').toLowerCase() !== 'true') {
     try {
         console.log(`[dataProvider] ${sport}: trying SportsData.io fallback`);
         const sdiData = await fetchSportsDataIO(sport);
@@ -1674,6 +1679,9 @@ async function buildLiveData(options = {}) {
         }
     } catch (sdiErr) {
         console.error(`[dataProvider] ${sport}: SportsData.io fallback failed:`, sdiErr.message);
+    }
+    } else {
+        console.warn(`[dataProvider] ${sport}: SportsData.io disabled by DISABLE_SPORTSDATA_IO`);
     }
 
     // --- Source 5: RapidAPI (fallback) ---

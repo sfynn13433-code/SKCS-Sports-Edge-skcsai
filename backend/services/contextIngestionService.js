@@ -188,6 +188,7 @@ function buildApiSportsHeaders() {
 async function getInjuries(fixtureId) {
     const id = String(fixtureId || '').trim();
     if (!id) return null;
+    if (String(process.env.DISABLE_APISPORTS || '').toLowerCase() === 'true') return null;
 
     try {
         const res = await axios.get(
