@@ -57,8 +57,32 @@ function isTier1PrioritySport(sport) {
  *  - Anything else (upcoming, within grace window) → accept.
  */
 function isMatchWithinGraceWindow(normalizedMatch) {
-    console.log("VIP Bypass: Allowing match regardless of time.");
-    return true;
+    try {
+        const raw = normalizedMatch || {};
+        const kickoffStr = String(
+            raw?.match_info?.kickoff ||
+            raw?.kickoff ||
+            raw?.date ||
+            raw?.match_time ||
+            ''
+        ).trim();
+
+        // No parseable kickoff → pass through
+        if (!kickoffStr) return true;
+        const kickoff = new Date(kickoffStr);
+        if (Number.isNaN(kickoff.getTime())) return true;
+
+        const now = new Date();
+        const pastCutoff = new Date(now.getTime() - SYNC_GRACE_MINUTES * 60 * 1000);
+        const futureCutoff = new Date(now.getTime() + SYNC_FUTURE_DAYS * 24 * 60 * 60 * 1000);
+
+        if (kickoff < pastCutoff) return false;      // stale
+        if (kickoff > futureCutoff) return false;    // too far in the future
+        return true;                                  // within window
+    } catch (err) {
+        // Defensive: on any parsing error, allow through and let downstream handle
+        return true;
+    }
 }
 
 function toNormalizationInput(rawMatch) {
@@ -194,8 +218,7 @@ const BASE_SPORTS_CONFIG = [
     { sport: 'AFL', leagueId: '1', season: SEASON_YEAR, oddsKey: 'aussierules_afl' },
     { sport: 'AFL', leagueId: '2', season: SEASON_YEAR, oddsKey: null },
 
-    // Formula 1 + MMA
-    { sport: 'F1', leagueId: null, season: SEASON_YEAR, oddsKey: null },
+    // MMA
     { sport: 'MMA', leagueId: null, season: SEASON_YEAR, oddsKey: 'mma_mixed_martial_arts' },
     { sport: 'Tennis', leagueId: null, season: SEASON_YEAR, oddsKey: null },
     { sport: 'Cricket', leagueId: null, season: SEASON_YEAR, oddsKey: null },
@@ -267,10 +290,6 @@ function normalizeSportToken(value) {
         nfl: 'NFL',
         'american-football': 'NFL',
         american_football: 'NFL',
-        motorsport: 'F1',
-        'formula-1': 'F1',
-        formula_1: 'F1',
-        formula1: 'F1',
         basketball_nba: 'Basketball',
         nba: 'Basketball',
         football: 'Football',
@@ -283,7 +302,6 @@ function normalizeSportToken(value) {
         afl: 'AFL',
         nhl: 'NHL',
         mlb: 'MLB',
-        f1: 'F1',
         golf: 'Golf',
         boxing: 'Boxing',
         tennis: 'Tennis',
