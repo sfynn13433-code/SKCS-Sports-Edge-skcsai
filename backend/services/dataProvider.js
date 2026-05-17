@@ -20,7 +20,7 @@ const LEAGUE_SPORT_MAP = {
 const THESPORTSDB_SUPPORTED_SPORTS = new Set(Object.values(LEAGUE_SPORT_MAP));
 
 const THESPORTSDB_BASE_URL = 'https://www.thesportsdb.com/api/v1/json';
-const THESPORTSDB_DELAY_MS = Math.max(0, Number(process.env.THESPORTSDB_DELAY_MS || 500));
+const THESPORTSDB_DELAY_MS = Math.max(0, Number(process.env.THESPORTSDB_DELAY_MS || 25000));
 const TIER1_HTTP_DELAY_MS = Math.max(2400, Number(process.env.TIER1_HTTP_DELAY_MS || 2400));
 
 const sportsClient = axios.create({
@@ -103,8 +103,6 @@ function normalizeRequestedSport(sport) {
     if (key === 'mlb') return 'MLB';
     if (key === 'nhl') return 'NHL';
     if (key === 'nfl') return 'NFL';
-    if (key === 'motorsport') return 'F1';
-    if (key === 'formula-1' || key === 'formula_1') return 'F1';
     if (key === 'american-football') return 'NFL';
     return key;
 }
