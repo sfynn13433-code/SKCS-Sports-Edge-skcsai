@@ -12,6 +12,8 @@
     "sync:live": "node backend/services/syncService.js",
     "test": "node scripts/smoke-test.js",
     "test:smoke": "node scripts/smoke-test.js",
+    "build-config": "node scripts/build-sportsdb-config.js",
+    "verify-coverage": "node scripts/verify-sportsdb-coverage.js",
     "refresh:trigger": "node scripts/trigger-refresh.js",
     "refresh:football": "node scripts/trigger-refresh.js --sport=football",
     "grade:trigger": "node scripts/trigger-grade.js",
@@ -24,7 +26,10 @@
     "context:april5": "node scripts/backfill-football-context.js --date=2026-04-05 --sport=football",
     "sync:sportsrc": "node backend/scripts/sync-sportsrc-fixtures.js",
     "cricket:cache:daily": "node scripts/cricapi-cache-refresh.js --mode=daily",
-    "cricket:cache:live": "node scripts/cricapi-cache-refresh.js --mode=live"
+    "cricket:cache:live": "node scripts/cricapi-cache-refresh.js --mode=live",
+    "tsdb:day": "node scripts/fetch-thesportsdb-day.js",
+    "form:enrich": "node scripts/enrich-team-form.js",
+    "h2h:enrich": "node scripts/enrich-h2h.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
