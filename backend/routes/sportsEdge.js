@@ -224,30 +224,36 @@ router.get('/api/trends', async (req, res) => {
 router.get('/api/live-scores', async (req, res) => {
   const cacheKey = 'live_scores';
   try {
-    const data = await fetchFromRapidAPI('/fixtures/live', {}, cacheKey, 60); // 1 min cache
-    
-    // Filter live games for bandwidth
-    const liveGames = (data.response || data.games || []).slice(0, 20).map(game => ({
-      id: game.fixture?.id || game.id,
-      homeTeam: game.teams?.home?.name || game.homeTeam,
-      awayTeam: game.teams?.away?.name || game.awayTeam,
-      homeScore: game.goals?.home || game.score?.home,
-      awayScore: game.goals?.away || game.score?.away,
-      status: game.fixture?.status?.short || game.status,
-      minute: game.fixture?.status?.elapsed || game.minute,
-      competition: game.league?.name || game.competition
+    // Prefer hybrid approach to avoid provider endpoint mismatch
+    const hybrid = await getLiveScores();
+    const rows = Array.isArray(hybrid?.data) ? hybrid.data : [];
+
+    const liveGames = rows.slice(0, 20).map((game) => ({
+      id: game?.fixture?.id || game?.id || game?.gameId || game?.eventId || null,
+      homeTeam: game?.teams?.home?.name || game?.homeTeam || game?.homeTeamName || null,
+      awayTeam: game?.teams?.away?.name || game?.awayTeam || game?.awayTeamName || null,
+      homeScore: game?.goals?.home ?? game?.score?.home ?? game?.homeScore ?? null,
+      awayScore: game?.goals?.away ?? game?.score?.away ?? game?.awayScore ?? null,
+      status: game?.fixture?.status?.short || game?.status || (game?.isLive ? 'LIVE' : 'NS'),
+      minute: game?.fixture?.status?.elapsed || game?.minute || null,
+      competition: game?.league?.name || game?.tournamentName || game?.competition || null,
+      source: hybrid?.source || null
     }));
-    
+
+    // Cache for 1 minute when live
+    dataCache.set(cacheKey, { games: liveGames, source: hybrid?.source || 'hybrid' }, 60);
+
     res.json({
       success: true,
       data: {
         games: liveGames,
         total: liveGames.length,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
+        source: hybrid?.source || 'hybrid',
+        fallback: Boolean(hybrid?.fallback)
       },
-      cached: dataCache.has(cacheKey)
+      cached: false
     });
-    
   } catch (error) {
     console.error('Error fetching live scores:', error.message);
     res.status(500).json({ 
