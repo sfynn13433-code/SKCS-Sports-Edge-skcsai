@@ -1,0 +1,38 @@
+name: Daily Insights
+
+on:
+  schedule:
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+
+jobs:
+  build-insights:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install deps
+        run: npm ci
+      - name: Generate insights
+        run: |
+          DATE=$(date -u +%F)
+          npm run tsdb:day -- --date=$DATE --out=public/data/tsdb-day-$DATE.json
+          npm run form:enrich -- --date=$DATE --out=public/data/team-form-$DATE.json
+      - name: Commit and push
+        run: |
+          DATE=$(date -u +%F)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/tsdb-day-$DATE.json public/data/team-form-$DATE.json public/data/team-form-cache.json || true
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: daily insights for $DATE [skip ci]"
+            git push
+          fi
