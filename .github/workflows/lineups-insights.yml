@@ -26,12 +26,13 @@ jobs:
           npm run h2h:enrich -- --date=$DATE --out=public/data/h2h-$DATE.json
           npm run injuries:enrich -- --in=public/data/h2h-$DATE.json --out=public/data/injuries-$DATE.json
           npm run lineups:enrich -- --in=public/data/h2h-$DATE.json --out=public/data/lineups-$DATE.json
+          node scripts/enrich-travel.js --in=public/data/injuries-$DATE.json --out=public/data/travel-$DATE.json
       - name: Commit and push
         run: |
           DATE=$(date -u +%F)
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/data/h2h-$DATE.json public/data/injuries-$DATE.json public/data/lineups-$DATE.json || true
+          git add public/data/h2h-$DATE.json public/data/injuries-$DATE.json public/data/lineups-$DATE.json public/data/travel-$DATE.json || true
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
