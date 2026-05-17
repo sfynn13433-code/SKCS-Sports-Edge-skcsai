@@ -27,11 +27,13 @@ const { getScoreboard: getEspnScoreboard } = require('./espnHiddenApiService');
 const freeLivescoreService = require('./freeLivescoreApiService');
 
 // Pro Football API config (fallback)
-const PRO_FOOTBALL_BASE_URL = 'https://sportsapi-pro-football-data.p.rapidapi.com';
+const PRO_FOOTBALL_HOST = String(process.env.SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_HOST || 'sportsapi-pro-football-data.p.rapidapi.com').trim() || 'sportsapi-pro-football-data.p.rapidapi.com';
+const PRO_FOOTBALL_KEY = String(process.env.SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_KEY || process.env.X_RAPIDAPI_KEY || process.env.RAPIDAPI_KEY || '').trim();
+const PRO_FOOTBALL_BASE_URL = `https://${PRO_FOOTBALL_HOST}`;
 const PRO_FOOTBALL_HEADERS = {
   'Content-Type': 'application/json',
-  'x-rapidapi-host': 'sportsapi-pro-football-data.p.rapidapi.com',
-  'x-rapidapi-key': '61fb6ae19emshbc93fdce17fd87fp1ee5fajsnac7912504616'
+  'x-rapidapi-host': PRO_FOOTBALL_HOST,
+  'x-rapidapi-key': PRO_FOOTBALL_KEY
 };
 
 /**

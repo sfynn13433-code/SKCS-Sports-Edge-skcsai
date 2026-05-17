@@ -7,6 +7,8 @@
 const axios = require('axios');
 const Bottleneck = require('bottleneck');
 const NodeCache = require('node-cache');
+const dotenv = require('dotenv');
+dotenv.config();
 
 // 1. Initialize Cache: Metadata lasts 24h, Trends 1h, Games 1m
 const localCache = new NodeCache({ stdTTL: 600 });
@@ -17,11 +19,14 @@ const limiter = new Bottleneck({
   maxConcurrent: 1
 });
 
+const PRO_FOOTBALL_HOST = String(process.env.SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_HOST || 'sportsapi-pro-football-data.p.rapidapi.com').trim() || 'sportsapi-pro-football-data.p.rapidapi.com';
+const PRO_FOOTBALL_KEY = String(process.env.SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_KEY || process.env.X_RAPIDAPI_KEY || process.env.RAPIDAPI_KEY || '').trim();
+
 const api = axios.create({
-  baseURL: 'https://sportsapi-pro-football-data.p.rapidapi.com',
+  baseURL: `https://${PRO_FOOTBALL_HOST}`,
   headers: {
-    'x-rapidapi-host': 'sportsapi-pro-football-data.p.rapidapi.com',
-    'x-rapidapi-key': '61fb6ae19emshbc93fdce17fd87fp1ee5fajsnac7912504616'
+    'x-rapidapi-host': PRO_FOOTBALL_HOST,
+    'x-rapidapi-key': PRO_FOOTBALL_KEY
   }
 });
 

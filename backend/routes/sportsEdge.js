@@ -39,7 +39,7 @@ let cacheStats = {
 };
 
 // API Configuration
-const API_KEY = process.env.RAPIDAPI_KEY || '61fb6ae19emshbc93fdce17fd87fp1ee5fajsnac7912504616';
+const API_KEY = process.env.RAPIDAPI_KEY || process.env.SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_KEY || process.env.X_RAPIDAPI_KEY || '';
 const API_HOST = process.env.RAPIDAPI_HOST_SPORTS_EDGE || 'sportsapi-pro-football-data.p.rapidapi.com';
 
 // Generic Fetcher wrapped in Governor with caching

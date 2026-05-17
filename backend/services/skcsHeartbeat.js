@@ -136,11 +136,13 @@ async function syncLiveScores() {
     // Fallback to Pro Football competitions if hybrid fails
     try {
       console.log('[Heartbeat] Falling back to Pro Football competitions...');
-      const response = await fetch(`https://sportsapi-pro-football-data.p.rapidapi.com/competitions?sport=1`, {
+      const host = String(process.env.SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_HOST || 'sportsapi-pro-football-data.p.rapidapi.com').trim() || 'sportsapi-pro-football-data.p.rapidapi.com';
+      const key = String(process.env.SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_KEY || process.env.X_RAPIDAPI_KEY || process.env.RAPIDAPI_KEY || '').trim();
+      const response = await fetch(`https://${host}/competitions?sport=1`, {
         headers: {
           'Content-Type': 'application/json',
-          'x-rapidapi-host': 'sportsapi-pro-football-data.p.rapidapi.com',
-          'x-rapidapi-key': '61fb6ae19emshbc93fdce17fd87fp1ee5fajsnac7912504616'
+          'x-rapidapi-host': host,
+          'x-rapidapi-key': key
         }
       });
       
