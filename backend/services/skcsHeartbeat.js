@@ -5,6 +5,9 @@
  */
 
 const proFootballService = require('./proFootballDataService');
+const ENABLE_PRO_FOOTBALL = String(process.env.ENABLE_SPORTSAPI_PRO_FOOTBALL || '').trim() === 'true';
+const DISABLE_PRO_FOOTBALL = String(process.env.DISABLE_SPORTSAPI_PRO_FOOTBALL || '').trim() === 'true';
+const ALLOW_PRO_FOOTBALL = ENABLE_PRO_FOOTBALL && !DISABLE_PRO_FOOTBALL;
 
 // Heartbeat state management
 let heartbeatState = {
@@ -133,42 +136,44 @@ async function syncLiveScores() {
     console.error('[Heartbeat] Hybrid live scores sync failed:', error.message);
     heartbeatState.stats.errors++;
     
-    // Fallback to Pro Football competitions if hybrid fails
-    try {
-      console.log('[Heartbeat] Falling back to Pro Football competitions...');
-      const host = String(process.env.SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_HOST || 'sportsapi-pro-football-data.p.rapidapi.com').trim() || 'sportsapi-pro-football-data.p.rapidapi.com';
-      const key = String(process.env.SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_KEY || process.env.X_RAPIDAPI_KEY || process.env.RAPIDAPI_KEY || '').trim();
-      const response = await fetch(`https://${host}/competitions?sport=1`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-rapidapi-host': host,
-          'x-rapidapi-key': key
+    // Fallback to Pro Football competitions if allowed
+    if (ALLOW_PRO_FOOTBALL) {
+      try {
+        console.log('[Heartbeat] Falling back to Pro Football competitions...');
+        const host = String(process.env.SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_HOST || 'sportsapi-pro-football-data.p.rapidapi.com').trim() || 'sportsapi-pro-football-data.p.rapidapi.com';
+        const key = String(process.env.SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_KEY || process.env.X_RAPIDAPI_KEY || process.env.RAPIDAPI_KEY || '').trim();
+        const response = await fetch(`https://${host}/competitions?sport=1`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-rapidapi-host': host,
+            'x-rapidapi-key': key
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          const liveCompetitions = (data.competitions || [])
+            .filter(comp => comp.sportId === 1 && comp.liveGames > 0)
+            .slice(0, 10);
+          
+          const fallbackData = {
+            allGames: liveCompetitions,
+            featured: liveCompetitions.slice(0, 5),
+            totalLiveGames: liveCompetitions.reduce((sum, comp) => sum + comp.liveGames, 0),
+            timestamp: new Date().toISOString(),
+            source: 'profootball',
+            fallback: true,
+            apiNote: 'Fallback to Pro Football competitions'
+          };
+          
+          console.log(`[Heartbeat] Fallback successful: ${fallbackData.totalLiveGames} live games`);
+          heartbeatState.lastSync.liveScores = new Date().toISOString();
+          
+          return fallbackData;
         }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        const liveCompetitions = (data.competitions || [])
-          .filter(comp => comp.sportId === 1 && comp.liveGames > 0)
-          .slice(0, 10);
-        
-        const fallbackData = {
-          allGames: liveCompetitions,
-          featured: liveCompetitions.slice(0, 5),
-          totalLiveGames: liveCompetitions.reduce((sum, comp) => sum + comp.liveGames, 0),
-          timestamp: new Date().toISOString(),
-          source: 'profootball',
-          fallback: true,
-          apiNote: 'Fallback to Pro Football competitions'
-        };
-        
-        console.log(`[Heartbeat] Fallback successful: ${fallbackData.totalLiveGames} live games`);
-        heartbeatState.lastSync.liveScores = new Date().toISOString();
-        
-        return fallbackData;
+      } catch (fallbackError) {
+        console.error('[Heartbeat] Even fallback failed:', fallbackError.message);
       }
-    } catch (fallbackError) {
-      console.error('[Heartbeat] Even fallback failed:', fallbackError.message);
     }
   }
   
@@ -183,20 +188,20 @@ async function syncTrendsAndNews() {
   console.log('[Heartbeat] Syncing trends and news...');
   
   try {
-    // Sync AI Trends
+    if (!ALLOW_PRO_FOOTBALL) {
+      console.log('[Heartbeat] Pro Football disabled by flag; skipping trends/news');
+      return { trends: null, news: null };
+    }
     const trendsData = await bandwidthAwareCall(proFootballService.getAITrends, 1);
     if (trendsData) {
       console.log(`[Heartbeat] AI trends updated: ${trendsData.length} trends`);
       heartbeatState.lastSync.trends = new Date().toISOString();
     }
-    
-    // Sync Sports News
     const newsData = await bandwidthAwareCall(proFootballService.getSportsNews, 1);
     if (newsData) {
       console.log(`[Heartbeat] Sports news updated`);
       heartbeatState.lastSync.news = new Date().toISOString();
     }
-    
     return { trends: trendsData, news: newsData };
   } catch (error) {
     console.error('[Heartbeat] Trends/News sync failed:', error.message);
@@ -214,6 +219,10 @@ async function syncMetadata() {
   console.log('[Heartbeat] Syncing metadata...');
   
   try {
+    if (!ALLOW_PRO_FOOTBALL) {
+      console.log('[Heartbeat] Pro Football disabled by flag; skipping metadata');
+      return null;
+    }
     const metadata = await bandwidthAwareCall(proFootballService.getMetadata);
     if (metadata) {
       console.log('[Heartbeat] Metadata cached for 24 hours');

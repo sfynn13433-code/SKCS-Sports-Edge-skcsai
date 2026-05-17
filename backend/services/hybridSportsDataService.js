@@ -29,6 +29,9 @@ const freeLivescoreService = require('./freeLivescoreApiService');
 // Pro Football API config (fallback)
 const PRO_FOOTBALL_HOST = String(process.env.SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_HOST || 'sportsapi-pro-football-data.p.rapidapi.com').trim() || 'sportsapi-pro-football-data.p.rapidapi.com';
 const PRO_FOOTBALL_KEY = String(process.env.SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_KEY || process.env.X_RAPIDAPI_KEY || process.env.RAPIDAPI_KEY || '').trim();
+const ENABLE_PRO_FOOTBALL = String(process.env.ENABLE_SPORTSAPI_PRO_FOOTBALL || '').trim() === 'true';
+const DISABLE_PRO_FOOTBALL = String(process.env.DISABLE_SPORTSAPI_PRO_FOOTBALL || '').trim() === 'true';
+const ALLOW_PRO_FOOTBALL = ENABLE_PRO_FOOTBALL && !DISABLE_PRO_FOOTBALL;
 const PRO_FOOTBALL_BASE_URL = `https://${PRO_FOOTBALL_HOST}`;
 const PRO_FOOTBALL_HEADERS = {
   'Content-Type': 'application/json',
@@ -47,9 +50,11 @@ async function getFeaturedGames() {
   const sources = [
     { name: 'ESPN', fn: () => getEspnFeaturedGames(), priority: 1, rateLimit: 'unlimited' },
     { name: 'TheSportsDB', fn: () => getTheSportsDbFixtures(new Date().toISOString().split('T')[0]), priority: 2, rateLimit: '25/min' },
-    { name: 'Free Livescore', fn: () => getFreeLivescoreFeaturedGames(), priority: 3, rateLimit: 'unknown' },
-    { name: 'Pro Football', fn: () => getProFootballCompetitions(), priority: 4, rateLimit: '10/min (0/month)' }
+    { name: 'Free Livescore', fn: () => getFreeLivescoreFeaturedGames(), priority: 3, rateLimit: 'unknown' }
   ];
+  if (ALLOW_PRO_FOOTBALL) {
+    sources.push({ name: 'Pro Football', fn: () => getProFootballCompetitions(), priority: 4, rateLimit: '10/min' });
+  }
   
   for (const source of sources) {
     try {
@@ -248,14 +253,20 @@ async function getLiveScores() {
       };
     }
 
-    // Fallback: Use Pro Football competitions with live games
-    console.log('[Hybrid] TheSportsDB live failed (no data returned), falling back to Pro Football API');
-    const proFootballData = await getProFootballLiveCompetitions();
-
+    // Fallback: Use Pro Football competitions with live games if allowed
+    if (ALLOW_PRO_FOOTBALL) {
+      console.log('[Hybrid] TheSportsDB live failed (no data returned), falling back to Pro Football API');
+      const proFootballData = await getProFootballLiveCompetitions();
+      return {
+        source: 'profootball',
+        data: proFootballData,
+        fallback: true
+      };
+    }
     return {
-      source: 'profootball',
-      data: proFootballData,
-      fallback: true
+      source: 'none',
+      data: [],
+      fallback: false
     };
 
   } catch (error) {

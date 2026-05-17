@@ -8,6 +8,19 @@ dotenv.config({ path: 'backend/.env', override: false });
 
 const DEFAULT_HOST = 'sportsapi-pro-football-data.p.rapidapi.com';
 const DEFAULT_TIMEOUT_MS = 20000;
+const DEFAULT_MIN_INTERVAL_MS = Number(process.env.SPORTSAPI_PRO_FOOTBALL_MIN_INTERVAL_MS || 6500);
+
+// Simple in-process pacing to respect provider's ~10 RPM cap
+let __sportsApiProFootballLastRequestAt = 0;
+function sleep(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
+async function paceRequests() {
+    const now = Date.now();
+    const elapsed = now - __sportsApiProFootballLastRequestAt;
+    const wait = DEFAULT_MIN_INTERVAL_MS - elapsed;
+    if (wait > 0) {
+        await sleep(wait);
+    }
+}
 
 function getConfig() {
     const host = String(process.env.SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_HOST || DEFAULT_HOST).trim() || DEFAULT_HOST;
@@ -68,20 +81,42 @@ async function requestSportsApiProFootball(path, params = {}) {
 
     const { host, key, baseUrl } = getConfig();
 
-    try {
-        const response = await axios.get(`${baseUrl}${endpoint}`, {
-            params: safeParams,
-            timeout: DEFAULT_TIMEOUT_MS,
-            validateStatus: () => true,
-            headers: {
-                'Content-Type': 'application/json',
-                'x-rapidapi-host': host,
-                'x-rapidapi-key': key
-            }
-        });
+    const doGet = async () => axios.get(`${baseUrl}${endpoint}`, {
+        params: safeParams,
+        timeout: DEFAULT_TIMEOUT_MS,
+        validateStatus: () => true,
+        headers: {
+            'Content-Type': 'application/json',
+            'x-rapidapi-host': host,
+            'x-rapidapi-key': key
+        }
+    });
 
-        const status = Number(response?.status) || null;
-        const rateLimit = extractRateLimit(response?.headers);
+    try {
+        // Pace before request
+        await paceRequests();
+        let response = await doGet();
+        let status = Number(response?.status) || null;
+        let rateLimit = extractRateLimit(response?.headers);
+
+        // Update last request timestamp
+        __sportsApiProFootballLastRequestAt = Date.now();
+
+        // Handle rate limiting with a single retry if Retry-After is provided or default backoff
+        if (status === 429) {
+            const retryAfterHeader = response?.headers?.['retry-after'] ?? response?.headers?.['Retry-After'];
+            let waitMs = DEFAULT_MIN_INTERVAL_MS;
+            const sec = Number(retryAfterHeader);
+            if (Number.isFinite(sec) && sec > 0) {
+                waitMs = Math.max(waitMs, sec * 1000);
+            }
+            await sleep(waitMs);
+            await paceRequests();
+            response = await doGet();
+            status = Number(response?.status) || null;
+            rateLimit = extractRateLimit(response?.headers);
+            __sportsApiProFootballLastRequestAt = Date.now();
+        }
 
         if (status >= 200 && status < 300) {
             return {
