@@ -32,7 +32,8 @@
     "h2h:enrich": "node scripts/enrich-h2h.js",
     "lineups:enrich": "node scripts/enrich-lineups.js",
     "injuries:enrich": "node scripts/enrich-injuries.js",
-    "travel:enrich": "node scripts/enrich-travel.js"
+    "travel:enrich": "node scripts/enrich-travel.js",
+    "importance:enrich": "node scripts/enrich-importance.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
