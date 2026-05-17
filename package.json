@@ -29,7 +29,8 @@
     "cricket:cache:live": "node scripts/cricapi-cache-refresh.js --mode=live",
     "tsdb:day": "node scripts/fetch-thesportsdb-day.js",
     "form:enrich": "node scripts/enrich-team-form.js",
-    "h2h:enrich": "node scripts/enrich-h2h.js"
+    "h2h:enrich": "node scripts/enrich-h2h.js",
+    "lineups:enrich": "node scripts/enrich-lineups.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
