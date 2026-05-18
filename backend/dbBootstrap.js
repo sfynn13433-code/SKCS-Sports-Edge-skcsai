@@ -480,18 +480,19 @@ async function bootstrap() {
             `);
         } catch (indexErr) {
             console.log('[dbBootstrap] Index creation failed (IMMUTABLE function issue):', indexErr.message);
-            // Create a simpler index without jsonb_typeof as fallback
+            // Create a simpler index using materialized fixture_id to avoid JSON functions in index
             await query(`
                 CREATE UNIQUE INDEX IF NOT EXISTS uq_predictions_final_live_direct_fixture_market_fallback
                 ON direct1x2_prediction_final (
                     LOWER(COALESCE(sport, '')),
                     LOWER(COALESCE(market_type, '')),
-                    NULLIF(BTRIM(matches->0->>'fixture_id'), '')
+                    fixture_id
                 )
                 WHERE LOWER(COALESCE(tier, '')) = 'normal'
                   AND LOWER(COALESCE(type, '')) = 'direct'
                   AND publish_run_id IS NULL
-                  AND NULLIF(BTRIM(matches->0->>'fixture_id'), '') IS NOT NULL;
+                  AND fixture_id IS NOT NULL
+                  AND fixture_id <> '';
             `);
         }
 
@@ -750,19 +751,50 @@ async function bootstrap() {
 
         // Add composite partial unique index for fallback predictions to prevent duplicates
         // Note: Removed timezone conversion from index to avoid immutable function error
-        await query(`
-            CREATE UNIQUE INDEX IF NOT EXISTS uq_predictions_final_fallback
-            ON direct1x2_prediction_final (
-                LOWER(COALESCE(sport, '')),
-                LOWER(COALESCE(type, '')),
-                LOWER(COALESCE(tier, '')),
-                LOWER(COALESCE(market_type, '')),
-                LOWER(COALESCE(home_team, '')),
-                LOWER(COALESCE(away_team, '')),
-                COALESCE(matches->0->>'kickoff', created_at::text)
-            )
-            WHERE publish_run_id IS NULL;
-        `);
+        try {
+            await query(`
+                CREATE UNIQUE INDEX IF NOT EXISTS uq_predictions_final_fallback
+                ON direct1x2_prediction_final (
+                    LOWER(COALESCE(sport, '')),
+                    LOWER(COALESCE(type, '')),
+                    LOWER(COALESCE(tier, '')),
+                    LOWER(COALESCE(market_type, '')),
+                    LOWER(COALESCE(home_team, '')),
+                    LOWER(COALESCE(away_team, '')),
+                    COALESCE(matches->0->>'kickoff', created_at::text)
+                )
+                WHERE publish_run_id IS NULL;
+            `);
+        } catch (immutableErr) {
+            console.log('[dbBootstrap] Fallback unique index failed, applying simpler indexes:', immutableErr.message);
+            await query(`
+                CREATE UNIQUE INDEX IF NOT EXISTS uq_predictions_final_fallback_simple_by_fixture
+                ON direct1x2_prediction_final (
+                    sport,
+                    type,
+                    tier,
+                    market_type,
+                    fixture_id
+                )
+                WHERE publish_run_id IS NULL
+                  AND fixture_id IS NOT NULL
+                  AND fixture_id <> '';
+            `);
+            await query(`
+                CREATE UNIQUE INDEX IF NOT EXISTS uq_predictions_final_fallback_simple_no_fixture
+                ON direct1x2_prediction_final (
+                    sport,
+                    type,
+                    tier,
+                    market_type,
+                    home_team,
+                    away_team,
+                    match_date
+                )
+                WHERE publish_run_id IS NULL
+                  AND (fixture_id IS NULL OR fixture_id = '');
+            `);
+        }
 
         await query(`
             CREATE TABLE IF NOT EXISTS debug_published (
