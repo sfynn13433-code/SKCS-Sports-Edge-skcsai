@@ -48,6 +48,31 @@ router.get('/metrx', requireSupabaseUser, requireActiveSubscription, async (req,
         const params = { ...req.query };
         const cacheMinutes = 3;
 
+        const debug = ['1', 'true', 'yes', 'on'].includes(String(params.debugHeaders || params.forwardHeaders || params.debug || '').toLowerCase());
+        if (debug) {
+            try {
+                const response = await axios.get(endpointUrl, { headers, params, timeout: 15000, validateStatus: () => true });
+                const h = response?.headers || {};
+                // Forward selected provider headers with skcs prefix
+                const pick = (name) => h[name] ?? h[String(name).toLowerCase()] ?? null;
+                res.setHeader('x-skcs-rapid-region', pick('x-rapidapi-region') || 'unknown');
+                res.setHeader('x-skcs-rapid-request-id', pick('x-rapidapi-request-id') || 'unknown');
+                res.setHeader('x-skcs-rl-requests-limit', pick('x-ratelimit-requests-limit') || '');
+                res.setHeader('x-skcs-rl-requests-remaining', pick('x-ratelimit-requests-remaining') || '');
+                res.setHeader('x-skcs-rl-requests-reset', pick('x-ratelimit-requests-reset') || '');
+                res.setHeader('x-skcs-rl-hard-limit', pick('x-ratelimit-rapid-free-plans-hard-limit-limit') || '');
+                res.setHeader('x-skcs-rl-hard-remaining', pick('x-ratelimit-rapid-free-plans-hard-limit-remaining') || '');
+                res.setHeader('x-skcs-rl-hard-reset', pick('x-ratelimit-rapid-free-plans-hard-limit-reset') || '');
+                return res.status(response.status || 200).json({
+                    ok: response.status >= 200 && response.status < 300,
+                    provider: 'metrx_factory',
+                    data: response.data
+                });
+            } catch (err) {
+                return res.status(502).json({ ok: false, error: 'upstream_error_debug', details: String(err.message || 'error') });
+            }
+        }
+
         let payload = null;
         if (isCacheWallReady()) {
             payload = await fetchWithCache('metrx_factory', endpointUrl, headers, params, cacheMinutes);
