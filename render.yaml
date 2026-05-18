@@ -23,6 +23,16 @@ services:
         sync: false
       - key: SPORTSAPI_PRO_FOOTBALL_MIN_INTERVAL_MS
         value: 6500
+      - key: ENABLE_METRX_FACTORY
+        value: "true"
+      - key: DISABLE_METRX_FACTORY
+        value: "false"
+      - key: METRX_FACTORY_RAPIDAPI_HOST
+        value: metrx-factory.p.rapidapi.com
+      - key: METRX_FACTORY_RAPIDAPI_KEY
+        sync: false
+      - key: METRX_FACTORY_MIN_INTERVAL_MS
+        value: 1000
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_ANON_KEY
