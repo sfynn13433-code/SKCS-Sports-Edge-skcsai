@@ -1,0 +1,59 @@
+{
+  "ok": true,
+  "key_masked": "3***",
+  "date": "2026-05-19",
+  "sports_checked": 2,
+  "by_sport_today": [
+    {
+      "sport": "Soccer",
+      "today": 3
+    },
+    {
+      "sport": "Motorsport",
+      "today": 0
+    }
+  ],
+  "by_league_upcoming": [
+    {
+      "league_id": "4328",
+      "upcoming": 1
+    },
+    {
+      "league_id": "4332",
+      "upcoming": 1
+    },
+    {
+      "league_id": "4331",
+      "upcoming": 0
+    },
+    {
+      "league_id": "4335",
+      "upcoming": 1
+    },
+    {
+      "league_id": "4334",
+      "upcoming": 0,
+      "error": "HTTP Error 429: Too Many Requests"
+    },
+    {
+      "league_id": "4387",
+      "upcoming": 0,
+      "error": "HTTP Error 429: Too Many Requests"
+    },
+    {
+      "league_id": "4424",
+      "upcoming": 0,
+      "error": "HTTP Error 429: Too Many Requests"
+    },
+    {
+      "league_id": "4380",
+      "upcoming": 0,
+      "error": "HTTP Error 429: Too Many Requests"
+    },
+    {
+      "league_id": "4391",
+      "upcoming": 0,
+      "error": "HTTP Error 429: Too Many Requests"
+    }
+  ]
+}

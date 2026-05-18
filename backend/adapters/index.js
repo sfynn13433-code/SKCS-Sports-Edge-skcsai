@@ -1,6 +1,5 @@
 // Adapter registry for dynamic loading
 const footballAdapter = require('./footballAdapter');
-const f1Adapter = require('./f1Adapter');
 const tennisAdapter = require('./tennisAdapter');
 
 // Placeholder adapters for other sports (to be implemented)
@@ -79,7 +78,6 @@ const volleyballAdapter = {
 // Adapter registry
 const adapters = {
   footballAdapter,
-  f1Adapter,
   tennisAdapter,
   basketballAdapter,
   cricketAdapter,

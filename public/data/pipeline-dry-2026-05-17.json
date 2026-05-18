@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "date": "2026-05-17",
+  "total": 3,
+  "predictions": [
+    {
+      "match_id": "2432126",
+      "sport": "NFL",
+      "league": "UFL",
+      "home_team": "Birmingham Stallions",
+      "away_team": "Columbus Aviators",
+      "kickoff": "2026-05-17T17:00:00Z",
+      "prediction": "home",
+      "confidence": 85,
+      "volatility": "low",
+      "source": "dolphin"
+    },
+    {
+      "match_id": "2469886",
+      "sport": "NFL",
+      "league": "European Football Alliance",
+      "home_team": "Munich Ravens",
+      "away_team": "Raiders Tirol",
+      "kickoff": "2026-05-17T14:00:00Z",
+      "prediction": "draw",
+      "confidence": 75,
+      "volatility": "medium",
+      "source": "dolphin"
+    },
+    {
+      "match_id": "2400586",
+      "sport": "AFL",
+      "league": "Australian AFL",
+      "home_team": "Essendon Football Club",
+      "away_team": "Fremantle Football Club",
+      "kickoff": "2026-05-17T03:10:00Z",
+      "prediction": "draw",
+      "confidence": 80,
+      "volatility": "low",
+      "source": "dolphin"
+    }
+  ]
+}

@@ -1,0 +1,295 @@
+{
+  "ok": true,
+  "date": "2026-05-17",
+  "total": 3,
+  "events": [
+    {
+      "id": "2432126",
+      "sport": "American Football",
+      "league_id": "5434",
+      "league": "UFL",
+      "season": "2026",
+      "event": "Birmingham Stallions vs Columbus Aviators",
+      "event_alt": "Columbus Aviators @ Birmingham Stallions",
+      "home_team": "Birmingham Stallions",
+      "away_team": "Columbus Aviators",
+      "timestamp_utc": "2026-05-17T17:00:00Z",
+      "date": "2026-05-17",
+      "time": "17:00:00",
+      "status": "Not Started",
+      "country": "United States",
+      "city": "Birmingham, AL",
+      "venue": "Protective Stadium",
+      "round": "8",
+      "home_score": null,
+      "away_score": null,
+      "team_form": {
+        "home": {
+          "last5": "",
+          "matches": 0,
+          "goals_scored_avg": 0,
+          "goals_conceded_avg": 0,
+          "home_wins": 0,
+          "home_draws": 0,
+          "home_losses": 0,
+          "away_wins": 0,
+          "away_draws": 0,
+          "away_losses": 0
+        },
+        "away": {
+          "last5": "",
+          "matches": 0,
+          "goals_scored_avg": 0,
+          "goals_conceded_avg": 0,
+          "home_wins": 0,
+          "home_draws": 0,
+          "home_losses": 0,
+          "away_wins": 0,
+          "away_draws": 0,
+          "away_losses": 0
+        }
+      },
+      "h2h": {
+        "matches": [],
+        "summary": {
+          "total_matches": 0,
+          "home_wins": 0,
+          "away_wins": 0,
+          "draws": 0,
+          "home_goals": 0,
+          "away_goals": 0
+        }
+      },
+      "availability": {
+        "home": {
+          "source": "none",
+          "reports": []
+        },
+        "away": {
+          "source": "none",
+          "reports": []
+        }
+      },
+      "travel": {
+        "home": {
+          "rest_days": null,
+          "travel_km": null,
+          "cumulative_7d_km": null,
+          "last_match_date": null,
+          "last_venue": null,
+          "fatigue_flag": false
+        },
+        "away": {
+          "rest_days": null,
+          "travel_km": null,
+          "cumulative_7d_km": null,
+          "last_match_date": null,
+          "last_venue": null,
+          "fatigue_flag": false
+        }
+      },
+      "pressure": {
+        "home": {
+          "score": 10,
+          "reason": "Regular season"
+        },
+        "away": {
+          "score": 10,
+          "reason": "Regular season"
+        }
+      }
+    },
+    {
+      "id": "2469886",
+      "sport": "American Football",
+      "league_id": "5876",
+      "league": "European Football Alliance",
+      "season": "2026",
+      "event": "Munich Ravens vs Raiders Tirol",
+      "event_alt": "Raiders Tirol @ Munich Ravens",
+      "home_team": "Munich Ravens",
+      "away_team": "Raiders Tirol",
+      "timestamp_utc": "2026-05-17T14:00:00Z",
+      "date": "2026-05-17",
+      "time": "14:00:00",
+      "status": "Not Started",
+      "country": "Germany",
+      "city": "Munich",
+      "venue": "Sportpark Unterhaching",
+      "round": "1",
+      "home_score": null,
+      "away_score": null,
+      "team_form": {
+        "home": {
+          "last5": "",
+          "matches": 0,
+          "goals_scored_avg": 0,
+          "goals_conceded_avg": 0,
+          "home_wins": 0,
+          "home_draws": 0,
+          "home_losses": 0,
+          "away_wins": 0,
+          "away_draws": 0,
+          "away_losses": 0
+        },
+        "away": {
+          "last5": "",
+          "matches": 0,
+          "goals_scored_avg": 0,
+          "goals_conceded_avg": 0,
+          "home_wins": 0,
+          "home_draws": 0,
+          "home_losses": 0,
+          "away_wins": 0,
+          "away_draws": 0,
+          "away_losses": 0
+        }
+      },
+      "h2h": {
+        "matches": [],
+        "summary": {
+          "total_matches": 0,
+          "home_wins": 0,
+          "away_wins": 0,
+          "draws": 0,
+          "home_goals": 0,
+          "away_goals": 0
+        }
+      },
+      "availability": {
+        "home": {
+          "source": "none",
+          "reports": []
+        },
+        "away": {
+          "source": "none",
+          "reports": []
+        }
+      },
+      "travel": {
+        "home": {
+          "rest_days": null,
+          "travel_km": null,
+          "cumulative_7d_km": null,
+          "last_match_date": null,
+          "last_venue": null,
+          "fatigue_flag": false
+        },
+        "away": {
+          "rest_days": null,
+          "travel_km": null,
+          "cumulative_7d_km": null,
+          "last_match_date": null,
+          "last_venue": null,
+          "fatigue_flag": false
+        }
+      },
+      "pressure": {
+        "home": {
+          "score": 10,
+          "reason": "Regular season"
+        },
+        "away": {
+          "score": 10,
+          "reason": "Regular season"
+        }
+      }
+    },
+    {
+      "id": "2400586",
+      "sport": "Australian Football",
+      "league_id": "4456",
+      "league": "Australian AFL",
+      "season": "2026",
+      "event": "Essendon Football Club vs Fremantle Football Club",
+      "event_alt": "Fremantle Football Club @ Essendon Football Club",
+      "home_team": "Essendon Football Club",
+      "away_team": "Fremantle Football Club",
+      "timestamp_utc": "2026-05-17T03:10:00Z",
+      "date": "2026-05-17",
+      "time": "03:10:00",
+      "status": "Match Finished",
+      "country": "Australia",
+      "city": "Melbourne, Victoria",
+      "venue": "Melbourne Cricket Ground",
+      "round": "10",
+      "home_score": "61",
+      "away_score": "104",
+      "team_form": {
+        "home": {
+          "last5": "",
+          "matches": 0,
+          "goals_scored_avg": 0,
+          "goals_conceded_avg": 0,
+          "home_wins": 0,
+          "home_draws": 0,
+          "home_losses": 0,
+          "away_wins": 0,
+          "away_draws": 0,
+          "away_losses": 0
+        },
+        "away": {
+          "last5": "",
+          "matches": 0,
+          "goals_scored_avg": 0,
+          "goals_conceded_avg": 0,
+          "home_wins": 0,
+          "home_draws": 0,
+          "home_losses": 0,
+          "away_wins": 0,
+          "away_draws": 0,
+          "away_losses": 0
+        }
+      },
+      "h2h": {
+        "matches": [],
+        "summary": {
+          "total_matches": 0,
+          "home_wins": 0,
+          "away_wins": 0,
+          "draws": 0,
+          "home_goals": 0,
+          "away_goals": 0
+        }
+      },
+      "availability": {
+        "home": {
+          "source": "none",
+          "reports": []
+        },
+        "away": {
+          "source": "none",
+          "reports": []
+        }
+      },
+      "travel": {
+        "home": {
+          "rest_days": null,
+          "travel_km": null,
+          "cumulative_7d_km": null,
+          "last_match_date": null,
+          "last_venue": null,
+          "fatigue_flag": false
+        },
+        "away": {
+          "rest_days": null,
+          "travel_km": null,
+          "cumulative_7d_km": null,
+          "last_match_date": null,
+          "last_venue": null,
+          "fatigue_flag": false
+        }
+      },
+      "pressure": {
+        "home": {
+          "score": 10,
+          "reason": "Regular season"
+        },
+        "away": {
+          "score": 10,
+          "reason": "Regular season"
+        }
+      }
+    }
+  ]
+}
