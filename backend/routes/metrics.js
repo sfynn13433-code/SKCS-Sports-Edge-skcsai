@@ -66,7 +66,17 @@ router.get('/metrx', requireSupabaseUser, requireActiveSubscription, async (req,
                 return res.status(response.status || 200).json({
                     ok: response.status >= 200 && response.status < 300,
                     provider: 'metrx_factory',
-                    data: response.data
+                    data: response.data,
+                    rateLimit: {
+                        region: pick('x-rapidapi-region') || null,
+                        requestId: pick('x-rapidapi-request-id') || null,
+                        requestsLimit: pick('x-ratelimit-requests-limit') || null,
+                        requestsRemaining: pick('x-ratelimit-requests-remaining') || null,
+                        requestsReset: pick('x-ratelimit-requests-reset') || null,
+                        hardLimit: pick('x-ratelimit-rapid-free-plans-hard-limit-limit') || null,
+                        hardRemaining: pick('x-ratelimit-rapid-free-plans-hard-limit-remaining') || null,
+                        hardReset: pick('x-ratelimit-rapid-free-plans-hard-limit-reset') || null
+                    }
                 });
             } catch (err) {
                 return res.status(502).json({ ok: false, error: 'upstream_error_debug', details: String(err.message || 'error') });
