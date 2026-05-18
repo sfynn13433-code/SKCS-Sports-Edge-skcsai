@@ -13,6 +13,16 @@ services:
         value: production
       - key: PORT
         value: 10000
+      - key: ENABLE_SPORTSAPI_PRO_FOOTBALL
+        value: "true"
+      - key: DISABLE_SPORTSAPI_PRO_FOOTBALL
+        value: "false"
+      - key: SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_HOST
+        value: sportsapi-pro-football-data.p.rapidapi.com
+      - key: SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_KEY
+        sync: false
+      - key: SPORTSAPI_PRO_FOOTBALL_MIN_INTERVAL_MS
+        value: 6500
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_ANON_KEY
