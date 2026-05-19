@@ -2,6 +2,7 @@
 
 const axios = require('axios');
 const dotenv = require('dotenv');
+const { consumeQuota } = require('./providerQuotaService');
 
 dotenv.config();
 dotenv.config({ path: 'backend/.env', override: false });
@@ -9,6 +10,7 @@ dotenv.config({ path: 'backend/.env', override: false });
 const DEFAULT_HOST = 'sportsapi-pro-football-data.p.rapidapi.com';
 const DEFAULT_TIMEOUT_MS = 20000;
 const DEFAULT_MIN_INTERVAL_MS = Number(process.env.SPORTSAPI_PRO_FOOTBALL_MIN_INTERVAL_MS || 6500);
+const DEFAULT_RPM_LIMIT = Number(process.env.SPORTSAPI_PRO_FOOTBALL_RPM_LIMIT || 10);
 
 // Simple in-process pacing to respect provider's ~10 RPM cap
 let __sportsApiProFootballLastRequestAt = 0;
@@ -95,6 +97,19 @@ async function requestSportsApiProFootball(path, params = {}) {
     try {
         // Pace before request
         await paceRequests();
+        // Global per-minute quota guard across instances
+        const q1 = await consumeQuota('sportsapi_pro_football', { perMinuteLimit: DEFAULT_RPM_LIMIT });
+        if (!q1.allowed) {
+            return {
+                ok: false,
+                endpoint,
+                params: safeParams,
+                status: 429,
+                message: 'local_quota_exceeded_minute',
+                rateLimit: null,
+                data: null
+            };
+        }
         let response = await doGet();
         let status = Number(response?.status) || null;
         let rateLimit = extractRateLimit(response?.headers);
@@ -112,6 +127,18 @@ async function requestSportsApiProFootball(path, params = {}) {
             }
             await sleep(waitMs);
             await paceRequests();
+            const q2 = await consumeQuota('sportsapi_pro_football', { perMinuteLimit: DEFAULT_RPM_LIMIT });
+            if (!q2.allowed) {
+                return {
+                    ok: false,
+                    endpoint,
+                    params: safeParams,
+                    status: 429,
+                    message: 'local_quota_exceeded_minute',
+                    rateLimit,
+                    data: response?.data ?? null
+                };
+            }
             response = await doGet();
             status = Number(response?.status) || null;
             rateLimit = extractRateLimit(response?.headers);
