@@ -38,11 +38,15 @@
     "pipeline:from-context": "node scripts/run-pipeline-from-context-pack.js",
     "pipeline:from-context:dry": "node scripts/run-pipeline-from-context-pack.js --dry",
     "db:migrate:rules": "node scripts/run-migration.js 20260718000001_db_rule_alignment_75_55_30.sql",
-    "db:verify:rules": "node scripts/verify-db-rule-alignment.js"
+    "db:verify:rules": "node scripts/verify-db-rule-alignment.js",
+    "antigravity:start": "node scripts/start-antigravity.js",
+    "antigravity:test": "node scripts/test-antigravity.js",
+    "antigravity:status": "curl -s http://localhost:10000/api/antigravity/status | jq .",
+    "antigravity:trigger": "curl -X POST http://localhost:10000/api/antigravity/workflows/automated-data-sync/trigger | jq ."
   },
-  
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@iarna/toml": "^2.2.5",
     "@supabase/supabase-js": "^2.105.1",
     "axios": "^1.15.0",
     "bcrypt": "^6.0.0",
@@ -64,7 +68,8 @@
     "pg": "^8.13.3",
     "sentiment": "^5.0.2",
     "sqlite3": "^6.0.1",
-    "tailwindcss": "^3.4.0"
+    "tailwindcss": "^3.4.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

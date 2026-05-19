@@ -15,9 +15,15 @@
 ```
 ├── public/           # Frontend (HTML, CSS, JS)
 ├── backend/          # Node.js Express server
+├── docs/             # Documentation & guides
 ├── .github/workflows/ # GitHub Actions workflows
 └── scripts/          # Python utility scripts
 ```
+
+## 📚 Documentation
+- **[docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md)** - Complete deployment instructions
+- **[docs/DATA_INGESTION.md](docs/DATA_INGESTION.md)** - Sports data ingestion requirements
+- **[docs/README.md](docs/README.md)** - Full documentation overview
 
 ## 🛠️ Development
 - Frontend: HTML/CSS/JavaScript

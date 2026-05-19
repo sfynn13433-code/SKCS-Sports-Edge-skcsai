@@ -237,6 +237,7 @@ const sportsEdgeRouter   = require('./routes/sportsEdge');
 const schedulerRouter   = require('./routes/scheduler');
 const metricsRouter     = require('./routes/metrics');
 const divanscoreRouter  = require('./routes/divanscore');
+const antigravityRouter = require('./routes/antigravity');
 const { runTier1Stage1Bootstrap } = require('./services/tier1BootstrapService');
 
 const DIRECT_INSIGHTS_SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
@@ -725,6 +726,7 @@ app.use('/api/cron', cricketCronRouter);
 app.use('/api/scheduler', schedulerRouter);
 app.use('/api/metrics', metricsRouter);
 app.use('/api', divanscoreRouter);
+app.use('/api/antigravity', antigravityRouter);
 
 // SKCS Sports Edge routes
 app.use('/', sportsEdgeRouter);
