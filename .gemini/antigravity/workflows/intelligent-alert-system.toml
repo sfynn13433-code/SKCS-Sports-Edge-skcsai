@@ -86,7 +86,7 @@ description = "Automated response actions"
 
 [workflow.steps.automation.actions]
 auto_recovery = { enabled = true, success_rate_threshold = 0.8, max_attempts = 3 }
-resource_scaling = { enabled = true, scale_up_threshold = 0.8, scale_down_delay = "10m" 
+resource_scaling = { enabled = true, scale_up_threshold = 0.8, scale_down_delay = "10m" }
 cache_refresh = { enabled = true, staleness_threshold = "5m", force_refresh = false }
 service_restart = { enabled = true, failure_threshold = 0.1, cooldown = "15m" }
 
@@ -115,14 +115,14 @@ type = "report"
 description = "Comprehensive alert reporting"
 
 [workflow.steps.reporting.schedules]
-real_time_dashboard = { update_frequency = "30s", retention = "24h" 
+real_time_dashboard = { update_frequency = "30s", retention = "24h" }
 daily_summary = { time = "23:59", recipients = ["team@skcs.co.za"] }
 weekly_analysis = { day = "Monday", time = "09:00", include_trends = true }
 monthly_review = { day = 1, time = "10:00", strategic_insights = true }
 
 [workflow.steps.reporting.metrics]
 alert_volume = { breakdown = ["severity", "category", "source"], trend_analysis = true }
-response_performance = { metrics = ["mttr", "resolution_rate"], benchmarking = true 
+response_performance = { metrics = ["mttr", "resolution_rate"], benchmarking = true }
 system_health = { indicators = ["uptime", "performance", "stability"], correlation = true }
 business_impact = { financial_metrics = true, user_impact = true }
 
@@ -131,10 +131,10 @@ type = "integrate"
 description = "External system integration"
 
 [workflow.integration.systems]
-monitoring = { prometheus, grafana, datadog }
-communication = { slack, teams, email, sms }
-ticketing = { jira, service_now, zendesk }
-analytics = { elk_stack, splunk, custom_dashboard }
+monitoring = ["prometheus", "grafana", "datadog"]
+communication = ["slack", "teams", "email", "sms"]
+ticketing = ["jira", "service_now", "zendesk"]
+analytics = ["elk_stack", "splunk", "custom_dashboard"]
 
 [workflow.fallback]
 type = "fallback"
@@ -142,6 +142,6 @@ description = "Robust fallback mechanisms"
 
 [workflow.fallback.strategies]
 offline_mode = { enabled = true, cache_duration = "1h", essential_alerts_only = true }
-redundant_channels = { primary = "slack", secondary = "email", tertiary = "sms" 
+redundant_channels = { primary = "slack", secondary = "email", tertiary = "sms" }
 graceful_degradation = { feature_tiers = ["critical", "important", "nice_to_have"] }
 manual_override = { admin_access = true, emergency_contacts = true }

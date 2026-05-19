@@ -10,7 +10,7 @@ events = ["fixture_update", "odds_change", "injury_report"]
 
 [workflow.steps]
 [workflow.steps.data_fetch]
-type = "parallel"
+type = "collect"
 description = "Fetch data from multiple sources simultaneously"
 
 [workflow.steps.data_fetch.sources]
@@ -19,7 +19,7 @@ thesportsdb = { provider = "thesportsdb", timeout = 20, retry = 2 }
 espn = { provider = "espn", timeout = 25, retry = 2 }
 
 [workflow.steps.data_validation]
-type = "filter"
+type = "validate"
 description = "Validate and clean incoming data"
 rules = [
     "remove_duplicates",
@@ -29,7 +29,7 @@ rules = [
 ]
 
 [workflow.steps.ai_enrichment]
-type = "transform"
+type = "analyze"
 description = "AI-powered data enrichment"
 model = "gemini-pro"
 context_window = 32000
@@ -41,13 +41,13 @@ risk_assessment = { priority = "medium", confidence_threshold = 0.65 }
 injury_impact = { priority = "high", confidence_threshold = 0.80 }
 
 [workflow.steps.database_sync]
-type = "output"
+type = "generate"
 description = "Sync validated data to database"
 batch_size = 100
 conflict_resolution = "update_latest"
 
 [workflow.steps.notification]
-type = "condition"
+type = "route"
 description = "Send notifications for critical events"
 conditions = [
     "high_risk_matches",
