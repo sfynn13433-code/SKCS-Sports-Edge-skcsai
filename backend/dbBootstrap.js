@@ -844,6 +844,23 @@ async function bootstrap() {
         `);
 
         await query(`
+            CREATE TABLE IF NOT EXISTS rapidapi_quota_usage (
+                id BIGSERIAL PRIMARY KEY,
+                provider_name TEXT NOT NULL,
+                window_type TEXT NOT NULL CHECK (window_type IN ('minute','day')),
+                window_start TIMESTAMPTZ NOT NULL,
+                usage_count INTEGER NOT NULL DEFAULT 0,
+                updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                UNIQUE (provider_name, window_type, window_start)
+            );
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_quota_provider_window
+            ON rapidapi_quota_usage(provider_name, window_type, window_start DESC);
+        `);
+
+        await query(`
             INSERT INTO table_lifecycle_registry (table_name, lifecycle_state, is_active, owner_component, notes)
             VALUES
                 ('predictions_raw', 'active', true, 'pipeline', 'Primary raw prediction ingest table.'),
@@ -853,6 +870,7 @@ async function bootstrap() {
                 ('predictions_accuracy', 'active', true, 'grading', 'Prediction grading and outcomes table.'),
                 ('team_week_locks', 'active', true, 'publish', 'Persistent single-use team/week lock table across publish runs.'),
                 ('rapidapi_cache', 'active', true, 'ingest', 'RapidAPI payload cache wall table.'),
+                ('rapidapi_quota_usage', 'active', true, 'ingest', 'Provider quota ledger by minute/day.'),
                 ('scheduling_logs', 'active', true, 'scheduler', 'Scheduler telemetry table.'),
                 ('predictions_final', 'compatibility', true, 'compatibility', 'Compatibility view that mirrors direct1x2_prediction_final.'),
                 ('prediction_final', 'compatibility', true, 'compatibility', 'Legacy compatibility view that mirrors direct1x2_prediction_final.'),

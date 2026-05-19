@@ -9,6 +9,7 @@ const {
     recordFailure: circuitRecordFailure,
     recordSuccess: circuitRecordSuccess
 } = require('../utils/providerCircuitBreaker');
+const { consumeQuota } = require('./providerQuotaService');
 
 const SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
 const SUPABASE_SERVICE_ROLE_KEY = String(
@@ -174,7 +175,8 @@ async function fetchWithCache(
     endpointUrl,
     headers,
     params = {},
-    cacheDurationMinutes = 1440
+    cacheDurationMinutes = 1440,
+    quotaOptions = null
 ) {
     const safeProvider = String(providerName || '').trim();
     const safeEndpoint = String(endpointUrl || '').trim();
@@ -199,6 +201,16 @@ async function fetchWithCache(
         try {
             console.warn(`[Cache Wall] Bypass enabled. Making uncached RapidAPI request for ${safeProvider}.`);
             cacheMetrics.bypasses += 1;
+            if (quotaOptions) {
+                const q = await consumeQuota(safeProvider, {
+                    perMinuteLimit: quotaOptions.perMinuteLimit ?? null,
+                    dailyLimit: quotaOptions.dailyLimit ?? null
+                });
+                if (!q.allowed) {
+                    console.warn(`[Cache Wall] Quota denied for ${safeProvider} (${q.scope}) used=${q.used}/${q.limit}`);
+                    return null;
+                }
+            }
             const response = await axios.get(safeEndpoint, {
                 headers,
                 params,
@@ -232,6 +244,16 @@ async function fetchWithCache(
 
         console.log(`[Cache Wall] cache miss/expired: ${safeProvider}. consuming 1 RapidAPI call.`);
         cacheMetrics.misses += 1;
+        if (quotaOptions) {
+            const q = await consumeQuota(safeProvider, {
+                perMinuteLimit: quotaOptions.perMinuteLimit ?? null,
+                dailyLimit: quotaOptions.dailyLimit ?? null
+            });
+            if (!q.allowed) {
+                console.warn(`[Cache Wall] Quota denied for ${safeProvider} (${q.scope}) used=${q.used}/${q.limit}`);
+                return null;
+            }
+        }
         const response = await axios.get(safeEndpoint, {
             headers,
             params,

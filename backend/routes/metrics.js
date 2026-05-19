@@ -7,6 +7,7 @@ const router = express.Router();
 const { requireSupabaseUser, requireActiveSubscription } = require('../middleware/supabaseJwt');
 const { fetchWithCache, isCacheWallReady } = require('../services/apiCacheService');
 const { getMetrxConfig } = require('../services/metrxFactoryService');
+const { consumeQuota } = require('../services/providerQuotaService');
 
 function flagOn(name, defaultVal = false) {
     const v = String(process.env[name] || '').trim().toLowerCase();
@@ -47,10 +48,15 @@ router.get('/metrx', requireSupabaseUser, requireActiveSubscription, async (req,
 
         const params = { ...req.query };
         const cacheMinutes = 3;
+        const dailyLimit = Number(process.env.METRX_FACTORY_DAILY_LIMIT || 100);
 
         const debug = ['1', 'true', 'yes', 'on'].includes(String(params.debugHeaders || params.forwardHeaders || params.debug || '').toLowerCase());
         if (debug) {
             try {
+                const q = await consumeQuota('metrx_factory', { dailyLimit });
+                if (!q.allowed) {
+                    return res.status(429).json({ ok: false, error: 'quota_exceeded', scope: q.scope, limit: q.limit, used: q.used });
+                }
                 const response = await axios.get(endpointUrl, { headers, params, timeout: 15000, validateStatus: () => true });
                 const h = response?.headers || {};
                 // Forward selected provider headers with skcs prefix
@@ -85,8 +91,12 @@ router.get('/metrx', requireSupabaseUser, requireActiveSubscription, async (req,
 
         let payload = null;
         if (isCacheWallReady()) {
-            payload = await fetchWithCache('metrx_factory', endpointUrl, headers, params, cacheMinutes);
+            payload = await fetchWithCache('metrx_factory', endpointUrl, headers, params, cacheMinutes, { dailyLimit });
         } else {
+            const q = await consumeQuota('metrx_factory', { dailyLimit });
+            if (!q.allowed) {
+                return res.status(429).json({ ok: false, error: 'quota_exceeded', scope: q.scope, limit: q.limit, used: q.used });
+            }
             const response = await axios.get(endpointUrl, { headers, params, timeout: 15000 });
             payload = response.data;
         }
