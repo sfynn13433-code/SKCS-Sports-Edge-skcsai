@@ -28,19 +28,27 @@ function toPositiveInt(value, fallback) {
 }
 
 function getDivanscoreConfig() {
-    const host = String(process.env.DIVANSCORE_RAPIDAPI_HOST || '').trim();
+    const host = String(process.env.DIVANSCORE_RAPIDAPI_HOST || 'divanscore.p.rapidapi.com').trim() || 'divanscore.p.rapidapi.com';
     const baseUrlRaw = String(process.env.DIVANSCORE_BASE_URL || '').trim();
-    const baseUrl = baseUrlRaw.replace(/\/+$/, '');
-    const apiKey = String(process.env.DIVANSCORE_RAPIDAPI_KEY || '').trim();
-    const dailyLimit = toPositiveInt(process.env.DIVANSCORE_DAILY_LIMIT, 10);
-    const timeoutMs = toPositiveInt(process.env.DIVANSCORE_TIMEOUT_MS, 8000);
-    const enabled = Boolean(apiKey && host && baseUrl);
+    const computedBase = host ? `https://${host}` : '';
+    const baseUrl = (baseUrlRaw || computedBase).replace(/\/+$/, '');
+    const key = String(
+        process.env.DIVANSCORE_RAPIDAPI_KEY
+        || process.env.X_RAPIDAPI_KEY
+        || process.env.RAPIDAPI_KEY
+        || ''
+    ).trim();
+    const dailyLimit = toPositiveInt(process.env.DIVANSCORE_DAILY_LIMIT, 15);
+    const timeoutMs = toPositiveInt(process.env.DIVANSCORE_TIMEOUT_MS, 15000);
+    const enabled = Boolean(key && host && baseUrl);
 
     return {
+        ok: enabled,
         enabled,
         host,
         baseUrl,
-        apiKeyPresent: Boolean(apiKey),
+        key,
+        apiKeyPresent: Boolean(key),
         dailyLimit,
         timeoutMs
     };
@@ -199,7 +207,7 @@ async function fetchTeamRankingsFallback(teamId, options = {}) {
             headers: {
                 'Content-Type': 'application/json',
                 'x-rapidapi-host': config.host,
-                'x-rapidapi-key': String(process.env.DIVANSCORE_RAPIDAPI_KEY || '').trim()
+                'x-rapidapi-key': config.key
             }
         });
 
@@ -311,3 +319,44 @@ module.exports = {
     getDivanscoreUsageState,
     resetDivanscoreUsageForTests
 };
+
+async function fetchTeamStatistics(params = {}, options = {}) {
+    const { teamId, tournamentId, seasonId, type } = params || {};
+    const normalizedTeamId = normalizeDivanscoreParam(teamId);
+    const cfg = getDivanscoreConfig();
+    if (!cfg.ok) {
+        return { ok: false, error: 'config_error', details: 'Missing DIVANSCORE host/base/key' };
+    }
+    const url = `${cfg.baseUrl}/teams/get-statistics`;
+    const qs = {};
+    if (normalizedTeamId) qs.teamId = normalizedTeamId;
+    if (tournamentId !== undefined) qs.tournamentId = tournamentId;
+    if (seasonId !== undefined) qs.seasonId = seasonId;
+    if (type !== undefined) qs.type = type;
+    try {
+        const res = await axios.get(url, {
+            params: qs,
+            timeout: toPositiveInt(options.timeoutMs, cfg.timeoutMs),
+            validateStatus: () => true,
+            headers: {
+                'Content-Type': 'application/json',
+                'x-rapidapi-host': cfg.host,
+                'x-rapidapi-key': cfg.key
+            }
+        });
+        if (res.status >= 200 && res.status < 300) {
+            return { ok: true, data: res.data };
+        }
+        return { ok: false, status: res.status, error: 'http_error', data: res.data };
+    } catch (err) {
+        return { ok: false, error: 'request_failed', details: err?.message || 'error' };
+    }
+}
+
+function normalizeDivanscoreParam(v) {
+    if (v === null || v === undefined) return undefined;
+    const s = String(v).trim();
+    return s.length ? s : undefined;
+}
+
+module.exports.fetchTeamStatistics = fetchTeamStatistics;
