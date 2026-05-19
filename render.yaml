@@ -33,6 +33,20 @@ services:
         sync: false
       - key: METRX_FACTORY_MIN_INTERVAL_MS
         value: 1000
+      - key: ENABLE_DIVANSCORE
+        value: "true"
+      - key: DISABLE_DIVANSCORE
+        value: "false"
+      - key: DIVANSCORE_RAPIDAPI_HOST
+        value: divanscore.p.rapidapi.com
+      - key: DIVANSCORE_RAPIDAPI_KEY
+        sync: false
+      - key: DIVANSCORE_CACHE_MINUTES
+        value: 30
+      - key: DIVANSCORE_RPM_LIMIT
+        value: 10
+      - key: DIVANSCORE_DAILY_LIMIT
+        value: 15
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_ANON_KEY
