@@ -2882,7 +2882,9 @@ async function loadValidFilteredPredictions(tier, client, options = {}) {
             ...row,
             date: row.kickoff_utc || row?.metadata?.match_time || row?.metadata?.kickoff || row?.metadata?.kickoff_time || null
         }));
+    console.log('[accaBuilder][DIAG] loadValid SQL returned %d rows for tier=%s', mappedRows.length, t);
     const futureRows = filterExpiredFixtures(mappedRows);
+    console.log('[accaBuilder][DIAG] After filterExpiredFixtures: %d rows (dropped %d)', futureRows.length, mappedRows.length - futureRows.length);
     const dateExcluded = mappedRows.length - futureRows.length;
     if (dateExcluded > 0) {
         const perSportDateExcluded = new Map();
@@ -2927,11 +2929,17 @@ async function loadValidFilteredPredictions(tier, client, options = {}) {
         sportFiltered.push(row);
     }
 
+    console.log('[accaBuilder][DIAG] sportFiltered: %d rows', sportFiltered.length);
     const publishable = [];
+    let publishRejectCount = 0;
     for (const row of sportFiltered) {
         const sport = normalizeSportKey(row?.sport || 'unknown');
         const allowed = isPublishablePrediction(row, t, now);
         if (!allowed) {
+            publishRejectCount++;
+            if (publishRejectCount <= 3) {
+                console.log('[accaBuilder][DIAG] isPublishablePrediction REJECTED match_id=%s sport=%s market=%s conf=%s match_time=%s', row.match_id, row.sport, row.market, row.confidence, row?.metadata?.match_time || row.kickoff_utc || 'null');
+            }
             pipelineLogger.rejectionAdd({
                 run_id: telemetryRunId,
                 sport,
@@ -2947,6 +2955,7 @@ async function loadValidFilteredPredictions(tier, client, options = {}) {
         publishable.push(row);
     }
 
+    console.log('[accaBuilder][DIAG] publishable: %d rows (rejected %d by isPublishablePrediction)', publishable.length, publishRejectCount);
     return publishable.sort((a, b) => compareCandidates(a, b, now));
 }
 
@@ -3788,6 +3797,7 @@ async function buildFinalForTier(tier, options = {}) {
             now,
             telemetryRunId
         });
+        console.log('[accaBuilder][DIAG] buildFinalForTier tier=%s valid=%d', t, valid.length);
         
         const weekLockedTeamCompetitionMap = await loadWeekLockedTeamCompetitionMap(client, now);
         const runTeamCompetitionMap = new Map();
@@ -3850,15 +3860,20 @@ async function buildFinalForTier(tier, options = {}) {
         // 1. DIRECT LAYER (First Priority - singles reserve fixtures first)
         // ---------------------------------------------------------------------
         const directRows = [];
+        const directCandidatesBeforeFilter = limitedCandidates.filter((candidate) => isDirectMarketSelection(candidate));
+        console.log('[accaBuilder][DIAG] limitedCandidates=%d directCandidates=%d', limitedCandidates.length, directCandidatesBeforeFilter.length);
+        if (directCandidatesBeforeFilter.length === 0 && limitedCandidates.length > 0) {
+            const sample = limitedCandidates[0];
+            console.log('[accaBuilder][DIAG] Sample candidate: market=%s confidence=%s sport=%s match_id=%s', sample?.market, sample?.confidence, sample?.sport, sample?.match_id);
+        }
         const directSelections = takeAvailablePredictions(
-            sortDirectCandidatesByBand(
-                limitedCandidates.filter((candidate) => isDirectMarketSelection(candidate))
-            ),
+            sortDirectCandidatesByBand(directCandidatesBeforeFilter),
             globalUsedFixtures,
             weekLockedTeamCompetitionMap,
             runTeamCompetitionMap,
             Infinity
         );
+        console.log('[accaBuilder][DIAG] directSelections after takeAvailable=%d', directSelections.length);
         for (const prediction of directSelections) {
             const matches = [toFinalMatchPayload(prediction)];
             const total = computeTotalConfidence(matches);
