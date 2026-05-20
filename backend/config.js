@@ -3,6 +3,8 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env'
 
 module.exports = {
     DATA_MODE: process.env.DATA_MODE || 'live',
+    BYPASS_PIPELINE_FILTERS: process.env.BYPASS_PIPELINE_FILTERS === 'true' || true,
+    REQUIRE_SHARP_ODDS: process.env.REQUIRE_SHARP_ODDS === 'true' || false,
     database: {
         url: process.env.DATABASE_URL,
     },
