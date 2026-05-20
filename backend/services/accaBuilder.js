@@ -2783,9 +2783,9 @@ function normalizeRequestedSports(requestedSports = []) {
     const normalized = values
         .map((value) => normalizeSportKey(value))
         .filter((value) => value && value !== 'all');
-    if (!normalized.length) return ['football'];
+    if (!normalized.length) return [];
     const filtered = normalized.filter((sport) => isDeploymentSportEnabled(sport));
-    return filtered.length ? filtered : ['football'];
+    return filtered.length ? filtered : [];
 }
 
 function getPerSportCandidateLimit(requestedSports = []) {
@@ -3897,7 +3897,108 @@ async function buildFinalForTier(tier, options = {}) {
         }
 
         // ---------------------------------------------------------------------
-        // 2. SKCS LAW: ACCA PUBLISH FLOW (uniqueness + team lock + pool rotation)
+        // 2. SECONDARY LAYER (Second Priority — per Master Rulebook §3)
+        // ---------------------------------------------------------------------
+        const secondaryRows = [];
+        const safeSinglesPool = (
+            await buildSecondaryCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap))
+        ).filter((candidate) => isSafeSinglesSelection(candidate));
+        const secondarySelections = takeAvailablePredictions(
+            safeSinglesPool,
+            globalUsedFixtures,
+            weekLockedTeamCompetitionMap,
+            runTeamCompetitionMap,
+            categoryBuildCaps.secondary
+        );
+        for (const prediction of secondarySelections) {
+            const matches = [toFinalMatchPayload(prediction)];
+            const total = computeTotalConfidence(matches);
+            const row = await insertFinalRow({
+                publish_run_id: publishRunId,
+                tier: t,
+                type: 'secondary',
+                matches,
+                total_confidence: total,
+                risk_level: riskLevelFromConfidence(total)
+            }, client);
+            if (row) {
+                secondaryRows.push(row);
+                await persistTeamWeekLocks(client, row, {
+                    publishRunId,
+                    sourceType: 'secondary',
+                    sourceTier: t,
+                    now
+                });
+            }
+        }
+
+        // ---------------------------------------------------------------------
+        // 3. SAME MATCH LAYER (Third Priority — per Master Rulebook §11)
+        // ---------------------------------------------------------------------
+        const sameMatchRows = [];
+        const sameMatchSelections = takeAvailablePredictions(
+            await buildSameMatchCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap), {
+                no_conflicting_markets: accaRules.no_conflicting_markets
+            }),
+            globalUsedFixtures,
+            weekLockedTeamCompetitionMap,
+            runTeamCompetitionMap,
+            categoryBuildCaps.same_match
+        );
+        for (const row of sameMatchSelections) {
+            const inserted = await insertFinalRow({
+                publish_run_id: publishRunId,
+                tier: t,
+                type: 'same_match',
+                matches: row.matches,
+                total_confidence: row.total_confidence,
+                risk_level: row.risk_level
+            }, client);
+            if (inserted) {
+                sameMatchRows.push(inserted);
+                await persistTeamWeekLocks(client, inserted, {
+                    publishRunId,
+                    sourceType: 'same_match',
+                    sourceTier: t,
+                    now
+                });
+            }
+        }
+
+        // ---------------------------------------------------------------------
+        // 4. MULTI LAYER (Fourth Priority)
+        // ---------------------------------------------------------------------
+        const multiRows = [];
+        const multiSelections = takeAvailablePredictions(
+            buildMultiCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap)),
+            globalUsedFixtures,
+            weekLockedTeamCompetitionMap,
+            runTeamCompetitionMap,
+            categoryBuildCaps.multi
+        );
+        for (const row of multiSelections) {
+            const inserted = await insertFinalRow({
+                publish_run_id: publishRunId,
+                tier: t,
+                type: 'multi',
+                matches: row.matches,
+                total_confidence: row.total_confidence,
+                risk_level: row.risk_level
+            }, client);
+            if (inserted) {
+                multiRows.push(inserted);
+                await persistTeamWeekLocks(client, inserted, {
+                    publishRunId,
+                    sourceType: 'multi',
+                    sourceTier: t,
+                    now
+                });
+            }
+        }
+
+        // ---------------------------------------------------------------------
+        // 5. SKCS LAW: ACCA PUBLISH FLOW — LAST (per Master Rulebook §5)
+        // (uniqueness + team lock + pool rotation)
         // ---------------------------------------------------------------------
         const accaRows = [];
         const megaAccaRows = [];
@@ -4269,106 +4370,6 @@ async function buildFinalForTier(tier, options = {}) {
         console.log('[accaBuilder DIAGNOSTICS] mega_rejected_for_insufficient_legs=%s', megaDiagnostics.mega_rejected_for_insufficient_legs);
         console.log('[accaBuilder DIAGNOSTICS] mega_final_cards_built=%s', megaDiagnostics.mega_final_cards_built);
         console.log('[accaBuilder DIAGNOSTICS] mega_zero_reason=%s', megaDiagnostics.mega_zero_reason || 'n/a');
-
-        // ---------------------------------------------------------------------
-        // 3. MULTI LAYER (Third Priority)
-        // ---------------------------------------------------------------------
-        const multiRows = [];
-        const multiSelections = takeAvailablePredictions(
-            buildMultiCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap)),
-            globalUsedFixtures,
-            weekLockedTeamCompetitionMap,
-            runTeamCompetitionMap,
-            categoryBuildCaps.multi
-        );
-        for (const row of multiSelections) {
-            const inserted = await insertFinalRow({
-                publish_run_id: publishRunId,
-                tier: t,
-                type: 'multi',
-                matches: row.matches,
-                total_confidence: row.total_confidence,
-                risk_level: row.risk_level
-            }, client);
-            if (inserted) {
-                multiRows.push(inserted);
-                await persistTeamWeekLocks(client, inserted, {
-                    publishRunId,
-                    sourceType: 'multi',
-                    sourceTier: t,
-                    now
-                });
-            }
-        }
-
-        // ---------------------------------------------------------------------
-        // 4. SAME MATCH LAYER (Fourth Priority)
-        // ---------------------------------------------------------------------
-        const sameMatchRows = [];
-        const sameMatchSelections = takeAvailablePredictions(
-            await buildSameMatchCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap), {
-                no_conflicting_markets: accaRules.no_conflicting_markets
-            }),
-            globalUsedFixtures,
-            weekLockedTeamCompetitionMap,
-            runTeamCompetitionMap,
-            categoryBuildCaps.same_match
-        );
-        for (const row of sameMatchSelections) {
-            const inserted = await insertFinalRow({
-                publish_run_id: publishRunId,
-                tier: t,
-                type: 'same_match',
-                matches: row.matches,
-                total_confidence: row.total_confidence,
-                risk_level: row.risk_level
-            }, client);
-            if (inserted) {
-                sameMatchRows.push(inserted);
-                await persistTeamWeekLocks(client, inserted, {
-                    publishRunId,
-                    sourceType: 'same_match',
-                    sourceTier: t,
-                    now
-                });
-            }
-        }
-
-        // ---------------------------------------------------------------------
-        // 5. SECONDARY LAYER (Last Priority)
-        // ---------------------------------------------------------------------
-        const secondaryRows = [];
-        const safeSinglesPool = (
-            await buildSecondaryCandidates(filterAvailablePredictions(limitedCandidates, globalUsedFixtures, weekLockedTeamCompetitionMap, runTeamCompetitionMap))
-        ).filter((candidate) => isSafeSinglesSelection(candidate));
-        const secondarySelections = takeAvailablePredictions(
-            safeSinglesPool,
-            globalUsedFixtures,
-            weekLockedTeamCompetitionMap,
-            runTeamCompetitionMap,
-            categoryBuildCaps.secondary
-        );
-        for (const prediction of secondarySelections) {
-            const matches = [toFinalMatchPayload(prediction)];
-            const total = computeTotalConfidence(matches);
-            const row = await insertFinalRow({
-                publish_run_id: publishRunId,
-                tier: t,
-                type: 'secondary',
-                matches,
-                total_confidence: total,
-                risk_level: riskLevelFromConfidence(total)
-            }, client);
-            if (row) {
-                secondaryRows.push(row);
-                await persistTeamWeekLocks(client, row, {
-                    publishRunId,
-                    sourceType: 'secondary',
-                    sourceTier: t,
-                    now
-                });
-            }
-        }
 
         const insightRowsInserted = directRows.length + secondaryRows.length + sameMatchRows.length + multiRows.length;
         const accaRowsInserted = accaRows.length + megaAccaRows.length;
