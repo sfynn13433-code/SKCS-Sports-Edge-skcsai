@@ -172,13 +172,13 @@ router.get('/api/featured-games', async (req, res) => {
 
 /**
  * AI TRENDS: Betting Edge Dashboard
- * Endpoint: /trends?sports=1
+ * Endpoint: /bets/trends?sports=1
  * Cache: 1 hour for trends data
  */
 router.get('/api/trends', async (req, res) => {
   const cacheKey = 'ai_trends';
   try {
-    const data = await fetchFromRapidAPI('/trends', { sports: '1' }, cacheKey, 3600); // 1 hour cache
+    const data = await fetchFromRapidAPI('/bets/trends', { sports: '1' }, cacheKey, 3600); // 1 hour cache
     
     // Filter and format trends for frontend
     const filteredTrends = (data.trends || []).slice(0, 10).map(trend => ({
