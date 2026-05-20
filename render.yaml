@@ -123,3 +123,24 @@ services:
         sync: false
       - key: CRON_SECRET
         sync: false
+  - type: cron
+    name: sports-fixture-population
+    env: python
+    region: frankfurt
+    plan: free
+    schedule: "0 * * * *"
+    buildCommand: pip install -r scripts/requirements.txt
+    startCommand: python scripts/populate_sports_data.py
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: RAPIDAPI_KEY
+        sync: false
+      - key: X_RAPIDAPI_KEY
+        sync: false
