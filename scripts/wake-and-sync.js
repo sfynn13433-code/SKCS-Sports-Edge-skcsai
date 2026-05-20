@@ -19,7 +19,7 @@ function wakeService(host) {
 }
 
 async function triggerPipeline() {
-    const host = 'skcsai.onrender.com';
+    const host = 'skcsai-z8cd.onrender.com';
     const path = '/api/pipeline/sync';
     const apiKey = process.env.SKCS_PIPELINE_KEY || process.env.SKCS_REFRESH_KEY;
     

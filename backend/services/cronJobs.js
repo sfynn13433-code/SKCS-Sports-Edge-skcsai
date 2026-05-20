@@ -101,6 +101,42 @@ function initCronJobs() {
         timezone: 'UTC'
     });
     console.log('[CRON] Pulse Check scheduled: every 30 minutes');
+
+    // ── Schedule 3: Stale Prediction Cleanup (every 30 minutes) ──────────────────
+    // Removes predictions for matches that have kicked off (>15 min grace period)
+    // This guarantees the UI never shows live/completed matches
+    cron.schedule('*/30 * * * *', async () => {
+        console.log('[CRON] Running Stale Prediction Cleanup...');
+        
+        try {
+            const graceMinutes = 15;
+            
+            // Clean direct1x2_prediction_final — matches past kickoff + grace
+            const finalResult = await db.query(`
+                DELETE FROM direct1x2_prediction_final
+                WHERE match_date IS NOT NULL
+                  AND match_date < NOW() - ($1 || ' minutes')::interval
+            `, [String(graceMinutes)]);
+            
+            // Clean predictions_raw — stale rows
+            const rawResult = await db.query(`
+                DELETE FROM predictions_raw
+                WHERE updated_at < NOW() - INTERVAL '24 hours'
+            `);
+            
+            const finalDeleted = Number(finalResult.rowCount || 0);
+            const rawDeleted = Number(rawResult.rowCount || 0);
+            
+            if (finalDeleted > 0 || rawDeleted > 0) {
+                console.log(`[CRON] Cleanup: removed ${finalDeleted} stale predictions (final) + ${rawDeleted} raw rows`);
+            }
+        } catch (err) {
+            console.error(`[CRON] Stale Prediction Cleanup failed:`, err.message);
+        }
+    }, {
+        timezone: 'UTC'
+    });
+    console.log('[CRON] Stale Prediction Cleanup scheduled: every 30 minutes');
     
     console.log('[CRON] All cron jobs initialized successfully');
 }

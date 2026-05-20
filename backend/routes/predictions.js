@@ -82,6 +82,7 @@ const PREDICTION_ROW_QUALITY_SQL = `
     AND LOWER(pf.home_team) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
     AND LOWER(pf.away_team) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
     AND COALESCE(pf.sport, 'Football') <> 'unknown'
+    AND pf.match_date > NOW()
 `;
 
 function parseBoundedInt(value, fallback, min, max) {
@@ -2277,6 +2278,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                     let query = sb
                         .from('direct1x2_prediction_final')
                         .select('*')
+                        .gt('match_date', new Date().toISOString())
                         .order('created_at', { ascending: false })
                         .limit(2500);
                     
@@ -2314,11 +2316,13 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                             .from('direct1x2_prediction_final')
                             .select('*')
                             .eq('publish_run_id', latestSupabaseRun.id)
+                            .gt('match_date', new Date().toISOString())
                             .order('created_at', { ascending: false })
                             .limit(2000)
                         : await sb
                             .from('direct1x2_prediction_final')
                             .select('*')
+                            .gt('match_date', new Date().toISOString())
                             .order('created_at', { ascending: false })
                             .limit(2000);
 
