@@ -22,18 +22,18 @@ function run() {
     );
     assertEqual(
         normalizeFootballRiskTier('STRONG'),
-        'HIGH_CONFIDENCE',
-        'STRONG => HIGH_CONFIDENCE'
+        'LOW_RISK',
+        'STRONG => LOW_RISK'
     );
     assertEqual(
-        normalizeFootballRiskTier('HIGH_CONFIDENCE'),
-        'HIGH_CONFIDENCE',
-        'HIGH_CONFIDENCE passthrough'
+        normalizeFootballRiskTier('LOW_RISK'),
+        'LOW_RISK',
+        'LOW_RISK passthrough'
     );
     assertEqual(
-        normalizeFootballRiskTier('MODERATE_RISK'),
-        'MODERATE_RISK',
-        'MODERATE_RISK passthrough'
+        normalizeFootballRiskTier('MEDIUM_RISK'),
+        'MEDIUM_RISK',
+        'MEDIUM_RISK passthrough'
     );
     assertEqual(
         normalizeFootballRiskTier('unknown'),

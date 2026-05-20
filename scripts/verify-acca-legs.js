@@ -7,7 +7,7 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
         SELECT id, recommendation, 
                jsonb_array_length(matches) as legs,
                tier, type
-        FROM predictions_final 
+        FROM direct1x2_prediction_final 
         WHERE type = 'acca' AND recommendation IN ('Standard 6-Fold', 'Mega 12-Fold')
     `);
     console.log('Accas with leg count:', JSON.stringify(r.rows, null, 2));

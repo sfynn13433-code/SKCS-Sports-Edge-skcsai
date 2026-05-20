@@ -20,9 +20,9 @@ async function applyGovernance() {
         `);
         console.log(`✅ Deleted ${res1.rowCount} bad placeholder rows from direct1x2_prediction_final`);
 
-        // Delete bad data from predictions_final
+        // Delete bad data from direct1x2_prediction_final
         const res2 = await client.query(`
-            DELETE FROM predictions_final
+            DELETE FROM direct1x2_prediction_final
             WHERE type = 'direct' 
               AND (
                   (matches->0->'metadata'->>'reasoning') LIKE '%projects at 58% confidence%'
@@ -32,7 +32,7 @@ async function applyGovernance() {
                OR (matches->0->'metadata'->>'reasoning') LIKE '%projects % on AWAY WIN.%'
               )
         `);
-        console.log(`✅ Deleted ${res2.rowCount} bad placeholder rows from predictions_final`);
+        console.log(`✅ Deleted ${res2.rowCount} bad placeholder rows from direct1x2_prediction_final`);
 
         console.log('🛡️ 2. Creating Strict Allowlist schema in Supabase...');
         await client.query(`

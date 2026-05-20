@@ -114,7 +114,7 @@ router.get('/matches/:match_id/predictions', requireSupabaseUser, async (req, re
             fallback_message: secondarySelection.fallbackMessage,
             metadata: {
                 total_markets_analyzed: allMarkets.length,
-                high_confidence_secondary_count: allMarkets.filter(m => 
+                low_risk_secondary_count: allMarkets.filter(m => 
                     m.market_type !== '1X2' && m.confidence >= 75
                 ).length,
                 safe_haven_candidates_count: secondarySelection.secondary.length,

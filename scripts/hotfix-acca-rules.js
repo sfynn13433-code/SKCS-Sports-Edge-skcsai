@@ -19,10 +19,10 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
     const rules = await client.query('SELECT * FROM acca_rules');
     console.log('New acca_rules:', JSON.stringify(rules.rows, null, 2));
     
-    // Step 2: Delete old dummy accas from predictions_final
+    // Step 2: Delete old dummy accas from direct1x2_prediction_final
     console.log('\n[STEP 2] Purging old dummy accas...');
     
-    const deleted = await client.query("DELETE FROM predictions_final WHERE type = 'acca' AND recommendation IN ('Safe Double', 'Medium Acca 3-Fold') RETURNING id");
+    const deleted = await client.query("DELETE FROM direct1x2_prediction_final WHERE type = 'acca' AND recommendation IN ('Safe Double', 'Medium Acca 3-Fold') RETURNING id");
     console.log(`Deleted ${deleted.rowCount} old accas`);
     
     client.release();

@@ -155,8 +155,8 @@ function toNum(value, fallback = 0) {
 
 function classifyConfidence(confidence) {
     const c = toNum(confidence, 0);
-    if (c >= 80) return { band: 'high_confidence', risk: 'low', advisory: 'Direct market can be used as the primary angle with standard staking.' };
-    if (c >= 70) return { band: 'moderate', risk: 'medium', advisory: 'Playable but keep stake disciplined and pair with one safer cover.' };
+    if (c >= 80) return { band: 'low_risk', risk: 'low', advisory: 'Direct market can be used as the primary angle with standard staking.' };
+    if (c >= 70) return { band: 'medium_risk', risk: 'medium', advisory: 'Playable but keep stake disciplined and pair with one safer cover.' };
     if (c >= 59) return { band: 'high_risk', risk: 'high', advisory: 'High-risk direct angle; prioritize safer secondary markets.' };
     return { band: 'extreme_risk', risk: 'extreme', advisory: 'Extreme-risk direct angle; avoid direct exposure and use only safer alternatives.' };
 }

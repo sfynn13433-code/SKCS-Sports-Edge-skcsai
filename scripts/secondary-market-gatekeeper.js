@@ -94,10 +94,10 @@ function resolveDirectRiskTier(confidence) {
     const score = Math.max(0, Math.min(100, Math.round(toNumber(confidence, 0))));
 
     if (score >= 80) {
-        return { score, tier: 'safe', label: 'HIGH_CONFIDENCE_SAFE', requiresSecondaryPivot: false, requiresExactFourSecondary: false };
+        return { score, tier: 'safe', label: 'LOW_RISK_SAFE', requiresSecondaryPivot: false, requiresExactFourSecondary: false };
     }
     if (score >= 70) {
-        return { score, tier: 'moderate', label: 'MODERATE_RISK', requiresSecondaryPivot: false, requiresExactFourSecondary: false };
+        return { score, tier: 'moderate', label: 'MEDIUM_RISK', requiresSecondaryPivot: false, requiresExactFourSecondary: false };
     }
     if (score >= 59) {
         return { score, tier: 'high', label: 'HIGH_RISK', requiresSecondaryPivot: true, requiresExactFourSecondary: false };

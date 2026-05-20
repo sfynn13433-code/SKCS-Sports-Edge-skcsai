@@ -21,7 +21,7 @@ async function backfillPlanVisibility() {
     // Get all current predictions
     const predictions = await pool.query(`
         SELECT id, tier, type, total_confidence, plan_visibility
-        FROM predictions_final
+        FROM direct1x2_prediction_final
         ORDER BY id
     `);
     
@@ -116,7 +116,7 @@ async function backfillPlanVisibility() {
     for (const update of updates) {
         try {
             await pool.query(`
-                UPDATE predictions_final 
+                UPDATE direct1x2_prediction_final 
                 SET plan_visibility = $1
                 WHERE id = $2
             `, [JSON.stringify(update.visibility), update.id]);
@@ -145,7 +145,7 @@ async function backfillPlanVisibility() {
             COUNT(*) as total,
             COUNT(CASE WHEN plan_visibility IS NULL OR jsonb_array_length(plan_visibility) = 0 THEN 1 END) as empty,
             COUNT(CASE WHEN jsonb_array_length(plan_visibility) > 0 THEN 1 END) as populated
-        FROM predictions_final
+        FROM direct1x2_prediction_final
     `);
     
     const v = verification.rows[0];

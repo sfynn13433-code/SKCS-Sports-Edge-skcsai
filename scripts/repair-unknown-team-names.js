@@ -116,7 +116,7 @@ async function repairUnknownTeamNames() {
     try {
         const rowsRes = await client.query(`
             SELECT id, type, matches
-            FROM predictions_final
+            FROM direct1x2_prediction_final
             WHERE LOWER(COALESCE(type, '')) IN ('multi', 'same_match', 'acca', 'acca_6match', 'mega_acca_12')
               AND EXISTS (
                 SELECT 1
@@ -195,7 +195,7 @@ async function repairUnknownTeamNames() {
 
             await client.query(
                 `
-                UPDATE predictions_final
+                UPDATE direct1x2_prediction_final
                 SET matches = $2::jsonb
                 WHERE id = $1
                 `,

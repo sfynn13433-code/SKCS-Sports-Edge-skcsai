@@ -244,7 +244,7 @@ async function insertPredictionsFinal(fixtures) {
             };
 
             const sql = `
-                INSERT INTO predictions_final (
+                INSERT INTO direct1x2_prediction_final (
                     tier, 
                     type, 
                     matches, 
@@ -290,7 +290,7 @@ async function verifyInsertedData() {
                 COUNT(*) as count,
                 type,
                 AVG(total_confidence) as avg_confidence
-            FROM predictions_final
+            FROM direct1x2_prediction_final
             WHERE created_at >= NOW() - INTERVAL '1 hour'
             GROUP BY sport, type
             ORDER BY sport

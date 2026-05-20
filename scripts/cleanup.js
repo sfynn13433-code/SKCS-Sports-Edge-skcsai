@@ -7,10 +7,10 @@ async function cleanup() {
     try {
         console.log('Starting cleanup...');
         
-        await pool.query("DELETE FROM predictions_final WHERE matches::text LIKE '%Unknown%'");
+        await pool.query("DELETE FROM direct1x2_prediction_final WHERE matches::text LIKE '%Unknown%'");
         console.log('Deleted Unknown matches');
         
-        await pool.query("DELETE FROM predictions_final WHERE recommendation LIKE '%RED CARDS%'");
+        await pool.query("DELETE FROM direct1x2_prediction_final WHERE recommendation LIKE '%RED CARDS%'");
         console.log('Deleted RED CARDS predictions');
         
         await pool.query('ALTER TABLE tier_rules DROP CONSTRAINT IF EXISTS tier_rules_tier_check');

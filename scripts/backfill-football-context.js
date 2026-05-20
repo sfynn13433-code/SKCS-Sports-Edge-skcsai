@@ -390,7 +390,7 @@ async function fetchEventsForDate(client, date) {
                 LEFT(COALESCE(m->>'match_date', m->>'commence_time', ''), 10) AS fixture_date,
                 LOWER(TRIM(COALESCE(m->>'home_team', m->'metadata'->>'home_team', ''))) AS home_team_name_norm,
                 LOWER(TRIM(COALESCE(m->>'away_team', m->'metadata'->>'away_team', ''))) AS away_team_name_norm
-            FROM predictions_final pf
+            FROM direct1x2_prediction_final pf
             CROSS JOIN LATERAL jsonb_array_elements(pf.matches) AS m
             WHERE LEFT(COALESCE(m->>'match_date', m->>'commence_time', ''), 10) = $1::text
               AND COALESCE(m->>'sport', '') = 'football'

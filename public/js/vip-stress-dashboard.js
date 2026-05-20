@@ -154,7 +154,7 @@
             ?? (
                 confidence >= 80
                     ? 'VERIFIED_EDGE'
-                    : (confidence >= 70 ? 'MODERATE_RISK' : (confidence >= 59 ? 'HIGH_RISK' : 'EXTREME_RISK'))
+                    : (confidence >= 70 ? 'MEDIUM_RISK' : (confidence >= 59 ? 'HIGH_RISK' : 'EXTREME_RISK'))
             )
         );
         const status = String(statusRaw || 'PENDING').trim().toUpperCase();

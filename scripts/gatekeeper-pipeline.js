@@ -422,7 +422,7 @@ async function insertPredictions(predictions) {
         for (const pred of predictions) {
             try {
                 const sql = `
-                    INSERT INTO predictions_final (
+                    INSERT INTO direct1x2_prediction_final (
                         tier, type, matches, total_confidence, risk_level, sport, market_type, recommendation, 
                         edgemind_report, secondary_insights, created_at
                     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())

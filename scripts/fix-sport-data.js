@@ -11,7 +11,7 @@ async function fixSportData() {
     try {
         const result = await client.query(`
             SELECT id, matches 
-            FROM predictions_final 
+            FROM direct1x2_prediction_final 
             WHERE tier IS NULL
             LIMIT 20
         `);
@@ -27,7 +27,7 @@ async function fixSportData() {
                 const sport = firstMatch.metadata?.sport || firstMatch.sport || 'football';
                 
                 await client.query(`
-                    UPDATE predictions_final 
+                    UPDATE direct1x2_prediction_final 
                     SET tier = 'normal'
                     WHERE id = $1
                 `, [row.id]);
@@ -42,7 +42,7 @@ async function fixSportData() {
         
         const stats = await client.query(`
             SELECT tier, type, COUNT(*) as count 
-            FROM predictions_final 
+            FROM direct1x2_prediction_final 
             GROUP BY tier, type
             ORDER BY tier, type
         `);

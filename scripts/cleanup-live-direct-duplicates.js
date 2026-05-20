@@ -52,13 +52,13 @@ async function getStats(client) {
                 COUNT(*) FILTER (WHERE ${SCOPE_WHERE})::int AS scoped_rows,
                 COUNT(*) FILTER (WHERE ${SCOPE_WHERE} AND ${FIXTURE_ID_EXPR} IS NULL)::int AS missing_fixture_rows,
                 COUNT(*) FILTER (WHERE ${SCOPE_WHERE} AND ${KICKOFF_EXPR} IS NULL)::int AS missing_kickoff_rows
-            FROM predictions_final
+            FROM direct1x2_prediction_final
         `),
         client.query(`
             SELECT COALESCE(SUM(bucket.ct - 1), 0)::int AS duplicate_rows
             FROM (
                 SELECT ${FIXTURE_ID_EXPR} AS fixture_id, COUNT(*)::int AS ct
-                FROM predictions_final
+                FROM direct1x2_prediction_final
                 WHERE ${SCOPE_WHERE}
                   AND ${FIXTURE_ID_EXPR} IS NOT NULL
                 GROUP BY ${FIXTURE_ID_EXPR}
@@ -91,7 +91,7 @@ async function cleanup() {
                     ${FIXTURE_ID_EXPR} AS fixture_id,
                     ${KICKOFF_EXPR} AS kickoff_raw,
                     created_at
-                FROM predictions_final
+                FROM direct1x2_prediction_final
                 WHERE ${SCOPE_WHERE}
             ),
             ranked AS (
@@ -112,7 +112,7 @@ async function cleanup() {
                    OR kickoff_raw IS NULL
                    OR rn > 1
             )
-            DELETE FROM predictions_final pf
+            DELETE FROM direct1x2_prediction_final pf
             USING to_delete td
             WHERE pf.id = td.id
         `);

@@ -46,7 +46,7 @@ async function buildAccumulators() {
                 e.home_team,
                 e.away_team,
                 e.commence_time
-            FROM predictions_final pf
+            FROM direct1x2_prediction_final pf
             JOIN LATERAL jsonb_array_elements(pf.matches) m ON true
             JOIN events e ON e.id = (m->>'fixture_id')::text
             WHERE pf.type = 'direct'
@@ -69,7 +69,7 @@ async function buildAccumulators() {
                 e.home_team,
                 e.away_team,
                 e.commence_time
-            FROM predictions_final pf
+            FROM direct1x2_prediction_final pf
             JOIN LATERAL jsonb_array_elements(pf.matches) m ON true
             JOIN events e ON e.id = (m->>'fixture_id')::text
             WHERE pf.type = 'direct'
@@ -120,7 +120,7 @@ async function buildAccumulators() {
             const avgConfidence = chunk.reduce((sum, m) => sum + (m.total_confidence || 65), 0) / chunk.length;
             
             await client.query(`
-                INSERT INTO predictions_final (tier, type, matches, total_confidence, risk_level, sport, market_type, recommendation, created_at)
+                INSERT INTO direct1x2_prediction_final (tier, type, matches, total_confidence, risk_level, sport, market_type, recommendation, created_at)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
             `, [
                 tier6,
@@ -173,7 +173,7 @@ async function buildAccumulators() {
             const avgConfidence = chunk.reduce((sum, m) => sum + (m.total_confidence || 65), 0) / chunk.length;
             
             await client.query(`
-                INSERT INTO predictions_final (tier, type, matches, total_confidence, risk_level, sport, market_type, recommendation, created_at)
+                INSERT INTO direct1x2_prediction_final (tier, type, matches, total_confidence, risk_level, sport, market_type, recommendation, created_at)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
             `, [
                 tier12,
