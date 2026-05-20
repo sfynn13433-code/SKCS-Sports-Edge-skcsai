@@ -2133,6 +2133,14 @@ function sendPredictionsError(res, statusCode, errorMessage, payload = {}) {
 // Default tier = deep (elite pool); subscription limits use /api/user/predictions
 router.get('/', requireSupabaseUser, async (req, res) => {
     try {
+        // DIAGNOSTIC: Log user info
+        console.log('[DIAG] req.user:', JSON.stringify({
+            id: req.user?.id,
+            email: req.user?.email,
+            subscription_plan_ids: req.user?.subscription_plan_ids,
+            access_tiers: req.user?.access_tiers
+        }));
+
         // HARD-CODED ADMIN BYPASS
         const isHardcodedAdmin = String(req.user?.email || '').toLowerCase().trim() === 'sfynn13433@gmail.com';
         if (isHardcodedAdmin) {
