@@ -6,10 +6,9 @@ WORKDIR /usr/src/app
 
 # Copy package files first to leverage Docker layer caching
 COPY package*.json ./
-COPY backend/package*.json ./backend/
 
 # Install only production dependencies
-RUN npm ci --only=production && npm --prefix backend ci --only=production
+RUN npm ci --only=production
 
 # Copy the rest of the SKCS AI Sports Edge codebase
 COPY . .
