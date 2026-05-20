@@ -16,6 +16,11 @@ const GROQ_API_KEY = process.env.GROQ_API_KEY || process.env.GROQ_KEY || null;
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.1-8b-instant'; // Production model on Groq
 
+// Gemini API configuration (Google Generative AI)
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || null;
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+const GEMINI_MODEL = 'gemini-pro';
+
 function extractAndParseJSON(rawResponse) {
     try {
         // 1. Strip markdown code blocks if the AI included them
@@ -403,8 +408,111 @@ async function isGroqAvailable() {
 }
 
 /**
+ * Check if Gemini API is available.
+ */
+async function isGeminiAvailable() {
+    if (!GEMINI_API_KEY) return false;
+    try {
+        const response = await axios.get(`https://generativelanguage.googleapis.com/v1beta/models?key=${GEMINI_API_KEY}`, {
+            timeout: 5000
+        });
+        return response.status === 200;
+    } catch {
+        return false;
+    }
+}
+
+/**
+ * Generate insight using Gemini API (Google Generative AI).
+ * Fallback between Groq and Dolphin.
+ */
+async function generateInsightWithGemini(params) {
+    if (!GEMINI_API_KEY) {
+        throw new Error('Gemini API key not configured');
+    }
+
+    const systemPrompt = `You are the SKCS EdgeMind Bot. Generate a football match prediction insight.
+
+EDGEMIND REPORT RULES (CRITICAL):
+1. Stage 1 (Baseline): State the initial probability "On paper"
+2. Stage 2 (Deep Context): Explain adjustments based on team/player intelligence  
+3. Stage 3 (Reality Check): Explain adjustments based on weather/news/form
+4. Stage 4 (Decision Engine): State the final confidence percentage
+
+IMPORTANT Direct 1X2 risk rules:
+- 80-100%: High Confidence / Safe.
+- 70-79%: Moderate Risk.
+- 59-69%: High Risk. Advise user to pivot to Secondary Insights.
+- 0-58%: Extreme Risk. Explicitly tell user NOT to bet direct 1X2 and to use Secondary Insights instead. You MUST enforce payload with exactly 4 top Secondary Insights if confidence is 0-58%.
+
+Output ONLY valid JSON with this exact structure:
+{
+  "market_name": "Home Win",
+  "confidence": 72,
+  "edgemind_report": "On paper, [Team] has a 60% baseline probability... [Continue narrative following the 4 stages above]",
+  "secondary_insights": [
+    {"market": "OVER 1.5 GOALS", "confidence": 85},
+    {"market": "DOUBLE CHANCE - 1X", "confidence": 82},
+    {"market": "UNDER 3.5 GOALS", "confidence": 78},
+    {"market": "BTTS - YES", "confidence": 77}
+  ]
+}`;
+
+    const userPrompt = `Generate prediction for:
+Home: ${params.home || 'TBD'}
+Away: ${params.away || 'TBD'}
+League: ${params.league || 'Unknown'}
+Kickoff: ${params.kickoff || 'TBD'}
+Market: ${params.market || '1X2'}
+Baseline probability: ${params.confidence || 70}%
+
+Context Data:
+${params.formData || 'No recent form data'}
+${params.h2h ? 'Head-to-head: ' + params.h2h : ''}
+${params.weather ? 'Weather: ' + params.weather : ''}
+${params.absences ? 'Absences/Injuries: ' + params.absences : ''}
+
+Follow the EDGEMIND REPORT RULES from your system prompt. Max 3 sentences for edgemind_report.`;
+
+    const response = await axios.post(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+        contents: [
+            {
+                parts: [
+                    { text: `${systemPrompt}\n\n${userPrompt}` }
+                ]
+            }
+        ],
+        generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 300,
+            topK: 40,
+            topP: 0.95
+        }
+    }, {
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        timeout: 30000
+    });
+
+    const content = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const parsed = extractAndParseJSON(content);
+
+    if (!parsed || !parsed.edgemind_report) {
+        throw new Error('Gemini response missing edgemind_report');
+    }
+
+    return {
+        market_name: parsed.market_name || params.market || '1X2',
+        confidence: Math.max(50, Math.min(95, parsed.confidence || params.confidence || 70)),
+        edgemind_report: parsed.edgemind_report,
+        secondary_insights: parsed.secondary_insights || null
+    };
+}
+
+/**
  * Generate AI insight text for a prediction.
- * Priority: 1) Groq API (fast/cheap), 2) Local Dolphin, 3) Fallback template
+ * Priority: 1) Groq API (fast/cheap), 2) Gemini API (Google Generative AI), 3) Local Dolphin, 4) Fallback template
  * Returns structured JSON with market_name, confidence, and edgemind_report.
  */
 async function generateInsight(params) {
@@ -416,13 +524,25 @@ async function generateInsight(params) {
             console.log(`[AI Insight] Groq generated insight successfully`);
             return groqResult;
         } catch (groqErr) {
-            console.warn(`[AI Insight] Groq failed: ${groqErr.message}, falling back to Dolphin...`);
+            console.warn(`[AI Insight] Groq failed: ${groqErr.message}, falling back to Gemini...`);
         }
     }
-    
+
+    // Fallback to Gemini API
+    if (GEMINI_API_KEY) {
+        try {
+            console.log(`[AI Insight] Using Gemini API for ${params.home} vs ${params.away}...`);
+            const geminiResult = await generateInsightWithGemini(params);
+            console.log(`[AI Insight] Gemini generated insight successfully`);
+            return geminiResult;
+        } catch (geminiErr) {
+            console.warn(`[AI Insight] Gemini failed: ${geminiErr.message}, falling back to Dolphin...`);
+        }
+    }
+
     // Fallback to local Dolphin server
     const prompt = buildInsightPrompt(params);
-    
+
     try {
         const response = await axios.post(`${DOLPHIN_URL}/completion`, {
             prompt,
@@ -434,12 +554,12 @@ async function generateInsight(params) {
         let insightText = response.data?.response || response.data?.choices?.[0]?.text || '';
         insightText = insightText.replace(/<\|im_end\|>/g, '').trim();
         insightText = insightText.replace(/<\|im_start\|>.*?assistant\s*/gi, '').trim();
-        
+
         if (!insightText || insightText.length < 10) {
             console.warn('[AI Insight] Generated text too short, using fallback');
             return generateFallbackInsightStructured(params);
         }
-        
+
         // Try to parse JSON response
         const parsed = extractAndParseJSON(insightText);
         if (parsed && parsed.market_name && parsed.edgemind_report) {
@@ -450,7 +570,7 @@ async function generateInsight(params) {
                 secondary_insights: parsed.secondary_insights || null
             };
         }
-        
+
         // If JSON parsing failed, return structured format anyway with raw text
         return {
             market_name: params.market || '1X2',
@@ -523,9 +643,12 @@ module.exports = {
     analyzeWithDolphin,
     isDolphinAvailable,
     isGroqAvailable,
+    isGeminiAvailable,
     buildMatchAnalysisPrompt,
     buildInsightPrompt,
     generateInsight,
+    generateInsightWithGroq,
+    generateInsightWithGemini,
     generateFallbackInsightStructured,
     extractAndParseJSON
 };
