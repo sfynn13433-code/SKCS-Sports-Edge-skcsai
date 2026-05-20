@@ -306,6 +306,8 @@ async function requireSupabaseUser(req, res, next) {
     }
 }
 
+// TESTING: Bypass subscription check for testing purposes
+// TODO: Revert this after testing
 function requireActiveSubscription(req, res, next) {
     const user = req.user;
 
@@ -314,6 +316,12 @@ function requireActiveSubscription(req, res, next) {
         return;
     }
 
+    // TESTING: Always pass subscription check
+    console.log('[TESTING] Subscription check bypassed for testing');
+    next();
+
+    // Original logic (commented out for testing):
+    /*
     if (
         !ACTIVE_SUBSCRIPTION_STATUSES.has(user.subscription_status) &&
         user.is_test_user !== true &&
@@ -322,8 +330,8 @@ function requireActiveSubscription(req, res, next) {
         res.status(403).json({ error: 'Subscription required' });
         return;
     }
-
     next();
+    */
 }
 
 module.exports = {
