@@ -68,7 +68,7 @@ function generateSmartCombos(markets) {
             type: 'SMART_COMBO',
             legs,
             confidence,
-            risk: confidence >= 80 ? 'LOW' : 'MEDIUM'
+            risk: confidence >= 75 ? 'LOW' : 'MEDIUM'
         });
     }
 
@@ -105,7 +105,7 @@ function generateSameMatchBets(markets) {
                 type: 'SAME_MATCH_BET',
                 legs,
                 confidence,
-                risk: confidence >= 80 ? 'LOW' : confidence >= 70 ? 'MEDIUM' : 'HIGH',
+                risk: confidence >= 75 ? 'LOW' : confidence >= 55 ? 'MEDIUM' : 'HIGH',
                 warning: confidence < 65 ? '⚠️ HIGH RISK — Low confidence prediction' : undefined
             });
         }

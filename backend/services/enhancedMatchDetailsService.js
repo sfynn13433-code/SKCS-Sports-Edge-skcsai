@@ -259,7 +259,7 @@ function generateTemplateAI(context) {
   ];
   
   // Risk assessment based on confidence
-  if (confidence >= 70) {
+  if (confidence >= 75) {
     risk = 'Low';
   } else if (confidence >= 55) {
     risk = 'Medium';

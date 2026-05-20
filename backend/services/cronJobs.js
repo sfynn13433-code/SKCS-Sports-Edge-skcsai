@@ -53,34 +53,43 @@ function initCronJobs() {
             
             console.log(`[CRON] Pulse Check: Found ${upcomingMatches.length} matches within 72 hours`);
             
-            // Safety: Check if ApiQueue is saturated before processing
+            // Safety: Check ApiQueue saturation and batch gracefully
             const queueLength = apiQueue.getQueueLength();
-            const QUEUE_THRESHOLD = 20; // Don't add more than 20 pending items
+            const QUEUE_THRESHOLD = 20;
+            const BATCH_SIZE = 5;
             
             if (queueLength > QUEUE_THRESHOLD) {
-                console.warn(`[CRON] Pulse Check: ApiQueue saturated (${queueLength} items). Skipping enrichment.`);
-                return;
+                console.warn(`[CRON] Pulse Check: ApiQueue saturated (${queueLength} items). Processing in small batches with delay.`);
             }
             
-            // Process each match
+            // Process matches in batches to avoid overwhelming the queue
             let enrichedCount = 0;
             let insightCount = 0;
             
-            for (const match of upcomingMatches) {
-                const { id_event, start_time } = match;
+            for (let batchStart = 0; batchStart < upcomingMatches.length; batchStart += BATCH_SIZE) {
+                const batch = upcomingMatches.slice(batchStart, batchStart + BATCH_SIZE);
                 
-                try {
-                    // Enrich match context
-                    const enriched = await enrichMatchContext(id_event);
-                    if (enriched) enrichedCount++;
+                for (const match of batch) {
+                    const { id_event, start_time } = match;
                     
-                    // Immediately generate AI insight
-                    const insight = await generateEdgeMindInsight(id_event);
-                    if (insight) insightCount++;
-                    
-                    console.log(`[CRON] Pulse Check: Processed ${id_event} (starts ${start_time})`);
-                } catch (err) {
-                    console.error(`[CRON] Pulse Check: Failed to process ${id_event}:`, err.message);
+                    try {
+                        // Enrich match context
+                        const enriched = await enrichMatchContext(id_event);
+                        if (enriched) enrichedCount++;
+                        
+                        // Immediately generate AI insight
+                        const insight = await generateEdgeMindInsight(id_event);
+                        if (insight) insightCount++;
+                        
+                        console.log(`[CRON] Pulse Check: Processed ${id_event} (starts ${start_time})`);
+                    } catch (err) {
+                        console.error(`[CRON] Pulse Check: Failed to process ${id_event}:`, err.message);
+                    }
+                }
+                
+                // Graceful delay between batches if queue is saturated
+                if (queueLength > QUEUE_THRESHOLD && batchStart + BATCH_SIZE < upcomingMatches.length) {
+                    await new Promise(resolve => setTimeout(resolve, 5000));
                 }
             }
             

@@ -128,10 +128,10 @@ function requiresSecondaryMarkets(confidence) {
  * @returns {boolean} True if Safe Haven should be triggered
  */
 function shouldTriggerSafeHaven(mainConfidence, secondaryMarkets = []) {
-    // Trigger if main confidence < 80% and no secondary markets ≥80%
+    // Trigger if main confidence < 80% and no secondary markets >= 75%
     if (mainConfidence >= 80) return false;
     
-    return !secondaryMarkets.some(market => (market.confidence || 0) >= 80);
+    return !secondaryMarkets.some(market => (market.confidence || 0) >= 75);
 }
 
 /**

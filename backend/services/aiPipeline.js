@@ -400,34 +400,34 @@ function isPrimaryMatchOutcomeMarket(value) {
 
 function riskLevelFromConfidence(confidence) {
     const n = Number(confidence);
-    if (!Number.isFinite(n)) return 'unsafe';
-    if (n >= 80) return 'safe';
-    if (n >= 60) return 'good';
-    if (n >= 45) return 'fair';
-    return 'unsafe';
+    if (!Number.isFinite(n)) return 'extreme_risk';
+    if (n >= 75) return 'low_risk';
+    if (n >= 55) return 'medium_risk';
+    if (n >= 30) return 'high_risk';
+    return 'extreme_risk';
 }
 
 function transparencyFlagsForRiskLevel(riskLevel) {
-    if (riskLevel === 'unsafe') {
+    if (riskLevel === 'extreme_risk') {
         return {
-            warning_banner: 'Primary match outcome is below the 45% direct-display threshold.',
-            action_advice: 'Avoid treating this as a safe direct insight.'
+            warning_banner: 'EXTREME RISK: Primary match outcome is below the 30% direct-display threshold.',
+            action_advice: 'Avoid treating this as a safe direct insight. Review Safe Haven alternatives below.'
         };
     }
-    if (riskLevel === 'fair') {
+    if (riskLevel === 'high_risk') {
         return {
-            warning_banner: 'EXTREME CAUTION: 45–59 confidence band.',
+            warning_banner: 'HIGH RISK: 30–54 confidence band.',
             action_advice: 'Use the draw-cover alternative and lower-variance alternatives below.'
         };
     }
-    if (riskLevel === 'good') {
+    if (riskLevel === 'medium_risk') {
         return {
-            warning_banner: 'MODERATE / HIGH CAUTION: 60–79 confidence band.',
+            warning_banner: 'MEDIUM RISK: 55–74 confidence band.',
             action_advice: 'Use lower-variance alternatives below and avoid treating this as a safe direct insight.'
         };
     }
     return {
-        warning_banner: 'STRONG SIGNAL: 80+ confidence band.',
+        warning_banner: 'LOW RISK: 75+ confidence band.',
         action_advice: 'Still review the 4 lower-variance alternatives below.'
     };
 }
@@ -505,7 +505,7 @@ function isAllowedSecondaryPivotMarket(marketKey) {
 function buildSecondaryInsights(candidates, selectedMarket) {
     const selectedKey = normalizeMarketKey(selectedMarket);
     const deduped = new Map();
-    const minSecondaryConfidence = 76;
+    const minSecondaryConfidence = 75;
 
     ensureArray(candidates)
         .map((candidate) => {
@@ -633,10 +633,10 @@ function buildMandatorySecondaryInsights({
 function directConfidenceTierWarning(confidence) {
     const score = Number(confidence);
     if (!Number.isFinite(score)) return 'UNKNOWN';
-    if (score >= 80) return 'STRONG';
-    if (score >= 60) return 'MODERATE_HIGH_CAUTION';
-    if (score >= 45) return 'EXTREME_CAUTION';
-    return 'REJECT';
+    if (score >= 75) return 'LOW_RISK';
+    if (score >= 55) return 'MEDIUM_RISK';
+    if (score >= 30) return 'HIGH_RISK';
+    return 'EXTREME_RISK';
 }
 
 function normalizeContextSignals(value) {

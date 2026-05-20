@@ -207,14 +207,14 @@ function evaluateDirect1x2(matchContext = {}) {
     let secondaryRequired = false;
     let accaEligible = false;
 
-    if (confidence >= 45 && confidence <= 59) {
-        tier = 'EXTREME_CAUTION';
+    if (confidence >= 30 && confidence <= 54) {
+        tier = 'HIGH_RISK';
         secondaryRequired = true;
-    } else if (confidence >= 60 && confidence <= 79) {
-        tier = 'MODERATE_HIGH_CAUTION';
+    } else if (confidence >= 55 && confidence <= 74) {
+        tier = 'MEDIUM_RISK';
         secondaryRequired = true;
-    } else if (confidence >= 80) {
-        tier = 'STRONG';
+    } else if (confidence >= 75) {
+        tier = 'LOW_RISK';
         secondaryRequired = true;
         accaEligible = true;
     }

@@ -693,10 +693,10 @@ window.updateModalWithAIData = function(aiPrediction) {
         
         // Set color based on risk tier
         const score = aiPrediction.confidence_score;
-        let color = '#ef4444'; // Red (0-58% Extreme Risk)
-        if (score >= 80) color = '#22c55e'; // Green (80-100% High Confidence)
-        else if (score >= 70) color = '#3b82f6'; // Blue (70-79% Moderate Risk)
-        else if (score >= 59) color = '#f97316'; // Orange (59-69% High Risk)
+        let color = '#ef4444'; // Red (<30% Extreme Risk)
+        if (score >= 75) color = '#22c55e'; // Green (>=75% Low Risk)
+        else if (score >= 55) color = '#facc15'; // Yellow (55-74% Medium Risk)
+        else if (score >= 30) color = '#f97316'; // Orange (30-54% High Risk)
         confidenceScoreEl.style.color = color;
 
         // Update progress bar

@@ -316,8 +316,8 @@ async function initializeTables() {
                     WHERE typname = 'risk_tier_enum'
                 ) THEN
                     CREATE TYPE risk_tier_enum AS ENUM (
-                        'HIGH_CONFIDENCE',
-                        'MODERATE_RISK',
+                        'LOW_RISK',
+                        'MEDIUM_RISK',
                         'HIGH_RISK',
                         'EXTREME_RISK'
                     );

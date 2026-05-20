@@ -2,8 +2,8 @@
 
 const FOOTBALL_RULES = {
     confidenceBands: {
-        highConfidence: { min: 75, label: 'HIGH_CONFIDENCE' },
-        moderateRisk: { min: 55, max: 74, label: 'MODERATE_RISK' },
+        lowRisk: { min: 75, label: 'LOW_RISK' },
+        mediumRisk: { min: 55, max: 74, label: 'MEDIUM_RISK' },
         highRisk: { min: 30, max: 54, label: 'HIGH_RISK' },
         extremeRisk: { max: 29, label: 'EXTREME_RISK' }
     },
@@ -25,7 +25,7 @@ const FOOTBALL_RULES = {
     },
 
     acca: {
-        minLegConfidence: Number(process.env.ACCA_CONFIDENCE_MIN || 70),
+        minLegConfidence: Number(process.env.ACCA_CONFIDENCE_MIN || 75),
         minAllowedConfidence: 45,
         maxAllowedConfidence: 99,
         defaultSixLegs: 6,

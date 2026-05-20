@@ -377,13 +377,13 @@ async function generateEdgeMindInsight(idEvent) {
   // Generate placeholder value combos and same match builder (can be enhanced later)
   const valueCombos = {
     under_over: confidenceScore > 65 ? 'Under 2.5 Goals' : null,
-    double_chance: confidenceScore < 60 ? 'Double Chance (1X or X2)' : null
+    double_chance: confidenceScore < 75 ? 'Double Chance (1X or X2)' : null
   };
 
   const sameMatchBuilder = {
     legs: [
-      { market: 'Match Winner', prediction: confidenceScore > 60 ? 'Home' : 'Draw', confidence: confidenceScore },
-      { market: 'Over/Under 2.5', prediction: confidenceScore > 65 ? 'Under' : 'Over', confidence: confidenceScore - 10 }
+      { market: 'Match Winner', prediction: confidenceScore > 75 ? 'Home' : 'Draw', confidence: confidenceScore },
+      { market: 'Over/Under 2.5', prediction: confidenceScore > 75 ? 'Under' : 'Over', confidence: confidenceScore - 10 }
     ]
   };
 

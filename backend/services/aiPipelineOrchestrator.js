@@ -389,7 +389,7 @@ class AIPipelineOrchestrator {
             kickoff: fixture.start_time
           }]),
           finalPrediction.confidence,
-          finalPrediction.risk_tier === 'HIGH_CONFIDENCE' ? 'safe' : 'medium',
+          finalPrediction.risk_tier === 'LOW_RISK' ? 'safe' : 'medium',
           fixture.sport || 'football',
           finalPrediction.market,
           finalPrediction.recommendation,
@@ -577,9 +577,9 @@ class AIPipelineOrchestrator {
   }
 
   determineRiskTier(confidence) {
-    if (confidence >= 80) return 'HIGH_CONFIDENCE';
-    if (confidence >= 70) return 'MODERATE_RISK';
-    if (confidence >= 59) return 'HIGH_RISK';
+    if (confidence >= 75) return 'LOW_RISK';
+    if (confidence >= 55) return 'MEDIUM_RISK';
+    if (confidence >= 30) return 'HIGH_RISK';
     return 'EXTREME_RISK';
   }
 
@@ -587,7 +587,7 @@ class AIPipelineOrchestrator {
     const secondaryInsights = [];
     
     // Only generate secondary insights for moderate to extreme risk
-    if (riskTier !== 'HIGH_CONFIDENCE') {
+    if (riskTier !== 'LOW_RISK') {
       // Generate based on sport and context
       const sportSpecificInsights = await this.getSportSpecificSecondaryInsights(fixture);
       secondaryInsights.push(...sportSpecificInsights);
@@ -623,7 +623,7 @@ class AIPipelineOrchestrator {
   async generateFinalDecision(fixture, riskAssessedPrediction) {
     return {
       edgemind_report: `AI analysis complete. Confidence: ${riskAssessedPrediction.confidence}%. Risk level: ${riskAssessedPrediction.volatility_score}.`,
-      recommendation: riskAssessedPrediction.confidence >= 70 ? 'CONSIDER' : 'AVOID'
+      recommendation: riskAssessedPrediction.confidence >= 75 ? 'CONSIDER' : 'AVOID'
     };
   }
 
@@ -631,9 +631,9 @@ class AIPipelineOrchestrator {
     if (prediction.prediction === 'NO_EDGE_FOUND') return 'NO_EDGE_FOUND';
     
     const confidence = prediction.confidence;
-    if (confidence >= 80) return 'STRONG_BET';
-    if (confidence >= 70) return 'CONSIDER';
-    if (confidence >= 59) return 'CAUTIOUS';
+    if (confidence >= 75) return 'STRONG_BET';
+    if (confidence >= 55) return 'CONSIDER';
+    if (confidence >= 30) return 'CAUTIOUS';
     return 'AVOID';
   }
 }

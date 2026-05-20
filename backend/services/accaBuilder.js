@@ -98,8 +98,8 @@ const MIXED_SPORT_TARGETS = new Set([
 ]);
 const SAFE_TIER3_ACCA_MARKETS = new Set(['btts_no', 'under_3_5', 'first_half_draw']);
 const ACCA_FALLBACK_LADDER = Object.freeze([
-    { pass: 'elite', minConfidence: 80, tiers: [1], safeTier3Only: false, directSafeOnly: false },
-    { pass: 'strong', minConfidence: 75, tiers: [1, 2], safeTier3Only: false, directSafeOnly: false },
+    { pass: 'elite', minConfidence: 75, tiers: [1], safeTier3Only: false, directSafeOnly: false },
+    { pass: 'strong', minConfidence: 55, tiers: [1, 2], safeTier3Only: false, directSafeOnly: false },
     { pass: 'safe', minConfidence: ACCA_MIN_LEG_CONFIDENCE, tiers: [1, 2, 3], safeTier3Only: true, directSafeOnly: false },
     { pass: 'fallback', minConfidence: ACCA_MIN_LEG_CONFIDENCE, tiers: [1, 2, 3, 4], safeTier3Only: true, directSafeOnly: true }
 ]);
@@ -143,8 +143,9 @@ function endOfWeekSast(now = new Date()) {
 }
 
 function riskLevelFromConfidence(avgConfidence) {
-    if (avgConfidence >= 80) return 'safe';
-    return 'medium';
+    if (avgConfidence >= 75) return 'low_risk';
+    if (avgConfidence >= 55) return 'medium_risk';
+    return 'high_risk';
 }
 
 function toLeg(p) {
@@ -719,9 +720,9 @@ function selectionConfidence(prediction) {
 function directConfidenceBand(confidenceValue) {
     const confidence = Number(confidenceValue);
     if (!Number.isFinite(confidence)) return 3;
-    if (confidence >= 80) return 0; // High Confidence
-    if (confidence >= 70) return 1; // Moderate Risk
-    if (confidence >= 59) return 2; // High Risk
+    if (confidence >= 75) return 0; // Low Risk
+    if (confidence >= 55) return 1; // Medium Risk
+    if (confidence >= 30) return 2; // High Risk
     return 3; // Extreme Risk
 }
 
@@ -1099,8 +1100,8 @@ function deriveDirectSecondaryInsights(matches, totalConfidence) {
     normalized.sort((a, b) => Number(b.confidence || 0) - Number(a.confidence || 0));
     let shaped = normalized.slice(0, 4);
     const confidence = Number(totalConfidence);
-    const inHighRiskBand = Number.isFinite(confidence) && confidence >= 59 && confidence <= 69;
-    const inExtremeRiskBand = Number.isFinite(confidence) && confidence >= 0 && confidence <= 58;
+    const inHighRiskBand = Number.isFinite(confidence) && confidence >= 30 && confidence <= 54;
+    const inExtremeRiskBand = Number.isFinite(confidence) && confidence >= 0 && confidence <= 29;
 
     if ((inHighRiskBand && shaped.length < 4) || (inExtremeRiskBand && shaped.length < 4)) {
         const synthetic = buildSyntheticSecondaryPivotCandidates(firstMatch, confidence);
@@ -1359,7 +1360,7 @@ async function buildDerivedMarkets(prediction, options = {}) {
 
 async function buildSecondaryCandidates(predictions) {
     const secondary = [];
-    const minSecondaryConfidence = 76;
+    const minSecondaryConfidence = 75;
 
     for (const prediction of predictions) {
         const primaryLeg = toFinalMatchPayload(prediction);

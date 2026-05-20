@@ -160,9 +160,9 @@ function shouldTriggerSafeHaven(mainConfidence, secondaryMarkets = []) {
         return false;
     }
     
-    // And no secondary markets with confidence >= 80%
+    // And no secondary markets with confidence >= 75%
     const hasHighConfidenceSecondary = secondaryMarkets.some(market => 
-        Number(market.confidence || 0) >= 80
+        Number(market.confidence || 0) >= 75
     );
     
     return !hasHighConfidenceSecondary;
@@ -219,9 +219,9 @@ function normalizeMarketKey(market) {
  * @returns {Object} Selection result with fallback info
  */
 function selectSecondaryMarkets(mainConfidence, allMarkets = []) {
-    // Primary rule: markets with confidence >= 80%
+    // Primary rule: markets with confidence >= 75%
     const highConfidenceMarkets = allMarkets.filter(market => 
-        Number(market.confidence || 0) >= 80
+        Number(market.confidence || 0) >= 75
     );
     
     let selectedMarkets = [];
