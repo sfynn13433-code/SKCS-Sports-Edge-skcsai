@@ -3239,18 +3239,32 @@ function reservePredictionFixtures(prediction, usedFixtureIds) {
 
 function takeAvailablePredictions(predictions, usedFixtureIds, historicalTeamCompetitionMap, runTeamCompetitionMap, limit = Infinity) {
     const out = [];
+    let highRiskCount = 0;
+    let fixtureUsedCount = 0;
+    let teamLockCount = 0;
 
     for (const prediction of predictions) {
         if (out.length >= limit) break;
-        if (isPredictionHighRisk(prediction)) continue;
+        if (isPredictionHighRisk(prediction)) {
+            highRiskCount++;
+            continue;
+        }
         const ids = predictionFixtureIds(prediction);
-        if (!ids.length || ids.some((id) => usedFixtureIds.has(id))) continue;
-        if (!isPredictionTeamAllowed(prediction, historicalTeamCompetitionMap, runTeamCompetitionMap)) continue;
+        if (!ids.length || ids.some((id) => usedFixtureIds.has(id))) {
+            fixtureUsedCount++;
+            continue;
+        }
+        if (!isPredictionTeamAllowed(prediction, historicalTeamCompetitionMap, runTeamCompetitionMap)) {
+            teamLockCount++;
+            continue;
+        }
         out.push(prediction);
         reservePredictionFixtures(prediction, usedFixtureIds);
         reservePredictionTeams(prediction, runTeamCompetitionMap);
     }
 
+    console.log('[accaBuilder][DIAG] takeAvailablePredictions: input=%d output=%d blocked: highRisk=%d fixtureUsed=%d teamLock=%d',
+        predictions.length, out.length, highRiskCount, fixtureUsedCount, teamLockCount);
     return out;
 }
 
@@ -3866,10 +3880,11 @@ async function buildFinalForTier(tier, options = {}) {
             const sample = limitedCandidates[0];
             console.log('[accaBuilder][DIAG] Sample candidate: market=%s confidence=%s sport=%s match_id=%s', sample?.market, sample?.confidence, sample?.sport, sample?.match_id);
         }
+        // Direct predictions are single-match, so skip weekly team lock (only for ACCA diversity)
         const directSelections = takeAvailablePredictions(
             sortDirectCandidatesByBand(directCandidatesBeforeFilter),
             globalUsedFixtures,
-            weekLockedTeamCompetitionMap,
+            new Map(), // Empty map - direct predictions not subject to weekly team lock
             runTeamCompetitionMap,
             Infinity
         );
