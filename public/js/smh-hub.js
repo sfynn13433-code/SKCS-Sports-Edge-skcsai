@@ -149,9 +149,8 @@ function showNotification(message, type = 'info') {
         try {
             // Add cache-busting timestamp to prevent stale responses
             const timestamp = Date.now();
-            const url = BACKEND_URL + '/api/vip/stress-payload' +
+            const url = BACKEND_URL + '/api/predictions' +
                         '?sport=' + encodeURIComponent(normalizedSport) +
-                        '&include_all=true' +
                         '&t=' + timestamp;
 
             const response = await fetch(url, {
