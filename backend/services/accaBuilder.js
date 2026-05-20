@@ -1052,22 +1052,22 @@ function normalizeSecondaryPivotCandidate(candidate) {
 
 function buildSyntheticSecondaryPivotCandidates(primaryMatch, baseConfidence) {
     const normalizedPrimary = String(primaryMatch?.prediction || '').trim().toLowerCase();
-    const syntheticBase = clamp(Math.round((Number(baseConfidence) + 18) * 100) / 100, 76, 92);
+    const syntheticBase = clamp(Math.round((Number(baseConfidence) + 18) * 100) / 100, 80, 92);
     const out = [];
 
     if (normalizedPrimary === 'home_win' || normalizedPrimary === 'home') {
         out.push({ market: 'double_chance_1x', prediction: '1x', confidence: syntheticBase });
-        out.push({ market: 'draw_no_bet_home', prediction: 'home', confidence: Math.max(76, syntheticBase - 4) });
+        out.push({ market: 'draw_no_bet_home', prediction: 'home', confidence: Math.max(80, syntheticBase - 4) });
     } else if (normalizedPrimary === 'away_win' || normalizedPrimary === 'away') {
         out.push({ market: 'double_chance_x2', prediction: 'x2', confidence: syntheticBase });
-        out.push({ market: 'draw_no_bet_away', prediction: 'away', confidence: Math.max(76, syntheticBase - 4) });
+        out.push({ market: 'draw_no_bet_away', prediction: 'away', confidence: Math.max(80, syntheticBase - 4) });
     } else {
         out.push({ market: 'double_chance_12', prediction: '12', confidence: syntheticBase });
-        out.push({ market: 'double_chance_1x', prediction: '1x', confidence: Math.max(76, syntheticBase - 5) });
+        out.push({ market: 'double_chance_1x', prediction: '1x', confidence: Math.max(80, syntheticBase - 5) });
     }
 
-    out.push({ market: 'under_3_5', prediction: 'under', confidence: Math.max(76, syntheticBase - 2) });
-    out.push({ market: 'over_1_5', prediction: 'over', confidence: Math.max(76, syntheticBase - 3) });
+    out.push({ market: 'under_3_5', prediction: 'under', confidence: Math.max(75, syntheticBase - 2) });
+    out.push({ market: 'over_1_5', prediction: 'over', confidence: Math.max(75, syntheticBase - 3) });
     return out;
 }
 
@@ -1089,7 +1089,7 @@ function deriveDirectSecondaryInsights(matches, totalConfidence) {
     for (const item of existing) {
         const candidate = normalizeSecondaryPivotCandidate(item);
         if (!candidate) continue;
-        if (candidate.confidence < 76) continue;
+        if (candidate.confidence < 80) continue;
         if (!isCompatibleWithPrimaryPrediction(firstMatch, candidate)) continue;
         const key = `${candidate.market}:${candidate.prediction}`;
         if (seen.has(key)) continue;

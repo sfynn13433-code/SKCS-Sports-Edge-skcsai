@@ -562,20 +562,20 @@ function secondaryFallbackDefaultsForOutcome(primaryOutcome, fallbackConfidence 
     const normalizedOutcome = normalizePrediction(primaryOutcome) || 'home_win';
 
     const homeWinDefaults = [
-        { market: 'double_chance_1x', prediction: '1x', confidence: Math.max(76, baseConfidence) },
-        { market: 'draw_no_bet_home', prediction: 'home', confidence: Math.max(76, baseConfidence - 2) },
+        { market: 'double_chance_1x', prediction: '1x', confidence: Math.max(80, baseConfidence) },
+        { market: 'draw_no_bet_home', prediction: 'home', confidence: Math.max(80, baseConfidence - 2) },
         { market: 'over_1_5', prediction: 'over', confidence: Math.max(75, baseConfidence - 3) },
         { market: 'under_4_5', prediction: 'under', confidence: Math.max(75, baseConfidence - 4) }
     ];
     const awayWinDefaults = [
-        { market: 'double_chance_x2', prediction: 'x2', confidence: Math.max(76, baseConfidence) },
-        { market: 'draw_no_bet_away', prediction: 'away', confidence: Math.max(76, baseConfidence - 2) },
+        { market: 'double_chance_x2', prediction: 'x2', confidence: Math.max(80, baseConfidence) },
+        { market: 'draw_no_bet_away', prediction: 'away', confidence: Math.max(80, baseConfidence - 2) },
         { market: 'over_1_5', prediction: 'over', confidence: Math.max(75, baseConfidence - 3) },
         { market: 'under_4_5', prediction: 'under', confidence: Math.max(75, baseConfidence - 4) }
     ];
     const drawDefaults = [
-        { market: 'double_chance_1x', prediction: '1x', confidence: Math.max(76, baseConfidence - 1) },
-        { market: 'double_chance_x2', prediction: 'x2', confidence: Math.max(76, baseConfidence - 1) },
+        { market: 'double_chance_1x', prediction: '1x', confidence: Math.max(80, baseConfidence - 1) },
+        { market: 'double_chance_x2', prediction: 'x2', confidence: Math.max(80, baseConfidence - 1) },
         { market: 'under_3_5', prediction: 'under', confidence: Math.max(75, baseConfidence - 2) },
         { market: 'btts_no', prediction: 'no', confidence: Math.max(75, baseConfidence - 3) }
     ];

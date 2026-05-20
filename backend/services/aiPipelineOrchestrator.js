@@ -599,13 +599,13 @@ class AIPipelineOrchestrator {
   async getSportSpecificSecondaryInsights(fixture) {
     // Sport-specific secondary market logic
     const sport = fixture.sport || 'football';
-    
+
     if (sport === 'football') {
       return [
         {
           market: 'double_chance_1x',
           prediction: 'home_or_draw',
-          confidence: 76,
+          confidence: 80,
           reasoning: 'Defensive backup for home team'
         },
         {
