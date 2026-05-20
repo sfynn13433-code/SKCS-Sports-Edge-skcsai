@@ -242,11 +242,11 @@ EDGEMIND REPORT RULES (CRITICAL):
 3. Stage 3 (Reality Check): Explain adjustments based on weather/news/form
 4. Stage 4 (Decision Engine): State the final confidence percentage
 
-IMPORTANT Direct 1X2 risk rules:
-- 80-100%: High Confidence / Safe.
-- 70-79%: Moderate Risk.
-- 59-69%: High Risk. Advise user to pivot to Secondary Insights.
-- 0-58%: Extreme Risk. Explicitly tell user NOT to bet direct 1X2 and to use Secondary Insights instead. You MUST enforce payload with exactly 4 top Secondary Insights if confidence is 0-58%.
+IMPORTANT Direct 1X2 risk rules (Master Rulebook v2):
+- 75-100%: Low Risk / High Confidence (Green).
+- 55-74%: Medium Risk / Moderate Confidence (Yellow).
+- 30-54%: High Risk / Low Confidence (Orange). Advise user to pivot to Secondary Insights.
+- 0-29%: Extreme Risk / Very Low Confidence (Red). Explicitly tell user NOT to bet direct 1X2 and to use Secondary Insights instead. You MUST enforce payload with exactly 4 top Secondary Insights if confidence is 0-29%.
 
 Output ONLY valid JSON with this exact structure:
 {
@@ -324,11 +324,11 @@ EDGEMIND REPORT RULES (CRITICAL):
 3. Stage 3 (Reality Check): Explain adjustments based on weather/news/form
 4. Stage 4 (Decision Engine): State the final confidence percentage
 
-IMPORTANT Direct 1X2 risk rules:
-- 80-100%: High Confidence / Safe.
-- 70-79%: Moderate Risk.
-- 59-69%: High Risk. Advise user to pivot to Secondary Insights.
-- 0-58%: Extreme Risk. Explicitly tell user NOT to bet direct 1X2 and to use Secondary Insights instead. You MUST enforce payload with exactly 4 top Secondary Insights if confidence is 0-58%.
+IMPORTANT Direct 1X2 risk rules (Master Rulebook v2):
+- 75-100%: Low Risk / High Confidence (Green).
+- 55-74%: Medium Risk / Moderate Confidence (Yellow).
+- 30-54%: High Risk / Low Confidence (Orange). Advise user to pivot to Secondary Insights.
+- 0-29%: Extreme Risk / Very Low Confidence (Red). Explicitly tell user NOT to bet direct 1X2 and to use Secondary Insights instead. You MUST enforce payload with exactly 4 top Secondary Insights if confidence is 0-29%.
 
 Output ONLY valid JSON with this exact structure:
 {
@@ -439,11 +439,11 @@ EDGEMIND REPORT RULES (CRITICAL):
 3. Stage 3 (Reality Check): Explain adjustments based on weather/news/form
 4. Stage 4 (Decision Engine): State the final confidence percentage
 
-IMPORTANT Direct 1X2 risk rules:
-- 80-100%: High Confidence / Safe.
-- 70-79%: Moderate Risk.
-- 59-69%: High Risk. Advise user to pivot to Secondary Insights.
-- 0-58%: Extreme Risk. Explicitly tell user NOT to bet direct 1X2 and to use Secondary Insights instead. You MUST enforce payload with exactly 4 top Secondary Insights if confidence is 0-58%.
+IMPORTANT Direct 1X2 risk rules (Master Rulebook v2):
+- 75-100%: Low Risk / High Confidence (Green).
+- 55-74%: Medium Risk / Moderate Confidence (Yellow).
+- 30-54%: High Risk / Low Confidence (Orange). Advise user to pivot to Secondary Insights.
+- 0-29%: Extreme Risk / Very Low Confidence (Red). Explicitly tell user NOT to bet direct 1X2 and to use Secondary Insights instead. You MUST enforce payload with exactly 4 top Secondary Insights if confidence is 0-29%.
 
 Output ONLY valid JSON with this exact structure:
 {
@@ -585,24 +585,24 @@ async function generateInsight(params) {
 }
 
 /**
- * Generate fallback structured insight.
+ * Generate fallback structured insight (Master Rulebook v2 thresholds: 75/55/30).
  */
 function generateFallbackInsightStructured(params) {
     const { home, away, market, confidence } = params;
     const marketLabel = market || '1X2';
     const conf = confidence || 70;
-    
+
     let report;
-    if (conf >= 80) {
-        report = `Stage 1 (Baseline): On paper, ${home} shows a strong ${conf}% baseline probability. Stage 2 (Deep Context): Deep analysis confirms a formidable form advantage. Stage 3 (Reality Check): Conditions remain stable with minimal external volatility. Stage 4 (Decision Engine): Final confidence is ${conf}%. HIGH CONFIDENCE / SAFE ${marketLabel} selection.`;
-    } else if (conf >= 70) {
-        report = `Stage 1 (Baseline): On paper, ${home} has a fair ${conf}% baseline probability against ${away}. Stage 2 (Deep Context): Contextual data shows a moderate edge. Stage 3 (Reality Check): Standard sports volatility applies. Stage 4 (Decision Engine): Final confidence is ${conf}%. MODERATE RISK ${marketLabel} selection.`;
-    } else if (conf >= 59) {
+    if (conf >= 75) {
+        report = `Stage 1 (Baseline): On paper, ${home} shows a strong ${conf}% baseline probability. Stage 2 (Deep Context): Deep analysis confirms a formidable form advantage. Stage 3 (Reality Check): Conditions remain stable with minimal external volatility. Stage 4 (Decision Engine): Final confidence is ${conf}%. LOW RISK / HIGH CONFIDENCE ${marketLabel} selection.`;
+    } else if (conf >= 55) {
+        report = `Stage 1 (Baseline): On paper, ${home} has a fair ${conf}% baseline probability against ${away}. Stage 2 (Deep Context): Contextual data shows a moderate edge. Stage 3 (Reality Check): Standard sports volatility applies. Stage 4 (Decision Engine): Final confidence is ${conf}%. MEDIUM RISK ${marketLabel} selection.`;
+    } else if (conf >= 30) {
         report = `Stage 1 (Baseline): On paper, this is a tight matchup with a ${conf}% baseline probability. Stage 2 (Deep Context): Form data is heavily contested. Stage 3 (Reality Check): Reality check indicates high volatility and unstable conditions. Stage 4 (Decision Engine): Final confidence is ${conf}%. HIGH RISK. Pivot to Secondary Insights.`;
     } else {
         report = `Stage 1 (Baseline): On paper, there is no clear mathematical advantage (${conf}%). Stage 2 (Deep Context): Contextual indicators are weak for a direct outcome. Stage 3 (Reality Check): Extreme volatility detected in external factors. Stage 4 (Decision Engine): Final confidence is ${conf}%. EXTREME RISK. Do NOT bet direct 1X2. Use Secondary Insights instead.`;
     }
-    
+
     return {
         market_name: marketLabel,
         confidence: conf,
@@ -615,12 +615,12 @@ function generateFallbackInsight(params) {
     const { home, away, market, confidence } = params;
     const marketLabel = market || '1X2';
     const conf = confidence || 70;
-    
-    if (conf >= 80) {
-        return `Stage 1 (Baseline): On paper, ${home} shows a strong ${conf}% baseline probability. Stage 2 (Deep Context): Deep analysis confirms a formidable form advantage. Stage 3 (Reality Check): Conditions remain stable with minimal external volatility. Stage 4 (Decision Engine): Final confidence is ${conf}%. HIGH CONFIDENCE / SAFE ${marketLabel} selection.`;
-    } else if (conf >= 70) {
-        return `Stage 1 (Baseline): On paper, ${home} has a fair ${conf}% baseline probability against ${away}. Stage 2 (Deep Context): Contextual data shows a moderate edge. Stage 3 (Reality Check): Standard sports volatility applies. Stage 4 (Decision Engine): Final confidence is ${conf}%. MODERATE RISK ${marketLabel} selection.`;
-    } else if (conf >= 59) {
+
+    if (conf >= 75) {
+        return `Stage 1 (Baseline): On paper, ${home} shows a strong ${conf}% baseline probability. Stage 2 (Deep Context): Deep analysis confirms a formidable form advantage. Stage 3 (Reality Check): Conditions remain stable with minimal external volatility. Stage 4 (Decision Engine): Final confidence is ${conf}%. LOW RISK / HIGH CONFIDENCE ${marketLabel} selection.`;
+    } else if (conf >= 55) {
+        return `Stage 1 (Baseline): On paper, ${home} has a fair ${conf}% baseline probability against ${away}. Stage 2 (Deep Context): Contextual data shows a moderate edge. Stage 3 (Reality Check): Standard sports volatility applies. Stage 4 (Decision Engine): Final confidence is ${conf}%. MEDIUM RISK ${marketLabel} selection.`;
+    } else if (conf >= 30) {
         return `Stage 1 (Baseline): On paper, this is a tight matchup with a ${conf}% baseline probability. Stage 2 (Deep Context): Form data is heavily contested. Stage 3 (Reality Check): Reality check indicates high volatility and unstable conditions. Stage 4 (Decision Engine): Final confidence is ${conf}%. HIGH RISK. Pivot to Secondary Insights.`;
     } else {
         return `Stage 1 (Baseline): On paper, there is no clear mathematical advantage (${conf}%). Stage 2 (Deep Context): Contextual indicators are weak for a direct outcome. Stage 3 (Reality Check): Extreme volatility detected in external factors. Stage 4 (Decision Engine): Final confidence is ${conf}%. EXTREME RISK. Do NOT bet direct 1X2. Use Secondary Insights instead.`;
