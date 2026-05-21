@@ -146,13 +146,13 @@ function showNotification(message, type = 'info') {
         // Normalize sport to Title Case
         const normalizedSport = sport.charAt(0).toUpperCase() + sport.slice(1);
 
-        try {
-            // Add cache-busting timestamp to prevent stale responses
-            const timestamp = Date.now();
-            const url = BACKEND_URL + '/api/predictions' +
-                        '?sport=' + encodeURIComponent(normalizedSport) +
-                        '&t=' + timestamp;
+        // Add cache-busting timestamp to prevent stale responses
+        const timestamp = Date.now();
+        const url = BACKEND_URL + '/api/predictions' +
+                    '?sport=' + encodeURIComponent(normalizedSport) +
+                    '&t=' + timestamp;
 
+        try {
             const response = await fetch(url, {
                 headers: { 
                     'x-api-key': API_KEY,
