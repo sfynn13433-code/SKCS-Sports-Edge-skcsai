@@ -2591,6 +2591,33 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             subscription_tier_excluded: Math.max(0, stageCounts.elite_floor_rows - stageCounts.subscription_tier_filtered_rows)
         };
 
+        // Translation Layer: Group predictions into categories for frontend (smh-hub.js)
+        const categories = {
+            direct: [],
+            analytical_insights: [],
+            multi: [],
+            same_match: [],
+            acca_6match: [],
+            mega_acca_12: []
+        };
+
+        for (const prediction of predictionsEnriched) {
+            const sectionType = inferSectionType(prediction);
+            if (sectionType === 'direct') {
+                categories.direct.push(prediction);
+            } else if (sectionType === 'secondary') {
+                categories.analytical_insights.push(prediction);
+            } else if (sectionType === 'multi') {
+                categories.multi.push(prediction);
+            } else if (sectionType === 'same_match') {
+                categories.same_match.push(prediction);
+            } else if (sectionType === 'acca_6match') {
+                categories.acca_6match.push(prediction);
+            } else if (sectionType === 'mega_acca_12') {
+                categories.mega_acca_12.push(prediction);
+            }
+        }
+
         res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
         res.set('Pragma', 'no-cache');
         res.set('Expires', '0');
@@ -2635,6 +2662,8 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                 drop_counts: dropCounts
             },
             count: predictionsEnriched.length,
+            source_rows: predictionsEnriched.length,
+            payload: { categories },
             predictions: predictionsEnriched
         }, 200);
     } catch (err) {
