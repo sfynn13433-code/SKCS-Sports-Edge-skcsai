@@ -500,22 +500,12 @@ async function syncSports(options = {}) {
                              continue;
                          }
                         // TEMPORARY BYPASS: Relax gatekeepers to allow matches without context/odds to proceed
-                        // if (!hasAnySharpOdds(normalized)) {
-                        //     pipelineLogger.rejectionAdd({
-                        //         run_id: telemetryRunId,
-                        //         sport: item.sport,
-                        //         bucket: 'missing_odds',
-                        //         metadata: { match_id: normalized?.match_info?.match_id || null }
-                        //     });
-                        // }
-                        // if (!hasMeaningfulContext(normalized)) {
-                        //     pipelineLogger.rejectionAdd({
-                        //         run_id: telemetryRunId,
-                        //         sport: item.sport,
-                        //         bucket: 'missing_context',
-                        //         metadata: { match_id: normalized?.match_info?.match_id || null }
-                        //     });
-                        // }
+                        if (!hasAnySharpOdds(normalized)) {
+                            console.warn('[syncService] Bypassing missing odds for match %s (ProFootballAPI 404/400 errors)', normalized?.match_info?.match_id || 'unknown');
+                        }
+                        if (!hasMeaningfulContext(normalized)) {
+                            console.warn('[syncService] Bypassing missing context for match %s (ProFootballAPI 404/400 errors)', normalized?.match_info?.match_id || 'unknown');
+                        }
                         // IRON-CLAD DATE PATCH: drop matches that are past the grace window.
                         if (!isMatchWithinGraceWindow(normalized)) {
                             pipelineLogger.rejectionAdd({
@@ -528,6 +518,10 @@ async function syncSports(options = {}) {
                                 }
                             });
                             continue;
+                        }
+                        // Safeguard: Ensure contextual_intelligence is initialized as {} when empty
+                        if (!normalized.contextual_intelligence || typeof normalized.contextual_intelligence !== 'object') {
+                            normalized.contextual_intelligence = {};
                         }
                         normalizedMatches.push(normalized);
                     } catch (normalizeErr) {
