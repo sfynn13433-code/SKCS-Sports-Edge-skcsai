@@ -70,7 +70,7 @@
     "sentiment": "^5.0.2",
     "sqlite3": "^6.0.1",
     "tailwindcss": "^3.4.0",
-    "uuid": "^9.0.1"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
