@@ -20,4 +20,4 @@ EXPOSE 8080
 
 # The command to start your pipeline server
 # Adjust this if your main entry file is named differently
-CMD [ "node", "backend/server.js" ]
+CMD [ "node", "backend/server-express.js" ]
