@@ -2275,6 +2275,24 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             console.error('[predictions] primary DB query failed, falling back to Supabase:', dbErr.message);
         }
 
+        // Enforce strict fixture-level deduplication using JavaScript Map
+        // Keep only the latest prediction per fixture based on created_at
+        const fixtureMap = new Map();
+        for (const prediction of predictions) {
+            const matches = Array.isArray(prediction.matches) ? prediction.matches : [];
+            if (matches.length === 0) continue;
+            
+            const firstMatch = matches[0];
+            const fixtureId = firstMatch.fixture_id || firstMatch.match_id || firstMatch.id || `${firstMatch.home_team}_${firstMatch.away_team}_${firstMatch.commence_time || firstMatch.match_date}`;
+            
+            const existing = fixtureMap.get(fixtureId);
+            if (!existing || new Date(prediction.created_at) > new Date(existing.created_at)) {
+                fixtureMap.set(fixtureId, prediction);
+            }
+        }
+        predictions = Array.from(fixtureMap.values());
+        console.log('[predictions] Fixture-level deduplication:', `before=${predictions.length + (existing?.length || 0)}, after=${predictions.length}`);
+
         // If DB returned no predictions, attempt Supabase fallback (useful when Supabase is the source)
         try {
             if ((!predictions || predictions.length === 0) && config.supabase && config.supabase.url && config.supabase.anonKey) {
