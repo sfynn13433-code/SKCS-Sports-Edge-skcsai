@@ -2230,13 +2230,13 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                     // Filter by sport - use OR condition to match any of the allowed sport values
                     const sportPlaceholders = sportFilterValues.map((_, i) => `$${i + 1}`).join(', ');
                     queryStr = `
-                        SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at,
+                        SELECT DISTINCT ON (pf.id) pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at,
                                pf.plan_visibility, pf.sport, pf.market_type, pf.recommendation, pf.expires_at,
                                pf.edgemind_report, pf.secondary_insights
                         FROM direct1x2_prediction_final pf
                         WHERE LOWER(COALESCE(pf.sport, 'football')) IN (${sportPlaceholders})
                           AND ${PREDICTION_ROW_QUALITY_SQL}
-                        ORDER BY created_at DESC
+                        ORDER BY pf.id, pf.created_at DESC
                         LIMIT 2500;
                     `;
                     // Sport column is included in SELECT for frontend filtering
@@ -2244,12 +2244,12 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                 } else {
                     // No sport filter - return all
                     queryStr = `
-                        SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at,
+                        SELECT DISTINCT ON (pf.id) pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at,
                                pf.plan_visibility, pf.sport, pf.market_type, pf.recommendation, pf.expires_at,
                                pf.edgemind_report, pf.secondary_insights
                         FROM direct1x2_prediction_final pf
                         WHERE ${PREDICTION_ROW_QUALITY_SQL}
-                        ORDER BY created_at DESC
+                        ORDER BY pf.id, pf.created_at DESC
                         LIMIT 2500;
                     `;
                 }
@@ -2257,13 +2257,13 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                 // Query ALL predictions with matching tier (don't restrict by publish_run_id).
                 // The date windowing and subscription filtering below handles what the user sees.
                 queryStr = `
-                    SELECT pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at,
+                    SELECT DISTINCT ON (pf.id) pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.created_at,
                            pf.plan_visibility, pf.sport, pf.market_type, pf.recommendation, pf.expires_at,
                            pf.edgemind_report, pf.secondary_insights
                     FROM direct1x2_prediction_final pf
                     WHERE LOWER(COALESCE(pf.tier, 'normal')) = ANY($1::text[])
                       AND ${PREDICTION_ROW_QUALITY_SQL}
-                    ORDER BY created_at DESC
+                    ORDER BY pf.id, pf.created_at DESC
                     LIMIT 2000;
                 `;
                 queryParams = [queryTiers];

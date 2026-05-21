@@ -397,6 +397,11 @@ function showNotification(message, type = 'info') {
         // We avoid clearing window.SMH_CARD_REGISTRY entirely to not break the main dashboard
         // but we ensure these specific sport insights are available.
 
+        // Clear container before rendering to prevent duplication
+        if (codesList) {
+            codesList.innerHTML = '';
+        }
+
         var html = '<div class="results-scroll-container" style="width:100%;max-height:420px;overflow-y:auto;padding-right:8px;">';
 
         filteredPredictions.forEach(function (pred) {
@@ -459,33 +464,33 @@ function showNotification(message, type = 'info') {
 
             // Master Rulebook risk tier classification
             var riskTier, isHighVariance, pickTypeLabel, marketLabel, pickTypeColor, marketBgColor;
-            
+
             if (confidence >= 75) {
                 riskTier = 'Low Risk';
                 isHighVariance = false;
                 pickTypeLabel = 'Direct Pick';
-                marketLabel = '1X2';
+                marketLabel = market; // Use actual market from JSON instead of hardcoded '1X2'
                 pickTypeColor = 'text-emerald-500';
                 marketBgColor = 'bg-emerald-950/50 text-emerald-400 border border-emerald-700/50';
             } else if (confidence >= 55) {
                 riskTier = 'Medium Risk';
                 isHighVariance = true;
                 pickTypeLabel = 'Risk-Adjusted';
-                marketLabel = 'Double Chance';
+                marketLabel = market; // Use actual market from JSON instead of hardcoded 'Double Chance'
                 pickTypeColor = 'text-amber-500';
                 marketBgColor = 'bg-amber-950/50 text-amber-400 border border-amber-700/50';
             } else if (confidence >= 30) {
                 riskTier = 'High Risk';
                 isHighVariance = true;
                 pickTypeLabel = 'Risk-Adjusted';
-                marketLabel = 'Double Chance';
+                marketLabel = market; // Use actual market from JSON instead of hardcoded 'Double Chance'
                 pickTypeColor = 'text-orange-500';
                 marketBgColor = 'bg-orange-950/50 text-orange-400 border border-orange-700/50';
             } else {
                 riskTier = 'Extreme Risk';
                 isHighVariance = true;
                 pickTypeLabel = 'Risk-Adjusted';
-                marketLabel = 'Double Chance';
+                marketLabel = market; // Use actual market from JSON instead of hardcoded 'Double Chance'
                 pickTypeColor = 'text-red-500';
                 marketBgColor = 'bg-red-950/50 text-red-400 border border-red-700/50';
             }
