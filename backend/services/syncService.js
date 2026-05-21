@@ -499,22 +499,23 @@ async function syncSports(options = {}) {
                              });
                              continue;
                          }
-                        if (!hasAnySharpOdds(normalized)) {
-                            pipelineLogger.rejectionAdd({
-                                run_id: telemetryRunId,
-                                sport: item.sport,
-                                bucket: 'missing_odds',
-                                metadata: { match_id: normalized?.match_info?.match_id || null }
-                            });
-                        }
-                        if (!hasMeaningfulContext(normalized)) {
-                            pipelineLogger.rejectionAdd({
-                                run_id: telemetryRunId,
-                                sport: item.sport,
-                                bucket: 'missing_context',
-                                metadata: { match_id: normalized?.match_info?.match_id || null }
-                            });
-                        }
+                        // TEMPORARY BYPASS: Relax gatekeepers to allow matches without context/odds to proceed
+                        // if (!hasAnySharpOdds(normalized)) {
+                        //     pipelineLogger.rejectionAdd({
+                        //         run_id: telemetryRunId,
+                        //         sport: item.sport,
+                        //         bucket: 'missing_odds',
+                        //         metadata: { match_id: normalized?.match_info?.match_id || null }
+                        //     });
+                        // }
+                        // if (!hasMeaningfulContext(normalized)) {
+                        //     pipelineLogger.rejectionAdd({
+                        //         run_id: telemetryRunId,
+                        //         sport: item.sport,
+                        //         bucket: 'missing_context',
+                        //         metadata: { match_id: normalized?.match_info?.match_id || null }
+                        //     });
+                        // }
                         // IRON-CLAD DATE PATCH: drop matches that are past the grace window.
                         if (!isMatchWithinGraceWindow(normalized)) {
                             pipelineLogger.rejectionAdd({
