@@ -512,35 +512,35 @@ Follow the EDGEMIND REPORT RULES from your system prompt. Max 3 sentences for ed
 
 /**
  * Generate AI insight text for a prediction.
- * Priority: 1) Groq API (fast/cheap), 2) Gemini API (Google Generative AI), 3) Local Dolphin, 4) Fallback template
+ * Priority: 1) Gemini API (Primary), 2) Groq API (Fallback 1), 3) Local Dolphin (Fallback 2), 4) Fallback template
  * Returns structured JSON with market_name, confidence, and edgemind_report.
  */
 async function generateInsight(params) {
-    // Try Groq first (preferred - fast and cheap)
-    if (GROQ_API_KEY) {
-        try {
-            console.log(`[AI Insight] Using Groq API for ${params.home} vs ${params.away}...`);
-            const groqResult = await generateInsightWithGroq(params);
-            console.log(`[AI Insight] Groq generated insight successfully`);
-            return groqResult;
-        } catch (groqErr) {
-            console.warn(`[AI Insight] Groq failed: ${groqErr.message}, falling back to Gemini...`);
-        }
-    }
-
-    // Fallback to Gemini API
+    // Try Gemini first (Primary - mandated by user)
     if (GEMINI_API_KEY) {
         try {
-            console.log(`[AI Insight] Using Gemini API for ${params.home} vs ${params.away}...`);
+            console.log(`[AI Insight] Using Gemini API (Primary) for ${params.home} vs ${params.away}...`);
             const geminiResult = await generateInsightWithGemini(params);
             console.log(`[AI Insight] Gemini generated insight successfully`);
             return geminiResult;
         } catch (geminiErr) {
-            console.warn(`[AI Insight] Gemini failed: ${geminiErr.message}, falling back to Dolphin...`);
+            console.warn(`[AI Insight] Gemini failed: ${geminiErr.message}, falling back to Groq...`);
         }
     }
 
-    // Fallback to local Dolphin server
+    // Fallback to Groq API (Fallback 1)
+    if (GROQ_API_KEY) {
+        try {
+            console.log(`[AI Insight] Using Groq API (Fallback 1) for ${params.home} vs ${params.away}...`);
+            const groqResult = await generateInsightWithGroq(params);
+            console.log(`[AI Insight] Groq generated insight successfully`);
+            return groqResult;
+        } catch (groqErr) {
+            console.warn(`[AI Insight] Groq failed: ${groqErr.message}, falling back to Dolphin...`);
+        }
+    }
+
+    // Fallback to local Dolphin server (Fallback 2)
     const prompt = buildInsightPrompt(params);
 
     try {
@@ -581,6 +581,7 @@ async function generateInsight(params) {
     } catch (err) {
         console.error('[AI Insight] Generation failed:', err.message);
         console.error('[AI Insight] Error details:', err.stack || err);
+        console.error('[AI Insight] GEMINI_API_KEY configured:', !!process.env.GEMINI_API_KEY);
         console.error('[AI Insight] GROQ_API_KEY configured:', !!process.env.GROQ_API_KEY);
         console.error('[AI Insight] DOLPHIN_URL configured:', !!process.env.DOLPHIN_URL);
         return generateFallbackInsightStructured(params);
