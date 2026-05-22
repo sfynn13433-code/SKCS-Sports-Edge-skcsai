@@ -95,13 +95,9 @@ async function getTopScorers(leagueId = 39, season = 2025) {
 // Strategy: Call this once per day. It maps IDs like 11 to LaLiga.
 async function getMetadata() {
   const cacheKey = 'metadata_map';
-  // Try the correct endpoint for ProFootballAPI
-  try {
-    return await callEdgeAPI('/leagues', {}, cacheKey, 86400); // Cache 24h
-  } catch (err) {
-    console.warn('[ProFootballAPI] /leagues endpoint not supported by this provider, skipping metadata fetch');
-    return null;
-  }
+  // ProFootballAPI does not support /leagues endpoint - skip silently
+  console.log('[ProFootballAPI] Skipping /leagues metadata fetch (endpoint not supported by provider)');
+  return null;
 }
 
 // B. The AI Betting Trends (The "Edge")
@@ -171,12 +167,9 @@ async function getSportsNews(sportId = 1) {
 // F. League Information Cache
 async function getLeagueInfo(leagueId) {
   const cacheKey = `league_info_${leagueId}`;
-  try {
-    return await callEdgeAPI('/leagues', { id: leagueId }, cacheKey, 86400); // Cache 24h
-  } catch (err) {
-    console.warn('[ProFootballAPI] /leagues endpoint not supported by this provider, skipping league info fetch');
-    return null;
-  }
+  // ProFootballAPI does not support /leagues endpoint - skip silently
+  console.log('[ProFootballAPI] Skipping /leagues league info fetch (endpoint not supported by provider)');
+  return null;
 }
 
 // G. Team Information Cache
