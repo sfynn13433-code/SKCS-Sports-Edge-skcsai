@@ -110,23 +110,25 @@ function initCronJobs() {
         
         try {
             const graceMinutes = 15;
-            
+
             // Clean direct1x2_prediction_final — matches past kickoff + grace
             const finalResult = await db.query(`
                 DELETE FROM direct1x2_prediction_final
                 WHERE match_date IS NOT NULL
                   AND match_date < NOW() - ($1 || ' minutes')::interval
             `, [String(graceMinutes)]);
-            
+
             // Clean predictions_raw — stale rows
-            const rawResult = await db.query(`
-                DELETE FROM predictions_raw
-                WHERE updated_at < NOW() - INTERVAL '24 hours'
-            `);
-            
+            // TEMPORARY BYPASS: predictions_raw table missing updated_at column
+            // const rawResult = await db.query(`
+            //     DELETE FROM predictions_raw
+            //     WHERE updated_at < NOW() - INTERVAL '24 hours'
+            // `);
+
             const finalDeleted = Number(finalResult.rowCount || 0);
-            const rawDeleted = Number(rawResult.rowCount || 0);
-            
+            // const rawDeleted = Number(rawResult.rowCount || 0);
+            const rawDeleted = 0;
+
             if (finalDeleted > 0 || rawDeleted > 0) {
                 console.log(`[CRON] Cleanup: removed ${finalDeleted} stale predictions (final) + ${rawDeleted} raw rows`);
             }

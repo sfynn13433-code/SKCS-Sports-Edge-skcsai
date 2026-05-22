@@ -21,6 +21,7 @@ const { enrichWithAvailability } = require('../utils/availability');
 const { filterPredictionsByUsagePolicy, markFixtureUsed } = require('../utils/insightUsage');
 const { getRiskColor, getRiskTierLabel } = require('../services/masterRulebookRiskClassification');
 const { filterMarketsByMainPick, validateSMBCLegs } = require('../services/contradictionGovernance');
+const { getLatestRunSnapshot } = require('../utils/pipelineLogger');
 
 const router = express.Router();
 const ACTIVE_DEPLOYMENT_SPORT = 'Football';
@@ -2641,6 +2642,25 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         res.set('Pragma', 'no-cache');
         res.set('Expires', '0');
 
+        // Fetch pipeline metrics for frontend visibility
+        const pipelineSnapshot = getLatestRunSnapshot();
+        const sportKey = sport === 'Football' ? 'Football' : sport;
+        const sportMetrics = pipelineSnapshot?.sports?.[sportKey] || null;
+
+        const pipelineMetrics = sportMetrics ? {
+            ingested: sportMetrics.stages.normalized_count || 0,
+            analyzed: sportMetrics.stages.market_scored_count || 0,
+            rejected_confidence: sportMetrics.rejections.low_confidence || 0,
+            rejected_efficiency: sportMetrics.rejections.validation_reject || 0,
+            published: sportMetrics.stages.published_count || 0
+        } : {
+            ingested: 0,
+            analyzed: 0,
+            rejected_confidence: 0,
+            rejected_efficiency: 0,
+            published: 0
+        };
+
         return sendPredictionsSuccess(res, {
             plan_id: planId,
             sport,
@@ -2680,6 +2700,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                 stage_counts: stageCounts,
                 drop_counts: dropCounts
             },
+            pipeline_metrics: pipelineMetrics,
             count: predictionsEnriched.length,
             source_rows: predictionsEnriched.length,
             payload: { categories },

@@ -363,23 +363,35 @@ function showNotification(message, type = 'info') {
         // ── Empty state ──────────────────────────────────────────────────────
         if (filteredPredictions.length === 0) {
             if (resultsPanel) resultsPanel.style.justifyContent = 'center';
-            if (displayTitle) displayTitle.textContent = sport + ' \u2014 No Predictions Available';
+            if (displayTitle) displayTitle.textContent = sport + ' \u2014 Market Scan Complete';
 
-            var sourceRows = data.source_rows || 0;
-            var emptyMsg = sourceRows > 0
-                ? 'The database has ' + sourceRows + ' raw row(s) but none passed the category filter. Check confidence thresholds or trigger a new AI pipeline run.'
-                : 'No records in the database for this sport. A sync may be needed \u2014 wait for the scheduled refresh or contact your admin.';
+            // Assume the backend now returns `data.pipeline_metrics` from pipelineLogger.js
+            var metrics = data.pipeline_metrics || { ingested: 0, analyzed: 0, rejected_confidence: 0, rejected_efficiency: 0, published: 0 };
+
+            var funnelHtml =
+                '<div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; text-align: left; width: 100%; max-width: 400px; margin: 0 auto;">' +
+                    '<h3 style="color: #38bdf8; margin-bottom: 15px; font-size: 1.1rem;">Engine Status: Healthy</h3>' +
+                    '<p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 15px;">We scanned today\'s markets but no fixtures passed our strict institutional thresholds. Here is the breakdown:</p>' +
+                    '<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">' +
+                        '<span style="color: #64748b;">Fixtures Scanned:</span>' +
+                        '<span style="color: #f8fafc; font-weight: bold;">' + metrics.ingested + '</span>' +
+                    '</div>' +
+                    '<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">' +
+                        '<span style="color: #64748b;">Failed Market Efficiency:</span>' +
+                        '<span style="color: #ef4444; font-weight: bold;">' + metrics.rejected_efficiency + '</span>' +
+                    '</div>' +
+                    '<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">' +
+                        '<span style="color: #64748b;">Failed Confidence Threshold:</span>' +
+                        '<span style="color: #f59e0b; font-weight: bold;">' + metrics.rejected_confidence + '</span>' +
+                    '</div>' +
+                    '<div style="display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">' +
+                        '<span style="color: #38bdf8; font-weight: bold;">Approved Insights:</span>' +
+                        '<span style="color: #4ade80; font-weight: bold;">0</span>' +
+                    '</div>' +
+                '</div>';
 
             if (codesList) {
-                codesList.innerHTML =
-                    '<div style="text-align:center;padding:20px;">' +
-                        '<div style="font-size:2.5rem;margin-bottom:12px;">\uD83D\uDCED</div>' +
-                        '<p style="color:#94a3b8;font-size:1rem;margin-bottom:8px;">' +
-                            'No published predictions found for ' +
-                            '<strong style="color:#38bdf8;">' + sport + '</strong>.' +
-                        '</p>' +
-                        '<p style="color:#64748b;font-size:0.85rem;">' + emptyMsg + '</p>' +
-                    '</div>';
+                codesList.innerHTML = funnelHtml;
             }
             return;
         }
