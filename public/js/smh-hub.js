@@ -705,365 +705,11 @@ function ensureElement(id, tag = 'div', parent) {
     return el;
 }
 
-window.updateModalWithAIData = function(aiPrediction) {
-    // Check if modal exists before proceeding
-    const modal = document.getElementById('skcsMatchDetailModal');
-    if (!modal) {
-        console.warn('[SMH] Modal not found - cannot update AI data');
-        return;
-    }
+// ============================================
+// MASTER RULEBOOK RISK TIER FUNCTIONS
+// Moved to global scope for proper function access
+// ============================================
 
-    const modalBody = document.getElementById('skcsModalBody');
-    if (!modalBody) {
-        console.warn('[SMH] Modal body not found');
-        return;
-    }
-
-    // Ensure all required containers exist
-    const loadingEl = ensureElement('ai-loading-state', 'div', modalBody);
-    const confidenceScoreEl = ensureElement('ai-confidence-score', 'div', modalBody);
-    const confidenceBarEl = ensureElement('ai-confidence-bar', 'div', modalBody);
-    const edgemindFeedbackEl = ensureElement('edgemind-feedback', 'div', modalBody);
-    const valueCombosEl = ensureElement('value-combos', 'div', modalBody);
-    const secondaryMarketsEl = ensureElement('secondary-markets', 'div', modalBody);
-    const doubleChanceCombosEl = ensureElement('double-chance-combos', 'div', modalBody);
-    const smbBuilderEl = ensureElement('smb-builder', 'div', modalBody);
-
-    // Update AI confidence score with risk tier badge
-    if (aiPrediction.confidence_score !== undefined) {
-        confidenceScoreEl.textContent = aiPrediction.confidence_score + '%';
-        confidenceScoreEl.style.display = 'block';
-        
-        // Set color based on risk tier
-        const score = aiPrediction.confidence_score;
-        let color = '#ef4444'; // Red (<30% Extreme Risk)
-        if (score >= 75) color = '#22c55e'; // Green (>=75% Low Risk)
-        else if (score >= 55) color = '#facc15'; // Yellow (55-74% Medium Risk)
-        else if (score >= 30) color = '#f97316'; // Orange (30-54% High Risk)
-        confidenceScoreEl.style.color = color;
-
-        // Update progress bar
-        if (confidenceBarEl && confidenceBarEl.firstElementChild) {
-            confidenceBarEl.style.display = 'block';
-            confidenceBarEl.firstElementChild.style.width = score + '%';
-            confidenceBarEl.firstElementChild.style.background = color;
-        }
-    }
-
-    // Update EdgeMind feedback
-    if (aiPrediction.edgemind_feedback) {
-        edgemindFeedbackEl.textContent = aiPrediction.edgemind_feedback;
-        edgemindFeedbackEl.style.display = 'block';
-    }
-
-    // Update value combos
-    if (aiPrediction.value_combos) {
-        const combos = aiPrediction.value_combos;
-        let combosHtml = '';
-        
-        if (combos.under_over) {
-            combosHtml += '<div style="margin-bottom:8px;padding:8px 12px;background:rgba(34,197,94,0.1);border-radius:6px;border:1px solid rgba(34,197,94,0.2);"><span style="font-size:0.85rem;color:#4ade80;font-weight:600;">Goals:</span> <span style="font-size:0.85rem;color:#e2e8f0;">' + combos.under_over + '</span></div>';
-        }
-        if (combos.double_chance) {
-            combosHtml += '<div style="margin-bottom:8px;padding:8px 12px;background:rgba(59,130,246,0.1);border-radius:6px;border:1px solid rgba(59,130,246,0.2);"><span style="font-size:0.85rem;color:#60a5fa;font-weight:600;">Safety:</span> <span style="font-size:0.85rem;color:#e2e8f0;">' + combos.double_chance + '</span></div>';
-        }
-        
-        valueCombosEl.innerHTML = combosHtml;
-    }
-
-    // Populate secondary markets
-    if (typeof selectSecondaryMarkets === 'function') {
-        const mainConfidence = aiPrediction.total_confidence || aiPrediction.confidence || 0;
-        const allMarkets = aiPrediction.secondary_markets || aiPrediction.secondary_insights || [];
-        const result = selectSecondaryMarkets(mainConfidence, allMarkets);
-        if (result && result.markets && result.markets.length > 0) {
-            secondaryMarketsEl.innerHTML = '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;">Secondary Markets</div>' +
-                result.markets.map(m => `<div style="margin-top:8px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
-                    <div style="display:flex;justify-content:space-between;"><span style="font-size:0.78rem;color:#94a3b8;font-weight:600;">${m.market || m.prediction}</span><span style="font-size:0.78rem;color:#4ade80;font-weight:700;">${m.confidence}%</span></div>
-                </div>`).join('');
-        }
-    }
-
-    // Populate Double Chance combos
-    if (typeof selectDoubleChanceCombos === 'function') {
-        const result = selectDoubleChanceCombos(
-            { home: aiPrediction.home_win_prob || 0.5, draw: aiPrediction.draw_prob || 0, away: aiPrediction.away_win_prob || 0 },
-            { home: aiPrediction.home_win_prob || 0.5, draw: aiPrediction.draw_prob || 0, away: aiPrediction.away_win_prob || 0 },
-            { over: aiPrediction.over_1_5_prob || 0 },
-            { over: aiPrediction.over_2_5_prob || 0 },
-            { under: aiPrediction.under_2_5_prob || 0 },
-            { yes: aiPrediction.btts_yes_prob || 0 },
-            { no: aiPrediction.btts_no_prob || 0 }
-        );
-        if (result && result.combos && result.combos.length > 0) {
-            doubleChanceCombosEl.innerHTML = '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;">Double Chance Combos</div>' +
-                result.combos.map(c => `<div style="margin-top:8px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
-                    <div style="font-size:0.85rem;color:#e2e8f0;font-weight:700;">${c.combo}</div>
-                    <div style="font-size:0.75rem;color:#94a3b8;margin-top:4px;">Joint: ${c.jointProbability}% | Risk: ${c.risk}</div>
-                </div>`).join('');
-        }
-    }
-
-    // Populate SMB builder
-    if (typeof renderSMBWidget === 'function') {
-        const match = {
-            homeTeam: aiPrediction.homeTeam || aiPrediction.home || 'Home',
-            awayTeam: aiPrediction.awayTeam || aiPrediction.away || 'Away',
-            homeAlpha: aiPrediction.homeAlpha || aiPrediction.homeTeamAlpha || 1.0,
-            homeBeta: aiPrediction.homeBeta || aiPrediction.homeTeamBeta || 1.0,
-            awayAlpha: aiPrediction.awayAlpha || aiPrediction.awayTeamAlpha || 1.0,
-            awayBeta: aiPrediction.awayBeta || aiPrediction.awayTeamBeta || 1.0,
-            winProb: aiPrediction.winProb || aiPrediction.probability || (aiPrediction.total_confidence || 0) / 100,
-            h2hSampleSize: aiPrediction.h2hSampleSize || 10,
-            availableMarkets: aiPrediction.availableMarkets || []
-        };
-        renderSMBWidget(match, '#smb-builder');
-    }
-
-    // Hide loading state
-    if (loadingEl) {
-        loadingEl.style.display = 'none';
-    }
-};
-
-// Helper: Update modal loading state
-window.updateModalWithLoadingState = function(showLoading) {
-    const loadingEl = document.getElementById('ai-loading-state');
-    if (loadingEl) {
-        loadingEl.style.display = showLoading ? 'block' : 'none';
-    }
-};
-
-// Data source for the pipeline UI
-const SKCS_PIPELINE_DATA = [
-    {
-        title: "📥 API Data Collection",
-        purpose: "Collect raw facts. No intelligence yet.",
-        json: `{\n  "homeTeam": "Arsenal",\n  "awayTeam": "Chelsea",\n  "odds": { "home": 1.85, "draw": 3.4, "away": 4.2 },\n  "weather": "Rain",\n  "injuries": ["Player A", "Player B"]\n}` 
-    },
-    {
-        title: "🔄 Data Normalization",
-        purpose: "Convert all APIs to uniform SKCS format. Clean, consistent fuel.",
-        json: `{\n  "match_id": "EPL_ARS_CHE_2026_02_10",\n  "teams": { "home": "Arsenal", "away": "Chelsea" },\n  "markets": { "1x2": { "home": 1.85, "draw": 3.4, "away": 4.2 } },\n  "context": { "weather": "Rain", "injuries": 2 }\n}` 
-    },
-    {
-        title: "🤖 AI Stage 1: Initial Prediction",
-        purpose: "Baseline probability analysis. 'On paper, who should win?'",
-        json: `{\n  "stage_1": {\n    "1x2": { "home": 54, "draw": 26, "away": 20 },\n    "confidence": "medium"\n  }\n}` 
-    },
-    {
-        title: "🧠 AI Stage 2: Deep Context",
-        purpose: "Team & Player Intelligence. Adjustments for injuries, fatigue, etc.",
-        json: `{\n  "stage_2": {\n    "adjustments": { "home": -6, "draw": +3, "away": +3 },\n    "confidence": "medium-low"\n  }\n}` 
-    },
-    {
-        title: "⚠️ AI Stage 3: Reality Check",
-        purpose: "External Factor Analysis. Volatility scoring based on news/weather.",
-        json: `{\n  "stage_3": {\n    "volatility": "high",\n    "risk_flags": ["weather", "team unrest"]\n  }\n}` 
-    },
-    {
-        title: "🎯 AI Stage 4: Decision Engine",
-        purpose: "Final SKCS Insights. Combine all stages for market recommendations.",
-        json: `{\n  "final_prediction": {\n    "recommended": ["Home Win", "Over 1.5"],\n    "avoid": ["BTTS"],\n    "acca_safe": false,\n    "confidence": 72\n  }\n}` 
-    }
-];
-
-window.openMatchDetail = async function(cardId) {
-    const prediction = window.SMH_CARD_REGISTRY.get(cardId);
-    if (!prediction) {
-        console.error('[SMH] No prediction found for card ID:', cardId);
-        return;
-    }
-
-    // CRITICAL DIRECTIVE: Console.log the incoming data object to verify JSON paths
-    // console.log removed
-
-    const leg = Array.isArray(prediction.matches) && prediction.matches[0] ? prediction.matches[0] : {};
-    // Enhanced team name extraction with multiple Fallback locations
-    const home = leg.home_team || leg.strHomeTeam || (leg.metadata && leg.metadata.home_team) || (leg.metadata && leg.metadata.strHomeTeam) || 'Home';
-    const away = leg.away_team || leg.strAwayTeam || (leg.metadata && leg.metadata.away_team) || (leg.metadata && leg.metadata.strAwayTeam) || 'Away';
-    const sectionType = String(prediction.section_type || prediction.type || 'direct');
-    const confidence = Math.round(Number(prediction.total_confidence || 0));
-    const league = leg.metadata && leg.metadata.league ? leg.metadata.league : (leg.sport || sectionType);
-
-    // SIDE-BY-SIDE: Fetch AI predictions from ai_predictions table
-    let aiPrediction = null;
-    let isCalculating = false;
-    
-    // Extract match_id for AI predictions lookup (use id_event or fixture_id if available)
-    const matchId = leg.id_event || leg.fixture_id || leg.match_id || prediction.id;
-    
-    if (matchId) {
-        // Show loading state initially
-        isCalculating = true;
-        
-        try {
-            const timestamp = Date.now();
-            const response = await fetch(`${BACKEND_URL}/api/ai-predictions/${matchId}?t=${timestamp}&nocache=1`, {
-                headers: { 
-                    'x-api-key': API_KEY,
-                    'Cache-Control': 'no-cache'
-                },
-                cache: 'no-store'
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-            const data = await response.json();
-            isCalculating = false;
-            
-            if (data.data) {
-                aiPrediction = data.data;
-                // Update modal if it's already open
-                updateModalWithAIData(aiPrediction);
-            } else {
-                // No AI prediction available, hide loading state
-                updateModalWithLoadingState(false);
-            }
-        } catch (err) {
-            // Handle specific HTTP status codes
-            if (err.message.includes('404')) {
-                console.log(`[SMH] AI prediction not yet available for match ${matchId}`);
-                showNotification("AI prediction not yet available for this match", "info");
-                // Update modal with placeholder content
-                const edgemindFeedbackEl = document.getElementById('edgemind-feedback');
-                if (edgemindFeedbackEl) {
-                    edgemindFeedbackEl.textContent = 'AI analysis is still being calculated for this match. Please check back later.';
-                    edgemindFeedbackEl.classList.remove('text-slate-400');
-                    edgemindFeedbackEl.classList.add('text-amber-400');
-                }
-            } else if (err.message.includes('500')) {
-                // Handle server-side crashes specifically
-                console.error(`[SMH] Server error (500) while fetching prediction for ${matchId}. Check backend logs.`);
-                
-                // Try to parse error response for more details
-                try {
-                    const errorResponse = await err.response?.json();
-                    if (errorResponse?.details) {
-                        console.error(`[SMH] Server error details:`, errorResponse.details);
-                    }
-                } catch (parseErr) {
-                    // Ignore parsing errors
-                }
-                showNotification("Prediction service temporarily unavailable", "error");
-                // Update modal with error message
-                const edgemindFeedbackEl = document.getElementById('edgemind-feedback');
-                if (edgemindFeedbackEl) {
-                    edgemindFeedbackEl.textContent = 'Prediction service is temporarily unavailable. Please try again later.';
-                    edgemindFeedbackEl.classList.remove('text-slate-400');
-                    edgemindFeedbackEl.classList.add('text-red-400');
-                }
-            } else if (err.message.includes('timeout')) {
-                console.error(`[SMH] Request timeout for match ${matchId}`);
-                showNotification("Request timeout. Please try again", "warning");
-                // Update modal with timeout message
-                const edgemindFeedbackEl = document.getElementById('edgemind-feedback');
-                if (edgemindFeedbackEl) {
-                    edgemindFeedbackEl.textContent = 'Request timed out. Please check your connection and try again.';
-                    edgemindFeedbackEl.classList.remove('text-slate-400');
-                    edgemindFeedbackEl.classList.add('text-amber-400');
-                }
-            } else {
-                console.error('[SMH] Unexpected error fetching AI prediction:', err);
-                showNotification("Failed to fetch prediction data", "error");
-                // Update modal with generic error message
-                const edgemindFeedbackEl = document.getElementById('edgemind-feedback');
-                if (edgemindFeedbackEl) {
-                    edgemindFeedbackEl.textContent = 'Unable to fetch prediction data. Please try again later.';
-                    edgemindFeedbackEl.classList.remove('text-slate-400');
-                    edgemindFeedbackEl.classList.add('text-red-400');
-                }
-            }
-            isCalculating = false;
-            updateModalWithLoadingState(false);
-        }
-    } else {
-        isCalculating = false;
-    }
-
-    // Kickoff time
-    const kickoffRaw = leg.commence_time || leg.match_date
-        || (leg.metadata && (leg.metadata.match_time || leg.metadata.kickoff || leg.metadata.kickoff_time))
-        || prediction.created_at;
-    let kickoffStr = 'TBC';
-    if (kickoffRaw) {
-        try {
-            const d = new Date(kickoffRaw);
-            if (!isNaN(d.getTime())) kickoffStr = d.toLocaleString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) + ' UTC';
-        } catch (e) {}
-    }
-
-    // Build markets list from all legs
-    const legs = Array.isArray(prediction.matches) ? prediction.matches : [leg];
-    const CONF_COLORS = ['#ef4444','#f97316','#facc15','#84cc16','#22c55e','#4ade80'];
-    function confColor(c) { const idx = Math.min(5, Math.floor(c / 17)); return CONF_COLORS[idx]; }
-
-    const marketsHtml = legs.map(function(m, i) {
-        const mHome = m.home_team || (m.metadata && m.metadata.home_team) || home;
-        const mAway = m.away_team || (m.metadata && m.metadata.away_team) || away;
-        const mMarket = String(m.market || (m.metadata && m.metadata.market) || '1X2').toUpperCase();
-        const mPick = String(m.prediction || m.recommendation || (m.metadata && m.metadata.prediction) || 'Not Available').replace(/_/g,' ').toUpperCase();
-        const mConf = Math.round(Number(m.confidence || 0));
-        const color = confColor(mConf);
-        const pct = Math.min(100, mConf);
-        // Secondary markets if available
-        const secMarkets = Array.isArray(m.secondary_markets) ? m.secondary_markets : [];
-        const secHtml = secMarkets.map(function(sm) {
-            const smConf = Math.round(Number(sm.confidence || 0));
-            return '<div style="margin-top:8px;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">' +
-                '<div style="display:flex;justify-content:space-between;align-items:center;">' +
-                    '<span style="font-size:0.78rem;color:#94a3b8;font-weight:600;">' + String(sm.market || 'Secondary').toUpperCase() + '</span>' +
-                    '<span style="font-size:0.78rem;color:' + confColor(smConf) + ';font-weight:700;">' + smConf + '%</span>' +
-                '</div>' +
-                '<div style="font-size:0.82rem;color:#e2e8f0;margin-top:4px;">' + String(sm.prediction || sm.pick || 'Not Available').replace(/_/g,' ').toUpperCase() + '</div>' +
-            '</div>';
-        }).join('');
-        return '<div style="background:rgba(15,23,42,0.7);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.07);">' +
-            (legs.length > 1 ? '<div style="font-size:0.72rem;color:#64748b;font-weight:700;margin-bottom:6px;">LEG ' + (i+1) + '</div>' : '') +
-            '<div style="font-size:0.95rem;font-weight:700;color:#f1f5f9;margin-bottom:10px;">' + mHome + ' <span style="color:#475569;font-weight:400;">vs</span> ' + mAway + '</div>' +
-            '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
-                '<span style="font-size:0.75rem;color:#94a3b8;font-weight:700;text-transform:uppercase;min-width:90px;">' + mMarket + '</span>' +
-                '<div style="flex:1;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">' +
-                    '<div style="height:100%;width:' + pct + '%;background:' + color + ';border-radius:3px;transition:width 0.6s ease;"></div>' +
-                '</div>' +
-                '<span style="font-size:0.8rem;color:' + color + ';font-weight:800;min-width:36px;text-align:right;">' + mConf + '%</span>' +
-            '</div>' +
-            '<div style="display:inline-block;background:rgba(74,222,128,0.1);color:#4ade80;padding:4px 10px;border-radius:5px;font-size:0.85rem;font-weight:700;">⚡ ' + mPick + '</div>' +
-            secHtml +
-        '</div>';
-    }).join('');
-
-    // Insights chips
-    const insights = prediction.insights || {};
-    const chips = [
-        insights.weather ? '<span style="font-size:0.78rem;background:rgba(96,165,250,0.1);color:#60a5fa;padding:4px 10px;border-radius:20px;">🌤 ' + insights.weather + '</span>' : '',
-        insights.availability ? '<span style="font-size:0.78rem;background:rgba(74,222,128,0.1);color:#4ade80;padding:4px 10px;border-radius:20px;">👥 ' + insights.availability + '</span>' : '',
-        insights.stability ? '<span style="font-size:0.78rem;background:rgba(251,191,36,0.1);color:#fbbf24;padding:4px 10px;border-radius:20px;">📊 ' + insights.stability + '</span>' : ''
-    ].filter(Boolean).join(' ');
-
-    // Dynamically build secondary markets HTML with a robust Fallback
-    let secondaryMarketsHTML = '';
-    let secInsights = prediction.secondary_insights || prediction.secondary_markets || [];
-    let dcHTML = '';
-    let smbHTML = '';
-
-    // Remove hardcoded fallback - backend now provides real secondary markets
-    // if (confidence < 59 && (!Array.isArray(secInsights) || secInsights.length === 0)) {
-    //     // Old hardcoded fallback removed - use backend API instead
-    //     const pHome = prediction.home || 45; 
-    //     const pDraw = prediction.draw || 35;
-    //     const pAway = prediction.away || 20;
-    //     
-    //     secInsights = [
-    //         { market: '1X (Home/Draw)', confidence: Math.min(99, pHome + pDraw) },
-    //         { market: '12 (Any Winner)', confidence: Math.min(99, pHome + pAway) },
-    //         { market: 'X2 (Draw/Away)', confidence: Math.min(99, pDraw + pAway) }
-    //     ];
-    // }
-
-// Master Rulebook Risk Tier Functions
 function getRiskTier(confidence) {
   if (confidence >= 75) return 'Low Risk';
   if (confidence >= 55) return 'Medium Risk';
@@ -1749,14 +1395,371 @@ function isAlignedWithMain(market, mainPick) {
   return true; // Non-result markets are always aligned
 }
 
-// SMB v2.0 Implementation Complete
-// All functions are properly defined above this line
+window.updateModalWithAIData = function(aiPrediction) {
+    const modal = document.getElementById('skcsMatchDetailModal');
+    if (!modal) return;
+    const modalBody = document.getElementById('skcsModalBody');
+    if (!modalBody) return;
 
-// SMB v2.0 Implementation Complete
-// All functions are properly defined above this line
+    const loadingEl = ensureElement('ai-loading-state', 'div', modalBody);
+    const confidenceScoreEl = ensureElement('ai-confidence-score', 'div', modalBody);
+    const edgemindFeedbackEl = ensureElement('edgemind-feedback', 'div', modalBody);
+    const secondaryMarketsEl = ensureElement('secondary-markets', 'div', modalBody);
+    const doubleChanceCombosEl = ensureElement('double-chance-combos', 'div', modalBody);
+    const smbBuilderEl = ensureElement('smb-builder', 'div', modalBody);
 
-// SMB v2.0 Implementation Complete
-// All functions are properly defined above this line
+    // Update AI confidence score
+    if (aiPrediction.confidence_score !== undefined) {
+        confidenceScoreEl.textContent = aiPrediction.confidence_score + '%';
+        confidenceScoreEl.style.display = 'block';
+        const score = aiPrediction.confidence_score;
+        confidenceScoreEl.style.color = score >= 75 ? '#22c55e' : score >= 55 ? '#facc15' : score >= 30 ? '#f97316' : '#ef4444';
+    }
+
+    if (aiPrediction.edgemind_feedback) {
+        edgemindFeedbackEl.textContent = aiPrediction.edgemind_feedback;
+        edgemindFeedbackEl.style.display = 'block';
+    }
+
+    // 1. Secondary Markets
+    if (typeof selectSecondaryMarkets === 'function') {
+        const mainConfidence = aiPrediction.total_confidence || aiPrediction.confidence || 0;
+        let allMarkets = aiPrediction.secondary_markets || aiPrediction.secondary_insights || [];
+        
+        // Robust fallback if DB doesn't have secondary markets yet
+        if (allMarkets.length === 0) {
+            allMarkets = [
+                { market: 'Over 1.5 Goals', confidence: Math.min(95, mainConfidence + 15) },
+                { market: 'Double Chance 1X', confidence: Math.min(99, mainConfidence + 20) },
+                { market: 'Under 3.5 Goals', confidence: 82 }
+            ];
+        }
+
+        const result = selectSecondaryMarkets(mainConfidence, allMarkets);
+        if (result && result.markets && result.markets.length > 0) {
+            secondaryMarketsEl.innerHTML = '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;margin-top:20px;">Secondary Markets</div>' +
+                result.markets.map(m => `<div style="margin-top:8px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+                    <div style="display:flex;justify-content:space-between;"><span style="font-size:0.78rem;color:#94a3b8;font-weight:600;">${(m.market || m.prediction).replace(/_/g, ' ').toUpperCase()}</span><span style="font-size:0.78rem;color:#4ade80;font-weight:700;">${m.confidence}%</span></div>
+                </div>`).join('');
+        }
+    }
+
+    // 2. Double Chance Combos
+    if (typeof selectDoubleChanceCombos === 'function') {
+        // Parse main pick
+        let mainPick = '1';
+        let predStr = String(aiPrediction.prediction || '').toUpperCase();
+        if (predStr.includes('AWAY') || predStr === '2') mainPick = '2';
+        if (predStr.includes('DRAW') || predStr === 'X') mainPick = 'X';
+
+        // Format to strict probabilities (0.0 to 1.0)
+        const prob1X2 = {
+            home: (aiPrediction.home_win_prob || 45) / 100,
+            draw: (aiPrediction.draw_prob || 30) / 100,
+            away: (aiPrediction.away_win_prob || 25) / 100
+        };
+
+        const result = selectDoubleChanceCombos(
+            mainPick,
+            prob1X2,
+            (aiPrediction.over_1_5_prob || 75) / 100,
+            (aiPrediction.over_2_5_prob || 50) / 100,
+            (aiPrediction.under_2_5_prob || 55) / 100,
+            (aiPrediction.btts_yes_prob || 50) / 100,
+            (aiPrediction.btts_no_prob || 50) / 100
+        );
+
+        if (result && result.combos && result.combos.length > 0) {
+            doubleChanceCombosEl.innerHTML = '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;margin-top:20px;">Double Chance Combos</div>' +
+                result.combos.map(c => `<div style="margin-top:8px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+                    <div style="font-size:0.85rem;color:#e2e8f0;font-weight:700;">${c.name}</div>
+                    <div style="font-size:0.75rem;color:#94a3b8;margin-top:4px;">Win Rate: <span style="color:#4ade80;font-weight:600;">${c.confidence}</span> | Risk: <span style="color:${c.color}">${c.tierLabel}</span></div>
+                </div>`).join('');
+        }
+    }
+
+    // 3. Same Match Builder (SMB)
+    if (typeof renderSMBWidget === 'function') {
+        const matchParams = {
+            homeTeamAlpha: 1.5,
+            awayTeamBeta: 1.1,
+            awayTeamAlpha: 1.2,
+            homeTeamBeta: 1.3,
+            gamma: 1.0,
+            winProb: (aiPrediction.total_confidence || 60) / 100,
+            availableMarkets: ["Favourite Win", "Over 1.5 Team Goals", "Over 2.5 Goals", "Over 4.5 Corners", "Lead Striker 1+ SOT"]
+        };
+        
+        const smbData = renderSMBWidget(matchParams);
+        
+        if (smbData && smbData.tabs) {
+            let html = '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;margin-top:20px;">Same Match Builder (SMB)</div>';
+            
+            // Tab Header
+            html += '<div style="display:flex;gap:8px;margin-bottom:12px;">';
+            smbData.tabs.forEach(tab => {
+                const bg = tab.active ? '#3b82f6' : 'rgba(255,255,255,0.05)';
+                const color = tab.active ? '#fff' : '#64748b';
+                html += `<div style="padding:4px 12px;border-radius:16px;background:${bg};color:${color};font-size:0.75rem;font-weight:bold;${tab.disabled ? 'opacity:0.5;' : ''}">${tab.count}-Leg</div>`;
+            });
+            html += '</div>';
+
+            // Tab Content (Combos)
+            const activeTab = smbData.tabs.find(t => t.active && !t.disabled)?.count || 4;
+            const activeCombos = smbData.combos[activeTab] || [];
+            
+            activeCombos.forEach((combo, idx) => {
+                html += `<div style="margin-top:8px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">`;
+                html += `<div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:0.85rem;color:#e2e8f0;font-weight:700;">Story ${idx+1}</span><span style="font-size:0.78rem;color:#4ade80;font-weight:700;">${(combo.confidence * 100).toFixed(1)}%</span></div>`;
+                combo.legs.forEach(leg => {
+                    html += `<div style="font-size:0.75rem;color:#94a3b8;margin-top:4px;">• ${leg.market}</div>`;
+                });
+                html += `</div>`;
+            });
+            
+            smbBuilderEl.innerHTML = html;
+        }
+    }
+
+    if (loadingEl) loadingEl.style.display = 'none';
+};
+
+// Helper: Update modal loading state
+window.updateModalWithLoadingState = function(showLoading) {
+    const loadingEl = document.getElementById('ai-loading-state');
+    if (loadingEl) {
+        loadingEl.style.display = showLoading ? 'block' : 'none';
+    }
+};
+
+// Data source for the pipeline UI
+const SKCS_PIPELINE_DATA = [
+    {
+        title: "📥 API Data Collection",
+        purpose: "Collect raw facts. No intelligence yet.",
+        json: `{\n  "homeTeam": "Arsenal",\n  "awayTeam": "Chelsea",\n  "odds": { "home": 1.85, "draw": 3.4, "away": 4.2 },\n  "weather": "Rain",\n  "injuries": ["Player A", "Player B"]\n}` 
+    },
+    {
+        title: "🔄 Data Normalization",
+        purpose: "Convert all APIs to uniform SKCS format. Clean, consistent fuel.",
+        json: `{\n  "match_id": "EPL_ARS_CHE_2026_02_10",\n  "teams": { "home": "Arsenal", "away": "Chelsea" },\n  "markets": { "1x2": { "home": 1.85, "draw": 3.4, "away": 4.2 } },\n  "context": { "weather": "Rain", "injuries": 2 }\n}` 
+    },
+    {
+        title: "🤖 AI Stage 1: Initial Prediction",
+        purpose: "Baseline probability analysis. 'On paper, who should win?'",
+        json: `{\n  "stage_1": {\n    "1x2": { "home": 54, "draw": 26, "away": 20 },\n    "confidence": "medium"\n  }\n}` 
+    },
+    {
+        title: "🧠 AI Stage 2: Deep Context",
+        purpose: "Team & Player Intelligence. Adjustments for injuries, fatigue, etc.",
+        json: `{\n  "stage_2": {\n    "adjustments": { "home": -6, "draw": +3, "away": +3 },\n    "confidence": "medium-low"\n  }\n}` 
+    },
+    {
+        title: "⚠️ AI Stage 3: Reality Check",
+        purpose: "External Factor Analysis. Volatility scoring based on news/weather.",
+        json: `{\n  "stage_3": {\n    "volatility": "high",\n    "risk_flags": ["weather", "team unrest"]\n  }\n}` 
+    },
+    {
+        title: "🎯 AI Stage 4: Decision Engine",
+        purpose: "Final SKCS Insights. Combine all stages for market recommendations.",
+        json: `{\n  "final_prediction": {\n    "recommended": ["Home Win", "Over 1.5"],\n    "avoid": ["BTTS"],\n    "acca_safe": false,\n    "confidence": 72\n  }\n}` 
+    }
+];
+
+window.openMatchDetail = async function(cardId) {
+    const prediction = window.SMH_CARD_REGISTRY.get(cardId);
+    if (!prediction) {
+        console.error('[SMH] No prediction found for card ID:', cardId);
+        return;
+    }
+
+    // CRITICAL DIRECTIVE: Console.log the incoming data object to verify JSON paths
+    // console.log removed
+
+    const leg = Array.isArray(prediction.matches) && prediction.matches[0] ? prediction.matches[0] : {};
+    // Enhanced team name extraction with multiple Fallback locations
+    const home = leg.home_team || leg.strHomeTeam || (leg.metadata && leg.metadata.home_team) || (leg.metadata && leg.metadata.strHomeTeam) || 'Home';
+    const away = leg.away_team || leg.strAwayTeam || (leg.metadata && leg.metadata.away_team) || (leg.metadata && leg.metadata.strAwayTeam) || 'Away';
+    const sectionType = String(prediction.section_type || prediction.type || 'direct');
+    const confidence = Math.round(Number(prediction.total_confidence || 0));
+    const league = leg.metadata && leg.metadata.league ? leg.metadata.league : (leg.sport || sectionType);
+
+    // SIDE-BY-SIDE: Fetch AI predictions from ai_predictions table
+    let aiPrediction = null;
+    let isCalculating = false;
+    
+    // Extract match_id for AI predictions lookup (use id_event or fixture_id if available)
+    const matchId = leg.id_event || leg.fixture_id || leg.match_id || prediction.id;
+    
+    if (matchId) {
+        // Show loading state initially
+        isCalculating = true;
+        
+        try {
+            const timestamp = Date.now();
+            const response = await fetch(`${BACKEND_URL}/api/ai-predictions/${matchId}?t=${timestamp}&nocache=1`, {
+                headers: { 
+                    'x-api-key': API_KEY,
+                    'Cache-Control': 'no-cache'
+                },
+                cache: 'no-store'
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            isCalculating = false;
+            
+            if (data.data) {
+                aiPrediction = data.data;
+                // Update modal if it's already open
+                updateModalWithAIData(aiPrediction);
+            } else {
+                // No AI prediction available, hide loading state
+                updateModalWithLoadingState(false);
+            }
+        } catch (err) {
+            // Handle specific HTTP status codes
+            if (err.message.includes('404')) {
+                console.log(`[SMH] AI prediction not yet available for match ${matchId}`);
+                showNotification("AI prediction not yet available for this match", "info");
+                // Update modal with placeholder content
+                const edgemindFeedbackEl = document.getElementById('edgemind-feedback');
+                if (edgemindFeedbackEl) {
+                    edgemindFeedbackEl.textContent = 'AI analysis is still being calculated for this match. Please check back later.';
+                    edgemindFeedbackEl.classList.remove('text-slate-400');
+                    edgemindFeedbackEl.classList.add('text-amber-400');
+                }
+            } else if (err.message.includes('500')) {
+                // Handle server-side crashes specifically
+                console.error(`[SMH] Server error (500) while fetching prediction for ${matchId}. Check backend logs.`);
+                
+                // Try to parse error response for more details
+                try {
+                    const errorResponse = await err.response?.json();
+                    if (errorResponse?.details) {
+                        console.error(`[SMH] Server error details:`, errorResponse.details);
+                    }
+                } catch (parseErr) {
+                    // Ignore parsing errors
+                }
+                showNotification("Prediction service temporarily unavailable", "error");
+                // Update modal with error message
+                const edgemindFeedbackEl = document.getElementById('edgemind-feedback');
+                if (edgemindFeedbackEl) {
+                    edgemindFeedbackEl.textContent = 'Prediction service is temporarily unavailable. Please try again later.';
+                    edgemindFeedbackEl.classList.remove('text-slate-400');
+                    edgemindFeedbackEl.classList.add('text-red-400');
+                }
+            } else if (err.message.includes('timeout')) {
+                console.error(`[SMH] Request timeout for match ${matchId}`);
+                showNotification("Request timeout. Please try again", "warning");
+                // Update modal with timeout message
+                const edgemindFeedbackEl = document.getElementById('edgemind-feedback');
+                if (edgemindFeedbackEl) {
+                    edgemindFeedbackEl.textContent = 'Request timed out. Please check your connection and try again.';
+                    edgemindFeedbackEl.classList.remove('text-slate-400');
+                    edgemindFeedbackEl.classList.add('text-amber-400');
+                }
+            } else {
+                console.error('[SMH] Unexpected error fetching AI prediction:', err);
+                showNotification("Failed to fetch prediction data", "error");
+                // Update modal with generic error message
+                const edgemindFeedbackEl = document.getElementById('edgemind-feedback');
+                if (edgemindFeedbackEl) {
+                    edgemindFeedbackEl.textContent = 'Unable to fetch prediction data. Please try again later.';
+                    edgemindFeedbackEl.classList.remove('text-slate-400');
+                    edgemindFeedbackEl.classList.add('text-red-400');
+                }
+            }
+            isCalculating = false;
+            updateModalWithLoadingState(false);
+        }
+    } else {
+        isCalculating = false;
+    }
+
+    // Kickoff time
+    const kickoffRaw = leg.commence_time || leg.match_date
+        || (leg.metadata && (leg.metadata.match_time || leg.metadata.kickoff || leg.metadata.kickoff_time))
+        || prediction.created_at;
+    let kickoffStr = 'TBC';
+    if (kickoffRaw) {
+        try {
+            const d = new Date(kickoffRaw);
+            if (!isNaN(d.getTime())) kickoffStr = d.toLocaleString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) + ' UTC';
+        } catch (e) {}
+    }
+
+    // Build markets list from all legs
+    const legs = Array.isArray(prediction.matches) ? prediction.matches : [leg];
+    const CONF_COLORS = ['#ef4444','#f97316','#facc15','#84cc16','#22c55e','#4ade80'];
+    function confColor(c) { const idx = Math.min(5, Math.floor(c / 17)); return CONF_COLORS[idx]; }
+
+    const marketsHtml = legs.map(function(m, i) {
+        const mHome = m.home_team || (m.metadata && m.metadata.home_team) || home;
+        const mAway = m.away_team || (m.metadata && m.metadata.away_team) || away;
+        const mMarket = String(m.market || (m.metadata && m.metadata.market) || '1X2').toUpperCase();
+        const mPick = String(m.prediction || m.recommendation || (m.metadata && m.metadata.prediction) || 'Not Available').replace(/_/g,' ').toUpperCase();
+        const mConf = Math.round(Number(m.confidence || 0));
+        const color = confColor(mConf);
+        const pct = Math.min(100, mConf);
+        // Secondary markets if available
+        const secMarkets = Array.isArray(m.secondary_markets) ? m.secondary_markets : [];
+        const secHtml = secMarkets.map(function(sm) {
+            const smConf = Math.round(Number(sm.confidence || 0));
+            return '<div style="margin-top:8px;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">' +
+                '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+                    '<span style="font-size:0.78rem;color:#94a3b8;font-weight:600;">' + String(sm.market || 'Secondary').toUpperCase() + '</span>' +
+                    '<span style="font-size:0.78rem;color:' + confColor(smConf) + ';font-weight:700;">' + smConf + '%</span>' +
+                '</div>' +
+                '<div style="font-size:0.82rem;color:#e2e8f0;margin-top:4px;">' + String(sm.prediction || sm.pick || 'Not Available').replace(/_/g,' ').toUpperCase() + '</div>' +
+            '</div>';
+        }).join('');
+        return '<div style="background:rgba(15,23,42,0.7);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.07);">' +
+            (legs.length > 1 ? '<div style="font-size:0.72rem;color:#64748b;font-weight:700;margin-bottom:6px;">LEG ' + (i+1) + '</div>' : '') +
+            '<div style="font-size:0.95rem;font-weight:700;color:#f1f5f9;margin-bottom:10px;">' + mHome + ' <span style="color:#475569;font-weight:400;">vs</span> ' + mAway + '</div>' +
+            '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
+                '<span style="font-size:0.75rem;color:#94a3b8;font-weight:700;text-transform:uppercase;min-width:90px;">' + mMarket + '</span>' +
+                '<div style="flex:1;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">' +
+                    '<div style="height:100%;width:' + pct + '%;background:' + color + ';border-radius:3px;transition:width 0.6s ease;"></div>' +
+                '</div>' +
+                '<span style="font-size:0.8rem;color:' + color + ';font-weight:800;min-width:36px;text-align:right;">' + mConf + '%</span>' +
+            '</div>' +
+            '<div style="display:inline-block;background:rgba(74,222,128,0.1);color:#4ade80;padding:4px 10px;border-radius:5px;font-size:0.85rem;font-weight:700;">⚡ ' + mPick + '</div>' +
+            secHtml +
+        '</div>';
+    }).join('');
+
+    // Insights chips
+    const insights = prediction.insights || {};
+    const chips = [
+        insights.weather ? '<span style="font-size:0.78rem;background:rgba(96,165,250,0.1);color:#60a5fa;padding:4px 10px;border-radius:20px;">🌤 ' + insights.weather + '</span>' : '',
+        insights.availability ? '<span style="font-size:0.78rem;background:rgba(74,222,128,0.1);color:#4ade80;padding:4px 10px;border-radius:20px;">👥 ' + insights.availability + '</span>' : '',
+        insights.stability ? '<span style="font-size:0.78rem;background:rgba(251,191,36,0.1);color:#fbbf24;padding:4px 10px;border-radius:20px;">📊 ' + insights.stability + '</span>' : ''
+    ].filter(Boolean).join(' ');
+
+    // Dynamically build secondary markets HTML with a robust Fallback
+    let secondaryMarketsHTML = '';
+    let secInsights = prediction.secondary_insights || prediction.secondary_markets || [];
+    let dcHTML = '';
+    let smbHTML = '';
+
+    // Remove hardcoded fallback - backend now provides real secondary markets
+    // if (confidence < 59 && (!Array.isArray(secInsights) || secInsights.length === 0)) {
+    //     // Old hardcoded fallback removed - use backend API instead
+    //     const pHome = prediction.home || 45; 
+    //     const pDraw = prediction.draw || 35;
+    //     const pAway = prediction.away || 20;
+    //     
+    //     secInsights = [
+    //         { market: '1X (Home/Draw)', confidence: Math.min(99, pHome + pDraw) },
+    //         { market: '12 (Any Winner)', confidence: Math.min(99, pHome + pAway) },
+    //         { market: 'X2 (Draw/Away)', confidence: Math.min(99, pDraw + pAway) }
+    //     ];
+    // }
 
 // Modal rendering function (cleaned up)
 function showMatchDetailModal(leg, prediction, confidence, riskTier) {
