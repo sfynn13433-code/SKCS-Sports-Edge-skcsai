@@ -575,9 +575,14 @@ class AIPipelineOrchestrator {
   }
 
   async getMinConfidence(sport) {
+    // PHASE 2: Query sport-specific thresholds
+    const normalizedSport = sport?.toLowerCase() || 'football';
     const { rows: [tierRule] } = await query(`
-      SELECT min_confidence FROM tier_rules WHERE tier = 'normal' LIMIT 1
-    `);
+      SELECT min_confidence FROM tier_rules
+      WHERE tier = 'normal' AND (sport = $1 OR sport IS NULL)
+      ORDER BY sport DESC NULLS LAST
+      LIMIT 1
+    `, [normalizedSport]);
     return tierRule?.min_confidence || 35;
   }
 

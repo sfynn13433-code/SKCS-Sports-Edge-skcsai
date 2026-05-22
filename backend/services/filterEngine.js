@@ -46,6 +46,7 @@ function normalizeRuleArray(value) {
 function mapRuleRow(rule) {
     return {
         tier: normalizeTier(rule?.tier),
+        sport: rule?.sport || null,
         min_confidence: Number(rule?.min_confidence),
         allowed_markets: normalizeRuleArray(rule?.allowed_markets),
         allowed_volatility: normalizeRuleArray(rule?.allowed_volatility),
@@ -64,7 +65,9 @@ async function fetchTierRulesMap() {
     const rulesMap = tierRules.reduce((acc, rule) => {
         try {
             const mapped = mapRuleRow(rule);
-            acc[mapped.tier] = mapped;
+            // PHASE 2: Build composite key for sport-specific rules
+            const key = mapped.sport ? `${mapped.tier}:${mapped.sport}` : mapped.tier;
+            acc[key] = mapped;
         } catch (_error) {
             console.warn(`[filterEngine] Ignoring unsupported tier_rules row: ${String(rule?.tier || '')}`);
         }
@@ -74,11 +77,16 @@ async function fetchTierRulesMap() {
     return rulesMap;
 }
 
-function getTierRules(tier, rulesMap) {
+function getTierRules(tier, rulesMap, sport = null) {
     const t = normalizeTier(tier);
-    const rules = rulesMap?.[t];
+    const normalizedSport = sport?.toLowerCase() || null;
+
+    // PHASE 2: Look for sport-specific rules first, fallback to default
+    const sportKey = normalizedSport ? `${t}:${normalizedSport}` : t;
+    const rules = rulesMap?.[sportKey] || rulesMap?.[t];
+
     if (!rules) {
-        throw new Error(`Missing tier_rules row for tier=${t}`);
+        throw new Error(`Missing tier_rules row for tier=${t}${normalizedSport ? `, sport=${normalizedSport}` : ''}`);
     }
     if (!Number.isFinite(rules.min_confidence)) {
         throw new Error(`Invalid min_confidence in tier_rules for tier=${t}`);
@@ -252,7 +260,6 @@ function evaluateRawAgainstTier(raw, rules) {
 
 async function filterRawPrediction({ rawId, tier, rulesMap }, client) {
     const activeRulesMap = rulesMap || await fetchTierRulesMap();
-    const rules = getTierRules(tier, activeRulesMap);
 
     const rawRes = await client.query('select * from predictions_raw where id = $1 limit 1;', [rawId]);
     if (!rawRes.rows.length) {
@@ -261,6 +268,12 @@ async function filterRawPrediction({ rawId, tier, rulesMap }, client) {
 
     const raw = rawRes.rows[0];
     validateRawPredictionForInsert(raw);
+
+    // PHASE 2: Extract sport from metadata for sport-specific thresholds
+    const metadata = getMetadata(raw);
+    const sport = metadata.sport || 'football';
+
+    const rules = getTierRules(tier, activeRulesMap, sport);
 
     const { is_valid, reject_reason, is_watchlist } = evaluateRawAgainstTier(raw, rules);
 

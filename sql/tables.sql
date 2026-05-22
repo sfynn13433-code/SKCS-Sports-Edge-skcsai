@@ -33,11 +33,13 @@ create table if not exists predictions_final (
 );
 
 create table if not exists tier_rules (
-    tier text primary key check (tier in ('normal', 'deep')),
+    tier text not null check (tier in ('normal', 'deep')),
+    sport text,
     min_confidence numeric not null,
     allowed_markets jsonb not null,
     max_acca_size integer not null,
-    allowed_volatility jsonb not null
+    allowed_volatility jsonb not null,
+    primary key (tier, sport)
 );
 
 create table if not exists acca_rules (
