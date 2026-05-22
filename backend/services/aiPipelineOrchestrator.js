@@ -310,17 +310,21 @@ class AIPipelineOrchestrator {
     try {
       // Apply tier rules and market governance
       const finalDecision = await this.generateFinalDecision(fixture, riskAssessedPrediction);
-      
+
+      // RETHINK SINGLE-USE TEAM: Apply weighted exposure penalty
+      const exposurePenalty = await this.calculateExposurePenalty(fixture);
+      const adjustedConfidence = Math.max(0, riskAssessedPrediction.confidence + exposurePenalty);
+
       // Check if confidence meets minimum thresholds
       const minConfidence = await this.getMinConfidence(sport);
-      const finalConfidence = Math.max(riskAssessedPrediction.confidence, minConfidence);
-      
+      const finalConfidence = Math.max(adjustedConfidence, minConfidence);
+
       // Determine risk tier
       const riskTier = this.determineRiskTier(finalConfidence);
-      
+
       // Generate secondary insights if needed
       const secondaryInsights = await this.generateSecondaryInsights(fixture, riskAssessedPrediction, riskTier);
-      
+
       return {
         stage: 'final_decision',
         prediction: riskAssessedPrediction.prediction,
@@ -332,6 +336,7 @@ class AIPipelineOrchestrator {
         risk_flags: riskAssessedPrediction.risk_flags,
         volatility: riskAssessedPrediction.volatility_score,
         meets_threshold: finalConfidence >= minConfidence,
+        exposure_penalty: exposurePenalty,
         recommendation: this.generateRecommendation(riskAssessedPrediction, riskTier)
       };
 
@@ -625,6 +630,64 @@ class AIPipelineOrchestrator {
       edgemind_report: `AI analysis complete. Confidence: ${riskAssessedPrediction.confidence}%. Risk level: ${riskAssessedPrediction.volatility_score}.`,
       recommendation: riskAssessedPrediction.confidence >= 75 ? 'CONSIDER' : 'AVOID'
     };
+  }
+
+  async calculateExposurePenalty(fixture) {
+    try {
+      // Get team IDs from fixture
+      const homeTeamId = fixture.home_team_id;
+      const awayTeamId = fixture.away_team_id;
+
+      if (!homeTeamId || !awayTeamId) {
+        return 0; // No penalty if team IDs missing
+      }
+
+      // Count appearances in last 7 days for both teams
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+      const { rows: homeAppearances } = await query(`
+        SELECT COUNT(*) as count
+        FROM direct1x2_prediction_final
+        WHERE (matches->0->>'home_team_id' = $1 OR matches->0->>'away_team_id' = $1)
+          AND created_at >= $2
+      `, [homeTeamId, sevenDaysAgo]);
+
+      const { rows: awayAppearances } = await query(`
+        SELECT COUNT(*) as count
+        FROM direct1x2_prediction_final
+        WHERE (matches->0->>'home_team_id' = $1 OR matches->0->>'away_team_id' = $1)
+          AND created_at >= $2
+      `, [awayTeamId, sevenDaysAgo]);
+
+      const homeCount = Number(homeAppearances[0]?.count || 0);
+      const awayCount = Number(awayAppearances[0]?.count || 0);
+
+      // Calculate penalty based on max appearance count
+      const maxAppearances = Math.max(homeCount, awayCount);
+
+      // Weighted exposure penalty:
+      // 1st appearance: 0% penalty
+      // 2nd appearance: -5% penalty
+      // 3rd appearance: -12% penalty
+      // 4th+ appearance: -20% penalty
+      let penalty = 0;
+      if (maxAppearances === 1) {
+        penalty = 0;
+      } else if (maxAppearances === 2) {
+        penalty = -5;
+      } else if (maxAppearances === 3) {
+        penalty = -12;
+      } else {
+        penalty = -20;
+      }
+
+      console.log(`[Exposure] Team exposure penalty: ${penalty}% (home: ${homeCount}, away: ${awayCount})`);
+      return penalty;
+
+    } catch (error) {
+      console.error('[Exposure] Failed to calculate exposure penalty:', error.message);
+      return 0; // Default to no penalty on error
+    }
   }
 
   generateRecommendation(prediction, riskTier) {
