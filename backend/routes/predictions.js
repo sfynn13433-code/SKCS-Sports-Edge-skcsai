@@ -2097,7 +2097,7 @@ function canUserAccessPlan(user, requestedPlanId) {
     return access.has('core') || access.has('elite') || access.has('vip');
 }
 
-const DEFAULT_PREDICTIONS_SOURCE = 'direct1x2_prediction_final';
+const DEFAULT_PREDICTIONS_SOURCE = config.USE_RELATIONAL_TABLES ? 'direct1x2_prediction_final_unified' : 'direct1x2_prediction_final';
 
 function sendPredictionsSuccess(res, payload = {}, statusCode = 200) {
     const predictions = Array.isArray(payload?.predictions) ? payload.predictions : [];

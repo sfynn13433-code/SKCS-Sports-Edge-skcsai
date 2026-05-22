@@ -11,6 +11,7 @@
 const { Pool } = require('pg');
 const axios = require('axios');
 const config = require('../config');
+const { query: dbQuery } = require('../db');
 
 // Database connection
 const pool = new Pool({
@@ -285,6 +286,7 @@ function processOddsData(oddsData, canonicalBookmakers) {
 
 /**
  * Store odds data in match_context_data table
+ * Optionally sync to bookmaker_odds relational table when feature flag is enabled
  */
 async function storeOddsInDatabase(processedOdds) {
     const client = await pool.connect();
@@ -293,6 +295,7 @@ async function storeOddsInDatabase(processedOdds) {
         await client.query('BEGIN');
         
         let updateCount = 0;
+        const useRelational = config.USE_RELATIONAL_TABLES;
         
         for (const [eventId, oddsData] of Object.entries(processedOdds)) {
             // Find corresponding fixture in raw_fixtures table
@@ -318,11 +321,28 @@ async function storeOddsInDatabase(processedOdds) {
                     updated_at = NOW()
             `, [idEvent, JSON.stringify(oddsData)]);
             
+            // Sync to bookmaker_odds relational table if feature flag is enabled
+            if (useRelational) {
+                try {
+                    const syncResult = await dbQuery(
+                        'SELECT sync_bookmaker_odds_from_context($1) as synced_count',
+                        [idEvent]
+                    );
+                    const syncedCount = syncResult.rows[0]?.synced_count || 0;
+                    if (syncedCount > 0) {
+                        console.log(`[OddsAPI] Synced ${syncedCount} odds to bookmaker_odds for ${idEvent}`);
+                    }
+                } catch (syncError) {
+                    console.warn(`[OddsAPI] Failed to sync to bookmaker_odds for ${idEvent}:`, syncError.message);
+                    // Continue without failing the entire transaction
+                }
+            }
+            
             updateCount++;
         }
         
         await client.query('COMMIT');
-        console.log(`[OddsAPI] Successfully stored odds for ${updateCount} fixtures`);
+        console.log(`[OddsAPI] Successfully stored odds for ${updateCount} fixtures${useRelational ? ' (with relational sync)' : ''}`);
         
         return updateCount;
     } catch (error) {

@@ -5,6 +5,7 @@ const { query: dbQuery } = require('../db');
 const { selectSecondaryMarkets } = require('../utils/secondaryMarketSelector');
 const { generateInsight, isDolphinAvailable, isGroqAvailable } = require('./aiProvider');
 const { FOOTBALL_RULES } = require('../config/footballRules');
+const config = require('../config');
 
 const SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
 const SUPABASE_KEY = String(
@@ -628,6 +629,33 @@ async function buildAndStoreDirect1X2(fixture, confidence, prediction, additiona
     if (error) {
         console.error('[direct1x2Builder] write failed:', error.message);
         return { success: false, error };
+    }
+
+    // Enable sync trigger if relational tables feature flag is enabled
+    if (config.USE_RELATIONAL_TABLES && data?.id) {
+        try {
+            // Check if trigger exists and is enabled
+            const triggerCheck = await dbQuery(`
+                SELECT tgname
+                FROM pg_trigger
+                WHERE tgname = 'trg_sync_to_normalized_tables'
+                AND tgrelid = 'direct1x2_prediction_final'::regclass
+            `);
+            
+            if (triggerCheck.rows.length === 0) {
+                // Enable the sync trigger
+                await dbQuery(`
+                    CREATE TRIGGER trg_sync_to_normalized_tables
+                    AFTER INSERT OR UPDATE ON direct1x2_prediction_final
+                    FOR EACH ROW
+                    EXECUTE FUNCTION trg_sync_to_normalized_tables()
+                `);
+                console.log('[direct1x2Builder] Enabled sync trigger for normalized tables');
+            }
+        } catch (triggerError) {
+            console.warn('[direct1x2Builder] Failed to enable sync trigger:', triggerError.message);
+            // Continue without failing the operation
+        }
     }
 
     return {

@@ -5,6 +5,8 @@ module.exports = {
     DATA_MODE: process.env.DATA_MODE || 'live',
     BYPASS_PIPELINE_FILTERS: process.env.BYPASS_PIPELINE_FILTERS === 'true' || false,
     REQUIRE_SHARP_ODDS: process.env.REQUIRE_SHARP_ODDS === 'true' || false,
+    // Feature flag for dual-read transitional mode (read from relational tables with JSONB fallback)
+    USE_RELATIONAL_TABLES: process.env.USE_RELATIONAL_TABLES === 'true' || false,
     database: {
         url: process.env.DATABASE_URL,
     },
