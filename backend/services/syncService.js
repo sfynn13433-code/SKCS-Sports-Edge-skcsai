@@ -155,87 +155,42 @@ const SEASON_RANGE = `${SEASON_START_YEAR}-${SEASON_START_YEAR + 1}`;
  * These are the REAL leagues the AI will now look for.
  */
 const BASE_SPORTS_CONFIG = [
-    // Soccer - England
-    { sport: 'Football', leagueId: '39', season: SEASON_YEAR, oddsKey: 'soccer_epl' },
-    { sport: 'Football', leagueId: '40', season: SEASON_YEAR, oddsKey: null },
-    // Soccer - Spain
-    { sport: 'Football', leagueId: '140', season: SEASON_YEAR, oddsKey: 'soccer_spain_la_liga' },
-    { sport: 'Football', leagueId: '141', season: SEASON_YEAR, oddsKey: null },
-    // Soccer - Germany
-    { sport: 'Football', leagueId: '78', season: SEASON_YEAR, oddsKey: 'soccer_germany_bundesliga' },
-    { sport: 'Football', leagueId: '79', season: SEASON_YEAR, oddsKey: null },
-    // Soccer - Italy
-    { sport: 'Football', leagueId: '135', season: SEASON_YEAR, oddsKey: 'soccer_italy_serie_a' },
-    { sport: 'Football', leagueId: '136', season: SEASON_YEAR, oddsKey: null },
-    // Soccer - France
-    { sport: 'Football', leagueId: '61', season: SEASON_YEAR, oddsKey: 'soccer_france_ligue_one' },
-    { sport: 'Football', leagueId: '62', season: SEASON_YEAR, oddsKey: null },
-    // Soccer - International
-    { sport: 'Football', leagueId: '2', season: SEASON_YEAR, oddsKey: 'soccer_uefa_champs_league' },
-    { sport: 'Football', leagueId: '3', season: SEASON_YEAR, oddsKey: 'soccer_uefa_europa_league' },
+    // Soccer - England (TheSportsDB league IDs)
+    { sport: 'Football', leagueId: '4328', season: SEASON_YEAR, oddsKey: 'soccer_epl' },
+    // Soccer - Spain (TheSportsDB league IDs)
+    { sport: 'Football', leagueId: '4335', season: SEASON_YEAR, oddsKey: 'soccer_spain_la_liga' },
+    // Soccer - Germany (TheSportsDB league IDs)
+    { sport: 'Football', leagueId: '4331', season: SEASON_YEAR, oddsKey: 'soccer_germany_bundesliga' },
+    // Soccer - Italy (TheSportsDB league IDs)
+    { sport: 'Football', leagueId: '4332', season: SEASON_YEAR, oddsKey: 'soccer_italy_serie_a' },
+    // Soccer - France (TheSportsDB league IDs)
+    { sport: 'Football', leagueId: '4334', season: SEASON_YEAR, oddsKey: 'soccer_france_ligue_one' },
 
-    // Basketball / NBA
-    { sport: 'Basketball', leagueId: '12', season: SEASON_YEAR, oddsKey: 'basketball_nba' },
-    { sport: 'Basketball', leagueId: '20', season: SEASON_YEAR, oddsKey: null },
-    { sport: 'Basketball', leagueId: '117', season: SEASON_RANGE, oddsKey: null },
-    { sport: 'Basketball', leagueId: '85', season: SEASON_RANGE, oddsKey: null },
-    { sport: 'Basketball', leagueId: '120', season: SEASON_RANGE, oddsKey: 'basketball_euroleague' },
+    // Basketball - NBA (TheSportsDB league ID)
+    { sport: 'Basketball', leagueId: '4387', season: SEASON_YEAR, oddsKey: 'basketball_nba' },
 
-    // Rugby
-    { sport: 'Rugby', leagueId: '13', season: SEASON_YEAR, oddsKey: null },
-    { sport: 'Rugby', leagueId: '14', season: SEASON_YEAR, oddsKey: null },
-    { sport: 'Rugby', leagueId: '1', season: SEASON_YEAR, oddsKey: null },
-    { sport: 'Rugby', leagueId: '45', season: SEASON_YEAR, oddsKey: null },
-    { sport: 'Rugby', leagueId: '44', season: SEASON_YEAR, oddsKey: 'rugbyunion_international' },
-    { sport: 'Rugby', leagueId: '7', season: SEASON_YEAR, oddsKey: null },
+    // MLB (TheSportsDB league ID)
+    { sport: 'MLB', leagueId: '4424', season: SEASON_YEAR, oddsKey: 'baseball_mlb' },
 
-    // American Football
-    { sport: 'NFL', leagueId: '1', season: SEASON_YEAR, oddsKey: 'americanfootball_nfl' },
-    { sport: 'NFL', leagueId: '2', season: SEASON_YEAR, oddsKey: null },
+    // NHL (TheSportsDB league ID)
+    { sport: 'NHL', leagueId: '4380', season: SEASON_YEAR, oddsKey: 'icehockey_nhl' },
 
-    // Baseball
-    { sport: 'MLB', leagueId: '1', season: SEASON_YEAR, oddsKey: 'baseball_mlb' },
-    { sport: 'MLB', leagueId: '2', season: SEASON_YEAR, oddsKey: null },
-    { sport: 'MLB', leagueId: '3', season: SEASON_YEAR, oddsKey: null },
-    { sport: 'MLB', leagueId: '96', season: SEASON_YEAR, oddsKey: null },
-    { sport: 'MLB', leagueId: '97', season: SEASON_YEAR, oddsKey: null },
-
-    // Hockey
-    { sport: 'NHL', leagueId: '57', season: SEASON_YEAR, oddsKey: 'icehockey_nhl' },
-    { sport: 'NHL', leagueId: '58', season: SEASON_YEAR, oddsKey: null },
-    { sport: 'NHL', leagueId: '69', season: SEASON_YEAR, oddsKey: null },
-    { sport: 'NHL', leagueId: '70', season: SEASON_YEAR, oddsKey: null },
-
-    // Volleyball
-    { sport: 'Volleyball', leagueId: '95', season: SEASON_YEAR, oddsKey: null },
-    { sport: 'Volleyball', leagueId: '96', season: SEASON_YEAR, oddsKey: null },
-
-    // Handball
-    { sport: 'Handball', leagueId: '82', season: SEASON_YEAR, oddsKey: null },
-    { sport: 'Handball', leagueId: '83', season: SEASON_YEAR, oddsKey: null },
-
-    // Aussie Rules
-    { sport: 'AFL', leagueId: '1', season: SEASON_YEAR, oddsKey: 'aussierules_afl' },
-    { sport: 'AFL', leagueId: '2', season: SEASON_YEAR, oddsKey: null },
-
-    // MMA
-    { sport: 'MMA', leagueId: null, season: SEASON_YEAR, oddsKey: 'mma_mixed_martial_arts' },
-    { sport: 'Tennis', leagueId: null, season: SEASON_YEAR, oddsKey: null },
-    { sport: 'Cricket', leagueId: null, season: SEASON_YEAR, oddsKey: null },
+    // NFL (TheSportsDB league ID)
+    { sport: 'NFL', leagueId: '4391', season: SEASON_YEAR, oddsKey: 'americanfootball_nfl' },
 ];
 
-const FOOTBALL_TIER_1_LEAGUES = new Set(['39', '140', '78', '135', '61', '2', '3']);
-const FOOTBALL_TIER_2_LEAGUES = new Set(['40', '141', '79', '136', '62']);
-const BASKETBALL_TIER_1_LEAGUES = new Set(['12', '120']);
-const BASKETBALL_TIER_2_LEAGUES = new Set(['20', '117', '85']);
-const RUGBY_TIER_1_LEAGUES = new Set(['13', '14', '44']);
-const RUGBY_TIER_2_LEAGUES = new Set(['1', '45', '7']);
-const AMERICAN_FOOTBALL_TIER_1_LEAGUES = new Set(['1']);
-const AMERICAN_FOOTBALL_TIER_2_LEAGUES = new Set(['2']);
-const BASEBALL_TIER_1_LEAGUES = new Set(['1']);
-const BASEBALL_TIER_2_LEAGUES = new Set(['2', '3', '96', '97']);
-const HOCKEY_TIER_1_LEAGUES = new Set(['57']);
-const HOCKEY_TIER_2_LEAGUES = new Set(['58', '69', '70']);
+const FOOTBALL_TIER_1_LEAGUES = new Set(['4328', '4335', '4331', '4332', '4334']);
+const FOOTBALL_TIER_2_LEAGUES = new Set([]);
+const BASKETBALL_TIER_1_LEAGUES = new Set(['4387']);
+const BASKETBALL_TIER_2_LEAGUES = new Set([]);
+const RUGBY_TIER_1_LEAGUES = new Set([]);
+const RUGBY_TIER_2_LEAGUES = new Set([]);
+const AMERICAN_FOOTBALL_TIER_1_LEAGUES = new Set(['4391']);
+const AMERICAN_FOOTBALL_TIER_2_LEAGUES = new Set([]);
+const BASEBALL_TIER_1_LEAGUES = new Set(['4424']);
+const BASEBALL_TIER_2_LEAGUES = new Set([]);
+const HOCKEY_TIER_1_LEAGUES = new Set(['4380']);
+const HOCKEY_TIER_2_LEAGUES = new Set([]);
 
 function resolveLeagueTier(item) {
     const sport = normalizeSportToken(item?.sport || '');
