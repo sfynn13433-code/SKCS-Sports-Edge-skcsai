@@ -356,7 +356,8 @@ function showNotification(message, type = 'info') {
             multi:               (cats.multi               || []).length,
             same_match:          (cats.same_match          || []).length,
             acca_6match:         (cats.acca_6match         || []).length,
-            mega_acca_12:        (cats.mega_acca_12        || []).length
+            mega_acca_12:        (cats.mega_acca_12        || []).length,
+            watchlist:           (cats.watchlist           || []).length
         });
         // console.log removed
 
@@ -367,6 +368,7 @@ function showNotification(message, type = 'info') {
 
             // Assume the backend now returns `data.pipeline_metrics` from pipelineLogger.js
             var metrics = data.pipeline_metrics || { ingested: 0, analyzed: 0, rejected_confidence: 0, rejected_efficiency: 0, published: 0 };
+            var watchlistItems = cats.watchlist || [];
 
             var funnelHtml =
                 '<div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; text-align: left; width: 100%; max-width: 400px; margin: 0 auto;">' +
@@ -387,8 +389,33 @@ function showNotification(message, type = 'info') {
                     '<div style="display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">' +
                         '<span style="color: #38bdf8; font-weight: bold;">Approved Insights:</span>' +
                         '<span style="color: #4ade80; font-weight: bold;">0</span>' +
-                    '</div>' +
-                '</div>';
+                    '</div>';
+
+            // PHASE 3: Add watchlist section if items exist
+            if (watchlistItems.length > 0) {
+                funnelHtml +=
+                    '<div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">' +
+                        '<h4 style="color: #f59e0b; margin-bottom: 10px; font-size: 0.95rem;">Market Watch (' + watchlistItems.length + ')</h4>' +
+                        '<p style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 10px;">Near-miss fixtures monitoring for odds drift:</p>';
+
+                for (var i = 0; i < Math.min(watchlistItems.length, 3); i++) {
+                    var item = watchlistItems[i];
+                    funnelHtml +=
+                        '<div style="background: rgba(245, 158, 11, 0.1); border-left: 3px solid #f59e0b; padding: 10px; margin-bottom: 8px; border-radius: 4px;">' +
+                            '<div style="color: #f8fafc; font-size: 0.85rem; font-weight: bold;">' + (item.home_team || 'Unknown') + ' vs ' + (item.away_team || 'Unknown') + '</div>' +
+                            '<div style="color: #f59e0b; font-size: 0.75rem; margin-top: 4px;">Confidence: ' + (item.confidence || 0) + '% (Below Publication Threshold)</div>' +
+                            '<div style="color: #94a3b8; font-size: 0.75rem;">Status: Monitoring for Odds Drift</div>' +
+                        '</div>';
+                }
+
+                if (watchlistItems.length > 3) {
+                    funnelHtml += '<div style="color: #94a3b8; font-size: 0.75rem; text-align: center; margin-top: 8px;">+ ' + (watchlistItems.length - 3) + ' more on watchlist</div>';
+                }
+
+                funnelHtml += '</div>';
+            }
+
+            funnelHtml += '</div>';
 
             if (codesList) {
                 codesList.innerHTML = funnelHtml;

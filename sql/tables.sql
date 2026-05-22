@@ -17,6 +17,7 @@ create table if not exists predictions_filtered (
     tier text not null check (tier in ('normal', 'deep')),
     is_valid boolean not null,
     reject_reason text,
+    is_watchlist boolean not null default false,
     created_at timestamptz not null default now(),
     unique (raw_id, tier)
 );

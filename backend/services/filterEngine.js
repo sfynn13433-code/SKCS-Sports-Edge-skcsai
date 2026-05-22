@@ -194,19 +194,20 @@ function evaluateMetadataQuality(raw, tier) {
     return { is_valid: true, reject_reason: null };
 }
 
-async function upsertFilteredRow({ rawId, tier, isValid, rejectReason }, client) {
+async function upsertFilteredRow({ rawId, tier, isValid, rejectReason, isWatchlist = false }, client) {
     const sql = `
-        insert into predictions_filtered (raw_id, tier, is_valid, reject_reason)
-        values ($1, $2, $3, $4)
+        insert into predictions_filtered (raw_id, tier, is_valid, reject_reason, is_watchlist)
+        values ($1, $2, $3, $4, $5)
         on conflict (raw_id, tier)
         do update set
             is_valid = excluded.is_valid,
             reject_reason = excluded.reject_reason,
+            is_watchlist = excluded.is_watchlist,
             created_at = now()
         returning *;
     `;
 
-    const res = await client.query(sql, [rawId, tier, isValid, rejectReason]);
+    const res = await client.query(sql, [rawId, tier, isValid, rejectReason, isWatchlist]);
     return res.rows[0];
 }
 
@@ -218,7 +219,18 @@ function evaluateRawAgainstTier(raw, rules) {
         return { is_valid: false, reject_reason: buildRejectReason({ tier, reason: 'Missing or non-numeric confidence', raw }) };
     }
 
+    // PHASE 3: Watchlist for near-misses (confidence within 5% of threshold)
+    const nearMissThreshold = rules.min_confidence - 5;
     if (!primaryMarket && raw.confidence < rules.min_confidence) {
+        if (raw.confidence >= nearMissThreshold) {
+            // Near miss: flag as watchlist instead of hard reject
+            return {
+                is_valid: false,
+                is_watchlist: true,
+                reject_reason: buildRejectReason({ tier, reason: `Near miss - confidence ${raw.confidence}% below threshold ${rules.min_confidence}%`, raw })
+            };
+        }
+        // Hard reject for significantly below threshold
         return { is_valid: false, reject_reason: buildRejectReason({ tier, reason: `Confidence below min_confidence (${rules.min_confidence})`, raw }) };
     }
 
@@ -250,13 +262,14 @@ async function filterRawPrediction({ rawId, tier, rulesMap }, client) {
     const raw = rawRes.rows[0];
     validateRawPredictionForInsert(raw);
 
-    const { is_valid, reject_reason } = evaluateRawAgainstTier(raw, rules);
+    const { is_valid, reject_reason, is_watchlist } = evaluateRawAgainstTier(raw, rules);
 
     const filtered = await upsertFilteredRow({
         rawId,
         tier: rules.tier,
         isValid: is_valid,
-        rejectReason: reject_reason
+        rejectReason: reject_reason,
+        isWatchlist: is_watchlist || false
     }, client);
 
     console.log('[filterEngine] raw_id=%s tier=%s is_valid=%s reason=%s', rawId, rules.tier, is_valid, reject_reason);

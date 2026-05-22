@@ -2295,6 +2295,31 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         predictions = Array.from(fixtureMap.values());
         console.log('[predictions] Fixture-level deduplication:', `before=${originalLength}, after=${predictions.length}`);
 
+        // PHASE 3: Fetch watchlist items from predictions_filtered table
+        let watchlistItems = [];
+        try {
+            const sportFilterValues = getSportFilterValues(sport);
+            if (sportFilterValues.length > 0) {
+                const sportPlaceholders = sportFilterValues.map((_, i) => `$${i + 1}`).join(', ');
+                const watchlistQuery = `
+                    SELECT pr.*, pf.is_watchlist, pf.reject_reason
+                    FROM predictions_filtered pf
+                    JOIN predictions_raw pr ON pf.raw_id = pr.id
+                    WHERE pf.is_watchlist = true
+                      AND pf.tier = ANY($1)
+                      AND LOWER(COALESCE(pr.metadata->>'sport', 'football')) IN (${sportPlaceholders})
+                    ORDER BY pr.created_at DESC
+                    LIMIT 50;
+                `;
+                const watchlistParams = [queryTiers, ...sportFilterValues.map(s => s.toLowerCase())];
+                const watchlistRes = await query(watchlistQuery, watchlistParams);
+                watchlistItems = watchlistRes.rows || [];
+                console.log('[predictions] Fetched watchlist items:', watchlistItems.length);
+            }
+        } catch (watchlistErr) {
+            console.warn('[predictions] Failed to fetch watchlist items:', watchlistErr.message);
+        }
+
         // If DB returned no predictions, attempt Supabase fallback (useful when Supabase is the source)
         try {
             if ((!predictions || predictions.length === 0) && config.supabase && config.supabase.url && config.supabase.anonKey) {
@@ -2618,7 +2643,8 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             multi: [],
             same_match: [],
             acca_6match: [],
-            mega_acca_12: []
+            mega_acca_12: [],
+            watchlist: []
         };
 
         for (const prediction of predictionsEnriched) {
@@ -2636,6 +2662,25 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             } else if (sectionType === 'mega_acca_12') {
                 categories.mega_acca_12.push(prediction);
             }
+        }
+
+        // PHASE 3: Add watchlist items to categories
+        for (const watchlistItem of watchlistItems) {
+            const metadata = watchlistItem.metadata || {};
+            const enrichedWatchlist = {
+                id: watchlistItem.id,
+                home_team: metadata.home_team || 'Unknown',
+                away_team: metadata.away_team || 'Unknown',
+                prediction: watchlistItem.prediction || 'Unknown',
+                confidence: watchlistItem.confidence || 0,
+                market: watchlistItem.market || 'Unknown',
+                edgemind_report: watchlistItem.edgemind_report || 'Near miss - below publication threshold',
+                reject_reason: watchlistItem.reject_reason || 'Near miss',
+                is_watchlist: true,
+                created_at: watchlistItem.created_at,
+                match_date: metadata.match_time || metadata.kickoff || null
+            };
+            categories.watchlist.push(enrichedWatchlist);
         }
 
         res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
