@@ -104,16 +104,8 @@ async function getMetadata() {
 // Strategy: This is your highest-value data. We fetch this every hour.
 async function getAITrends(sportId = 1) {
   const cacheKey = `trends_${sportId}`;
-  const data = await callEdgeAPI('/bets/trends', { sports: sportId }, cacheKey, 3600);
-  
-  // LOGIC: Filter for "isTop: true" or "percentage > 0.85"
-  if (data && data.trends) {
-    return data.trends.filter(trend => 
-      trend.isTop === true || 
-      (trend.percentage && parseFloat(trend.percentage) > 0.85)
-    );
-  }
-  
+  // ProFootballAPI does not support /bets/trends endpoint - skip silently
+  console.log('[ProFootballAPI] Skipping /bets/trends fetch (endpoint not supported by provider)');
   return [];
 }
 
