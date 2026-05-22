@@ -27,6 +27,14 @@ services:
         value: api-football-v1.p.rapidapi.com
       - key: RAPIDAPI_HOST
         value: api-football-v1.p.rapidapi.com
+      - key: RAPIDAPI_HOSTS_ACTIVE
+        value: api-football-v1.p.rapidapi.com
+      - key: RAPIDAPI_HOSTS_ACTIVE_ALL
+        value: api-football-v1.p.rapidapi.com
+      - key: RAPIDAPI_HOSTS_ACTIVE_FOOTBALL
+        value: api-football-v1.p.rapidapi.com
+      - key: RAPIDAPI_FOOTBALL_HOSTS
+        value: api-football-v1.p.rapidapi.com
       - key: ENABLE_METRX_FACTORY
         value: "true"
       - key: DISABLE_METRX_FACTORY
