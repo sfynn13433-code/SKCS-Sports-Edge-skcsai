@@ -23,6 +23,10 @@ services:
         sync: false
       - key: SPORTSAPI_PRO_FOOTBALL_MIN_INTERVAL_MS
         value: 6500
+      - key: RAPIDAPI_HOST_FOOTBALL_API
+        value: api-football-v1.p.rapidapi.com
+      - key: RAPIDAPI_HOST
+        value: api-football-v1.p.rapidapi.com
       - key: ENABLE_METRX_FACTORY
         value: "true"
       - key: DISABLE_METRX_FACTORY
