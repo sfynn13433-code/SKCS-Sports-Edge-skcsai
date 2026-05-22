@@ -565,6 +565,7 @@ async function syncSports(options = {}) {
                     console.warn(`  - Season is over or hasn't started yet`);
                     console.warn(`  - API keys are missing or invalid`);
                     console.warn(`  - League ID or season configuration is incorrect`);
+                    console.warn(`  - Provider does not support this sport (leagueId=${item.leagueId})`);
                     if (!perSport.has(item.sport)) {
                         perSport.set(item.sport, 0);
                     }
