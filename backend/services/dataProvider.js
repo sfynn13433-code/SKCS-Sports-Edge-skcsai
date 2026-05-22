@@ -1145,7 +1145,8 @@ function toPredictionInputFromSportsDbFixture(fixture) {
 async function fetchUpcomingFixtures(options = {}) {
     const sportsDbKey = String(config.theSportsDbKey || '').trim();
     if (!sportsDbKey) {
-        throw new Error('TheSportsDB key is missing (THESPORTSDB_KEY or SPORTS_DB_KEY)');
+        console.warn('[dataProvider] TheSportsDB key missing (THESPORTSDB_KEY or SPORTS_DB_KEY) - skipping provider');
+        return [];
     }
 
     const requestedLeagueIds = Array.isArray(options.leagueIds) && options.leagueIds.length > 0

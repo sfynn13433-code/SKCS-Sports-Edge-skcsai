@@ -376,6 +376,14 @@ async function syncSports(options = {}) {
         console.log('[syncService] Active-sports gate blocked requested sports: %s', blockedSports.join(', '));
     }
     console.log(`[syncService] Using season config: SEASON_YEAR=${SEASON_YEAR}, SEASON_RANGE=${SEASON_RANGE}`);
+
+    // ── PROVIDER STATUS LOGGING ─────────────────────────────────────────────
+    console.log('[Provider Status]');
+    console.log(`  API-Sports: ${String(process.env.DISABLE_APISPORTS || '').toLowerCase() === 'true' ? 'DISABLED' : 'ACTIVE'} (X_APISPORTS_KEY=${process.env.X_APISPORTS_KEY ? 'SET' : 'MISSING'})`);
+    console.log(`  TheSportsDB: ${process.env.THESPORTSDB_KEY ? 'ACTIVE' : 'DISABLED'} (THESPORTSDB_KEY=${process.env.THESPORTSDB_KEY ? 'SET' : 'MISSING'})`);
+    console.log(`  Odds API: ${process.env.ODDS_API_KEY ? 'ACTIVE' : 'DISABLED'} (ODDS_API_KEY=${process.env.ODDS_API_KEY ? 'SET' : 'MISSING'})`);
+    console.log(`  FootballData.org: ${normalizeRequestedSport(requestedSports[0] || 'football') === 'football' ? 'ACTIVE' : 'N/A (football only)'}`);
+    // ────────────────────────────────────────────────────────────────────
     const telemetryRunId = `sync_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     pipelineLogger.startRun({
         run_id: telemetryRunId,
@@ -620,6 +628,14 @@ async function syncSports(options = {}) {
         } else {
             console.warn('[syncService] Sync finished but 0 real matches were found. Check your API Keys and season configuration.');
             console.log(`[DIAG] FINAL SUMMARY: totalMatchesProcessed=0 perSport=${JSON.stringify(Array.from(perSport.entries()))} errors=${JSON.stringify(Array.from(perSportErrors.entries()))}`);
+
+            // ── FIXTURES FETCHED SUMMARY ───────────────────────────────────────────
+            console.log('[Fixtures fetched]');
+            perSport.forEach((count, sport) => {
+                console.log(`  ${sport}: ${count}`);
+            });
+            // ────────────────────────────────────────────────────────────────────
+
             const report = pipelineLogger.finishRun({
                 run_id: telemetryRunId,
                 status: 'completed',

@@ -158,3 +158,5 @@ services:
         sync: false
       - key: DISABLE_APISPORTS
         value: "true"
+      - key: THESPORTSDB_KEY
+        sync: false
