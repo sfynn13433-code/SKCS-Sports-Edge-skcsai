@@ -156,5 +156,5 @@ services:
         sync: false
       - key: X_RAPIDAPI_KEY
         sync: false
-      - key: X_APISPORTS_KEY
-        sync: false
+      - key: DISABLE_APISPORTS
+        value: "true"
