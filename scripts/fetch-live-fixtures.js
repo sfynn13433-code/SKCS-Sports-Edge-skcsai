@@ -862,7 +862,6 @@ async function generateEdgeMindReports(fixtures, existingMap) {
     const client = await pool.connect();
     let eventsFromDB = [];
     let staleDirectFromDB = [];
-    let dbUsedMatches = new Set();
     
     try {
         const result = await client.query(`
@@ -944,29 +943,6 @@ async function generateEdgeMindReports(fixtures, existingMap) {
         `, [staleRefreshLimit]);
         staleDirectFromDB = staleResult.rows;
         console.log(`[STEP 5] Stale direct refresh candidates: ${staleDirectFromDB.length}`);
-        
-        // PHASE 2.5: Get matches used this week to enforce Single-Use Insight Policy
-        const weekStart = new Date();
-        weekStart.setDate(weekStart.getDate() - (weekStart.getDay() || 7) + 1); // Monday
-        weekStart.setHours(0, 0, 0, 0);
-
-        const usedMatchesRes = await client.query(`
-            SELECT 
-                COALESCE(NULLIF(TRIM(matches->0->>'home_team'), ''), NULLIF(TRIM(matches->0->>'home_team_name'), '')) AS home_team,
-                COALESCE(NULLIF(TRIM(matches->0->>'away_team'), ''), NULLIF(TRIM(matches->0->>'away_team_name'), '')) AS away_team
-            FROM direct1x2_prediction_final
-            WHERE created_at >= $1
-              AND LOWER(COALESCE(type, '')) = 'direct'
-        `, [weekStart.toISOString()]);
-
-        for (const row of usedMatchesRes.rows) {
-            if (row.home_team && row.away_team) {
-                const normHome = normalizeTeamName(row.home_team);
-                const normAway = normalizeTeamName(row.away_team);
-                dbUsedMatches.add([normHome, normAway].sort().join('-vs-'));
-            }
-        }
-        console.log(`[STEP 5] Single-Use Policy: found ${dbUsedMatches.size} match signatures already used this week.`);
     } catch (err) {
         console.error('[PHASE 2 ERROR]: Failed to fetch from events table:', err.message);
     } finally {
@@ -1015,13 +991,7 @@ async function generateEdgeMindReports(fixtures, existingMap) {
 
         const isExisting = existingMap.has(normalizedFixtureId);
 
-        // Enforce Single-Use Policy for NEW insights
-        if (!isExisting && dbUsedMatches.has(matchSignature)) {
-            continue;
-        }
-
         uniqueMatchSignatures.add(matchSignature);
-        dbUsedMatches.add(matchSignature);
 
         const kickoffValueRaw =
             fixture.commence_time ||

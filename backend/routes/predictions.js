@@ -18,7 +18,8 @@ const { getCardDescriptor } = require('../utils/insightEngine');
 const { buildContextInsightsFromMetadata } = require('../utils/contextInsights');
 const { enrichWithWeather } = require('../utils/weather');
 const { enrichWithAvailability } = require('../utils/availability');
-const { filterPredictionsByUsagePolicy, markFixtureUsed } = require('../utils/insightUsage');
+// insightUsage utility removed - unused dead code (per-format tracking not needed)
+// ACCA-specific restrictions are correctly implemented in team_week_locks table
 const { getRiskColor, getRiskTierLabel } = require('../services/masterRulebookRiskClassification');
 const { filterMarketsByMainPick, validateSMBCLegs } = require('../services/contradictionGovernance');
 const { getLatestRunSnapshot } = require('../utils/pipelineLogger');
