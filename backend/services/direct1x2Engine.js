@@ -211,10 +211,10 @@ function evaluateDirect1x2(matchContext = {}) {
         tier = 'HIGH_RISK';
         secondaryRequired = true;
     } else if (confidence >= 55 && confidence <= 74) {
-        tier = 'MEDIUM_RISK';
+        tier = 'MODERATE_RISK';
         secondaryRequired = true;
     } else if (confidence >= 75) {
-        tier = 'LOW_RISK';
+        tier = 'HIGH_CONFIDENCE';
         secondaryRequired = true;
         accaEligible = true;
     }

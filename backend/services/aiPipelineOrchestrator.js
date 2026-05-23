@@ -394,7 +394,7 @@ class AIPipelineOrchestrator {
             kickoff: fixture.start_time
           }]),
           finalPrediction.confidence,
-          finalPrediction.risk_tier === 'LOW_RISK' ? 'safe' : 'medium',
+          finalPrediction.risk_tier === 'HIGH_CONFIDENCE' ? 'safe' : 'medium',
           fixture.sport || 'football',
           finalPrediction.market,
           finalPrediction.recommendation,
@@ -456,7 +456,7 @@ class AIPipelineOrchestrator {
         WHERE publish_run_id = $1 
           AND type = 'direct' 
           AND confidence >= 55
-          AND risk_tier IN ('LOW_RISK', 'MEDIUM_RISK')
+          AND risk_tier IN ('HIGH_CONFIDENCE', 'MODERATE_RISK')
         ORDER BY confidence DESC
       `, [publishRunId]);
 
@@ -587,8 +587,8 @@ class AIPipelineOrchestrator {
   }
 
   determineRiskTier(confidence) {
-    if (confidence >= 75) return 'LOW_RISK';
-    if (confidence >= 55) return 'MEDIUM_RISK';
+    if (confidence >= 75) return 'HIGH_CONFIDENCE';
+    if (confidence >= 55) return 'MODERATE_RISK';
     if (confidence >= 30) return 'HIGH_RISK';
     return 'EXTREME_RISK';
   }
@@ -597,7 +597,7 @@ class AIPipelineOrchestrator {
     const secondaryInsights = [];
     
     // Only generate secondary insights for moderate to extreme risk
-    if (riskTier !== 'LOW_RISK') {
+    if (riskTier !== 'HIGH_CONFIDENCE') {
       // Generate based on sport and context
       const sportSpecificInsights = await this.getSportSpecificSecondaryInsights(fixture);
       secondaryInsights.push(...sportSpecificInsights);
