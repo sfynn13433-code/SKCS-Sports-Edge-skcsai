@@ -534,6 +534,20 @@ function showNotification(message, type = 'info') {
                 marketBgColor = 'bg-red-950/50 text-red-400 border border-red-700/50';
             }
 
+            // EDGEMIND AI UI BLOCK
+            var edgeMindHtml = pred.edgemind_report ? 
+                '<div style="margin-top:12px; padding:12px; background:rgba(15,23,42,0.8); border-left:3px solid ' + confColor + '; border-radius:6px;">' +
+                    '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">' +
+                        '<span style="font-size:0.75rem; font-weight:800; color:' + confColor + '; text-transform:uppercase; letter-spacing:0.05em;">' +
+                            (pred.risk_tier ? pred.risk_tier.replace(/_/g, ' ') : 'SYSTEM RATED') +
+                        '</span>' +
+                        '<span style="font-size:0.7rem; color:#94a3b8;">EDGEMIND AI</span>' +
+                    '</div>' +
+                    '<div style="font-size:0.85rem; color:#cbd5e1; line-height:1.5; font-style:italic;">' +
+                        '"' + pred.edgemind_report + '"' +
+                    '</div>' +
+                '</div>' : '';
+
             // Use .smh-result-item class for hover (CSP-safe, no inline onmouseover)
             html +=
                 '<div class="smh-result-item" data-card-id="' + cardId + '" style="border-left:4px solid ' + accentColor + ';">' +
@@ -552,6 +566,7 @@ function showNotification(message, type = 'info') {
                         '<span style="background:rgba(74,222,128,0.12);color:#4ade80;padding:3px 9px;border-radius:4px;font-size:0.88rem;font-weight:700;">\u26A1 ' + pick + '</span>' +
                         oddsHtml + timeHtml +
                     '</div>' +
+                    edgeMindHtml +
                     '<button class="insight-btn" data-card-id="' + cardId + '" style="width:100%;padding:10px 16px;background:linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);color:#ffffff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 12px rgba(139,92,246,0.3);transition:all 0.2s ease;margin-top:8px;">Click for insights</button>' +
                 '</div>';
         });
