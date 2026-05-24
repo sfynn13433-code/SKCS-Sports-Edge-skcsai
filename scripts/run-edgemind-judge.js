@@ -1,0 +1,133 @@
+'use strict';
+
+const { createClient } = require('@supabase/supabase-js');
+const config = require('../backend/config');
+
+// Initialize Supabase using project config
+const supabaseUrl = config.supabase?.url || process.env.SUPABASE_URL || '';
+const supabaseKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || config.supabase?.anonKey || '').trim();
+if (!supabaseUrl || !supabaseKey) {
+    console.error('❌ Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY. Set them in your environment.');
+    process.exit(1);
+}
+const supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false, autoRefreshToken: false }
+});
+
+// Note: If you have a real AI provider configured (like Groq/OpenAI), import it here.
+// For this test, we will simulate the AI's response to ensure database plumbing works perfectly.
+
+// Map final_confidence to risk_tier enum values (matching Master Rulebook v2 thresholds)
+function resolveRiskTier(confidence) {
+    if (confidence >= 75) return 'HIGH_CONFIDENCE';
+    if (confidence >= 55) return 'MODERATE_RISK';
+    if (confidence >= 30) return 'HIGH_RISK';
+    return 'EXTREME_RISK';
+}
+
+async function runEdgeMindJudge() {
+    console.log("🧠 Waking up EdgeMind (The Judge)...");
+
+    // 1. Fetch matches sitting in Stage 3 that need AI analysis
+    const { data: stage3Matches, error: fetchError } = await supabase
+        .from('predictions_stage_3')
+        .select('*')
+        .limit(5); // Process in small batches
+
+    if (fetchError || !stage3Matches || stage3Matches.length === 0) {
+        console.error("❌ No Stage 3 matches found for EdgeMind.");
+        return;
+    }
+
+    for (const match of stage3Matches) {
+        // 2. Fetch the actual Team Names and Kickoff Time from canonical_events
+        const { data: eventData } = await supabase
+            .from('canonical_events')
+            .select('competition_name, raw_provider_data, start_time_utc')
+            .eq('provider_event_id', match.fixture_id)
+            .limit(1)
+            .single();
+
+        if (!eventData) {
+            console.log(`⚠️ Could not find canonical event for ${match.fixture_id}. Skipping.`);
+            continue;
+        }
+
+        // Parse team names from your raw JSON payload (adjust based on your API's structure)
+        // Example assumes API-Football structure. Adjust if using Sportmonks/Cricbuzz.
+        const raw = eventData.raw_provider_data || {};
+        const homeTeam = raw?.teams?.home?.name
+            || raw?.home_team || raw?.strHomeTeam
+            || raw?.competitions?.[0]?.competitors?.find(c => c.homeAway === 'home')?.team?.displayName
+            || 'Home Team';
+        const awayTeam = raw?.teams?.away?.name
+            || raw?.away_team || raw?.strAwayTeam
+            || raw?.competitions?.[0]?.competitors?.find(c => c.homeAway === 'away')?.team?.displayName
+            || 'Away Team';
+
+        // risk_flags comes back as JSONB array from Supabase
+        const riskFlags = Array.isArray(match.risk_flags) ? match.risk_flags : [];
+
+        // -------------------------------------------------------------
+        // 🗣️ THE AI PROMPT
+        // This is what you actually send to Groq/OpenAI via API
+        // -------------------------------------------------------------
+        const aiPrompt = `
+            You are SKCS EdgeMind, an elite sports intelligence analyst.
+            Match: ${homeTeam} vs ${awayTeam}
+            System Probability: ${match.final_confidence}% for a HOME_WIN.
+            Risk Flags: ${riskFlags.join(', ')}.
+            Volatility Score: ${match.volatility_score}.
+            
+            Write a strict, 2-sentence pre-match insight explaining this probability and highlighting the risk factors. 
+            Do not guess numbers. Use the data provided.
+        `;
+
+        console.log(`\n🤖 Sending prompt to EdgeMind for ${homeTeam} vs ${awayTeam}...`);
+        
+        // Simulated AI Response (Replace with your actual API call later)
+        const edgemind_report = `SKCS models indicate a ${match.final_confidence}% probability for ${homeTeam} based on core metrics. However, bettors should exercise caution due to a high volatility score of ${match.volatility_score}, driven heavily by ${riskFlags.join(' and ')}.`;
+
+        const riskTier = resolveRiskTier(match.final_confidence);
+
+        // -------------------------------------------------------------
+        // 🚀 PUBLISH TO LIVE FRONTEND TABLE
+        // -------------------------------------------------------------
+        const finalPayload = {
+            fixture_id: match.fixture_id,
+            sport: 'Football',
+            tier: 'normal',
+            type: 'direct',
+            market_type: '1X2',
+            home_team: homeTeam,
+            away_team: awayTeam,
+            match_date: eventData.start_time_utc,
+            prediction: 'HOME_WIN',
+            recommendation: 'HOME_WIN',
+            confidence: match.final_confidence,
+            total_confidence: match.final_confidence,
+            risk_level: match.volatility_score > 0.5 ? 'medium' : 'safe', // Gatekeeper logic
+            risk_tier: riskTier,
+            edgemind_report: edgemind_report,
+            matches: [{ home: homeTeam, away: awayTeam, fixture_id: match.fixture_id, kickoff: eventData.start_time_utc }],
+            plan_visibility: ["free", "premium", "pro"],
+            secondary_insights: [],
+            secondary_markets: [],
+            created_at: new Date().toISOString()
+        };
+
+        const { error: publishError } = await supabase
+            .from('direct1x2_prediction_final')
+            .insert(finalPayload);
+
+        if (publishError) {
+            console.error(`❌ Failed to publish ${match.fixture_id}:`, publishError.message);
+        } else {
+            console.log(`✅ PUBLISHED: ${homeTeam} vs ${awayTeam} is now LIVE on SKCS Sports Edge!`);
+        }
+    }
+    
+    console.log("\n🏁 EdgeMind Handover Complete.");
+}
+
+runEdgeMindJudge().catch(console.error);

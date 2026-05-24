@@ -1386,6 +1386,32 @@ app.get('/api/cron/cricket-daily-fixtures', verifyCronSecret, async (req, res) =
     }
 });
 
+// 🚀 MASTER PIPELINE CRON ENDPOINT
+// Triggers the full deterministic pipeline: Stage 1 → Stage 2 → Stage 3 → EdgeMind Judge
+// Configure your external cron (cron-job.org) to hit this every 4-6 hours.
+app.get('/api/cron/trigger-master-pipeline', verifyCronSecret, (req, res) => {
+    console.log('[cron/master-pipeline] Master Pipeline triggered via external cron.');
+
+    // Respond immediately so the cron job doesn't timeout waiting for the AI
+    res.status(200).json({ 
+        status: 'success', 
+        message: 'Master Pipeline triggered. Running in background.' 
+    });
+
+    // Trigger the Master Orchestrator in the background
+    const scriptPath = path.join(__dirname, '..', 'scripts', 'run-master-pipeline.js');
+    const child = spawn('node', [scriptPath], {
+        cwd: path.join(__dirname, '..'),
+        stdio: 'pipe'
+    });
+
+    child.stdout.on('data', (data) => console.log(`[master-pipeline] ${data.toString().trim()}`));
+    child.stderr.on('data', (data) => console.error(`[master-pipeline] ${data.toString().trim()}`));
+    child.on('close', (code) => {
+        console.log(`[cron/master-pipeline] Pipeline exited with code ${code}`);
+    });
+});
+
 // ESPN Hidden API Live Odds Monitoring Endpoint
 app.get('/api/admin/cdn-live-loop', requireAdminKey, async (req, res) => {
     try {

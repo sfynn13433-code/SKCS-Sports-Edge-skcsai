@@ -96,6 +96,31 @@ async function syncDailyFixtures(date) {
     // }
 
     // NEW PIPE: Universal Intake Valve via supabase.rpc('upsert_canonical_event')
+    if (!supabase) {
+      console.error('[syncDailyFixtures] Supabase client not initialized — falling back to direct SQL');
+      try {
+        await db.query(`
+          INSERT INTO raw_fixtures (id_event, sport, league_id, home_team_id, away_team_id, start_time, raw_json)
+          VALUES ($1, $2, $3, $4, $5, $6, $7)
+          ON CONFLICT (id_event) DO UPDATE SET
+            raw_json = EXCLUDED.raw_json,
+            updated_at = NOW()
+        `, [
+          idEvent,
+          event.strSport || 'Unknown',
+          event.idLeague,
+          event.idHomeTeam,
+          event.idAwayTeam,
+          event.dateEvent ? new Date(`${event.dateEvent} ${event.strTime || '00:00'}Z`) : null,
+          JSON.stringify(event)
+        ]);
+        syncedCount++;
+      } catch (err) {
+        console.error(`[syncDailyFixtures] Fallback SQL failed for ${idEvent}:`, err.message);
+      }
+      continue;
+    }
+
     const cleanData = {
       p_provider_name: 'thesportsdb',
       p_provider_event_id: idEvent.toString(),
