@@ -5,7 +5,7 @@
   "events": [
     {
       "id": "2432126",
-      "sport": "American Football",
+      "sport": "NFL",
       "league_id": "5434",
       "league": "UFL",
       "season": "2026",
@@ -101,7 +101,7 @@
     },
     {
       "id": "2469886",
-      "sport": "American Football",
+      "sport": "NFL",
       "league_id": "5876",
       "league": "European Football Alliance",
       "season": "2026",
@@ -197,7 +197,7 @@
     },
     {
       "id": "2400586",
-      "sport": "Australian Football",
+      "sport": "AFL",
       "league_id": "4456",
       "league": "Australian AFL",
       "season": "2026",

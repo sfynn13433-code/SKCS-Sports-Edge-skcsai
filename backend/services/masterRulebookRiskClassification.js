@@ -9,8 +9,8 @@
 function determineRiskTier(confidence) {
     if (!Number.isFinite(confidence)) return 'EXTREME_RISK';
     
-    if (confidence >= 75) return 'LOW_RISK';
-    if (confidence >= 55) return 'MEDIUM_RISK';
+    if (confidence >= 75) return 'HIGH_CONFIDENCE';
+    if (confidence >= 55) return 'MODERATE_RISK';
     if (confidence >= 30) return 'HIGH_RISK';
     return 'EXTREME_RISK';
 }
@@ -102,8 +102,8 @@ function getRiskTierLabel(confidence) {
     const tier = determineRiskTier(confidence);
     
     const labels = {
-        'LOW_RISK': 'Low Risk',
-        'MEDIUM_RISK': 'Medium Risk',
+        'HIGH_CONFIDENCE': 'High Confidence',
+        'MODERATE_RISK': 'Moderate Risk',
         'HIGH_RISK': 'High Risk',
         'EXTREME_RISK': 'Extreme Risk'
     };
@@ -174,11 +174,11 @@ function generateAIReport(confidence, homeTeam, awayTeam, marketLabel) {
     const conf = Math.round(confidence);
     
     switch (tier) {
-        case 'LOW_RISK':
-            return `Stage 1 (Baseline): On paper, ${homeTeam} shows a strong ${conf}% baseline probability. Stage 2 (Deep Context): Deep analysis confirms a formidable form advantage. Stage 3 (Reality Check): Conditions remain stable with minimal external volatility. Stage 4 (Decision Engine): Final confidence is ${conf}%. LOW RISK ${marketLabel} selection.`;
+        case 'HIGH_CONFIDENCE':
+            return `Stage 1 (Baseline): On paper, ${homeTeam} shows a strong ${conf}% baseline probability. Stage 2 (Deep Context): Deep analysis confirms a formidable form advantage. Stage 3 (Reality Check): Conditions remain stable with minimal external volatility. Stage 4 (Decision Engine): Final confidence is ${conf}%. HIGH CONFIDENCE ${marketLabel} selection.`;
             
-        case 'MEDIUM_RISK':
-            return `Stage 1 (Baseline): On paper, ${homeTeam} has a fair ${conf}% baseline probability against ${awayTeam}. Stage 2 (Deep Context): Contextual data shows a moderate edge. Stage 3 (Reality Check): Standard sports volatility applies. Stage 4 (Decision Engine): Final confidence is ${conf}%. MEDIUM RISK ${marketLabel} selection.`;
+        case 'MODERATE_RISK':
+            return `Stage 1 (Baseline): On paper, ${homeTeam} has a fair ${conf}% baseline probability against ${awayTeam}. Stage 2 (Deep Context): Contextual data shows a moderate edge. Stage 3 (Reality Check): Standard sports volatility applies. Stage 4 (Decision Engine): Final confidence is ${conf}%. MODERATE RISK ${marketLabel} selection.`;
             
         case 'HIGH_RISK':
             return `Stage 1 (Baseline): On paper, this is a tight matchup with a ${conf}% baseline probability. Stage 2 (Deep Context): Form data is heavily contested. Stage 3 (Reality Check): Reality check indicates high volatility and unstable conditions. Stage 4 (Decision Engine): Final confidence is ${conf}%. HIGH RISK. Consider secondary markets for alternative options.`;
@@ -208,7 +208,7 @@ Output ONLY valid JSON with this exact structure:
 {
   "market": "HOME_WIN|DRAW|AWAY_WIN",
   "confidence": number,
-  "risk_tier": "LOW_RISK|MEDIUM_RISK|HIGH_RISK|EXTREME_RISK",
+  "risk_tier": "HIGH_CONFIDENCE|MODERATE_RISK|HIGH_RISK|EXTREME_RISK",
   "edgemind_report": "string",
   "secondary_markets": [
     {

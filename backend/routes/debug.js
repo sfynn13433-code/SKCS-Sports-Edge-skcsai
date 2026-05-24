@@ -8,8 +8,10 @@ const { getPlanCapabilities, filterPredictionsForPlan } = require('../config/sub
 const router = express.Router();
 
 const SPORT_FILTER_MAP = {
-    football: [
+    Football: [
+        'Football',
         'football',
+        'soccer',
         'soccer_epl',
         'soccer_england_efl_cup',
         'soccer_uefa_champs_league',
@@ -19,17 +21,18 @@ const SPORT_FILTER_MAP = {
         'soccer_france_ligue_one',
         'soccer_uefa_europa_league'
     ],
-    basketball: ['basketball', 'nba', 'basketball_nba', 'basketball_euroleague'],
-    nfl: ['nfl', 'american_football', 'americanfootball_nfl'],
-    rugby: ['rugby', 'rugbyunion_international', 'rugbyunion_six_nations'],
-    hockey: ['hockey', 'icehockey_nhl'],
-    baseball: ['baseball', 'baseball_mlb'],
-    afl: ['afl', 'aussierules_afl'],
-    mma: ['mma', 'mma_mixed_martial_arts'],
-    formula1: ['formula1'],
-    handball: ['handball'],
-    volleyball: ['volleyball'],
-    cricket: ['cricket']
+    Basketball: ['Basketball', 'basketball', 'nba', 'basketball_nba', 'basketball_euroleague'],
+    NFL: ['NFL', 'nfl', 'american_football', 'americanfootball_nfl'],
+    Rugby: ['Rugby', 'rugby', 'rugbyunion_international', 'rugbyunion_six_nations'],
+    NHL: ['NHL', 'nhl', 'hockey', 'icehockey_nhl'],
+    MLB: ['MLB', 'mlb', 'baseball', 'baseball_mlb'],
+    AFL: ['AFL', 'afl', 'aussierules_afl'],
+    MMA: ['MMA', 'mma', 'mma_mixed_martial_arts'],
+    F1: ['F1', 'formula1'],
+    Handball: ['Handball', 'handball'],
+    Volleyball: ['Volleyball', 'volleyball'],
+    Cricket: ['Cricket', 'cricket'],
+    Esports: ['Esports', 'esports']
 };
 
 function normalizeSportKey(value) {
