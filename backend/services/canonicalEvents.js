@@ -1,6 +1,13 @@
 'use strict';
 
-const { query } = require('../db');
+const { createClient } = require('@supabase/supabase-js');
+
+// Supabase client for Universal Intake Valve
+const SUPABASE_URL = process.env.SUPABASE_URL || '';
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || '';
+const supabase = SUPABASE_URL && SUPABASE_KEY
+    ? createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false, autoRefreshToken: false } })
+    : null;
 
 function normalizeSport(value) {
     const key = String(value || '').trim().toLowerCase();
@@ -63,10 +70,19 @@ function extractStartTime(item) {
 
 function extractStatus(item) {
     const raw = item?.raw_provider_data || {};
-    return raw?.fixture?.status?.long || raw?.status?.long || raw?.game?.status?.long || item?.status || 'Not Started';
+    return raw?.fixture?.status?.short || raw?.fixture?.status?.long || raw?.status?.long || raw?.game?.status?.long || item?.status || 'Not Started';
+}
+
+function extractProviderName(item) {
+    return item?.provider_name || item?.provider || 'unknown';
 }
 
 async function upsertCanonicalEvents(items = []) {
+    if (!supabase) {
+        console.error('[canonicalEvents] Supabase client not initialized — cannot ingest events');
+        return;
+    }
+
     const rows = Array.isArray(items) ? items : [];
 
     for (const item of rows) {
@@ -74,80 +90,26 @@ async function upsertCanonicalEvents(items = []) {
         const startTime = extractStartTime(item);
         if (!providerEventId || !startTime) continue;
 
-        const sport = normalizeSport(item?.sport);
-        const competitionName = extractCompetitionName(item);
-        const season = extractSeason(item);
-        const status = extractStatus(item);
-        const rawProviderData = item?.raw_provider_data || null;
-        const providerName = item?.provider_name || item?.provider || null;
+        // Map the chaotic API data to our clean variables
+        const cleanData = {
+            p_provider_name: extractProviderName(item),
+            p_provider_event_id: providerEventId,
+            p_sport: normalizeSport(item?.sport),
+            p_competition_name: extractCompetitionName(item),
+            p_season: extractSeason(item),
+            p_start_time_utc: new Date(startTime).toISOString(),
+            p_status: extractStatus(item),
+            p_raw_payload: item?.raw_provider_data || item
+        };
 
-        const existing = await query(
-            `
-            SELECT id
-            FROM canonical_events
-            WHERE sport = $1
-              AND COALESCE(
-                    raw_provider_data->'fixture'->>'id',
-                    raw_provider_data->>'id',
-                    raw_provider_data->'game'->>'id',
-                    raw_provider_data->'fight'->>'id',
-                    raw_provider_data->'race'->>'id'
-                  ) = $2
-            ORDER BY updated_at DESC
-            LIMIT 1
-            `,
-            [sport, providerEventId]
-        );
+        // Push it through the Universal Intake Valve
+        const { error } = await supabase.rpc('upsert_canonical_event', cleanData);
 
-        if (existing.rows.length > 0) {
-            await query(
-                `
-                UPDATE canonical_events
-                SET competition_name = $2,
-                    season = $3,
-                    start_time_utc = $4,
-                    status = $5,
-                    raw_provider_data = $6::jsonb,
-                    provider_name = $7,
-                    updated_at = NOW()
-                WHERE id = $1
-                `,
-                [
-                    existing.rows[0].id,
-                    competitionName,
-                    season,
-                    startTime,
-                    status,
-                    JSON.stringify(rawProviderData),
-                    providerName
-                ]
-            );
-            continue;
+        if (error) {
+            console.error(`❌ Failed to ingest match ${cleanData.p_provider_event_id}:`, error.message);
+        } else {
+            console.log(`✅ Match ${cleanData.p_provider_event_id} safely landed in canonical_events.`);
         }
-
-        await query(
-            `
-            INSERT INTO canonical_events (
-                sport,
-                competition_name,
-                season,
-                start_time_utc,
-                status,
-                raw_provider_data,
-                provider_name
-            )
-            VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7)
-            `,
-            [
-                sport,
-                competitionName,
-                season,
-                startTime,
-                status,
-                JSON.stringify(rawProviderData),
-                providerName
-            ]
-        );
     }
 }
 

@@ -11,10 +11,18 @@
 
 const { apiQueue } = require('../utils/apiQueue');
 const db = require('../db'); // PostgreSQL pool
+const { createClient } = require('@supabase/supabase-js');
 
 // TheSportsDB API configuration
 const config = require('../config');
 const THESPORTSDB_BASE_URL = `https://www.thesportsdb.com/api/v1/json/${config.theSportsDbKey || '3'}`;
+
+// Supabase client for Universal Intake Valve
+const SUPABASE_URL = process.env.SUPABASE_URL || '';
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || '';
+const supabase = SUPABASE_URL && SUPABASE_KEY
+  ? createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false, autoRefreshToken: false } })
+  : null;
 
 /**
  * syncDailyFixtures(date)
@@ -61,29 +69,51 @@ async function syncDailyFixtures(date) {
     const idEvent = event.idEvent;
     if (!idEvent) continue;
 
-    const query = `
-      INSERT INTO raw_fixtures (id_event, sport, league_id, home_team_id, away_team_id, start_time, raw_json)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-      ON CONFLICT (id_event) DO UPDATE SET
-        raw_json = EXCLUDED.raw_json,
-        updated_at = NOW()
-    `;
+    // ══════════════════════════════════════════════════════════════════════
+    // KILL SWITCH: Old raw_fixtures pipe disabled. Now using Universal Intake Valve.
+    // ══════════════════════════════════════════════════════════════════════
+    // const query = `
+    //   INSERT INTO raw_fixtures (id_event, sport, league_id, home_team_id, away_team_id, start_time, raw_json)
+    //   VALUES ($1, $2, $3, $4, $5, $6, $7)
+    //   ON CONFLICT (id_event) DO UPDATE SET
+    //     raw_json = EXCLUDED.raw_json,
+    //     updated_at = NOW()
+    // `;
+    // const values = [
+    //   idEvent,
+    //   event.strSport || 'Unknown',
+    //   event.idLeague,
+    //   event.idHomeTeam,
+    //   event.idAwayTeam,
+    //   event.dateEvent ? new Date(`${event.dateEvent} ${event.strTime || '00:00'}Z`) : null,
+    //   JSON.stringify(event)
+    // ];
+    // try {
+    //   await db.query(query, values);
+    //   syncedCount++;
+    // } catch (err) {
+    //   console.error(`[syncDailyFixtures] Failed to upsert event ${idEvent}:`, err.message);
+    // }
 
-    const values = [
-      idEvent,
-      event.strSport || 'Unknown',
-      event.idLeague,
-      event.idHomeTeam,
-      event.idAwayTeam,
-      event.dateEvent ? new Date(`${event.dateEvent} ${event.strTime || '00:00'}Z`) : null,
-      JSON.stringify(event)
-    ];
+    // NEW PIPE: Universal Intake Valve via supabase.rpc('upsert_canonical_event')
+    const cleanData = {
+      p_provider_name: 'thesportsdb',
+      p_provider_event_id: idEvent.toString(),
+      p_sport: event.strSport || 'Unknown',
+      p_competition_name: event.strLeague || 'Unknown',
+      p_season: event.strSeason || new Date().getFullYear().toString(),
+      p_start_time_utc: event.dateEvent ? new Date(`${event.dateEvent} ${event.strTime || '00:00'}Z`).toISOString() : new Date().toISOString(),
+      p_status: event.strStatus || 'NS',
+      p_raw_payload: event
+    };
 
-    try {
-      await db.query(query, values);
+    const { error } = await supabase.rpc('upsert_canonical_event', cleanData);
+
+    if (error) {
+      console.error(`❌ Failed to ingest match ${cleanData.p_provider_event_id}:`, error.message);
+    } else {
+      console.log(`✅ Match ${cleanData.p_provider_event_id} safely landed in canonical_events.`);
       syncedCount++;
-    } catch (err) {
-      console.error(`[syncDailyFixtures] Failed to upsert event ${idEvent}:`, err.message);
     }
   }
 
