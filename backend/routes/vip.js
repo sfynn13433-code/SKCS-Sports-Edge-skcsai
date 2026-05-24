@@ -235,6 +235,9 @@ function shapePrediction(row) {
         compound_ticket_confidence: compoundConfidence,
         diversity_breakdown: diversityBreakdown,
         risk_level: row.risk_level,
+        risk_tier: row.risk_tier,
+        edgemind_report: row.edgemind_report,
+        prediction: row.prediction || row.recommendation,
         created_at: row.created_at,
         validation_matrix: validation,
         context_insights: firstMatch?.context_insights || buildContextInsightsFromMetadata(firstMatch?.metadata?.context_intelligence || null),
@@ -306,7 +309,7 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
         if (!latestPublishRunId && !includeAll) {
             console.warn('[vip/stress-payload] latest_publish_run_id is null, using fallback to most recent predictions');
             // Fallback to most recent predictions instead of filtering by tier
-            const queryText = `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
+            const queryText = `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, risk_tier, edgemind_report, prediction, recommendation, created_at
                FROM direct1x2_prediction_final
                WHERE COALESCE(sport, 'Football') = ANY($1::text[])
                ORDER BY created_at DESC
@@ -325,19 +328,19 @@ router.get('/stress-payload', requireRole('user'), async (req, res) => {
 
         // include_all bypass: query wide set for UI stress testing without plan/tier gating.
         const queryText = includeAll
-            ? `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
+            ? `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, risk_tier, edgemind_report, prediction, recommendation, created_at
                FROM direct1x2_prediction_final
                WHERE COALESCE(sport, 'Football') = ANY($1::text[])
                ORDER BY created_at DESC
                LIMIT 2500`
             : latestPublishRunId
-                ? `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
+                ? `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, risk_tier, edgemind_report, prediction, recommendation, created_at
                    FROM direct1x2_prediction_final
                    WHERE publish_run_id = $1
                      AND COALESCE(sport, 'Football') = ANY($2::text[])
                    ORDER BY total_confidence DESC, created_at DESC
                    LIMIT 3000`
-                : `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, created_at
+                : `SELECT id, publish_run_id, tier, type, matches, total_confidence, risk_level, risk_tier, edgemind_report, prediction, recommendation, created_at
                    FROM direct1x2_prediction_final
                    WHERE LOWER(COALESCE(tier, 'normal')) = ANY($1::text[])
                      AND COALESCE(sport, 'Football') = ANY($2::text[])

@@ -384,6 +384,31 @@
             `
             : '';
 
+        // -----------------------------------------------------------------
+        // EDGEMIND & RISK TIER UI LAYER
+        // -----------------------------------------------------------------
+        const riskColors = {
+            'HIGH_CONFIDENCE': '#22c55e',
+            'MODERATE_RISK': '#f59e0b',
+            'HIGH_RISK': '#ef4444',
+            'EXTREME_RISK': '#7f1d1d'
+        };
+        const activeColor = riskColors[prediction.risk_tier] || '#64748b';
+
+        const edgeMindHtml = prediction.edgemind_report ? `
+            <div style="margin-top:12px; padding:12px; background:rgba(15,23,42,0.8); border-left:3px solid ${activeColor}; border-radius:6px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <span style="font-size:0.75rem; font-weight:800; color:${activeColor}; text-transform:uppercase; letter-spacing:0.05em;">
+                        ${prediction.risk_tier ? prediction.risk_tier.replace('_', ' ') : 'SYSTEM RATED'}
+                    </span>
+                    <span style="font-size:0.7rem; color:#94a3b8;">EDGEMIND AI</span>
+                </div>
+                <div style="font-size:0.85rem; color:#cbd5e1; line-height:1.5; font-style:italic;">
+                    "${safe(prediction.edgemind_report)}"
+                </div>
+            </div>
+        ` : '';
+
         const cardId = registerCard(prediction);
         return `
           <article class="card skcs-clickable-card" data-card-id="${cardId}" style="cursor:pointer;">
@@ -396,6 +421,7 @@
             ${legsPreview}
             ${insightsFooter}
             ${engineLogFooter}
+            ${edgeMindHtml}
             <button class="insight-trigger-btn" data-card-id="${cardId}" style="margin-top:10px;padding:8px 16px;background:linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);color:#ffffff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 12px rgba(139,92,246,0.3);transition:all 0.2s ease;">Click for insights</button>
           </article>
         `;
