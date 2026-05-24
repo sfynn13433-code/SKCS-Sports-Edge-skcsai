@@ -95,7 +95,7 @@ async function runEdgeMindJudge() {
         // -------------------------------------------------------------
         const finalPayload = {
             fixture_id: match.fixture_id,
-            sport: 'Football',
+            sport: eventData.sport || 'Football',
             tier: 'normal',
             type: 'direct',
             market_type: '1X2',
@@ -109,7 +109,7 @@ async function runEdgeMindJudge() {
             risk_level: match.volatility_score > 0.5 ? 'medium' : 'safe', // Gatekeeper logic
             risk_tier: riskTier,
             edgemind_report: edgemind_report,
-            matches: [{ home: homeTeam, away: awayTeam, fixture_id: match.fixture_id, kickoff: eventData.start_time_utc }],
+            matches: [{ home_team: homeTeam, away_team: awayTeam, fixture_id: match.fixture_id, match_date: eventData.start_time_utc, prediction: 'HOME_WIN', recommendation: 'HOME_WIN', confidence: match.final_confidence, market: '1X2' }],
             plan_visibility: ["free", "premium", "pro"],
             secondary_insights: [],
             secondary_markets: [],
