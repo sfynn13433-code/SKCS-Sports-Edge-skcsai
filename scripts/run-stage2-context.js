@@ -1,92 +1,64 @@
-'use strict';
-
 const { createClient } = require('@supabase/supabase-js');
 const config = require('../backend/config');
 
-// Initialize Supabase using project config
-const supabaseUrl = config.supabase?.url || process.env.SUPABASE_URL || '';
-const supabaseKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || config.supabase?.anonKey || '').trim();
-if (!supabaseUrl || !supabaseKey) {
-    console.error('❌ Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY. Set them in your environment.');
+const supabase = createClient(
+    config.supabase?.url || process.env.SUPABASE_URL || '',
+    (process.env.SUPABASE_SERVICE_ROLE_KEY || config.supabase?.anonKey || '').trim(),
+    { auth: { persistSession: false } }
+);
+
+const args = process.argv.slice(2);
+const sportArgIndex = args.indexOf('--sport');
+const targetSport = sportArgIndex !== -1 ? args[sportArgIndex + 1].toLowerCase() : 'football';
+
+const sportRules = require('../backend/config/sportRules')[targetSport];
+if (!sportRules) {
+    console.error(`❌ Rules for sport '${targetSport}' not defined. Exiting.`);
     process.exit(1);
 }
-const supabase = createClient(supabaseUrl, supabaseKey, {
-    auth: { persistSession: false, autoRefreshToken: false }
-});
+
+const stage1Table = `${targetSport}_stage_1_base`;
+const stage2Table = `${targetSport}_stage_2_context`;
 
 async function generateContextualAdjustments() {
-    console.log("🌧️ Waking up Math Engine: Stage 2 (Contextual Adjustments)...");
+    console.log(`🌧️ Waking up Math Engine [${targetSport.toUpperCase()}]: Stage 2...`);
 
-    // 1. Fetch matches that have passed Stage 1
     const { data: stage1Matches, error: fetchError } = await supabase
-        .from('predictions_stage_1')
+        .from(stage1Table)
         .select('*')
-        .limit(10); // Process in batches
+        .limit(10);
 
-    if (fetchError || !stage1Matches || stage1Matches.length === 0) {
-        console.error("❌ No Stage 1 matches found or error:", fetchError);
-        return;
-    }
+    if (fetchError || !stage1Matches || stage1Matches.length === 0) return;
 
-    console.log(`✅ Found ${stage1Matches.length} matches ready for Stage 2.`);
-
-    // 2. Loop through and apply mathematical adjustments
     for (const match of stage1Matches) {
-        
-        // -------------------------------------------------------------
-        // 🧠 THE CONTEXT MATH HAPPENS HERE
-        // In production, this queries your event_weather_snapshots and event_injuries tables.
-        // We simulate the variables here to test the pipeline logic.
-        // -------------------------------------------------------------
+        // 🧠 Dynamic Context Math
         let weather_impact = 0;
         let injury_impact = 0;
-        let home_advantage_impact = +2.5; // Base home advantage bump
-        let confidence_adjustment = 0;
+        let home_advantage_impact = sportRules.baseHomeAdvantage;
 
-        // Simulate a heavy rain penalty if recommendation is Home Win
-        if (match.recommendation === 'HOME_WIN') {
-            weather_impact = -1.5; 
-            injury_impact = -2.0;  // Simulate a missing key player
+        // Only apply weather if the sport is played outdoors
+        if (sportRules.weatherImpactsGame && match.recommendation === 'HOME_WIN') {
+            weather_impact = -1.5;
+            injury_impact = -2.0;
         }
 
-        // Calculate total adjustment
-        confidence_adjustment = weather_impact + injury_impact + home_advantage_impact;
-        
-        // Calculate new adjusted confidence
-        let adjusted_confidence = match.baseline_probability + confidence_adjustment;
-        
-        // Ensure confidence stays within logical bounds (e.g., max 99%)
-        if (adjusted_confidence > 99) adjusted_confidence = 99;
-        if (adjusted_confidence < 1) adjusted_confidence = 1;
+        let confidence_adjustment = weather_impact + injury_impact + home_advantage_impact;
+        let adjusted_confidence = Math.min(99, Math.max(1, match.baseline_probability + confidence_adjustment));
 
-        // 3. Prepare payload for predictions_stage_2
         const stage2Payload = {
             stage_1_id: match.id,
             fixture_id: match.fixture_id,
             adjusted_confidence: adjusted_confidence,
             confidence_adjustment: confidence_adjustment,
-            team_form_impact: 0, // Placeholder for form script
-            injury_impact: injury_impact,
-            suspension_impact: 0, 
-            home_advantage_impact: home_advantage_impact,
             weather_impact: weather_impact,
-            volatility_adjustment: Math.abs(confidence_adjustment), // High adjustments = higher volatility
+            injury_impact: injury_impact,
+            home_advantage_impact: home_advantage_impact,
+            volatility_adjustment: Math.abs(confidence_adjustment),
             created_at: new Date().toISOString()
         };
 
-        // 4. Push to Stage 2
-        const { error: insertError } = await supabase
-            .from('predictions_stage_2')
-            .upsert(stage2Payload, { onConflict: 'fixture_id' }); 
-
-        if (insertError) {
-            console.error(`❌ Failed Stage 2 for ${match.fixture_id}:`, insertError.message);
-        } else {
-            console.log(`✅ Stage 2 complete for ${match.fixture_id}: Base ${match.baseline_probability}% -> Adjusted ${adjusted_confidence}% (Net: ${confidence_adjustment})`);
-        }
+        await supabase.from(stage2Table).upsert(stage2Payload, { onConflict: 'fixture_id' });
+        console.log(`✅ Stage 2 complete for ${match.fixture_id} -> Adjusted ${adjusted_confidence}%`);
     }
-    
-    console.log("🏁 Stage 2 Processing Complete.");
 }
-
 generateContextualAdjustments().catch(console.error);

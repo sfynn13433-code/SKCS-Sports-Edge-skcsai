@@ -14,6 +14,13 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
     auth: { persistSession: false, autoRefreshToken: false }
 });
 
+const args = process.argv.slice(2);
+const sportArgIndex = args.indexOf('--sport');
+const targetSport = sportArgIndex !== -1 ? args[sportArgIndex + 1].toLowerCase() : 'football';
+
+const stage3Table = `${targetSport}_stage_3_gatekeeper`;
+const canonicalTable = `${targetSport}_canonical_events`;
+
 // Note: If you have a real AI provider configured (like Groq/OpenAI), import it here.
 // For this test, we will simulate the AI's response to ensure database plumbing works perfectly.
 
@@ -26,11 +33,11 @@ function resolveRiskTier(confidence) {
 }
 
 async function runEdgeMindJudge() {
-    console.log("🧠 Waking up EdgeMind (The Judge)...");
+    console.log(`🧠 Waking up EdgeMind (The Judge) [${targetSport.toUpperCase()}]...`);
 
     // 1. Fetch matches sitting in Stage 3 that need AI analysis
     const { data: stage3Matches, error: fetchError } = await supabase
-        .from('predictions_stage_3')
+        .from(stage3Table)
         .select('*')
         .limit(5); // Process in small batches
 
@@ -42,7 +49,7 @@ async function runEdgeMindJudge() {
     for (const match of stage3Matches) {
         // 2. Fetch the actual Team Names and Kickoff Time from canonical_events
         const { data: eventData } = await supabase
-            .from('canonical_events')
+            .from(canonicalTable)
             .select('competition_name, raw_provider_data, start_time_utc')
             .eq('provider_event_id', match.fixture_id)
             .limit(1)

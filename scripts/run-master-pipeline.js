@@ -1,19 +1,20 @@
-'use strict';
-
 const { exec } = require('child_process');
 const path = require('path');
 
-// Define the exact order of execution
+// 1. Get the target sport from the webhook/cron
+const args = process.argv.slice(2);
+const sportArgIndex = args.indexOf('--sport');
+const targetSport = sportArgIndex !== -1 ? args[sportArgIndex + 1].toLowerCase() : 'football';
+
+// 2. Pass the flag to every stage
 const pipelineStages = [
-    // Note: Add your ingestion script here if you want it to fetch data first
-    // 'node scripts/brute-force-ingest.js', 
-    'node scripts/run-stage1-math.js',
-    'node scripts/run-stage2-context.js',
-    'node scripts/run-stage3-volatility.js',
-    'node scripts/run-edgemind-judge.js'
+    `node scripts/run-stage1-math.js --sport ${targetSport}`,
+    `node scripts/run-stage2-context.js --sport ${targetSport}`,
+    `node scripts/run-stage3-volatility.js --sport ${targetSport}`,
+    `node scripts/run-edgemind-judge.js --sport ${targetSport}`
 ];
 
-console.log("🚀 STARTING SKCS MASTER PIPELINE...");
+console.log(`🚀 STARTING SKCS MASTER PIPELINE [${targetSport.toUpperCase()}]...`);
 
 // Function to run scripts one after the other
 function runNextStage(index) {
