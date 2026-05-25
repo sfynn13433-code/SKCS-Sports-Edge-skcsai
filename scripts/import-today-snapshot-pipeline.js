@@ -9,6 +9,7 @@ const { buildMatchContext } = require('../backend/services/normalizerService');
 const { runPipelineForMatches, rebuildFinalOutputs } = require('../backend/services/aiPipeline');
 const { buildAndStoreDirect1X2 } = require('../backend/services/direct1x2Builder');
 const { getApiSportsKeyPool, getRapidApiKeyPool, maskKey } = require('../backend/utils/keyPool');
+const { enforceRateLimitAndFetch } = require('../backend/utils/apiUsageLimiter');
 const { fetchCricbuzzMatches, normalizeCricbuzzData } = require('../backend/services/cricbuzzService');
 
 console.log('🚨 PIPELINE SPORT KEY:', process.env.RAPIDAPI_KEY ? 'RAPIDAPI_KEY present' : 'MISSING');
@@ -1142,84 +1143,88 @@ function isRetryableApiSportsError(error) {
 }
 
 async function requestApiSportsWithRotation(spec, params) {
-    const keyPool = uniqueNonEmpty([
-        ...RAPID_KEYS,
-        ...getApiSportsKeyPool({ sport: spec.sport, fallbackKeys: APISPORTS_KEYS }),
-        ...APISPORTS_KEYS
-    ]).slice(0, ACTIVE_KEY_LIMIT);
-    if (!keyPool.length) {
-        throw new Error(`No RapidAPI/API-Sports keys configured for ${spec.sport}`);
-    }
+    const fetchOperation = async () => {
+        const keyPool = uniqueNonEmpty([
+            ...RAPID_KEYS,
+            ...getApiSportsKeyPool({ sport: spec.sport, fallbackKeys: APISPORTS_KEYS }),
+            ...APISPORTS_KEYS
+        ]).slice(0, ACTIVE_KEY_LIMIT);
+        if (!keyPool.length) {
+            throw new Error(`No RapidAPI/API-Sports keys configured for ${spec.sport}`);
+        }
 
-    const hosts = resolveRapidHostsForSport(spec);
-    if (!hosts.length) {
-        throw new Error(`No RapidAPI host candidates configured for ${spec.sport}`);
-    }
-    const endpoints = resolveEndpointsForSport(spec);
-    if (!endpoints.length) {
-        throw new Error(`No endpoint candidates configured for ${spec.sport}`);
-    }
-    let lastError = null;
+        const hosts = resolveRapidHostsForSport(spec);
+        if (!hosts.length) {
+            throw new Error(`No RapidAPI host candidates configured for ${spec.sport}`);
+        }
+        const endpoints = resolveEndpointsForSport(spec);
+        if (!endpoints.length) {
+            throw new Error(`No endpoint candidates configured for ${spec.sport}`);
+        }
+        let lastError = null;
 
-    for (let endpointIdx = 0; endpointIdx < endpoints.length; endpointIdx += 1) {
-        const endpointPath = endpoints[endpointIdx];
-        for (let hostIdx = 0; hostIdx < hosts.length; hostIdx += 1) {
-            const host = hosts[hostIdx];
-            const url = `https://${host}${endpointPath}`;
-            for (let idx = 0; idx < keyPool.length; idx += 1) {
-                const key = keyPool[idx];
-                const headers = {
-                    'x-rapidapi-key': key,
-                    'x-rapidapi-host': host
-                };
-                if (host.endsWith('api-sports.io')) {
-                    headers['x-apisports-key'] = key;
-                }
-
-                try {
-                    const response = await axios.get(url, {
-                        headers,
-                        params,
-                        timeout: 30000
-                    });
-
-                    if (hasApiSportsQuotaPayload(response.data)) {
-                        console.warn(`[snapshot-import] ${spec.sport} endpoint=${endpointPath} host=${host} key ${idx + 1}/${keyPool.length} (${maskKey(key)}) quota exhausted. Rotating...`);
-                        lastError = new Error('API-Sports quota exhausted');
-                        continue;
+        for (let endpointIdx = 0; endpointIdx < endpoints.length; endpointIdx += 1) {
+            const endpointPath = endpoints[endpointIdx];
+            for (let hostIdx = 0; hostIdx < hosts.length; hostIdx += 1) {
+                const host = hosts[hostIdx];
+                const url = `https://${host}${endpointPath}`;
+                for (let idx = 0; idx < keyPool.length; idx += 1) {
+                    const key = keyPool[idx];
+                    const headers = {
+                        'x-rapidapi-key': key,
+                        'x-rapidapi-host': host
+                    };
+                    if (host.endsWith('api-sports.io')) {
+                        headers['x-apisports-key'] = key;
                     }
 
-                    const payload = response.data || {};
-                    if (!Array.isArray(payload.response) && typeof payload.response === 'undefined') {
-                        lastError = new Error(`Host ${host} returned unsupported payload shape for endpoint ${endpointPath}`);
-                        continue;
-                    }
+                    try {
+                        const response = await axios.get(url, {
+                            headers,
+                            params,
+                            timeout: 30000
+                        });
 
-                    return response;
-                } catch (error) {
-                    lastError = error;
-                    if (isRetryableApiSportsError(error)) {
-                        const status = Number(error?.response?.status || 0) || 'network';
-                        console.warn(`[snapshot-import] ${spec.sport} endpoint=${endpointPath} host=${host} key ${idx + 1}/${keyPool.length} (${maskKey(key)}) failed (${status}). Rotating...`);
-                        continue;
+                        if (hasApiSportsQuotaPayload(response.data)) {
+                            console.warn(`[snapshot-import] ${spec.sport} endpoint=${endpointPath} host=${host} key ${idx + 1}/${keyPool.length} (${maskKey(key)}) quota exhausted. Rotating...`);
+                            lastError = new Error('API-Sports quota exhausted');
+                            continue;
+                        }
+
+                        const payload = response.data || {};
+                        if (!Array.isArray(payload.response) && typeof payload.response === 'undefined') {
+                            lastError = new Error(`Host ${host} returned unsupported payload shape for endpoint ${endpointPath}`);
+                            continue;
+                        }
+
+                        return response;
+                    } catch (error) {
+                        lastError = error;
+                        if (isRetryableApiSportsError(error)) {
+                            const status = Number(error?.response?.status || 0) || 'network';
+                            console.warn(`[snapshot-import] ${spec.sport} endpoint=${endpointPath} host=${host} key ${idx + 1}/${keyPool.length} (${maskKey(key)}) failed (${status}). Rotating...`);
+                            continue;
+                        }
+                        const status = Number(error?.response?.status || 0);
+                        if (status === 400 || status === 404 || status === 405) {
+                            continue;
+                        }
+                        if (status >= 500) {
+                            continue;
+                        }
+                        if (error?.code === 'ENOTFOUND' || error?.code === 'ECONNREFUSED' || error?.code === 'ETIMEDOUT') {
+                            continue;
+                        }
+                        throw error;
                     }
-                    const status = Number(error?.response?.status || 0);
-                    if (status === 400 || status === 404 || status === 405) {
-                        continue;
-                    }
-                    if (status >= 500) {
-                        continue;
-                    }
-                    if (error?.code === 'ENOTFOUND' || error?.code === 'ECONNREFUSED' || error?.code === 'ETIMEDOUT') {
-                        continue;
-                    }
-                    throw error;
                 }
             }
         }
-    }
 
-    throw new Error(`[snapshot-import] ${spec.sport}: all RapidAPI/API-Sports hosts+keys failed (${lastError ? lastError.message : 'unknown'})`);
+        throw new Error(`[snapshot-import] ${spec.sport}: all RapidAPI/API-Sports hosts+keys failed (${lastError ? lastError.message : 'unknown'})`);
+    };
+
+    return enforceRateLimitAndFetch(`snapshot-import:${spec.sport}`, fetchOperation);
 }
 
 async function fetchApiSportsByDate(spec) {
