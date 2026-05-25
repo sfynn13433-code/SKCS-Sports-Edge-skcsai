@@ -50,7 +50,7 @@ async function runEdgeMindJudge() {
         // 2. Fetch the actual Team Names and Kickoff Time from canonical_events
         const { data: eventData } = await supabase
             .from(canonicalTable)
-            .select('competition_name, raw_provider_data, start_time_utc')
+            .select('competition_name, raw_provider_data, start_time_utc, sport')
             .eq('provider_event_id', match.fixture_id)
             .limit(1)
             .single();

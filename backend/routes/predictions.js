@@ -183,6 +183,10 @@ function getSportFilterValues(sport) {
     return SPORT_FILTER_MAP[key] || [key];
 }
 
+function getStrictSportFilterValue(sport) {
+    return normalizePredictionSportKey(String(sport || ACTIVE_DEPLOYMENT_SPORT).trim().toLowerCase());
+}
+
 function normalizeInsightTierLabel(value) {
     const tier = String(value || '').trim().toLowerCase();
     if (!tier) return null;
@@ -2182,6 +2186,7 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         // Require explicit include_all request; do not auto-enable full-history mode for admins.
         const includeAll = includeAllRequested && (isAdminAudit || req.user?.is_test_user === true);
         const sportFilterValues = getSportFilterValues(sport);
+        const strictSportFilterValue = getStrictSportFilterValue(sport);
         
         let historyWindowDays = Number(req.query.history_days);
         if (isNaN(historyWindowDays)) {
@@ -2227,22 +2232,19 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             let queryParams = [];
             if (includeAll) {
                 // Even in include_all mode, respect sport filtering when specified
-                const sportFilterValues = getSportFilterValues(sport);
-                if (sportFilterValues.length > 0) {
-                    // Filter by sport - use OR condition to match any of the allowed sport values
-                    const sportPlaceholders = sportFilterValues.map((_, i) => `$${i + 1}`).join(', ');
+                if (strictSportFilterValue) {
                     queryStr = `
                         SELECT DISTINCT ON (pf.id) pf.id, pf.publish_run_id, pf.tier, pf.type, pf.matches, pf.total_confidence, pf.risk_level, pf.risk_tier, pf.prediction, pf.created_at,
                                pf.plan_visibility, pf.sport, pf.market_type, pf.recommendation, pf.expires_at,
                                pf.edgemind_report, pf.secondary_insights
                         FROM direct1x2_prediction_final pf
-                        WHERE LOWER(COALESCE(pf.sport, 'football')) IN (${sportPlaceholders})
+                        WHERE LOWER(COALESCE(pf.sport, '')) = LOWER($1)
                           AND ${PREDICTION_ROW_QUALITY_SQL}
                         ORDER BY pf.id, pf.created_at DESC
                         LIMIT 2500;
                     `;
                     // Sport column is included in SELECT for frontend filtering
-                    queryParams = sportFilterValues.map(s => s.toLowerCase());
+                    queryParams = [strictSportFilterValue];
                 } else {
                     // No sport filter - return all
                     queryStr = `
@@ -2264,11 +2266,12 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                            pf.edgemind_report, pf.secondary_insights
                     FROM direct1x2_prediction_final pf
                     WHERE LOWER(COALESCE(pf.tier, 'normal')) = ANY($1::text[])
+                      AND LOWER(COALESCE(pf.sport, '')) = LOWER($2)
                       AND ${PREDICTION_ROW_QUALITY_SQL}
                     ORDER BY pf.id, pf.created_at DESC
                     LIMIT 2000;
                 `;
-                queryParams = [queryTiers];
+                queryParams = [queryTiers, strictSportFilterValue];
             }
 
             const dbRes = await query(queryStr, queryParams);
@@ -2326,8 +2329,8 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             if ((!predictions || predictions.length === 0) && config.supabase && config.supabase.url && config.supabase.anonKey) {
                 console.log('[predictions] DB empty - attempting Supabase fallback');
                 const sb = createClient(config.supabase.url, config.supabase.anonKey);
-                const sportFilterValues = getSportFilterValues(sport);
-                
+                const strictSportFilterValue = getStrictSportFilterValue(sport);
+
                 if (includeAll) {
                     let query = sb
                         .from('direct1x2_prediction_final')
@@ -2335,10 +2338,10 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                         .gt('match_date', new Date().toISOString())
                         .order('created_at', { ascending: false })
                         .limit(2500);
-                    
+
                     // Apply sport filter even in includeAll mode
-                    if (sportFilterValues.length > 0) {
-                        query = query.in('sport', sportFilterValues);
+                    if (strictSportFilterValue) {
+                        query = query.ilike('sport', strictSportFilterValue);
                     }
 
                     const { data, error } = await query;
@@ -2370,12 +2373,14 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                             .from('direct1x2_prediction_final')
                             .select('*')
                             .eq('publish_run_id', latestSupabaseRun.id)
+                            .ilike('sport', strictSportFilterValue)
                             .gt('match_date', new Date().toISOString())
                             .order('created_at', { ascending: false })
                             .limit(2000)
                         : await sb
                             .from('direct1x2_prediction_final')
                             .select('*')
+                            .ilike('sport', strictSportFilterValue)
                             .gt('match_date', new Date().toISOString())
                             .order('created_at', { ascending: false })
                             .limit(2000);

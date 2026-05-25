@@ -232,6 +232,7 @@ function showNotification(message, type = 'info') {
 
         // FILTER: Only show predictions matching the current sport
         var sportLower = sport.toLowerCase().trim();
+        var isAccaView = category === 'ACCAs';
 
         // Safe stringified log before filter runs
         if (allPredictions.length > 0) {
@@ -318,6 +319,14 @@ function showNotification(message, type = 'info') {
         var filteredPredictions = allPredictions.filter(function(pred) {
             var match = (pred.matches && pred.matches[0]) ? pred.matches[0] : {};
             var meta = (match.metadata && typeof match.metadata === 'object') ? match.metadata : {};
+            // 🛡️ THE MASTER RULEBOOK: ACCA GATEKEEPER
+            // Only allow Safe or Moderate Risk matches into the ACCA builder
+            var isHighRisk = pred.risk_tier === 'HIGH_RISK' || pred.risk_tier === 'EXTREME_RISK';
+
+            if (isAccaView && isHighRisk) {
+                console.warn(`🛑 ACCA Blocked: ${(pred.home_team || match.home_team || 'Home Team')} vs ${(pred.away_team || match.away_team || 'Away Team')} is too volatile (${pred.risk_tier}).`);
+                return false;
+            }
 
             // Safely extract sport from multiple possible locations
             var predSportValues = [
