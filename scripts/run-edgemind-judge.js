@@ -83,12 +83,91 @@ async function runEdgeMindJudge() {
             Do not guess numbers. Use the data provided.
         `;
 
-        console.log(`\n🤖 Sending prompt to EdgeMind for ${homeTeam} vs ${awayTeam}...`);
-        
-        // Simulated AI Response (Replace with your actual API call later)
-        const edgemind_report = `SKCS models indicate a ${match.final_confidence}% probability for ${homeTeam} based on core metrics. However, bettors should exercise caution due to a high volatility score of ${match.volatility_score}, driven heavily by ${riskFlags.join(' and ')}.`;
-
         const riskTier = resolveRiskTier(match.final_confidence);
+
+        console.log(`\n🤖 Sending prompt to EdgeMind for ${homeTeam} vs ${awayTeam}...`);
+        let edgemind_report = "";
+
+        // =====================================================================
+        // 🧠 THE 4-TIER EDGEMIND WATERFALL MATRIX
+        // Priority 1: Gemini Pro | Priority 2: Groq | Priority 3: Local | Priority 4: Template
+        // =====================================================================
+
+        const systemPrompt = `You are SKCS EdgeMind, an elite sports intelligence analyst. The system has officially classified this match as ${riskTier}. You cannot alter this classification. Write a strict, 2-sentence pre-match insight explaining this probability and highlighting the risk factors. Do not guess numbers.`;
+        const userPrompt = `Match: ${homeTeam} vs ${awayTeam} | Probability: ${match.final_confidence}% for ${match.recommendation} | Risk Flags: ${riskFlags.join(', ')} | Volatility: ${match.volatility_score}`;
+
+        try {
+            // 🥇 PRIORITY 1: GOOGLE GEMINI (gemini-pro)
+            console.log("   Attempting Priority 1: Google Gemini...");
+            const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }]
+                })
+            });
+            if (!geminiRes.ok) throw new Error("Gemini API Error");
+            const geminiData = await geminiRes.json();
+            edgemind_report = geminiData.candidates[0].content.parts[0].text.replace(/\n/g, ' ').trim();
+            console.log("   ✅ Success: Gemini generated the insight.");
+
+        } catch (geminiError) {
+            console.warn("   ⚠️ Gemini Failed. Falling back to Priority 2...");
+
+            try {
+                // 🥈 PRIORITY 2: GROQ (llama-3.1-8b-instant)
+                console.log("   Attempting Priority 2: Groq...");
+                const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+                        'Content-Type': 'application/json' 
+                    },
+                    body: JSON.stringify({
+                        model: "llama-3.1-8b-instant",
+                        messages: [
+                            { role: "system", content: systemPrompt },
+                            { role: "user", content: userPrompt }
+                        ],
+                        max_tokens: 150
+                    })
+                });
+                if (!groqRes.ok) throw new Error("Groq API Error");
+                const groqData = await groqRes.json();
+                edgemind_report = groqData.choices[0].message.content.replace(/\n/g, ' ').trim();
+                console.log("   ✅ Success: Groq generated the insight.");
+
+            } catch (groqError) {
+                console.warn("   ⚠️ Groq Failed. Falling back to Priority 3...");
+
+                try {
+                    // 🥉 PRIORITY 3: LOCAL DOLPHIN/LLAMA
+                    console.log("   Attempting Priority 3: Local Dolphin...");
+                    const localRes = await fetch("http://localhost:11434/api/generate", {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            model: "dolphin-llama3",
+                            prompt: `${systemPrompt}\n\n${userPrompt}`,
+                            stream: false
+                        })
+                    });
+                    if (!localRes.ok) throw new Error("Local LLM Offline or Error");
+                    const localData = await localRes.json();
+                    edgemind_report = localData.response.replace(/\n/g, ' ').trim();
+                    console.log("   ✅ Success: Local Dolphin generated the insight.");
+
+                } catch (localError) {
+                    console.warn("   🚨 All AI APIs Offline. Falling back to Priority 4...");
+
+                    // 🏁 PRIORITY 4: TEMPLATE ENGINE (Final Fallback)
+                    console.log("   Engaging Template Engine...");
+                    const flagsText = riskFlags.length > 0 ? `driven heavily by ${riskFlags.join(' and ')}` : "based on standard metrics";
+                    edgemind_report = `SKCS models indicate a ${match.final_confidence}% probability for ${match.recommendation.replace('_', ' ')}. However, bettors should exercise caution due to a volatility score of ${match.volatility_score}, ${flagsText}.`;
+                    console.log("   ✅ Success: Template Engine deployed.");
+                }
+            }
+        }
 
         // -------------------------------------------------------------
         // 🚀 PUBLISH TO LIVE FRONTEND TABLE
