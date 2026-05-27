@@ -1188,9 +1188,19 @@ async function requestApiSportsWithRotation(spec, params) {
 
                     const url = `https://${host}${endpointPath}`;
                     try {
-                        console.log(`[snapshot-import] Requesting ${spec.sport} via ${host} (${isApiSportsHost ? 'api-sports primary' : `rapid ${idx + 1}/${keysForHost.length}`}) endpoint=${endpointPath}`);
+                        const fetchHeaders = isApiSportsHost
+                            ? { 'x-apisports-key': String(process.env.X_APISPORTS_KEY).trim() }
+                            : { 'x-rapidapi-key': key, 'x-rapidapi-host': host };
+
+                        if (!isApiSportsHost && host.endsWith('api-sports.io')) {
+                            fetchHeaders['x-apisports-key'] = String(process.env.X_APISPORTS_KEY).trim();
+                        }
+
+                        console.log(`📡 EXECUTING FETCH TO: ${url}`);
+                        console.log(`🏷️ WITH HEADERS:`, fetchHeaders);
+
                         const response = await axios.get(url, {
-                            headers,
+                            headers: fetchHeaders,
                             params,
                             timeout: 30000
                         });
