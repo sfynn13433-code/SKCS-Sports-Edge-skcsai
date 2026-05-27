@@ -14,6 +14,7 @@ async function runContextInsertProbe(supabase) {
     if (String(process.env.SKCS_CONTEXT_INSERT_TEST || '').trim() !== '1') return;
 
     const { error } = await supabase.from('match_context_data').insert({
+        id_event: 'test_match',
         match_id: 'test_match',
         injuries: { test: true },
         h2h: null,
@@ -39,6 +40,7 @@ async function saveContextData(supabase, matchId, data) {
     const payload = data && typeof data === 'object' ? data : {};
     const normalizedSport = String(payload.sport || payload.match_sport || payload?.metadata?.sport || '').trim();
     const safePayload = {
+        id_event: safeMatchId,
         match_id: safeMatchId,
         injuries: payload.injuries ?? {},
         h2h: mergeTier1SchemaIntoContext(payload.h2h ?? {}, normalizedSport),
@@ -69,6 +71,7 @@ async function saveContextData(supabase, matchId, data) {
     }
 
     const fallbackInsert = await supabase.from('match_context_data').insert({
+        id_event: safeMatchId,
         match_id: safeMatchId,
         injuries: {},
         h2h: {},

@@ -1,6 +1,14 @@
 'use strict';
 
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+
+console.log("🚨 DOTENV CHECK: X_APISPORTS_KEY is", process.env.X_APISPORTS_KEY ? "FOUND AND LOADED" : "MISSING - DOTENV IS BLIND");
+
+const dns = require('dns');
+if (dns.setDefaultResultOrder) {
+    dns.setDefaultResultOrder('ipv4first');
+}
 
 const axios = require('axios');
 const { query } = require('../backend/db');
@@ -8,14 +16,14 @@ const { upsertCanonicalEvents } = require('../backend/services/canonicalEvents')
 const { buildMatchContext } = require('../backend/services/normalizerService');
 const { runPipelineForMatches, rebuildFinalOutputs } = require('../backend/services/aiPipeline');
 const { buildAndStoreDirect1X2 } = require('../backend/services/direct1x2Builder');
-const { getApiSportsKeyPool, getRapidApiKeyPool, maskKey } = require('../backend/utils/keyPool');
+const { getRapidApiKeyPool } = require('../backend/utils/keyPool');
 const { enforceRateLimitAndFetch } = require('../backend/utils/apiUsageLimiter');
 const { fetchCricbuzzMatches, normalizeCricbuzzData } = require('../backend/services/cricbuzzService');
 
-console.log('🚨 PIPELINE SPORT KEY:', process.env.RAPIDAPI_KEY ? 'RAPIDAPI_KEY present' : 'MISSING');
 console.log('🚨 CRICBUZZ HOST:', process.env.RAPIDAPI_HOST_CRICBUZZ);
 
-const APISPORTS_KEYS = getApiSportsKeyPool();
+const APISPORTS_KEY = String(process.env.X_APISPORTS_KEY || '').trim();
+console.log(`[snapshot-import] X_APISPORTS_KEY loaded: ${APISPORTS_KEY ? `yes (len=${APISPORTS_KEY.length})` : 'NO — env missing'}`);
 const CRICKETDATA_API_KEY = String(process.env.CRICKETDATA_API_KEY || '').trim();
 const TODAY = new Date().toISOString().slice(0, 10);
 const SPORT_STAGGER_MS = 900;
@@ -112,6 +120,7 @@ const RAPID_KEYS = uniqueNonEmpty([
     ...ACTIVE_KEY_OVERRIDES,
     ...getRapidApiKeyPool()
 ]).slice(0, ACTIVE_KEY_LIMIT);
+const RAPID_KEY_COUNT = RAPID_KEYS.length;
 
 function sportEnvToken(sport) {
     return String(sport || '').toUpperCase().replace(/[^A-Z0-9]+/g, '_');
@@ -1138,47 +1147,48 @@ function hasApiSportsQuotaPayload(data) {
 
 function isRetryableApiSportsError(error) {
     const status = Number(error?.response?.status || 0);
-    if (status === 401 || status === 403 || status === 429) return true;
+    if (status === 429) return true;
     return hasApiSportsQuotaPayload(error?.response?.data);
 }
 
 async function requestApiSportsWithRotation(spec, params) {
     const fetchOperation = async () => {
-        const keyPool = uniqueNonEmpty([
-            ...RAPID_KEYS,
-            ...getApiSportsKeyPool({ sport: spec.sport, fallbackKeys: APISPORTS_KEYS }),
-            ...APISPORTS_KEYS
-        ]).slice(0, ACTIVE_KEY_LIMIT);
-        if (!keyPool.length) {
-            throw new Error(`No RapidAPI/API-Sports keys configured for ${spec.sport}`);
+        if (!APISPORTS_KEY) {
+            throw new Error('Missing API-Sports key. Set X_APISPORTS_KEY in the environment.');
         }
 
-        const hosts = resolveRapidHostsForSport(spec);
-        if (!hosts.length) {
-            throw new Error(`No RapidAPI host candidates configured for ${spec.sport}`);
-        }
         const endpoints = resolveEndpointsForSport(spec);
         if (!endpoints.length) {
             throw new Error(`No endpoint candidates configured for ${spec.sport}`);
         }
+
+        const apiSportsHost = sanitizeHost(spec.baseUrl);
+        const hostSequence = uniqueNonEmpty([apiSportsHost, ...resolveRapidHostsForSport(spec)]);
         let lastError = null;
 
-        for (let endpointIdx = 0; endpointIdx < endpoints.length; endpointIdx += 1) {
-            const endpointPath = endpoints[endpointIdx];
-            for (let hostIdx = 0; hostIdx < hosts.length; hostIdx += 1) {
-                const host = hosts[hostIdx];
-                const url = `https://${host}${endpointPath}`;
-                for (let idx = 0; idx < keyPool.length; idx += 1) {
-                    const key = keyPool[idx];
-                    const headers = {
-                        'x-rapidapi-key': key,
-                        'x-rapidapi-host': host
-                    };
-                    if (host.endsWith('api-sports.io')) {
-                        headers['x-apisports-key'] = key;
+        for (const endpointPath of endpoints) {
+            for (const host of hostSequence) {
+                const isApiSportsHost = host.endsWith('api-sports.io');
+                const keysForHost = isApiSportsHost ? [APISPORTS_KEY] : RAPID_KEYS;
+                if (!keysForHost.length) {
+                    if (isApiSportsHost) {
+                        throw new Error('API-Sports host requires X_APISPORTS_KEY');
+                    }
+                    continue;
+                }
+
+                for (let idx = 0; idx < keysForHost.length; idx += 1) {
+                    const key = keysForHost[idx];
+                    const headers = isApiSportsHost
+                        ? { 'x-apisports-key': process.env.X_APISPORTS_KEY }
+                        : { 'x-rapidapi-key': key, 'x-rapidapi-host': host };
+                    if (!isApiSportsHost && host.endsWith('api-sports.io')) {
+                        headers['x-apisports-key'] = process.env.X_APISPORTS_KEY;
                     }
 
+                    const url = `https://${host}${endpointPath}`;
                     try {
+                        console.log(`[snapshot-import] Requesting ${spec.sport} via ${host} (${isApiSportsHost ? 'api-sports primary' : `rapid ${idx + 1}/${keysForHost.length}`}) endpoint=${endpointPath}`);
                         const response = await axios.get(url, {
                             headers,
                             params,
@@ -1186,8 +1196,11 @@ async function requestApiSportsWithRotation(spec, params) {
                         });
 
                         if (hasApiSportsQuotaPayload(response.data)) {
-                            console.warn(`[snapshot-import] ${spec.sport} endpoint=${endpointPath} host=${host} key ${idx + 1}/${keyPool.length} (${maskKey(key)}) quota exhausted. Rotating...`);
+                            console.warn(`[snapshot-import] ${spec.sport} endpoint=${endpointPath} host=${host} quota response: ${JSON.stringify(response.data.errors || response.data)}`);
                             lastError = new Error('API-Sports quota exhausted');
+                            if (isApiSportsHost) {
+                                throw lastError;
+                            }
                             continue;
                         }
 
@@ -1200,28 +1213,29 @@ async function requestApiSportsWithRotation(spec, params) {
                         return response;
                     } catch (error) {
                         lastError = error;
+                        const status = Number(error?.response?.status || 0) || 'network';
+                        const body = error?.response?.data ? JSON.stringify(error.response.data) : error.message;
+                        console.error(`[snapshot-import] ${spec.sport} host=${host} status=${status} body=${body}`);
+
+                        if (isApiSportsHost) {
+                            throw error;
+                        }
+
                         if (isRetryableApiSportsError(error)) {
-                            const status = Number(error?.response?.status || 0) || 'network';
-                            console.warn(`[snapshot-import] ${spec.sport} endpoint=${endpointPath} host=${host} key ${idx + 1}/${keyPool.length} (${maskKey(key)}) failed (${status}). Rotating...`);
                             continue;
                         }
-                        const status = Number(error?.response?.status || 0);
-                        if (status === 400 || status === 404 || status === 405) {
+
+                        if (status >= 500 || ['ENOTFOUND', 'ECONNREFUSED', 'ETIMEDOUT'].includes(error?.code)) {
                             continue;
                         }
-                        if (status >= 500) {
-                            continue;
-                        }
-                        if (error?.code === 'ENOTFOUND' || error?.code === 'ECONNREFUSED' || error?.code === 'ETIMEDOUT') {
-                            continue;
-                        }
+
                         throw error;
                     }
                 }
             }
         }
 
-        throw new Error(`[snapshot-import] ${spec.sport}: all RapidAPI/API-Sports hosts+keys failed (${lastError ? lastError.message : 'unknown'})`);
+        throw new Error(`[snapshot-import] ${spec.sport}: all hosts failed (${lastError ? lastError.message : 'unknown'})`);
     };
 
     return enforceRateLimitAndFetch(`snapshot-import:${spec.sport}`, fetchOperation);
@@ -1662,18 +1676,39 @@ async function persistDirect1x2Predictions(fixtures) {
     return { attempted, stored, failed };
 }
 
-async function main() {
-    const availableKeyCount = uniqueNonEmpty([...RAPID_KEYS, ...APISPORTS_KEYS]).length;
-    if (!availableKeyCount) {
-        throw new Error('No RapidAPI/API-Sports keys found in environment (expected RAPIDAPI_KEY / X_RAPIDAPI_KEY / X_APISPORTS_KEY)');
+function parseSportArg(argv) {
+    const safeArgv = Array.isArray(argv) ? argv : [];
+    const idx = safeArgv.findIndex((arg) => String(arg).trim().toLowerCase() === '--sport');
+    if (idx !== -1 && idx + 1 < safeArgv.length) {
+        return String(safeArgv[idx + 1]).trim().toLowerCase();
     }
-    console.log(`[snapshot-import] Rapid/API key pool size: ${availableKeyCount}`);
+    const eqArg = safeArgv.find((arg) => String(arg || '').startsWith('--sport='));
+    if (eqArg) {
+        return String(eqArg).split('=').slice(1).join('=').trim().toLowerCase();
+    }
+    return null;
+}
+
+async function main() {
+    if (!process.env.X_APISPORTS_KEY) {
+        throw new Error('Missing API-Sports key (X_APISPORTS_KEY) required for snapshot pipeline.');
+    }
+    console.log(`[snapshot-import] Rapid key pool size: ${RAPID_KEY_COUNT}`);
+
+    const targetSport = parseSportArg(process.argv);
+    if (targetSport) {
+        console.log(`[snapshot-import] Filtering execution to sport: ${targetSport}`);
+    }
 
     const importReport = [];
     const importedFixtures = [];
     const skippedSports = [];
 
-    for (const spec of SPORT_SPECS) {
+    const activeSportSpecs = targetSport 
+        ? SPORT_SPECS.filter((spec) => spec.sport.toLowerCase() === targetSport)
+        : SPORT_SPECS;
+
+    for (const spec of activeSportSpecs) {
         try {
             console.log(`[snapshot-import] fetching ${spec.sport}...`);
             const fixtures = await fetchApiSportsByDate(spec);
@@ -1697,26 +1732,28 @@ async function main() {
         await sleep(SPORT_STAGGER_MS);
     }
 
-    console.log('[snapshot-import] fetching cricket via Cricbuzz...');
-    const cricketCricbuzz = await ingestCricbuzz();
-    if (cricketCricbuzz.length > 0) {
-        importedFixtures.push(...cricketCricbuzz);
-        importReport.push({
-            sport: 'cricket',
-            provider: 'cricbuzz',
-            count: cricketCricbuzz.length,
-            status: 'ok'
-        });
-    } else {
-        console.log('[snapshot-import] Cricbuzz empty, trying CricketData API fallback...');
-        const cricketFallback = await fetchCricketFallback();
-        importedFixtures.push(...cricketFallback);
-        importReport.push({
-            sport: 'cricket',
-            provider: 'cricapi',
-            count: cricketFallback.length,
-            status: cricketFallback.length > 0 ? 'ok' : 'empty'
-        });
+    if (!targetSport || targetSport === 'cricket') {
+        console.log('[snapshot-import] fetching cricket via Cricbuzz...');
+        const cricketCricbuzz = await ingestCricbuzz();
+        if (cricketCricbuzz.length > 0) {
+            importedFixtures.push(...cricketCricbuzz);
+            importReport.push({
+                sport: 'cricket',
+                provider: 'cricbuzz',
+                count: cricketCricbuzz.length,
+                status: 'ok'
+            });
+        } else {
+            console.log('[snapshot-import] Cricbuzz empty, trying CricketData API fallback...');
+            const cricketFallback = await fetchCricketFallback();
+            importedFixtures.push(...cricketFallback);
+            importReport.push({
+                sport: 'cricket',
+                provider: 'cricapi',
+                count: cricketFallback.length,
+                status: cricketFallback.length > 0 ? 'ok' : 'empty'
+            });
+        }
     }
 
     const uniqueBySportId = new Map();

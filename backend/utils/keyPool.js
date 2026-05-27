@@ -190,26 +190,13 @@ function getPoolMaxSlots() {
     return Math.max(1, Math.min(1000, Math.floor(n)));
 }
 
-function getApiSportsKeyPool(options = {}) {
-    const maxSlots = getPoolMaxSlots();
-    const sport = options.sport || '';
-    const fallbackKeys = Array.isArray(options.fallbackKeys) ? options.fallbackKeys : [];
-    const sportPrefixes = sportSpecificPrefixes(sport);
-    const sportRegex = buildPrefixedKeyRegex(sportPrefixes);
-    const genericRegex = /^(X_APISPORTS_KEY|X_API_SPORTS_KEY|API_SPORTS_KEY|APISPORTS_KEY)(?:_\d+)?$/i;
-
-    const values = [
-        ...collectFromPrefixes(sportPrefixes, maxSlots),
-        ...collectFromPrefixes(['X_APISPORTS_KEY', 'X_API_SPORTS_KEY', 'API_SPORTS_KEY', 'APISPORTS_KEY'], maxSlots),
-        ...collectFromRegex(genericRegex),
-        ...collectFromDotenvFilesByRegex(genericRegex),
-        ...(sportRegex ? collectFromRegex(sportRegex) : []),
-        ...(sportRegex ? collectFromDotenvFilesByRegex(sportRegex) : []),
-        ...parseCommaSeparatedEnv('APISPORTS_KEYS'),
-        ...fallbackKeys
-    ];
-
-    return uniqueNonEmpty(values);
+function getApiSportsKeyPool() {
+    const primaryKey = toNonEmptyString(
+        process.env.X_APISPORTS_KEY
+        || process.env.API_SPORTS_KEY
+        || process.env.APISPORTS_KEY
+    );
+    return primaryKey ? [primaryKey] : [];
 }
 
 function getRapidApiKeyPool(options = {}) {

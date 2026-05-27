@@ -30,7 +30,7 @@ const {
 } = require('../backend/utils/providerCircuitBreaker');
 
 const RAPIDAPI_KEY = process.env.X_RAPIDAPI_KEY || process.env.RAPIDAPI_KEY;
-const APISPORTS_KEYS = getApiSportsKeyPool({ sport: 'football' });
+const PRIMARY_APISPORTS_KEY = getApiSportsKeyPool()[0] || '';
 const RAPIDAPI_CACHE_TTL_MINUTES = Math.max(1, Number(process.env.RAPIDAPI_FIXTURES_TTL_MINUTES || 20));
 const LIVE_RUN_STALE_HOURS = Math.max(1, Number(process.env.SKCS_STALE_RUN_HOURS || 2));
 
@@ -124,7 +124,7 @@ const FOOTBALL_ENDPOINTS = (() => {
 
 const REQUEST_KEY_POOL = uniqueNonEmpty([
     ...RAPID_KEYS,
-    ...APISPORTS_KEYS,
+    PRIMARY_APISPORTS_KEY,
     RAPIDAPI_KEY
 ]).slice(0, ACTIVE_KEY_LIMIT);
 
