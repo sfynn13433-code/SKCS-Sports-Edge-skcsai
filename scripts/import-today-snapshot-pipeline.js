@@ -1187,31 +1187,20 @@ async function requestApiSportsWithRotation(spec, params) {
                     }
 
                     let targetUrl = `https://${host}${endpointPath}`;
-                    if (params && typeof params === 'object') {
-                        const q = new URLSearchParams();
-                        for (const [k, v] of Object.entries(params)) {
-                            if (v !== undefined && v !== null) {
-                                q.set(k, String(v));
-                            }
-                        }
-                        const qs = q.toString();
-                        if (qs) {
-                            targetUrl = `${targetUrl}?${qs}`;
-                        }
-                    }
-
                     if (!targetUrl.includes('?')) {
                         targetUrl = `${targetUrl}?date=${new Date().toISOString().split('T')[0]}`;
                     }
 
+                    const finalKey = process.env.X_APISPORTS_KEY || APISPORTS_KEY;
                     console.log(`📡 NATIVE FETCH TO: ${targetUrl}`);
+                    console.log(`🏷️ INJECTING KEY: ${finalKey ? 'YES (' + finalKey.substring(0,4) + '...)' : 'NO KEY FOUND'}`);
 
                     try {
                         const responseRaw = await fetch(targetUrl, {
                             method: 'GET',
-                            headers: isApiSportsHost
-                                ? { 'x-apisports-key': process.env.X_APISPORTS_KEY }
-                                : { 'x-rapidapi-key': key, 'x-rapidapi-host': host }
+                            headers: {
+                                'x-apisports-key': finalKey
+                            }
                         });
 
                         const responseData = await responseRaw.json();
