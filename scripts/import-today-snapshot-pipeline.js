@@ -1186,24 +1186,39 @@ async function requestApiSportsWithRotation(spec, params) {
                         headers['x-apisports-key'] = process.env.X_APISPORTS_KEY;
                     }
 
-                    const url = `https://${host}${endpointPath}`;
-                    try {
-                        const fetchHeaders = isApiSportsHost
-                            ? { 'x-apisports-key': String(process.env.X_APISPORTS_KEY).trim() }
-                            : { 'x-rapidapi-key': key, 'x-rapidapi-host': host };
-
-                        if (!isApiSportsHost && host.endsWith('api-sports.io')) {
-                            fetchHeaders['x-apisports-key'] = String(process.env.X_APISPORTS_KEY).trim();
+                    let targetUrl = `https://${host}${endpointPath}`;
+                    if (params && typeof params === 'object') {
+                        const q = new URLSearchParams();
+                        for (const [k, v] of Object.entries(params)) {
+                            if (v !== undefined && v !== null) {
+                                q.set(k, String(v));
+                            }
                         }
+                        const qs = q.toString();
+                        if (qs) {
+                            targetUrl = `${targetUrl}?${qs}`;
+                        }
+                    }
 
-                        console.log(`📡 EXECUTING FETCH TO: ${url}`);
-                        console.log(`🏷️ WITH HEADERS:`, fetchHeaders);
+                    if (!targetUrl.includes('?')) {
+                        targetUrl = `${targetUrl}?date=${new Date().toISOString().split('T')[0]}`;
+                    }
 
-                        const response = await axios.get(url, {
-                            headers: fetchHeaders,
-                            params,
-                            timeout: 30000
+                    console.log(`📡 NATIVE FETCH TO: ${targetUrl}`);
+
+                    try {
+                        const responseRaw = await fetch(targetUrl, {
+                            method: 'GET',
+                            headers: isApiSportsHost
+                                ? { 'x-apisports-key': process.env.X_APISPORTS_KEY }
+                                : { 'x-rapidapi-key': key, 'x-rapidapi-host': host }
                         });
+
+                        const responseData = await responseRaw.json();
+                        const response = {
+                            data: responseData,
+                            status: responseRaw.status
+                        };
 
                         if (hasApiSportsQuotaPayload(response.data)) {
                             console.warn(`[snapshot-import] ${spec.sport} endpoint=${endpointPath} host=${host} quota response: ${JSON.stringify(response.data.errors || response.data)}`);

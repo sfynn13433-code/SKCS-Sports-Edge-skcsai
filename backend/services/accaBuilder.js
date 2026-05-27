@@ -3797,6 +3797,10 @@ function hasMinimumMarketDiversity(card) {
 
 
 async function buildFinalForTier(tier, options = {}) {
+    if (!options || !options.matches) {
+        console.log("[accaBuilder] No matches found in payload, safely skipping.");
+        return [];
+    }
     const t = normalizeTier(tier);
     const publishRunId = options.publishRunId || null;
     const now = options.now instanceof Date ? options.now : new Date();
