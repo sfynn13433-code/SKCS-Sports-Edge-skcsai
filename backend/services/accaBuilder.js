@@ -1439,15 +1439,73 @@ async function buildSameMatchCandidates(predictions, options = {}) {
             }
         }));
 
+        const totalConfidence = computeTotalConfidence(validatedLegs);
+        const riskLevel = riskLevelFromConfidence(totalConfidence);
+
         out.push({
             match_id: prediction.match_id,
             matches: validatedLegs,
-            total_confidence: computeTotalConfidence(validatedLegs),
-            risk_level: riskLevelFromConfidence(computeTotalConfidence(validatedLegs))
+            total_confidence: totalConfidence,
+            risk_level: riskLevel
         });
+
+        if (options.publishRunId && validatedLegs.length >= 4) {
+            await insertSameMatchCombination(prediction, validatedLegs, totalConfidence, riskLevel, options.publishRunId);
+        }
     }
 
     return out;
+}
+
+async function insertSameMatchCombination(prediction, legs, totalConfidence, riskLevel, publishRunId) {
+    const { query } = require('../db');
+    const fixtureId = String(prediction?.match_id || prediction?.fixture_id || '').trim();
+    if (!fixtureId) return;
+
+    const legCount = legs.length;
+    const combinationLegs = legCount >= 8 ? 8 : (legCount >= 6 ? 6 : 4);
+
+    const marketsArray = legs.slice(0, combinationLegs).map(leg => ({
+        market_key: leg.market,
+        label: leg.market,
+        probability: leg.confidence || 0
+    }));
+
+    const combinedProbability = marketsArray.reduce((acc, m) => acc * (m.probability / 100), 1) * 100;
+    const combinedOdds = marketsArray.reduce((acc, m) => acc * (100 / (m.probability || 1)), 1);
+
+    try {
+        await query(`
+            INSERT INTO same_match_combinations (
+                fixture_id, sport, home_team, away_team, match_date, league,
+                combination_legs, markets, combined_probability, combined_odds,
+                risk_tier, prediction_source, publish_run_id, metadata, created_at, updated_at
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW(), NOW())
+            ON CONFLICT (fixture_id, combination_legs) DO UPDATE SET
+                markets = EXCLUDED.markets,
+                combined_probability = EXCLUDED.combined_probability,
+                combined_odds = EXCLUDED.combined_odds,
+                risk_tier = EXCLUDED.risk_tier,
+                updated_at = NOW()
+        `, [
+            fixtureId,
+            String(prediction?.sport || 'football'),
+            String(prediction?.home_team || ''),
+            String(prediction?.away_team || ''),
+            prediction?.match_date || prediction?.date || null,
+            prediction?.league || null,
+            combinationLegs,
+            JSON.stringify(marketsArray),
+            combinedProbability,
+            combinedOdds,
+            riskLevel,
+            'same_match_builder',
+            publishRunId,
+            JSON.stringify({ _prediction_source: prediction?.prediction_source || 'unknown' })
+        ]);
+    } catch (err) {
+        console.error('[accaBuilder] Failed to insert same_match_combination:', err.message);
+    }
 }
 
 function buildMultiCandidates(predictions, maxRows = 16 * VOLUME_CAP_MULTIPLIER) {

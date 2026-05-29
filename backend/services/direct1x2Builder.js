@@ -78,11 +78,29 @@ function blendBaselines(primary, secondary, secondaryWeight = 0.55) {
 
 function getRiskTier(confidence) {
     const score = clampConfidence(confidence);
-    const bands = FOOTBALL_RULES.confidenceBands;
-    if (score >= bands.highConfidence.min) return bands.highConfidence.label;
-    if (score >= bands.moderateRisk.min) return bands.moderateRisk.label;
-    if (score >= bands.highRisk.min) return bands.highRisk.label;
-    return bands.extremeRisk.label;
+    const bands = FOOTBALL_RULES.confidenceBands || {};
+    
+    // Check if the new bands exist (lowRisk / mediumRisk)
+    if (bands.lowRisk) {
+        if (score >= bands.lowRisk.min) return bands.lowRisk.label;
+        if (bands.mediumRisk && score >= bands.mediumRisk.min) return bands.mediumRisk.label;
+        if (bands.highRisk && score >= bands.highRisk.min) return bands.highRisk.label;
+        return bands.extremeRisk?.label || 'EXTREME_RISK';
+    }
+    
+    // Fallback to old band naming if needed
+    if (bands.highConfidence) {
+        if (score >= bands.highConfidence.min) return bands.highConfidence.label;
+        if (bands.moderateRisk && score >= bands.moderateRisk.min) return bands.moderateRisk.label;
+        if (bands.highRisk && score >= bands.highRisk.min) return bands.highRisk.label;
+        return bands.extremeRisk?.label || 'EXTREME_RISK';
+    }
+    
+    // Hardcoded safety fallback conforming to the new rulebook specification
+    if (score >= 75) return 'LOW_RISK';
+    if (score >= 55) return 'MEDIUM_RISK';
+    if (score >= 30) return 'HIGH_RISK';
+    return 'EXTREME_RISK';
 }
 
 function toLegacyRiskLevel(confidence) {
@@ -117,7 +135,7 @@ function resolveLeagueName(fixture) {
 
 function getLeagueDefaultBaseline(leagueName) {
     const key = String(leagueName || '').trim().toLowerCase();
-    if (!key) return { home: 40, draw: 30, away: 30 };
+    if (!key) return null;
 
     if (key.includes('premier') || key.includes('epl')) return { home: 45, draw: 27, away: 28 };
     if (key.includes('la liga') || key.includes('laliga')) return { home: 44, draw: 29, away: 27 };
@@ -130,7 +148,7 @@ function getLeagueDefaultBaseline(leagueName) {
     if (key.includes('amateur') || key.includes('regional') || key.includes('division') || key.includes('super amateur')) {
         return { home: 40, draw: 30, away: 30 };
     }
-    return { home: 41, draw: 30, away: 29 };
+    return null;
 }
 
 function extractThreeWayOdds(odds) {
@@ -438,11 +456,35 @@ async function buildAndStoreDirect1X2(fixture, confidence, prediction, additiona
         return { success: false, error: new Error('fixture_id is required') };
     }
 
-    const contextual = await getContextualBaseline(fixture);
-    const derived = derivePredictionAndConfidence(prediction || fixture?.prediction, confidence, contextual?.baseline);
+    // ── STRICT: Only use real API probability baseline - no fallbacks ──
+    const apiProbability = fixture?.api_probability;
+    let baseline = null;
+    let predictionSource = 'unknown';
+    let apiSource = 'api_sports';
+
+    if (apiProbability && typeof apiProbability === 'object') {
+        const parseApiPct = (val) => { const n = parseFloat(String(val || '0').replace('%', '').trim()); return Number.isFinite(n) ? n : 0; };
+        const apiHome = parseApiPct(apiProbability.home);
+        const apiDraw = parseApiPct(apiProbability.draw);
+        const apiAway = parseApiPct(apiProbability.away);
+        if (apiHome + apiDraw + apiAway > 0) {
+            baseline = normalizeBaseline({ home: apiHome, draw: apiDraw, away: apiAway });
+            if (baseline) {
+                predictionSource = 'api_predictions';
+            }
+        }
+    }
+
+    if (!baseline) {
+        return { success: false, error: new Error('No valid API probability provided - cannot generate prediction without real data') };
+    }
+
+    const derived = derivePredictionAndConfidence(prediction || fixture?.prediction, confidence, baseline);
     const score = derived.confidence;
     const normalizedPrediction = normalizePrediction(derived.prediction);
     const riskTier = getRiskTier(score);
+
+    const contextual = { baseline, source: 'api_probability', data_sufficient: true, leagueStats: null };
     const secondarySelection = score < 70
         ? selectSecondaryMarkets(
             { ...fixture, prediction: normalizedPrediction, baseline: contextual?.baseline, leagueStats: contextual?.leagueStats },
@@ -524,11 +566,44 @@ async function buildAndStoreDirect1X2(fixture, confidence, prediction, additiona
         tier: 'normal',
         type: 'direct',
         match_date: fixture?.match_date || fixture?.date || fixture?.commence_time || null,
-        matches: buildMatchesPayload(fixture, score, normalizedPrediction, riskTier, secondaryMarkets, contextual, secondaryNote),
+        matches: buildMatchesPayload(
+            {
+                ...fixture,
+                _probability_source: fixture?.prediction_source || 'unknown',
+                _api_probability: fixture?.api_probability || null
+            },
+            score, normalizedPrediction, riskTier, secondaryMarkets, contextual, secondaryNote
+        ),
         secondary_markets: secondaryMarkets,
         secondary_insights: secondaryMarkets,
         edgemind_report: additionalData?.edgemind_report || edgemindReport,
         created_at: new Date().toISOString()
+    };
+
+    const best1x2Market = normalizedPrediction === 'home_win' ? 'home' : (normalizedPrediction === 'away_win' ? 'away' : 'draw');
+    const best1x2Pct = baseline[best1x2Market];
+
+    const direct1x2Row = {
+        fixture_id: fixtureId,
+        sport: String(fixture?.sport || 'football'),
+        home_team: String(fixture?.home_team || ''),
+        away_team: String(fixture?.away_team || ''),
+        match_date: fixture?.match_date || fixture?.date || fixture?.commence_time || null,
+        league: resolveLeagueName(fixture),
+        home_pct: baseline.home,
+        draw_pct: baseline.draw,
+        away_pct: baseline.away,
+        best_1x2_market: best1x2Market,
+        best_1x2_pct: best1x2Pct,
+        risk_tier: riskTier,
+        prediction_source: predictionSource,
+        api_source: apiSource,
+        metadata: {
+            _api_probability: fixture?.api_probability || null,
+            _probability_source: fixture?.prediction_source || 'unknown'
+        },
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
     };
 
     const existingResult = await supabase
@@ -629,6 +704,28 @@ async function buildAndStoreDirect1X2(fixture, confidence, prediction, additiona
     if (error) {
         console.error('[direct1x2Builder] write failed:', error.message);
         return { success: false, error };
+    }
+
+    const existingDirect1x2Result = await supabase
+        .from('direct_1x2_predictions')
+        .select('id')
+        .eq('fixture_id', fixtureId)
+        .limit(1);
+
+    if (existingDirect1x2Result.error) {
+        console.error('[direct1x2Builder] direct_1x2_predictions lookup failed:', existingDirect1x2Result.error.message);
+    }
+
+    const existingDirect1x2Id = existingDirect1x2Result?.data?.[0]?.id || null;
+    const direct1x2Mutation = existingDirect1x2Id
+        ? supabase.from('direct_1x2_predictions').update(direct1x2Row).eq('id', existingDirect1x2Id).select('*').single()
+        : supabase.from('direct_1x2_predictions').insert(direct1x2Row).select('*').single();
+
+    let direct1x2Result = await direct1x2Mutation;
+    if (direct1x2Result.error) {
+        console.error('[direct1x2Builder] direct_1x2_predictions write failed:', direct1x2Result.error.message);
+    } else {
+        console.log('[direct1x2Builder] direct_1x2_predictions upsert successful:', direct1x2Result.data?.id);
     }
 
     // Enable sync trigger if relational tables feature flag is enabled

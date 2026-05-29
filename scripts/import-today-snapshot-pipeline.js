@@ -179,6 +179,16 @@ function normalizeCompetitionText(value) {
         .trim();
 }
 
+const TARGET_LEAGUE_IDS = [
+  1,        // World: FIFA World Cup
+  253,      // USA: Major League Soccer (MLS)
+  71, 72,   // Brazil: Serie A & Serie B
+  128,      // Argentina: Liga Profesional
+  98,       // Japan: J1 League
+  113,      // Sweden: Allsvenskan
+  103       // Norway: Eliteserien
+];
+
 const FOOTBALL_TARGET_LEAGUE_IDS = Object.freeze(new Set([
     '39', '40', '41', '42',
     '140', '141',
@@ -1255,6 +1265,130 @@ async function requestApiSportsWithRotation(spec, params) {
     return enforceRateLimitAndFetch(`snapshot-import:${spec.sport}`, fetchOperation);
 }
 
+// ─── 4-PHASE FOOTBALL BATCHING (quota-safe: 2 + max 15 API calls) ────────────
+
+async function fetchFootballBatched() {
+    // Aggressively strip ALL hidden CRLF/whitespace characters from the API key
+    // to prevent Node's native fetch from silently dropping the header on Windows
+    const rawKey = process.env.X_APISPORTS_KEY || '';
+    const cleanKey = String(rawKey).replace(/[^a-zA-Z0-9]/g, '').trim();
+    console.log(`[football-batch] Key sanitized: len=${cleanKey.length} prefix=${cleanKey.substring(0, 4)}...`);
+
+    const options = {
+        method: 'GET',
+        headers: {
+            'x-apisports-key': cleanKey
+        }
+    };
+
+    const today = new Date().toISOString().split('T')[0];
+
+    // Phase 1 — Global Radar (1 API call): fetch ALL of today's fixtures
+    console.log('[football-batch] Phase 1: Global Radar fetch for', today);
+    const radarResponse = await fetch(
+        'https://v3.football.api-sports.io/fixtures?date=' + today,
+        options
+    );
+    const radarData = await radarResponse.json();
+
+    if (radarData.errors && (radarData.errors.requests || radarData.errors.token)) {
+        throw new Error('[football-batch] API-Sports quota exhausted on radar call: ' + JSON.stringify(radarData.errors));
+    }
+
+    const allFixtures = Array.isArray(radarData.response) ? radarData.response : [];
+    console.log(`[football-batch] Phase 1 complete: ${allFixtures.length} total fixtures returned`);
+
+    // Phase 2 — Local Filtering (0 API calls): keep only target leagues, cap at 15
+    const filtered = allFixtures
+        .filter((f) => TARGET_LEAGUE_IDS.includes(Number(f?.league?.id)))
+        .slice(0, 15);
+    console.log(`[football-batch] Phase 2 complete: ${filtered.length} fixtures kept from target leagues [${TARGET_LEAGUE_IDS.join(', ')}]`);
+
+    if (!filtered.length) {
+        console.log('[football-batch] No fixtures in target leagues today — skipping phases 3 & 4');
+        return [];
+    }
+
+    // Phase 3 — Deep Data Batch (1 API call): fetch full fixture data for all IDs at once
+    const fixtureIds = filtered.map((f) => f.fixture.id);
+    const joinedIds = fixtureIds.join('-');
+    console.log(`[football-batch] Phase 3: Batch deep fetch for IDs: ${joinedIds}`);
+    const batchResponse = await fetch(
+        'https://v3.football.api-sports.io/fixtures?ids=' + joinedIds,
+        options
+    );
+    const batchData = await batchResponse.json();
+
+    if (batchData.errors && !batchData.errors.requests && !batchData.errors.token && Object.keys(batchData.errors).length > 0) {
+        console.warn(`[football-batch] Phase 3 warning/non-fatal errors:`, JSON.stringify(batchData.errors));
+    }
+
+    if (batchData.errors && (batchData.errors.requests || batchData.errors.token)) {
+        throw new Error('[football-batch] API-Sports quota exhausted on batch call: ' + JSON.stringify(batchData.errors));
+    }
+
+    const deepFixtures = Array.isArray(batchData.response) ? batchData.response : [];
+    console.log(`[football-batch] Phase 3 complete: ${deepFixtures.length} deep fixture records received`);
+
+    // Build a map of fixtureId → deep raw for Phase 4 merge.
+    // Seed with the filtered fixtures from Phase 2 as a fallback (essential for Free API plans which don't support the 'ids' parameter).
+    const deepMap = new Map();
+    for (const f of filtered) {
+        const id = String(f?.fixture?.id || '');
+        if (id) deepMap.set(id, f);
+    }
+    for (const f of deepFixtures) {
+        const id = String(f?.fixture?.id || '');
+        if (id) deepMap.set(id, f);
+    }
+
+    // Phase 4 — Predictions (max 15 API calls): fetch algorithmic probabilities per fixture
+    console.log(`[football-batch] Phase 4: Fetching predictions for ${fixtureIds.length} fixtures`);
+    const results = [];
+    for (const id of fixtureIds) {
+        let predData = null;
+        try {
+            const predResponse = await fetch(
+                'https://v3.football.api-sports.io/predictions?fixture=' + id,
+                options
+            );
+            predData = await predResponse.json();
+            if (predData.errors && (predData.errors.requests || predData.errors.token)) {
+                console.warn(`[football-batch] Phase 4: quota hit on fixture ${id}, stopping predictions loop`);
+                break;
+            }
+        } catch (predErr) {
+            console.warn(`[football-batch] Phase 4: prediction fetch failed for fixture ${id}:`, predErr.message);
+        }
+
+        // Merge: deep fixture raw + predictions into the canonical payload
+        const rawDeep = deepMap.get(String(id)) || {};
+        const predPayload = Array.isArray(predData?.response) && predData.response.length > 0
+            ? predData.response[0]
+            : {};
+
+        const merged = {
+            ...rawDeep,
+            _predictions: predPayload
+        };
+
+        const mapped = mapApiSportsRowToFixture(merged, 'football');
+        if (mapped) {
+            // Attach algorithmic probabilities into raw_provider_data for downstream pipeline use
+            mapped.raw_provider_data = merged;
+            mapped.api_predictions = predPayload;
+            results.push(mapped);
+        }
+
+        await sleep(200); // gentle pacing between prediction calls
+    }
+
+    console.log(`[football-batch] Phase 4 complete: ${results.length} enriched football fixtures ready`);
+    return results;
+}
+
+// ─── GENERIC SPORT FETCHER (non-football) ─────────────────────────────────────
+
 async function fetchApiSportsByDate(spec) {
     const out = [];
     const firstResponse = await requestApiSportsWithRotation(spec, { date: TODAY });
@@ -1278,11 +1412,6 @@ async function fetchApiSportsByDate(spec) {
     if (spec.sport === 'tennis') {
         const filtered = out.filter((fixture) => isAllowedTennisFixture(fixture));
         console.log(`[snapshot-import] tennis allowlist kept ${filtered.length}/${out.length} fixtures`);
-        return filtered;
-    }
-    if (spec.sport === 'football') {
-        const filtered = out.filter((fixture) => isAllowedFootballFixture(fixture));
-        console.log(`[snapshot-import] football allowlist kept ${filtered.length}/${out.length} fixtures`);
         return filtered;
     }
     if (spec.sport === 'basketball') {
@@ -1610,17 +1739,86 @@ function stableFixtureSeed(fixture) {
 }
 
 function inferDirectPredictionAndConfidence(fixture) {
-    const seed = stableFixtureSeed(fixture);
-    const confidence = 54 + (seed % 43); // 54..96
+    // ── PRIORITY 1: Parse real probabilities from api_predictions (Phase 4 payload) ──
+    const apiPred = fixture?.api_predictions;
+    if (apiPred && typeof apiPred === 'object') {
+        // API-Sports /predictions endpoint shape:
+        // { predictions: { winner: { id, name, comment }, percent: { home, draw, away } }, ... }
+        const preds = apiPred.predictions;
+        if (preds && typeof preds === 'object') {
+            const percent = preds.percent;
+            const winner = preds.winner;
 
-    const outcomePick = seed % 100;
-    let prediction = 'home_win';
-    if (outcomePick >= 35 && outcomePick < 62) prediction = 'draw';
-    if (outcomePick >= 62) prediction = 'away_win';
+            // Parse percentage strings like "45%", "30%", "25%"
+            const homeRaw = parseFloat(String(percent?.home || '0').replace('%', '').trim());
+            const drawRaw = parseFloat(String(percent?.draw || '0').replace('%', '').trim());
+            const awayRaw = parseFloat(String(percent?.away || '0').replace('%', '').trim());
 
+            const homeNum = Number.isFinite(homeRaw) ? homeRaw : 0;
+            const drawNum = Number.isFinite(drawRaw) ? drawRaw : 0;
+            const awayNum = Number.isFinite(awayRaw) ? awayRaw : 0;
+            const total = homeNum + drawNum + awayNum;
+
+            if (total > 0) {
+                // Pick the outcome with the highest API probability
+                let prediction = 'home_win';
+                let bestPct = homeNum;
+                if (drawNum > bestPct) { prediction = 'draw'; bestPct = drawNum; }
+                if (awayNum > bestPct) { prediction = 'away_win'; bestPct = awayNum; }
+
+                // Use winner comment override if API explicitly marks one as winner
+                if (winner && winner.name) {
+                    const winnerName = String(winner.name).toLowerCase();
+                    const homeName = String(fixture?.home_team || '').toLowerCase();
+                    const awayName = String(fixture?.away_team || '').toLowerCase();
+                    if (winnerName.includes(homeName) || (homeName && homeName.includes(winnerName))) {
+                        prediction = 'home_win';
+                        bestPct = homeNum;
+                    } else if (winnerName.includes(awayName) || (awayName && awayName.includes(winnerName))) {
+                        prediction = 'away_win';
+                        bestPct = awayNum;
+                    }
+                }
+
+                const confidence = Math.max(0, Math.min(100, Math.round(bestPct)));
+                if (confidence > 0) {
+                    return { confidence, prediction, source: 'api_predictions' };
+                }
+            }
+        }
+    }
+
+    // ── PRIORITY 2: Parse from _predictions (alternative Phase 4 merge key) ──
+    const rawPred = fixture?.raw_provider_data?._predictions;
+    if (rawPred && typeof rawPred === 'object') {
+        const preds = rawPred.predictions;
+        if (preds && typeof preds === 'object') {
+            const percent = preds.percent;
+            const homeRaw = parseFloat(String(percent?.home || '0').replace('%', '').trim());
+            const drawRaw = parseFloat(String(percent?.draw || '0').replace('%', '').trim());
+            const awayRaw = parseFloat(String(percent?.away || '0').replace('%', '').trim());
+            const homeNum = Number.isFinite(homeRaw) ? homeRaw : 0;
+            const drawNum = Number.isFinite(drawRaw) ? drawRaw : 0;
+            const awayNum = Number.isFinite(awayRaw) ? awayRaw : 0;
+            const total = homeNum + drawNum + awayNum;
+            if (total > 0) {
+                let prediction = 'home_win';
+                let bestPct = homeNum;
+                if (drawNum > bestPct) { prediction = 'draw'; bestPct = drawNum; }
+                if (awayNum > bestPct) { prediction = 'away_win'; bestPct = awayNum; }
+                const confidence = Math.max(0, Math.min(100, Math.round(bestPct)));
+                if (confidence > 0) {
+                    return { confidence, prediction, source: 'raw_predictions' };
+                }
+            }
+        }
+    }
+
+    // ── STRICT: No fallback - require real API probability data ──
     return {
-        confidence: Math.max(0, Math.min(100, confidence)),
-        prediction
+        confidence: 0,
+        prediction: null,
+        source: 'no_api_data'
     };
 }
 
@@ -1646,6 +1844,8 @@ async function persistDirect1x2Predictions(fixtures) {
         attempted += 1;
 
         const inferred = inferDirectPredictionAndConfidence(fixture);
+        console.log(`[direct1x2] ${fixture.home_team} vs ${fixture.away_team}: inferred ${inferred.prediction} @ ${inferred.confidence}% [source: ${inferred.source}]`);
+
         const weatherSummary = asNonEmptyString(
             fixture?.weather
             || fixture?.raw_provider_data?.weather?.description
@@ -1662,6 +1862,9 @@ async function persistDirect1x2Predictions(fixtures) {
                 ? fixture.raw_provider_data.odds
                 : null);
 
+        // Extract the real probability breakdown from the API for downstream storage
+        const apiPercent = fixture?.api_predictions?.predictions?.percent || null;
+
         const result = await buildAndStoreDirect1X2(
             {
                 id: fixture.match_id,
@@ -1676,7 +1879,9 @@ async function persistDirect1x2Predictions(fixtures) {
                 context: `League: ${fixture.league || 'football'}`,
                 contextNotes,
                 weather: weatherSummary || null,
-                odds: oddsSnapshot
+                odds: oddsSnapshot,
+                api_probability: apiPercent,           // real % breakdown from API
+                prediction_source: inferred.source,    // 'api_predictions' | 'raw_predictions' | 'seed_fallback'
             },
             inferred.confidence,
             inferred.prediction,
@@ -1724,19 +1929,32 @@ async function main() {
 
     for (const spec of activeSportSpecs) {
         try {
-            console.log(`[snapshot-import] fetching ${spec.sport}...`);
-            const fixtures = await fetchApiSportsByDate(spec);
-            importedFixtures.push(...fixtures);
-            importReport.push({
-                sport: spec.sport,
-                provider: 'api-sports',
-                count: fixtures.length,
-                status: 'ok'
-            });
+            if (spec.sport === 'football') {
+                // Football uses the quota-safe 4-phase batching architecture
+                console.log('[snapshot-import] fetching football via 4-phase batch architecture...');
+                const fixtures = await fetchFootballBatched();
+                importedFixtures.push(...fixtures);
+                importReport.push({
+                    sport: 'football',
+                    provider: 'api-sports-batched',
+                    count: fixtures.length,
+                    status: 'ok'
+                });
+            } else {
+                console.log(`[snapshot-import] fetching ${spec.sport}...`);
+                const fixtures = await fetchApiSportsByDate(spec);
+                importedFixtures.push(...fixtures);
+                importReport.push({
+                    sport: spec.sport,
+                    provider: 'api-sports',
+                    count: fixtures.length,
+                    status: 'ok'
+                });
+            }
         } catch (error) {
             importReport.push({
                 sport: spec.sport,
-                provider: 'api-sports',
+                provider: spec.sport === 'football' ? 'api-sports-batched' : 'api-sports',
                 count: 0,
                 status: 'error',
                 detail: error.message

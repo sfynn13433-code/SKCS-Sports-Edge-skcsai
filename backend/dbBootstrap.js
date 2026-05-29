@@ -369,6 +369,8 @@ async function bootstrap() {
                 ('over_1_5', 'Goals Totals'),
                 ('over_2_5', 'Goals Totals'),
                 ('over_3_5', 'Goals Totals'),
+                ('over_4_5', 'Goals Totals'),
+                ('over_5_5', 'Goals Totals'),
                 ('under_2_5', 'Goals Totals'),
                 ('under_3_5', 'Goals Totals'),
                 ('under_4_5', 'Defensive'),
@@ -380,6 +382,8 @@ async function bootstrap() {
                 ('btts_no', 'BTTS'),
                 ('btts_over_2_5', 'BTTS'),
                 ('btts_under_3_5', 'BTTS'),
+                ('btts_and_over_2_5', 'BTTS'),
+                ('btts_and_under_3_5', 'BTTS'),
                 ('home_win_btts_yes', 'BTTS'),
                 ('away_win_btts_yes', 'BTTS'),
                 ('home_win_btts_no', 'BTTS'),
@@ -387,11 +391,17 @@ async function bootstrap() {
                 ('double_chance_over_1_5', 'Defensive'),
                 ('double_chance_under_3_5', 'Defensive'),
                 ('over_0_5_first_half', 'Half Markets'),
+                ('first_half_over_0_5', 'Half Markets'),
+                ('first_half_under_1_5', 'Half Markets'),
                 ('under_1_5_first_half', 'Half Markets'),
                 ('first_half_draw', 'Half Markets'),
                 ('home_win_either_half', 'Half Markets'),
                 ('away_win_either_half', 'Half Markets'),
-                ('win_either_half', 'Half Markets')
+                ('win_either_half', 'Half Markets'),
+                ('ultra_over_1_5', 'Goals Totals'),
+                ('ultra_under_4_5', 'Defensive'),
+                ('ultra_home_over_0_5', 'Team Totals'),
+                ('ultra_away_over_0_5', 'Team Totals')
             ON CONFLICT (market_key) DO NOTHING;
         `);
 
@@ -860,18 +870,168 @@ async function bootstrap() {
             ON rapidapi_quota_usage(provider_name, window_type, window_start DESC);
         `);
 
+
+        // ── Market Segregation Tables (Database Overhaul) ───────────────────────────
+        // direct_1x2_predictions: strict main market table (only home, draw, away with real percentages)
+        await query(`
+            CREATE TABLE IF NOT EXISTS direct_1x2_predictions (
+                id               BIGSERIAL PRIMARY KEY,
+                fixture_id       TEXT NOT NULL,
+                sport            TEXT NOT NULL DEFAULT 'football',
+                home_team        TEXT,
+                away_team        TEXT,
+                match_date       TIMESTAMPTZ,
+                league           TEXT,
+                -- Only allowed keys: home, draw, away with their real percentages
+                home_pct         NUMERIC NOT NULL CHECK (home_pct >= 0 AND home_pct <= 100),
+                draw_pct         NUMERIC NOT NULL CHECK (draw_pct >= 0 AND draw_pct <= 100),
+                away_pct         NUMERIC NOT NULL CHECK (away_pct >= 0 AND away_pct <= 100),
+                -- Best 1x2 pick based on real percentages
+                best_1x2_market  TEXT CHECK (best_1x2_market IN ('home', 'draw', 'away')),
+                best_1x2_pct     NUMERIC,
+                risk_tier        TEXT,
+                prediction_source TEXT NOT NULL, -- 'api_predictions' | 'seed_fallback' | 'league_stats'
+                api_source       TEXT DEFAULT 'api_sports',
+                metadata         JSONB NOT NULL DEFAULT '{}'::jsonb,
+                created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+        `);
+
+        await query(`
+            CREATE UNIQUE INDEX IF NOT EXISTS uq_direct_1x2_fixture
+            ON direct_1x2_predictions(fixture_id);
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_direct_1x2_match_date
+            ON direct_1x2_predictions(match_date DESC NULLS LAST);
+        `);
+
+        // secondary_market_predictions: per-market rows with real API probabilities
+        await query(`
+            CREATE TABLE IF NOT EXISTS secondary_market_predictions (
+                id               BIGSERIAL PRIMARY KEY,
+                fixture_id       TEXT NOT NULL,
+                sport            TEXT NOT NULL DEFAULT 'football',
+                home_team        TEXT,
+                away_team        TEXT,
+                match_date       TIMESTAMPTZ,
+                league           TEXT,
+                market_key       TEXT NOT NULL,           -- e.g. 'btts', 'over_2_5', 'double_chance_1x'
+                market_label     TEXT,                    -- human-readable, e.g. 'Both Teams To Score'
+                probability      NUMERIC,                 -- 0-100 real API percentage
+                recommendation   TEXT,                   -- 'yes' | 'no' | 'over' | 'under' etc.
+                confidence       NUMERIC,                 -- same as probability when directly from API
+                risk_tier        TEXT,
+                api_source       TEXT DEFAULT 'api_sports', -- track where the percentage came from
+                prediction_source TEXT,                  -- 'api_predictions' | 'seed_fallback' | 'league_stats'
+                metadata         JSONB NOT NULL DEFAULT '{}'::jsonb,
+                created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_secondary_mkt_fixture
+            ON secondary_market_predictions(fixture_id, market_key);
+        `);
+
+        await query(`
+            CREATE UNIQUE INDEX IF NOT EXISTS uq_secondary_mkt_fixture_market
+            ON secondary_market_predictions(fixture_id, market_key)
+            WHERE prediction_source IS NOT NULL;
+        `);
+
+        // double_chance_predictions: explicit 1X, 12, X2 rows derived from API probabilities
+        await query(`
+            CREATE TABLE IF NOT EXISTS double_chance_predictions (
+                id               BIGSERIAL PRIMARY KEY,
+                fixture_id       TEXT NOT NULL,
+                sport            TEXT NOT NULL DEFAULT 'football',
+                home_team        TEXT,
+                away_team        TEXT,
+                match_date       TIMESTAMPTZ,
+                league           TEXT,
+                -- API-derived raw 1x2 probabilities (percentages, 0-100)
+                home_pct         NUMERIC,
+                draw_pct         NUMERIC,
+                away_pct         NUMERIC,
+                -- Derived double-chance win rates (sum of relevant 1x2 components)
+                dc_1x            NUMERIC,   -- home_pct + draw_pct
+                dc_12            NUMERIC,   -- home_pct + away_pct
+                dc_x2            NUMERIC,   -- draw_pct + away_pct
+                -- Best double-chance pick
+                best_dc_market   TEXT,      -- '1X' | '12' | 'X2'
+                best_dc_pct      NUMERIC,
+                risk_tier        TEXT,
+                prediction_source TEXT,     -- 'api_predictions' | 'seed_fallback' | 'league_stats'
+                metadata         JSONB NOT NULL DEFAULT '{}'::jsonb,
+                created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+        `);
+
+        await query(`
+            CREATE UNIQUE INDEX IF NOT EXISTS uq_double_chance_fixture
+            ON double_chance_predictions(fixture_id);
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_double_chance_match_date
+            ON double_chance_predictions(match_date DESC NULLS LAST);
+        `);
+
+        // same_match_combinations: pre-calculated multi-leg accumulator paths (SMB)
+        await query(`
+            CREATE TABLE IF NOT EXISTS same_match_combinations (
+                id               BIGSERIAL PRIMARY KEY,
+                fixture_id       TEXT NOT NULL,
+                sport            TEXT NOT NULL DEFAULT 'football',
+                home_team        TEXT,
+                away_team        TEXT,
+                match_date       TIMESTAMPTZ,
+                league           TEXT,
+                combination_legs INTEGER NOT NULL CHECK (combination_legs IN (4, 6, 8)),
+                markets          JSONB NOT NULL DEFAULT '[]'::jsonb,  -- array of {market_key, label, probability}
+                combined_probability NUMERIC,                          -- product of individual probabilities
+                combined_odds    NUMERIC,                              -- estimated decimal odds
+                risk_tier        TEXT,
+                prediction_source TEXT,
+                publish_run_id   BIGINT REFERENCES prediction_publish_runs(id) ON DELETE CASCADE,
+                metadata         JSONB NOT NULL DEFAULT '{}'::jsonb,
+                created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_smb_fixture_legs
+            ON same_match_combinations(fixture_id, combination_legs);
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_smb_match_date
+            ON same_match_combinations(match_date DESC NULLS LAST);
+        `);
+        // ─────────────────────────────────────────────────────────────────────────────
+
         await query(`
             INSERT INTO table_lifecycle_registry (table_name, lifecycle_state, is_active, owner_component, notes)
             VALUES
                 ('predictions_raw', 'active', true, 'pipeline', 'Primary raw prediction ingest table.'),
                 ('predictions_filtered', 'active', true, 'pipeline', 'Tier validation output table.'),
                 ('direct1x2_prediction_final', 'active', true, 'publish', 'Live published insights table.'),
+                ('direct_1x2_predictions', 'active', true, 'publish', 'Strict main market table (only home, draw, away with real percentages).'),
                 ('prediction_publish_runs', 'active', true, 'publish', 'Run tracking table for all publish flows.'),
                 ('predictions_accuracy', 'active', true, 'grading', 'Prediction grading and outcomes table.'),
                 ('team_week_locks', 'active', true, 'publish', 'Persistent single-use team/week lock table across publish runs.'),
                 ('rapidapi_cache', 'active', true, 'ingest', 'RapidAPI payload cache wall table.'),
                 ('rapidapi_quota_usage', 'active', true, 'ingest', 'Provider quota ledger by minute/day.'),
                 ('scheduling_logs', 'active', true, 'scheduler', 'Scheduler telemetry table.'),
+                ('secondary_market_predictions', 'active', true, 'publish', 'Segregated secondary market rows with real API probabilities.'),
+                ('double_chance_predictions', 'active', true, 'publish', 'Double-chance (1X, 12, X2) predictions derived from API probability splits.'),
+                ('same_match_combinations', 'active', true, 'publish', 'Pre-calculated same-match multi-leg accumulator combinations (4/6/8-leg SMB).'),
                 ('predictions_final', 'compatibility', true, 'compatibility', 'Compatibility view that mirrors direct1x2_prediction_final.'),
                 ('prediction_final', 'compatibility', true, 'compatibility', 'Legacy compatibility view that mirrors direct1x2_prediction_final.'),
                 ('prediction_results', 'legacy', false, 'legacy', 'Legacy accuracy table replaced by predictions_accuracy.'),
