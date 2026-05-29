@@ -499,6 +499,7 @@ async function buildAndStoreDirect1X2(fixture, confidence, prediction, additiona
     let edgemindReport;
     let marketName = prettyPrediction(normalizedPrediction);
     let aiSource = 'template';
+    let finalScore = score; // Default to baseline-derived score
     
     try {
         const groqReady = await isGroqAvailable();
@@ -506,6 +507,10 @@ async function buildAndStoreDirect1X2(fixture, confidence, prediction, additiona
         
         if (groqReady || dolphinReady) {
             console.log(`[direct1x2Builder] Generating AI insight for ${fixture?.home_team} vs ${fixture?.away_team} via ${groqReady ? 'Groq' : 'Dolphin'}...`);
+            
+            // Pass api_probability instead of baseline to avoid "41% baseline" in prose
+            const apiProbText = baseline ? `Home: ${baseline.home}%, Draw: ${baseline.draw}%, Away: ${baseline.away}%` : 'Not available';
+            
             const aiInsight = await generateInsight({
                 home: fixture?.home_team,
                 away: fixture?.away_team,
@@ -516,13 +521,19 @@ async function buildAndStoreDirect1X2(fixture, confidence, prediction, additiona
                 formData: contextual?.leagueStats ? `League: ${contextual.leagueStats.matches} matches, Home win rate: ${(contextual.leagueStats.homeWinRate * 100).toFixed(1)}%` : null,
                 h2h: null,
                 weather: fixture?.weather || fixture?.weatherSummary,
-                absences: null
+                absences: null,
+                api_probability: apiProbText // Pass real API probability to prompt
             });
             
             if (aiInsight && aiInsight.edgemind_report) {
                 edgemindReport = aiInsight.edgemind_report;
                 marketName = aiInsight.market_name || marketName;
                 aiSource = groqReady ? 'groq' : 'dolphin';
+                // Use AI-calculated confidence if available, otherwise keep baseline score
+                if (aiInsight.confidence && typeof aiInsight.confidence === 'number') {
+                    finalScore = Math.max(0, Math.min(100, aiInsight.confidence));
+                    console.log(`[direct1x2Builder] Using AI-calculated confidence: ${finalScore}% (baseline was ${score}%)`);
+                }
                 console.log(`[direct1x2Builder] AI insight generated successfully via ${aiSource}`);
             } else {
                 console.log(`[direct1x2Builder] AI insight failed, using template fallback`);
@@ -556,10 +567,10 @@ async function buildAndStoreDirect1X2(fixture, confidence, prediction, additiona
         sport: String(fixture?.sport || 'football'),
         home_team: String(fixture?.home_team || ''),
         away_team: String(fixture?.away_team || ''),
-        confidence: score,
-        total_confidence: score,
-        risk_tier: riskTier,
-        risk_level: toLegacyRiskLevel(score),
+        confidence: finalScore,
+        total_confidence: finalScore,
+        risk_tier: getRiskTier(finalScore),
+        risk_level: toLegacyRiskLevel(finalScore),
         prediction: normalizedPrediction,
         recommendation: prettyPrediction(normalizedPrediction),
         market_type: '1X2',
@@ -572,7 +583,7 @@ async function buildAndStoreDirect1X2(fixture, confidence, prediction, additiona
                 _probability_source: fixture?.prediction_source || 'unknown',
                 _api_probability: fixture?.api_probability || null
             },
-            score, normalizedPrediction, riskTier, secondaryMarkets, contextual, secondaryNote
+            finalScore, normalizedPrediction, getRiskTier(finalScore), secondaryMarkets, contextual, secondaryNote
         ),
         secondary_markets: secondaryMarkets,
         secondary_insights: secondaryMarkets,

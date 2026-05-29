@@ -209,24 +209,25 @@ function buildInsightPrompt(params) {
         h2h,
         weather,
         absences,
-        odds
+        odds,
+        api_probability
     } = params;
 
     // AI-DISABLED: [Missing strict enforcement for exactly 4 top Secondary Insights per STRICT_RULES.md]
     // const systemPrompt = `You are the SKCS EdgeMind Bot. You MUST generate a prediction AND an edgemind_report.
-    // 
+    //
     // EDGEMIND REPORT RULES (CRITICAL):
     // 1. Stage 1 (Baseline): State the initial probability "On paper"
     // 2. Stage 2 (Deep Context): Explain adjustments based on team/player intelligence
     // 3. Stage 3 (Reality Check): Explain adjustments based on weather/news/form
     // 4. Stage 4 (Decision Engine): State the final confidence percentage
-    // 
+    //
     // IMPORTANT Direct 1X2 risk rules:
     // - 80-100%: High Confidence / Safe.
     // - 70-79%: Moderate Risk.
     // - 59-69%: High Risk. Advise user to pivot to Secondary Insights.
     // - 0-58%: Extreme Risk. Explicitly tell user NOT to bet direct 1X2 and to use Secondary Insights.
-    // 
+    //
     // Output ONLY valid JSON with this exact structure:
     // {
     //   "market_name": "Home Win",
@@ -237,7 +238,7 @@ function buildInsightPrompt(params) {
     const systemPrompt = `You are the SKCS EdgeMind Bot. You MUST generate a prediction AND an edgemind_report.
 
 EDGEMIND REPORT RULES (CRITICAL):
-1. Stage 1 (Baseline): State the initial probability "On paper"
+1. Stage 1 (Baseline): State the initial probability using the provided API probability breakdown
 2. Stage 2 (Deep Context): Explain adjustments based on team/player intelligence
 3. Stage 3 (Reality Check): Explain adjustments based on weather/news/form
 4. Stage 4 (Decision Engine): State the final confidence percentage
@@ -252,7 +253,7 @@ Output ONLY valid JSON with this exact structure:
 {
   "market_name": "Home Win",
   "confidence": 72,
-  "edgemind_report": "On paper, [Team] has a 60% baseline probability... [Continue narrative following the 4 stages above]",
+  "edgemind_report": "Based on API probability (Home: 45%, Draw: 30%, Away: 25%), [Team] shows... [Continue narrative following the 4 stages above]",
   "secondary_insights": [
     {"market": "OVER 1.5 GOALS", "confidence": 85},
     {"market": "DOUBLE CHANCE - 1X", "confidence": 82},
@@ -267,7 +268,7 @@ Away: ${away || 'TBD'}
 League: ${league || 'Unknown'}
 Kickoff: ${kickoff || 'TBD'}
 Market: ${market || '1X2'}
-Baseline probability: ${confidence || 70}%
+API Probability: ${api_probability || confidence + '%'}
 
 Context Data:
 ${formData || 'No recent form data'}
@@ -275,7 +276,7 @@ ${h2h ? 'Head-to-head: ' + h2h : ''}
 ${weather ? 'Weather: ' + weather : ''}
 ${absences ? 'Absences/Injuries: ' + absences : ''}
 
-Follow the EDGEMIND REPORT RULES from your system prompt. Max 3 sentences for edgemind_report.`;
+Follow the EDGEMIND REPORT RULES from your system prompt. Use the provided API probability breakdown in Stage 1. Max 3 sentences for edgemind_report.`;
 
     return `<|im_start|>system
 ${systemPrompt}<|im_end|>
