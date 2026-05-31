@@ -568,8 +568,27 @@ async function clearFixtureInsights(fixtureRow) {
     }
 }
 
+const { assertSportPipelineAllowed } = require('../backend/services/apiQuotaRouter');
+
 async function publishCricbuzzCricket(options = {}) {
     const startedAt = new Date().toISOString();
+    const pipelineGate = assertSportPipelineAllowed('cricket', { pipeline: 'publish_cricbuzz_cricket' });
+    if (!pipelineGate.allowed) {
+        console.log('[cricket-policy] ingestion disabled — publish skipped');
+        return {
+            ok: true,
+            skipped: true,
+            reason: pipelineGate.reason,
+            source: 'cricbuzz',
+            fetched: 0,
+            normalized: 0,
+            fixtureUpserts: 0,
+            insightUpserts: 0,
+            startedAt,
+            finishedAt: new Date().toISOString()
+        };
+    }
+
     console.log('=== PUBLISH CRICBUZZ CRICKET START ===');
     const dryRunPreview = process.env.CRICKET_ENRICH_DRY_RUN === '1';
     const cricbuzzFeed = String(options.feed || process.env.CRICKET_CRICBUZZ_FEED || 'upcoming').trim().toLowerCase();

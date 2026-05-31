@@ -32,6 +32,11 @@ function isCanonicalIngestUnavailable(error) {
     || message.includes('upsert_canonical_event');
 }
 
+function isSoccerFixtureEvent(event) {
+  const sport = String(event?.strSport || '').trim().toLowerCase();
+  return sport === 'soccer' || sport === 'football';
+}
+
 async function upsertRawFixtureRow(event) {
   const idEvent = event.idEvent;
   if (!idEvent) return false;
@@ -67,7 +72,7 @@ async function upsertRawFixtureRow(event) {
  * @returns {Promise<number>} - Number of fixtures synced
  */
 async function syncDailyFixtures(date) {
-  const url = `${THESPORTSDB_BASE_URL}/eventsday.php?d=${date}`;
+  const url = `${THESPORTSDB_BASE_URL}/eventsday.php?d=${encodeURIComponent(date)}&s=Soccer`;
 
   const response = await apiQueue.add(async () => {
     const fetch = require('node-fetch');
@@ -103,6 +108,7 @@ async function syncDailyFixtures(date) {
   for (const event of events) {
     const idEvent = event.idEvent;
     if (!idEvent) continue;
+    if (!isSoccerFixtureEvent(event)) continue;
 
     // ══════════════════════════════════════════════════════════════════════
     // KILL SWITCH: Old raw_fixtures pipe disabled. Now using Universal Intake Valve.

@@ -3,6 +3,7 @@
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+const { reserveApiCall, isSportIngestionEnabled } = require('./apiQuotaRouter');
 
 const BASE_URL = 'https://cricket-live-line-advance.p.rapidapi.com';
 const MATCH_LIST_PATH = '/matches?status=3&per_paged=20&paged=1&highlight_live_matches=1';
@@ -289,8 +290,24 @@ async function fetchProviderMatches() {
     const cached = loadFreshCache();
     if (cached) return cached;
 
+    if (!isSportIngestionEnabled('cricket')) {
+        const stale = loadStaleCache();
+        return stale || [];
+    }
+
     const headers = getHeaders();
     if (!headers['x-rapidapi-key']) {
+        const stale = loadStaleCache();
+        return stale || [];
+    }
+
+    const gate = await reserveApiCall({
+        sport: 'cricket',
+        provider: 'cricket_live_line_advance',
+        units: 1,
+        source: 'cricketLiveMatchResolver.fetchProviderMatches'
+    });
+    if (!gate.allowed) {
         const stale = loadStaleCache();
         return stale || [];
     }
@@ -321,6 +338,14 @@ async function fetchProviderMatches() {
 
 async function resolveMatchIds(cricbuzzMatches = []) {
     if (!Array.isArray(cricbuzzMatches) || cricbuzzMatches.length === 0) return [];
+
+    if (!isSportIngestionEnabled('cricket')) {
+        return cricbuzzMatches.map((match) => ({
+            ...match,
+            cricket_live_match_id: null,
+            cricket_live_score: 0
+        }));
+    }
 
     const providerMatches = await fetchProviderMatches();
     if (!providerMatches.length) {

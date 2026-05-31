@@ -122,6 +122,7 @@ services:
         sync: false
       - key: ADMIN_API_KEY
         sync: false
+  # Cricket cron stays defined but exits immediately unless CRICKET_INGESTION_ENABLED=1 on Render.
   - type: cron
     name: skcs-cricket-daily-fixtures
     env: node
@@ -135,6 +136,10 @@ services:
         sync: false
       - key: CRON_SECRET
         sync: false
+      - key: CRICKET_INGESTION_ENABLED
+        value: "0"
+      - key: SKCS_ENABLED_SPORTS
+        value: football
   - type: cron
     name: sports-fixture-population
     env: python

@@ -1364,6 +1364,16 @@ app.get('/api/cron/sync-full', verifyCronSecret, async (req, res) => {
 
 // CRICKET DAILY FIXTURES CRON
 app.get('/api/cron/cricket-daily-fixtures', verifyCronSecret, async (req, res) => {
+    const { isSportIngestionEnabled } = require('./services/apiQuotaRouter');
+    if (!isSportIngestionEnabled('cricket')) {
+        console.log('[cron/cricket-daily-fixtures] Skipped — cricket ingestion disabled (CRICKET_INGESTION_ENABLED)');
+        return res.json({
+            status: 'skipped',
+            job: 'cron_cricket_daily_fixtures',
+            reason: 'cricket_ingestion_disabled'
+        });
+    }
+
     console.log('[cron/cricket-daily-fixtures] Starting Cricbuzz daily cricket fixture sync...');
 
     try {
@@ -1736,14 +1746,33 @@ app.get('/api/debug/cricket-tables', async (_req, res) => {
 });
 
 // TEMPORARY: Admin routes for testing pipeline
-app.get('/api/admin/force-discovery', requireAdminKey, async (_req, res) => {
+app.get('/api/admin/force-discovery', requireAdminKey, async (req, res) => {
     try {
         const today = new Date().toISOString().split('T')[0];
         console.log(`[ADMIN] Force discovery triggered for ${today}`);
         
         const count = await syncDailyFixtures(today);
-        
-        res.json({ success: true, message: `Daily discovery triggered for ${today}`, fixturesSynced: count });
+        const runFootballSync = req.query.football_sync !== '0';
+        let footballSync = 'skipped';
+
+        if (runFootballSync) {
+            footballSync = 'started_in_background';
+            setImmediate(() => {
+                syncSports({ sports: 'football' })
+                    .then((result) => {
+                        const summary = result?.summary || result;
+                        console.log('[ADMIN] Background football sync finished:', JSON.stringify(summary));
+                    })
+                    .catch((err) => console.error('[ADMIN] Background football sync failed:', err.message));
+            });
+        }
+
+        res.json({
+            success: true,
+            message: `Daily soccer discovery for ${today}; hub ingest uses API-Sports league sync`,
+            fixturesSynced: count,
+            footballSync
+        });
     } catch (err) {
         console.error('[ADMIN] Force discovery failed:', err.message);
         res.status(500).json({ success: false, error: safeErr(err) });

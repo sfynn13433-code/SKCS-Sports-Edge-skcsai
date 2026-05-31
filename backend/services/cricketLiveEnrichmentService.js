@@ -1,11 +1,13 @@
 'use strict';
 
 const axios = require('axios');
+const { reserveApiCall, isSportIngestionEnabled } = require('./apiQuotaRouter');
 
 const BASE_URL = 'https://cricket-live-line-advance.p.rapidapi.com';
-const MAX_DAILY_CALLS = 90;
-const MAX_ENRICH_MATCHES = 10;
-let callCount = 0;
+const MAX_ENRICH_MATCHES = Math.max(
+    0,
+    Math.min(10, Number(process.env.CRICKET_LIVE_MAX_ENRICH_MATCHES) || 3)
+);
 
 function getHeaders() {
     const apiKey =
@@ -205,13 +207,21 @@ async function safeCall(label, path) {
         return null;
     }
 
-    if (callCount >= MAX_DAILY_CALLS) {
-        console.log('Cricket Live limit reached');
+    if (!isSportIngestionEnabled('cricket')) {
+        return null;
+    }
+
+    const gate = await reserveApiCall({
+        sport: 'cricket',
+        provider: 'cricket_live_line_advance',
+        units: 1,
+        source: `cricketLiveEnrichmentService.${label}`
+    });
+    if (!gate.allowed) {
         return null;
     }
 
     try {
-        callCount += 1;
         const res = await axios.get(`${BASE_URL}${path}`, { headers, timeout: 20000 });
         return res.data || null;
     } catch (_err) {
@@ -283,6 +293,13 @@ async function enrichMatch(match) {
 
 async function enrichTopCricketMatches(matches = []) {
     console.log('\nCricket Live Enrichment Start');
+
+    if (!isSportIngestionEnabled('cricket')) {
+        console.log('Cricket ingestion disabled — skipping live enrichment');
+        return Array.isArray(matches)
+            ? matches.map((match) => ({ ...match, intelligence: fallbackIntelligence() }))
+            : [];
+    }
 
     if (!Array.isArray(matches) || matches.length === 0) {
         console.log('No matches provided for enrichment');

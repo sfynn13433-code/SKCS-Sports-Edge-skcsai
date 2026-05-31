@@ -292,4 +292,31 @@ router.get('/pipeline-status', async (req, res) => {
     }
 });
 
+router.get('/api-governance', async (req, res) => {
+    try {
+        const {
+            getGovernanceSnapshot,
+            getBlockedCallsSummary,
+            isSportIngestionEnabled
+        } = require('../services/apiQuotaRouter');
+
+        const days = Number(req.query.days) || 7;
+        const sport = req.query.sport || null;
+        const provider = req.query.provider || null;
+
+        const snapshot = getGovernanceSnapshot();
+        const blocked = await getBlockedCallsSummary({ days, sport, provider });
+
+        res.status(200).json({
+            ok: true,
+            governance: snapshot,
+            cricket_enabled: isSportIngestionEnabled('cricket'),
+            blocked_calls: blocked
+        });
+    } catch (err) {
+        console.error('[debug/api-governance] error:', err);
+        res.status(500).json({ ok: false, error: err.message });
+    }
+});
+
 module.exports = router;

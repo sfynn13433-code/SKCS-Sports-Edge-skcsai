@@ -108,12 +108,14 @@ function parsePositiveInt(value, fallback, min, max) {
 function normalizeRequestedSport(sport) {
     const key = String(sport || '').trim().toLowerCase();
     if (!key) return null;
-    if (key === 'nba') return 'Basketball';
-    if (key === 'mlb') return 'MLB';
-    if (key === 'nhl') return 'NHL';
-    if (key === 'nfl') return 'NFL';
-    if (key === 'american-football') return 'NFL';
-    return key;
+    if (key === 'football' || key === 'soccer') return 'Football';
+    if (key === 'basketball' || key === 'nba') return 'Basketball';
+    if (key === 'rugby') return 'Rugby';
+    if (key === 'mma' || key === 'fighting') return 'MMA';
+    if (key === 'mlb' || key === 'baseball') return 'MLB';
+    if (key === 'nhl' || key === 'hockey') return 'NHL';
+    if (key === 'nfl' || key === 'american-football' || key === 'american football') return 'NFL';
+    return key.charAt(0).toUpperCase() + key.slice(1);
 }
 
 function isTier1PrioritySport(sport) {
@@ -1197,7 +1199,7 @@ function toPredictionInputFromSportsDbFixture(fixture) {
 }
 
 async function fetchUpcomingFixtures(options = {}) {
-    const sportsDbKey = String(config.theSportsDbKey || '').trim();
+    const sportsDbKey = String(config.theSportsDbKey || process.env.THESPORTSDB_DEFAULT_KEY || '3').trim();
     if (!sportsDbKey) {
         console.warn('[dataProvider] TheSportsDB key missing (THESPORTSDB_KEY or SPORTS_DB_KEY) - skipping provider');
         return [];

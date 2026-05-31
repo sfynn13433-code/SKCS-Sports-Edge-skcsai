@@ -14,6 +14,17 @@ function parseTimeoutMs(value, fallbackMs = 30000) {
 }
 
 async function main() {
+    const { isSportIngestionEnabled } = require('./services/apiQuotaRouter');
+    if (!isSportIngestionEnabled('cricket')) {
+        console.log(JSON.stringify({
+            ok: true,
+            skipped: true,
+            reason: 'cricket_ingestion_disabled',
+            hint: 'Set CRICKET_INGESTION_ENABLED=1 to run cricket cron'
+        }));
+        return;
+    }
+
     const host = normalizeHost(
         process.env.SKCS_TRIGGER_HOST ||
         process.env.SKCS_REFRESH_HOST ||

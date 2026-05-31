@@ -3,10 +3,14 @@ const config = require('./config');
 const { fetchRapidApiCustom, getRapidApiProviderForSport, getRapidApiHostCandidates } = require('./services/dataProviders');
 const { getApiSportsKeyPool, maskKey } = require('./utils/keyPool');
 const {
-    shouldAllowOddsCall,
     consumeOddsCallSlot,
     applyOddsProviderHeaders
 } = require('./services/oddsBudgetService');
+const {
+    reserveApiCall,
+    normalizeSportKey,
+    apiSportsProviderKey
+} = require('./services/apiQuotaRouter');
 const {
     shouldAllow: circuitShouldAllow,
     recordFailure: circuitRecordFailure,
@@ -96,9 +100,21 @@ class APISportsClient {
     async requestWithRotation(sport, endpoint, params) {
         const baseUrl = this.getBaseUrl(sport);
         const keys = this.getKeysForSport(sport);
+        const sportKey = normalizeSportKey(sport);
+        const providerKey = apiSportsProviderKey(sportKey);
 
         if (!keys.length) {
             throw new Error(`No API keys configured for sport=${sport}`);
+        }
+
+        const gate = await reserveApiCall({
+            sport: sportKey,
+            provider: providerKey,
+            units: 1,
+            source: `APISportsClient.${endpoint}`
+        });
+        if (!gate.allowed) {
+            throw new Error(`API-Sports blocked (${gate.reason}) sport=${sportKey} provider=${providerKey}`);
         }
 
         let lastError = null;
@@ -268,9 +284,14 @@ class OddsAPIClient {
     }
 
     async getOdds(sportKey, regions = 'us', markets = 'h2h') {
-        const budget = shouldAllowOddsCall();
-        if (!budget.allowed) {
-            console.warn(`[OddsAPI] skipped: ${budget.reason}`);
+        const gate = await reserveApiCall({
+            sport: normalizeSportKey(sportKey) || 'football',
+            provider: 'odds_api',
+            units: 1,
+            source: 'OddsAPIClient.getOdds'
+        });
+        if (!gate.allowed) {
+            console.warn(`[OddsAPI] skipped: ${gate.reason}`);
             return null;
         }
 

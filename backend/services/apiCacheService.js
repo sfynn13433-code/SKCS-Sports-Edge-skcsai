@@ -9,7 +9,18 @@ const {
     recordFailure: circuitRecordFailure,
     recordSuccess: circuitRecordSuccess
 } = require('../utils/providerCircuitBreaker');
-const { consumeQuota } = require('./providerQuotaService');
+const { reserveApiCall } = require('./apiQuotaRouter');
+
+function sportKeyForProvider(providerName) {
+    const key = String(providerName || '').toLowerCase();
+    if (key.includes('cricket') || key.includes('cricapi') || key.includes('cricbuzz')) return 'cricket';
+    if (key.includes('basketball')) return 'basketball';
+    if (key.includes('baseball')) return 'baseball';
+    if (key.includes('hockey')) return 'hockey';
+    if (key.includes('rugby')) return 'rugby';
+    if (key.includes('mma')) return 'mma';
+    return 'football';
+}
 
 const SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
 const SUPABASE_SERVICE_ROLE_KEY = String(
@@ -201,15 +212,13 @@ async function fetchWithCache(
         try {
             console.warn(`[Cache Wall] Bypass enabled. Making uncached RapidAPI request for ${safeProvider}.`);
             cacheMetrics.bypasses += 1;
-            if (quotaOptions) {
-                const q = await consumeQuota(safeProvider, {
-                    perMinuteLimit: quotaOptions.perMinuteLimit ?? null,
-                    dailyLimit: quotaOptions.dailyLimit ?? null
-                });
-                if (!q.allowed) {
-                    console.warn(`[Cache Wall] Quota denied for ${safeProvider} (${q.scope}) used=${q.used}/${q.limit}`);
-                    return null;
-                }
+            const gate = await reserveApiCall({
+                sport: sportKeyForProvider(safeProvider),
+                provider: safeProvider,
+                source: `apiCacheService.bypass.${safeEndpoint}`
+            });
+            if (!gate.allowed) {
+                return null;
             }
             const response = await axios.get(safeEndpoint, {
                 headers,
@@ -244,15 +253,13 @@ async function fetchWithCache(
 
         console.log(`[Cache Wall] cache miss/expired: ${safeProvider}. consuming 1 RapidAPI call.`);
         cacheMetrics.misses += 1;
-        if (quotaOptions) {
-            const q = await consumeQuota(safeProvider, {
-                perMinuteLimit: quotaOptions.perMinuteLimit ?? null,
-                dailyLimit: quotaOptions.dailyLimit ?? null
-            });
-            if (!q.allowed) {
-                console.warn(`[Cache Wall] Quota denied for ${safeProvider} (${q.scope}) used=${q.used}/${q.limit}`);
-                return null;
-            }
+        const gate = await reserveApiCall({
+            sport: sportKeyForProvider(safeProvider),
+            provider: safeProvider,
+            source: `apiCacheService.${safeEndpoint}`
+        });
+        if (!gate.allowed) {
+            return null;
         }
         const response = await axios.get(safeEndpoint, {
             headers,

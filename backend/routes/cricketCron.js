@@ -8,6 +8,15 @@ const {
 } = require('../services/cricApiCacheService');
 
 const router = express.Router();
+const { isSportIngestionEnabled } = require('../services/apiQuotaRouter');
+
+function cricketIngestionDisabledResponse(res) {
+    return res.json({
+        ok: true,
+        skipped: true,
+        reason: 'cricket_ingestion_disabled'
+    });
+}
 
 // Verify cron secret
 function verifyCronSecret(req) {
@@ -22,6 +31,10 @@ function verifyCronSecret(req) {
 
 router.get('/cricket/cricbuzz', async (req, res) => {
     try {
+        if (!isSportIngestionEnabled('cricket')) {
+            return cricketIngestionDisabledResponse(res);
+        }
+
         // Verify cron secret
         if (!verifyCronSecret(req)) {
             return res.status(401).json({
@@ -65,6 +78,10 @@ router.get('/cricket/cricbuzz', async (req, res) => {
 
 router.get('/cricket/cricapi/daily', async (req, res) => {
     try {
+        if (!isSportIngestionEnabled('cricket')) {
+            return cricketIngestionDisabledResponse(res);
+        }
+
         if (!verifyCronSecret(req)) {
             return res.status(401).json({
                 ok: false,
@@ -95,6 +112,10 @@ router.get('/cricket/cricapi/daily', async (req, res) => {
 
 router.get('/cricket/cricapi/live', async (req, res) => {
     try {
+        if (!isSportIngestionEnabled('cricket')) {
+            return cricketIngestionDisabledResponse(res);
+        }
+
         if (!verifyCronSecret(req)) {
             return res.status(401).json({
                 ok: false,
