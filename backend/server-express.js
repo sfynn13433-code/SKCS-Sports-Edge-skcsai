@@ -225,6 +225,7 @@ const debugRouter       = require('./routes/debug');
 const userRouter        = require('./routes/user');
 const chatRouter        = require('./routes/chat');
 const accuracyRouter    = require('./routes/accuracy');
+const skcsGradingRouter = require('./routes/skcsGrading');
 const vipRouter         = require('./routes/vip');
 const direct1x2Router   = require('./routes/direct1x2');
 const refreshAIRouter   = require('./routes/refresh-ai');
@@ -713,6 +714,7 @@ app.use('/api/admin', refreshAIRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/edgemind', chatRouter);
 app.use('/api/accuracy', accuracyRouter);
+app.use('/api/skcs', skcsGradingRouter);
 app.use('/api/vip', vipRouter);
 app.use('/api/direct-1x2', direct1x2Router);
 app.use('/api/tier1', tier1Router);
@@ -899,7 +901,7 @@ async function runSettlementJob({ sport, gradeDate }) {
 }
 
 app.post('/api/grade-predictions', requireRefreshKey, async (req, res) => {
-    const sport     = req.query.sport || req.body?.sport || 'Football';
+    const sport     = req.query.sport || req.body?.sport || 'football';
     const dateParam = req.query.date  || req.body?.date  || null;
 
     // Default to yesterday in Africa/Johannesburg

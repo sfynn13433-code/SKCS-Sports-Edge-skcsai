@@ -113,9 +113,14 @@ function initCronJobs() {
 
             // Clean direct1x2_prediction_final — matches past kickoff + grace
             const finalResult = await db.query(`
-                DELETE FROM direct1x2_prediction_final
-                WHERE match_date IS NOT NULL
-                  AND match_date < NOW() - ($1 || ' minutes')::interval
+                DELETE FROM direct1x2_prediction_final pf
+                WHERE pf.match_date IS NOT NULL
+                  AND pf.match_date < NOW() - ($1 || ' minutes')::interval
+                  AND NOT EXISTS (
+                      SELECT 1
+                      FROM predictions_accuracy pa
+                      WHERE pa.prediction_final_id = pf.id
+                  )
             `, [String(graceMinutes)]);
 
             // Clean predictions_raw — stale rows

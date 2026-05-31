@@ -4,89 +4,17 @@ const express = require('express');
 const { query } = require('../db');
 
 const router = express.Router();
-const ACCURACY_ROW_QUALITY_SQL = `
-    pa.prediction_final_id IS NOT NULL
-    AND EXISTS (SELECT 1 FROM direct1x2_prediction_final pf0 WHERE pf0.id = pa.prediction_final_id)
-    AND NULLIF(TRIM(pa.home_team), '') IS NOT NULL
-    AND NULLIF(TRIM(pa.away_team), '') IS NOT NULL
-    AND LOWER(TRIM(pa.home_team)) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
-    AND LOWER(TRIM(pa.away_team)) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
-`;
-const PUBLISHED_ROW_QUALITY_SQL = `
-    pf.home_team IS NOT NULL
-    AND pf.away_team IS NOT NULL
-    AND LOWER(pf.home_team) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
-    AND LOWER(pf.away_team) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
-    AND COALESCE(pf.sport, 'Football') <> 'unknown'
-`;
-
-function startOfWeekUtc(now = new Date()) {
-    const current = new Date(now);
-    const day = current.getUTCDay();
-    const diffToMonday = day === 0 ? -6 : 1 - day;
-    current.setUTCDate(current.getUTCDate() + diffToMonday);
-    current.setUTCHours(0, 0, 0, 0);
-    return current;
-}
-
-function endOfWeekUtc(now = new Date()) {
-    const start = startOfWeekUtc(now);
-    const end = new Date(start);
-    end.setUTCDate(end.getUTCDate() + 7);
-    return end;
-}
-
-function formatWeekKey(date) {
-    const year = date.getUTCFullYear();
-    const week = getWeekNumber(date);
-    return `${year}-W${String(week).padStart(2, '0')}`;
-}
-
-function getWeekNumber(date) {
-    const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-    const dayNum = d.getUTCDay() || 7;
-    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-}
-
-function normalizeTierKey(value) {
-    const key = String(value || '').trim().toLowerCase();
-    return key === 'deep' || key === 'elite' ? 'elite' : 'core';
-}
-
-function normalizeTypeKey(value) {
-    const key = String(value || '').trim().toLowerCase();
-    if (key === 'same_match') return 'same_match';
-    if (key === 'secondary') return 'secondary';
-    if (key === 'multi') return 'multi';
-    if (key === 'mega_acca_12' || key === 'acca_6match' || key === 'acca') return 'acca';
-    return 'direct';
-}
-
-function humanizeTypeKey(key) {
-    const labels = {
-        direct: 'Direct Markets (1X2)',
-        secondary: 'Analytical Insights',
-        multi: 'Double Chance & Specials',
-        same_match: 'Same Match',
-        acca: 'ACCA'
-    };
-    return labels[key] || String(key || 'Unknown');
-}
-
-function buildEmptyStats() {
-    return { wins: 0, losses: 0, graded: 0, pending: 0, void: 0, unsupported: 0, winRate: 0 };
-}
-
-function finalizeStats(stats) {
-    const graded = Number(stats.graded) || 0;
-    const wins = Number(stats.wins) || 0;
-    return {
-        ...stats,
-        winRate: graded > 0 ? Math.round((wins / graded) * 100) : 0
-    };
-}
+const {
+    ACCURACY_ROW_QUALITY_SQL,
+    PUBLISHED_ROW_QUALITY_SQL,
+    finalizeStats,
+    buildEmptyStats,
+    normalizeTierKey,
+    normalizeTypeKey,
+    humanizeTypeKey,
+    startOfWeekUtc,
+    formatWeekKey
+} = require('../services/gradingAccuracyCore');
 
 function determineProductStatus(rows) {
     if (rows.some((row) => row.resolution_status === 'lost')) return 'lost';

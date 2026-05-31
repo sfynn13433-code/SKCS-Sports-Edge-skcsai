@@ -113,10 +113,13 @@ async function cleanupInvalidPublishedRows() {
     const accuracyCleanupRes = await query(`
         DELETE FROM predictions_accuracy pa
         WHERE pa.prediction_final_id IS NULL
-           OR NOT EXISTS (
-                SELECT 1
-                FROM direct1x2_prediction_final pf
-                WHERE pf.id = pa.prediction_final_id
+           OR (
+                pa.resolution_status IS NULL
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM direct1x2_prediction_final pf
+                    WHERE pf.id = pa.prediction_final_id
+                )
            )
            OR NULLIF(TRIM(pa.home_team), '') IS NULL
            OR NULLIF(TRIM(pa.away_team), '') IS NULL

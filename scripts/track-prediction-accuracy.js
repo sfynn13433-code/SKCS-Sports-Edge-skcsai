@@ -10,19 +10,48 @@ const SAST_TZ = 'Africa/Johannesburg';
 
 function parseArgs() {
     const args = process.argv.slice(2);
-    const result = { sport: 'football', date: null };
+    const result = { sport: 'football', date: null, from: null, to: null, days: null };
     for (const arg of args) {
         if (arg.startsWith('--sport=')) {
             result.sport = arg.replace('--sport=', '');
         } else if (arg.startsWith('--date=')) {
             result.date = arg.replace('--date=', '');
+        } else if (arg.startsWith('--from=')) {
+            result.from = arg.replace('--from=', '');
+        } else if (arg.startsWith('--to=')) {
+            result.to = arg.replace('--to=', '');
+        } else if (arg.startsWith('--days=')) {
+            result.days = Number(arg.replace('--days=', ''));
         }
     }
-    // Default to yesterday in Africa/Johannesburg if no date provided
     if (!result.date) {
         result.date = moment().tz('Africa/Johannesburg').subtract(1, 'day').format('YYYY-MM-DD');
     }
     return result;
+}
+
+function listDatesInclusive(from, to) {
+    const dates = [];
+    let cursor = moment(from, 'YYYY-MM-DD', true);
+    const end = moment(to, 'YYYY-MM-DD', true);
+    if (!cursor.isValid() || !end.isValid()) return dates;
+    while (cursor.isSameOrBefore(end, 'day')) {
+        dates.push(cursor.format('YYYY-MM-DD'));
+        cursor = cursor.add(1, 'day');
+    }
+    return dates;
+}
+
+function resolveDateRange(args) {
+    if (args.from && args.to) {
+        return listDatesInclusive(args.from, args.to);
+    }
+    if (args.days && Number.isFinite(args.days) && args.days > 0) {
+        const to = args.to || moment().tz('Africa/Johannesburg').subtract(1, 'day').format('YYYY-MM-DD');
+        const from = moment(to, 'YYYY-MM-DD').subtract(args.days - 1, 'day').format('YYYY-MM-DD');
+        return listDatesInclusive(from, to);
+    }
+    return [args.date];
 }
 
 function classifyAIInsight(result, confidence) {
@@ -66,6 +95,57 @@ function parseMatches(matchesValue) {
 
 function normalizeTeamToken(value) {
     return String(value || '').trim().toLowerCase();
+}
+
+/** Finished statuses used across Odds API, API-Sports, and legacy rows */
+const FINISHED_STATUS_SQL = `
+    lower(trim(coalesce(e.status, ''))) IN (
+        'ft', 'finished', 'match finished', 'full time', 'complete', 'completed', 'final'
+    )
+`;
+
+const FOOTBALL_SPORT_KEY_SQL = `
+    (
+        lower(coalesce(e.sport_key, '')) IN ('football', 'soccer')
+        OR lower(coalesce(e.sport_key, '')) LIKE '%soccer%'
+        OR lower(coalesce(e.sport_key, '')) LIKE '%football%'
+    )
+`;
+
+const PREDICTION_QUALITY_SQL = `
+    COALESCE(NULLIF(TRIM(home_team), ''), NULLIF(TRIM(matches->0->>'home_team'), ''), NULLIF(TRIM(matches->0->>'home_team_name'), '')) IS NOT NULL
+    AND COALESCE(NULLIF(TRIM(away_team), ''), NULLIF(TRIM(matches->0->>'away_team'), ''), NULLIF(TRIM(matches->0->>'away_team_name'), '')) IS NOT NULL
+    AND LOWER(COALESCE(NULLIF(TRIM(home_team), ''), NULLIF(TRIM(matches->0->>'home_team'), ''), NULLIF(TRIM(matches->0->>'home_team_name'), ''))) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+    AND LOWER(COALESCE(NULLIF(TRIM(away_team), ''), NULLIF(TRIM(matches->0->>'away_team'), ''), NULLIF(TRIM(matches->0->>'away_team_name'), ''))) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
+    AND LOWER(COALESCE(NULLIF(TRIM(sport), ''), NULLIF(TRIM(matches->0->>'sport'), ''))) <> 'unknown'
+`;
+
+function sportKeyForGrading(sport) {
+    const key = String(sport || 'football').trim().toLowerCase();
+    if (key === 'football' || key === 'soccer') return 'football';
+    return key;
+}
+
+function sportLabelForAccuracy(sport) {
+    const key = sportKeyForGrading(sport);
+    if (key === 'football') return 'Football';
+    return String(sport || 'Football');
+}
+
+function eventSportFilterSql(sportKey) {
+    if (sportKey === 'football') return FOOTBALL_SPORT_KEY_SQL;
+    return `lower(coalesce(e.sport_key, '')) = $2`;
+}
+
+function predictionSportFilterSql(sportKey, paramIndex = 5) {
+    if (sportKey === 'football') {
+        return `(
+            LOWER(COALESCE(NULLIF(TRIM(sport), ''), NULLIF(TRIM(matches->0->>'sport'), ''))) IN ('football', 'soccer')
+            OR LOWER(COALESCE(NULLIF(TRIM(sport), ''), NULLIF(TRIM(matches->0->>'sport'), ''))) LIKE '%football%'
+            OR COALESCE(NULLIF(TRIM(sport), ''), NULLIF(TRIM(matches->0->>'sport'), '')) IS NULL
+        )`;
+    }
+    return `LOWER(COALESCE(NULLIF(TRIM(sport), ''), NULLIF(TRIM(matches->0->>'sport'), ''))) = $${paramIndex}`;
 }
 
 function resolvePredictionMatchIndex(matches, event) {
@@ -120,7 +200,11 @@ async function gradePredictionsForDate(sport, date) {
         `);
         const defaultPublishRunId = latestCompletedRunRes.rows?.[0]?.id || null;
 
-        // Find events from the target date that are finished
+        const sportKey = sportKeyForGrading(sport);
+        const sportFilter = eventSportFilterSql(sportKey);
+        const eventParams = [date];
+        if (sportKey !== 'football') eventParams.push(sportKey);
+
         const eventsResult = await client.query(`
             SELECT 
                 e.id, 
@@ -132,12 +216,13 @@ async function gradePredictionsForDate(sport, date) {
                 e.commence_time,
                 DATE(e.commence_time AT TIME ZONE 'UTC' AT TIME ZONE 'Africa/Johannesburg') as fixture_date
             FROM events e
-            WHERE e.status = 'FT'
+            WHERE ${FINISHED_STATUS_SQL}
               AND e.home_score IS NOT NULL
               AND e.away_score IS NOT NULL
-              AND DATE(e.commence_time AT TIME ZONE 'UTC' AT TIME ZONE 'Africa/Johannesburg') = $1
+              AND ${sportFilter}
+              AND DATE(e.commence_time AT TIME ZONE 'UTC' AT TIME ZONE 'Africa/Johannesburg') = $1::date
             ORDER BY e.commence_time DESC
-        `, [date]);
+        `, eventParams);
 
         console.log(`[STEP 1] Found ${eventsResult.rows.length} finished events for ${date}`);
 
@@ -151,6 +236,10 @@ async function gradePredictionsForDate(sport, date) {
             try {
                 // Find predictions for this event from both tables
                 // Match by fixture_id OR by team names (fuzzy match)
+                const predParams = [event.id, event.home_team, event.away_team, date];
+                if (sportKey !== 'football') predParams.push(sportKey);
+                const predSportFilter = predictionSportFilterSql(sportKey, predParams.length);
+
                 const predResult = await client.query(`
                     SELECT DISTINCT ON (id)
                         id, 
@@ -164,17 +253,19 @@ async function gradePredictionsForDate(sport, date) {
                         away_team,
                         match_date
                     FROM direct1x2_prediction_final
-                    WHERE fixture_id = $1
-                       OR (home_team IS NOT NULL AND away_team IS NOT NULL 
-                           AND (LOWER(home_team) = LOWER($2) OR LOWER($2) LIKE '%' || LOWER(home_team) || '%')
-                           AND (LOWER(away_team) = LOWER($3) OR LOWER($3) LIKE '%' || LOWER(away_team) || '%'))
-                       OR matches::text LIKE '%' || $1 || '%'
-                      AND COALESCE(NULLIF(TRIM(home_team), ''), NULLIF(TRIM(matches->0->>'home_team'), ''), NULLIF(TRIM(matches->0->>'home_team_name'), '')) IS NOT NULL
-                      AND COALESCE(NULLIF(TRIM(away_team), ''), NULLIF(TRIM(matches->0->>'away_team'), ''), NULLIF(TRIM(matches->0->>'away_team_name'), '')) IS NOT NULL
-                      AND LOWER(COALESCE(NULLIF(TRIM(home_team), ''), NULLIF(TRIM(matches->0->>'home_team'), ''), NULLIF(TRIM(matches->0->>'home_team_name'), ''))) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
-                      AND LOWER(COALESCE(NULLIF(TRIM(away_team), ''), NULLIF(TRIM(matches->0->>'away_team'), ''), NULLIF(TRIM(matches->0->>'away_team_name'), ''))) NOT IN ('unknown', 'unknown home', 'unknown away', 'home team', 'away team', 'tbd', 'n/a')
-                      AND LOWER(COALESCE(NULLIF(TRIM(sport), ''), NULLIF(TRIM(matches->0->>'sport'), ''))) <> 'unknown'
-                `, [event.id, event.home_team, event.away_team]);
+                    WHERE (
+                        fixture_id::text = $1::text
+                        OR (
+                            home_team IS NOT NULL AND away_team IS NOT NULL
+                            AND LOWER(TRIM(home_team)) = LOWER(TRIM($2))
+                            AND LOWER(TRIM(away_team)) = LOWER(TRIM($3))
+                        )
+                        OR matches::text LIKE '%' || $1::text || '%'
+                    )
+                    AND ${PREDICTION_QUALITY_SQL}
+                    AND ${predSportFilter}
+                    AND DATE(COALESCE(match_date, created_at) AT TIME ZONE 'Africa/Johannesburg') BETWEEN ($4::date - INTERVAL '3 days') AND ($4::date + INTERVAL '3 days')
+                `, predParams);
 
                 if (predResult.rows.length === 0) {
                     continue;
@@ -316,7 +407,7 @@ async function gradePredictionsForDate(sport, date) {
                             publishRunId,
                             matchIndex,
                             event.id,
-                            sport,
+                            sportLabelForAccuracy(sport),
                             pred.tier || 'normal',
                             predictionType,
                             confidence,
@@ -373,24 +464,51 @@ async function gradePredictionsForDate(sport, date) {
     }
 }
 
-// Main execution
-(async () => {
-    const { sport, date } = parseArgs();
-    console.log(`[track-prediction-accuracy] Starting: sport=${sport}, date=${date}`);
+async function runGradingBatch(sport, dates) {
+    let totalGraded = 0;
+    let totalErrors = 0;
+    const perDate = [];
 
-    try {
+    for (const date of dates) {
         const result = await gradePredictionsForDate(sport, date);
-        console.log('\n[RESULT]', JSON.stringify({
-            ok: true,
-            sport,
-            date,
-            ...result
-        }));
-        process.exit(0);
-    } catch (err) {
-        console.error('[FATAL]', err.message);
-        process.exit(1);
-    } finally {
-        await pool.end();
+        totalGraded += result.graded || 0;
+        totalErrors += result.errors || 0;
+        perDate.push({ date, ...result });
     }
-})();
+
+    return { totalGraded, totalErrors, perDate };
+}
+
+if (require.main === module) {
+    (async () => {
+        const args = parseArgs();
+        const dates = resolveDateRange(args);
+        console.log(`[track-prediction-accuracy] Starting: sport=${args.sport}, dates=${dates.length} (${dates[0]}..${dates[dates.length - 1]})`);
+
+        try {
+            const batch = await runGradingBatch(args.sport, dates);
+            console.log('\n[RESULT]', JSON.stringify({
+                ok: true,
+                sport: args.sport,
+                datesProcessed: dates.length,
+                ...batch
+            }));
+            process.exit(0);
+        } catch (err) {
+            console.error('[FATAL]', err.message);
+            process.exit(1);
+        } finally {
+            await pool.end();
+        }
+    })();
+}
+
+module.exports = {
+    pool,
+    gradePredictionsForDate,
+    runGradingBatch,
+    parseArgs,
+    resolveDateRange,
+    FINISHED_STATUS_SQL,
+    FOOTBALL_SPORT_KEY_SQL
+};

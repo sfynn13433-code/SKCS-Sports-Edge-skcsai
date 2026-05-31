@@ -1,6 +1,13 @@
 'use strict';
 
 const { createClient } = require('@supabase/supabase-js');
+const {
+    CANONICAL_FOOTBALL_PROVIDER,
+    evaluateCanonicalIngest,
+    createEmptyFirewallStats,
+    recordFirewallAccept,
+    recordFirewallRejection
+} = require('./canonicalIngestFirewall');
 
 // Supabase client for Universal Intake Valve
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
@@ -34,9 +41,9 @@ function normalizeSport(value) {
     return value;
 }
 
-function extractProviderEventId(item) {
-    const raw = item?.raw_provider_data || {};
-    const direct = item?.match_id || raw?.fixture?.id || raw?.id || raw?.game?.id || raw?.fight?.id || raw?.race?.id || null;
+function extractProviderEventId(item, payloadOverride = null) {
+    const raw = payloadOverride || item?.raw_provider_data || {};
+    const direct = raw?.fixture?.id || item?.match_id || raw?.id || raw?.game?.id || raw?.fight?.id || raw?.race?.id || null;
     return direct === null || typeof direct === 'undefined' ? null : String(direct);
 }
 
@@ -77,40 +84,89 @@ function extractProviderName(item) {
     return item?.provider_name || item?.provider || 'unknown';
 }
 
-async function upsertCanonicalEvents(items = []) {
+function extractFieldsFromPayload(item, payload) {
+    const merged = { ...item, raw_provider_data: payload };
+    return {
+        competitionName: extractCompetitionName(merged),
+        season: extractSeason(merged),
+        startTime: extractStartTime(merged),
+        status: extractStatus(merged)
+    };
+}
+
+/**
+ * Upsert football canonical events — API-Sports fixture payloads only.
+ * @see docs/canonical_ingest_firewall.spec.md
+ * @returns {Promise<{ accepted: number, rejected: number, byReason: Record<string, number> }>}
+ */
+async function upsertCanonicalEvents(items = [], options = {}) {
+    const stats = createEmptyFirewallStats();
+
     if (!supabase) {
         console.error('[canonicalEvents] Supabase client not initialized — cannot ingest events');
-        return;
+        return stats;
     }
 
     const rows = Array.isArray(items) ? items : [];
+    const requireGoals = Boolean(options.requireGoals);
+    const logRejections = options.logRejections !== false;
 
     for (const item of rows) {
-        const providerEventId = extractProviderEventId(item);
-        const startTime = extractStartTime(item);
-        if (!providerEventId || !startTime) continue;
+        const gate = evaluateCanonicalIngest(item, {
+            requireGoals,
+            sport: item?.sport
+        });
 
-        // Map the chaotic API data to our clean variables
+        if (!gate.accept || !gate.payload) {
+            recordFirewallRejection(stats, gate.reason);
+            if (logRejections) {
+                console.warn(
+                    '[canonicalFirewall] REJECT provider=%s reason=%s match_id=%s',
+                    gate.provider || extractProviderName(item),
+                    gate.reason,
+                    item?.match_id || item?.raw_provider_data?.id || 'unknown'
+                );
+            }
+            continue;
+        }
+
+        const payload = gate.payload;
+        const providerEventId = extractProviderEventId(item, payload);
+        const fields = extractFieldsFromPayload(item, payload);
+        const startTime = fields.startTime;
+
+        if (!providerEventId || !startTime) {
+            recordFirewallRejection(stats, 'missing_fixture_id_or_kickoff');
+            continue;
+        }
+
         const cleanData = {
-            p_provider_name: extractProviderName(item),
+            p_provider_name: CANONICAL_FOOTBALL_PROVIDER,
             p_provider_event_id: providerEventId,
             p_sport: normalizeSport(item?.sport),
-            p_competition_name: extractCompetitionName(item),
-            p_season: extractSeason(item),
+            p_competition_name: fields.competitionName,
+            p_season: fields.season,
             p_start_time_utc: new Date(startTime).toISOString(),
-            p_status: extractStatus(item),
-            p_raw_payload: item?.raw_provider_data || item
+            p_status: fields.status,
+            p_raw_payload: payload
         };
 
-        // Push it through the Universal Intake Valve
         const { error } = await supabase.rpc('upsert_canonical_event', cleanData);
 
         if (error) {
-            console.error(`❌ Failed to ingest match ${cleanData.p_provider_event_id}:`, error.message);
+            recordFirewallRejection(stats, `rpc_error:${error.message}`);
+            console.error(`[canonicalFirewall] RPC failed ${cleanData.p_provider_event_id}:`, error.message);
         } else {
-            console.log(`✅ Match ${cleanData.p_provider_event_id} safely landed in canonical_events.`);
+            recordFirewallAccept(stats);
+            console.log(`[canonicalFirewall] ACCEPT fixture=${cleanData.p_provider_event_id} → canonical`);
         }
     }
+
+    if (rows.length > 0) {
+        console.log('[canonicalFirewall] summary', JSON.stringify(stats));
+    }
+
+    return stats;
 }
 
 module.exports = {
