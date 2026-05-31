@@ -159,6 +159,29 @@ async function bootstrap() {
         `);
 
         await query(`
+            CREATE TABLE IF NOT EXISTS raw_fixtures (
+                id_event text PRIMARY KEY,
+                sport text NOT NULL,
+                league_id text,
+                home_team_id text,
+                away_team_id text,
+                start_time timestamptz,
+                raw_json jsonb,
+                updated_at timestamptz NOT NULL DEFAULT now()
+            );
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_raw_fixtures_start_time
+            ON raw_fixtures(start_time);
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_raw_fixtures_sport
+            ON raw_fixtures(sport);
+        `);
+
+        await query(`
             CREATE TABLE IF NOT EXISTS predictions_raw (
                 id bigserial PRIMARY KEY,
                 match_id text NOT NULL,
@@ -183,6 +206,17 @@ async function bootstrap() {
                 created_at timestamptz NOT NULL DEFAULT now(),
                 UNIQUE (raw_id, tier)
             );
+        `);
+
+        await query(`
+            ALTER TABLE predictions_filtered
+            ADD COLUMN IF NOT EXISTS is_watchlist boolean NOT NULL DEFAULT false;
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_predictions_filtered_watchlist
+            ON predictions_filtered(is_watchlist)
+            WHERE is_watchlist = true;
         `);
 
         await ensureFinalPredictionsCompatibility();
@@ -873,6 +907,28 @@ async function bootstrap() {
             ON rapidapi_quota_usage(provider_name, window_type, window_start DESC);
         `);
 
+        await query(`
+            CREATE TABLE IF NOT EXISTS blocked_api_calls_log (
+                id BIGSERIAL PRIMARY KEY,
+                sport TEXT NOT NULL,
+                provider TEXT NOT NULL,
+                reason TEXT NOT NULL,
+                source TEXT,
+                units INTEGER NOT NULL DEFAULT 1,
+                metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_blocked_api_calls_created
+            ON blocked_api_calls_log(created_at DESC);
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_blocked_api_calls_sport_provider
+            ON blocked_api_calls_log(sport, provider, created_at DESC);
+        `);
 
         // ── Market Segregation Tables (Database Overhaul) ───────────────────────────
         // direct_1x2_predictions: strict main market table (only home, draw, away with real percentages)
@@ -1031,6 +1087,7 @@ async function bootstrap() {
                 ('team_week_locks', 'active', true, 'publish', 'Persistent single-use team/week lock table across publish runs.'),
                 ('rapidapi_cache', 'active', true, 'ingest', 'RapidAPI payload cache wall table.'),
                 ('rapidapi_quota_usage', 'active', true, 'ingest', 'Provider quota ledger by minute/day.'),
+                ('blocked_api_calls_log', 'active', true, 'governance', 'Cost observability: blocked external API attempts by sport/provider.'),
                 ('scheduling_logs', 'active', true, 'scheduler', 'Scheduler telemetry table.'),
                 ('secondary_market_predictions', 'active', true, 'publish', 'Segregated secondary market rows with real API probabilities.'),
                 ('double_chance_predictions', 'active', true, 'publish', 'Double-chance (1X, 12, X2) predictions derived from API probability splits.'),

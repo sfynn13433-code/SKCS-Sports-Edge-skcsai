@@ -45,6 +45,10 @@ function initCronJobs() {
                 FROM raw_fixtures
                 WHERE start_time >= NOW()
                   AND start_time <= NOW() + INTERVAL '72 hours'
+                  AND (
+                    LOWER(COALESCE(sport, '')) IN ('soccer', 'football')
+                    OR LOWER(COALESCE(sport, '')) LIKE '%soccer%'
+                  )
                 ORDER BY start_time ASC
             `;
             

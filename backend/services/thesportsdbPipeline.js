@@ -24,6 +24,41 @@ const supabase = SUPABASE_URL && SUPABASE_KEY
   ? createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false, autoRefreshToken: false } })
   : null;
 
+function isCanonicalIngestUnavailable(error) {
+  const message = String(error?.message || error || '').toLowerCase();
+  return message.includes('canonical_events')
+    || message.includes('does not exist')
+    || message.includes('schema cache')
+    || message.includes('upsert_canonical_event');
+}
+
+async function upsertRawFixtureRow(event) {
+  const idEvent = event.idEvent;
+  if (!idEvent) return false;
+
+  await db.query(`
+    INSERT INTO raw_fixtures (id_event, sport, league_id, home_team_id, away_team_id, start_time, raw_json)
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    ON CONFLICT (id_event) DO UPDATE SET
+      sport = EXCLUDED.sport,
+      league_id = EXCLUDED.league_id,
+      home_team_id = EXCLUDED.home_team_id,
+      away_team_id = EXCLUDED.away_team_id,
+      start_time = EXCLUDED.start_time,
+      raw_json = EXCLUDED.raw_json,
+      updated_at = NOW()
+  `, [
+    idEvent,
+    event.strSport || 'Unknown',
+    event.idLeague,
+    event.idHomeTeam,
+    event.idAwayTeam,
+    event.dateEvent ? new Date(`${event.dateEvent} ${event.strTime || '00:00'}Z`) : null,
+    JSON.stringify(event)
+  ]);
+  return true;
+}
+
 /**
  * syncDailyFixtures(date)
  * Uses the undocumented searchevents.php?d= endpoint to populate raw_fixtures.
@@ -95,49 +130,42 @@ async function syncDailyFixtures(date) {
     //   console.error(`[syncDailyFixtures] Failed to upsert event ${idEvent}:`, err.message);
     // }
 
-    // NEW PIPE: Universal Intake Valve via supabase.rpc('upsert_canonical_event')
-    if (!supabase) {
-      console.error('[syncDailyFixtures] Supabase client not initialized — falling back to direct SQL');
-      try {
-        await db.query(`
-          INSERT INTO raw_fixtures (id_event, sport, league_id, home_team_id, away_team_id, start_time, raw_json)
-          VALUES ($1, $2, $3, $4, $5, $6, $7)
-          ON CONFLICT (id_event) DO UPDATE SET
-            raw_json = EXCLUDED.raw_json,
-            updated_at = NOW()
-        `, [
-          idEvent,
-          event.strSport || 'Unknown',
-          event.idLeague,
-          event.idHomeTeam,
-          event.idAwayTeam,
-          event.dateEvent ? new Date(`${event.dateEvent} ${event.strTime || '00:00'}Z`) : null,
-          JSON.stringify(event)
-        ]);
-        syncedCount++;
-      } catch (err) {
-        console.error(`[syncDailyFixtures] Fallback SQL failed for ${idEvent}:`, err.message);
+    let ingested = false;
+
+    if (supabase) {
+      const cleanData = {
+        p_provider_name: 'thesportsdb',
+        p_provider_event_id: idEvent.toString(),
+        p_sport: event.strSport || 'Unknown',
+        p_competition_name: event.strLeague || 'Unknown',
+        p_season: event.strSeason || new Date().getFullYear().toString(),
+        p_start_time_utc: event.dateEvent ? new Date(`${event.dateEvent} ${event.strTime || '00:00'}Z`).toISOString() : new Date().toISOString(),
+        p_status: event.strStatus || 'NS',
+        p_raw_payload: event
+      };
+
+      const { error } = await supabase.rpc('upsert_canonical_event', cleanData);
+
+      if (!error) {
+        console.log(`✅ Match ${cleanData.p_provider_event_id} safely landed in canonical_events.`);
+        ingested = true;
+      } else if (isCanonicalIngestUnavailable(error)) {
+        console.warn(`[syncDailyFixtures] Supabase canonical ingest unavailable for ${idEvent}; using raw_fixtures (${error.message})`);
+      } else {
+        console.error(`❌ Failed to ingest match ${cleanData.p_provider_event_id}:`, error.message);
       }
-      continue;
     }
 
-    const cleanData = {
-      p_provider_name: 'thesportsdb',
-      p_provider_event_id: idEvent.toString(),
-      p_sport: event.strSport || 'Unknown',
-      p_competition_name: event.strLeague || 'Unknown',
-      p_season: event.strSeason || new Date().getFullYear().toString(),
-      p_start_time_utc: event.dateEvent ? new Date(`${event.dateEvent} ${event.strTime || '00:00'}Z`).toISOString() : new Date().toISOString(),
-      p_status: event.strStatus || 'NS',
-      p_raw_payload: event
-    };
+    if (!ingested) {
+      try {
+        await upsertRawFixtureRow(event);
+        ingested = true;
+      } catch (err) {
+        console.error(`[syncDailyFixtures] raw_fixtures upsert failed for ${idEvent}:`, err.message);
+      }
+    }
 
-    const { error } = await supabase.rpc('upsert_canonical_event', cleanData);
-
-    if (error) {
-      console.error(`❌ Failed to ingest match ${cleanData.p_provider_event_id}:`, error.message);
-    } else {
-      console.log(`✅ Match ${cleanData.p_provider_event_id} safely landed in canonical_events.`);
+    if (ingested) {
       syncedCount++;
     }
   }

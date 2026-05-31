@@ -2304,13 +2304,13 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         try {
             const sportFilterValues = getSportFilterValues(sport);
             if (sportFilterValues.length > 0) {
-                const sportPlaceholders = sportFilterValues.map((_, i) => `$${i + 1}`).join(', ');
+                const sportPlaceholders = sportFilterValues.map((_, i) => `$${i + 2}`).join(', ');
                 const watchlistQuery = `
                     SELECT pr.*, pf.is_watchlist, pf.reject_reason
                     FROM predictions_filtered pf
                     JOIN predictions_raw pr ON pf.raw_id = pr.id
                     WHERE pf.is_watchlist = true
-                      AND pf.tier = ANY($1)
+                      AND LOWER(COALESCE(pf.tier, 'normal')) = ANY($1::text[])
                       AND LOWER(COALESCE(pr.metadata->>'sport', 'football')) IN (${sportPlaceholders})
                     ORDER BY pr.created_at DESC
                     LIMIT 50;
