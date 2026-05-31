@@ -22,7 +22,15 @@ const DEFAULT_FOOTBALL_LEAGUES = [
     { id: 140, name: 'La Liga' },
     { id: 78, name: 'Bundesliga' },
     { id: 135, name: 'Serie A' },
-    { id: 61, name: 'Ligue 1' }
+    { id: 61, name: 'Ligue 1' },
+    { id: 98, name: 'J1 League' },
+    { id: 99, name: 'J2 League' },
+    { id: 169, name: 'Chinese Super League' },
+    { id: 170, name: 'China League One' },
+    { id: 253, name: 'MLS' },
+    { id: 255, name: 'USL Championship' },
+    { id: 71, name: 'Brasileirão Série A' },
+    { id: 72, name: 'Brasileirão Série B' }
 ];
 
 function parseArgs(argv) {

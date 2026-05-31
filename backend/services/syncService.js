@@ -179,8 +179,27 @@ const BASE_SPORTS_CONFIG = [
     { sport: 'NFL', leagueId: '4391', season: SEASON_YEAR, oddsKey: 'americanfootball_nfl' },
 ];
 
-const FOOTBALL_TIER_1_LEAGUES = new Set(['4328', '4335', '4331', '4332', '4334']);
-const FOOTBALL_TIER_2_LEAGUES = new Set([]);
+/**
+ * Summer / global football — API-Sports V3 league ids (not TheSportsDB).
+ * Same ingest waterfall per league (API-Sports primary); no change to stagger, quotas, or router rules.
+ * @see docs/football-leagues-apisports.md
+ */
+const FOOTBALL_APISPORTS_LEAGUE_CONFIG = [
+    { sport: 'Football', leagueId: '98', season: SEASON_YEAR, oddsKey: null, leagueTier: 1, competition: 'J1 League' },
+    { sport: 'Football', leagueId: '99', season: SEASON_YEAR, oddsKey: null, leagueTier: 2, competition: 'J2 League' },
+    { sport: 'Football', leagueId: '169', season: SEASON_YEAR, oddsKey: null, leagueTier: 1, competition: 'Chinese Super League' },
+    { sport: 'Football', leagueId: '170', season: SEASON_YEAR, oddsKey: null, leagueTier: 2, competition: 'China League One' },
+    { sport: 'Football', leagueId: '253', season: SEASON_YEAR, oddsKey: null, leagueTier: 1, competition: 'MLS' },
+    { sport: 'Football', leagueId: '255', season: SEASON_YEAR, oddsKey: null, leagueTier: 2, competition: 'USL Championship' },
+    { sport: 'Football', leagueId: '71', season: SEASON_YEAR, oddsKey: null, leagueTier: 1, competition: 'Brasileirão Série A' },
+    { sport: 'Football', leagueId: '72', season: SEASON_YEAR, oddsKey: null, leagueTier: 2, competition: 'Brasileirão Série B' }
+];
+
+const FOOTBALL_TIER_1_LEAGUES = new Set([
+    '4328', '4335', '4331', '4332', '4334',
+    '98', '169', '253', '71'
+]);
+const FOOTBALL_TIER_2_LEAGUES = new Set(['99', '170', '255', '72']);
 const BASKETBALL_TIER_1_LEAGUES = new Set(['4387']);
 const BASKETBALL_TIER_2_LEAGUES = new Set([]);
 const RUGBY_TIER_1_LEAGUES = new Set([]);
@@ -233,10 +252,13 @@ function resolveLeagueTier(item) {
     return 2;
 }
 
-const SPORTS_CONFIG = BASE_SPORTS_CONFIG.map((item) => ({
-    ...item,
-    leagueTier: resolveLeagueTier(item)
-}));
+const SPORTS_CONFIG = [
+    ...BASE_SPORTS_CONFIG.map((item) => ({
+        ...item,
+        leagueTier: resolveLeagueTier(item)
+    })),
+    ...FOOTBALL_APISPORTS_LEAGUE_CONFIG
+];
 
 function normalizeSportToken(value) {
     const token = String(value || '').trim().toLowerCase();
