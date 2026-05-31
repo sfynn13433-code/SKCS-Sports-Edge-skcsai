@@ -29,7 +29,12 @@ function parseArgs(argv) {
     const out = {
         from: null,
         to: null,
-        season: String(new Date().getUTCFullYear()),
+        season: String((() => {
+            const now = new Date();
+            const month = now.getUTCMonth() + 1;
+            const year = now.getUTCFullYear();
+            return month >= 8 ? year : year - 1;
+        })()),
         leagues: DEFAULT_FOOTBALL_LEAGUES.map((l) => l.id),
         dryRun: false,
         refreshFinished: false

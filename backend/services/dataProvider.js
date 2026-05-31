@@ -6,6 +6,15 @@ const { APISportsClient, OddsAPIClient, SportsDataOrgClient, SportsDataIOClient,
 const { getScoreboard } = require('./espnHiddenApiService');
 
 const SUPPORTED_LEAGUES = ['4328', '4332', '4331', '4335', '4334', '4387', '4424', '4380', '4391'];
+/** TheSportsDB league id → API-Sports league id (see docs/SKCS_ENGINE_V2_PHASE0B5_REPLAY.md) */
+const THESPORTSDB_TO_APISPORTS_LEAGUE = Object.freeze({
+    '4328': '39',   // Premier League
+    '4335': '140',  // La Liga
+    '4331': '78',   // Bundesliga
+    '4332': '135',  // Serie A
+    '4334': '61'    // Ligue 1
+});
+
 const LEAGUE_SPORT_MAP = {
     '4328': 'Football',          // EPL
     '4332': 'Football',          // Serie A
@@ -1046,6 +1055,45 @@ function deriveSeasonLabel(referenceDate = new Date()) {
     return `${year - 1}-${year}`;
 }
 
+/** Same calendar rule as syncService.getSeasonStartYear — API-Sports season param (e.g. 2025 for 2025-26). */
+function deriveApiSportsSeasonYear(referenceDate = new Date()) {
+    const month = referenceDate.getUTCMonth() + 1;
+    const year = referenceDate.getUTCFullYear();
+    return month >= 8 ? year : year - 1;
+}
+
+function resolveApiSportsLeagueId(leagueId, sport) {
+    const id = String(leagueId || '').trim();
+    if (!id) return null;
+    const sportKey = normalizeRequestedSport(sport);
+    if (sportKey === 'football' || String(sport || '').toLowerCase() === 'football') {
+        if (THESPORTSDB_TO_APISPORTS_LEAGUE[id]) {
+            return THESPORTSDB_TO_APISPORTS_LEAGUE[id];
+        }
+        if (FOOTBALL_TARGET_LEAGUE_IDS.has(id)) {
+            return id;
+        }
+        return null;
+    }
+    return id;
+}
+
+function apiSportsSeasonPlanBlocked(errors) {
+    if (!errors || typeof errors !== 'object') return false;
+    const text = JSON.stringify(errors).toLowerCase();
+    return text.includes('free plans do not have access to this season')
+        || text.includes('try from 2022 to 2024');
+}
+
+function footballApiSportsSeasonFallbacks(primarySeason) {
+    const primary = Number(primarySeason);
+    const ordered = [2024, 2023, 2022];
+    if (Number.isFinite(primary) && !ordered.includes(primary)) {
+        ordered.unshift(primary);
+    }
+    return [...new Set(ordered.map(String))];
+}
+
 function buildUtcWindow(fromDate, toDate) {
     const startRaw = String(fromDate || '').trim() || todayStr();
     const endRaw = String(toDate || '').trim() || startRaw;
@@ -1586,19 +1634,54 @@ async function buildLiveData(options = {}) {
     // --- Source 1: API-Sports (primary) ---
     if (String(process.env.DISABLE_APISPORTS || '').toLowerCase() !== 'true') {
     try {
+        const apiSportsLeagueId = resolveApiSportsLeagueId(leagueId, sport);
+        if (!apiSportsLeagueId) {
+            console.warn(`[dataProvider] ${sport}: no API-Sports league mapping for leagueId=${leagueId}`);
+        } else if (String(leagueId) !== String(apiSportsLeagueId)) {
+            console.log(`[dataProvider] ${sport}: API-Sports league remap ${leagueId} → ${apiSportsLeagueId}`);
+        }
+
+        let data = null;
+        let fixtures = [];
+        let seasonUsed = season || String(deriveApiSportsSeasonYear());
+
+        if (apiSportsLeagueId) {
+        const primarySeason = seasonUsed;
+        const seasonCandidates = (normalizeRequestedSport(sport) === 'football' || String(sport).toLowerCase() === 'football')
+            ? footballApiSportsSeasonFallbacks(primarySeason)
+            : [primarySeason];
         const queryOpts = { from: today, to: windowEnd };
 
-        console.log(`[dataProvider] ${sport}: Fetching fixtures for league=${leagueId}, season=${season}, dateRange=${today} to ${windowEnd} (${windowDays * 24}h window)`);
-        console.log(`[DIAG] API-Sports URL: ${client.getBaseUrl(sport)}/fixtures?league=${leagueId}&season=${season}&from=${today}&to=${windowEnd}`);
-        
-        let data = await client.getFixtures(leagueId, season, queryOpts, sport);
-        console.log(`[DIAG] API-Sports raw response: data=${data ? 'received' : 'NULL'} results=${data?.results ?? 'N/A'} responseLength=${data?.response?.length ?? 'N/A'} errors=${JSON.stringify(data?.errors || {})}`);
-        let fixtures = data?.response || [];
+        for (const seasonCandidate of seasonCandidates) {
+            seasonUsed = seasonCandidate;
+            console.log(`[dataProvider] ${sport}: Fetching fixtures for league=${apiSportsLeagueId}, season=${seasonCandidate}, dateRange=${today} to ${windowEnd} (${windowDays * 24}h window)`);
+            console.log(`[DIAG] API-Sports URL: ${client.getBaseUrl(sport)}/fixtures?league=${apiSportsLeagueId}&season=${seasonCandidate}&from=${today}&to=${windowEnd}`);
+
+            data = await client.getFixtures(apiSportsLeagueId, seasonCandidate, queryOpts, sport);
+            console.log(`[DIAG] API-Sports raw response: data=${data ? 'received' : 'NULL'} results=${data?.results ?? 'N/A'} responseLength=${data?.response?.length ?? 'N/A'} errors=${JSON.stringify(data?.errors || {})}`);
+            fixtures = data?.response || [];
+
+            if (fixtures.length > 0) break;
+            if (!apiSportsSeasonPlanBlocked(data?.errors)) break;
+            console.warn(`[dataProvider] ${sport}: API-Sports season ${seasonCandidate} blocked on plan; trying fallback season`);
+        }
+
+        if (fixtures.length === 0 && (normalizeRequestedSport(sport) === 'football' || String(sport).toLowerCase() === 'football')) {
+            console.log(`[dataProvider] ${sport}: No fixtures found with date range, trying single-day query`);
+            for (const seasonCandidate of seasonCandidates) {
+                seasonUsed = seasonCandidate;
+                data = await client.getFixtures(apiSportsLeagueId, seasonCandidate, { date: today }, sport);
+                fixtures = data?.response || [];
+                if (fixtures.length > 0) break;
+                if (!apiSportsSeasonPlanBlocked(data?.errors)) break;
+            }
+        }
 
         if (fixtures.length === 0 && sport !== 'football') {
             console.log(`[dataProvider] ${sport}: No fixtures found with date range, trying single-day query`);
-            data = await client.getFixtures(leagueId, season, { date: today }, sport);
+            data = await client.getFixtures(apiSportsLeagueId, seasonUsed, { date: today }, sport);
             fixtures = data?.response || [];
+        }
         }
 
         if (fixtures.length > 0) {
