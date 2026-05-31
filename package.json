@@ -25,6 +25,8 @@
     "accuracy:audit": "node scripts/audit-grading-pipeline.js",
     "accuracy:bridge": "node scripts/bridge-raw-predictions-for-grading.js",
     "accuracy:backfill": "node scripts/backfill-prediction-grading.js --sport=football --days=90",
+    "audit:api": "node scripts/audit-api-call-map.js",
+    "verify:vercel": "node scripts/verify-vercel-build.js",
     "context:backfill": "node scripts/backfill-football-context.js",
     "context:april5": "node scripts/backfill-football-context.js --date=2026-04-05 --sport=football",
     "sync:sportsrc": "node backend/scripts/sync-sportsrc-fixtures.js",
