@@ -4,6 +4,7 @@ const axios = require('axios');
 const config = require('../config');
 const { APISportsClient, OddsAPIClient, SportsDataOrgClient, SportsDataIOClient, RapidAPIClient, CricketDataClient } = require('../apiClients');
 const { getScoreboard } = require('./espnHiddenApiService');
+const ProviderQuotaExceededError = require('../errors/ProviderQuotaExceededError');
 
 const SUPPORTED_LEAGUES = ['4328', '4332', '4331', '4335', '4334', '4387', '4424', '4380', '4391'];
 /** TheSportsDB league id → API-Sports league id (see docs/SKCS_ENGINE_V2_PHASE0B5_REPLAY.md) */
@@ -1547,6 +1548,7 @@ async function buildLiveData(options = {}) {
     const sport = options.sport || 'football';
     const leagueId = options.leagueId || null;
     const season = options.season || null;
+    const syncState = isObject(options.syncState) ? options.syncState : null;
     const today = todayStr();
     const requestedWindowDays = Number(options.windowDays ?? process.env.LIVE_FETCH_WINDOW_DAYS ?? 3);
     const windowDays = Number.isFinite(requestedWindowDays)
@@ -1652,6 +1654,7 @@ async function buildLiveData(options = {}) {
         let data = null;
         let fixtures = [];
         let seasonUsed = season || String(deriveApiSportsSeasonYear());
+        let apiSportsQuotaBlocked = false;
 
         if (apiSportsLeagueId) {
         const primarySeason = seasonUsed;
@@ -1659,13 +1662,29 @@ async function buildLiveData(options = {}) {
             ? footballApiSportsSeasonFallbacks(primarySeason)
             : [primarySeason];
         const queryOpts = { from: today, to: windowEnd };
+        const isQuotaExceededError = (error) => (
+            error instanceof ProviderQuotaExceededError
+            || error?.code === 'provider_quota_exceeded'
+        );
 
         for (const seasonCandidate of seasonCandidates) {
             seasonUsed = seasonCandidate;
             console.log(`[dataProvider] ${sport}: Fetching fixtures for league=${apiSportsLeagueId}, season=${seasonCandidate}, dateRange=${today} to ${windowEnd} (${windowDays * 24}h window)`);
             console.log(`[DIAG] API-Sports URL: ${client.getBaseUrl(sport)}/fixtures?league=${apiSportsLeagueId}&season=${seasonCandidate}&from=${today}&to=${windowEnd}`);
 
-            data = await client.getFixtures(apiSportsLeagueId, seasonCandidate, queryOpts, sport);
+            try {
+                data = await client.getFixtures(apiSportsLeagueId, seasonCandidate, queryOpts, sport);
+            } catch (error) {
+                if (isQuotaExceededError(error)) {
+                    apiSportsQuotaBlocked = true;
+                    if (syncState && normalizeRequestedSport(sport) === 'football') {
+                        syncState.apiSportsFootballBlocked = true;
+                    }
+                    console.warn(`[dataProvider] ${sport}: API-Sports quota exhausted; stopping API-Sports retries for this league.`);
+                    break;
+                }
+                throw error;
+            }
             console.log(`[DIAG] API-Sports raw response: data=${data ? 'received' : 'NULL'} results=${data?.results ?? 'N/A'} responseLength=${data?.response?.length ?? 'N/A'} errors=${JSON.stringify(data?.errors || {})}`);
             fixtures = data?.response || [];
 
@@ -1674,21 +1693,49 @@ async function buildLiveData(options = {}) {
             console.warn(`[dataProvider] ${sport}: API-Sports season ${seasonCandidate} blocked on plan; trying fallback season`);
         }
 
-        if (fixtures.length === 0 && (normalizeRequestedSport(sport) === 'football' || String(sport).toLowerCase() === 'football')) {
+        if (!apiSportsQuotaBlocked && fixtures.length === 0 && (normalizeRequestedSport(sport) === 'football' || String(sport).toLowerCase() === 'football')) {
             console.log(`[dataProvider] ${sport}: No fixtures found with date range, trying single-day query`);
             for (const seasonCandidate of seasonCandidates) {
                 seasonUsed = seasonCandidate;
-                data = await client.getFixtures(apiSportsLeagueId, seasonCandidate, { date: today }, sport);
+                try {
+                    data = await client.getFixtures(apiSportsLeagueId, seasonCandidate, { date: today }, sport);
+                } catch (error) {
+                    if (isQuotaExceededError(error)) {
+                        apiSportsQuotaBlocked = true;
+                        if (syncState && normalizeRequestedSport(sport) === 'football') {
+                            syncState.apiSportsFootballBlocked = true;
+                        }
+                        console.warn(`[dataProvider] ${sport}: API-Sports quota exhausted; skipping single-day retry.`);
+                        break;
+                    }
+                    throw error;
+                }
                 fixtures = data?.response || [];
                 if (fixtures.length > 0) break;
                 if (!apiSportsSeasonPlanBlocked(data?.errors)) break;
             }
         }
 
-        if (fixtures.length === 0 && sport !== 'football') {
+        if (!apiSportsQuotaBlocked && fixtures.length === 0 && sport !== 'football') {
             console.log(`[dataProvider] ${sport}: No fixtures found with date range, trying single-day query`);
-            data = await client.getFixtures(apiSportsLeagueId, seasonUsed, { date: today }, sport);
+            try {
+                data = await client.getFixtures(apiSportsLeagueId, seasonUsed, { date: today }, sport);
+            } catch (error) {
+                if (isQuotaExceededError(error)) {
+                    apiSportsQuotaBlocked = true;
+                    if (syncState && normalizeRequestedSport(sport) === 'football') {
+                        syncState.apiSportsFootballBlocked = true;
+                    }
+                    console.warn(`[dataProvider] ${sport}: API-Sports quota exhausted; skipping single-day retry.`);
+                } else {
+                    throw error;
+                }
+            }
             fixtures = data?.response || [];
+        }
+
+        if (apiSportsQuotaBlocked) {
+            console.warn(`[dataProvider] ${sport}: API-Sports quota exhausted, skipping remaining API-Sports fallbacks.`);
         }
         }
 
@@ -1705,7 +1752,9 @@ async function buildLiveData(options = {}) {
             }
         }
 
-        console.warn(`[dataProvider] ${sport}: 0 fixtures from API-Sports`);
+        if (!apiSportsQuotaBlocked) {
+            console.warn(`[dataProvider] ${sport}: 0 fixtures from API-Sports`);
+        }
     } catch (error) {
         console.error(`[dataProvider] ${sport}: API-Sports ERROR:`, error.message);
     }

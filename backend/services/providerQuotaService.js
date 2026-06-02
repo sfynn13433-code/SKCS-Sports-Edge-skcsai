@@ -1,6 +1,7 @@
 'use strict';
 
 const { query, withTransaction } = require('../database');
+const { getProviderConfig } = require('./apiQuotaRouterProviders');
 
 function truncateToUtc(date, unit) {
   const d = new Date(date);
@@ -66,6 +67,50 @@ async function consumeQuota(providerName, { perMinuteLimit = null, dailyLimit = 
   });
 }
 
+async function getQuotaState(providerName) {
+  const provider = String(providerName || '').trim();
+  if (!provider) return null;
+
+  const providerConfig = getProviderConfig(provider);
+  if (!providerConfig) return null;
+
+  const now = new Date();
+  const minuteStart = truncateToUtc(now, 'minute').toISOString();
+  const dayStart = truncateToUtc(now, 'day').toISOString();
+
+  const minuteRes = await query(
+    `SELECT usage_count FROM rapidapi_quota_usage WHERE provider_name = $1 AND window_type = 'minute' AND window_start = $2`,
+    [provider, minuteStart]
+  );
+  const dayRes = await query(
+    `SELECT usage_count FROM rapidapi_quota_usage WHERE provider_name = $1 AND window_type = 'day' AND window_start = $2`,
+    [provider, dayStart]
+  );
+
+  const minuteUsed = Number(minuteRes.rows?.[0]?.usage_count || 0);
+  const dayUsed = Number(dayRes.rows?.[0]?.usage_count || 0);
+  const dailyLimit = providerConfig.dailyLimit == null ? null : Number(providerConfig.dailyLimit);
+  const perMinuteLimit = providerConfig.perMinuteLimit == null ? null : Number(providerConfig.perMinuteLimit);
+  const remainingToday = dailyLimit == null ? null : Math.max(0, dailyLimit - dayUsed);
+  const remainingPerMinute = perMinuteLimit == null ? null : Math.max(0, perMinuteLimit - minuteUsed);
+
+  return {
+    providerName: provider,
+    family: providerConfig.family,
+    dailyLimit,
+    perMinuteLimit,
+    usage: {
+      day: dayUsed,
+      minute: minuteUsed
+    },
+    remainingToday,
+    remainingPerMinute,
+    exhaustedToday: dailyLimit == null ? false : dayUsed >= dailyLimit,
+    exhaustedPerMinute: perMinuteLimit == null ? false : minuteUsed >= perMinuteLimit
+  };
+}
+
 module.exports = {
-  consumeQuota
+  consumeQuota,
+  getQuotaState
 };

@@ -11,6 +11,7 @@ const {
     normalizeSportKey,
     apiSportsProviderKey
 } = require('./services/apiQuotaRouter');
+const ProviderQuotaExceededError = require('./errors/ProviderQuotaExceededError');
 const {
     shouldAllow: circuitShouldAllow,
     recordFailure: circuitRecordFailure,
@@ -114,7 +115,11 @@ class APISportsClient {
             source: `APISportsClient.${endpoint}`
         });
         if (!gate.allowed) {
-            throw new Error(`API-Sports blocked (${gate.reason}) sport=${sportKey} provider=${providerKey}`);
+            throw new ProviderQuotaExceededError(
+                providerKey,
+                sportKey,
+                `API-Sports blocked (${gate.reason}) sport=${sportKey} provider=${providerKey}`
+            );
         }
 
         let lastError = null;
@@ -150,6 +155,9 @@ class APISportsClient {
                 circuitRecordSuccess(signature);
                 return response.data;
             } catch (error) {
+            if (error instanceof ProviderQuotaExceededError || error?.code === 'provider_quota_exceeded') {
+                throw error;
+            }
                 const status = Number(error?.response?.status || 0);
                 const payload = error.response && error.response.data ? error.response.data : null;
                 if (this.hasQuotaErrorPayload(payload)) {
@@ -212,6 +220,9 @@ class APISportsClient {
             if (error.response) {
                 console.error('Response data:', error.response.data);
             }
+            if (error instanceof ProviderQuotaExceededError || error?.code === 'provider_quota_exceeded') {
+                throw error;
+            }
             return null;
         }
     }
@@ -235,6 +246,9 @@ class APISportsClient {
             if (error.response) {
                 console.error('Response data:', error.response.data);
             }
+            if (error instanceof ProviderQuotaExceededError || error?.code === 'provider_quota_exceeded') {
+                throw error;
+            }
             return null;
         }
     }
@@ -248,6 +262,9 @@ class APISportsClient {
             });
         } catch (error) {
             console.error('API-Sports team stats error:', error.message);
+            if (error instanceof ProviderQuotaExceededError || error?.code === 'provider_quota_exceeded') {
+                throw error;
+            }
             return null;
         }
     }
@@ -260,6 +277,9 @@ class APISportsClient {
             });
         } catch (error) {
             console.error('API-Sports injuries error:', error.message);
+            if (error instanceof ProviderQuotaExceededError || error?.code === 'provider_quota_exceeded') {
+                throw error;
+            }
             return null;
         }
     }
@@ -272,6 +292,9 @@ class APISportsClient {
             });
         } catch (error) {
             console.error('API-Sports H2H error:', error.message);
+            if (error instanceof ProviderQuotaExceededError || error?.code === 'provider_quota_exceeded') {
+                throw error;
+            }
             return null;
         }
     }

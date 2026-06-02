@@ -5,6 +5,7 @@ const { buildLiveData } = require('./dataProvider');
 const { upsertCanonicalEvents } = require('./canonicalEvents');
 const { assertRapidApiCacheWallReady } = require('./dataProviders');
 const { buildMatchContext } = require('./normalizerService');
+const quotaPlanner = require('./quotaPlanner');
 const pipelineLogger = require('../utils/pipelineLogger');
 const config = require('../config');
 const { resolveActiveDeploymentSports } = require('../config/activeSports');
@@ -347,6 +348,9 @@ async function syncSports(options = {}) {
     }
 
     const { configs, requestedSports, blockedSports } = getSportsConfigForRequest(options.sports);
+    const syncState = {
+        apiSportsFootballBlocked: false
+    };
     const scopeLabel = requestedSports.length ? requestedSports.join(', ') : 'all sports';
     console.log(`[syncService] Starting sports data sync for REAL matches (${scopeLabel})...`);
     if (blockedSports.length > 0) {
@@ -415,9 +419,70 @@ async function syncSports(options = {}) {
                 return String(a?.leagueId || '').localeCompare(String(b?.leagueId || ''));
             });
 
+        const footballConfigs = prioritizedConfigs.filter((item) => normalizeSportToken(item?.sport) === 'football');
+        const footballPlan = footballConfigs.length > 0
+            ? (await quotaPlanner.buildPlan({
+                sports: requestedSports,
+                football: {
+                    leagues: footballConfigs,
+                    callsPerLeague: 1,
+                    minRequiredCalls: 1
+                }
+            })).football || null
+            : null;
+        const footballLeagueAllowlist = new Set(
+            Array.isArray(footballPlan?.leaguesAllowed)
+                ? footballPlan.leaguesAllowed.map((item) => String(item?.leagueId || '').trim()).filter(Boolean)
+                : []
+        );
+        const footballOnlyRequested = requestedSports.length > 0
+            && requestedSports.every((sport) => normalizeSportToken(sport) === 'football');
+
+        if (footballPlan && footballPlan.allowed === false) {
+            syncState.apiSportsFootballBlocked = true;
+            console.log(
+                `[syncService] Football API-Sports preflight blocked: ${footballPlan.reason} (remainingToday=${footballPlan.rawState?.remainingToday ?? 'n/a'}, remainingPerMinute=${footballPlan.rawState?.remainingPerMinute ?? 'n/a'})`
+            );
+
+            if (footballOnlyRequested) {
+                const report = pipelineLogger.finishRun({
+                    run_id: telemetryRunId,
+                    status: 'completed',
+                    metadata: {
+                        total_matches_processed: 0,
+                        note: 'football_quota_preflight_blocked',
+                        blocked_sports: blockedSports
+                    }
+                });
+                console.log('[syncService][pipeline_telemetry] %s', JSON.stringify(report, null, 2));
+                return {
+                    requestedSports,
+                    totalMatchesProcessed: 0,
+                    rebuiltFinalOutputs: false,
+                    perSport: footballConfigs.map((item) => ({ sport: item.sport, matchesProcessed: 0 })),
+                    errors: [`football: ${footballPlan.reason}`]
+                };
+            }
+        }
+
         for (let index = 0; index < prioritizedConfigs.length; index += 1) {
             const item = prioritizedConfigs[index];
             try {
+                const itemSportToken = normalizeSportToken(item?.sport);
+                if (itemSportToken === 'football' && footballPlan) {
+                    const leagueId = String(item?.leagueId || '').trim();
+                    if (footballPlan.allowed === false || (footballLeagueAllowlist.size > 0 && !footballLeagueAllowlist.has(leagueId))) {
+                        console.log(`[syncService] Skipping ${item.leagueId || 'football'} - football quota planner excluded this league`);
+                        if (!perSport.has(item.sport)) perSport.set(item.sport, 0);
+                        continue;
+                    }
+                }
+
+                if (syncState.apiSportsFootballBlocked && itemSportToken === 'football') {
+                    console.log(`[syncService] Skipping ${item.leagueId || 'football'} - API-Sports football quota already exhausted`);
+                    if (!perSport.has(item.sport)) perSport.set(item.sport, 0);
+                    continue;
+                }
                 if (!isActiveDeploymentSport(item.sport)) {
                     console.log('[syncService] Skipping disabled sport in phase-1 deployment: %s', item.sport);
                     continue;
@@ -427,7 +492,8 @@ async function syncSports(options = {}) {
 
                 const rawMatches = await buildLiveData({
                     ...item,
-                    windowDays: DEFAULT_SYNC_WINDOW_DAYS
+                    windowDays: DEFAULT_SYNC_WINDOW_DAYS,
+                    syncState
                 });
                 const rawMatchesList = Array.isArray(rawMatches) ? rawMatches : [];
                 console.log(`[DIAG] syncSports buildLiveData returned ${rawMatchesList.length} raw matches for ${item.sport}/${item.leagueId}`);
@@ -548,6 +614,10 @@ async function syncSports(options = {}) {
                     }
                 }
             } catch (sportErr) {
+                if (sportErr?.code === 'provider_quota_exceeded' && normalizeSportToken(item?.sport) === 'football') {
+                    syncState.apiSportsFootballBlocked = true;
+                    console.warn('[syncService] API-Sports football quota exhausted; remaining football leagues will be skipped.');
+                }
                 const errorMsg = `${item.sport}: ${sportErr.message}`;
                 console.error(`[syncService] ERROR processing ${item.sport}:`, sportErr.message);
                 console.error(`[syncService] Stack trace:`, sportErr.stack);
