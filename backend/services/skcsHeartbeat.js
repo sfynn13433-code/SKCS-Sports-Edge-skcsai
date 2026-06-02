@@ -8,6 +8,7 @@ const proFootballService = require('./proFootballDataService');
 const ENABLE_PRO_FOOTBALL = String(process.env.ENABLE_SPORTSAPI_PRO_FOOTBALL || '').trim() === 'true';
 const DISABLE_PRO_FOOTBALL = String(process.env.DISABLE_SPORTSAPI_PRO_FOOTBALL || '').trim() === 'true';
 const ALLOW_PRO_FOOTBALL = ENABLE_PRO_FOOTBALL && !DISABLE_PRO_FOOTBALL;
+const DISABLE_LIVE_SCORES = String(process.env.DISABLE_LIVE_SCORES || '').trim() === '1';
 
 // Heartbeat state management
 let heartbeatState = {
@@ -104,6 +105,16 @@ async function bandwidthAwareCall(apiFunction, ...args) {
  * Note: Reduced frequency to stay within rate limits
  */
 async function syncLiveScores() {
+  if (DISABLE_LIVE_SCORES) {
+    console.log('[Heartbeat] Live scores disabled; skipping live-score sync');
+    return {
+      source: 'disabled',
+      data: [],
+      fallback: false,
+      disabled: true
+    };
+  }
+
   console.log('[Heartbeat] Syncing live scores using hybrid approach (30min interval)...');
   
   try {
@@ -248,22 +259,26 @@ async function startSKCSHeartbeat() {
   
   console.log('🚀 SKCS AI Sports Edge Heartbeat Started...');
   console.log('📊 Bandwidth Management: Enabled');
-  console.log('⏱️  Live Scores: Every 60 seconds');
+  console.log(`⏱️  Live Scores: ${DISABLE_LIVE_SCORES ? 'Disabled' : 'Every 30 minutes'}`);
   console.log('📈 Trends/News: Every 60 minutes');
   
   heartbeatState.isRunning = true;
   
   // Initial sync
   await syncMetadata(); // One-time metadata sync
-  await syncLiveScores(); // Initial live scores
+  if (!DISABLE_LIVE_SCORES) {
+    await syncLiveScores(); // Initial live scores
+  }
   await syncTrendsAndNews(); // Initial trends/news
   
   // Set up intervals
   
   // Every 30 minutes: Update Live Scores (Basic Plan optimization)
-  heartbeatState.liveScoresInterval = setInterval(async () => {
-    await syncLiveScores();
-  }, 1800000); // 30 minutes (1,800,000 ms)
+  if (!DISABLE_LIVE_SCORES) {
+    heartbeatState.liveScoresInterval = setInterval(async () => {
+      await syncLiveScores();
+    }, 1800000); // 30 minutes (1,800,000 ms)
+  }
   
   // Every hour: Update Trends and News
   heartbeatState.trendsInterval = setInterval(async () => {
