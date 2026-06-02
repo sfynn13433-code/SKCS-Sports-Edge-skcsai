@@ -33,6 +33,10 @@ const THESPORTSDB_BASE_URL = 'https://www.thesportsdb.com/api/v1/json';
 const THESPORTSDB_DELAY_MS = Math.max(0, Number(process.env.THESPORTSDB_DELAY_MS || 25000));
 const TIER1_HTTP_DELAY_MS = Math.max(2400, Number(process.env.TIER1_HTTP_DELAY_MS || 2400));
 
+function isObject(value) {
+    return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
 const sportsClient = axios.create({
     baseURL: THESPORTSDB_BASE_URL,
     timeout: 15000
