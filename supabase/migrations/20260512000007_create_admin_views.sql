@@ -62,10 +62,10 @@ GROUP BY sport;
 CREATE OR REPLACE VIEW admin_processing_times AS
 SELECT
   sport,
-  AVG(EXTRACT(EPOCH FROM (enrichment_completed_at - ingestion_completed_at))/60) AS avg_enrichment_minutes,
-  AVG(EXTRACT(EPOCH FROM (ai_completed_at - enrichment_completed_at))/60) AS avg_ai_minutes,
-  AVG(EXTRACT(EPOCH FROM (publication_completed_at - ai_completed_at))/60) AS avg_publication_minutes,
-  AVG(EXTRACT(EPOCH FROM (publication_completed_at - ingestion_completed_at))/60) AS avg_total_minutes,
+  AVG(EXTRACT(EPOCH FROM (enrichment_completed_at - ingestion_completed_at))) AS avg_enrichment_sec,
+  AVG(EXTRACT(EPOCH FROM (ai_completed_at - enrichment_completed_at))) AS avg_ai_sec,
+  AVG(EXTRACT(EPOCH FROM (publication_completed_at - ai_completed_at))) AS avg_publication_sec,
+  AVG(EXTRACT(EPOCH FROM (publication_completed_at - ingestion_completed_at))) AS avg_total_sec,
   COUNT(*) AS sample_size
 FROM fixture_processing_log
 WHERE ingestion_completed_at IS NOT NULL
@@ -96,18 +96,18 @@ CREATE OR REPLACE VIEW admin_suppression_reasons AS
 SELECT
   sport,
   suppression_reason,
-  COUNT(*) AS count,
+  COUNT(*) AS occurrences,
   ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (PARTITION BY sport), 1) AS percentage
 FROM fixture_processing_log
 WHERE suppression_reason IS NOT NULL
   AND created_at > NOW() - INTERVAL '7 days'
 GROUP BY sport, suppression_reason
-ORDER BY sport, count DESC;
+ORDER BY sport, occurrences DESC;
 
--- 2.8 Daily Pipeline Volume
-CREATE OR REPLACE VIEW admin_daily_volume AS
+DROP VIEW IF EXISTS admin_daily_volume CASCADE;
+CREATE VIEW admin_daily_volume AS
 SELECT
-  DATE(created_at) AS processing_date,
+  created_at AS day,
   sport,
   COUNT(*) AS total_events,
   COUNT(*) FILTER (WHERE publication_completed_at IS NOT NULL) AS published,
@@ -116,8 +116,8 @@ SELECT
   ROUND(100.0 * COUNT(*) FILTER (WHERE publication_completed_at IS NOT NULL) / COUNT(*), 1) AS success_rate
 FROM fixture_processing_log
 WHERE created_at >= NOW() - INTERVAL '30 days'
-GROUP BY DATE(created_at), sport
-ORDER BY processing_date DESC, sport;
+GROUP BY created_at, sport
+ORDER BY day DESC, sport;
 
 -- Grant access to service role for admin views
 GRANT SELECT ON admin_pipeline_health TO service_role;

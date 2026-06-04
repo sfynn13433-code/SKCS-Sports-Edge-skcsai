@@ -13,9 +13,20 @@ CREATE INDEX IF NOT EXISTS idx_eos_snapshot_at ON event_odds_snapshots(snapshot_
 CREATE INDEX IF NOT EXISTS idx_eos_source ON event_odds_snapshots(source);
 
 -- Add foreign key constraint to raw_fixtures
-ALTER TABLE event_odds_snapshots
-ADD CONSTRAINT IF NOT EXISTS fk_eos_fixture 
-FOREIGN KEY (id_event) REFERENCES raw_fixtures(id_event) ON DELETE CASCADE;
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'fk_eos_fixture'
+          AND conrelid = 'event_odds_snapshots'::regclass
+    ) THEN
+        ALTER TABLE event_odds_snapshots
+        ADD CONSTRAINT fk_eos_fixture
+        FOREIGN KEY (id_event) REFERENCES raw_fixtures(id_event) ON DELETE CASCADE;
+    END IF;
+END
+$$;
 
 -- Create function to get odds volatility for AI Stage 3
 CREATE OR REPLACE FUNCTION get_odds_volatility(

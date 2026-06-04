@@ -23,9 +23,20 @@ const { enrichWithAvailability } = require('../utils/availability');
 const { getRiskColor, getRiskTierLabel } = require('../services/masterRulebookRiskClassification');
 const { filterMarketsByMainPick, validateSMBCLegs } = require('../services/contradictionGovernance');
 const { getLatestRunSnapshot } = require('../utils/pipelineLogger');
+const verificationController = require('../core/verificationController');
 
 const router = express.Router();
 const ACTIVE_DEPLOYMENT_SPORT = 'Football';
+
+function getSystemHealthSnapshot() {
+    return verificationController.getSnapshot();
+}
+
+function attachSystemHealth(res) {
+    const systemHealth = getSystemHealthSnapshot();
+    res.set('X-System-State', String(systemHealth.state || 'UNKNOWN'));
+    return systemHealth;
+}
 
 const SPORT_FILTER_MAP = {
     Football: [
@@ -2109,6 +2120,7 @@ function sendPredictionsSuccess(res, payload = {}, statusCode = 200) {
     const count = Number.isFinite(payload?.count) ? payload.count : predictions.length;
     const sport = String(payload?.sport || ACTIVE_DEPLOYMENT_SPORT || 'football');
     const source = String(payload?.source || DEFAULT_PREDICTIONS_SOURCE);
+    const systemHealth = attachSystemHealth(res);
 
     return res.status(statusCode).json({
         ...payload,
@@ -2116,13 +2128,15 @@ function sendPredictionsSuccess(res, payload = {}, statusCode = 200) {
         sport,
         source,
         count,
-        predictions
+        predictions,
+        system_health: systemHealth
     });
 }
 
 function sendPredictionsError(res, statusCode, errorMessage, payload = {}) {
     const sport = String(payload?.sport || ACTIVE_DEPLOYMENT_SPORT || 'football');
     const source = String(payload?.source || DEFAULT_PREDICTIONS_SOURCE);
+    const systemHealth = attachSystemHealth(res);
 
     return res.status(statusCode).json({
         ...payload,
@@ -2131,7 +2145,8 @@ function sendPredictionsError(res, statusCode, errorMessage, payload = {}) {
         source,
         predictions: [],
         count: 0,
-        error: String(errorMessage || 'Request failed')
+        error: String(errorMessage || 'Request failed'),
+        system_health: systemHealth
     });
 }
 

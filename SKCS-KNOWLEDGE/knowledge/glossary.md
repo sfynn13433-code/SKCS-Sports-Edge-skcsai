@@ -1,0 +1,28 @@
+# SKCS Glossary
+
+- SKCS
+  - The sports prediction platform and its surrounding operational system.
+- SMH
+  - Sports Market Hub.
+- Supabase brain
+  - The database, SQL functions, views, and governance rules that hold the business logic.
+- Publication layer
+  - The row or view surface the website reads from.
+- Deterministic layer
+  - SQL-based scoring and business-rule logic.
+- Quota router
+  - The component that decides whether an external API call is allowed.
+- Quota planner
+  - Preflight budgeting for provider usage.
+- Match results spine
+  - Canonical finished-match table used for backfills and scoring.
+- Prediction scores
+  - The new SQL scoring output used to support confidence and context.
+- Confidence
+  - The final reliability score for a prediction.
+- Volatility
+  - The instability or risk measure applied to a market or fixture.
+- Secondary market
+  - A side market such as double chance, DNB, totals, or BTTS.
+- Knowledge layer
+  - The documentation system that prevents architectural drift across AI tools.

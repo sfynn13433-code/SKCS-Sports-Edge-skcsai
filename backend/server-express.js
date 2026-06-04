@@ -41,6 +41,7 @@ const {
     calculateSubscriptionStart,
     formatSastDateTime
 } = require('./services/subscriptionTiming');
+const verificationController = require('./core/verificationController');
 
 const { getPlanCapabilities, filterPredictionsForPlan } = require('./config/subscriptionMatrix');
 const { normalizeFixtureDate, getPredictionWindow, isFixtureEligibleForPrediction } = require('./utils/dateNormalization');
@@ -537,13 +538,16 @@ app.post('/api/internal/fetch-fixtures', async (req, res) => {
 });
 
 app.get('/api/health', (_req, res) => {
+  const systemHealth = verificationController.getSnapshot();
+  res.set('X-System-State', String(systemHealth.state || 'UNKNOWN'));
   res.json({
-    status: 'ok',
+    status: systemHealth.state === 'HEALTHY' ? 'ok' : String(systemHealth.state || 'unknown').toLowerCase(),
     timestamp: new Date().toISOString(),
     version: process.env.npm_package_version || '1.0.0',
     uptime: Math.floor(process.uptime()),
     env: process.env.NODE_ENV || 'development',
-    marker_deploy: 'test-' + Date.now()
+    marker_deploy: 'test-' + Date.now(),
+    system_health: systemHealth
   });
 });
 

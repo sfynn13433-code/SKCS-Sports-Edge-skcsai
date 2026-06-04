@@ -247,17 +247,20 @@ CREATE INDEX IF NOT EXISTS idx_event_news_scores_relevance ON event_news_scores(
 
 -- View to reconstruct odds JSONB from bookmaker_odds
 CREATE OR REPLACE VIEW v_bookmaker_odds_jsonb AS
-SELECT 
+WITH bookmaker_levels AS (
+    SELECT
+        id_event,
+        snapshot_at,
+        bookmaker_key,
+        jsonb_object_agg(market_type || '_' || selection, odds) AS bookmaker_odds
+    FROM bookmaker_odds
+    GROUP BY id_event, snapshot_at, bookmaker_key
+)
+SELECT
     id_event,
     snapshot_at,
-    jsonb_object_agg(
-        bookmaker_key, 
-        jsonb_object_agg(
-            market_type || '_' || selection,
-            odds
-        )
-    ) AS odds
-FROM bookmaker_odds
+    jsonb_object_agg(bookmaker_key, bookmaker_odds) AS odds
+FROM bookmaker_levels
 GROUP BY id_event, snapshot_at;
 
 -- View to reconstruct secondary_markets JSONB from prediction_secondary_markets

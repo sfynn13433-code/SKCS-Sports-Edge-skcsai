@@ -12,6 +12,7 @@
 const { apiQueue } = require('../utils/apiQueue');
 const db = require('../db'); // PostgreSQL pool
 const { createClient } = require('@supabase/supabase-js');
+const verificationController = require('../core/verificationController');
 
 // TheSportsDB API configuration
 const config = require('../config');
@@ -266,6 +267,14 @@ async function enrichMatchContext(idEvent) {
     console.warn(`[enrichMatchContext] Failed to fetch deep context for ${idEvent}:`, err.message);
     // Continue without deep context - don't fail the entire enrichment
   }
+
+  verificationController.enforce(
+    verificationController.evaluateEnrichmentState({
+      source: 'thesportsdbPipeline',
+      results: h2hData?.results || null,
+      updated_at: new Date().toISOString()
+    })
+  );
 
   // Build deep_context object
   const deepContext = {

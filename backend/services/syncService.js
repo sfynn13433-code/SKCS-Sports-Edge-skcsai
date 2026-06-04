@@ -6,6 +6,7 @@ const { upsertCanonicalEvents } = require('./canonicalEvents');
 const { assertRapidApiCacheWallReady } = require('./dataProviders');
 const { buildMatchContext } = require('./normalizerService');
 const quotaPlanner = require('./quotaPlanner');
+const verificationController = require('../core/verificationController');
 const pipelineLogger = require('../utils/pipelineLogger');
 const config = require('../config');
 const { resolveActiveDeploymentSports } = require('../config/activeSports');
@@ -430,6 +431,21 @@ async function syncSports(options = {}) {
                 }
             })).football || null
             : null;
+
+        verificationController.enforce(
+            verificationController.evaluateQuotaState({
+                source: 'syncService',
+                remainingToday: footballPlan?.rawState?.remainingToday ?? null,
+                remainingPerMinute: footballPlan?.rawState?.remainingPerMinute ?? null,
+                exhaustedToday: footballPlan?.rawState?.exhaustedToday === true,
+                exhaustedPerMinute: footballPlan?.rawState?.exhaustedPerMinute === true,
+                bufferBelow10percent: footballPlan?.rawState?.remainingToday != null && footballPlan?.rawState?.dailyLimit != null
+                    ? footballPlan.rawState.remainingToday <= Math.max(1, Math.floor(Number(footballPlan.rawState.dailyLimit) * 0.1))
+                    : false,
+                hardStop: footballPlan?.reason === 'NO_PROVIDER_STATE'
+            })
+        );
+
         const footballLeagueAllowlist = new Set(
             Array.isArray(footballPlan?.leaguesAllowed)
                 ? footballPlan.leaguesAllowed.map((item) => String(item?.leagueId || '').trim()).filter(Boolean)

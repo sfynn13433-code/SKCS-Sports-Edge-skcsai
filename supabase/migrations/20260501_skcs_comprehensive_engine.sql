@@ -810,7 +810,14 @@ $$ LANGUAGE plpgsql;
 
 DO $$
 BEGIN
-    IF to_regclass('public.predictions_final') IS NOT NULL THEN
+    IF EXISTS (
+        SELECT 1
+        FROM pg_class c
+        JOIN pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname = 'public'
+          AND c.relname = 'predictions_final'
+          AND c.relkind = 'r'
+    ) THEN
         DROP TRIGGER IF EXISTS enforce_secondary_market_governance ON public.predictions_final;
         CREATE TRIGGER enforce_secondary_market_governance
         BEFORE INSERT OR UPDATE ON public.predictions_final

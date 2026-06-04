@@ -23,6 +23,7 @@ const { saveDirectInsight } = require('./saveDirectInsights');
 const pipelineLogger = require('../utils/pipelineLogger');
 const enrichFixtureWithContext = require('../src/services/contextIntelligence/aiPipeline');
 const adjustProbability = require('../src/services/contextIntelligence/adjustProbability');
+const verificationController = require('../core/verificationController');
 const { resolveActiveDeploymentSports } = require('../config/activeSports');
 
 let isRunning = false;
@@ -1831,6 +1832,10 @@ async function buildRawPredictionFromProviderItem(item) {
         });
         throw validationError;
     }
+
+    const verificationState = verificationController.evaluatePipelineOutput(raw);
+    verificationController.enforce(verificationState);
+
     pipelineLogger.stageAdd({
         run_id: telemetryRunId,
         sport,

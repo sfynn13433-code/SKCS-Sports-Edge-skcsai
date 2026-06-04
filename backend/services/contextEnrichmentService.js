@@ -1,5 +1,6 @@
 const { query } = require('../database');
 const axios = require('axios');
+const verificationController = require('../core/verificationController');
 
 class ContextEnrichmentService {
   constructor() {
@@ -28,6 +29,11 @@ class ContextEnrichmentService {
       for (const job of jobs) {
         try {
           await this.enrichFixture(job.id_event, job.sport);
+          verificationController.evaluateEnrichmentState({
+            source: 'contextEnrichmentService',
+            results: [{ id_event: job.id_event }],
+            updated_at: new Date().toISOString()
+          });
           
           // Mark as completed
           await query(`
@@ -38,6 +44,11 @@ class ContextEnrichmentService {
 
         } catch (error) {
           console.error(`Failed to enrich ${job.id_event}:`, error.message);
+          verificationController.evaluateEnrichmentState({
+            source: 'contextEnrichmentService',
+            results: null,
+            updated_at: new Date().toISOString()
+          });
           
           // Mark as failed
           await query(`

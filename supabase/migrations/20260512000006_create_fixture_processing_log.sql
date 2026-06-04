@@ -21,9 +21,19 @@ CREATE INDEX IF NOT EXISTS idx_fpl_sport ON fixture_processing_log(sport);
 CREATE INDEX IF NOT EXISTS idx_fpl_publish_run ON fixture_processing_log(publish_run_id);
 CREATE INDEX IF NOT EXISTS idx_fpl_created_at ON fixture_processing_log(created_at);
 
--- Add unique constraint to prevent duplicate rows
-ALTER TABLE fixture_processing_log
-ADD CONSTRAINT IF NOT EXISTS uq_fpl_event_run UNIQUE (id_event, publish_run_id);
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'uq_fpl_event_run'
+          AND conrelid = 'fixture_processing_log'::regclass
+    ) THEN
+        ALTER TABLE fixture_processing_log
+        ADD CONSTRAINT uq_fpl_event_run UNIQUE (id_event, publish_run_id);
+    END IF;
+END
+$$;
 
 -- Create update_fixture_processing_log RPC function
 CREATE OR REPLACE FUNCTION update_fixture_processing_log(

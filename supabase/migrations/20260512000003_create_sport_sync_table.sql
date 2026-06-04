@@ -35,28 +35,6 @@ CREATE TRIGGER trg_sport_sync_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION trg_sport_sync_updated_at();
 
--- Populate with 15 sports configuration
-INSERT INTO sport_sync (sport, adapter_name, provider, sync_interval_minutes, supports_live, supports_odds, supports_player_stats) VALUES
-('football', 'footballAdapter', 'api-football', 60, true, true, true),
-('f1', 'f1Adapter', 'openf1', 180, true, true, false),
-('tennis', 'tennisAdapter', 'sportradar', 120, true, true, true),
-('basketball', 'basketballAdapter', 'api-sports', 90, true, true, true),
-('cricket', 'cricketAdapter', 'cricapi', 120, true, true, true),
-('rugby', 'rugbyAdapter', 'api-sports', 180, true, false, true),
-('golf', 'golfAdapter', 'golfdata', 360, false, true, false),
-('boxing', 'boxingAdapter', 'api-sports', 240, false, true, false),
-('mma', 'mmaAdapter', 'api-sports', 240, false, true, false),
-('baseball', 'baseballAdapter', 'api-sports', 90, true, true, true),
-('american_football', 'americanFootballAdapter', 'api-sports', 90, true, true, true),
-('hockey', 'hockeyAdapter', 'api-sports', 90, true, true, true),
-('horse_racing', 'horseRacingAdapter', 'horseracingapi', 60, true, true, false),
-('darts', 'dartsAdapter', 'api-sports', 360, false, false, false),
-('volleyball', 'volleyballAdapter', 'api-sports', 180, true, false, true)
-ON CONFLICT (sport) DO UPDATE SET
-    adapter_name = EXCLUDED.adapter_name,
-    provider = EXCLUDED.provider,
-    sync_interval_minutes = EXCLUDED.sync_interval_minutes,
-    supports_live = EXCLUDED.supports_live,
-    supports_odds = EXCLUDED.supports_odds,
-    supports_player_stats = EXCLUDED.supports_player_stats,
-    updated_at = NOW();
+-- Seed values intentionally omitted here because the live sport_sync shape
+-- varies across schema eras in this repository. Backfill via a dedicated
+-- schema-aware migration or runtime bootstrap if needed.

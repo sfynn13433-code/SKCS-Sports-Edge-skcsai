@@ -1,5 +1,6 @@
 -- Create RPC function to get prediction by match ID with JSONB search
-CREATE OR REPLACE FUNCTION get_prediction_by_match_id(match_id TEXT)
+DROP FUNCTION IF EXISTS get_prediction_by_match_id(TEXT);
+CREATE FUNCTION get_prediction_by_match_id(match_id TEXT)
 RETURNS SETOF direct1x2_prediction_final
 LANGUAGE sql STABLE AS $$
   SELECT * FROM direct1x2_prediction_final

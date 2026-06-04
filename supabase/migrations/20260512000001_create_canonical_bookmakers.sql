@@ -43,26 +43,39 @@ INSERT INTO canonical_bookmakers (bookmaker_key, title, priority_order) VALUES
 ('betfred', 'Betfred', 16),
 ('totesport', 'Totesport', 17),
 ('boylesports', 'BoyleSports', 18),
-('betfred', 'Betfred', 19),
+('sportingbet', 'Sportingbet', 19),
 ('marathonbet', 'Marathonbet', 20),
 ('10bet', '10Bet', 21),
 ('betonline', 'BetOnline', 22)
 ON CONFLICT (bookmaker_key) DO UPDATE SET
     title = EXCLUDED.title,
-    priority_order = EXCLUDED.priority_order,
-    updated_at = NOW();
+    priority_order = EXCLUDED.priority_order
+    -- updated_at is optional in older schemas
+    ;
 
 -- Add updated_at trigger
-CREATE OR REPLACE FUNCTION trg_canonical_bookmakers_updated_at()
-RETURNS TRIGGER AS $$
+DO $$
 BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+    IF EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'canonical_bookmakers'
+          AND column_name = 'updated_at'
+    ) THEN
+        CREATE OR REPLACE FUNCTION trg_canonical_bookmakers_updated_at()
+        RETURNS TRIGGER AS $fn$
+        BEGIN
+            NEW.updated_at = NOW();
+            RETURN NEW;
+        END;
+        $fn$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS trg_canonical_bookmakers_updated_at ON canonical_bookmakers;
-CREATE TRIGGER trg_canonical_bookmakers_updated_at
-    BEFORE UPDATE ON canonical_bookmakers
-    FOR EACH ROW
-    EXECUTE FUNCTION trg_canonical_bookmakers_updated_at();
+        DROP TRIGGER IF EXISTS trg_canonical_bookmakers_updated_at ON canonical_bookmakers;
+        CREATE TRIGGER trg_canonical_bookmakers_updated_at
+            BEFORE UPDATE ON canonical_bookmakers
+            FOR EACH ROW
+            EXECUTE FUNCTION trg_canonical_bookmakers_updated_at();
+    END IF;
+END
+$$;

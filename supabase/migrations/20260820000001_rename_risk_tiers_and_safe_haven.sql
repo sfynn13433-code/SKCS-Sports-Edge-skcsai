@@ -19,9 +19,60 @@ $$;
 DO $$
 BEGIN
     IF to_regclass('public.secondary_market_allowlist') IS NOT NULL THEN
+        IF NOT EXISTS (
+            SELECT 1
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND table_name = 'secondary_market_allowlist'
+              AND column_name = 'market_type'
+        ) THEN
+            ALTER TABLE public.secondary_market_allowlist
+            ADD COLUMN market_type text;
+        END IF;
+
+        IF NOT EXISTS (
+            SELECT 1
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND table_name = 'secondary_market_allowlist'
+              AND column_name = 'market_name'
+        ) THEN
+            ALTER TABLE public.secondary_market_allowlist
+            ADD COLUMN market_name text;
+        END IF;
+
+        IF NOT EXISTS (
+            SELECT 1
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND table_name = 'secondary_market_allowlist'
+              AND column_name = 'min_confidence'
+        ) THEN
+            ALTER TABLE public.secondary_market_allowlist
+            ADD COLUMN min_confidence numeric;
+        END IF;
+
+        IF NOT EXISTS (
+            SELECT 1
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND table_name = 'secondary_market_allowlist'
+              AND column_name = 'is_safe_haven'
+        ) THEN
+            ALTER TABLE public.secondary_market_allowlist
+            ADD COLUMN is_safe_haven boolean DEFAULT false;
+        END IF;
+
+        UPDATE public.secondary_market_allowlist
+        SET market_type = COALESCE(market_type, CASE WHEN category IS NOT NULL THEN 'primary' END),
+            market_name = COALESCE(market_name, market_key),
+            min_confidence = COALESCE(min_confidence, 80),
+            is_safe_haven = COALESCE(is_safe_haven, false)
+        WHERE market_key IS NOT NULL;
+
         UPDATE public.secondary_market_allowlist
         SET min_confidence = 80
-        WHERE market_type = 'primary';
+        WHERE COALESCE(market_type, 'primary') = 'primary';
     END IF;
 END
 $$;
@@ -30,18 +81,23 @@ $$;
 DO $$
 BEGIN
     IF to_regclass('public.secondary_market_allowlist') IS NOT NULL THEN
-        INSERT INTO public.secondary_market_allowlist (market_type, market_name, min_confidence, is_safe_haven)
+        INSERT INTO public.secondary_market_allowlist (market_key, category, is_active, market_type, market_name, min_confidence, is_safe_haven)
         VALUES
-            ('secondary', 'double_chance_1x', 75, true),
-            ('secondary', 'double_chance_x2', 75, true),
-            ('secondary', 'double_chance_12', 75, true),
-            ('secondary', 'draw_no_bet_home', 75, true),
-            ('secondary', 'draw_no_bet_away', 75, true),
-            ('secondary', 'over_1_5', 75, true),
-            ('secondary', 'under_4_5', 75, true),
-            ('secondary', 'under_3_5', 75, true)
-        ON CONFLICT (market_type, market_name) DO UPDATE
-        SET min_confidence = 75, is_safe_haven = true;
+            ('double_chance_1x', 'Double Chance', true, 'secondary', 'double_chance_1x', 75, true),
+            ('double_chance_x2', 'Double Chance', true, 'secondary', 'double_chance_x2', 75, true),
+            ('double_chance_12', 'Double Chance', true, 'secondary', 'double_chance_12', 75, true),
+            ('draw_no_bet_home', 'Draw No Bet', true, 'secondary', 'draw_no_bet_home', 75, true),
+            ('draw_no_bet_away', 'Draw No Bet', true, 'secondary', 'draw_no_bet_away', 75, true),
+            ('over_1_5', 'Goals Totals', true, 'secondary', 'over_1_5', 75, true),
+            ('under_4_5', 'Defensive', true, 'secondary', 'under_4_5', 75, true),
+            ('under_3_5', 'Goals Totals', true, 'secondary', 'under_3_5', 75, true)
+        ON CONFLICT (market_key) DO UPDATE
+        SET category = EXCLUDED.category,
+            is_active = EXCLUDED.is_active,
+            market_type = EXCLUDED.market_type,
+            market_name = EXCLUDED.market_name,
+            min_confidence = EXCLUDED.min_confidence,
+            is_safe_haven = EXCLUDED.is_safe_haven;
     END IF;
 END
 $$;
