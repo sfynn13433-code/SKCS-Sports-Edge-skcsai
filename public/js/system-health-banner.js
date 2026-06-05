@@ -83,7 +83,7 @@
     const controlReasons = Array.isArray(systemHealth?.controlPlane?.reasons)
       ? systemHealth.controlPlane.reasons
       : [];
-    const merged = reasons.concat(controlReasons).filter(Boolean);
+    const merged = Array.from(new Set(reasons.concat(controlReasons).filter(Boolean)));
     return merged.length ? merged.slice(0, 3) : ['No additional health reasons were provided.'];
   }
 

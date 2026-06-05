@@ -63,6 +63,27 @@ function mapSystemStateToControlState(systemState) {
     }
 }
 
+function hasMeaningfulDeepContext(deepContext) {
+    if (!deepContext || typeof deepContext !== 'object') {
+        return false;
+    }
+
+    const standings = deepContext.standings;
+    const h2h = deepContext.h2h;
+
+    if (standings && typeof standings === 'object') {
+        if (standings.home || standings.away) return true;
+    }
+
+    if (h2h && typeof h2h === 'object') {
+        const recentMatches = Array.isArray(h2h.recent_matches) ? h2h.recent_matches : [];
+        if (recentMatches.length > 0) return true;
+        if (Number.isFinite(Number(h2h.total_matches)) && Number(h2h.total_matches) > 0) return true;
+    }
+
+    return false;
+}
+
 class VerificationController {
     constructor() {
         this.reset();
@@ -590,8 +611,9 @@ class VerificationController {
         const ageHours = updatedAt && !Number.isNaN(updatedAt.getTime())
             ? (Date.now() - updatedAt.getTime()) / (1000 * 60 * 60)
             : null;
+        const hasDeepContext = hasMeaningfulDeepContext(contextPayload?.deep_context);
 
-        if (!contextPayload || (!hasResults && !contextPayload?.deep_context)) {
+        if (!contextPayload || (!hasResults && !hasDeepContext)) {
             severity = SYSTEM_STATES.DEGRADED;
             reason = 'Enrichment payload is missing primary results context.';
             failureType = FAILURE_TYPES.DATA_FAIL;

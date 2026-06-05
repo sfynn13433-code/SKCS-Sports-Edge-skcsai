@@ -268,14 +268,6 @@ async function enrichMatchContext(idEvent) {
     // Continue without deep context - don't fail the entire enrichment
   }
 
-  verificationController.enforce(
-    verificationController.evaluateEnrichmentState({
-      source: 'thesportsdbPipeline',
-      results: h2hData?.results || null,
-      updated_at: new Date().toISOString()
-    })
-  );
-
   // Build deep_context object
   const deepContext = {
     standings: null,
@@ -347,6 +339,15 @@ async function enrichMatchContext(idEvent) {
       })
     };
   }
+
+  verificationController.enforce(
+    verificationController.evaluateEnrichmentState({
+      source: 'thesportsdbPipeline',
+      results: deepContext?.h2h?.recent_matches || h2hData?.results || null,
+      deep_context: deepContext,
+      updated_at: new Date().toISOString()
+    })
+  );
 
   const query = `
     INSERT INTO match_context_data (id_event, lineups, stats, timeline, home_last_5, away_last_5, deep_context)
