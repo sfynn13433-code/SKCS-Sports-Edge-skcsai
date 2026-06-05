@@ -557,38 +557,6 @@ function resolveMatchTeamName(match, side) {
         : extractTeamNameValue(match?.metadata?.teams?.away || match?.metadata?.teams?.awayTeam || match?.metadata?.team_away);
     if (fromMetadataTeams) return fromMetadataTeams;
 
-    const providerPayloads = [
-        match?.raw_provider_data,
-        match?.metadata?.raw_provider_data,
-        match?.metadata?.match_context?.raw_provider_data,
-        match?.metadata?.match_context?.match?.raw_provider_data
-    ].filter((payload) => payload && typeof payload === 'object');
-
-    for (const payload of providerPayloads) {
-        const fromProvider = side === 'home'
-            ? extractTeamNameValue(
-                payload?.teams?.home
-                || payload?.homeTeam
-                || payload?.home_team
-                || payload?.home
-            )
-            : extractTeamNameValue(
-                payload?.teams?.away
-                || payload?.awayTeam
-                || payload?.away_team
-                || payload?.away
-            );
-        if (fromProvider) return fromProvider;
-
-        const participants = Array.isArray(payload?.participants) ? payload.participants : [];
-        for (const participant of participants) {
-            const location = String(participant?.meta?.location || participant?.location || '').trim().toLowerCase();
-            if (location !== side) continue;
-            const fromParticipant = extractTeamNameValue(participant?.name || participant?.team?.name);
-            if (fromParticipant) return fromParticipant;
-        }
-    }
-
     const fromMatchInfo = side === 'home'
         ? extractTeamNameValue(
             match?.match_info?.home_team
@@ -668,13 +636,6 @@ function firstNonEmptyString(sources, paths) {
 
 function resolveLeagueCountryForMatch(match = {}, prediction = {}) {
     const metadata = match?.metadata && typeof match.metadata === 'object' ? match.metadata : {};
-    const providerPayloads = [
-        match?.raw_provider_data,
-        metadata?.raw_provider_data,
-        metadata?.match_context?.raw_provider_data,
-        metadata?.match_context?.match?.raw_provider_data
-    ].filter((value) => value && typeof value === 'object');
-
     const sources = [
         match,
         metadata,
@@ -682,8 +643,7 @@ function resolveLeagueCountryForMatch(match = {}, prediction = {}) {
         metadata?.match_info || {},
         metadata?.match_context || {},
         metadata?.match_context?.match_info || {},
-        prediction,
-        ...providerPayloads
+        prediction
     ];
 
     const league = firstNonEmptyString(sources, [
@@ -694,9 +654,6 @@ function resolveLeagueCountryForMatch(match = {}, prediction = {}) {
         'metadata.league',
         'metadata.competition',
         'match_info.league',
-        'raw_provider_data.league.name',
-        'raw_provider_data.competition.name',
-        'raw_provider_data.tournament.name',
         'league.name',
         'competition.name',
         'tournament.name'
@@ -708,8 +665,6 @@ function resolveLeagueCountryForMatch(match = {}, prediction = {}) {
         'metadata.country',
         'metadata.league_country',
         'match_info.country',
-        'raw_provider_data.league.country',
-        'raw_provider_data.country',
         'league.country',
         'competition.country'
     ]);

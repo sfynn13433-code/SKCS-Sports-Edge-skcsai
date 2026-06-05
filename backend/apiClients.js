@@ -447,11 +447,11 @@ class SportsDataOrgClient {
 class SportsDataIOClient {
     constructor() {
         this.apiKey = config.sportsDataIoKey;
-        this.baseUrl = 'https://api.sportsdata.io/v3';
+        this.baseUrl = 'https://api.sportsdata.io/v4';
         this.role = 'pre-match fixture/context';
     }
 
-    async getFixtures(sport) {
+    async getFixtures(sport, competitionId, date = new Date().toISOString().slice(0, 10)) {
         if (!this.apiKey) {
             console.log(`[SportsData.io] ${sport}: skipped (missing SPORTSDATA_IO_KEY or SPORTS_DB_KEY)`);
             return [];
@@ -477,21 +477,22 @@ class SportsDataIOClient {
             console.log(`[SportsData.io] ${sport}: skipped (unsupported sport mapping)`);
             return [];
         }
-        const today = new Date().toISOString().slice(0, 10);
-        const url = `${this.baseUrl}/${sportEndpoint}/scores/json/SchedulesByDate`;
+        const competition = String(competitionId || '').trim();
+        if (!competition) {
+            console.log(`[SportsData.io] ${sport}: skipped (missing competition id)`);
+            return [];
+        }
+        const url = `${this.baseUrl}/${sportEndpoint}/scores/json/GamesByDate/${encodeURIComponent(competition)}/${encodeURIComponent(String(date).slice(0, 10))}`;
 
         try {
             const response = await axios.get(url, {
                 headers: {
                     'Ocp-Apim-Subscription-Key': this.apiKey,
                 },
-                params: {
-                    date: today,
-                },
                 timeout: 10000,
             });
 
-            console.log(`[SportsData.io] ${sport}: returned ${Array.isArray(response.data) ? response.data.length : 0} schedule rows for ${this.role}`);
+            console.log(`[SportsData.io] ${sport}: returned ${Array.isArray(response.data) ? response.data.length : 0} game rows for ${this.role}`);
             return response.data || [];
         } catch (error) {
             console.error(`[SportsData.io] ${sport} error:`, error.message);

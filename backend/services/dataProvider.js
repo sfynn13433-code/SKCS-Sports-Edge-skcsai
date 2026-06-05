@@ -1447,15 +1447,20 @@ async function fetchSportsDataOrg(sport, leagueCode) {
     return data.map(match => client.normalizeFixture(match, sport));
 }
 
-async function fetchSportsDataIO(sport) {
+async function fetchSportsDataIO(sport, leagueId, date = todayStr(), options = {}) {
     const client = new SportsDataIOClient();
-    const data = await client.getFixtures(sport);
+    const data = await client.getFixtures(sport, leagueId, date);
     if (!data || data.length === 0) return [];
 
-    return data
+    const normalized = data
         .map(game => client.normalizeFixture(game, sport))
-        .filter(Boolean)
-        .filter((fixture) => isPreMatchSportsDataIOStatus(fixture.status));
+        .filter(Boolean);
+
+    if (options.allowFinalForDisplay) {
+        return normalized;
+    }
+
+    return normalized.filter((fixture) => isPreMatchSportsDataIOStatus(fixture.status));
 }
 
 async function fetchRapidAPI(sport, leagueId, season) {
@@ -1485,7 +1490,7 @@ function futureStr(days) {
 }
 
 function isSupportedSportsDataIOSport(sport) {
-    const normalized = normalizeRequestedSport(sport);
+    const normalized = String(normalizeRequestedSport(sport) || '').trim().toLowerCase();
     return [
         'football',
         'soccer',
@@ -1848,7 +1853,8 @@ async function buildLiveData(options = {}) {
     } else {
     try {
         console.log(`[dataProvider] ${sport}: trying SportsData.io fallback`);
-        const sdiData = await fetchSportsDataIO(sport);
+        const sportsDataIoDate = String(options.fixtureDate || options.date || today).trim() || today;
+        const sdiData = await fetchSportsDataIO(sport, leagueId, sportsDataIoDate, options);
         if (sdiData.length > 0) {
             const out = applyCompetitionAllowlist(
                 dedupePredictionInputs(sdiData),
