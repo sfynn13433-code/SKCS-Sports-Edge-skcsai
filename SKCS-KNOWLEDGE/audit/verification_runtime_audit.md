@@ -29,10 +29,10 @@ This is a truth audit, not a design audit.
 
 ## Audit method
 
-This audit records only what is actually present in runtime code paths or live policy state.
+This audit records only what is actually present in runtime code paths or active policy state.
 
 Classification:
-- `VERIFIED` = the check is implemented and visible in a live code path.
+- `VERIFIED` = the check is implemented and visible in a runtime code path.
 - `PARTIAL` = some logic exists, but it is not a full enforcement gate.
 - `MISSING` = no runtime implementation was found in the scanned code paths.
 - `UNKNOWN` = not yet verified in the current pass.

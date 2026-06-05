@@ -1447,12 +1447,20 @@ async function fetchSportsDataOrg(sport, leagueCode) {
     return data.map(match => client.normalizeFixture(match, sport));
 }
 
-async function fetchSportsDataIO(sport) {
+async function fetchSportsDataIO(sport, leagueId, date = todayStr(), options = {}) {
     const client = new SportsDataIOClient();
-    const data = await client.getFixtures(sport);
+    const data = await client.getFixtures(sport, leagueId, date);
     if (!data || data.length === 0) return [];
 
-    return data.map(game => client.normalizeFixture(game, sport));
+    const normalized = data
+        .map(game => client.normalizeFixture(game, sport))
+        .filter(Boolean);
+
+    if (options.allowFinalForDisplay) {
+        return normalized;
+    }
+
+    return normalized.filter((fixture) => isPreMatchSportsDataIOStatus(fixture.status));
 }
 
 async function fetchRapidAPI(sport, leagueId, season) {
@@ -1479,6 +1487,37 @@ function futureStr(days) {
     const d = new Date();
     d.setDate(d.getDate() + days);
     return d.toISOString().slice(0, 10);
+}
+
+function isSupportedSportsDataIOSport(sport) {
+    const normalized = String(normalizeRequestedSport(sport) || '').trim().toLowerCase();
+    return [
+        'football',
+        'soccer',
+        'basketball',
+        'nba',
+        'nfl',
+        'american_football',
+        'baseball',
+        'mlb',
+        'hockey',
+        'nhl'
+    ].includes(normalized);
+}
+
+function isPreMatchSportsDataIOStatus(status) {
+    const normalized = String(status || '').trim().toUpperCase();
+    if (!normalized) return true;
+    return [
+        'NS',
+        'TBD',
+        'SCHEDULED',
+        'NOT STARTED',
+        'UPCOMING',
+        'POSTPONED',
+        'DELAYED',
+        'PREGAME'
+    ].includes(normalized);
 }
 
 function normalizeFixture(f, sport) {
@@ -1809,9 +1848,13 @@ async function buildLiveData(options = {}) {
 
     // --- Source 4: SportsData.io (fallback) ---
     if (String(process.env.DISABLE_SPORTSDATA_IO || '').toLowerCase() !== 'true') {
+    if (!isSupportedSportsDataIOSport(sport)) {
+        console.log(`[dataProvider] ${sport}: skipping SportsData.io fallback (unsupported sport mapping)`);
+    } else {
     try {
         console.log(`[dataProvider] ${sport}: trying SportsData.io fallback`);
-        const sdiData = await fetchSportsDataIO(sport);
+        const sportsDataIoDate = String(options.fixtureDate || options.date || today).trim() || today;
+        const sdiData = await fetchSportsDataIO(sport, leagueId, sportsDataIoDate, options);
         if (sdiData.length > 0) {
             const out = applyCompetitionAllowlist(
                 dedupePredictionInputs(sdiData),
@@ -1824,6 +1867,7 @@ async function buildLiveData(options = {}) {
         }
     } catch (sdiErr) {
         console.error(`[dataProvider] ${sport}: SportsData.io fallback failed:`, sdiErr.message);
+    }
     }
     } else {
         console.warn(`[dataProvider] ${sport}: SportsData.io disabled by DISABLE_SPORTSDATA_IO`);

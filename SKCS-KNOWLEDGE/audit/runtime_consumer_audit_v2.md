@@ -7,7 +7,7 @@ It focuses on both read-path consumers and write-path producers so break impact 
 
 ### What it stores
 
-The live publication and compatibility surface for predictions.
+The publication and compatibility surface for predictions.
 
 ### Write-path producers
 

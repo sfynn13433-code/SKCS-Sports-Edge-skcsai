@@ -117,9 +117,9 @@
       wrapper.innerHTML = `
         <div class="skcs-health-banner__inner">
           <div>
-            <p class="skcs-health-banner__headline">System health: ${state}</p>
+            <p class="skcs-health-banner__headline">Pre-match health: ${state}</p>
             <p class="skcs-health-banner__meta">
-              Last updated ${systemHealth.lastUpdatedAt ? new Date(systemHealth.lastUpdatedAt).toLocaleString() : 'moments ago'}
+              Pre-match context refreshed ${systemHealth.lastUpdatedAt ? new Date(systemHealth.lastUpdatedAt).toLocaleString() : 'moments ago'}
             </p>
             <ul class="skcs-health-banner__reasons">${reasons}</ul>
           </div>

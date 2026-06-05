@@ -14,6 +14,7 @@ const router = express.Router();
 // Import hybrid sports data service
 const { getFeaturedGames, getLiveScores, healthCheck } = require('../services/hybridSportsDataService');
 const { getEnhancedMatchDetails } = require('../services/enhancedMatchDetailsService');
+const PRE_MATCH_ONLY_MODE = String(process.env.SKCS_PRE_MATCH_ONLY || 'true').trim() !== 'false';
 
 // API Governor: 6500ms to stay strictly under 10 RPM
 const apiGovernor = new Bottleneck({
@@ -176,6 +177,12 @@ router.get('/api/featured-games', async (req, res) => {
  * Cache: 1 hour for trends data
  */
 router.get('/api/trends', async (req, res) => {
+  if (PRE_MATCH_ONLY_MODE) {
+    return res.status(410).json({
+      success: false,
+      error: 'Trends are disabled in pre-match-only mode'
+    });
+  }
   const cacheKey = 'ai_trends';
   try {
     const data = await fetchFromRapidAPI('/bets/trends', { sports: '1' }, cacheKey, 3600); // 1 hour cache
@@ -222,6 +229,12 @@ router.get('/api/trends', async (req, res) => {
  * Cache: 1 minute for live data
  */
 router.get('/api/live-scores', async (req, res) => {
+  if (PRE_MATCH_ONLY_MODE) {
+    return res.status(410).json({
+      success: false,
+      error: 'Live scores are disabled in pre-match-only mode'
+    });
+  }
   const cacheKey = 'live_scores';
   try {
     // Prefer hybrid approach to avoid provider endpoint mismatch
@@ -627,6 +640,12 @@ router.get('/api/ai-predictions/:matchId', async (req, res) => {
  * Cache: 1 hour for news
  */
 router.get('/api/sports-news', async (req, res) => {
+  if (PRE_MATCH_ONLY_MODE) {
+    return res.status(410).json({
+      success: false,
+      error: 'Sports news polling is disabled in pre-match-only mode'
+    });
+  }
   const cacheKey = 'sports_news';
   try {
     const data = await fetchFromRapidAPI('/news', { sports: '1' }, cacheKey, 3600); // 1 hour cache

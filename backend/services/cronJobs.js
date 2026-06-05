@@ -2,8 +2,8 @@
  * Cron Jobs Service
  * 
  * Schedules automated pipeline tasks:
- * 1. Daily Discovery (00:01 UTC) - Syncs daily fixtures from TheSportsDB
- * 2. Pulse Check (every 30 minutes) - Enriches and generates AI predictions for upcoming matches
+ * 1. Daily Discovery (00:01 UTC) - Syncs daily pre-match fixtures from TheSportsDB
+ * 2. Pulse Check (every 30 minutes) - Disabled in pre-match-only mode
  */
 
 const cron = require('node-cron');
@@ -13,6 +13,7 @@ const db = require('../db');
 const { getExecutionConstraints } = require('../semantic-layer/governanceGatekeeper');
 const { refreshPipelineHealthState } = require('./pipelineMetricsService');
 const { executeOperation } = require('../core/executionPipeline');
+const PRE_MATCH_ONLY_MODE = String(process.env.SKCS_PRE_MATCH_ONLY || 'true').trim() !== 'false';
 
 /**
  * Initialize all cron jobs
@@ -48,6 +49,7 @@ function initCronJobs() {
     console.log('[CRON] Daily Discovery scheduled: 00:01 UTC daily');
 
     // ── Schedule 2: Pulse Check (every 30 minutes) ────────────────────────────────
+    if (!PRE_MATCH_ONLY_MODE) {
     cron.schedule('*/30 * * * *', async () => {
         console.log(`[CRON] Running Pulse Check at ${new Date().toISOString()}`);
         const constraints = getExecutionConstraints();
@@ -136,8 +138,12 @@ function initCronJobs() {
         timezone: 'UTC'
     });
     console.log('[CRON] Pulse Check scheduled: every 30 minutes');
+    } else {
+        console.log('[CRON] Pulse Check disabled in pre-match-only mode');
+    }
 
     // ── Schedule 3: Pipeline Health Feed Pulse (every 30 minutes) ────────────────
+    if (!PRE_MATCH_ONLY_MODE) {
     cron.schedule('5,35 * * * *', async () => {
         console.log(`[CRON] Refreshing pipeline health feed at ${new Date().toISOString()}`);
         try {
@@ -155,6 +161,9 @@ function initCronJobs() {
         timezone: 'UTC'
     });
     console.log('[CRON] Pipeline health feed pulse scheduled: minutes 5 and 35 every hour');
+    } else {
+        console.log('[CRON] Pipeline health feed pulse disabled in pre-match-only mode');
+    }
 
     // ── Schedule 4: Stale Prediction Cleanup (every 30 minutes) ──────────────────
     // Removes predictions for matches that have kicked off (>15 min grace period)

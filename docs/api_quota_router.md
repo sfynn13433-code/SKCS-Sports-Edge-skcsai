@@ -7,7 +7,7 @@ Single governance layer for all external API exposure. Replaces scattered per-sp
 ```text
 apiQuotaRouter
  ├── football → api_sports_football, odds_api, sportsapi_pro, thesportsdb, …
- ├── cricket  → cricket_live_line_advance, cricapi (OFF in prod by default)
+ ├── cricket  → cricket_live_line_advance (legacy), cricapi (OFF in prod by default)
  ├── basketball / baseball / … → api_sports_<sport>
  └── blocked_api_calls_log (cost observability)
 ```
@@ -41,7 +41,7 @@ Table: `blocked_api_calls_log`
 | Column | Purpose |
 |--------|---------|
 | `sport` | Who tried to call (football, cricket, …) |
-| `provider` | Which provider (odds_api, cricket_live_line_advance, …) |
+| `provider` | Which provider (odds_api, cricket_live_line_advance legacy, …) |
 | `reason` | Why blocked (sport_ingestion_disabled, provider_quota_exceeded, …) |
 | `source` | Code path (file/function label) |
 
@@ -54,7 +54,7 @@ Table: `blocked_api_calls_log`
 
 - `apiClients.js` — API-Sports + Odds API
 - `apiCacheService.js` — RapidAPI cache wall
-- `cricketLiveEnrichmentService.js` / `cricketLiveMatchResolver.js`
+- `cricketLiveEnrichmentService.js` / `cricketLiveMatchResolver.js` (legacy cricket enrichment paths)
 - `publish-cricbuzz-cricket.js`, cricket crons, `deploy-trigger-cricket.js`
 
 ## Re-enable cricket (sprint only)

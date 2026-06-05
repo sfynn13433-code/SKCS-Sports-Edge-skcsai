@@ -615,13 +615,13 @@ class VerificationController {
 
         if (!contextPayload || (!hasResults && !hasDeepContext)) {
             severity = SYSTEM_STATES.DEGRADED;
-            reason = 'Enrichment payload is missing primary results context.';
+            reason = 'Pre-match context payload is missing primary results context.';
             failureType = FAILURE_TYPES.DATA_FAIL;
         }
 
         if (ageHours !== null && ageHours > 24) {
             severity = severity === SYSTEM_STATES.HEALTHY ? SYSTEM_STATES.DEGRADED : severity;
-            reason = `Context data is stale (${ageHours.toFixed(1)}h old).`;
+            reason = `Pre-match context data is stale (${ageHours.toFixed(1)}h old).`;
             failureType = FAILURE_TYPES.DATA_FAIL;
         }
 

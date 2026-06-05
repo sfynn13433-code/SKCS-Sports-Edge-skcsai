@@ -165,8 +165,6 @@ function formatPredictionRow(row) {
         || firstMatch?.league
         || firstMatch?.metadata?.match_info?.league
         || firstMatch?.metadata?.match_context?.match_info?.league
-        || firstMatch?.metadata?.raw_provider_data?.league?.name
-        || firstMatch?.metadata?.raw_provider_data?.competition?.name
         || row?.league
         || row?.competition
         || ''
@@ -177,8 +175,6 @@ function formatPredictionRow(row) {
         || firstMatch?.country
         || firstMatch?.metadata?.match_info?.country
         || firstMatch?.metadata?.match_context?.match_info?.country
-        || firstMatch?.metadata?.raw_provider_data?.league?.country
-        || firstMatch?.metadata?.raw_provider_data?.country
         || row?.country
         || ''
     ).trim();

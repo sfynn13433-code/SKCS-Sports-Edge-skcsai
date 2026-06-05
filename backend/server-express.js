@@ -46,6 +46,7 @@ const verificationHydrationPromise = verificationController.hydrateFromLatestSys
     console.warn('[Server] Failed to seed verification controller from system health state:', error.message);
     return null;
 });
+const PRE_MATCH_ONLY_MODE = String(process.env.SKCS_PRE_MATCH_ONLY || 'true').trim() !== 'false';
 
 const { getPlanCapabilities, filterPredictionsForPlan } = require('./config/subscriptionMatrix');
 const { normalizeFixtureDate, getPredictionWindow, isFixtureEligibleForPrediction } = require('./utils/dateNormalization');
@@ -1084,6 +1085,12 @@ app.get('/api/admin/reset-tier-rules', async (_req, res) => {
 // TIER 1: LIVE SYNC -> Run every 5 minutes
 // Uses the main pipeline from fetch-live-fixtures.js with Master League filtering
 app.get('/api/cron/sync-live', verifyCronSecret, async (req, res) => {
+    if (PRE_MATCH_ONLY_MODE) {
+        return res.status(410).json({
+            status: 'disabled',
+            message: 'Live sync is disabled in pre-match-only mode'
+        });
+    }
     console.log('[cron/sync-live] Starting tier-1 live sync...');
     const logId = await jobLogger.start('cron_sync_live', {
         path: req.path,
@@ -1459,6 +1466,11 @@ app.get('/api/cron/trigger-master-pipeline', verifyCronSecret, (req, res) => {
 // ESPN Hidden API Live Odds Monitoring Endpoint
 app.get('/api/admin/cdn-live-loop', requireAdminKey, async (req, res) => {
     try {
+        if (PRE_MATCH_ONLY_MODE) {
+            return res.status(410).json({
+                error: 'Live monitoring is disabled in pre-match-only mode'
+            });
+        }
         const { key } = req.query;
         
         if (key !== 'skcs_super_secret_cron_key_2026') {

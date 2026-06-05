@@ -225,14 +225,14 @@ It captures quotas, estimated call frequency, budget class, duplication risk, an
 - **Optimization candidate**
   - No
 
-### Heartbeat live score interval
+### Heartbeat pre-match freshness interval
 
 - **Frequency**
-  - `48/day` when enabled
+  - Disabled by default in pre-match-only mode
 - **Provider**
-  - Live score sources
+  - Pre-match metadata sources
 - **Estimated calls**
-  - High when enabled
+  - Low when enabled
 - **Budget class**
   - `Optional`
 - **Optimization candidate**
@@ -356,14 +356,14 @@ It captures quotas, estimated call frequency, budget class, duplication risk, an
 - **Optimization candidate**
   - Yes
 
-### Live-score maintenance
+### Pre-match freshness maintenance
 
 - **Providers**
-  - live-score sources
+  - pre-match metadata sources
 - **Jobs**
-  - heartbeat live score interval
+  - heartbeat pre-match freshness interval
 - **Estimated daily cost**
-  - High when enabled
+  - Low by default; higher only if live-style polling is explicitly re-enabled
 - **Risk**
   - Medium
 - **Optimization candidate**
@@ -390,7 +390,7 @@ This section records the current measurable cost shape of the system from the ru
 - Daily Discovery cron: `1/day`
 - Pulse Check cron: `48/day`
 - Stale Prediction Cleanup cron: `48/day`
-- Heartbeat live score interval: `48/day` when enabled
+- Heartbeat pre-match freshness interval: `0/day` by default, `48/day` only if live-style polling is explicitly re-enabled
 - Heartbeat trends/news interval: `24/day`
 - Sports sync orchestration: on demand plus scheduled triggers
 
@@ -400,7 +400,7 @@ This section records the current measurable cost shape of the system from the ru
 - TheSportsDB discovery and enrichment
 - Groq primary AI generation
 - Dolphin fallback bursts during provider failures
-- Live-score maintenance when enabled
+- Pre-match freshness maintenance when enabled
 
 ### Current duplicate-call hotspots
 
@@ -415,7 +415,7 @@ This section records the current measurable cost shape of the system from the ru
 - Provider sensitivity and duplicate-call risk
 - Optimization candidates by workflow
 
-### What still needs live telemetry
+### What still needs pre-match telemetry
 
 - Exact monthly dollar cost per provider
 - Per-workflow token consumption

@@ -9,6 +9,7 @@ const { executeOperation } = require('../core/executionPipeline');
 const ENABLE_PRO_FOOTBALL = String(process.env.ENABLE_SPORTSAPI_PRO_FOOTBALL || '').trim() === 'true';
 const DISABLE_PRO_FOOTBALL = String(process.env.DISABLE_SPORTSAPI_PRO_FOOTBALL || '').trim() === 'true';
 const ALLOW_PRO_FOOTBALL = ENABLE_PRO_FOOTBALL && !DISABLE_PRO_FOOTBALL;
+const PRE_MATCH_ONLY_MODE = String(process.env.SKCS_PRE_MATCH_ONLY || 'true').trim() !== 'false';
 const DISABLE_LIVE_SCORES = String(process.env.DISABLE_LIVE_SCORES || '').trim() === '1';
 
 // Heartbeat state management
@@ -106,13 +107,14 @@ async function bandwidthAwareCall(apiFunction, ...args) {
  * Note: Reduced frequency to stay within rate limits
  */
 async function syncLiveScores() {
-  if (DISABLE_LIVE_SCORES) {
-    console.log('[Heartbeat] Live scores disabled; skipping live-score sync');
+  if (PRE_MATCH_ONLY_MODE || DISABLE_LIVE_SCORES) {
+    console.log('[Heartbeat] Pre-match-only mode enabled; skipping live-score sync');
     return {
       source: 'disabled',
       data: [],
       fallback: false,
-      disabled: true
+      disabled: true,
+      preMatchOnly: true
     };
   }
 
@@ -197,6 +199,11 @@ async function syncLiveScores() {
  * Updates high-value AI betting trends and news
  */
 async function syncTrendsAndNews() {
+  if (PRE_MATCH_ONLY_MODE) {
+    console.log('[Heartbeat] Pre-match-only mode enabled; skipping trends/news sync');
+    return { trends: null, news: null, disabled: true, preMatchOnly: true };
+  }
+
   console.log('[Heartbeat] Syncing trends and news...');
   
   try {
@@ -228,16 +235,16 @@ async function syncTrendsAndNews() {
  * Caches league/team mappings to avoid repeated API calls
  */
 async function syncMetadata() {
-  console.log('[Heartbeat] Syncing metadata...');
+  console.log('[Heartbeat] Syncing pre-match metadata...');
   
   try {
     if (!ALLOW_PRO_FOOTBALL) {
-      console.log('[Heartbeat] Pro Football disabled by flag; skipping metadata');
+      console.log('[Heartbeat] Pro Football disabled by flag; skipping pre-match metadata');
       return null;
     }
     const metadata = await bandwidthAwareCall(proFootballService.getMetadata);
     if (metadata) {
-      console.log('[Heartbeat] Metadata cached for 24 hours');
+      console.log('[Heartbeat] Pre-match metadata cached for 24 hours');
       heartbeatState.lastSync.metadata = new Date().toISOString();
       return metadata;
     }
@@ -260,8 +267,9 @@ async function startSKCSHeartbeat() {
   
   console.log('🚀 SKCS AI Sports Edge Heartbeat Started...');
   console.log('📊 Bandwidth Management: Enabled');
-  console.log(`⏱️  Live Scores: ${DISABLE_LIVE_SCORES ? 'Disabled' : 'Every 30 minutes'}`);
-  console.log('📈 Trends/News: Every 60 minutes');
+  console.log(`⏱️  Pre-match mode: ${PRE_MATCH_ONLY_MODE ? 'Enabled' : 'Disabled'}`);
+  console.log(`📈 Live scores: ${PRE_MATCH_ONLY_MODE || DISABLE_LIVE_SCORES ? 'Disabled' : 'Every 30 minutes'}`);
+  console.log(`📰 Trends/News: ${PRE_MATCH_ONLY_MODE ? 'Disabled' : 'Every 60 minutes'}`);
   
   heartbeatState.isRunning = true;
   
@@ -272,7 +280,7 @@ async function startSKCSHeartbeat() {
     payload: { source: 'startup' },
     execute: async () => syncMetadata()
   }); // One-time metadata sync
-  if (!DISABLE_LIVE_SCORES) {
+  if (!PRE_MATCH_ONLY_MODE && !DISABLE_LIVE_SCORES) {
     await executeOperation({
       operation: 'heartbeat.liveScores',
       caller: 'backend/services/skcsHeartbeat.js',
@@ -280,17 +288,19 @@ async function startSKCSHeartbeat() {
       execute: async () => syncLiveScores()
     }); // Initial live scores
   }
-  await executeOperation({
-    operation: 'heartbeat.trendsNews',
-    caller: 'backend/services/skcsHeartbeat.js',
-    payload: { source: 'startup' },
-    execute: async () => syncTrendsAndNews()
-  }); // Initial trends/news
+  if (!PRE_MATCH_ONLY_MODE) {
+    await executeOperation({
+      operation: 'heartbeat.trendsNews',
+      caller: 'backend/services/skcsHeartbeat.js',
+      payload: { source: 'startup' },
+      execute: async () => syncTrendsAndNews()
+    }); // Initial trends/news
+  }
   
   // Set up intervals
   
   // Every 30 minutes: Update Live Scores (Basic Plan optimization)
-  if (!DISABLE_LIVE_SCORES) {
+  if (!PRE_MATCH_ONLY_MODE && !DISABLE_LIVE_SCORES) {
     heartbeatState.liveScoresInterval = setInterval(async () => {
       await executeOperation({
         operation: 'heartbeat.liveScores',
@@ -302,14 +312,16 @@ async function startSKCSHeartbeat() {
   }
   
   // Every hour: Update Trends and News
-  heartbeatState.trendsInterval = setInterval(async () => {
-    await executeOperation({
-      operation: 'heartbeat.trendsNews',
-      caller: 'backend/services/skcsHeartbeat.js',
-      payload: { source: 'interval' },
-      execute: async () => syncTrendsAndNews()
-    });
-  }, 3600000); // 60 minutes
+  if (!PRE_MATCH_ONLY_MODE) {
+    heartbeatState.trendsInterval = setInterval(async () => {
+      await executeOperation({
+        operation: 'heartbeat.trendsNews',
+        caller: 'backend/services/skcsHeartbeat.js',
+        payload: { source: 'interval' },
+        execute: async () => syncTrendsAndNews()
+      });
+    }, 3600000); // 60 minutes
+  }
   
   console.log('✅ Heartbeat intervals established');
   
@@ -365,6 +377,11 @@ function logHeartbeatStatus() {
     const minutesSince = Math.floor((Date.now() - new Date(status.lastSync.liveScores)) / 60000);
     console.log(`[Heartbeat] Last live sync: ${minutesSince}m ago`);
   }
+
+  if (status.lastSync.metadata) {
+    const minutesSince = Math.floor((Date.now() - new Date(status.lastSync.metadata)) / 60000);
+    console.log(`[Heartbeat] Last pre-match metadata sync: ${minutesSince}m ago`);
+  }
 }
 
 /**
@@ -372,6 +389,14 @@ function logHeartbeatStatus() {
  */
 async function triggerLiveSync() {
   console.log('[Heartbeat] Manual live sync triggered');
+  if (PRE_MATCH_ONLY_MODE) {
+    return {
+      source: 'disabled',
+      disabled: true,
+      preMatchOnly: true,
+      message: 'Live-score sync is disabled in pre-match-only mode'
+    };
+  }
   return await executeOperation({
     operation: 'heartbeat.manualLive',
     caller: 'backend/services/skcsHeartbeat.js',
@@ -382,6 +407,14 @@ async function triggerLiveSync() {
 
 async function triggerTrendsSync() {
   console.log('[Heartbeat] Manual trends sync triggered');
+  if (PRE_MATCH_ONLY_MODE) {
+    return {
+      source: 'disabled',
+      disabled: true,
+      preMatchOnly: true,
+      message: 'Trends/news sync is disabled in pre-match-only mode'
+    };
+  }
   return await executeOperation({
     operation: 'heartbeat.manualTrends',
     caller: 'backend/services/skcsHeartbeat.js',

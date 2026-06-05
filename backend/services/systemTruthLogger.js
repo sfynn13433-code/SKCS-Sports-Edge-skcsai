@@ -18,12 +18,32 @@ async function getTruthLedgerSchemaStatus() {
             const { rows } = await query(`
                 SELECT
                     to_regclass('public.pipeline_executions') AS pipeline_executions,
-                    to_regclass('public.decision_fingerprints') AS decision_fingerprints
+                    to_regclass('public.decision_fingerprints') AS decision_fingerprints,
+                    EXISTS (
+                        SELECT 1
+                        FROM information_schema.columns
+                        WHERE table_schema = 'public'
+                          AND table_name = 'pipeline_executions'
+                          AND column_name IN ('data_contract_id', 'data_contract_version', 'raw_response_snapshot')
+                        GROUP BY table_name
+                        HAVING COUNT(*) = 3
+                    ) AS pipeline_executions_has_contract_columns,
+                    EXISTS (
+                        SELECT 1
+                        FROM information_schema.columns
+                        WHERE table_schema = 'public'
+                          AND table_name = 'decision_fingerprints'
+                          AND column_name IN ('data_contract_id', 'data_contract_version')
+                        GROUP BY table_name
+                        HAVING COUNT(*) = 2
+                    ) AS decision_fingerprints_has_contract_columns
             `);
             const row = rows?.[0] || {};
             return {
                 pipelineExecutionsExists: Boolean(row.pipeline_executions),
-                decisionFingerprintsExists: Boolean(row.decision_fingerprints)
+                decisionFingerprintsExists: Boolean(row.decision_fingerprints),
+                pipelineExecutionsHasContractColumns: Boolean(row.pipeline_executions_has_contract_columns),
+                decisionFingerprintsHasContractColumns: Boolean(row.decision_fingerprints_has_contract_columns)
             };
         })().catch((error) => {
             truthLedgerSchemaPromise = null;
@@ -83,6 +103,9 @@ async function persistExecutionTrace(entry) {
     const completedAt = pipelineTrace.completed_at || entry.completed_at || entry.recordedAt || new Date().toISOString();
     const operation = String(entry.context?.operation || entry.operation || pipelineTrace.operation || 'unknown');
     const caller = String(entry.context?.caller || entry.caller || pipelineTrace.caller || 'unknown');
+    const dataContractId = String(entry.data_contract_id || entry.context?.data_contract_id || entry.context?.contract_id || '').trim() || null;
+    const dataContractVersion = String(entry.data_contract_version || entry.context?.data_contract_version || entry.context?.contract_version || 'skcs:sportsdataio:soccer:contract:v1.1').trim();
+    const rawResponseSnapshot = entry.raw_response_snapshot ?? entry.context?.raw_response_snapshot ?? entry.result ?? null;
     const schema = await getTruthLedgerSchemaStatus();
 
     if (!schema.pipelineExecutionsExists) {
@@ -94,60 +117,69 @@ async function persistExecutionTrace(entry) {
         return null;
     }
 
+    const executionColumns = [
+        'trace_id',
+        'publish_run_id',
+        'operation',
+        'caller',
+        'final_decision',
+        'halted_at',
+        'full_trace',
+        'metrics',
+        'decision_fingerprint',
+        'started_at',
+        'completed_at',
+        'updated_at'
+    ];
+    const executionValues = [
+        traceId,
+        publishRunId,
+        operation,
+        caller,
+        finalDecision,
+        haltedAt,
+        JSON.stringify(pipelineTrace.full_trace || entry),
+        JSON.stringify(pipelineTrace.metrics || entry.stageMetrics || entry.metrics || {}),
+        JSON.stringify(pipelineTrace.decision_fingerprint || entry.fingerprint || null),
+        startedAt,
+        completedAt,
+        new Date().toISOString()
+    ];
+    const executionUpdates = [
+        'publish_run_id = COALESCE(EXCLUDED.publish_run_id, public.pipeline_executions.publish_run_id)',
+        'operation = EXCLUDED.operation',
+        'caller = EXCLUDED.caller',
+        'final_decision = EXCLUDED.final_decision',
+        'halted_at = EXCLUDED.halted_at',
+        'full_trace = EXCLUDED.full_trace',
+        'metrics = EXCLUDED.metrics',
+        'decision_fingerprint = EXCLUDED.decision_fingerprint',
+        'started_at = LEAST(public.pipeline_executions.started_at, EXCLUDED.started_at)',
+        'completed_at = EXCLUDED.completed_at',
+        'updated_at = NOW()'
+    ];
+
+    if (schema.pipelineExecutionsHasContractColumns) {
+        executionColumns.splice(2, 0, 'data_contract_id', 'data_contract_version', 'raw_response_snapshot');
+        executionValues.splice(2, 0, dataContractId, dataContractVersion, JSON.stringify(rawResponseSnapshot ?? {}));
+        executionUpdates.splice(1, 0,
+            'data_contract_id = COALESCE(EXCLUDED.data_contract_id, public.pipeline_executions.data_contract_id)',
+            'data_contract_version = EXCLUDED.data_contract_version',
+            'raw_response_snapshot = EXCLUDED.raw_response_snapshot'
+        );
+    }
+
+    const executionPlaceholders = executionColumns.map((_, index) => `$${index + 1}`).join(',\n            ');
     const executionRes = await query(
         `INSERT INTO public.pipeline_executions (
-            trace_id,
-            publish_run_id,
-            operation,
-            caller,
-            final_decision,
-            halted_at,
-            full_trace,
-            metrics,
-            decision_fingerprint,
-            started_at,
-            completed_at,
-            updated_at
+            ${executionColumns.join(',\n            ')}
         ) VALUES (
-            $1,
-            $2,
-            $3,
-            $4,
-            $5,
-            $6,
-            $7::jsonb,
-            $8::jsonb,
-            $9::jsonb,
-            $10::timestamptz,
-            $11::timestamptz,
-            NOW()
+            ${executionPlaceholders}
         )
         ON CONFLICT (trace_id) DO UPDATE SET
-            publish_run_id = COALESCE(EXCLUDED.publish_run_id, public.pipeline_executions.publish_run_id),
-            operation = EXCLUDED.operation,
-            caller = EXCLUDED.caller,
-            final_decision = EXCLUDED.final_decision,
-            halted_at = EXCLUDED.halted_at,
-            full_trace = EXCLUDED.full_trace,
-            metrics = EXCLUDED.metrics,
-            decision_fingerprint = EXCLUDED.decision_fingerprint,
-            started_at = LEAST(public.pipeline_executions.started_at, EXCLUDED.started_at),
-            completed_at = EXCLUDED.completed_at,
-            updated_at = NOW()
+            ${executionUpdates.join(',\n            ')}
         RETURNING id`,
-        [
-            traceId,
-            publishRunId,
-            operation,
-            caller,
-            finalDecision,
-            haltedAt,
-            JSON.stringify(pipelineTrace.full_trace || entry),
-            JSON.stringify(pipelineTrace.metrics || entry.stageMetrics || entry.metrics || {}),
-            JSON.stringify(pipelineTrace.decision_fingerprint || entry.fingerprint || null),
-            startedAt,
-            completedAt
-        ]
+        executionValues
     ).catch((error) => {
         throw error;
     });
@@ -156,30 +188,45 @@ async function persistExecutionTrace(entry) {
 
     if (executionId && entry.fingerprint && typeof entry.fingerprint === 'object' && schema.decisionFingerprintsExists) {
         try {
+            const fingerprintColumns = [
+                'trace_id',
+                'pipeline_execution_id',
+                'prediction_id',
+                'fingerprint',
+                'created_at'
+            ];
+            const fingerprintValues = [
+                traceId,
+                executionId,
+                entry.fingerprint.prediction_id || null,
+                JSON.stringify(entry.fingerprint),
+                new Date().toISOString()
+            ];
+            const fingerprintUpdates = [
+                'pipeline_execution_id = EXCLUDED.pipeline_execution_id',
+                'prediction_id = EXCLUDED.prediction_id',
+                'fingerprint = EXCLUDED.fingerprint'
+            ];
+
+            if (schema.decisionFingerprintsHasContractColumns) {
+                fingerprintColumns.splice(2, 0, 'data_contract_id', 'data_contract_version');
+                fingerprintValues.splice(2, 0, dataContractId, dataContractVersion);
+                fingerprintUpdates.unshift(
+                    'data_contract_id = COALESCE(EXCLUDED.data_contract_id, public.decision_fingerprints.data_contract_id)',
+                    'data_contract_version = EXCLUDED.data_contract_version'
+                );
+            }
+
+            const fingerprintPlaceholders = fingerprintColumns.map((_, index) => `$${index + 1}`).join(',\n                    ');
             await query(
                 `INSERT INTO public.decision_fingerprints (
-                    trace_id,
-                    pipeline_execution_id,
-                    prediction_id,
-                    fingerprint,
-                    created_at
+                    ${fingerprintColumns.join(',\n                    ')}
                 ) VALUES (
-                    $1,
-                    $2,
-                    $3,
-                    $4::jsonb,
-                    NOW()
+                    ${fingerprintPlaceholders}
                 )
                 ON CONFLICT (trace_id) DO UPDATE SET
-                    pipeline_execution_id = EXCLUDED.pipeline_execution_id,
-                    prediction_id = EXCLUDED.prediction_id,
-                    fingerprint = EXCLUDED.fingerprint`,
-                [
-                    traceId,
-                    executionId,
-                    entry.fingerprint.prediction_id || null,
-                    JSON.stringify(entry.fingerprint)
-                ]
+                    ${fingerprintUpdates.join(',\n                    ')}`,
+                fingerprintValues
             );
         } catch (fingerprintError) {
             console.warn('[TRUTH_LOG] Failed to persist decision fingerprint:', fingerprintError.message);

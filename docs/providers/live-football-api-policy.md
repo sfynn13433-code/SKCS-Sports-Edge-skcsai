@@ -1,4 +1,4 @@
-# Live Football API Provider Policy
+# Football Enrichment Provider Policy
 
 Provider host:
 live-football-api.p.rapidapi.com
@@ -13,20 +13,20 @@ Fallback key order:
 3. RAPIDAPI_KEY
 
 Current SKCS role:
-Controlled, low-quota football enrichment provider.
+Controlled, low-quota football pre-match enrichment provider.
 
 Observed quota behavior:
 The provider must be treated as limited by x-ratelimit-requests-limit.
 Current observed practical request window: 100 requests/day.
-Do not use this provider for bulk fixture ingestion.
+Do not use this provider for bulk fixture ingestion or live monitoring loops.
 
 Approved use:
 - Match statistics enrichment
 - Match lineup inspection
-- Match events/timeline inspection
+- Match events/timeline inspection for pre-match context audits
 - League standings context
 - Top scorers context
-- H2H fallback only when parameters return useful rows
+- H2H fallback only when parameters return useful rows for pre-match context
 
 Not approved:
 - Bulk fixtures
@@ -40,7 +40,7 @@ Not approved:
 - Replacing SKCS Decision Engine
 
 Endpoint test result summary:
-Exactly 7 isolated live calls were completed.
+Exactly 7 isolated calls were completed.
 
 1. /league-standing
    Status: 200
@@ -96,7 +96,7 @@ Current provider hierarchy:
 
 3. live-football-api.p.rapidapi.com
    Role: controlled low-quota football enrichment provider.
-   Use only for selected high-value context endpoints.
+   Use only for selected high-value pre-match context endpoints.
 
 4. Metrx Factory
    Role: deep football enrichment provider.

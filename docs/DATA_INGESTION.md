@@ -25,7 +25,7 @@
 
 ### Formula 1 Data
 - **Library**: `fastf1`
-- **Source**: F1 live timing service (public)
+- **Source**: F1 timing service (public)
 - **Install**: `pip install fastf1`
 - **Usage**: Race data, driver telemetry, session information
 - **Notes**: Public F1 timing data

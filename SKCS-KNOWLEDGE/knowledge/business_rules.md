@@ -25,7 +25,7 @@ This file captures the major business rules that shape predictions, publication,
 ## Football and pre-match focus
 
 - The current operating focus is pre-match football content.
-- Live score fetching can be disabled with environment flags.
+- Pre-match score fetching can be disabled with environment flags.
 - Quota exhaustion must stop retries quickly instead of causing retry storms.
 
 ## Time and schedule

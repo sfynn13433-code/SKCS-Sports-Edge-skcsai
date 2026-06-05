@@ -17,11 +17,11 @@ External APIs
 - `quotaPlanner`
   - Preflight planner for football budget allocation.
 - `dataProvider`
-  - Builds live data and fallback payloads.
+  - Builds pre-match data and fallback payloads.
 - `syncService`
   - Orchestrates sports sync runs.
 - `skcsHeartbeat`
-  - Runs recurring background refreshes for trends and live data.
+  - Runs recurring background refreshes for pre-match metadata; live refreshes are gated off by default.
 - `aiPipeline`
   - Produces analysis and explanation content.
 

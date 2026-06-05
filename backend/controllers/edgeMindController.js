@@ -471,8 +471,8 @@ function buildRealtimeDirectEvaluationFromMetadata(metadata, pick) {
             keyPlayersOut: countKeyAbsences(contextual.injuries, 'away') + countKeyAbsences(contextual.suspensions, 'away')
         }
     };
-    const form = isObject(metadata?.form) ? metadata.form : (isObject(metadata?.raw_provider_data?.form) ? metadata.raw_provider_data.form : null);
-    const h2h = isObject(metadata?.h2h) ? metadata.h2h : (isObject(metadata?.raw_provider_data?.h2h) ? metadata.raw_provider_data.h2h : null);
+    const form = isObject(metadata?.form) ? metadata.form : null;
+    const h2h = isObject(metadata?.h2h) ? metadata.h2h : null;
     const volatilityScore = (() => {
         const values = [
             Number(signals.weather_risk),

@@ -33,7 +33,7 @@ Registry for sync + allowlist. **European top 5** use TheSportsDB ids in `syncSe
 
 ## API call rules (unchanged)
 
-- Same per-league `buildLiveData` waterfall (TheSportsDB only when `leagueId` is in `SUPPORTED_LEAGUES`; summer leagues skip TSDB league endpoints)
+- Same per-league `buildLiveData` waterfall (legacy name; TheSportsDB only when `leagueId` is in `SUPPORTED_LEAGUES`; summer leagues skip TSDB league endpoints)
 - Same `SPORT_FETCH_STAGGER_MS` between league fetches
 - No changes to `apiQuotaRouter`, cron quotas, or install commands
 

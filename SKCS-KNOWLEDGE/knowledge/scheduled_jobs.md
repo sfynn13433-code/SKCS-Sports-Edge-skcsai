@@ -5,7 +5,7 @@
 - `backend/services/cronJobs.js`
   - Contains recurring Node cron jobs for operational sync.
 - `backend/services/skcsHeartbeat.js`
-  - Uses intervals for live-score, trends, and news refresh behavior.
+  - Uses intervals for pre-match metadata refresh; live-score, trends, and news refresh are disabled in pre-match-only mode.
 - `scripts/external-scheduler.js`
   - Holds additional scheduled background actions.
 - `scripts/scheduler.js`
@@ -30,4 +30,4 @@
 ## Current operational note
 
 - Scheduled jobs should be treated as part of the engine, not as optional convenience scripts.
-- If a job costs API calls, that cost should be documented here and in the provider registry.
+- If a job costs API calls, that cost should be documented here and in the provider registry, with pre-match-only defaults preferred over live polling.

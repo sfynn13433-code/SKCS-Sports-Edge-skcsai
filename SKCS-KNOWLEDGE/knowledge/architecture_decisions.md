@@ -6,7 +6,7 @@
 - The website is the presentation layer.
 - Deterministic logic should move into SQL where it improves auditability and consistency.
 - Pre-match football is the primary focus.
-- Live score fetching can be disabled when the product is intentionally pre-match only.
+- Live-style score fetching should stay disabled when the product is intentionally pre-match only.
 - Quota exhaustion must stop redundant retries quickly.
 
 ## Current compatibility decisions
