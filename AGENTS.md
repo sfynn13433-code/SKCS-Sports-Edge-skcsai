@@ -78,6 +78,8 @@ Scripts live in `scripts/` directory. Common patterns:
 ### Testing & Debugging
 
 - **Smoke tests**: `npm run test` or `npm test` runs `scripts/smoke-test.js`
+- **Rulebook drift guard**: `npm run verify:rulebook` catches legacy `80/70/59` or `76%` thresholds (local only, no GitHub billing)
+- **Local pre-commit hook**: run `npm run install:hooks` once per clone to block commits that reintroduce legacy rule thresholds
 - **API testing**: Use postman, curl, or scripts like `scripts/test-api.js` with bearer token headers
 - **Database audit**: `scripts/audit-database.js` and `scripts/master-qa.js` validate tables and data consistency
 - **Logger**: Use `backend/utils/jobLogger.js` for structured job execution logs
@@ -140,17 +142,20 @@ Example: A user with `elite_30day_deep_vip` plan gets:
 
 ### Prediction Confidence Tiers & Risk Framework
 
-From `STRICT_RULES.md` — ALL predictions must follow this framework:
+From `STRICT_RULES.md` / `SKCS_MASTER_RULEBOOK.md` — ALL predictions must follow this framework:
 
-- **80-100%**: ✅ High Confidence (Green)
-- **70-79%**: 📊 Moderate Risk (Blue)
-- **59-69%**: ⚠️ High Risk (Orange) — Must attach secondary insights; UI warns users
-- **0-58%**: 🛑 Extreme Risk (Red) — Enforce exactly 4 secondary insights; UI tells users NOT to bet direct
+- **75-100%**: ✅ Low Risk (Green)
+- **55-74%**: 📊 Medium Risk (Blue)
+- **30-54%**: ⚠️ High Risk (Orange) — Must attach secondary insights; UI warns users
+- **0-29%**: 🛑 Extreme Risk (Red) — Not published; enforce exactly 4 secondary insights when surfaced
 
 Secondary insight rules (mandatory):
-- Confidence threshold: 76% minimum
+- Confidence threshold: 72% minimum
 - Max 4 per match
-- Allowed markets: double chance, draw no bet, goals/team totals, BTTS, corners, cards, half markets
+- Double Chance is a separate market group (not part of the secondary pool)
+- Same Match Builder sizes: 4, 6, 8
+- Allowed secondary markets: draw no bet, goals/team totals, BTTS, corners, cards, half markets
+- ACCA leg minimum: 75%
 
 **Do NOT modify these rules**: they are enforced at database level and in `backend/services/`. Violations create inconsistent user experiences.
 

@@ -45,11 +45,11 @@ const TEST_SCENARIOS = {
         {
             name: 'Low Risk Upper - 79%',
             mainConfidence: 79,
-            expectedBehavior: 'Published Low Risk. Safe Haven may trigger if no 80%+ secondary.',
+            expectedBehavior: 'Published Low Risk. Safe Haven may trigger if no 72%+ secondary.',
             expectedResult: { riskTier: 'LOW_RISK', hasSecondary: true }
         },
         {
-            name: 'Low Risk High - 80%',
+            name: 'Low Risk High - 75%+',
             mainConfidence: 80,
             expectedBehavior: 'Published Low Risk. Secondary always uses primary rule.',
             expectedResult: { riskTier: 'LOW_RISK', hasSecondary: true }
@@ -64,7 +64,7 @@ const TEST_SCENARIOS = {
     
     secondarySelectionTests: [
         {
-            name: 'Multiple 80%+ markets in same category',
+            name: 'Multiple 72%+ markets in same category',
             mainConfidence: 70,
             allMarkets: [
                 { market: 'double_chance_1x', confidence: 85 },
@@ -73,10 +73,10 @@ const TEST_SCENARIOS = {
                 { market: 'over_2_5', confidence: 80 }
             ],
             expectedBehavior: 'Only highest confidence per category appears',
-            expectedResult: { secondaryCount: 2, categories: ['Double Chance / Draw No Bet', 'Goals (Totals & Team)'] }
+            expectedResult: { secondaryCount: 2, categories: ['Double Chance', 'Goals (Totals & Team)'] }
         },
         {
-            name: 'No 80%+ markets, main at 74%',
+            name: 'No 72%+ markets, main at 74%',
             mainConfidence: 74,
             allMarkets: [
                 { market: 'double_chance_1x', confidence: 76 },
@@ -84,7 +84,7 @@ const TEST_SCENARIOS = {
                 { market: 'corners_over_8_5', confidence: 75.1 },
                 { market: 'btts_no', confidence: 74.9 }
             ],
-            expectedBehavior: 'Safe Haven fires, picks safe havens >74% and >=75%',
+            expectedBehavior: 'Safe Haven fires, picks safe havens >74% and >=72%',
             expectedResult: { secondaryCount: 3, safeHavenTriggered: true }
         },
         {
@@ -99,18 +99,18 @@ const TEST_SCENARIOS = {
             expectedResult: { secondaryCount: 0, safeHavenTriggered: false }
         },
         {
-            name: 'Main confidence 30%, safe haven at 75%',
+            name: 'Main confidence 30%, safe haven at 72%',
             mainConfidence: 30,
             allMarkets: [
                 { market: 'double_chance_1x', confidence: 75 },
                 { market: 'over_1_5', confidence: 76 },
                 { market: 'corners_over_8_5', confidence: 77 }
             ],
-            expectedBehavior: 'Safe Haven included because >30% and >=75%',
+            expectedBehavior: 'Safe Haven included because >30% and >=72%',
             expectedResult: { secondaryCount: 3, safeHavenTriggered: true }
         },
         {
-            name: 'Main at 85% with all secondary 80%+',
+            name: 'Main at 85% with all secondary 72%+',
             mainConfidence: 85,
             allMarkets: [
                 { market: 'double_chance_1x', confidence: 85 },
@@ -267,10 +267,10 @@ function classifyRiskTier(confidence) {
 }
 
 function shouldTriggerSafeHaven(mainConfidence, secondaryMarkets) {
-    if (mainConfidence >= 80) return false;
+    if (mainConfidence >= 72) return false;
     
     const hasHighConfidenceSecondary = secondaryMarkets.some(market => 
-        Number(market.confidence || 0) >= 80
+        Number(market.confidence || 0) >= 72
     );
     
     return !hasHighConfidenceSecondary;

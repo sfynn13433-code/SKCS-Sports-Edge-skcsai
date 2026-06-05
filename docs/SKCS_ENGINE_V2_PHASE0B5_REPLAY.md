@@ -7,6 +7,10 @@
 **Depends on:** `docs/canonical_ingest_firewall.spec.md` (Phase -0.5)  
 **Blocks:** Phase 0b `match_results` at scale, Phase 1 `team_strength_params`
 
+## Current runtime note
+
+Replay governs historical canonical football truth. It does not replace the live SportsDataIO display/context path, and it should not be read as a statement that only one provider can ever appear in the broader runtime.
+
 ---
 
 ## 1. What the firewall achieved (and did not)

@@ -468,7 +468,7 @@ async function insertPredictions(predictions) {
                     pred.type,
                     JSON.stringify(matchesJson),
                     pred.confidence,
-                    pred.confidence >= 70 ? 'safe' : 'medium',
+                    pred.confidence >= 75 ? 'safe' : 'medium',
                     pred.sport || 'Football',
                     pred.market || '1X2',
                     pred.prediction || 'Home Win',

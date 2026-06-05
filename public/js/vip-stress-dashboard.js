@@ -152,9 +152,9 @@
             ?? parsedMeta.ai_insight
             ?? contextIntell.ai_insight
             ?? (
-                confidence >= 80
+                confidence >= 75
                     ? 'VERIFIED_EDGE'
-                    : (confidence >= 70 ? 'MEDIUM_RISK' : (confidence >= 59 ? 'HIGH_RISK' : 'EXTREME_RISK'))
+                    : (confidence >= 55 ? 'MEDIUM_RISK' : (confidence >= 30 ? 'HIGH_RISK' : 'EXTREME_RISK'))
             )
         );
         const status = String(statusRaw || 'PENDING').trim().toUpperCase();
@@ -190,21 +190,21 @@
             `);
         }
 
-        if (confidence >= 70 && confidence < 80) {
+        if (confidence >= 55 && confidence < 75) {
             parts.push(`
                 <div class="intel-badge weather">
                   <span class="intel-icon">📊</span>
                   Moderate Caution: ${confidence.toFixed(1)}% (Review context before selection)
                 </div>
             `);
-        } else if (badgeState.status === 'EXPECTED_VARIANCE' || (confidence >= 59 && confidence < 70)) {
+        } else if (badgeState.status === 'EXPECTED_VARIANCE' || (confidence >= 30 && confidence < 55)) {
             parts.push(`
                 <div class="intel-badge filtered">
                   <span class="intel-icon">⚠️</span>
                   High Caution: ${confidence.toFixed(1)}% (Pivot to Secondary Insights)
                 </div>
             `);
-        } else if (confidence < 59) {
+        } else if (confidence < 30) {
             parts.push(`
                 <div class="intel-badge filtered">
                   <span class="intel-icon">🛑</span>
@@ -360,8 +360,8 @@
             ? `<div class="line">${engineLog.map((line) => safe(line)).join(' | ')}</div>`
             : '';
         const secondaryInsights = Array.isArray(prediction.secondary_insights) ? prediction.secondary_insights.slice(0, 4) : [];
-        const isHighRiskDirect = isDirect && compound >= 59 && compound <= 69;
-        const isExtremeRiskDirect = isDirect && compound >= 0 && compound <= 58;
+        const isHighRiskDirect = isDirect && compound >= 30 && compound <= 54;
+        const isExtremeRiskDirect = isDirect && compound >= 0 && compound <= 29;
         const secondaryPivotHtml = (isHighRiskDirect || isExtremeRiskDirect)
             ? `
             <div style="margin-top:10px;padding:${isExtremeRiskDirect ? '12px' : '10px'};border:${isExtremeRiskDirect ? '2px solid #dc2626' : '1px solid #f97316'};background:${isExtremeRiskDirect ? '#fee2e2' : '#fff7ed'};color:${isExtremeRiskDirect ? '#7f1d1d' : '#9a3412'};border-radius:8px;">

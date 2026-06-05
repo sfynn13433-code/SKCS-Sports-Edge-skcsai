@@ -2,6 +2,10 @@
 
 This file maps the important assets to the things they depend on and the things that depend on them.
 
+## Source of truth note
+
+SportsDataIO is a fixture/context provider, not a live tracker. Predictions and UI views depend on published canonical rows, not raw provider responses.
+
 ## Core scoring dependency chain
 
 - `calculate_confidence`
@@ -42,6 +46,9 @@ This file maps the important assets to the things they depend on and the things 
 - `buildLiveData`
   - Depends on: provider clients, quota errors, normalization helpers
   - Used by: sync orchestration
+- SportsDataIO fixture/context path
+  - Depends on: authorization, competition entitlement, pre-match windowing, controlled normalization
+  - Used by: syncSports only when the runtime explicitly enables the path
 - `apiQuotaRouter`
   - Depends on: provider registry and quota state
   - Used by: API clients, sync services, cache services
@@ -96,3 +103,4 @@ This file maps the important assets to the things they depend on and the things 
 - If an upstream asset changes, its downstream consumers must be checked for break impact.
 - If a function becomes SQL-authoritative, the documentation should show the old code path and the new one.
 - If a provider is blocked, all retry paths depending on that provider must be marked.
+- Any consumer that reads football truth must point to the canonical publish output, not to provider-native payloads.

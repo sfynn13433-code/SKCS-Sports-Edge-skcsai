@@ -1,5 +1,15 @@
 # SKCS Knowledge Layer Gap Report
 
+## Current runtime note
+
+This gap report is historical context. The runtime now includes controlled SportsDataIO support and canonical publish-table wiring changes, so any remaining gaps should be read against the current ingest and publish paths.
+
+Master Rulebook thresholds are now documented in `knowledge/business_rules.md` and `knowledge/formula_registry.md` as:
+- Direct 1X2: `75 / 55 / 30`
+- Secondary floor: `72%`
+- Double Chance: separate market group
+- Same Match Builder: `4 / 6 / 8`
+
 ## What is complete in this first pass
 
 - A first-pass inventory of core database objects.

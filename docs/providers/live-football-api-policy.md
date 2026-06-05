@@ -1,5 +1,9 @@
 # Football Enrichment Provider Policy
 
+## Current runtime note
+
+This policy applies only to the controlled football enrichment provider path. It does not override the canonical football truth rules or the SportsDataIO pre-match contract.
+
 Provider host:
 live-football-api.p.rapidapi.com
 

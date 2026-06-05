@@ -38,13 +38,13 @@ async function main() {
       `SELECT pg_get_functiondef('public.trg_enforce_secondary_market_governance()'::regprocedure) AS def`
     );
     const def = fn.rows?.[0]?.def || '';
-    const hasMin75 = def.includes('v_min_secondary_conf CONSTANT NUMERIC := 75');
+    const hasMin72 = def.includes('v_min_secondary_conf CONSTANT NUMERIC := 72');
     const hasHighBand = def.includes('v_row_conf BETWEEN 30 AND 54');
     const hasExtremeBand = def.includes('v_row_conf BETWEEN 0 AND 29');
-    if (hasMin75) {
-      console.log('OK: Secondary min confidence is set to 75 in DB trigger.');
+    if (hasMin72) {
+      console.log('OK: Secondary min confidence is set to 72 in DB trigger.');
     } else {
-      console.log('WARN: Could not confirm 75 threshold in trigger body.');
+      console.log('WARN: Could not confirm 72 threshold in trigger body.');
     }
     if (hasHighBand && hasExtremeBand) {
       console.log('OK: Direct 1X2 pivot bands updated to 30–54 (high risk) and 0–29 (extreme).');

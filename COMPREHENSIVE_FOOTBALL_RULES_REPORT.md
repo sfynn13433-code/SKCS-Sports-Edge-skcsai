@@ -13,19 +13,19 @@ This is a FULL-SCALE comprehensive analysis of the entire football (soccer) rule
 ```javascript
 const FOOTBALL_RULES = {
     confidenceBands: {
-        highConfidence: { min: 80, label: 'HIGH_CONFIDENCE' },
-        moderateRisk: { min: 70, max: 79, label: 'MODERATE_RISK' },
-        highRisk: { min: 59, max: 69, label: 'HIGH_RISK' },
-        extremeRisk: { max: 58, label: 'EXTREME_RISK' }
+        highConfidence: { min: 75, label: 'HIGH_CONFIDENCE' },
+        moderateRisk: { min: 55, max: 74, label: 'MODERATE_RISK' },
+        highRisk: { min: 30, max: 54, label: 'HIGH_RISK' },
+        extremeRisk: { max: 29, label: 'EXTREME_RISK' }
     },
     direct: {
         minConfidence: 45,
-        strongConfidence: 80,
-        moderateMin: 60,
-        cautionMin: 45
+        strongConfidence: 75,
+        moderateMin: 55,
+        cautionMin: 30
     },
     secondary: {
-        minConfidence: 76,
+        minConfidence: 72,
         maxItems: 4,
         diversityCaps: {
             goals: 2,
@@ -33,7 +33,7 @@ const FOOTBALL_RULES = {
         }
     },
     acca: {
-        minLegConfidence: 70,
+        minLegConfidence: 75,
         minAllowedConfidence: 45,
         maxAllowedConfidence: 99,
         defaultSixLegs: 6,
@@ -53,10 +53,10 @@ const FOOTBALL_RULES = {
 ### 1.2 Risk Assessment Framework (`STRICT_RULES.md`)
 
 #### 4-Tier Risk System (MANDATORY)
-- **80% - 100%**: ✅ High Confidence / Safe (Green)
-- **70% - 79%**: 📊 Moderate Risk (Blue)
-- **59% - 69%**: ⚠️ High Risk / Volatile (Orange) - MUST attach secondary insights
-- **0% - 58%**: 🛑 Extreme Risk / Danger (Red) - MUST enforce exactly 4 secondary insights
+- **75% - 100%**: ✅ High Confidence / Safe (Green)
+- **55% - 74%**: 📊 Moderate Risk (Blue)
+- **30% - 54%**: ⚠️ High Risk / Volatile (Orange) - MUST attach secondary insights
+- **0% - 29%**: 🛑 Extreme Risk / Danger (Red) - MUST enforce exactly 4 secondary insights
 
 ---
 
@@ -159,7 +159,7 @@ tier_3: [
 ### 3.1 Secondary Market Rules (`STRICT_RULES.md`)
 
 #### Mandatory Requirements
-- **Threshold**: MUST have confidence score of 76% or higher
+- **Threshold**: MUST have confidence score of 72% or higher
 - **Volume Limit**: Strictly limited to MAXIMUM of 4 secondary markets per match
 - **Database Enforcement**: Enforced at DB level via schema objects (allowlist table + triggers)
 
@@ -169,7 +169,7 @@ tier_3: [
 - **Goals Totals**: Over 0.5, 1.5, 2.5, 3.5 | Under 2.5, 3.5
 - **Team Totals**: Home Over 0.5, 1.5 | Away Over 0.5, 1.5
 - **BTTS**: YES, NO, BTTS & O2.5, BTTS & U3.5, Win & BTTS YES, Win & BTTS NO
-- **Defensive/Low Risk**: Under 3.5, 4.5 | Over 1.5 | Home/Away Team Over 0.5 | DC + U3.5, DC + O1.5
+- **Defensive/Low Risk**: Under 3.5, 4.5 | Over 1.5 | Home/Away Team Over 0.5
 - **Half Markets**: Over 0.5 FH, Under 1.5 FH, FH Draw, Home/Away Win Either Half
 - **Corners**: Over 6.5 through 12.5 | Under 7.5 through 12.5
 - **Cards**: Over 1.5 through 6.5 | Under 1.5 through 6.5
@@ -469,8 +469,8 @@ $$ LANGUAGE plpgsql;
 4. **Stage 4 (Decision Engine)**: "Final confidence: Y% due to综合因素"
 
 #### Risk Messaging Rules
-- **59% - 69%**: Must classify Direct 1X2 as high risk and advise pivot to Secondary Insights
-- **0% - 58%**: Must classify Direct 1X2 as extreme risk and explicitly instruct NOT to bet direct
+- **30% - 54%**: Must classify Direct 1X2 as high risk and advise pivot to Secondary Insights
+- **0% - 29%**: Must classify Direct 1X2 as extreme risk and explicitly instruct NOT to bet direct
 
 ### 9.2 Context Intelligence Pipeline (`backend/src/services/contextIntelligence/aiPipeline_core.js`)
 
@@ -581,9 +581,9 @@ function formatMarketLabel(marketKey, predictionKey) {
 ### 11.2 Risk Color Coding
 ```javascript
 function getRiskColor(confidence) {
-    if (confidence >= 80) return 'green';    // High Confidence
-    if (confidence >= 70) return 'blue';     // Moderate Risk
-    if (confidence >= 59) return 'orange';    // High Risk
+    if (confidence >= 75) return 'green';    // Low Risk
+    if (confidence >= 55) return 'blue';     // Medium Risk
+    if (confidence >= 30) return 'orange';   // High Risk
     return 'red';                             // Extreme Risk
 }
 ```
@@ -620,7 +620,7 @@ const ACTIVE_SPORTS = {
 
 ### 13.1 Market Validation Rules
 - **Red Card Markets**: BANNED (red_cards_over_0_5, red_cards_under_0_5, etc.)
-- **Minimum Confidence**: 76% for all secondary markets
+- **Minimum Confidence**: 72% for all secondary markets
 - **Maximum Secondary Markets**: 4 per fixture
 - **Database Enforcement**: All rules enforced at schema level
 
@@ -698,11 +698,11 @@ This comprehensive report documents EVERY football rule, algorithm, constraint, 
 10. ✅ **Compliance Framework** with validation and enforcement
 
 ### **Critical Numbers:**
-- **76%**: Minimum confidence for secondary markets
+- **72%**: Minimum confidence for secondary markets
 - **4**: Maximum secondary insights per match
-- **80%**: High confidence threshold
-- **59%**: High risk threshold requiring secondary insights
-- **58%**: Extreme risk threshold with mandatory warnings
+- **75%**: High confidence threshold
+- **30%**: High risk threshold requiring secondary insights
+- **29%**: Extreme risk threshold with mandatory warnings
 - **66**: Target football leagues
 - **360**: Sync interval in minutes
 

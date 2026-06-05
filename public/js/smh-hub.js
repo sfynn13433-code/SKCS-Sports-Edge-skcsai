@@ -753,7 +753,8 @@ function getRiskColor(riskTier) {
 // Master Rulebook Secondary Market Selection
 function selectSecondaryMarkets(mainConfidence, allMarkets) {
   const categories = {
-    "Double Chance / Draw No Bet": ["double_chance_1x", "double_chance_x2", "double_chance_12", "dnb_home", "dnb_away", "1x", "x2", "12", "home_or_draw", "draw_or_away", "home_or_away"],
+    "Double Chance": ["double_chance_1x", "double_chance_x2", "double_chance_12", "1x", "x2", "12", "home_or_draw", "draw_or_away", "home_or_away"],
+    "Draw No Bet": ["dnb_home", "dnb_away"],
     "Goals": ["over_0_5_goals", "over_1_5_goals", "over_2_5_goals", "over_3_5_goals", "under_2_5_goals", "under_3_5_goals", "btts_yes", "btts_no", "team_total_over", "team_total_under"],
     "Corners": ["corners_over_8_5", "corners_over_9_5", "corners_over_10_5", "corners_under_8_5", "corners_under_9_5", "corners_under_10_5", "team_corners_over", "team_corners_under"],
     "Cards": ["yellow_cards_over_2_5", "yellow_cards_under_2_5", "yellow_cards_over_3_5", "yellow_cards_under_3_5", "red_cards_over_0_5", "red_cards_under_0_5", "total_cards_over", "total_cards_under"],
@@ -761,17 +762,17 @@ function selectSecondaryMarkets(mainConfidence, allMarkets) {
     "Team Win Either Half": ["home_win_either_half", "away_win_either_half", "team_win_either_half"]
   };
 
-  // Step 1: Primary rule – markets >= 80%
-  let candidates = allMarkets.filter(m => (m.confidence || 0) >= 80);
+  // Step 1: Primary rule – markets >= 72%
+  let candidates = allMarkets.filter(m => (m.confidence || 0) >= 72);
 
   // Step 2: Safe Haven fallback
-  const fallbackTriggered = mainConfidence < 80 && candidates.length === 0 && mainConfidence >= 30;
+  const fallbackTriggered = mainConfidence < 72 && candidates.length === 0 && mainConfidence >= 30;
   if (fallbackTriggered) {
     candidates = allMarkets.filter(m => {
       const marketName = String(m.market || m.prediction || '').toLowerCase().replace(/\s+/g, '_');
       const isSafeHaven = Object.values(categories).flat().includes(marketName);
       const confidence = m.confidence || 0;
-      return isSafeHaven && confidence > mainConfidence && confidence >= 75;
+      return isSafeHaven && confidence > mainConfidence && confidence >= 72;
     });
   }
 
@@ -800,8 +801,8 @@ function selectSecondaryMarkets(mainConfidence, allMarkets) {
 function getBotMessage(mainConfidence, fallbackTriggered) {
   const tier = getRiskTier(mainConfidence);
   if (fallbackTriggered) {
-    return `While the main market carries a ${tier.toLowerCase()} level of confidence (${mainConfidence}%), here are safer markets that cross the low‑risk threshold of 75%.`;
-  } else if (mainConfidence >= 80) {
+    return `While the main market carries a ${tier.toLowerCase()} level of confidence (${mainConfidence}%), here are safer markets that cross the low‑risk threshold of 72%.`;
+  } else if (mainConfidence >= 72) {
     return `Strong main prediction (${mainConfidence}%). Consider these additional low‑risk options.`;
   } else if (mainConfidence >= 55) {
     return `Main prediction confidence is moderate (${mainConfidence}%). Check the secondary picks below for alternative options.`;
@@ -891,11 +892,7 @@ function selectDoubleChanceCombos(mainPick, prob1X2, probOver1_5, probOver2_5, p
   // 2. Calculate combined confidence and assign tiers (Master Rulebook v2.0)
   allowed.forEach(c => {
     c.confidence = computeCombinedConf(c.P_A, c.P_B, c.pairKey);
-    // Tier thresholds (Master Rulebook v2.0 — Double Chance Combos)
-    // Tier 1 (Safe):     ≥ 60%
-    // Tier 2 (Moderate): 50–59%
-    // Tier 3 (Risky):    20–49%
-    // Suppressed:         < 20%
+    // Combo-specific tiers (separate from the main direct/secondary risk bands)
     c.tier = c.confidence >= 0.60 ? 1 : c.confidence >= 0.50 ? 2 : c.confidence >= 0.20 ? 3 : 0;
   });
 

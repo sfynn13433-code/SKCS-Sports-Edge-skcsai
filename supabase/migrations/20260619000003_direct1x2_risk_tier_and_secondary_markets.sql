@@ -52,9 +52,9 @@ BEGIN
 
         UPDATE public.direct1x2_prediction_final
         SET risk_tier = CASE
-            WHEN confidence >= 80 THEN 'HIGH_CONFIDENCE'::public.risk_tier_enum
-            WHEN confidence >= 70 THEN 'MODERATE_RISK'::public.risk_tier_enum
-            WHEN confidence >= 59 THEN 'HIGH_RISK'::public.risk_tier_enum
+            WHEN confidence >= 75 THEN 'HIGH_CONFIDENCE'::public.risk_tier_enum
+            WHEN confidence >= 55 THEN 'MODERATE_RISK'::public.risk_tier_enum
+            WHEN confidence >= 30 THEN 'HIGH_RISK'::public.risk_tier_enum
             ELSE 'EXTREME_RISK'::public.risk_tier_enum
         END
         WHERE risk_tier IS NULL

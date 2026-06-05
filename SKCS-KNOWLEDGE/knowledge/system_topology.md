@@ -1,5 +1,9 @@
 # SKCS System Topology
 
+## Current topology note
+
+SKCS uses one canonical read path for the UI, but multiple provider inputs can feed the system through controlled normalization and publish steps. Raw provider payloads are not the source of truth.
+
 ## High-level flow
 
 External APIs
@@ -29,6 +33,8 @@ External APIs
 
 - Canonical identity and history
   - `skcs_teams`, `team_identity_map`, `team_aliases`, `match_results`
+- Canonical football truth
+  - `football_canonical_events`, `canonical_events`
 - Deterministic scoring layer
   - `team_form`, `team_strength`, `head_to_head`, `injury_impact`, `volatility_factors`, `prediction_scores`
 - Publication layer
@@ -42,12 +48,14 @@ External APIs
 
 - The website should read from the publication view, not directly from raw ingestion tables.
 - The deterministic layer should be treated as the authoritative business logic where possible.
+- The frontend must read only from published, canonical rows, not raw provider payloads.
 
 ## Write path
 
 - External data is ingested into raw or canonical tables.
 - Deterministic SQL functions derive scores.
 - Publication tables and views expose the final result.
+- Providers are inputs. Canonical storage is truth. UI is read-only.
 
 ## Important topology note
 

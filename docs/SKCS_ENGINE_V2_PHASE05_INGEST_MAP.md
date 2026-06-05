@@ -5,9 +5,13 @@
 
 **Enforcement:** `docs/canonical_ingest_firewall.spec.md` + `backend/services/canonicalIngestFirewall.js`
 
+## Current state
+
+This map is a source-shape diagnosis and routing audit, not a statement that only one provider can ever appear in the runtime. The key question is whether a row matches the accepted canonical shape for the active ingest path.
+
 ## Executive summary
 
-`football_canonical_events.raw_provider_data` is **not** failing because Poisson or identity logic is wrong. It fails because **the wrong objects are being stored as “canonical”**:
+`football_canonical_events.raw_provider_data` is **not** failing because Poisson or identity logic is wrong. It fails because **the wrong objects are being stored as “canonical”** or the canonical table wiring is out of sync with the deployed runtime:
 
 | Provider stored | Rows | Has `teams.home.id` | Has `goals` |
 |-----------------|-----:|--------------------:|------------:|
@@ -18,7 +22,7 @@
 
 \* Scores require a **finished-fixture refresh** from API-Sports (`goals` block is often empty on upcoming fixture pulls).
 
-Live DB: `canonical_events` **does not exist**; production table is `football_canonical_events` (5,877 rows).
+Live DB: the deployed canonical football schema and its current table wiring must stay aligned with the runtime ingest path.
 
 ---
 
@@ -165,12 +169,12 @@ Valid for provider `thesportsdb` mapping; V2 SQL expecting `teams.home.id` must 
 
 | # | Change | File |
 |---|--------|------|
-| 1 | **Skip** `upsertCanonicalEvents` when `provider === 'odds-api'` (or no `fixture.id` / no `teams.home.id`) | `canonicalEvents.js` |
-| 2 | Pass **`rawMatch`** to canonical upsert, not `normalized`, **or** force `p_raw_payload` from `rawMatch.raw_provider_data` only if API-shaped | `syncService.js` |
-| 3 | Prefer API-Sports for football canonical; raise `minFixturesTarget` fallback threshold before Odds fills sync batch | `dataProvider.js` |
+| 1 | Skip `upsertCanonicalEvents` when the row is not API-shaped for the active ingest path | `canonicalEvents.js` |
+| 2 | Pass the raw SportsDataIO row through the controlled display/context path only when explicitly authorized | `syncService.js` |
+| 3 | Prefer API-Sports for canonical truth, but keep SportsDataIO fixture/context support available in the runtime display path | `dataProvider.js` |
 | 4 | Finished scores: post-sync job `GET /fixtures?id=` for FT fixtures → merge `goals` into payload | new `scripts/refresh-canonical-results.js` |
-| 5 | Unify table target: RPC or insert into `football_canonical_events` | migration / `canonicalEvents.js` |
-| 6 | `render.yaml` hourly Python: `DISABLE_APISPORTS=true` **blocks** API-Sports on that cron — do not use that job for canonical truth | ops |
+| 5 | Keep the table target aligned with the deployed schema (`football_canonical_events` / `canonical_events` as applicable) | migration / `canonicalEvents.js` |
+| 6 | Do not let `DISABLE_APISPORTS=true` or similar cron flags silently redefine canonical truth | ops |
 
 ---
 
@@ -195,4 +199,4 @@ Phase 1+    team_strength → probabilities (unchanged)
 
 ## One-line truth
 
-> Canonical ingest stores **betting events** (~81% Odds API) instead of **API-Sports fixtures** (~3%). Fix source gating, not fuzzy team names.
+> Canonical ingest must store the correct fixture shape for the active truth path. Fix source gating and table wiring first; do not use fuzzy team matching to compensate for schema drift.

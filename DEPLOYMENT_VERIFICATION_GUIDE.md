@@ -196,7 +196,7 @@ curl -X GET "http://localhost:10000/api/v1/matches/test_high_conf_001/prediction
 }
 ```
 
-**Verification:** Safe Haven not triggered, all secondary ≥80%
+**Verification:** Safe Haven not triggered, all secondary ≥72%
 
 ---
 
@@ -319,7 +319,7 @@ node scripts/deployment_verification.js
 ✅ Extreme Risk Trigger: 29% prediction automatically unpublished
 ✅ Secondary Market Limit: 5th market correctly rejected
 ✅ Safe Haven Fallback: Triggered correctly with proper market selection
-✅ High Confidence Main: Safe Haven not triggered, secondary >=80%
+✅ High Confidence Main: Safe Haven not triggered, secondary >=72%
 ✅ ACCA Confidence Validation: 74.9% rejected, 75% accepted
 ✅ ACCA Correlation Validation: High correlation legs rejected
 ✅ Frontend Colors: Green (Low), Yellow (Medium), Orange (High) verified
@@ -396,7 +396,7 @@ WHERE total_fallbacks > 0
   AND (empty_count::NUMERIC / NULLIF(total_fallbacks, 0)) > 0.05;
 ```
 
-### ACCA Success Rate < 80%
+### ACCA Success Rate < 75%
 ```sql
 -- Alert query
 SELECT 
@@ -405,7 +405,7 @@ SELECT
 FROM acca_build_log
 WHERE created_at >= CURRENT_DATE - INTERVAL '1 day'
 GROUP BY DATE(created_at)
-HAVING (SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) < 80;
+HAVING (SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) < 75;
 ```
 
 ### API Response Time P95 > 1000ms
@@ -467,7 +467,7 @@ HAVING PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY response_time_ms) > 1000;
 
 **Post-Deployment Monitoring:**
 - Watch Safe Haven empty rate (target: < 5%)
-- Monitor ACCA success rate (target: > 80%)
+- Monitor ACCA success rate (target: > 75%)
 - Track API response times (target: P95 < 1000ms)
 - Verify risk tier distribution matches expectations
 

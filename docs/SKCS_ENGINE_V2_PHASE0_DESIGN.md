@@ -4,6 +4,10 @@
 **Date:** 2026-05-31  
 **Supersedes:** Text-first identity (`events` aliasing as primary path)
 
+## Current runtime note
+
+This design document describes the V2 identity and results spine. It should be read alongside the ingest/firewall docs so provider semantics, replay rules, and controlled SportsDataIO display support are not conflated.
+
 ---
 
 ## Constraint (data reality, not preference)

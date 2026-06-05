@@ -704,11 +704,11 @@ function buildEdgeMindFallbackReport(fixture, outcome, confidence) {
     const market = outcomeLabel(outcome);
     
     let action = '';
-    if (confidence >= 80) {
+    if (confidence >= 75) {
         action = `Final confidence score: **${Math.round(confidence)}%**. Decision: Proceed with standard stake on ${market}.`;
-    } else if (confidence >= 70) {
+    } else if (confidence >= 55) {
         action = `Final confidence score: **${Math.round(confidence)}%**. Decision: Keep ${market} as the direct angle with controlled stake sizing.`;
-    } else if (confidence >= 59) {
+    } else if (confidence >= 30) {
         action = `Final confidence score: **${Math.round(confidence)}%**. ⚠️ ADVISORY: The Direct 1X2 market is classified as HIGH RISK and volatile. 💡 RECOMMENDATION: Pivot to the Secondary Insights below for safer options.`;
     } else {
         action = `Final confidence score: **${Math.round(confidence)}%**. 🛑 CRITICAL WARNING: The Direct 1X2 market is EXTREME RISK. 🚫 ACTION REQUIRED: Do NOT place a direct market bet on this fixture. Use the 4 Secondary Insights instead.`;

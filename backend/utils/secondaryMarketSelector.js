@@ -4,9 +4,6 @@ const { FOOTBALL_RULES } = require('../config/footballRules');
 
 // Allowed markets (explicitly excludes red cards and full-match over_0_5).
 const ALLOWED_MARKETS = Object.freeze([
-    { market: 'double_chance_1x', category: 'double_chance' },
-    { market: 'double_chance_x2', category: 'double_chance' },
-    { market: 'double_chance_12', category: 'double_chance' },
     { market: 'draw_no_bet_home', category: 'dnb' },
     { market: 'draw_no_bet_away', category: 'dnb' },
     { market: 'over_1_5', category: 'goals' },

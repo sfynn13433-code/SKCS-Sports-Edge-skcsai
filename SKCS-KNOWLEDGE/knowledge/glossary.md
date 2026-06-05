@@ -23,6 +23,6 @@
 - Volatility
   - The instability or risk measure applied to a market or fixture.
 - Secondary market
-  - A side market such as double chance, DNB, totals, or BTTS.
+  - A side market such as DNB, totals, BTTS, corners, cards, or first-half markets. Double Chance is its own separate market group, and Same Match Builder is tracked separately as 4 / 6 / 8.
 - Knowledge layer
   - The documentation system that prevents architectural drift across AI tools.

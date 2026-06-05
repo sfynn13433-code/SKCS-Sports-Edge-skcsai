@@ -48,13 +48,13 @@ FAILURE TO FOLLOW THESE RULES WILL RESULT IN CASCADING SYSTEM FAILURES. READ, VE
 * **Allowed:** Home Win (1), Away Win (2), Draw (X).
 * **Confidence Range:** Direct 1X2 accepts the full range from **0% to 100%**.
 * **4-Tier Risk Framework (MANDATORY):**
-  * **80% - 100%:** ✅ High Confidence / Safe (Green)
-  * **70% - 79%:** 📊 Moderate Risk (Blue)
-  * **59% - 69%:** ⚠️ High Risk / Volatile (Orange) — Backend MUST flag as High Risk and attach secondary insights. UI and EdgeMind Bot MUST warn users to pivot to Secondary Insights.
-  * **0% - 58%:** 🛑 Extreme Risk / Danger (Red) — Backend MUST flag as Extreme Risk and enforce payload with **exactly 4 top Secondary Insights**. UI and EdgeMind Bot MUST explicitly instruct users NOT to bet the direct market and to use the 4 Secondary Insights.
+  * **75% - 100%:** ✅ High Confidence / Safe (Green)
+  * **55% - 74%:** 📊 Moderate Risk (Blue)
+  * **30% - 54%:** ⚠️ High Risk / Volatile (Orange) — Backend MUST flag as High Risk and attach secondary insights. UI and EdgeMind Bot MUST warn users to pivot to Secondary Insights.
+  * **0% - 29%:** 🛑 Extreme Risk / Danger (Red) — Backend MUST flag as Extreme Risk and enforce payload with **exactly 4 top Secondary Insights**. UI and EdgeMind Bot MUST explicitly instruct users NOT to bet the direct market and to use the 4 Secondary Insights.
 
 **3. Secondary Market Rules:**
-* **Thresholds:** MUST have a confidence score of 76% or higher.
+* **Thresholds:** MUST have a confidence score of 72% or higher.
 * **Volume Limit:** Strictly limited to a MAXIMUM of 4 secondary markets per match.
 * **Allowed Markets (STRICT ALLOWLIST - NO EXCEPTIONS):**
   * Double Chance: 1X, X2, 12
@@ -76,5 +76,5 @@ FAILURE TO FOLLOW THESE RULES WILL RESULT IN CASCADING SYSTEM FAILURES. READ, VE
   3. **Stage 3 (Reality Check):** Explain adjustments based on external volatility (weather, news).
   4. **Stage 4 (Decision Engine):** State the final confidence percentage.
 * **Risk Messaging Rules (CRITICAL):**
-  * If final confidence is **59% - 69%**, the report MUST classify Direct 1X2 as high risk/volatile and advise a pivot to Secondary Insights.
-  * If final confidence is **0% - 58%**, the report MUST classify Direct 1X2 as extreme risk and explicitly instruct the user not to bet the direct market and to use Secondary Insights instead.
+  * If final confidence is **30% - 54%**, the report MUST classify Direct 1X2 as high risk/volatile and advise a pivot to Secondary Insights.
+  * If final confidence is **0% - 29%**, the report MUST classify Direct 1X2 as extreme risk and explicitly instruct the user not to bet the direct market and to use Secondary Insights instead.

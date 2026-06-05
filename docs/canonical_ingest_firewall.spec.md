@@ -4,6 +4,10 @@
 
 ## Status: ACTIVE DESIGN CONTRACT (pre-migration)
 
+## Runtime note
+
+This spec describes the canonical football truth boundary and the controlled ingest path that writes to it. SportsDataIO may contribute only through an explicit authorized fixture/context path when the runtime allows it.
+
 ---
 
 ## 1. Purpose
@@ -27,7 +31,9 @@ It enforces that **SKCS Engine V2 cannot learn from corrupted or mixed-signal in
 ### Canonical truth source
 
 ```text
-API-Sports (primary and only allowed canonical football source)
+Canonical football truth is written only by the approved ingest path.
+API-Sports remains the strict historical baseline for canonical fixture identity.
+Authorized SportsDataIO fixtures may be surfaced only through a separate controlled display/context path when explicitly enabled.
 ```
 
 ---
@@ -53,7 +59,7 @@ API-Sports (primary and only allowed canonical football source)
 }
 ```
 
-**HARD RULE — reject if missing:**
+**HARD RULE — reject if the row does not match the accepted canonical fixture shape for the active ingest path:**
 
 - `fixture.id`
 - `teams.home.id`
@@ -108,7 +114,7 @@ if (!isAllowedCanonicalProvider(provider)) {
 }
 ```
 
-**Exception:** None for football canonical.
+**Exception:** Only if the runtime explicitly enables a controlled SportsDataIO display/context path and the payload still satisfies the accepted canonical fixture shape.
 
 ### 4.3 Routing rules
 
@@ -116,6 +122,7 @@ if (!isAllowedCanonicalProvider(provider)) {
 |----------|-------------|
 | API-Sports | `football_canonical_events` |
 | Odds API | `events` |
+| SportsDataIO | Authorized fixture/context path only, when explicitly enabled |
 | FootballData | Rejected from canonical (enrichment later) |
 | TheSportsDB | Rejected from canonical (enrichment later) |
 

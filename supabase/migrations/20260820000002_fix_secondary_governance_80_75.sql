@@ -1,7 +1,7 @@
--- Fix secondary governance trigger to enforce 80% for primary, 75% for safe haven
+-- Fix secondary governance trigger to enforce a 72% secondary floor
 -- This aligns the trigger with Master Rulebook v2 requirements
 
--- Update the governance trigger to differentiate between primary and safe haven secondary markets
+-- Update the governance trigger to keep the safe-haven branch but use a single 72% floor
 CREATE OR REPLACE FUNCTION public.trg_enforce_secondary_market_governance()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -22,8 +22,8 @@ DECLARE
     v_market_text TEXT;
     v_conf NUMERIC;
     v_existing_secondary_count INT := 0;
-    v_min_primary_secondary_conf CONSTANT NUMERIC := 80; -- Master Rulebook v2: primary secondary min 80%
-    v_min_safe_haven_conf CONSTANT NUMERIC := 75; -- Master Rulebook v2: safe haven min 75%
+    v_min_primary_secondary_conf CONSTANT NUMERIC := 72; -- Master Rulebook v2: secondary min 72%
+    v_min_safe_haven_conf CONSTANT NUMERIC := 72; -- Master Rulebook v2: safe haven min 72%
     v_max_secondary_count CONSTANT INT := 4;
     v_is_safe_haven BOOLEAN;
 BEGIN

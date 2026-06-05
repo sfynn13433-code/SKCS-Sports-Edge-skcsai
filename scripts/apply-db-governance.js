@@ -16,7 +16,7 @@ async function applyGovernance() {
                OR edgemind_report LIKE '%projects % on DRAW.%'
                OR edgemind_report LIKE '%projects % on HOME WIN.%'
                OR edgemind_report LIKE '%projects % on AWAY WIN.%'
-               OR (total_confidence <= 58 AND COALESCE(jsonb_array_length(secondary_insights), 0) < 4)
+               OR (total_confidence <= 29 AND COALESCE(jsonb_array_length(secondary_insights), 0) < 4)
         `);
         console.log(`✅ Deleted ${res1.rowCount} bad placeholder rows from direct1x2_prediction_final`);
 
@@ -83,9 +83,9 @@ async function applyGovernance() {
                 sec_market TEXT;
                 is_valid_market BOOLEAN;
             BEGIN
-                IF NEW.total_confidence <= 58 THEN
+                IF NEW.total_confidence <= 29 THEN
                     IF NEW.secondary_insights IS NULL OR jsonb_array_length(NEW.secondary_insights) != 4 THEN
-                        RAISE EXCEPTION 'DB_ENFORCEMENT: Extreme Risk (<=58%%) requires EXACTLY 4 secondary insights. Found: %', COALESCE(jsonb_array_length(NEW.secondary_insights), 0);
+                        RAISE EXCEPTION 'DB_ENFORCEMENT: Extreme Risk (<=29%%) requires EXACTLY 4 secondary insights. Found: %', COALESCE(jsonb_array_length(NEW.secondary_insights), 0);
                     END IF;
                 END IF;
                 IF NEW.secondary_insights IS NOT NULL AND jsonb_array_length(NEW.secondary_insights) > 4 THEN
@@ -95,7 +95,7 @@ async function applyGovernance() {
                     FOR sec_record IN SELECT * FROM jsonb_array_elements(NEW.secondary_insights) LOOP
                         sec_conf := (sec_record->>'confidence')::INT;
                         sec_market := COALESCE(sec_record->>'prediction', sec_record->>'market', sec_record->>'label');
-                        IF sec_conf < 76 THEN RAISE EXCEPTION 'DB_ENFORCEMENT: Secondary insight confidence must be >= 76%%. Found % for market %', sec_conf, sec_market; END IF;
+                        IF sec_conf < 72 THEN RAISE EXCEPTION 'DB_ENFORCEMENT: Secondary insight confidence must be >= 72%%. Found % for market %', sec_conf, sec_market; END IF;
                         SELECT EXISTS(SELECT 1 FROM secondary_markets_allowlist WHERE LOWER(REPLACE(market_name, '-', '')) = LOWER(REPLACE(sec_market, '-', '')) OR LOWER(REPLACE(market_name, '_', ' ')) = LOWER(REPLACE(sec_market, '_', ' '))) INTO is_valid_market;
                         IF NOT is_valid_market THEN RAISE EXCEPTION 'DB_ENFORCEMENT: Secondary market "%" is not in the strict allowlist.', sec_market; END IF;
                     END LOOP;
@@ -120,15 +120,15 @@ async function applyGovernance() {
             BEGIN
                 IF NEW.type = 'direct' THEN
                     sec_array := NEW.matches->0->'metadata'->'secondary_markets';
-                    IF NEW.total_confidence <= 58 THEN
-                        IF sec_array IS NULL OR jsonb_array_length(sec_array) != 4 THEN RAISE EXCEPTION 'DB_ENFORCEMENT: Extreme Risk (<=58%%) requires EXACTLY 4 secondary insights.'; END IF;
+                    IF NEW.total_confidence <= 29 THEN
+                        IF sec_array IS NULL OR jsonb_array_length(sec_array) != 4 THEN RAISE EXCEPTION 'DB_ENFORCEMENT: Extreme Risk (<=29%%) requires EXACTLY 4 secondary insights.'; END IF;
                     END IF;
                     IF sec_array IS NOT NULL AND jsonb_array_length(sec_array) > 4 THEN RAISE EXCEPTION 'DB_ENFORCEMENT: Strict limit of MAXIMUM 4 secondary insights exceeded.'; END IF;
                     IF sec_array IS NOT NULL AND jsonb_array_length(sec_array) > 0 THEN
                         FOR sec_record IN SELECT * FROM jsonb_array_elements(sec_array) LOOP
                             sec_conf := (sec_record->>'confidence')::INT;
                             sec_market := COALESCE(sec_record->>'prediction', sec_record->>'market', sec_record->>'label');
-                            IF sec_conf < 76 THEN RAISE EXCEPTION 'DB_ENFORCEMENT: Secondary insight confidence must be >= 76%%. Found %', sec_conf; END IF;
+                            IF sec_conf < 72 THEN RAISE EXCEPTION 'DB_ENFORCEMENT: Secondary insight confidence must be >= 72%%. Found %', sec_conf; END IF;
                             SELECT EXISTS(SELECT 1 FROM secondary_markets_allowlist WHERE LOWER(REPLACE(market_name, '-', '')) = LOWER(REPLACE(sec_market, '-', '')) OR LOWER(REPLACE(market_name, '_', ' ')) = LOWER(REPLACE(sec_market, '_', ' '))) INTO is_valid_market;
                             IF NOT is_valid_market THEN RAISE EXCEPTION 'DB_ENFORCEMENT: Secondary market "%" is not in the strict allowlist.', sec_market; END IF;
                         END LOOP;

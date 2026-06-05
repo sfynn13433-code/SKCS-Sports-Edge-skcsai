@@ -1,4 +1,4 @@
--- Align DB risk thresholds to 75/55/30 and set secondary min confidence to 75%
+-- Align DB risk thresholds to 75/55/30 and set secondary min confidence to 72%
 -- - Updates trg_enforce_secondary_market_governance()
 -- - Reclassifies risk_tier on direct1x2_prediction_final
 
@@ -24,7 +24,7 @@ DECLARE
     v_conf NUMERIC;
     v_existing_secondary_count INT := 0;
     -- New thresholds
-    v_min_secondary_conf CONSTANT NUMERIC := 75; -- changed from 76
+    v_min_secondary_conf CONSTANT NUMERIC := 72;
     v_max_secondary_count CONSTANT INT := 4;
 BEGIN
     IF jsonb_typeof(v_matches) = 'array' AND jsonb_array_length(v_matches) > 0 THEN
@@ -141,7 +141,7 @@ BEGIN
                 v_conf := COALESCE(public.skcs_to_numeric_safe(v_item->>'confidence', NULL), 0);
 
                 IF v_conf < v_min_secondary_conf THEN
-                    RAISE EXCEPTION 'SKCS Secondary Governance: attached secondary confidence % is below required %.',
+                RAISE EXCEPTION 'SKCS Secondary Governance: attached secondary confidence % is below required %.',
                         v_conf, v_min_secondary_conf;
                 END IF;
 

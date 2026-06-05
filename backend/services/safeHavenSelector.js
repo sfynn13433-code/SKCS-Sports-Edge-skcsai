@@ -1,5 +1,5 @@
 // Safe Haven Market Selector for SKCS Master Rulebook
-// Implements fallback logic when main confidence < 80% and no secondary markets >=80%
+// Implements fallback logic when main confidence < 72% and no secondary markets >=72%
 
 'use strict';
 
@@ -7,8 +7,7 @@ const { getStandardSecondaryMarkets } = require('./marketIntelligence');
 
 // Safe Haven Market List (from Master Rulebook)
 const SAFE_HAVEN_MARKETS = new Set([
-    // Double Chance / Draw No Bet
-    'double_chance_1x', 'double_chance_x2', 'double_chance_12',
+    // Draw No Bet only; Double Chance is a separate market group
     'draw_no_bet_home', 'draw_no_bet_away',
     
     // Goals Totals
@@ -36,8 +35,7 @@ const SAFE_HAVEN_MARKETS = new Set([
 
 // Market Categories for Best-in-Category Selection
 const MARKET_CATEGORIES = {
-    'Double Chance / Draw No Bet': [
-        'double_chance_1x', 'double_chance_x2', 'double_chance_12',
+        'Draw No Bet': [
         'draw_no_bet_home', 'draw_no_bet_away'
     ],
     'Goals (Totals & Team)': [
@@ -103,8 +101,8 @@ function selectSafeHavenMarkets(mainConfidence, allMarkets = []) {
             return false;
         }
         
-        // Must have confidence >= 75%
-        if (confidence < 75) {
+        // Must have confidence >= 72%
+        if (confidence < 72) {
             return false;
         }
         
@@ -155,14 +153,14 @@ function selectSafeHavenMarkets(mainConfidence, allMarkets = []) {
  * @returns {boolean} Whether Safe Haven fallback should be triggered
  */
 function shouldTriggerSafeHaven(mainConfidence, secondaryMarkets = []) {
-    // Trigger if main confidence < 80%
-    if (mainConfidence >= 80) {
+    // Trigger if main confidence < 72%
+    if (mainConfidence >= 72) {
         return false;
     }
     
-    // And no secondary markets with confidence >= 75%
+    // And no secondary markets with confidence >= 72%
     const hasHighConfidenceSecondary = secondaryMarkets.some(market => 
-        Number(market.confidence || 0) >= 75
+        Number(market.confidence || 0) >= 72
     );
     
     return !hasHighConfidenceSecondary;
@@ -176,7 +174,7 @@ function shouldTriggerSafeHaven(mainConfidence, secondaryMarkets = []) {
 function generateSafeHavenMessage(mainConfidence) {
     const riskLevel = getRiskLevel(mainConfidence);
     
-    return `While the main market carries a ${riskLevel.toLowerCase()} level of confidence, here are safer markets that cross the low-risk threshold of 75%.`;
+    return `While the main market carries a ${riskLevel.toLowerCase()} level of confidence, here are safer markets that cross the low-risk threshold of 72%.`;
 }
 
 /**
@@ -219,9 +217,9 @@ function normalizeMarketKey(market) {
  * @returns {Object} Selection result with fallback info
  */
 function selectSecondaryMarkets(mainConfidence, allMarkets = []) {
-    // Primary rule: markets with confidence >= 75%
+    // Primary rule: markets with confidence >= 72%
     const highConfidenceMarkets = allMarkets.filter(market => 
-        Number(market.confidence || 0) >= 75
+        Number(market.confidence || 0) >= 72
     );
     
     let selectedMarkets = [];

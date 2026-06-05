@@ -62,7 +62,7 @@ function generateSmartCombos(markets) {
         if (!isValidCombination(legs)) continue;
 
         const confidence = combinedConfidence(legs);
-        if (confidence < 70) continue;
+        if (confidence < 72) continue;
 
         out.push({
             type: 'SMART_COMBO',

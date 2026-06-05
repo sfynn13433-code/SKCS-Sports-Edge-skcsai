@@ -25,3 +25,5 @@
 - Document first.
 - Change second.
 - Audit third.
+- Run `npm run verify:rulebook` before merging rule-related changes to catch legacy `80/70/59` or `76%` drift.
+- Run `npm run install:hooks` once per clone to enable the local pre-commit guard (no GitHub Actions billing).
