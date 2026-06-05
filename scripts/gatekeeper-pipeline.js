@@ -10,6 +10,7 @@
 require('dotenv').config();
 const { pool } = require('../backend/database');
 const { generateInsight } = require('../backend/services/aiProvider');
+const { executeOperation } = require('../backend/core/executionPipeline');
 const { filterSecondaryMarkets, generateEdgeMindReport } = require('./secondary-market-gatekeeper');
 
 const TARGET_DATE = '2026-04-15';
@@ -280,18 +281,28 @@ async function generateAIPrediction(fixture) {
     const confidence = 55 + Math.floor(Math.random() * 40);
     
     try {
-        const insightData = await generateInsight({
-            home: fixture.homeTeam,
-            away: fixture.awayTeam,
-            league: fixture.league,
-            kickoff: fixture.kickoff,
-            market: market,
-            confidence: confidence,
-            formData: null,
-            h2h: null,
-            weather: null,
-            absences: null
+        const insightResult = await executeOperation({
+            operation: 'script.gatekeeper.generateInsight',
+            caller: 'scripts/gatekeeper-pipeline.js',
+            payload: {
+                fixture_id: fixture.fixture_id || fixture.id || null,
+                league: fixture.league,
+                market
+            },
+            execute: async () => generateInsight({
+                home: fixture.homeTeam,
+                away: fixture.awayTeam,
+                league: fixture.league,
+                kickoff: fixture.kickoff,
+                market: market,
+                confidence: confidence,
+                formData: null,
+                h2h: null,
+                weather: null,
+                absences: null
+            })
         });
+        const insightData = insightResult?.result;
         
         return {
             fixture_id: `${fixture.sport}_${TARGET_DATE}_${Date.now()}_${Math.random().toString(36).slice(2)}`,

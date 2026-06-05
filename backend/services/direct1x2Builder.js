@@ -6,6 +6,7 @@ const { selectSecondaryMarkets } = require('../utils/secondaryMarketSelector');
 const { generateInsight, isDolphinAvailable, isGroqAvailable } = require('./aiProvider');
 const { FOOTBALL_RULES } = require('../config/footballRules');
 const config = require('../config');
+const { executeOperation } = require('../core/executionPipeline');
 
 const SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
 const SUPABASE_KEY = String(
@@ -511,28 +512,37 @@ async function buildAndStoreDirect1X2(fixture, confidence, prediction, additiona
             // Pass api_probability instead of baseline to avoid "41% baseline" in prose
             const apiProbText = baseline ? `Home: ${baseline.home}%, Draw: ${baseline.draw}%, Away: ${baseline.away}%` : 'Not available';
             
-            const aiInsight = await generateInsight({
-                home: fixture?.home_team,
-                away: fixture?.away_team,
-                league: resolveLeagueName(fixture),
-                kickoff: fixture?.match_date || fixture?.commence_time,
-                market: marketName,
-                confidence: score,
-                formData: contextual?.leagueStats ? `League: ${contextual.leagueStats.matches} matches, Home win rate: ${(contextual.leagueStats.homeWinRate * 100).toFixed(1)}%` : null,
-                h2h: null,
-                weather: fixture?.weather || fixture?.weatherSummary,
-                absences: null,
-                api_probability: apiProbText, // Pass real API probability to prompt
-                telemetry: {
-                    pipeline_name: 'direct1x2Builder',
-                    task_name: 'generateInsight',
-                    budget_class: 'Important',
-                    knowledge_context: contextual?.leagueStats ? 'hybrid' : 'static',
-                    monthly_risk: 'High',
+            const insightResult = await executeOperation({
+                operation: 'direct1x2.generateInsight',
+                caller: 'backend/services/direct1x2Builder.js',
+                payload: {
                     fixture_id: fixture?.fixture_id || fixture?.id || null,
                     provider_chain: groqReady ? 'groq' : 'dolphin'
-                }
+                },
+                execute: async () => generateInsight({
+                    home: fixture?.home_team,
+                    away: fixture?.away_team,
+                    league: resolveLeagueName(fixture),
+                    kickoff: fixture?.match_date || fixture?.commence_time,
+                    market: marketName,
+                    confidence: score,
+                    formData: contextual?.leagueStats ? `League: ${contextual.leagueStats.matches} matches, Home win rate: ${(contextual.leagueStats.homeWinRate * 100).toFixed(1)}%` : null,
+                    h2h: null,
+                    weather: fixture?.weather || fixture?.weatherSummary,
+                    absences: null,
+                    api_probability: apiProbText,
+                    telemetry: {
+                        pipeline_name: 'direct1x2Builder',
+                        task_name: 'generateInsight',
+                        budget_class: 'Important',
+                        knowledge_context: contextual?.leagueStats ? 'hybrid' : 'static',
+                        monthly_risk: 'High',
+                        fixture_id: fixture?.fixture_id || fixture?.id || null,
+                        provider_chain: groqReady ? 'groq' : 'dolphin'
+                    }
+                })
             });
+            const aiInsight = insightResult?.result;
             
             if (aiInsight && aiInsight.edgemind_report) {
                 edgemindReport = aiInsight.edgemind_report;

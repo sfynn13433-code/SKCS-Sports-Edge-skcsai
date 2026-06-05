@@ -6,6 +6,7 @@ const path = require("path");require("dotenv").config({  path: path.resolve(__di
 
 const { createClient } = require('@supabase/supabase-js');
 const { generateInsight, isGroqAvailable } = require('./backend/services/aiProvider');
+const { executeOperation } = require('./backend/core/executionPipeline');
 
 const SUPABASE_URL =
   process.env.SUPABASE_URL ||
@@ -76,17 +77,26 @@ async function refreshAIInsights() {
 
         try {
             // Generate new AI insight
-            const aiInsight = await generateInsight({
-                home: p.home_team,
-                away: p.away_team,
-                kickoff: p.match_date,
-                market: p.prediction === 'home_win' ? 'Home Win' : p.prediction === 'draw' ? 'Draw' : 'Away Win',
-                confidence: p.confidence,
-                formData: `Confidence: ${p.confidence}%`,
-                h2h: null,
-                weather: null,
-                absences: null
+            const aiInsightResult = await executeOperation({
+                operation: 'script.refresh-ai-insights.generateInsight',
+                caller: 'refresh-ai-insights.js',
+                payload: {
+                    prediction_id: p.id,
+                    fixture_id: p.fixture_id || p.id || null
+                },
+                execute: async () => generateInsight({
+                    home: p.home_team,
+                    away: p.away_team,
+                    kickoff: p.match_date,
+                    market: p.prediction === 'home_win' ? 'Home Win' : p.prediction === 'draw' ? 'Draw' : 'Away Win',
+                    confidence: p.confidence,
+                    formData: `Confidence: ${p.confidence}%`,
+                    h2h: null,
+                    weather: null,
+                    absences: null
+                })
             });
+            const aiInsight = aiInsightResult?.result;
 
             if (aiInsight && aiInsight.edgemind_report && !aiInsight.edgemind_report.includes('Stage 2 Context: League matchup profile')) {
                 // Update in database

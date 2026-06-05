@@ -178,7 +178,12 @@ async function runRollingSync(label) {
     rollingSyncInProgress = true;
     try {
         console.log(`[cron] ${label}: starting rolling sync at ${now.format()} SAST`);
-        await syncAllSports();
+        await executeOperation({
+            operation: 'server.rolling-sync',
+            caller: 'backend/server-express.js',
+            payload: { label },
+            execute: async () => syncAllSports()
+        });
         console.log(`[cron] ${label}: rolling sync completed`);
     } catch (err) {
         console.error(`[cron] ${label}: rolling sync failed`, err.message);
@@ -1391,8 +1396,13 @@ app.get('/api/cron/cricket-daily-fixtures', verifyCronSecret, async (req, res) =
 
     try {
         const result = await runCronWithLog('cron_cricket_daily_fixtures', req, async () => {
-            return await publishCricbuzzCricket({
-                trigger: 'cron_cricket_daily_fixtures'
+            return await executeOperation({
+                operation: 'cron.cricket.daily-fixtures',
+                caller: 'backend/server-express.js',
+                payload: { trigger: 'cron_cricket_daily_fixtures' },
+                execute: async () => publishCricbuzzCricket({
+                    trigger: 'cron_cricket_daily_fixtures'
+                })
             });
         });
 

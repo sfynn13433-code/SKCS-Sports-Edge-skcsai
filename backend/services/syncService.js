@@ -6,6 +6,7 @@ const { upsertCanonicalEvents } = require('./canonicalEvents');
 const { assertRapidApiCacheWallReady } = require('./dataProviders');
 const { buildMatchContext } = require('./normalizerService');
 const quotaPlanner = require('./quotaPlanner');
+const { executeOperation } = require('../core/executionPipeline');
 const verificationController = require('../core/verificationController');
 const pipelineLogger = require('../utils/pipelineLogger');
 const config = require('../config');
@@ -599,12 +600,21 @@ async function syncSports(options = {}) {
                 if (normalizedMatches.length > 0) {
                     await upsertCanonicalEvents(normalizedMatches);
                     console.log(`[syncService] Found ${normalizedMatches.length} REAL matches for ${item.sport}. Running AI Analysis...`);
-                    const pipelineResult = await runPipelineForMatches({
-                        matches: normalizedMatches,
-                        telemetry: {
-                            run_id: telemetryRunId,
-                            sport: item.sport
-                        }
+                    const pipelineResult = await executeOperation({
+                        operation: 'syncService.runPipelineForMatches',
+                        caller: 'backend/services/syncService.js',
+                        payload: {
+                            sport: item.sport,
+                            matchCount: normalizedMatches.length,
+                            run_id: telemetryRunId
+                        },
+                        execute: async () => runPipelineForMatches({
+                            matches: normalizedMatches,
+                            telemetry: {
+                                run_id: telemetryRunId,
+                                sport: item.sport
+                            }
+                        })
                     });
                     if (pipelineResult?.error) {
                         const errorMsg = `${item.sport}: ${pipelineResult.error}`;
@@ -655,15 +665,24 @@ async function syncSports(options = {}) {
         if (totalMatchesProcessed > 0) {
             console.log('[syncService] Sync successful. Rebuilding final outputs for the website...');
             // This moves the AI results into the 'direct1x2_prediction_final' table the website sees.
-            const rebuild = await rebuildFinalOutputs({
-                triggerSource: 'sync_service',
-                requestedSports: requestedSports.length ? requestedSports : ['all'],
-                telemetryRunId: telemetryRunId,
-                metadata: {
-                    totalMatchesProcessed,
-                    perSport: Array.from(perSport.entries()).map(([sport, matchesProcessed]) => ({ sport, matchesProcessed })),
-                    errors: Array.from(perSportErrors.entries()).map(([sport, error]) => ({ sport, error }))
-                }
+            const rebuild = await executeOperation({
+                operation: 'syncService.rebuildFinalOutputs',
+                caller: 'backend/services/syncService.js',
+                payload: {
+                    triggerSource: 'sync_service',
+                    requestedSports: requestedSports.length ? requestedSports : ['all'],
+                    telemetryRunId
+                },
+                execute: async () => rebuildFinalOutputs({
+                    triggerSource: 'sync_service',
+                    requestedSports: requestedSports.length ? requestedSports : ['all'],
+                    telemetryRunId: telemetryRunId,
+                    metadata: {
+                        totalMatchesProcessed,
+                        perSport: Array.from(perSport.entries()).map(([sport, matchesProcessed]) => ({ sport, matchesProcessed })),
+                        errors: Array.from(perSportErrors.entries()).map(([sport, error]) => ({ sport, error }))
+                    }
+                })
             });
             const report = pipelineLogger.finishRun({
                 run_id: telemetryRunId,

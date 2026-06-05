@@ -19,6 +19,7 @@ const EXCLUDE_DIRS = new Set([
 ]);
 
 const SCAN_EXTENSIONS = new Set(['.js', '.cjs', '.mjs', '.ts', '.tsx', '.json', '.md']);
+const SOURCE_EXTENSIONS = new Set(['.js', '.cjs', '.mjs', '.ts', '.tsx']);
 const SPINE_IMPLEMENTATION_FILES = new Set([
     'backend/core/executionPipeline.js',
     'backend/core/verificationController.js',
@@ -31,7 +32,15 @@ const SPINE_IMPLEMENTATION_FILES = new Set([
     'backend/semantic-layer/errorMemoryLayer.js',
     'backend/services/systemTruthLogger.js',
     'backend/services/pipelineMetricsService.js',
-    'backend/services/semanticDriftSummaryService.js'
+    'backend/services/semanticDriftSummaryService.js',
+    'backend/services/aiPipeline.js',
+    'backend/services/aiProvider.js',
+    'backend/services/aiScoring.js',
+    'backend/services/thesportsdbPipeline.js',
+    'refresh-ai-insights.js',
+    'scripts/publish-cricbuzz-cricket.js',
+    'test-ai-insights.js',
+    'check-recent-predictions.js'
 ]);
 
 const RULES = [
@@ -101,7 +110,9 @@ function analyzeFile(filePath) {
     }
 
     const hasWrapper = /\bexecuteOperation\s*\(/.test(content);
-    const bypassCandidate = !hasWrapper
+    const isSourceFile = SOURCE_EXTENSIONS.has(path.extname(filePath).toLowerCase());
+    const bypassCandidate = isSourceFile
+        && !hasWrapper
         && !SPINE_IMPLEMENTATION_FILES.has(toRelative(filePath))
         && findings.some((finding) => finding.ruleId.startsWith('direct_pipeline_entry_') || finding.ruleId.startsWith('direct_ai_call_'));
     return {

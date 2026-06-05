@@ -15,6 +15,7 @@ const { query } = require('../backend/db');
 const { upsertCanonicalEvents } = require('../backend/services/canonicalEvents');
 const { buildMatchContext } = require('../backend/services/normalizerService');
 const { runPipelineForMatches, rebuildFinalOutputs } = require('../backend/services/aiPipeline');
+const { executeOperation } = require('../backend/core/executionPipeline');
 const { buildAndStoreDirect1X2 } = require('../backend/services/direct1x2Builder');
 const { getRapidApiKeyPool } = require('../backend/utils/keyPool');
 const { enforceRateLimitAndFetch } = require('../backend/utils/apiUsageLimiter');
@@ -2069,10 +2070,18 @@ async function main() {
     console.log('[snapshot-import] pipeline chunks complete');
 
     const requestedSports = [...new Set(dedupedFixtures.map((row) => row.sport))];
-    const publishResult = await rebuildFinalOutputs({
-        triggerSource: 'snapshot_today_import',
-        requestedSports,
-        notes: `snapshot import ${TODAY}`
+    const publishResult = await executeOperation({
+        operation: 'script.snapshot-import.rebuildFinalOutputs',
+        caller: 'scripts/import-today-snapshot-pipeline.js',
+        payload: {
+            triggerSource: 'snapshot_today_import',
+            requestedSports
+        },
+        execute: async () => rebuildFinalOutputs({
+            triggerSource: 'snapshot_today_import',
+            requestedSports,
+            notes: `snapshot import ${TODAY}`
+        })
     });
     console.log('[snapshot-import] publish rebuild complete');
 

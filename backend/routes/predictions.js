@@ -4,6 +4,7 @@ const express = require('express');
 const { query } = require('../db');
 const { rebuildFinalOutputs } = require('../services/aiPipeline');
 const { requireRole } = require('../utils/auth');
+const { executeOperation } = require('../core/executionPipeline');
 const { requireSupabaseUser } = require('../middleware/supabaseJwt');
 const config = require('../config');
 const { createClient } = require('@supabase/supabase-js');
@@ -2782,8 +2783,16 @@ router.get('/', requireSupabaseUser, async (req, res) => {
 router.post('/rebuild', requireRole('admin'), async (_req, res) => {
     try {
         console.log('[predictions] Manual rebuild of final outputs requested...');
-        const result = await rebuildFinalOutputs();
-        res.status(200).json({ ok: true, message: "Final outputs rebuilt successfully", data: result });
+        const result = await executeOperation({
+            operation: 'predictions.rebuild',
+            caller: 'backend/routes/predictions.js',
+            payload: { source: 'route_rebuild' },
+            execute: async () => rebuildFinalOutputs()
+        });
+        if (result?.success === false) {
+            return res.status(503).json({ error: result.reason || result.error || 'rebuild_blocked' });
+        }
+        res.status(200).json({ ok: true, message: 'Final outputs rebuilt successfully', data: result.result || result });
     } catch (err) {
         console.error('[predictions] rebuild error:', err);
         res.status(500).json({ error: 'Rebuild failed', details: err.message });

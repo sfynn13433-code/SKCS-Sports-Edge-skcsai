@@ -58,26 +58,36 @@ router.post('/refresh-ai-insights', requireAdmin, async (req, res) => {
                         const marketName = p.prediction === 'home_win' ? 'Home Win'
                             : p.prediction === 'draw' ? 'Draw' : 'Away Win';
 
-                        const aiInsight = await generateInsight({
-                            home: p.home_team,
-                            away: p.away_team,
-                            league: null,
-                            kickoff: p.match_date,
-                            market: marketName,
-                            confidence: p.confidence,
-                            formData: `Current confidence: ${p.confidence}%`,
-                            h2h: null,
-                            weather: null,
-                            absences: null,
-                            telemetry: {
-                                pipeline_name: 'refresh-ai',
-                                task_name: 'refreshInsight',
-                                budget_class: 'Important',
-                                knowledge_context: 'static',
-                                monthly_risk: 'Medium',
-                                fixture_id: p.fixture_id || p.id || null
-                            }
+                        const aiInsightResult = await executeOperation({
+                            operation: 'admin.refresh-ai.generateInsight',
+                            caller: 'backend/routes/refresh-ai.js',
+                            payload: {
+                                prediction_id: p.id,
+                                fixture_id: p.fixture_id || p.id || null,
+                                market: marketName
+                            },
+                            execute: async () => generateInsight({
+                                home: p.home_team,
+                                away: p.away_team,
+                                league: null,
+                                kickoff: p.match_date,
+                                market: marketName,
+                                confidence: p.confidence,
+                                formData: `Current confidence: ${p.confidence}%`,
+                                h2h: null,
+                                weather: null,
+                                absences: null,
+                                telemetry: {
+                                    pipeline_name: 'refresh-ai',
+                                    task_name: 'refreshInsight',
+                                    budget_class: 'Important',
+                                    knowledge_context: 'static',
+                                    monthly_risk: 'Medium',
+                                    fixture_id: p.fixture_id || p.id || null
+                                }
+                            })
                         });
+                        const aiInsight = aiInsightResult?.result;
 
                         const isAI = aiInsight?.edgemind_report
                             && !aiInsight.edgemind_report.includes('Stage 2 Context: League matchup profile')

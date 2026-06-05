@@ -191,9 +191,16 @@ router.post('/sync-detailed', requireRole('admin'), async (req, res) => {
             timestamp: new Date().toISOString()
         });
 
-        const result = requestedSport
-            ? await syncSports({ sports: requestedSport })
-            : await syncAllSports();
+        const result = await executeOperation({
+            operation: requestedSport ? 'pipeline.sync-detailed.sport' : 'pipeline.sync-detailed.all',
+            caller: 'backend/routes/pipeline.js',
+            payload: { requestedSport: requestedSport || 'all' },
+            execute: async () => (
+                requestedSport
+                    ? syncSports({ sports: requestedSport })
+                    : syncAllSports()
+            )
+        });
 
         // Step 3: Report results
         progress.steps.push({
@@ -201,14 +208,14 @@ router.post('/sync-detailed', requireRole('admin'), async (req, res) => {
             action: 'Sync completed',
             timestamp: new Date().toISOString(),
             details: {
-                totalMatchesProcessed: result?.totalMatchesProcessed || 0,
-                perSport: result?.perSport || [],
-                errors: result?.errors || [],
-                rebuiltFinalOutputs: result?.rebuiltFinalOutputs || false
+                totalMatchesProcessed: result?.result?.totalMatchesProcessed || 0,
+                perSport: result?.result?.perSport || [],
+                errors: result?.result?.errors || [],
+                rebuiltFinalOutputs: result?.result?.rebuiltFinalOutputs || false
             }
         });
 
-        progress.final = result;
+        progress.final = result?.result || result;
 
         res.status(200).json({
             ok: true,
