@@ -114,7 +114,8 @@ async function upsertCanonicalEvents(items = [], options = {}) {
     for (const item of rows) {
         const gate = evaluateCanonicalIngest(item, {
             requireGoals,
-            sport: item?.sport
+            sport: item?.sport,
+            allowSportsDataIo: Boolean(options.allowSportsDataIo)
         });
 
         if (!gate.accept || !gate.payload) {
@@ -141,7 +142,7 @@ async function upsertCanonicalEvents(items = [], options = {}) {
         }
 
         const cleanData = {
-            p_provider_name: CANONICAL_FOOTBALL_PROVIDER,
+            p_provider_name: gate.provider || CANONICAL_FOOTBALL_PROVIDER,
             p_provider_event_id: providerEventId,
             p_sport: normalizeSport(item?.sport),
             p_competition_name: fields.competitionName,
