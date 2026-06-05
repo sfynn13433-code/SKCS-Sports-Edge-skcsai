@@ -157,6 +157,7 @@ function isAllowedCanonicalProvider(provider) {
 function evaluateCanonicalIngest(item, options = {}) {
     const sportKey = String(options.sport || item?.sport || '').toLowerCase();
     const footballLike = !sportKey || sportKey === 'football' || sportKey === 'soccer' || sportKey.startsWith('soccer');
+    const allowSportsDataIo = Boolean(options.allowSportsDataIo);
 
     if (!footballLike) {
         return {
@@ -168,12 +169,62 @@ function evaluateCanonicalIngest(item, options = {}) {
     }
 
     const provider = resolveProviderFromItem(item);
-    if (!isAllowedCanonicalProvider(provider)) {
+    if (!isAllowedCanonicalProvider(provider) && !(allowSportsDataIo && provider === 'sportsdata-io')) {
         return {
             accept: false,
             reason: REJECT.INVALID_PROVIDER,
             provider,
             payload: resolveCanonicalPayload(item)
+        };
+    }
+
+    if (allowSportsDataIo && provider === 'sportsdata-io') {
+        const payload = resolveCanonicalPayload(item);
+        const fixtureId = pickId(item?.match_id || payload?.GameId || payload?.gameId || payload?.id);
+        const homeTeamId = pickId(
+            item?.home_team_id
+            || item?.homeTeamId
+            || payload?.HomeTeamId
+            || payload?.homeTeamId
+            || payload?.home_team?.id
+        );
+        const awayTeamId = pickId(
+            item?.away_team_id
+            || item?.awayTeamId
+            || payload?.AwayTeamId
+            || payload?.awayTeamId
+            || payload?.away_team?.id
+        );
+        const startTime = String(
+            item?.date
+            || item?.match_date
+            || payload?.DateTime
+            || payload?.dateTime
+            || payload?.Day
+            || ''
+        ).trim();
+
+        if (!fixtureId) {
+            return { accept: false, reason: REJECT.MISSING_FIXTURE_ID, provider, payload };
+        }
+        if (!homeTeamId) {
+            return { accept: false, reason: REJECT.MISSING_HOME_TEAM_ID, provider, payload };
+        }
+        if (!awayTeamId) {
+            return { accept: false, reason: REJECT.MISSING_AWAY_TEAM_ID, provider, payload };
+        }
+        if (!startTime) {
+            return { accept: false, reason: REJECT.MISSING_FIXTURE_ID, provider, payload };
+        }
+
+        return {
+            accept: true,
+            reason: null,
+            provider,
+            payload,
+            fixtureId,
+            homeTeamId,
+            awayTeamId
         };
     }
 
@@ -183,7 +234,7 @@ function evaluateCanonicalIngest(item, options = {}) {
     return {
         accept: verdict.accept,
         reason: verdict.reason,
-        provider: CANONICAL_FOOTBALL_PROVIDER,
+        provider,
         payload,
         fixtureId: verdict.fixtureId,
         homeTeamId: verdict.homeTeamId,

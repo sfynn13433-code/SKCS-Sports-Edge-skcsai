@@ -525,7 +525,8 @@ async function syncSports(options = {}) {
                 for (const rawMatch of rawMatchesList) {
                     try {
                         const normalizationInput = toNormalizationInput(rawMatch);
-                        if (!normalizationInput || !normalizationInput.match || !normalizationInput.odds) {
+                        const isSportsDataIoRow = String(rawMatch?.provider || rawMatch?.provider_name || '').toLowerCase().includes('sportsdata');
+                        if (!normalizationInput || !normalizationInput.match || (!normalizationInput.odds && !isSportsDataIoRow)) {
                             pipelineLogger.rejectionAdd({
                                 run_id: telemetryRunId,
                                 sport: item.sport,
@@ -576,7 +577,7 @@ async function syncSports(options = {}) {
                             console.warn('[syncService] Bypassing missing context for match %s (ProFootballAPI 404/400 errors)', normalized?.match_info?.match_id || 'unknown');
                         }
                         // IRON-CLAD DATE PATCH: drop matches that are past the grace window.
-                        if (!isMatchWithinGraceWindow(normalized)) {
+                        if (!isMatchWithinGraceWindow(normalized) && !(isSportsDataIoRow && item?.allowFinalForDisplay)) {
                             pipelineLogger.rejectionAdd({
                                 run_id: telemetryRunId,
                                 sport: item.sport,
@@ -599,7 +600,9 @@ async function syncSports(options = {}) {
                 }
 
                 if (normalizedMatches.length > 0) {
-                    await upsertCanonicalEvents(normalizedMatches);
+                    await upsertCanonicalEvents(normalizedMatches, {
+                        allowSportsDataIo: Boolean(item?.allowFinalForDisplay)
+                    });
                     console.log(`[syncService] Found ${normalizedMatches.length} REAL matches for ${item.sport}. Running AI Analysis...`);
                     const pipelineResult = await executeOperation({
                         operation: 'syncService.runPipelineForMatches',
