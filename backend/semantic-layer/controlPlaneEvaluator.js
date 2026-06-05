@@ -65,6 +65,10 @@ function derivePipelineThresholds(pipeline, options = {}) {
 
 function summarizeSignals(signals = []) {
     const normalizedSignals = Array.isArray(signals) ? signals.filter(Boolean) : [];
+    const violationSignals = normalizedSignals.filter((signal) => {
+        const severity = String(signal?.severity || 'UNKNOWN').trim().toUpperCase();
+        return severity !== 'HEALTHY' && severity !== 'UNKNOWN';
+    });
     const severityCounts = normalizedSignals.reduce((acc, signal) => {
         const severity = String(signal?.severity || 'UNKNOWN').trim().toUpperCase();
         acc[severity] = (acc[severity] || 0) + 1;
@@ -98,7 +102,7 @@ function summarizeSignals(signals = []) {
             || normalizedSignals[0]?.source
             || 'unknown',
         provider: normalizedSignals.find((signal) => signal?.metadata?.provider)?.metadata?.provider || null,
-        totalViolations: normalizedSignals.length,
+        totalViolations: violationSignals.length,
         criticalViolations: criticalSignals.length,
         warningViolations: normalizedSignals.filter((signal) => String(signal?.severity || '').trim().toUpperCase() === 'WARN').length,
         blockedViolations: normalizedSignals.filter((signal) => String(signal?.severity || '').trim().toUpperCase() === 'BLOCKED').length,

@@ -534,7 +534,12 @@ app.post('/api/internal/fetch-fixtures', async (req, res) => {
   }
 });
 
-app.get('/api/health', (_req, res) => {
+app.get('/api/health', async (_req, res) => {
+  try {
+    await verificationController.hydrateFromLatestSystemHealthState(true);
+  } catch (error) {
+    console.warn('[api/health] Failed to refresh health snapshot:', error.message);
+  }
   const systemHealth = verificationController.getSnapshot();
   res.set('X-System-State', String(systemHealth.state || 'UNKNOWN'));
   const normalizedState = String(systemHealth.state || 'UNKNOWN').toUpperCase();

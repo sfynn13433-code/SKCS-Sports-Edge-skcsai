@@ -181,8 +181,8 @@ class VerificationController {
         return this._controlPlaneThresholds;
     }
 
-    async hydrateFromLatestSystemHealthState() {
-        if (this._hydratedFromSystemHealthState === true) {
+    async hydrateFromLatestSystemHealthState(forceRefresh = false) {
+        if (!forceRefresh && this._hydratedFromSystemHealthState === true) {
             return this.getSnapshot();
         }
 
@@ -468,11 +468,11 @@ class VerificationController {
                     $8,
                     $9::jsonb,
                     $10::jsonb,
-                    $11::timestamptz,
-                    $12,
+                    $11::jsonb,
+                    $12::timestamptz,
                     $13,
                     $14,
-                    $15::jsonb,
+                    $15,
                     $16::jsonb,
                     $17::jsonb,
                     $18::timestamptz
