@@ -2,7 +2,7 @@
   'use strict';
 
   const REFRESH_MS = 60000;
-  const HEALTH_ENDPOINT = '/api/health';
+  const HEALTH_ENDPOINT = `${window.API_BASE_URL || ''}/api/health`;
   const SLOT_ID = 'system-health-banner';
 
   function ensureStyles() {
