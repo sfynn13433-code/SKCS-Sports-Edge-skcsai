@@ -2,6 +2,10 @@
 
 This registry captures **meaning**, not just structure. It defines how SKCS should interpret source fields, which values are canonical, and which assumptions must never leak into grading, enrichment, or reporting.
 
+## Scope note
+
+This registry defines **provider semantics**, not canonical truth ownership. Use these mappings after the provider has already been authorized and normalized.
+
 The goal is to prevent semantic drift such as:
 - joining on team names instead of `GameId`
 - treating `Period1` as a missing halftime object
@@ -13,6 +17,7 @@ The goal is to prevent semantic drift such as:
 - `HomeTeamName`, `AwayTeamName`, and `DateTime` are **not** identity keys.
 - Any join that can be expressed with `GameId` should use `GameId`.
 - Name-based joins are fallback-only and must be marked as inferred, not verified.
+- Canonical football truth ownership is decided by the ingest/firewall layer, not by this registry.
 
 ## Time and period mapping
 
@@ -59,3 +64,5 @@ The goal is to prevent semantic drift such as:
 
 - Update this registry whenever a source feed changes field names, status labels, or supported context types.
 - If a field is used in a prediction or grading path, its meaning should be recorded here before it is treated as trusted runtime truth.
+- Keep provider semantics and canonical ingest rules in separate documents.
+- Do not use this registry to override truth-layer policy.

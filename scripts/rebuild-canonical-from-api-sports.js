@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Phase 0b.5 — Rebuild football_canonical_events from API-Sports only.
+ * Phase 0b.5 — Rebuild football_canonical_events from the API-Sports replay source.
  * @see docs/SKCS_ENGINE_V2_PHASE0B5_REPLAY.md
  *
  * Usage:
@@ -16,7 +16,7 @@ const { APISportsClient } = require('../backend/apiClients');
 const { evaluateCanonicalIngest, createEmptyFirewallStats, recordFirewallAccept, recordFirewallRejection } = require('../backend/services/canonicalIngestFirewall');
 const { upsertCanonicalEvents } = require('../backend/services/canonicalEvents');
 
-/** API-Sports football league IDs — NOT TheSportsDB ids */
+/** API-Sports football league IDs for replay — NOT TheSportsDB ids */
 const DEFAULT_FOOTBALL_LEAGUES = [
     { id: 39, name: 'Premier League' },
     { id: 140, name: 'La Liga' },
@@ -96,7 +96,7 @@ async function main() {
     let apiCalls = 0;
     const acceptedRows = [];
 
-    console.log('[replay] SKCS canonical replay — API-Sports only');
+    console.log('[replay] SKCS canonical replay — API-Sports replay source');
     console.log('[replay] window:', args.from, '→', args.to, 'season:', args.season);
     console.log('[replay] leagues:', args.leagues.join(', '));
     console.log('[replay] dry-run:', args.dryRun);

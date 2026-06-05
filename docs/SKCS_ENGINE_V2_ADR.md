@@ -4,6 +4,10 @@
 **Date:** 2026-05-31  
 **Decision:** Build SKCS Engine V2 in parallel with V1. Do not replace production until statistically validated.
 
+## Current runtime note
+
+The live runtime now includes controlled SportsDataIO fixture/context support alongside the canonical football ingest path. This ADR still governs V2 identity and scoring decisions, but it must be read alongside the ingest/firewall docs so provider semantics do not get confused with truth ownership.
+
 ---
 
 ## Context

@@ -1,5 +1,9 @@
 # SKCS Architecture Decisions
 
+## Current runtime note
+
+The codebase now carries both canonical football truth and controlled SportsDataIO pre-match support. Record architectural decisions separately from provider semantics so the two do not get mixed together later.
+
 ## Decisions already visible in the codebase
 
 - Supabase is the business layer.

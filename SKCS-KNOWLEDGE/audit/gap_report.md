@@ -1,5 +1,9 @@
 # SKCS Knowledge Layer Gap Report
 
+## Current runtime note
+
+This gap report is historical context. The runtime now includes controlled SportsDataIO support and canonical publish-table wiring changes, so any remaining gaps should be read against the current ingest and publish paths.
+
 ## What is complete in this first pass
 
 - A first-pass inventory of core database objects.

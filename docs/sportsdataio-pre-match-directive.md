@@ -1,5 +1,9 @@
 # SportsDataIO Pre-Match Implementation Directive
 
+## Contract note
+
+This document defines a **pre-match context contract**, not a canonical truth contract. SportsDataIO may be used only when it helps SKCS with authorized fixture discovery, pre-kickoff context, and safe normalization for display or analysis.
+
 ## Goal
 
 Use SportsDataIO only as a pre-match fixture and context source for SKCS.
@@ -64,6 +68,8 @@ It must not be used for:
 4. Gate usage behind pre-match windows and existing quota controls.
 5. Prefer cached or scheduled fixture context over repeated polling.
 6. Log SportsDataIO as a context source, not a live-status source.
+7. SportsDataIO data may be normalized into SKCS only when it is authorized and safe for pre-match display.
+8. SportsDataIO must never override the canonical football truth store.
 
 ## Explicitly disallowed behavior
 

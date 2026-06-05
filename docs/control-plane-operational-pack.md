@@ -8,6 +8,10 @@ This file is now an index for the split operational docs:
 
 The canonical content lives in those three documents. The sections below remain as a historical combined reference.
 
+## Current runtime note
+
+The control plane remains the source of truth for system health, but it should not be read as a provider-routing policy. SportsDataIO, API-Sports, and other providers are handled in the ingestion layer; this pack only governs health transitions and degraded-state response.
+
 ## 1. Pipeline Metrics / Health Feed
 
 The pipeline health feed is a **telemetry aggregation layer only**.

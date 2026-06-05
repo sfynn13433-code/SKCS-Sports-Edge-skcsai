@@ -1,5 +1,9 @@
 # Free Livescore API Provider Discovery
 
+## Current runtime note
+
+This provider is an entity resolver and ID-mapping source only. It does not define canonical football truth and it does not replace the SportsDataIO or API-Sports ingest rules.
+
 ## Provider
 - Host: `free-livescore-api.p.rapidapi.com`
 - RapidAPI plan observed: Basic
