@@ -61,6 +61,36 @@ This file maps the important assets to the things they depend on and the things 
   - Depends on: fixture discovery, enrichment, prediction generation, cleanup queries
   - Used by: app startup
 
+## Semantic control plane dependency chain
+
+- `get_semantic_violation_summary`
+  - Depends on: `public.semantic_violations`, `pipeline_filter`, `provider_filter`, rolling time window arguments
+  - Used by: `semantic-drift-summary` edge function, `backend/services/semanticDriftSummaryService.js`, dashboard summary reads
+- `semanticDriftSummaryService.fetchSemanticDriftSummary`
+  - Depends on: the RPC summary, `verificationController.evaluateControlPlane`
+  - Used by: `backend/routes/semanticDrift.js`, future alerting and health consumers
+- `verificationController.evaluateControlPlane`
+  - Depends on: `controlPlaneEvaluator.js`, normalized semantic summaries, control-plane thresholds
+  - Used by: `aiPipeline`, semantic drift dashboard, runtime health snapshot persistence
+- `system_health_state`
+  - Depends on: controller persistence output, signal normalization, transition tracking
+  - Used by: `/api/health`, dashboard banners, audit and trend review
+- `/api/semantic-drift-summary`
+  - Depends on: `semanticDriftSummaryService`, the summary RPC, controller evaluation
+  - Used by: admin drift dashboard, future alert consumers
+- `/api/health`
+  - Depends on: `verificationController.getSnapshot`
+  - Used by: the global system-health banner and other runtime status checks
+
+## UI dependency chain
+
+- `system-health-banner.js`
+  - Depends on: `/api/health`, `system_health_state` snapshot data
+  - Used by: `public/index.html`
+- `semantic-drift-dashboard.js`
+  - Depends on: `/api/semantic-drift-summary`
+  - Used by: `public/admin-sync.html`
+
 ## Dependency rules
 
 - If an upstream asset changes, its downstream consumers must be checked for break impact.

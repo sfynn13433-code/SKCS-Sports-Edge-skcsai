@@ -14,6 +14,7 @@ This directory contains organized documentation for the SKCS AI Sports Edge plat
 - **[cricket-providers.md](./cricket-providers.md)** - Cricket data provider configurations
 - **[supabase-tier-display-requirements.md](./supabase-tier-display-requirements.md)** - Supabase tier system requirements
 - **[weekly-global-scrape-scheduler.md](./weekly-global-scrape-scheduler.md)** - Global data scraping schedule
+- **[blueprint-semantic-drift-control-plane.md](./blueprint-semantic-drift-control-plane.md)** - Semantic drift monitoring and enforcement control plane blueprint
 
 ### **Provider Documentation**
 - **[provider-discovery/](./provider-discovery/)** - Provider discovery and integration documentation

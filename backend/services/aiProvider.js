@@ -1,6 +1,7 @@
 'use strict';
 
 const axios = require('axios');
+const { recordAiTelemetry, recordBlockedAiCall } = require('./aiTelemetryService');
 
 // Support both local server (http://localhost:8080) and Render service (hostname only)
 const rawDolphinUrl = process.env.DOLPHIN_URL || 'http://localhost:8080';
@@ -20,6 +21,57 @@ const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.1-8b-instant'; // Producti
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || null;
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
 const GEMINI_MODEL = 'gemini-pro';
+
+function getTelemetryContext(params = {}, defaults = {}) {
+    const telemetry = params.telemetry && typeof params.telemetry === 'object' ? params.telemetry : {};
+    return {
+        pipeline_name: String(telemetry.pipeline_name || params.pipeline_name || defaults.pipeline_name || 'aiPipeline').trim() || 'aiPipeline',
+        task_name: String(telemetry.task_name || params.task_name || defaults.task_name || 'generateInsight').trim() || 'generateInsight',
+        budget_class: telemetry.budget_class || params.budget_class || defaults.budget_class || 'Important',
+        input_class: telemetry.input_class || params.input_class || defaults.input_class || null,
+        knowledge_context: telemetry.knowledge_context || params.knowledge_context || defaults.knowledge_context || 'hybrid',
+        monthly_risk: telemetry.monthly_risk || params.monthly_risk || defaults.monthly_risk || 'High',
+        fixture_id: telemetry.fixture_id || params.fixture_id || defaults.fixture_id || null,
+        provider_chain: telemetry.provider_chain || params.provider_chain || defaults.provider_chain || null
+    };
+}
+
+function extractUsage(response, provider) {
+    const usage = response?.data?.usage || response?.data?.usageMetadata || response?.data?.usage_metadata || {};
+    const promptTokens = Number(
+        usage.prompt_tokens
+        ?? usage.promptTokenCount
+        ?? usage.input_tokens
+        ?? usage.inputTokenCount
+        ?? 0
+    );
+    const completionTokens = Number(
+        usage.completion_tokens
+        ?? usage.candidatesTokenCount
+        ?? usage.output_tokens
+        ?? usage.outputTokenCount
+        ?? 0
+    );
+    const responseChars = String(
+        response?.data?.choices?.[0]?.message?.content
+        || response?.data?.content
+        || response?.data?.candidates?.[0]?.content?.parts?.[0]?.text
+        || response?.data?.response
+        || ''
+    ).length;
+
+    return {
+        input_tokens: Number.isFinite(promptTokens) ? Math.max(0, Math.round(promptTokens)) : 0,
+        output_tokens: Number.isFinite(completionTokens) ? Math.max(0, Math.round(completionTokens)) : 0,
+        response_chars: responseChars,
+        provider,
+        hasUsage: !!usage && Object.keys(usage).length > 0
+    };
+}
+
+async function logAiTelemetry(entry = {}) {
+    await recordAiTelemetry(entry);
+}
 
 function extractAndParseJSON(rawResponse) {
     try {
@@ -294,6 +346,11 @@ async function generateInsightWithGroq(params) {
     if (!GROQ_API_KEY) {
         throw new Error('Groq API key not configured');
     }
+    const telemetry = getTelemetryContext(params, {
+        pipeline_name: 'aiPipeline',
+        task_name: 'generateInsight'
+    });
+    const startedAt = Date.now();
     
     // AI-DISABLED: [Missing strict enforcement for exactly 4 top Secondary Insights per STRICT_RULES.md]
     // const systemPrompt = `You are the SKCS EdgeMind Bot. Generate a football match prediction insight.
@@ -360,36 +417,81 @@ ${params.absences ? 'Absences/Injuries: ' + params.absences : ''}
 
 Follow the EDGEMIND REPORT RULES from your system prompt. Max 3 sentences for edgemind_report.`;
 
-    const response = await axios.post(GROQ_URL, {
-        model: GROQ_MODEL,
-        messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 300,
-        response_format: { type: 'json_object' }
-    }, {
-        headers: {
-            'Authorization': `Bearer ${GROQ_API_KEY}`,
-            'Content-Type': 'application/json'
-        },
-        timeout: 30000 // 30 seconds - Groq is fast
-    });
-    
-    const content = response.data?.choices?.[0]?.message?.content || '';
-    const parsed = extractAndParseJSON(content);
-    
-    if (!parsed || !parsed.edgemind_report) {
-        throw new Error('Groq response missing edgemind_report');
+    try {
+        const response = await axios.post(GROQ_URL, {
+            model: GROQ_MODEL,
+            messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userPrompt }
+            ],
+            temperature: 0.7,
+            max_tokens: 300,
+            response_format: { type: 'json_object' }
+        }, {
+            headers: {
+                'Authorization': `Bearer ${GROQ_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            timeout: 30000 // 30 seconds - Groq is fast
+        });
+        
+        const content = response.data?.choices?.[0]?.message?.content || '';
+        const parsed = extractAndParseJSON(content);
+        
+        if (!parsed || !parsed.edgemind_report) {
+            throw new Error('Groq response missing edgemind_report');
+        }
+
+        const usage = extractUsage(response, 'groq');
+        void logAiTelemetry({
+            ...telemetry,
+            provider: 'groq',
+            model: GROQ_MODEL,
+            success: true,
+            status: 'complete',
+            finish_reason: response.data?.choices?.[0]?.finish_reason || 'stop',
+            partial: false,
+            input_tokens: usage.input_tokens,
+            output_tokens: usage.output_tokens,
+            latency_ms: Date.now() - startedAt,
+            metadata: {
+                provider: 'groq',
+                fallback: false,
+                provider_chain: telemetry.provider_chain || null,
+                prompt_chars: userPrompt.length,
+                response_chars: usage.response_chars,
+                has_usage: usage.hasUsage
+            }
+        });
+        
+        return {
+            market_name: parsed.market_name || params.market || '1X2',
+            confidence: Math.max(50, Math.min(95, parsed.confidence || params.confidence || 70)),
+            edgemind_report: parsed.edgemind_report,
+            secondary_insights: parsed.secondary_insights || null
+        };
+    } catch (error) {
+        void logAiTelemetry({
+            ...telemetry,
+            provider: 'groq',
+            model: GROQ_MODEL,
+            success: false,
+            status: 'failed',
+            finish_reason: 'error',
+            partial: false,
+            input_tokens: 0,
+            output_tokens: 0,
+            latency_ms: Date.now() - startedAt,
+            error: error.message,
+            metadata: {
+                provider: 'groq',
+                fallback: false,
+                prompt_chars: userPrompt.length,
+                error: error.message
+            }
+        });
+        throw error;
     }
-    
-    return {
-        market_name: parsed.market_name || params.market || '1X2',
-        confidence: Math.max(50, Math.min(95, parsed.confidence || params.confidence || 70)),
-        edgemind_report: parsed.edgemind_report,
-        secondary_insights: parsed.secondary_insights || null
-    };
 }
 
 /**
@@ -431,6 +533,11 @@ async function generateInsightWithGemini(params) {
     if (!GEMINI_API_KEY) {
         throw new Error('Gemini API key not configured');
     }
+    const telemetry = getTelemetryContext(params, {
+        pipeline_name: 'aiPipeline',
+        task_name: 'generateInsight'
+    });
+    const startedAt = Date.now();
 
     const systemPrompt = `You are the SKCS EdgeMind Bot. Generate a football match prediction insight.
 
@@ -475,40 +582,85 @@ ${params.absences ? 'Absences/Injuries: ' + params.absences : ''}
 
 Follow the EDGEMIND REPORT RULES from your system prompt. Max 3 sentences for edgemind_report.`;
 
-    const response = await axios.post(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
-        contents: [
-            {
-                parts: [
-                    { text: `${systemPrompt}\n\n${userPrompt}` }
-                ]
+    try {
+        const response = await axios.post(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+            contents: [
+                {
+                    parts: [
+                        { text: `${systemPrompt}\n\n${userPrompt}` }
+                    ]
+                }
+            ],
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 300,
+                topK: 40,
+                topP: 0.95
             }
-        ],
-        generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 300,
-            topK: 40,
-            topP: 0.95
+        }, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            timeout: 30000
+        });
+
+        const content = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        const parsed = extractAndParseJSON(content);
+
+        if (!parsed || !parsed.edgemind_report) {
+            throw new Error('Gemini response missing edgemind_report');
         }
-    }, {
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        timeout: 30000
-    });
 
-    const content = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    const parsed = extractAndParseJSON(content);
+        const usage = extractUsage(response, 'gemini');
+        void logAiTelemetry({
+            ...telemetry,
+            provider: 'gemini',
+            model: GEMINI_MODEL,
+            success: true,
+            status: 'complete',
+            finish_reason: response.data?.candidates?.[0]?.finishReason || 'stop',
+            partial: false,
+            input_tokens: usage.input_tokens,
+            output_tokens: usage.output_tokens,
+            latency_ms: Date.now() - startedAt,
+            metadata: {
+                provider: 'gemini',
+                fallback: false,
+                provider_chain: telemetry.provider_chain || null,
+                prompt_chars: userPrompt.length,
+                response_chars: usage.response_chars,
+                has_usage: usage.hasUsage
+            }
+        });
 
-    if (!parsed || !parsed.edgemind_report) {
-        throw new Error('Gemini response missing edgemind_report');
+        return {
+            market_name: parsed.market_name || params.market || '1X2',
+            confidence: Math.max(50, Math.min(95, parsed.confidence || params.confidence || 70)),
+            edgemind_report: parsed.edgemind_report,
+            secondary_insights: parsed.secondary_insights || null
+        };
+    } catch (error) {
+        void logAiTelemetry({
+            ...telemetry,
+            provider: 'gemini',
+            model: GEMINI_MODEL,
+            success: false,
+            status: 'failed',
+            finish_reason: 'error',
+            partial: false,
+            input_tokens: 0,
+            output_tokens: 0,
+            latency_ms: Date.now() - startedAt,
+            error: error.message,
+            metadata: {
+                provider: 'gemini',
+                fallback: false,
+                prompt_chars: userPrompt.length,
+                error: error.message
+            }
+        });
+        throw error;
     }
-
-    return {
-        market_name: parsed.market_name || params.market || '1X2',
-        confidence: Math.max(50, Math.min(95, parsed.confidence || params.confidence || 70)),
-        edgemind_report: parsed.edgemind_report,
-        secondary_insights: parsed.secondary_insights || null
-    };
 }
 
 /**
@@ -517,6 +669,10 @@ Follow the EDGEMIND REPORT RULES from your system prompt. Max 3 sentences for ed
  * Returns structured JSON with market_name, confidence, and edgemind_report.
  */
 async function generateInsight(params) {
+    const telemetry = getTelemetryContext(params, {
+        pipeline_name: 'aiPipeline',
+        task_name: 'generateInsight'
+    });
     // Try Gemini first (Primary - mandated by user)
     if (GEMINI_API_KEY) {
         try {
@@ -543,6 +699,7 @@ async function generateInsight(params) {
 
     // Fallback to local Dolphin server (Fallback 2)
     const prompt = buildInsightPrompt(params);
+    const startedAt = Date.now();
 
     try {
         const response = await axios.post(`${DOLPHIN_URL}/completion`, {
@@ -558,12 +715,52 @@ async function generateInsight(params) {
 
         if (!insightText || insightText.length < 10) {
             console.warn('[AI Insight] Generated text too short, using fallback');
+            void logAiTelemetry({
+                ...telemetry,
+                provider: 'dolphin',
+                model: 'dolphin',
+                success: false,
+                status: 'partial_failed',
+                finish_reason: 'length',
+                partial: true,
+                input_tokens: 0,
+                output_tokens: 0,
+                latency_ms: Date.now() - startedAt,
+                metadata: {
+                    provider: 'dolphin',
+                    fallback: true,
+                    provider_chain: 'gemini->groq->dolphin',
+                    prompt_chars: prompt.length,
+                    response_chars: insightText.length
+                }
+            });
             return generateFallbackInsightStructured(params);
         }
 
         // Try to parse JSON response
         const parsed = extractAndParseJSON(insightText);
         if (parsed && parsed.market_name && parsed.edgemind_report) {
+            const usage = extractUsage(response, 'dolphin');
+            void logAiTelemetry({
+                ...telemetry,
+                provider: 'dolphin',
+                model: 'dolphin',
+                success: true,
+                status: 'complete',
+                finish_reason: 'stop',
+                partial: false,
+                input_tokens: usage.input_tokens,
+                output_tokens: usage.output_tokens || usage.response_chars,
+                latency_ms: Date.now() - startedAt,
+                metadata: {
+                    provider: 'dolphin',
+                    fallback: true,
+                    provider_chain: 'gemini->groq->dolphin',
+                    prompt_chars: prompt.length,
+                    response_chars: usage.response_chars,
+                    has_usage: usage.hasUsage
+                }
+            });
             return {
                 market_name: parsed.market_name,
                 confidence: Math.max(50, Math.min(95, parsed.confidence || params.confidence || 70)),
@@ -573,6 +770,27 @@ async function generateInsight(params) {
         }
 
         // If JSON parsing failed, return structured format anyway with raw text
+        const usage = extractUsage(response, 'dolphin');
+        void logAiTelemetry({
+            ...telemetry,
+            provider: 'dolphin',
+            model: 'dolphin',
+            success: true,
+            status: 'partial_failed',
+            finish_reason: 'other',
+            partial: true,
+            input_tokens: usage.input_tokens,
+            output_tokens: usage.output_tokens || usage.response_chars,
+            latency_ms: Date.now() - startedAt,
+            metadata: {
+                provider: 'dolphin',
+                fallback: true,
+                provider_chain: 'gemini->groq->dolphin',
+                prompt_chars: prompt.length,
+                response_chars: usage.response_chars,
+                has_usage: usage.hasUsage
+            }
+        });
         return {
             market_name: params.market || '1X2',
             confidence: params.confidence || 70,
@@ -585,6 +803,38 @@ async function generateInsight(params) {
         console.error('[AI Insight] GEMINI_API_KEY configured:', !!process.env.GEMINI_API_KEY);
         console.error('[AI Insight] GROQ_API_KEY configured:', !!process.env.GROQ_API_KEY);
         console.error('[AI Insight] DOLPHIN_URL configured:', !!process.env.DOLPHIN_URL);
+        void logAiTelemetry({
+            ...telemetry,
+            provider: 'dolphin',
+            model: 'dolphin',
+            success: false,
+            status: 'failed',
+            finish_reason: 'error',
+            partial: false,
+            input_tokens: 0,
+            output_tokens: 0,
+            latency_ms: Date.now() - startedAt,
+            error: err.message,
+            metadata: {
+                provider: 'dolphin',
+                fallback: true,
+                provider_chain: 'gemini->groq->dolphin',
+                prompt_chars: prompt.length,
+                error: err.message
+            }
+        });
+        void recordBlockedAiCall({
+            ...telemetry,
+            model: 'multi-provider',
+            reason: err.message,
+            ceiling_type: 'hard_cap',
+            metadata: {
+                provider_chain: 'gemini->groq->dolphin',
+                error: err.message,
+                home: params.home || null,
+                away: params.away || null
+            }
+        });
         return generateFallbackInsightStructured(params);
     }
 }

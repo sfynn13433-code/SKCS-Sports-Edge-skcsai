@@ -24,6 +24,7 @@ const pipelineLogger = require('../utils/pipelineLogger');
 const enrichFixtureWithContext = require('../src/services/contextIntelligence/aiPipeline');
 const adjustProbability = require('../src/services/contextIntelligence/adjustProbability');
 const verificationController = require('../core/verificationController');
+const semanticGuard = require('../semantic-layer/enforcementGuard');
 const { resolveActiveDeploymentSports } = require('../config/activeSports');
 
 let isRunning = false;
@@ -1338,7 +1339,31 @@ async function buildRawPredictionFromProviderItem(item) {
     const telemetry = isObject(item?.telemetry) ? item.telemetry : {};
     const telemetryRunId = telemetry.run_id || null;
     const normalizationInput = toNormalizationInput(item);
-    const matchContext = buildMatchContext(normalizationInput);
+    const semanticState = semanticGuard.enforceSemanticAlignment(normalizationInput, {
+        pipeline: 'aiPipeline',
+        source: 'aiPipeline'
+    });
+    if (semanticState.violations.length > 0) {
+        pipelineLogger.rejectionAdd({
+            run_id: telemetryRunId,
+            sport: item?.sport || telemetry?.sport || 'unknown',
+            bucket: semanticState.quarantined ? 'semantic_quarantine' : 'semantic_alignment',
+            reason: semanticState.quarantined
+                ? 'canonical_identity_missing'
+                : 'semantic_guard_applied',
+            metadata: {
+                match_id: semanticState.normalizedInput?.match_id || item?.match_id || null,
+                violations: semanticState.violations,
+                blocked_contexts: semanticState.semantic?.blocked_contexts || []
+            }
+        });
+    }
+    if (semanticState.quarantined) {
+        return null;
+    }
+
+    const canonicalInput = semanticState.normalizedInput;
+    const matchContext = buildMatchContext(canonicalInput);
     if (!matchContext) {
         pipelineLogger.rejectionAdd({
             run_id: telemetryRunId,
@@ -1353,10 +1378,10 @@ async function buildRawPredictionFromProviderItem(item) {
     }
     const matchInfo = matchContext?.match_info || {};
 
-    const match_id = String(matchInfo.match_id || item.match_id || item.id || '').trim();
+    const match_id = String(matchInfo.match_id || canonicalInput.match_id || item.match_id || item.id || '').trim();
     if (!match_id) throw new Error('match_id missing in provider item');
 
-    const sport = normalizeSportForDeployment(matchContext?.sport || item.sport || 'Football');
+    const sport = normalizeSportForDeployment(matchContext?.sport || canonicalInput.sport || item.sport || 'Football');
     if (!isDeploymentSportEnabled(sport)) {
         pipelineLogger.rejectionAdd({
             run_id: telemetryRunId,
@@ -1377,72 +1402,130 @@ async function buildRawPredictionFromProviderItem(item) {
         count: 1
     });
 
+    const semanticFailures = semanticState.violations || [];
+    const controlDecision = verificationController.evaluateControlPlane({
+        pipeline: 'aiPipeline',
+        provider: canonicalInput?.metadata?.provider || canonicalInput?.provider || item?.provider || 'unknown',
+        totalViolations: semanticFailures.length,
+        criticalViolations: semanticFailures.filter((violation) => String(violation.severity || '').toLowerCase() === 'critical').length,
+        warningViolations: semanticFailures.filter((violation) => String(violation.severity || '').toLowerCase() === 'warning').length,
+        blockedViolations: semanticFailures.filter((violation) => String(violation.severity || '').toLowerCase() === 'blocked').length,
+        degradedFlag: semanticState.quarantined || semanticFailures.some((violation) => String(violation.severity || '').toLowerCase() === 'blocked'),
+        canonicalIntegrityBroken: semanticState.quarantined,
+        trend: 'stable',
+        batchSize: 1
+    }, {
+        pipelineThresholds: {
+            aiPipeline: {
+                warnViolations: 1,
+                degradedViolations: 1,
+                failViolations: 2,
+                warnViolationRate: 0.01,
+                degradedViolationRate: 0.05,
+                failViolationRate: 0.1
+            }
+        }
+    });
+
+    if (controlDecision.actions.quarantine || controlDecision.actions.allowPublish === false) {
+        pipelineLogger.rejectionAdd({
+            run_id: telemetryRunId,
+            sport,
+            bucket: 'control_plane_quarantine',
+            reason: controlDecision.state,
+            metadata: {
+                match_id,
+                healthScore: controlDecision.healthScore,
+                reasons: controlDecision.reasons,
+                actions: controlDecision.actions
+            }
+        });
+        return null;
+    }
+
     // Always ingest context for football fixtures before downstream pipeline filtering.
     let ingestedContextData = { injuries: {}, h2h: {}, weather: {}, news: [], sport };
-    try {
-        console.log('Processing fixture:', match_id);
-        const fixtureIdForIngestion = matchInfo.match_id || match_id;
-        const homeTeamIdForIngestion = matchInfo.home_team_id || item.home_team_id || null;
-        const awayTeamIdForIngestion = matchInfo.away_team_id || item.away_team_id || null;
-        const cityForWeather = resolveContextIngestionCity(matchInfo, item);
-        const homeTeamForNews = matchInfo.home_team || item.home_team || null;
-        const awayTeamForNews = matchInfo.away_team || item.away_team || null;
-        const kickoffForNews = matchInfo.kickoff || item.date || item.kickoff || null;
+    const allowEnrichment = controlDecision.actions.allowEnrichment !== false;
+    const allowWeather = semanticState.contextPolicy?.allowWeather === true;
+    const allowNews = semanticState.contextPolicy?.allowNews === true;
 
-        const [injuriesRaw, h2hRaw, weatherRaw, newsRaw] = await Promise.all([
-            safeFetch(
-                () => getInjuries(fixtureIdForIngestion),
-                'Injuries'
-            ),
-            safeFetch(
-                () => getH2H(homeTeamIdForIngestion, awayTeamIdForIngestion),
-                'H2H'
-            ),
-            safeFetch(
-                () => getWeather(cityForWeather),
-                'Weather'
-            ),
-            safeFetch(
-                () => getTeamNewsContext({
-                    homeTeam: homeTeamForNews,
-                    awayTeam: awayTeamForNews,
-                    kickoff: kickoffForNews
-                }),
-                'News'
-            )
-        ]);
+    if (allowEnrichment) {
+        try {
+            console.log('Processing fixture:', match_id);
+            const fixtureIdForIngestion = matchInfo.match_id || match_id;
+            const homeTeamIdForIngestion = matchInfo.home_team_id || item.home_team_id || null;
+            const awayTeamIdForIngestion = matchInfo.away_team_id || item.away_team_id || null;
+            const cityForWeather = resolveContextIngestionCity(matchInfo, item);
+            const homeTeamForNews = matchInfo.home_team || item.home_team || null;
+            const awayTeamForNews = matchInfo.away_team || item.away_team || null;
+            const kickoffForNews = matchInfo.kickoff || item.date || item.kickoff || null;
 
-        ingestedContextData = {
-            injuries: normalizeInjuriesFromProvider(injuriesRaw, homeTeamIdForIngestion, awayTeamIdForIngestion),
-            h2h: normalizeH2HFromProvider(h2hRaw),
-            weather: normalizeWeatherFromProvider(weatherRaw),
-            news: dedupePublicIncidents(newsRaw),
-            sport
-        };
+            const [injuriesRaw, h2hRaw, weatherRaw, newsRaw] = await Promise.all([
+                safeFetch(
+                    () => getInjuries(fixtureIdForIngestion),
+                    'Injuries'
+                ),
+                safeFetch(
+                    () => getH2H(homeTeamIdForIngestion, awayTeamIdForIngestion),
+                    'H2H'
+                ),
+                allowWeather
+                    ? safeFetch(
+                        () => getWeather(cityForWeather),
+                        'Weather'
+                    )
+                    : Promise.resolve(null),
+                allowNews
+                    ? safeFetch(
+                        () => getTeamNewsContext({
+                            homeTeam: homeTeamForNews,
+                            awayTeam: awayTeamForNews,
+                            kickoff: kickoffForNews
+                        }),
+                        'News'
+                    )
+                    : Promise.resolve([])
+            ]);
 
-        console.log('ATTEMPTING INSERT:', fixtureIdForIngestion);
-        const saveResult = await saveContextData(directInsightsSupabase, match_id, ingestedContextData);
-        if (saveResult?.saved === true) {
-            console.log('Context inserted:', match_id);
-        } else if (saveResult?.reason === 'already_exists') {
-            console.log('Context already exists:', match_id);
+            ingestedContextData = {
+                injuries: normalizeInjuriesFromProvider(injuriesRaw, homeTeamIdForIngestion, awayTeamIdForIngestion),
+                h2h: normalizeH2HFromProvider(h2hRaw),
+                weather: normalizeWeatherFromProvider(weatherRaw),
+                news: dedupePublicIncidents(newsRaw),
+                sport
+            };
+
+            console.log('ATTEMPTING INSERT:', fixtureIdForIngestion);
+            const saveResult = await saveContextData(directInsightsSupabase, match_id, ingestedContextData);
+            if (saveResult?.saved === true) {
+                console.log('Context inserted:', match_id);
+            } else if (saveResult?.reason === 'already_exists') {
+                console.log('Context already exists:', match_id);
+            }
+        } catch (contextIngestionErr) {
+            console.warn('[aiPipeline] context ingestion failed for match_id=%s: %s', match_id, contextIngestionErr.message);
         }
-    } catch (contextIngestionErr) {
-        console.warn('[aiPipeline] context ingestion failed for match_id=%s: %s', match_id, contextIngestionErr.message);
+    } else {
+        pipelineLogger.stageAdd({
+            run_id: telemetryRunId,
+            sport,
+            stage: 'semantic_enrichment_skipped',
+            count: 1
+        });
     }
 
     const scoring = await scoreMatch({
         match_id,
         sport,
-        home_team: matchInfo.home_team || item.home_team || null,
-        away_team: matchInfo.away_team || item.away_team || null,
-        prediction: item.prediction || null,
-        confidence: item.confidence,
-        raw_provider_data: item.raw_provider_data || matchContext.raw_provider_data || null,
-        metadata: item.metadata || matchContext.metadata || null
+        home_team: matchInfo.home_team || canonicalInput.home_team || item.home_team || null,
+        away_team: matchInfo.away_team || canonicalInput.away_team || item.away_team || null,
+        prediction: canonicalInput.prediction || null,
+        confidence: canonicalInput.confidence,
+        raw_provider_data: canonicalInput.raw_provider_data || matchContext.raw_provider_data || null,
+        metadata: canonicalInput.metadata || matchContext.metadata || null
     });
 
-    const providerPrediction = normalizePrediction(item.prediction || matchContext.prediction);
+    const providerPrediction = normalizePrediction(canonicalInput.prediction || matchContext.prediction);
     const predictionSource = providerPrediction ? 'provider' : 'ai_fallback';
     const fallbackPrediction = scoring.winner === 'home'
         ? 'home_win'
@@ -1452,11 +1535,14 @@ async function buildRawPredictionFromProviderItem(item) {
                 ? 'draw'
                 : 'home_win';
     const prediction = providerPrediction || fallbackPrediction;
-    const baselineConfidence = typeof item.confidence === 'number' && Number.isFinite(item.confidence)
-        ? item.confidence
+    const rawBaselineConfidence = typeof canonicalInput.confidence === 'number' && Number.isFinite(canonicalInput.confidence)
+        ? canonicalInput.confidence
         : (Number.isFinite(Number(scoring.confidence)) ? Number(scoring.confidence) : 62);
+    const baselineConfidence = controlDecision.actions.capConfidence && Number.isFinite(Number(controlDecision.actions.confidenceCap))
+        ? Math.min(rawBaselineConfidence, Number(controlDecision.actions.confidenceCap))
+        : rawBaselineConfidence;
     const p_base = toProbability(baselineConfidence);
-    const contextFixture = buildContextFixture(matchContext, item, sport);
+    const contextFixture = buildContextFixture(matchContext, canonicalInput, sport);
     let contextEnriched = null;
 
     try {

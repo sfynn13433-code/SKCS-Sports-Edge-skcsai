@@ -6,6 +6,7 @@ const { runPipelineForMatches } = require('../services/aiPipeline');
 const { buildLiveData } = require('../services/dataProvider');
 const { upsertCanonicalEvents } = require('../services/canonicalEvents');
 const { resolveActiveDeploymentSports } = require('../config/activeSports');
+const { executeOperation } = require('../core/executionPipeline');
 
 const router = express.Router();
 
@@ -13,18 +14,29 @@ const router = express.Router();
 router.post('/trigger-fixture-sync', async (req, res) => {
   try {
     console.log('Fixture sync triggered via API');
-    
-    // This would be called by external cron service
-    const result = await fetch(`${process.env.SUPABASE_URL}/functions/v1/scheduledFixtureSync`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
-        'Content-Type': 'application/json'
-      }
+    const result = await executeOperation({
+      operation: 'scheduler.fixture-sync',
+      caller: 'backend/routes/scheduler.js',
+      payload: { source: 'api' },
+      execute: async () => fetch(`${process.env.SUPABASE_URL}/functions/v1/scheduledFixtureSync`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      })
     });
-    
-    const data = await result.json();
-    
+
+    if (result?.success === false) {
+      return res.status(503).json({
+        success: false,
+        error: result.reason || result.error || 'fixture_sync_blocked',
+        traceId: result.traceId || result.trace_id || null
+      });
+    }
+
+    const data = await result.result.json();
+
     res.json({
       success: true,
       message: 'Fixture sync triggered',
@@ -44,8 +56,19 @@ router.post('/trigger-fixture-sync', async (req, res) => {
 router.post('/trigger-context-enrichment', async (req, res) => {
   try {
     console.log('Context enrichment triggered via API');
-    
-    await contextEnrichmentService.processEnrichmentQueue();
+    const result = await executeOperation({
+      operation: 'scheduler.context-enrichment',
+      caller: 'backend/routes/scheduler.js',
+      payload: { source: 'api' },
+      execute: async () => contextEnrichmentService.processEnrichmentQueue()
+    });
+    if (result?.success === false) {
+      return res.status(503).json({
+        success: false,
+        error: result.reason || result.error || 'context_enrichment_blocked',
+        traceId: result.traceId || result.trace_id || null
+      });
+    }
     
     res.json({
       success: true,
@@ -91,38 +114,61 @@ router.post('/trigger-ai-pipeline', requireAdminKey, async (req, res) => {
       try {
         console.log(`[scheduler] Processing sport: ${currentSport}`);
 
-        // Fetch fixtures (same as syncService)
-        const rawMatches = await buildLiveData({
-          sport: currentSport,
-          windowDays: 7
+        const rawMatches = await executeOperation({
+          operation: 'scheduler.ai-pipeline.fetch',
+          caller: 'backend/routes/scheduler.js',
+          payload: { sport: currentSport },
+          execute: async () => buildLiveData({
+            sport: currentSport,
+            windowDays: 7
+          })
         });
+        if (rawMatches?.success === false) {
+          results.push({ sport: currentSport, status: 'blocked', error: rawMatches.reason || rawMatches.error || 'fetch_blocked' });
+          continue;
+        }
 
-        if (!rawMatches || rawMatches.length === 0) {
+        if (!rawMatches.result || rawMatches.result.length === 0) {
           console.log(`[scheduler] No fixtures found for ${currentSport}`);
           results.push({ sport: currentSport, status: 'no_fixtures', matchesProcessed: 0 });
           continue;
         }
 
-        // Upsert canonical events (same as syncService)
-        await upsertCanonicalEvents(rawMatches);
-
-        console.log(`[scheduler] Found ${rawMatches.length} matches for ${currentSport}. Running AI Analysis...`);
-
-        // Run AI pipeline (same function syncService uses)
-        const pipelineResult = await runPipelineForMatches({
-          matches: rawMatches,
-          telemetry: {
-            run_id: Date.now(),
-            sport: currentSport,
-            trigger_source: 'scheduler_api'
-          }
+        await executeOperation({
+          operation: 'scheduler.ai-pipeline.upsert',
+          caller: 'backend/routes/scheduler.js',
+          payload: { sport: currentSport, matches: rawMatches.result.length },
+          execute: async () => upsertCanonicalEvents(rawMatches.result)
         });
+
+        console.log(`[scheduler] Found ${rawMatches.result.length} matches for ${currentSport}. Running AI Analysis...`);
+
+        const pipelineResult = await executeOperation({
+          operation: 'scheduler.ai-pipeline.run',
+          caller: 'backend/routes/scheduler.js',
+          payload: {
+            sport: currentSport,
+            matches: rawMatches.result.length
+          },
+          execute: async () => runPipelineForMatches({
+            matches: rawMatches.result,
+            telemetry: {
+              run_id: Date.now(),
+              sport: currentSport,
+              trigger_source: 'scheduler_api'
+            }
+          })
+        });
+        if (pipelineResult?.success === false) {
+          results.push({ sport: currentSport, status: 'blocked', error: pipelineResult.reason || pipelineResult.error || 'pipeline_blocked' });
+          continue;
+        }
 
         results.push({
           sport: currentSport,
           status: 'success',
-          matchesProcessed: rawMatches.length,
-          pipelineResult
+          matchesProcessed: rawMatches.result.length,
+          pipelineResult: pipelineResult.result
         });
 
       } catch (sportError) {

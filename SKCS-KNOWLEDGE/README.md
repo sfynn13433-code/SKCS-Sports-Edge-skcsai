@@ -13,11 +13,15 @@ This folder is the first-pass knowledge system for SKCS.
 - Key files:
   - `knowledge/database_schema.md`
   - `knowledge/formula_registry.md`
+  - `knowledge/semantic_field_mapping_registry.md`
+  - `knowledge/semantic_violation_log.md`
+  - `knowledge/pipeline_metrics_registry.md`
   - `knowledge/dependency_registry.md`
   - `knowledge/cost_registry.md`
   - `knowledge/system_topology.md`
   - `governance/verification_layer_spec.md`
   - `audit/verification_runtime_audit.md`
+  - `audit/observability_registry.md`
   - `audit/column_dependency_matrix.md`
   - `audit/runtime_consumer_audit_v2.md`
   - `audit/cron_provider_runtime_map.md`

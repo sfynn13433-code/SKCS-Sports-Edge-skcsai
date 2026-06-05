@@ -10,6 +10,9 @@ const cron = require('node-cron');
 const { syncDailyFixtures, enrichMatchContext, generateEdgeMindInsight } = require('./thesportsdbPipeline');
 const { apiQueue } = require('../utils/apiQueue');
 const db = require('../db');
+const { getExecutionConstraints } = require('../semantic-layer/governanceGatekeeper');
+const { refreshPipelineHealthState } = require('./pipelineMetricsService');
+const { executeOperation } = require('../core/executionPipeline');
 
 /**
  * Initialize all cron jobs
@@ -22,10 +25,20 @@ function initCronJobs() {
     cron.schedule('1 0 * * *', async () => {
         const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
         console.log(`[CRON] Running Daily Discovery for ${today}`);
+        const constraints = getExecutionConstraints();
+        if (!constraints.proceed) {
+            console.warn(`[CRON] Daily Discovery skipped due to control plane state: ${constraints.state}`);
+            return;
+        }
         
         try {
-            const count = await syncDailyFixtures(today);
-            console.log(`[CRON] Daily Discovery completed: ${count} fixtures synced`);
+            const count = await executeOperation({
+                operation: 'cron.dailyDiscovery',
+                caller: 'backend/services/cronJobs.js',
+                payload: { today },
+                execute: async () => syncDailyFixtures(today)
+            });
+            console.log(`[CRON] Daily Discovery completed: ${count.result || 0} fixtures synced`);
         } catch (err) {
             console.error(`[CRON] Daily Discovery failed:`, err.message);
         }
@@ -37,6 +50,11 @@ function initCronJobs() {
     // ── Schedule 2: Pulse Check (every 30 minutes) ────────────────────────────────
     cron.schedule('*/30 * * * *', async () => {
         console.log(`[CRON] Running Pulse Check at ${new Date().toISOString()}`);
+        const constraints = getExecutionConstraints();
+        if (!constraints.proceed) {
+            console.warn(`[CRON] Pulse Check skipped due to control plane state: ${constraints.state}`);
+            return;
+        }
         
         try {
             // Query raw_fixtures for matches within the next 72 hours
@@ -56,6 +74,11 @@ function initCronJobs() {
             const upcomingMatches = result.rows;
             
             console.log(`[CRON] Pulse Check: Found ${upcomingMatches.length} matches within 72 hours`);
+
+            if (constraints.mode === 'fallback') {
+                console.warn('[CRON] Pulse Check running in fallback mode; skipping deep enrichment and AI insight generation.');
+                return;
+            }
             
             // Safety: Check ApiQueue saturation and batch gracefully
             const queueLength = apiQueue.getQueueLength();
@@ -77,13 +100,21 @@ function initCronJobs() {
                     const { id_event, start_time } = match;
                     
                     try {
-                        // Enrich match context
-                        const enriched = await enrichMatchContext(id_event);
-                        if (enriched) enrichedCount++;
+                        const enriched = await executeOperation({
+                            operation: 'cron.pulse.enrich',
+                            caller: 'backend/services/cronJobs.js',
+                            payload: { id_event },
+                            execute: async () => enrichMatchContext(id_event)
+                        });
+                        if (enriched?.result) enrichedCount++;
                         
-                        // Immediately generate AI insight
-                        const insight = await generateEdgeMindInsight(id_event);
-                        if (insight) insightCount++;
+                        const insight = await executeOperation({
+                            operation: 'cron.pulse.insight',
+                            caller: 'backend/services/cronJobs.js',
+                            payload: { id_event },
+                            execute: async () => generateEdgeMindInsight(id_event)
+                        });
+                        if (insight?.result) insightCount++;
                         
                         console.log(`[CRON] Pulse Check: Processed ${id_event} (starts ${start_time})`);
                     } catch (err) {
@@ -106,26 +137,55 @@ function initCronJobs() {
     });
     console.log('[CRON] Pulse Check scheduled: every 30 minutes');
 
-    // ── Schedule 3: Stale Prediction Cleanup (every 30 minutes) ──────────────────
+    // ── Schedule 3: Pipeline Health Feed Pulse (every 30 minutes) ────────────────
+    cron.schedule('5,35 * * * *', async () => {
+        console.log(`[CRON] Refreshing pipeline health feed at ${new Date().toISOString()}`);
+        try {
+            const result = await executeOperation({
+                operation: 'cron.pipelineHealth',
+                caller: 'backend/services/cronJobs.js',
+                payload: { source: 'cron' },
+                execute: async () => refreshPipelineHealthState({ source: 'cron' })
+            });
+            console.log(`[CRON] Pipeline health feed refreshed for ${result.result.summary.pipeline_count} pipelines`);
+        } catch (err) {
+            console.error('[CRON] Pipeline health feed refresh failed:', err.message);
+        }
+    }, {
+        timezone: 'UTC'
+    });
+    console.log('[CRON] Pipeline health feed pulse scheduled: minutes 5 and 35 every hour');
+
+    // ── Schedule 4: Stale Prediction Cleanup (every 30 minutes) ──────────────────
     // Removes predictions for matches that have kicked off (>15 min grace period)
     // This guarantees the UI never shows live/completed matches
     cron.schedule('*/30 * * * *', async () => {
         console.log('[CRON] Running Stale Prediction Cleanup...');
+        const constraints = getExecutionConstraints();
+        if (!constraints.proceed) {
+            console.warn(`[CRON] Stale Prediction Cleanup skipped due to control plane state: ${constraints.state}`);
+            return;
+        }
         
         try {
             const graceMinutes = 15;
 
             // Clean direct1x2_prediction_final — matches past kickoff + grace
-            const finalResult = await db.query(`
-                DELETE FROM direct1x2_prediction_final pf
-                WHERE pf.match_date IS NOT NULL
-                  AND pf.match_date < NOW() - ($1 || ' minutes')::interval
-                  AND NOT EXISTS (
-                      SELECT 1
-                      FROM predictions_accuracy pa
-                      WHERE pa.prediction_final_id = pf.id
-                  )
-            `, [String(graceMinutes)]);
+            const finalResult = await executeOperation({
+                operation: 'cron.staleCleanup',
+                caller: 'backend/services/cronJobs.js',
+                payload: { graceMinutes },
+                execute: async () => db.query(`
+                    DELETE FROM direct1x2_prediction_final pf
+                    WHERE pf.match_date IS NOT NULL
+                      AND pf.match_date < NOW() - ($1 || ' minutes')::interval
+                      AND NOT EXISTS (
+                          SELECT 1
+                          FROM predictions_accuracy pa
+                          WHERE pa.prediction_final_id = pf.id
+                      )
+                `, [String(graceMinutes)])
+            });
 
             // Clean predictions_raw — stale rows
             // TEMPORARY BYPASS: predictions_raw table missing updated_at column
@@ -134,7 +194,7 @@ function initCronJobs() {
             //     WHERE updated_at < NOW() - INTERVAL '24 hours'
             // `);
 
-            const finalDeleted = Number(finalResult.rowCount || 0);
+            const finalDeleted = Number(finalResult.result?.rowCount || 0);
             // const rawDeleted = Number(rawResult.rowCount || 0);
             const rawDeleted = 0;
 

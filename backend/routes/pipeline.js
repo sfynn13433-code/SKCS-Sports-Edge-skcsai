@@ -7,6 +7,7 @@ const {
     rebuildFinalOutputs 
 } = require('../services/aiPipeline');
 const { syncAllSports, syncSports } = require('../services/syncService');
+const { executeOperation } = require('../core/executionPipeline');
 const config = require('../config');
 const { requireRole } = require('../utils/auth');
 
@@ -49,20 +50,36 @@ async function handleSyncRequest(res, options = {}) {
 
     console.log(`[pipeline] Starting ${triggerLabel}${requestedSport ? ` for ${requestedSport}` : ''}...`);
 
-    const execute = () => (
-        requestedSport
-            ? syncSports({ sports: requestedSport })
-            : syncAllSports()
-    );
+    const execute = () => executeOperation({
+        operation: 'pipeline.sync',
+        caller: 'backend/routes/pipeline.js',
+        payload: {
+            requestedSport,
+            triggerLabel
+        },
+        execute: async () => (
+            requestedSport
+                ? syncSports({ sports: requestedSport })
+                : syncAllSports()
+        )
+    });
 
     if (waitForCompletion) {
         try {
             const result = await execute();
+            if (result?.success === false) {
+                res.status(503).json({
+                    ok: false,
+                    error: result.reason || result.error || 'pipeline_blocked',
+                    traceId: result.traceId || result.trace_id || null
+                });
+                return;
+            }
 
             res.status(200).json({
                 ok: true,
                 message: 'Sync completed successfully',
-                sync: result ? 'ok' : 'no result',
+                sync: result?.success === false ? 'failed' : 'ok',
                 requestedSport,
                 publishRun: result?.publishRun || null,
                 totalMatchesProcessed: result?.totalMatchesProcessed || 0,
@@ -93,7 +110,7 @@ async function handleSyncRequest(res, options = {}) {
         const result = await execute();
         console.log('[pipeline] Background sync complete:', JSON.stringify({
             trigger: triggerLabel,
-            sync: result ? 'ok' : 'no result',
+            sync: result?.success === false ? 'failed' : 'ok',
             requestedSport,
             publishRun: result?.publishRun || null,
             totalMatchesProcessed: result?.totalMatchesProcessed || 0,
@@ -239,24 +256,38 @@ router.get('/status', requireRole('admin'), async (_req, res) => {
 router.post('/run', requireRole('admin'), async (req, res) => {
     try {
         const matches = req.body?.matches;
-        const pipeline = Array.isArray(matches) && matches.length > 0
-            ? await runPipelineForMatches({ matches })
-            : await runPipelineFromConfiguredDataMode();
+        const pipeline = await executeOperation({
+            operation: 'pipeline.run',
+            caller: 'backend/routes/pipeline.js',
+            payload: {
+                matches: Array.isArray(matches) ? matches.length : 0
+            },
+            execute: async () => (
+                Array.isArray(matches) && matches.length > 0
+                    ? runPipelineForMatches({ matches })
+                    : runPipelineFromConfiguredDataMode()
+            )
+        });
 
-        if (pipeline?.error) {
-            res.status(409).json({ error: pipeline.error });
+        if (pipeline?.success === false || pipeline?.result?.error) {
+            res.status(409).json({ error: pipeline?.error || pipeline?.result?.error || 'Pipeline rejected' });
             return;
         }
 
-        const final = await rebuildFinalOutputs();
+        const final = await executeOperation({
+            operation: 'pipeline.rebuild',
+            caller: 'backend/routes/pipeline.js',
+            payload: { source: 'routes/pipeline' },
+            execute: async () => rebuildFinalOutputs()
+        });
 
         res.status(200).json({
-            mode: pipeline.mode,
-            raw_count: pipeline.inserted.length,
-            filtered_valid: pipeline.filtered_valid,
-            filtered_invalid: pipeline.filtered_invalid,
-            singles_count: (final?.normal?.singles?.length || 0) + (final?.deep?.singles?.length || 0),
-            acca_count: (final?.normal?.accas?.length || 0) + (final?.deep?.accas?.length || 0)
+            mode: pipeline?.result?.mode,
+            raw_count: pipeline?.result?.inserted?.length || 0,
+            filtered_valid: pipeline?.result?.filtered_valid || 0,
+            filtered_invalid: pipeline?.result?.filtered_invalid || 0,
+            singles_count: (final?.result?.normal?.singles?.length || 0) + (final?.result?.deep?.singles?.length || 0),
+            acca_count: (final?.result?.normal?.accas?.length || 0) + (final?.result?.deep?.accas?.length || 0)
         });
     } catch (err) {
         console.error('Pipeline error:', err);
@@ -287,8 +318,17 @@ router.post('/mode', requireRole('admin'), async (req, res) => {
 router.post('/rebuild', requireRole('admin'), async (_req, res) => {
     try {
         console.log('[pipeline] Manual rebuild of final outputs requested...');
-        const final = await rebuildFinalOutputs();
-        res.status(200).json({ ok: true, message: "Final outputs rebuilt successfully", data: final });
+        const final = await executeOperation({
+            operation: 'pipeline.rebuild',
+            caller: 'backend/routes/pipeline.js',
+            payload: { source: 'routes/pipeline.rebuild' },
+            execute: async () => rebuildFinalOutputs()
+        });
+        if (final?.success === false) {
+            res.status(503).json({ error: final.reason || final.error || 'rebuild_blocked', traceId: final.traceId || final.trace_id || null });
+            return;
+        }
+        res.status(200).json({ ok: true, message: 'Final outputs rebuilt successfully', data: final.result || final });
     } catch (err) {
         console.error('Pipeline rebuild error:', err);
         res.status(500).json({ error: 'Rebuild failed', details: err.message });

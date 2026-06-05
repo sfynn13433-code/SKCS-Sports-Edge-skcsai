@@ -591,6 +591,7 @@ async function publishCricbuzzCricket(options = {}) {
 
     console.log('=== PUBLISH CRICBUZZ CRICKET START ===');
     const dryRunPreview = process.env.CRICKET_ENRICH_DRY_RUN === '1';
+    const skipEnrichment = options.skipEnrichment === true || String(options.skipEnrichment || '').toLowerCase() === 'true';
     const cricbuzzFeed = String(options.feed || process.env.CRICKET_CRICBUZZ_FEED || 'upcoming').trim().toLowerCase();
     console.log(`[cricket-policy] source=cricbuzz feed=${cricbuzzFeed} (live feed disabled for prediction ingestion)`);
 
@@ -616,19 +617,27 @@ async function publishCricbuzzCricket(options = {}) {
     
     const matches = normalizeCricbuzzData(raw);
     let resolvedMatches = matches;
-    try {
-        resolvedMatches = await resolveMatchIds(matches);
-    } catch (err) {
-        console.log(`Cricket Live ID resolution skipped: ${err.message}`);
-        resolvedMatches = matches;
+    if (!skipEnrichment) {
+        try {
+            resolvedMatches = await resolveMatchIds(matches);
+        } catch (err) {
+            console.log(`Cricket Live ID resolution skipped: ${err.message}`);
+            resolvedMatches = matches;
+        }
+    } else {
+        console.log('[cricket-policy] skipping match ID resolution in fallback mode');
     }
 
     let enrichedMatches = resolvedMatches;
-    try {
-        enrichedMatches = await enrichTopCricketMatches(resolvedMatches);
-    } catch (err) {
-        console.log(`Cricket Live enrichment skipped: ${err.message}`);
-        enrichedMatches = resolvedMatches;
+    if (!skipEnrichment) {
+        try {
+            enrichedMatches = await enrichTopCricketMatches(resolvedMatches);
+        } catch (err) {
+            console.log(`Cricket Live enrichment skipped: ${err.message}`);
+            enrichedMatches = resolvedMatches;
+        }
+    } else {
+        console.log('[cricket-policy] skipping deep cricket enrichment in fallback mode');
     }
 
     if (dryRunPreview) {

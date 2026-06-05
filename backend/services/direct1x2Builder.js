@@ -522,7 +522,16 @@ async function buildAndStoreDirect1X2(fixture, confidence, prediction, additiona
                 h2h: null,
                 weather: fixture?.weather || fixture?.weatherSummary,
                 absences: null,
-                api_probability: apiProbText // Pass real API probability to prompt
+                api_probability: apiProbText, // Pass real API probability to prompt
+                telemetry: {
+                    pipeline_name: 'direct1x2Builder',
+                    task_name: 'generateInsight',
+                    budget_class: 'Important',
+                    knowledge_context: contextual?.leagueStats ? 'hybrid' : 'static',
+                    monthly_risk: 'High',
+                    fixture_id: fixture?.fixture_id || fixture?.id || null,
+                    provider_chain: groqReady ? 'groq' : 'dolphin'
+                }
             });
             
             if (aiInsight && aiInsight.edgemind_report) {

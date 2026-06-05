@@ -7,6 +7,7 @@
 require('dotenv').config({ path: require('path').resolve(__dirname, '..') });
 
 const thesportsdbPipeline = require('../backend/services/thesportsdbPipeline');
+const { executeOperation } = require('../backend/core/executionPipeline');
 
 async function testPipeline() {
   console.log('🚀 Testing Fixed TheSportsDB Pipeline');
@@ -18,16 +19,26 @@ async function testPipeline() {
   console.log(`\n📊 Testing enrichment for event ${testEventId}`);
   
   try {
-    const success = await thesportsdbPipeline.enrichMatchContext(testEventId);
+    const success = await executeOperation({
+      operation: 'script.test-fixed.enrich',
+      caller: 'scripts/test-fixed-pipeline.js',
+      payload: { testEventId },
+      execute: async () => thesportsdbPipeline.enrichMatchContext(testEventId)
+    });
     
-    if (success) {
+    if (success?.result) {
       console.log('✅ Enrichment completed successfully');
       
       // Test insight generation
       console.log('\n🧠 Testing insight generation...');
-      const insightSuccess = await thesportsdbPipeline.generateEdgeMindInsight(testEventId);
+      const insightSuccess = await executeOperation({
+        operation: 'script.test-fixed.insight',
+        caller: 'scripts/test-fixed-pipeline.js',
+        payload: { testEventId },
+        execute: async () => thesportsdbPipeline.generateEdgeMindInsight(testEventId)
+      });
       
-      if (insightSuccess) {
+      if (insightSuccess?.result) {
         console.log('✅ Insight generation completed successfully');
       } else {
         console.log('❌ Insight generation failed');

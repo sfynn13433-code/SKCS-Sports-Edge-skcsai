@@ -5,9 +5,12 @@ const axios = require('axios');
 const router = express.Router();
 
 const { requireSupabaseUser, requireActiveSubscription } = require('../middleware/supabaseJwt');
+const { requireRole } = require('../utils/auth');
 const { fetchWithCache, isCacheWallReady } = require('../services/apiCacheService');
 const { getMetrxConfig } = require('../services/metrxFactoryService');
 const { consumeQuota } = require('../services/providerQuotaService');
+const { refreshPipelineHealthState } = require('../services/pipelineMetricsService');
+const { executeOperation } = require('../core/executionPipeline');
 
 function flagOn(name, defaultVal = false) {
     const v = String(process.env[name] || '').trim().toLowerCase();
@@ -106,6 +109,32 @@ router.get('/metrx', requireSupabaseUser, requireActiveSubscription, async (req,
         }
 
         return res.json({ ok: true, provider: 'metrx_factory', data: payload });
+    } catch (err) {
+        return res.status(500).json({ ok: false, error: 'internal_error', details: String(err.message || 'error') });
+    }
+});
+
+router.get('/pipeline-health', requireRole('admin'), async (_req, res) => {
+    try {
+        const report = await executeOperation({
+            operation: 'metrics.pipeline-health',
+            caller: 'backend/routes/metrics.js',
+            payload: { source: 'api' },
+            execute: async () => refreshPipelineHealthState({ source: 'api' })
+        });
+        if (report?.success === false) {
+            return res.status(503).json({
+                ok: false,
+                error: report.reason || report.error || 'pipeline_health_blocked',
+                traceId: report.traceId || report.trace_id || null
+            });
+        }
+        return res.json({
+            ok: true,
+            feed: report.result?.feed,
+            summary: report.result?.summary,
+            snapshot: report.result?.snapshot
+        });
     } catch (err) {
         return res.status(500).json({ ok: false, error: 'internal_error', details: String(err.message || 'error') });
     }

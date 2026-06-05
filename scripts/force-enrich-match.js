@@ -1,5 +1,6 @@
 const { enrichMatchContext, generateEdgeMindInsight } = require('../backend/services/thesportsdbPipeline');
 const db = require('../backend/db');
+const { executeOperation } = require('../backend/core/executionPipeline');
 
 async function forceEnrichMatch() {
   try {
@@ -31,16 +32,26 @@ async function forceEnrichMatch() {
     
     // Force enrichment (bypass 72-hour check)
     console.log('Step 1: Enriching match context...');
-    const enriched = await enrichMatchContext(eventId);
+    const enriched = await executeOperation({
+      operation: 'script.force-enrich.enrich',
+      caller: 'scripts/force-enrich-match.js',
+      payload: { eventId },
+      execute: async () => enrichMatchContext(eventId)
+    });
     
-    if (enriched) {
+    if (enriched?.result) {
       console.log('✅ Match context enriched successfully\n');
       
       // Force AI prediction generation
       console.log('Step 2: Generating AI predictions...');
-      const insight = await generateEdgeMindInsight(eventId);
+      const insight = await executeOperation({
+        operation: 'script.force-enrich.insight',
+        caller: 'scripts/force-enrich-match.js',
+        payload: { eventId },
+        execute: async () => generateEdgeMindInsight(eventId)
+      });
       
-      if (insight) {
+      if (insight?.result) {
         console.log('✅ AI predictions generated successfully\n');
         
         // Check the results

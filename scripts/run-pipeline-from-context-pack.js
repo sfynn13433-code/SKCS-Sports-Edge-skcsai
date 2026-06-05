@@ -13,6 +13,8 @@ function readJson(p) {
   return JSON.parse(txt);
 }
 
+const { executeOperation } = require(path.resolve(__dirname, "..", "backend", "core", "executionPipeline.js"));
+
 function ensureZ(s) {
   if (!s) return null;
   return s.endsWith("Z") ? s : `${s}Z`;
@@ -177,8 +179,13 @@ async function main() {
   const { runPipelineForMatches } = require(path.resolve(__dirname, "..", "backend", "services", "aiPipeline.js"));
 
   try {
-    const res = await runPipelineForMatches({ matches, telemetry: { run_id: `context_pack_${date}`, source: "context_pack" } });
-    console.log(JSON.stringify({ ok: true, mode: res && res.mode, summary: res }, null, 2));
+    const res = await executeOperation({
+      operation: 'script.context-pack.pipeline',
+      caller: 'scripts/run-pipeline-from-context-pack.js',
+      payload: { date, matches: matches.length },
+      execute: async () => runPipelineForMatches({ matches, telemetry: { run_id: `context_pack_${date}`, source: "context_pack" } })
+    });
+    console.log(JSON.stringify({ ok: true, mode: res?.result && res.result.mode, summary: res.result }, null, 2));
   } catch (err) {
     console.error(JSON.stringify({ ok: false, error: err && err.message ? err.message : String(err) }, null, 2));
     process.exit(1);

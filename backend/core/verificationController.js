@@ -8,6 +8,11 @@ const {
     createVerificationSignal,
     isVerificationSignal
 } = require('./verificationSignalContract');
+const {
+    CONTROL_STATES,
+    evaluateControlPlane,
+    summarizeSignals
+} = require('../semantic-layer/controlPlaneEvaluator');
 
 const SYSTEM_STATES = Object.freeze({
     UNKNOWN: 'UNKNOWN',
@@ -18,31 +23,23 @@ const SYSTEM_STATES = Object.freeze({
     BLOCKED: 'BLOCKED'
 });
 
-const STATE_RANK = Object.freeze({
-    UNKNOWN: 0,
-    HEALTHY: 1,
-    WARN: 2,
-    DEGRADED: 3,
-    CRITICAL: 4,
-    BLOCKED: 5
-});
-
 function clone(value) {
     return JSON.parse(JSON.stringify(value));
 }
 
-function latestBySeverity(signals) {
-    return signals.reduce((current, signal) => {
-        const currentRank = STATE_RANK[current.severity] ?? 0;
-        const nextRank = STATE_RANK[signal.severity] ?? 0;
-        return nextRank > currentRank ? signal : current;
-    }, createVerificationSignal({
-        source: 'init',
-        type: SIGNAL_TYPES.api,
-        status: SIGNAL_STATUS.PASS,
-        severity: SYSTEM_STATES.UNKNOWN,
-        reason: 'No signals recorded yet.'
-    }));
+function mapControlStateToSystemState(controlState) {
+    switch (String(controlState || '').trim().toUpperCase()) {
+        case CONTROL_STATES.PASS:
+            return SYSTEM_STATES.HEALTHY;
+        case CONTROL_STATES.WARN:
+            return SYSTEM_STATES.WARN;
+        case CONTROL_STATES.DEGRADED:
+            return SYSTEM_STATES.DEGRADED;
+        case CONTROL_STATES.FAIL:
+            return SYSTEM_STATES.CRITICAL;
+        default:
+            return SYSTEM_STATES.UNKNOWN;
+    }
 }
 
 class VerificationController {
@@ -62,6 +59,7 @@ class VerificationController {
                 useFallback: false
             },
             signals: [],
+            pipelineMetrics: null,
             lastUpdatedAt: null
         };
     }
@@ -130,6 +128,22 @@ class VerificationController {
         }
     }
 
+    configureControlPlaneThresholds(thresholds = {}) {
+        this._controlPlaneThresholds = thresholds && typeof thresholds === 'object' ? thresholds : {};
+        return this._controlPlaneThresholds;
+    }
+
+    evaluateControlPlane(summary = {}, options = {}) {
+        const mergedOptions = {
+            ...options,
+            pipelineThresholds: {
+                ...(this._controlPlaneThresholds || {}),
+                ...((options && options.pipelineThresholds) || {})
+            }
+        };
+        return evaluateControlPlane(summary, mergedOptions);
+    }
+
     _commit(signals) {
         const normalizedSignals = this._normalizeSignals(signals);
         if (normalizedSignals.length === 0) {
@@ -143,16 +157,24 @@ class VerificationController {
             return this.getSnapshot();
         }
 
-        const highest = latestBySeverity(normalizedSignals);
-        const reasons = normalizedSignals
-            .filter((signal) => signal.severity !== SYSTEM_STATES.HEALTHY && signal.severity !== SYSTEM_STATES.UNKNOWN)
-            .map((signal) => `[${signal.severity}] ${signal.reason || signal.source}`);
+        const evaluation = evaluateControlPlane(summarizeSignals(normalizedSignals), {
+            pipelineThresholds: this._controlPlaneThresholds || {}
+        });
+        const reasons = Array.isArray(evaluation.reasons) && evaluation.reasons.length > 0
+            ? evaluation.reasons
+            : normalizedSignals
+                .filter((signal) => signal.severity !== SYSTEM_STATES.HEALTHY && signal.severity !== SYSTEM_STATES.UNKNOWN)
+                .map((signal) => `[${signal.severity}] ${signal.reason || signal.source}`);
 
+        const systemState = mapControlStateToSystemState(evaluation.state);
         const snapshot = {
-            state: highest.severity,
+            state: systemState,
+            controlState: evaluation.state,
             reasons,
-            actions: this._actionTemplate(highest.severity),
+            actions: evaluation.actions || this._actionTemplate(systemState),
             signals: normalizedSignals,
+            healthScore: evaluation.healthScore,
+            controlPlane: evaluation,
             lastUpdatedAt: new Date().toISOString()
         };
 
@@ -170,34 +192,91 @@ class VerificationController {
         }
 
         const signals = Array.isArray(snapshot.signals) ? snapshot.signals : [];
+        const reasons = Array.isArray(snapshot.reasons) ? snapshot.reasons : [];
+        const activeViolations = signals.filter((signal) => {
+            const severity = String(signal?.severity || '').trim().toUpperCase();
+            return severity && severity !== SYSTEM_STATES.HEALTHY && severity !== SYSTEM_STATES.UNKNOWN;
+        });
+        const activeDegradations = signals.filter((signal) => {
+            const severity = String(signal?.severity || '').trim().toUpperCase();
+            return severity === SYSTEM_STATES.WARN
+                || severity === SYSTEM_STATES.DEGRADED
+                || severity === SYSTEM_STATES.CRITICAL
+                || severity === SYSTEM_STATES.BLOCKED;
+        });
         const signalStateFor = (type) => {
             const match = signals.find((signal) => signal?.type === type);
             return String(match?.severity || SYSTEM_STATES.UNKNOWN);
         };
 
+        let previousState = null;
+        let previousTransition = null;
+        let previousRecordedAt = null;
+        try {
+            const { rows: previousRows } = await query(
+                `SELECT state, last_transition, recorded_at
+                 FROM public.system_health_state
+                 ORDER BY recorded_at DESC
+                 LIMIT 1`
+            );
+            previousState = previousRows?.[0]?.state || null;
+            previousTransition = previousRows?.[0]?.last_transition || null;
+            previousRecordedAt = previousRows?.[0]?.recorded_at || null;
+        } catch (error) {
+            console.warn('[verificationController] Failed to inspect previous health state:', error.message);
+        }
+
+        const nowIso = new Date().toISOString();
+        const transitionReason = reasons[0]
+            || snapshot.controlPlane?.reasons?.[0]
+            || snapshot.controlState
+            || 'Control plane snapshot updated.';
+        const lastTransition = previousState !== snapshot.state
+            ? nowIso
+            : previousTransition
+                || previousRecordedAt
+                || nowIso;
+
         const snapshotPayload = {
             state: String(snapshot.state || SYSTEM_STATES.UNKNOWN),
-            reasons: Array.isArray(snapshot.reasons) ? snapshot.reasons : [],
+            controlState: snapshot.controlState || null,
+            reasons,
             actions: snapshot.actions && typeof snapshot.actions === 'object' ? snapshot.actions : this._actionTemplate(SYSTEM_STATES.UNKNOWN),
             signals,
-            lastUpdatedAt: snapshot.lastUpdatedAt || null
+            pipelineMetrics: snapshot.pipelineMetrics && typeof snapshot.pipelineMetrics === 'object'
+                ? snapshot.pipelineMetrics
+                : null,
+            healthScore: Number.isFinite(Number(snapshot.healthScore)) ? Number(snapshot.healthScore) : null,
+            controlPlane: snapshot.controlPlane || null,
+            lastUpdatedAt: snapshot.lastUpdatedAt || null,
+            transitionReason,
+            activeViolations,
+            activeDegradations,
+            lastTransition,
+            updatedAt: nowIso
         };
 
         const { rows } = await query(
             `INSERT INTO public.system_health_state (
                 recorded_at,
                 state,
+                state_score,
+                transition_reason,
                 pipeline_state,
                 enrichment_state,
                 quota_state,
                 api_state,
                 db_state,
                 reasons,
+                active_violations,
+                active_degradations,
+                last_transition,
                 allow_publish,
                 allow_write,
                 use_fallback,
                 signals,
-                snapshot
+                snapshot,
+                updated_at
             ) VALUES (
                 NOW(),
                 $1,
@@ -206,27 +285,39 @@ class VerificationController {
                 $4,
                 $5,
                 $6,
-                $7::jsonb,
+                $7,
                 $8,
-                $9,
-                $10,
-                $11::jsonb,
-                $12::jsonb
+                $9::jsonb,
+                $10::jsonb,
+                $11::timestamptz,
+                $12,
+                $13,
+                $14,
+                $15::jsonb,
+                $16::jsonb,
+                $17::jsonb,
+                $18::timestamptz
             )
             RETURNING *`,
             [
                 snapshotPayload.state,
+                Number.isFinite(Number(snapshotPayload.healthScore)) ? Number(snapshotPayload.healthScore) : null,
+                transitionReason,
                 signalStateFor(SIGNAL_TYPES.pipeline),
                 signalStateFor(SIGNAL_TYPES.enrichment),
                 signalStateFor(SIGNAL_TYPES.quota),
                 signalStateFor(SIGNAL_TYPES.api),
                 signalStateFor(SIGNAL_TYPES.db),
                 JSON.stringify(snapshotPayload.reasons),
+                JSON.stringify(snapshotPayload.activeViolations),
+                JSON.stringify(snapshotPayload.activeDegradations),
+                lastTransition,
                 Boolean(snapshotPayload.actions.allowPublish),
                 Boolean(snapshotPayload.actions.allowWrite),
                 Boolean(snapshotPayload.actions.useFallback),
                 JSON.stringify(signals),
-                JSON.stringify(snapshotPayload)
+                JSON.stringify(snapshotPayload),
+                snapshotPayload.updatedAt
             ]
         );
 
@@ -253,6 +344,22 @@ class VerificationController {
         }
 
         return this._commit(signals);
+    }
+
+    recordPipelineMetrics(metrics = {}) {
+        const currentSnapshot = this.getSnapshot();
+        const nextSnapshot = {
+            ...currentSnapshot,
+            pipelineMetrics: metrics && typeof metrics === 'object' ? clone(metrics) : null,
+            lastUpdatedAt: new Date().toISOString()
+        };
+
+        this._latest = nextSnapshot;
+        this._pushHistory(nextSnapshot);
+        void this.persistSystemState(nextSnapshot).catch((error) => {
+            console.warn('[verificationController] Failed to persist pipeline metrics snapshot:', error.message);
+        });
+        return this.getSnapshot();
     }
 
     _evaluatePipelineStatus(payload = {}) {

@@ -2,6 +2,7 @@
 
 const { runPipelineForMatches } = require('../backend/services/aiPipeline');
 const adjustProbability = require('../backend/src/services/contextIntelligence/adjustProbability');
+const { executeOperation } = require('../backend/core/executionPipeline');
 
 function readArg(name, fallback) {
   const key = `--${name}=`;
@@ -52,12 +53,17 @@ async function run() {
     }
   };
 
-  const result = await runPipelineForMatches({
-    matches: [match],
-    telemetry: { run_id: 'wx-live-test-cli', sport: 'football' }
+  const result = await executeOperation({
+    operation: 'script.test-weather.pipeline',
+    caller: 'scripts/test-weather-pipeline.js',
+    payload: { venue, market: requestedMarket },
+    execute: async () => runPipelineForMatches({
+      matches: [match],
+      telemetry: { run_id: 'wx-live-test-cli', sport: 'football' }
+    })
   });
 
-  const row = result.inserted[0];
+  const row = result.result.inserted[0];
   const ci = row?.metadata?.context_intelligence || {};
   const signals = ci.signals || {};
   const selectedMarket = row?.market || 'unknown';
@@ -66,9 +72,9 @@ async function run() {
   const underAfter = adjustProbability.applyMarketAdjustment(ci.p_adj, 'under_2_5', signals.market_adjustments);
 
   console.log('PIPELINE_RESULT', JSON.stringify({
-    inserted: result.inserted.length,
-    filtered_valid: result.filtered_valid,
-    filtered_invalid: result.filtered_invalid,
+    inserted: result.result.inserted.length,
+    filtered_valid: result.result.filtered_valid,
+    filtered_invalid: result.result.filtered_invalid,
     selected_market: selectedMarket,
     selected_confidence: row?.confidence
   }, null, 2));

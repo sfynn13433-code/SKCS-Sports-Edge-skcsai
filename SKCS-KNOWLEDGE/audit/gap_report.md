@@ -21,6 +21,8 @@
 - `column_dependency_matrix.md` now exists, but it still needs a second pass for exact column-by-column frontend and script coverage.
 - `cron_provider_runtime_map.md` now exists, but it should be expanded with exact provider quota numbers, duplicate-call detection, and measurable refresh economics.
 - `prediction_dependency_audit.md` now exists, but it still needs verification against the full codebase and a follow-up `dependency_registry.md`.
+- `semantic_field_mapping_registry.md` now exists, but it still needs ongoing updates whenever source feed semantics or unsupported context assumptions change.
+- `semantic_violation_log.md` now exists as the governance ledger for blocked, quarantined, and normalized semantic events.
 - The Knowledge Layer completeness audit now confirms the remaining blind spots are concentrated in dependency, observability, cost, and centralized RLS documentation rather than broad architectural inventory.
 - `verification_layer_spec.md` now exists as the control-spec foundation for Layer 5, but it still needs implementation against SQL checks, cron validators, and deployment gates.
 - `verification_runtime_audit.md` now exists as the truth audit for Layer 5 enforcement reality; it needs continued verification as runtime changes are patched.
@@ -48,6 +50,8 @@
 ## High-priority docs created since the last pass
 
 - `prediction_dependency_audit.md` now exists as the canonical dependency map for prediction-related RLS rollout.
+- `semantic_field_mapping_registry.md` now exists as the semantic control layer for identity, time, and context meaning.
+- `semantic_violation_log.md` now exists as the audit trail for semantic enforcement events.
 - `verification_layer_spec.md` now exists as the first executable governance contract for Layer 5.
 - `verification_runtime_audit.md` now exists as the current truth audit for Layer 5 enforcement reality.
 
@@ -59,6 +63,8 @@
 - Create `observability_registry.md` for degraded-state and soft-failure detection.
 - Refresh or formalize `cost_registry.md` so provider cost, quota, and optimization live in one place.
 - Create or centralize `rls_registry.md` so the current policy state is easy to inspect later.
+- Keep the semantic mapping registry aligned with any new SportsDataIO field or status semantics before those values are used in grading.
+- Keep the semantic violation ledger aligned with the enforcement guard so every blocked or normalized event is preserved.
 - Implement the Layer 5 checks described in `verification_layer_spec.md`.
 - Patch only the missing hooks identified in `verification_runtime_audit.md`.
 

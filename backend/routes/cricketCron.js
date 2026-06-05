@@ -6,6 +6,8 @@ const {
     refreshDailyCache,
     refreshLiveScores
 } = require('../services/cricApiCacheService');
+const { getExecutionConstraints } = require('../semantic-layer/governanceGatekeeper');
+const { executeOperation } = require('../core/executionPipeline');
 
 const router = express.Router();
 const { isSportIngestionEnabled } = require('../services/apiQuotaRouter');
@@ -15,6 +17,15 @@ function cricketIngestionDisabledResponse(res) {
         ok: true,
         skipped: true,
         reason: 'cricket_ingestion_disabled'
+    });
+}
+
+function cricketControlPlaneResponse(res, constraints) {
+    return res.status(503).json({
+        ok: false,
+        skipped: true,
+        reason: constraints.reason || 'control_plane_blocked_execution',
+        control_state: constraints.state
     });
 }
 
@@ -31,6 +42,11 @@ function verifyCronSecret(req) {
 
 router.get('/cricket/cricbuzz', async (req, res) => {
     try {
+        const constraints = getExecutionConstraints();
+        if (!constraints.proceed) {
+            return cricketControlPlaneResponse(res, constraints);
+        }
+
         if (!isSportIngestionEnabled('cricket')) {
             return cricketIngestionDisabledResponse(res);
         }
@@ -44,11 +60,23 @@ router.get('/cricket/cricbuzz', async (req, res) => {
         }
 
         console.log('[cron/cricket/cricbuzz] Starting daily Cricbuzz cricket publish...');
+        if (constraints.mode === 'fallback') {
+            console.warn('[cron/cricket/cricbuzz] Running in fallback mode; deep cricket enrichment will be skipped.');
+        }
         const startedAt = new Date().toISOString();
 
-        const result = await publishCricbuzzCricket({
-            trigger: 'cron_cricket_cricbuzz'
+        const result = await executeOperation({
+            operation: 'cricket.cricbuzz.publish',
+            caller: 'backend/routes/cricketCron.js',
+            payload: { trigger: 'cron_cricket_cricbuzz' },
+            execute: async () => publishCricbuzzCricket({
+                trigger: 'cron_cricket_cricbuzz',
+                skipEnrichment: constraints.mode === 'fallback'
+            })
         });
+        if (result?.success === false) {
+            return cricketControlPlaneResponse(res, result);
+        }
 
         const finishedAt = new Date().toISOString();
 
@@ -58,11 +86,11 @@ router.get('/cricket/cricbuzz', async (req, res) => {
             started_at: startedAt,
             finished_at: finishedAt,
             result: {
-                fixturesFetched: result.normalized || 0,
-                fixturesInserted: result.fixtureUpserts || 0,
-                insightsPublished: result.insightUpserts || 0,
-                skipped: result.skipped || 0,
-                errors: result.errors?.length || 0
+                fixturesFetched: result.result?.normalized || 0,
+                fixturesInserted: result.result?.fixtureUpserts || 0,
+                insightsPublished: result.result?.insightUpserts || 0,
+                skipped: result.result?.skipped || 0,
+                errors: result.result?.errors?.length || 0
             }
         });
 
@@ -78,6 +106,11 @@ router.get('/cricket/cricbuzz', async (req, res) => {
 
 router.get('/cricket/cricapi/daily', async (req, res) => {
     try {
+        const constraints = getExecutionConstraints();
+        if (!constraints.proceed) {
+            return cricketControlPlaneResponse(res, constraints);
+        }
+
         if (!isSportIngestionEnabled('cricket')) {
             return cricketIngestionDisabledResponse(res);
         }
@@ -90,15 +123,25 @@ router.get('/cricket/cricapi/daily', async (req, res) => {
         }
 
         console.log('[cron/cricket/cricapi/daily] Building daily CricAPI cache...');
-        const result = await refreshDailyCache({
-            featuredLimit: req.query.featured_limit,
-            seriesLimit: req.query.series_limit
+        const degraded = constraints.mode === 'fallback';
+        const result = await executeOperation({
+            operation: 'cricket.cricapi.daily',
+            caller: 'backend/routes/cricketCron.js',
+            payload: { mode: 'daily' },
+            execute: async () => refreshDailyCache({
+                featuredLimit: degraded ? 1 : req.query.featured_limit,
+                seriesLimit: degraded ? 0 : req.query.series_limit,
+                detailDelayMs: degraded ? 0 : undefined
+            })
         });
+        if (result?.success === false) {
+            return cricketControlPlaneResponse(res, result);
+        }
 
         return res.json({
             ok: true,
             job: 'cricapi-daily-cache',
-            result
+            result: result.result
         });
     } catch (err) {
         console.error('[cron/cricket/cricapi/daily] Failed:', err);
@@ -112,6 +155,11 @@ router.get('/cricket/cricapi/daily', async (req, res) => {
 
 router.get('/cricket/cricapi/live', async (req, res) => {
     try {
+        const constraints = getExecutionConstraints();
+        if (!constraints.proceed) {
+            return cricketControlPlaneResponse(res, constraints);
+        }
+
         if (!isSportIngestionEnabled('cricket')) {
             return cricketIngestionDisabledResponse(res);
         }
@@ -124,14 +172,24 @@ router.get('/cricket/cricapi/live', async (req, res) => {
         }
 
         console.log('[cron/cricket/cricapi/live] Refreshing live CricAPI cache...');
-        const result = await refreshLiveScores({
-            liveLimit: req.query.live_limit
+        const degraded = constraints.mode === 'fallback';
+        const result = await executeOperation({
+            operation: 'cricket.cricapi.live',
+            caller: 'backend/routes/cricketCron.js',
+            payload: { mode: 'live' },
+            execute: async () => refreshLiveScores({
+                liveLimit: degraded ? 1 : req.query.live_limit,
+                detailDelayMs: degraded ? 0 : undefined
+            })
         });
+        if (result?.success === false) {
+            return cricketControlPlaneResponse(res, result);
+        }
 
         return res.json({
             ok: true,
             job: 'cricapi-live-refresh',
-            result
+            result: result.result
         });
     } catch (err) {
         console.error('[cron/cricket/cricapi/live] Failed:', err);

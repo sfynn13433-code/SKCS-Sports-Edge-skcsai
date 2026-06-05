@@ -126,6 +126,12 @@ It captures quotas, estimated call frequency, budget class, duplication risk, an
 
 ## 2) AI cost registry
 
+### Scope note
+
+- The AI tools used for building and reasoning (`Cursor`, `Gemini`, `NotebookLM`, and similar assistants) are **not** counted as SKCS AI Sports Edge runtime costs.
+- For the current project budget view, only in-product providers and runtime workflows are included.
+- In the current workspace, the stated external usage is: `Cursor` at `$20`, free-tier tools, and `Gemini` at `$26`, all treated as build-time support rather than product operating cost.
+
 ### Groq
 
 - **Use case**
@@ -374,6 +380,47 @@ It captures quotas, estimated call frequency, budget class, duplication risk, an
   - cache/reuse of stable outputs
   - reducing duplicate discovery/enrichment
   - disabling optional live-score work when the product is pre-match only
+
+## 7) Measured runtime snapshot
+
+This section records the current measurable cost shape of the system from the runtime map and code paths that exist today.
+
+### Current scheduled frequency
+
+- Daily Discovery cron: `1/day`
+- Pulse Check cron: `48/day`
+- Stale Prediction Cleanup cron: `48/day`
+- Heartbeat live score interval: `48/day` when enabled
+- Heartbeat trends/news interval: `24/day`
+- Sports sync orchestration: on demand plus scheduled triggers
+
+### Current high-cost surfaces
+
+- API-Sports football sync and fallback paths
+- TheSportsDB discovery and enrichment
+- Groq primary AI generation
+- Dolphin fallback bursts during provider failures
+- Live-score maintenance when enabled
+
+### Current duplicate-call hotspots
+
+- `syncSports` and football fallback/retry loops
+- Daily discovery and pulse check revisiting overlapping fixture windows
+- Repeated AI explanation generation for unchanged fixtures
+- Route-triggered syncs overlapping with scheduled syncs
+
+### What is measured today
+
+- Relative frequency of each major job
+- Provider sensitivity and duplicate-call risk
+- Optimization candidates by workflow
+
+### What still needs live telemetry
+
+- Exact monthly dollar cost per provider
+- Per-workflow token consumption
+- Exact duplicate-call counts from production runs
+- Storage and refresh cost per table or view
 
 ## 7) Next additions
 

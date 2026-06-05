@@ -19,6 +19,7 @@ const { buildAndStoreDirect1X2 } = require('../backend/services/direct1x2Builder
 const { getRapidApiKeyPool } = require('../backend/utils/keyPool');
 const { enforceRateLimitAndFetch } = require('../backend/utils/apiUsageLimiter');
 const { fetchCricbuzzMatches, normalizeCricbuzzData } = require('../backend/services/cricbuzzService');
+const { executeOperation } = require('../backend/core/executionPipeline');
 
 console.log('🚨 CRICBUZZ HOST:', process.env.RAPIDAPI_HOST_CRICBUZZ);
 
@@ -1652,15 +1653,20 @@ async function runPipelineInChunks(matches) {
             
             console.log(`[pipeline] Running ${sport}: ${sportMatches.length} matches`);
             
-            const result = await runPipelineForMatches({
-                matches: sportMatches,
-                telemetry
+            const result = await executeOperation({
+                operation: 'script.import-snapshot.pipeline',
+                caller: 'scripts/import-today-snapshot-pipeline.js',
+                payload: { sport, matches: sportMatches.length },
+                execute: async () => runPipelineForMatches({
+                    matches: sportMatches,
+                    telemetry
+                })
             });
-            if (Array.isArray(result?.inserted) && result.inserted.length > 0) {
-                inserted.push(...result.inserted);
+            if (Array.isArray(result?.result?.inserted) && result.result.inserted.length > 0) {
+                inserted.push(...result.result.inserted);
             }
-            filteredValid += Number(result?.filtered_valid || 0);
-            filteredInvalid += Number(result?.filtered_invalid || 0);
+            filteredValid += Number(result?.result?.filtered_valid || 0);
+            filteredInvalid += Number(result?.result?.filtered_invalid || 0);
         }
     }
 

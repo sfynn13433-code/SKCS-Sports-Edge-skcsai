@@ -64,80 +64,66 @@ app.post('/api/pipeline/trigger', async (req, res) => {
     }
 
     console.log(`[pipeline/trigger] Starting pipeline for run ${publishRunId}`);
-    
-    // 1. Context Enrichment
-    console.log('[pipeline/trigger] Starting context enrichment...');
-    try {
-      // Get fixtures that need enrichment (no enrichment completed yet)
-      const { rows: fixturesToEnrich } = await query(`
-        SELECT rf.id_event, rf.sport
-        FROM raw_fixtures rf
-        LEFT JOIN fixture_processing_log fpl ON rf.id_event = fpl.id_event AND fpl.publish_run_id = $1
-        WHERE fpl.enrichment_completed_at IS NULL
-          AND rf.start_time >= NOW()
-          AND rf.start_time <= NOW() + INTERVAL '7 days'
-      `, [publishRunId]);
-      
-      console.log(`[pipeline/trigger] Found ${fixturesToEnrich.length} fixtures to enrich`);
-      
-      for (const fixture of fixturesToEnrich) {
+    const result = await executeOperation({
+      operation: 'server.pipeline.trigger',
+      caller: 'backend/server-express.js',
+      payload: { publishRunId },
+      execute: async () => {
+        console.log('[pipeline/trigger] Starting context enrichment...');
         try {
-          // Call context enrichment service
-          const contextEnrichmentService = require('./services/contextEnrichmentService.js');
-          await contextEnrichmentService.enrichFixture(fixture.id_event, fixture.sport);
-          
-          // Log enrichment completion
-          await query(`
-            SELECT update_fixture_processing_log(
-              $1, $2, 'enrichment_completed', NULL, NULL, $3
-            )
-          `, [fixture.id_event, publishRunId, fixture.sport]);
-          
+          const { rows: fixturesToEnrich } = await query(`
+            SELECT rf.id_event, rf.sport
+            FROM raw_fixtures rf
+            LEFT JOIN fixture_processing_log fpl ON rf.id_event = fpl.id_event AND fpl.publish_run_id = $1
+            WHERE fpl.enrichment_completed_at IS NULL
+              AND rf.start_time >= NOW()
+              AND rf.start_time <= NOW() + INTERVAL '7 days'
+          `, [publishRunId]);
+
+          console.log(`[pipeline/trigger] Found ${fixturesToEnrich.length} fixtures to enrich`);
+
+          for (const fixture of fixturesToEnrich) {
+            try {
+              const contextEnrichmentService = require('./services/contextEnrichmentService.js');
+              await contextEnrichmentService.enrichFixture(fixture.id_event, fixture.sport);
+              await query(`
+                SELECT update_fixture_processing_log(
+                  $1, $2, 'enrichment_completed', NULL, NULL, $3
+                )
+              `, [fixture.id_event, publishRunId, fixture.sport]);
+            } catch (err) {
+              console.error(`[pipeline/trigger] Enrichment failed for ${fixture.id_event}:`, err.message);
+              await query(`
+                SELECT update_fixture_processing_log(
+                  $1, $2, 'enrichment_completed', NULL, $3, $4
+                )
+              `, [fixture.id_event, publishRunId, fixture.sport, err.message]);
+            }
+          }
         } catch (err) {
-          console.error(`[pipeline/trigger] Enrichment failed for ${fixture.id_event}:`, err.message);
-          
-          // Log enrichment failure
-          await query(`
-            SELECT update_fixture_processing_log(
-              $1, $2, 'enrichment_completed', NULL, $3, $4
-            )
-          `, [fixture.id_event, publishRunId, fixture.sport, err.message]);
+          console.error('[pipeline/trigger] Context enrichment failed:', err.message);
         }
+
+        console.log('[pipeline/trigger] Starting AI pipeline processing...');
+        const aiPipelineOrchestrator = require('./services/aiPipelineOrchestrator');
+        return await aiPipelineOrchestrator.runFullPipeline(null, 'UPCOMING_7_DAYS', publishRunId);
       }
-      
-    } catch (err) {
-      console.error('[pipeline/trigger] Context enrichment failed:', err.message);
-    }
-    
-    // 2. AI Pipeline Processing
-    console.log('[pipeline/trigger] Starting AI pipeline processing...');
-    try {
-      const aiPipelineOrchestrator = require('./services/aiPipelineOrchestrator');
-      const result = await aiPipelineOrchestrator.runFullPipeline(null, 'UPCOMING_7_DAYS', publishRunId);
-      
-      console.log(`[pipeline/trigger] AI pipeline completed:`, result);
-      
-      res.json({ 
-        success: true, 
+    });
+
+    if (result?.success === false) {
+      return res.status(503).json({
+        error: result.reason || result.error || 'pipeline_trigger_blocked',
         publishRunId,
-        result 
-      });
-      
-    } catch (err) {
-      console.error('[pipeline/trigger] AI pipeline failed:', err.message);
-      
-      // Update publish run with error
-      await query(`
-        UPDATE prediction_publish_runs 
-        SET error_message = $1, status = 'failed'
-        WHERE id = $2
-      `, [err.message, publishRunId]);
-      
-      res.status(500).json({ 
-        error: err.message,
-        publishRunId 
+        traceId: result.traceId || result.trace_id || null
       });
     }
+
+    console.log(`[pipeline/trigger] AI pipeline completed:`, result.result);
+    res.json({
+      success: true,
+      publishRunId,
+      result: result.result
+    });
     
   } catch (err) {
     console.error('[pipeline/trigger] Pipeline trigger error:', err.message);
@@ -238,9 +224,11 @@ const cricketCacheRouter = require('./routes/cricketCache');
 const sportsEdgeRouter   = require('./routes/sportsEdge');
 const schedulerRouter   = require('./routes/scheduler');
 const metricsRouter     = require('./routes/metrics');
+const semanticDriftRouter = require('./routes/semanticDrift');
 const divanscoreRouter  = require('./routes/divanscore');
 const antigravityRouter = require('./routes/antigravity');
 const { runTier1Stage1Bootstrap } = require('./services/tier1BootstrapService');
+const { executeOperation } = require('./core/executionPipeline');
 
 const DIRECT_INSIGHTS_SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
 const DIRECT_INSIGHTS_SUPABASE_KEY = String(
@@ -540,14 +528,18 @@ app.post('/api/internal/fetch-fixtures', async (req, res) => {
 app.get('/api/health', (_req, res) => {
   const systemHealth = verificationController.getSnapshot();
   res.set('X-System-State', String(systemHealth.state || 'UNKNOWN'));
+  const normalizedState = String(systemHealth.state || 'UNKNOWN').toUpperCase();
   res.json({
-    status: systemHealth.state === 'HEALTHY' ? 'ok' : String(systemHealth.state || 'unknown').toLowerCase(),
+    status: normalizedState === 'HEALTHY' || normalizedState === 'UNKNOWN'
+      ? 'ok'
+      : normalizedState.toLowerCase(),
     timestamp: new Date().toISOString(),
     version: process.env.npm_package_version || '1.0.0',
     uptime: Math.floor(process.uptime()),
     env: process.env.NODE_ENV || 'development',
     marker_deploy: 'test-' + Date.now(),
-    system_health: systemHealth
+    system_health: systemHealth,
+    pipeline_metrics: systemHealth.pipelineMetrics || null
   });
 });
 
@@ -731,6 +723,7 @@ console.log('[server] Cricket cache router mounted at /api/cricket/cache');
 app.use('/api/cron', cricketCronRouter);
 app.use('/api/scheduler', schedulerRouter);
 app.use('/api/metrics', metricsRouter);
+app.use('/api/semantic-drift-summary', semanticDriftRouter);
 app.use('/api', divanscoreRouter);
 app.use('/api/antigravity', antigravityRouter);
 
@@ -790,15 +783,22 @@ app.post('/api/refresh-predictions', requireRefreshKey, (req, res) => {
     // Run the sync in the background — unhandled errors are logged but won't crash the server
     (async () => {
         try {
-            const result = sport
-                ? await syncSports({ sports: sport })
-                : await syncAllSports();
+            const result = await executeOperation({
+                operation: 'server.refresh-predictions',
+                caller: 'backend/server-express.js',
+                payload: { sport },
+                execute: async () => (
+                    sport
+                        ? syncSports({ sports: sport })
+                        : syncAllSports()
+                )
+            });
 
             console.log(`[scheduler] ${label} completed:`, JSON.stringify({
-                totalMatchesProcessed: result?.totalMatchesProcessed || 0,
-                perSport: result?.perSport || [],
-                errors: result?.errors || [],
-                rebuiltFinalOutputs: result?.rebuiltFinalOutputs || false
+                totalMatchesProcessed: result?.result?.totalMatchesProcessed || 0,
+                perSport: result?.result?.perSport || [],
+                errors: result?.result?.errors || [],
+                rebuiltFinalOutputs: result?.result?.rebuiltFinalOutputs || false
             }));
         } catch (err) {
             console.error(`[scheduler] ${label} failed:`, err.message);
@@ -865,32 +865,41 @@ async function runSettlementJob({ sport, gradeDate }) {
     const scriptPath = path.join(__dirname, '..', 'scripts', 'track-prediction-accuracy.js');
     const args = [`--sport=${sport}`, `--date=${gradeDate}`];
 
-    const result = await new Promise((resolve, reject) => {
-        const child = spawn(process.execPath, [scriptPath, ...args], {
-            env:   { ...process.env },
-            stdio: ['ignore', 'pipe', 'pipe'],
-            timeout: 25 * 60 * 1000   // 25 minutes
-        });
+    const result = await executeOperation({
+        operation: 'server.settlement.run',
+        caller: 'backend/server-express.js',
+        payload: { sport, gradeDate },
+        execute: async () => new Promise((resolve, reject) => {
+            const child = spawn(process.execPath, [scriptPath, ...args], {
+                env: { ...process.env },
+                stdio: ['ignore', 'pipe', 'pipe'],
+                timeout: 25 * 60 * 1000   // 25 minutes
+            });
 
-        let stdout = '';
-        let stderr = '';
-        child.stdout.on('data', (chunk) => { stdout += chunk; });
-        child.stderr.on('data', (chunk) => { stderr += chunk; });
+            let stdout = '';
+            let stderr = '';
+            child.stdout.on('data', (chunk) => { stdout += chunk; });
+            child.stderr.on('data', (chunk) => { stderr += chunk; });
 
-        child.on('close', (code) => {
-            if (code === 0) {
-                resolve({ stdout, stderr });
-            } else {
-                reject(new Error(`Grading script exited with code ${code}: ${stderr || stdout}`));
-            }
-        });
+            child.on('close', (code) => {
+                if (code === 0) {
+                    resolve({ stdout, stderr });
+                } else {
+                    reject(new Error(`Grading script exited with code ${code}: ${stderr || stdout}`));
+                }
+            });
 
-        child.on('error', reject);
+            child.on('error', reject);
+        })
     });
+
+    if (result?.success === false) {
+        throw new Error(result.reason || result.error || 'settlement_blocked');
+    }
 
     let summary = null;
     try {
-        const lines = result.stdout.trim().split('\n');
+        const lines = result.result.stdout.trim().split('\n');
         for (let i = lines.length - 1; i >= 0; i--) {
             if (lines[i].trim().startsWith('{')) {
                 summary = JSON.parse(lines.slice(i).join('\n'));
@@ -901,7 +910,7 @@ async function runSettlementJob({ sport, gradeDate }) {
         summary = null;
     }
 
-    return { summary, raw: result.stdout.slice(-2000) };
+    return { summary, raw: result.result.stdout.slice(-2000) };
 }
 
 app.post('/api/grade-predictions', requireRefreshKey, async (req, res) => {
@@ -1754,17 +1763,29 @@ app.get('/api/admin/force-discovery', requireAdminKey, async (req, res) => {
     try {
         const today = new Date().toISOString().split('T')[0];
         console.log(`[ADMIN] Force discovery triggered for ${today}`);
-        
-        const count = await syncDailyFixtures(today);
+        const count = await executeOperation({
+            operation: 'admin.force-discovery',
+            caller: 'backend/server-express.js',
+            payload: { today },
+            execute: async () => syncDailyFixtures(today)
+        });
+        if (count?.success === false) {
+            return res.status(503).json({ success: false, error: count.reason || count.error || 'force_discovery_blocked' });
+        }
         const runFootballSync = req.query.football_sync !== '0';
         let footballSync = 'skipped';
 
         if (runFootballSync) {
             footballSync = 'started_in_background';
             setImmediate(() => {
-                syncSports({ sports: 'football' })
+                executeOperation({
+                    operation: 'admin.force-discovery.football',
+                    caller: 'backend/server-express.js',
+                    payload: { sport: 'football' },
+                    execute: async () => syncSports({ sports: 'football' })
+                })
                     .then((result) => {
-                        const summary = result?.summary || result;
+                        const summary = result?.result?.summary || result?.result || result;
                         console.log('[ADMIN] Background football sync finished:', JSON.stringify(summary));
                     })
                     .catch((err) => console.error('[ADMIN] Background football sync failed:', err.message));
@@ -1774,7 +1795,7 @@ app.get('/api/admin/force-discovery', requireAdminKey, async (req, res) => {
         res.json({
             success: true,
             message: `Daily soccer discovery for ${today}; hub ingest uses API-Sports league sync`,
-            fixturesSynced: count,
+            fixturesSynced: count?.result?.totalMatchesProcessed || count?.result || 0,
             footballSync
         });
     } catch (err) {
@@ -1808,13 +1829,21 @@ app.get('/api/admin/force-enrichment', requireAdminKey, async (_req, res) => {
             const { id_event, start_time } = match;
             
             try {
-                // Enrich match context
-                const enriched = await enrichMatchContext(id_event);
-                if (enriched) enrichedCount++;
-                
-                // Generate AI insight
-                const insight = await generateEdgeMindInsight(id_event);
-                if (insight) insightCount++;
+                const enriched = await executeOperation({
+                    operation: 'admin.force-enrichment.enrich',
+                    caller: 'backend/server-express.js',
+                    payload: { id_event },
+                    execute: async () => enrichMatchContext(id_event)
+                });
+                if (enriched?.result) enrichedCount++;
+
+                const insight = await executeOperation({
+                    operation: 'admin.force-enrichment.insight',
+                    caller: 'backend/server-express.js',
+                    payload: { id_event },
+                    execute: async () => generateEdgeMindInsight(id_event)
+                });
+                if (insight?.result) insightCount++;
                 
                 console.log(`[ADMIN] Force enrichment: Processed ${id_event} (starts ${start_time})`);
             } catch (err) {

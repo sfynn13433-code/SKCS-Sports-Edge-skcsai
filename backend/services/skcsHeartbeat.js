@@ -5,6 +5,7 @@
  */
 
 const proFootballService = require('./proFootballDataService');
+const { executeOperation } = require('../core/executionPipeline');
 const ENABLE_PRO_FOOTBALL = String(process.env.ENABLE_SPORTSAPI_PRO_FOOTBALL || '').trim() === 'true';
 const DISABLE_PRO_FOOTBALL = String(process.env.DISABLE_SPORTSAPI_PRO_FOOTBALL || '').trim() === 'true';
 const ALLOW_PRO_FOOTBALL = ENABLE_PRO_FOOTBALL && !DISABLE_PRO_FOOTBALL;
@@ -265,24 +266,49 @@ async function startSKCSHeartbeat() {
   heartbeatState.isRunning = true;
   
   // Initial sync
-  await syncMetadata(); // One-time metadata sync
+  await executeOperation({
+    operation: 'heartbeat.metadata',
+    caller: 'backend/services/skcsHeartbeat.js',
+    payload: { source: 'startup' },
+    execute: async () => syncMetadata()
+  }); // One-time metadata sync
   if (!DISABLE_LIVE_SCORES) {
-    await syncLiveScores(); // Initial live scores
+    await executeOperation({
+      operation: 'heartbeat.liveScores',
+      caller: 'backend/services/skcsHeartbeat.js',
+      payload: { source: 'startup' },
+      execute: async () => syncLiveScores()
+    }); // Initial live scores
   }
-  await syncTrendsAndNews(); // Initial trends/news
+  await executeOperation({
+    operation: 'heartbeat.trendsNews',
+    caller: 'backend/services/skcsHeartbeat.js',
+    payload: { source: 'startup' },
+    execute: async () => syncTrendsAndNews()
+  }); // Initial trends/news
   
   // Set up intervals
   
   // Every 30 minutes: Update Live Scores (Basic Plan optimization)
   if (!DISABLE_LIVE_SCORES) {
     heartbeatState.liveScoresInterval = setInterval(async () => {
-      await syncLiveScores();
+      await executeOperation({
+        operation: 'heartbeat.liveScores',
+        caller: 'backend/services/skcsHeartbeat.js',
+        payload: { source: 'interval' },
+        execute: async () => syncLiveScores()
+      });
     }, 1800000); // 30 minutes (1,800,000 ms)
   }
   
   // Every hour: Update Trends and News
   heartbeatState.trendsInterval = setInterval(async () => {
-    await syncTrendsAndNews();
+    await executeOperation({
+      operation: 'heartbeat.trendsNews',
+      caller: 'backend/services/skcsHeartbeat.js',
+      payload: { source: 'interval' },
+      execute: async () => syncTrendsAndNews()
+    });
   }, 3600000); // 60 minutes
   
   console.log('✅ Heartbeat intervals established');
@@ -346,17 +372,32 @@ function logHeartbeatStatus() {
  */
 async function triggerLiveSync() {
   console.log('[Heartbeat] Manual live sync triggered');
-  return await syncLiveScores();
+  return await executeOperation({
+    operation: 'heartbeat.manualLive',
+    caller: 'backend/services/skcsHeartbeat.js',
+    payload: { source: 'manual' },
+    execute: async () => syncLiveScores()
+  });
 }
 
 async function triggerTrendsSync() {
   console.log('[Heartbeat] Manual trends sync triggered');
-  return await syncTrendsAndNews();
+  return await executeOperation({
+    operation: 'heartbeat.manualTrends',
+    caller: 'backend/services/skcsHeartbeat.js',
+    payload: { source: 'manual' },
+    execute: async () => syncTrendsAndNews()
+  });
 }
 
 async function triggerMetadataSync() {
   console.log('[Heartbeat] Manual metadata sync triggered');
-  return await syncMetadata();
+  return await executeOperation({
+    operation: 'heartbeat.manualMetadata',
+    caller: 'backend/services/skcsHeartbeat.js',
+    payload: { source: 'manual' },
+    execute: async () => syncMetadata()
+  });
 }
 
 // Initialize heartbeat state
