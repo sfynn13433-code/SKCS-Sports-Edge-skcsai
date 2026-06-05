@@ -4,6 +4,35 @@ const { query } = require('../db');
 
 const records = [];
 const MAX_RECORDS = 250;
+let truthLedgerSchemaPromise = null;
+let warnedMissingTruthLedger = false;
+
+function isMissingSchemaError(error = {}) {
+    const message = String(error?.message || '');
+    return /does not exist|undefined column|relation .* does not exist|column .* does not exist/i.test(message);
+}
+
+async function getTruthLedgerSchemaStatus() {
+    if (!truthLedgerSchemaPromise) {
+        truthLedgerSchemaPromise = (async () => {
+            const { rows } = await query(`
+                SELECT
+                    to_regclass('public.pipeline_executions') AS pipeline_executions,
+                    to_regclass('public.decision_fingerprints') AS decision_fingerprints
+            `);
+            const row = rows?.[0] || {};
+            return {
+                pipelineExecutionsExists: Boolean(row.pipeline_executions),
+                decisionFingerprintsExists: Boolean(row.decision_fingerprints)
+            };
+        })().catch((error) => {
+            truthLedgerSchemaPromise = null;
+            throw error;
+        });
+    }
+
+    return truthLedgerSchemaPromise;
+}
 
 function deriveFinalDecision(record = {}) {
     if (String(record.finalDecision || '').trim()) {
@@ -54,6 +83,16 @@ async function persistExecutionTrace(entry) {
     const completedAt = pipelineTrace.completed_at || entry.completed_at || entry.recordedAt || new Date().toISOString();
     const operation = String(entry.context?.operation || entry.operation || pipelineTrace.operation || 'unknown');
     const caller = String(entry.context?.caller || entry.caller || pipelineTrace.caller || 'unknown');
+    const schema = await getTruthLedgerSchemaStatus();
+
+    if (!schema.pipelineExecutionsExists) {
+        if (!warnedMissingTruthLedger) {
+            warnedMissingTruthLedger = true;
+            console.warn('[TRUTH_LOG] pipeline_executions table is unavailable; skipping persistence until the truth mirror migration is deployed.');
+        }
+        truthLedgerSchemaPromise = null;
+        return null;
+    }
 
     const executionRes = await query(
         `INSERT INTO public.pipeline_executions (
@@ -115,7 +154,7 @@ async function persistExecutionTrace(entry) {
 
     const executionId = executionRes?.rows?.[0]?.id || null;
 
-    if (executionId && entry.fingerprint && typeof entry.fingerprint === 'object') {
+    if (executionId && entry.fingerprint && typeof entry.fingerprint === 'object' && schema.decisionFingerprintsExists) {
         try {
             await query(
                 `INSERT INTO public.decision_fingerprints (
@@ -145,6 +184,9 @@ async function persistExecutionTrace(entry) {
         } catch (fingerprintError) {
             console.warn('[TRUTH_LOG] Failed to persist decision fingerprint:', fingerprintError.message);
         }
+    } else if (executionId && entry.fingerprint && typeof entry.fingerprint === 'object' && !schema.decisionFingerprintsExists && !warnedMissingTruthLedger) {
+        warnedMissingTruthLedger = true;
+        console.warn('[TRUTH_LOG] decision_fingerprints table is unavailable; persisted execution trace without derived fingerprint.');
     }
 
     return traceId;

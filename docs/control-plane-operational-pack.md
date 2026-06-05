@@ -14,6 +14,7 @@ The pipeline health feed is a **telemetry aggregation layer only**.
 
 It collects facts from the runtime ledgers and job telemetry, but it does not decide the system state.
 The control plane evaluator remains the single source of truth for `PASS`, `WARN`, `DEGRADED`, and `FAIL`.
+Execution traces themselves live in `pipeline_executions`; the control-plane snapshot lives in `system_health_state`.
 
 ### 1.1 Feed inputs
 

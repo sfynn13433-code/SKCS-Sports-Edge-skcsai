@@ -29,7 +29,11 @@ function buildDecisionFingerprint({ traceId, context, gate, health, result, veri
         proceed: gate?.proceed !== false,
         constraints: gate?.constraints || {},
         systemState: health?.state || verification?.state || 'UNKNOWN',
-        controlState: health?.state || verification?.controlState || null,
+        controlState: health?.controlState
+            || health?.controlPlane?.state
+            || verification?.controlState
+            || verification?.controlPlane?.state
+            || null,
         fallback_mode: gate?.mode === 'fallback' || verification?.actions?.useFallback === true,
         dry_run: dryRun === true,
         strict_mode: strictMode === true,

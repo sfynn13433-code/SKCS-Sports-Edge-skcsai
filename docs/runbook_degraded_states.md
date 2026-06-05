@@ -17,8 +17,9 @@ Use it when the control plane emits `WARN`, `DEGRADED`, or `FAIL`.
 
 1. Semantic drift dashboard
 2. Latest `system_health_state` snapshot
-3. `semantic_violations`
-4. Pipeline telemetry and fallback counts
+3. Latest `pipeline_executions` trace for the failed operation
+4. `semantic_violations`
+5. Pipeline telemetry and fallback counts
 
 ## 3. Response by state
 

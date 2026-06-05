@@ -295,32 +295,66 @@ function evaluateControlPlane(summary = {}, options = {}) {
     };
 }
 
-function evaluate() {
+function evaluate(context = {}) {
     try {
         const verificationController = require('../core/verificationController');
-        const snapshot = verificationController.getSnapshot ? verificationController.getSnapshot() : {};
-        return snapshot?.controlPlane || {
-            state: snapshot?.state || CONTROL_STATES.PASS,
-            reasons: Array.isArray(snapshot?.reasons) ? snapshot.reasons : [],
-            actions: snapshot?.actions || deriveActionProfile(CONTROL_STATES.PASS, DEFAULT_THRESHOLDS, {}, {
-                score: 100,
-                effectiveViolations: 0,
-                violationRate: 0,
-                trend: 'stable',
-                smoothing: 1
-            }),
-            healthScore: Number.isFinite(Number(snapshot?.healthScore)) ? Number(snapshot.healthScore) : 100,
-            summary: snapshot?.pipelineMetrics || null,
-            drift: snapshot?.controlPlane?.drift || {
-                trend: 'stable',
-                effectiveViolations: 0,
-                violationRate: 0,
-                smoothing: 1
+        const hasSignals = context && typeof context === 'object' && (
+            context.pipelineStatus
+            || context.enrichmentStatus
+            || context.quotaStatus
+            || context.apiHealth
+            || context.dbHealth
+            || context.signal
+        );
+
+        const snapshot = hasSignals && typeof verificationController.evaluate === 'function'
+            ? verificationController.evaluate(context)
+            : (verificationController.getSnapshot ? verificationController.getSnapshot() : {});
+
+        const normalizedState = String(snapshot?.controlState || snapshot?.controlPlane?.state || snapshot?.state || CONTROL_STATES.PASS)
+            .trim()
+            .toUpperCase() || CONTROL_STATES.PASS;
+        const actions = snapshot?.actions || snapshot?.controlPlane?.actions || deriveActionProfile(normalizedState, DEFAULT_THRESHOLDS, {}, {
+            score: Number.isFinite(Number(snapshot?.healthScore)) ? Number(snapshot.healthScore) : 100,
+            effectiveViolations: 0,
+            violationRate: 0,
+            trend: 'stable',
+            smoothing: 1
+        });
+
+        return snapshot?.controlPlane
+            ? {
+                ...snapshot.controlPlane,
+                state: snapshot.controlPlane.state || normalizedState,
+                controlState: snapshot.controlPlane.controlState || normalizedState,
+                actions: snapshot.controlPlane.actions || actions,
+                healthScore: Number.isFinite(Number(snapshot.controlPlane.healthScore)) ? Number(snapshot.controlPlane.healthScore) : Number.isFinite(Number(snapshot?.healthScore)) ? Number(snapshot.healthScore) : 100,
+                summary: snapshot.controlPlane.summary || snapshot?.pipelineMetrics || null,
+                drift: snapshot.controlPlane.drift || snapshot?.drift || {
+                    trend: 'stable',
+                    effectiveViolations: 0,
+                    violationRate: 0,
+                    smoothing: 1
+                }
             }
-        };
+            : {
+                state: normalizedState,
+                controlState: normalizedState,
+                reasons: Array.isArray(snapshot?.reasons) ? snapshot.reasons : [],
+                actions,
+                healthScore: Number.isFinite(Number(snapshot?.healthScore)) ? Number(snapshot.healthScore) : 100,
+                summary: snapshot?.pipelineMetrics || snapshot?.summary || null,
+                drift: snapshot?.drift || {
+                    trend: 'stable',
+                    effectiveViolations: 0,
+                    violationRate: 0,
+                    smoothing: 1
+                }
+            };
     } catch {
         return {
             state: CONTROL_STATES.PASS,
+            controlState: CONTROL_STATES.PASS,
             reasons: [],
             actions: deriveActionProfile(CONTROL_STATES.PASS, DEFAULT_THRESHOLDS, {}, {
                 score: 100,

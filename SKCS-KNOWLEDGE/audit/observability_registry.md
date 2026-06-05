@@ -6,6 +6,7 @@ This registry is the source of truth for how SKCS detects degraded runtime behav
 
 - Runtime state is decided by `backend/semantic-layer/controlPlaneEvaluator.js`.
 - `verificationController` persists the evaluated state to `public.system_health_state`.
+- `systemTruthLogger` persists execution traces to `public.pipeline_executions` and derived decision fingerprints to `public.decision_fingerprints`.
 - UI surfaces must render backend state only and must not calculate health client-side.
 
 ## Control-plane states
@@ -40,6 +41,9 @@ This registry is the source of truth for how SKCS detects degraded runtime behav
 - `system_health_state`
   - Records append-only health snapshots.
   - Primary use: runtime banner, dashboard state, historical audits.
+- `pipeline_executions`
+  - Records append-only runtime execution traces from `executeOperation()`.
+  - Primary use: truth mirror, trace debugging, and fingerprint lineage.
 - `X-System-State`
   - Response header emitted by `/api/health` and other health-aware responses.
   - Primary use: quick client-side visibility and proxy/debug tooling.

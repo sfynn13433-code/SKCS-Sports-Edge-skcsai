@@ -58,7 +58,7 @@
         .tab-btn {
             flex: 1;
             padding: 0.8rem;
-            border: None;
+            border: none;
             background: #f0f0f0;
             border-radius: 8px;
             font-weight: bold;
@@ -70,7 +70,7 @@
             color: white;
         }
         .form {
-            display: None;
+            display: none;
         }
         .form.active {
             display: block;
@@ -92,7 +92,7 @@
             font-size: 1rem;
         }
         input:focus {
-            outline: None;
+            outline: none;
             border-color: #0d6efd;
             box-shadow: 0 0 0 3px rgba(13,110,253,0.1);
         }
@@ -101,7 +101,7 @@
             padding: 1rem;
             background: #0d6efd;
             color: white;
-            border: None;
+            border: none;
             border-radius: 6px;
             font-size: 1.1rem;
             font-weight: bold;
@@ -116,7 +116,7 @@
             padding: 0.8rem;
             border-radius: 6px;
             text-align: center;
-            display: None;
+            display: none;
         }
         .message.error {
             background: #f8d7da;
@@ -133,7 +133,7 @@
             text-align: center;
             margin-top: 1.5rem;
             color: #0d6efd;
-            text-decoration: None;
+            text-decoration: none;
         }
         .back-link:hover {
             text-decoration: underline;
@@ -239,7 +239,7 @@
             
             checkInit();
         })();
-        const supabaseClient = window.supabaseClient || None;
+        const supabaseClient = window.supabaseClient || null;
 
         // Tab switching
         const loginTab = document.getElementById('loginTab');
@@ -289,7 +289,7 @@
                 }
             }
             
-            return None;
+            return null;
         }
 
         // Login handler
@@ -397,7 +397,7 @@
                     return;
                 }
 
-                let session = data?.session || None;
+                let session = data?.session || null;
                 if (!session) {
                     const signInRes = await client.auth.signInWithPassword({ email, password });
                     if (!signInRes.error && signInRes.data?.session) {

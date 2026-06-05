@@ -14,6 +14,11 @@ const {
     summarizeSignals
 } = require('../semantic-layer/controlPlaneEvaluator');
 
+function isMissingSchemaError(error = {}) {
+    const message = String(error?.message || '');
+    return /does not exist|column .* does not exist|relation .* does not exist/i.test(message);
+}
+
 const SYSTEM_STATES = Object.freeze({
     UNKNOWN: 'UNKNOWN',
     HEALTHY: 'HEALTHY',
@@ -42,16 +47,37 @@ function mapControlStateToSystemState(controlState) {
     }
 }
 
+function mapSystemStateToControlState(systemState) {
+    switch (String(systemState || '').trim().toUpperCase()) {
+        case SYSTEM_STATES.HEALTHY:
+            return CONTROL_STATES.PASS;
+        case SYSTEM_STATES.WARN:
+            return CONTROL_STATES.WARN;
+        case SYSTEM_STATES.DEGRADED:
+            return CONTROL_STATES.DEGRADED;
+        case SYSTEM_STATES.CRITICAL:
+        case SYSTEM_STATES.BLOCKED:
+            return CONTROL_STATES.FAIL;
+        default:
+            return CONTROL_STATES.PASS;
+    }
+}
+
 class VerificationController {
     constructor() {
         this.reset();
+        void this.hydrateFromLatestSystemHealthState().catch((error) => {
+            console.warn('[verificationController] Startup hydration failed:', error.message);
+        });
     }
 
     reset() {
         this._signals = new Map();
         this._history = [];
+        this._hydratedFromSystemHealthState = false;
         this._latest = {
             state: SYSTEM_STATES.UNKNOWN,
+            controlState: CONTROL_STATES.PASS,
             reasons: [],
             actions: {
                 allowWrite: true,
@@ -60,7 +86,8 @@ class VerificationController {
             },
             signals: [],
             pipelineMetrics: null,
-            lastUpdatedAt: null
+            lastUpdatedAt: null,
+            controlPlane: null
         };
     }
 
@@ -131,6 +158,85 @@ class VerificationController {
     configureControlPlaneThresholds(thresholds = {}) {
         this._controlPlaneThresholds = thresholds && typeof thresholds === 'object' ? thresholds : {};
         return this._controlPlaneThresholds;
+    }
+
+    async hydrateFromLatestSystemHealthState() {
+        if (this._hydratedFromSystemHealthState === true) {
+            return this.getSnapshot();
+        }
+
+        if (this._hydrationPromise) {
+            return this._hydrationPromise;
+        }
+
+        this._hydrationPromise = (async () => {
+            let latestRow = null;
+            try {
+                const { rows } = await query(
+                    `SELECT *
+                     FROM public.system_health_state
+                     ORDER BY recorded_at DESC
+                     LIMIT 1`
+                );
+                latestRow = rows?.[0] || null;
+            } catch (error) {
+                if (!isMissingSchemaError(error)) {
+                    console.warn('[verificationController] Failed to hydrate system health snapshot:', error.message);
+                }
+                return this.getSnapshot();
+            }
+
+            if (!latestRow) {
+                this._hydratedFromSystemHealthState = true;
+                return this.getSnapshot();
+            }
+
+            const systemState = String(latestRow.current_state || latestRow.state || SYSTEM_STATES.UNKNOWN).trim().toUpperCase();
+            const controlState = mapSystemStateToControlState(systemState);
+            const actions = {
+                allowWrite: latestRow.allow_write !== false,
+                allowPublish: latestRow.allow_publish !== false,
+                useFallback: latestRow.use_fallback === true
+            };
+            const reasons = Array.isArray(latestRow.reasons) ? latestRow.reasons : [];
+            const controlPlane = {
+                state: controlState,
+                controlState,
+                reasons,
+                actions,
+                healthScore: Number.isFinite(Number(latestRow.state_score)) ? Number(latestRow.state_score) : null,
+                summary: latestRow.snapshot?.pipelineMetrics || latestRow.snapshot?.pipeline_metrics || null,
+                drift: latestRow.snapshot?.drift || {
+                    trend: 'stable',
+                    effectiveViolations: 0,
+                    violationRate: 0,
+                    smoothing: 1
+                }
+            };
+            const snapshot = {
+                state: systemState,
+                controlState,
+                reasons,
+                actions,
+                signals: Array.isArray(latestRow.signals) ? latestRow.signals : [],
+                pipelineMetrics: latestRow.snapshot?.pipelineMetrics || latestRow.snapshot?.pipeline_metrics || null,
+                healthScore: Number.isFinite(Number(latestRow.state_score)) ? Number(latestRow.state_score) : null,
+                controlPlane,
+                lastUpdatedAt: latestRow.updated_at || latestRow.recorded_at || null,
+                source: 'hydrated_system_health_state',
+                recordedAt: latestRow.recorded_at || null,
+                transitionReason: latestRow.transition_reason || (reasons[0] || null)
+            };
+
+            this._latest = snapshot;
+            this._pushHistory(snapshot);
+            this._hydratedFromSystemHealthState = true;
+            return this.getSnapshot();
+        })().finally(() => {
+            this._hydrationPromise = null;
+        });
+
+        return this._hydrationPromise;
     }
 
     evaluateControlPlane(summary = {}, options = {}) {
@@ -223,7 +329,21 @@ class VerificationController {
             previousTransition = previousRows?.[0]?.last_transition || null;
             previousRecordedAt = previousRows?.[0]?.recorded_at || null;
         } catch (error) {
-            console.warn('[verificationController] Failed to inspect previous health state:', error.message);
+            if (!isMissingSchemaError(error)) {
+                console.warn('[verificationController] Failed to inspect previous health state:', error.message);
+            }
+            try {
+                const { rows: previousRows } = await query(
+                    `SELECT state, recorded_at
+                     FROM public.system_health_state
+                     ORDER BY recorded_at DESC
+                     LIMIT 1`
+                );
+                previousState = previousRows?.[0]?.state || null;
+                previousRecordedAt = previousRows?.[0]?.recorded_at || null;
+            } catch (fallbackError) {
+                console.warn('[verificationController] Failed to inspect previous health state:', fallbackError.message);
+            }
         }
 
         const nowIso = new Date().toISOString();
@@ -256,70 +376,127 @@ class VerificationController {
             updatedAt: nowIso
         };
 
-        const { rows } = await query(
-            `INSERT INTO public.system_health_state (
-                recorded_at,
-                state,
-                state_score,
-                transition_reason,
-                pipeline_state,
-                enrichment_state,
-                quota_state,
-                api_state,
-                db_state,
-                reasons,
-                active_violations,
-                active_degradations,
-                last_transition,
-                allow_publish,
-                allow_write,
-                use_fallback,
-                signals,
-                snapshot,
-                updated_at
-            ) VALUES (
-                NOW(),
-                $1,
-                $2,
-                $3,
-                $4,
-                $5,
-                $6,
-                $7,
-                $8,
-                $9::jsonb,
-                $10::jsonb,
-                $11::timestamptz,
-                $12,
-                $13,
-                $14,
-                $15::jsonb,
-                $16::jsonb,
-                $17::jsonb,
-                $18::timestamptz
-            )
-            RETURNING *`,
-            [
-                snapshotPayload.state,
-                Number.isFinite(Number(snapshotPayload.healthScore)) ? Number(snapshotPayload.healthScore) : null,
-                transitionReason,
-                signalStateFor(SIGNAL_TYPES.pipeline),
-                signalStateFor(SIGNAL_TYPES.enrichment),
-                signalStateFor(SIGNAL_TYPES.quota),
-                signalStateFor(SIGNAL_TYPES.api),
-                signalStateFor(SIGNAL_TYPES.db),
-                JSON.stringify(snapshotPayload.reasons),
-                JSON.stringify(snapshotPayload.activeViolations),
-                JSON.stringify(snapshotPayload.activeDegradations),
-                lastTransition,
-                Boolean(snapshotPayload.actions.allowPublish),
-                Boolean(snapshotPayload.actions.allowWrite),
-                Boolean(snapshotPayload.actions.useFallback),
-                JSON.stringify(signals),
-                JSON.stringify(snapshotPayload),
-                snapshotPayload.updatedAt
-            ]
-        );
+        const richParams = [
+            snapshotPayload.state,
+            Number.isFinite(Number(snapshotPayload.healthScore)) ? Number(snapshotPayload.healthScore) : null,
+            transitionReason,
+            signalStateFor(SIGNAL_TYPES.pipeline),
+            signalStateFor(SIGNAL_TYPES.enrichment),
+            signalStateFor(SIGNAL_TYPES.quota),
+            signalStateFor(SIGNAL_TYPES.api),
+            signalStateFor(SIGNAL_TYPES.db),
+            JSON.stringify(snapshotPayload.reasons),
+            JSON.stringify(snapshotPayload.activeViolations),
+            JSON.stringify(snapshotPayload.activeDegradations),
+            lastTransition,
+            Boolean(snapshotPayload.actions.allowPublish),
+            Boolean(snapshotPayload.actions.allowWrite),
+            Boolean(snapshotPayload.actions.useFallback),
+            JSON.stringify(signals),
+            JSON.stringify(snapshotPayload),
+            snapshotPayload.updatedAt
+        ];
+
+        const legacyParams = [
+            snapshotPayload.state,
+            signalStateFor(SIGNAL_TYPES.pipeline),
+            signalStateFor(SIGNAL_TYPES.enrichment),
+            signalStateFor(SIGNAL_TYPES.quota),
+            signalStateFor(SIGNAL_TYPES.api),
+            signalStateFor(SIGNAL_TYPES.db),
+            JSON.stringify(snapshotPayload.reasons),
+            Boolean(snapshotPayload.actions.allowPublish),
+            Boolean(snapshotPayload.actions.allowWrite),
+            Boolean(snapshotPayload.actions.useFallback),
+            JSON.stringify(signals),
+            JSON.stringify(snapshotPayload)
+        ];
+
+        let rows;
+        try {
+            ({ rows } = await query(
+                `INSERT INTO public.system_health_state (
+                    recorded_at,
+                    state,
+                    state_score,
+                    transition_reason,
+                    pipeline_state,
+                    enrichment_state,
+                    quota_state,
+                    api_state,
+                    db_state,
+                    reasons,
+                    active_violations,
+                    active_degradations,
+                    last_transition,
+                    allow_publish,
+                    allow_write,
+                    use_fallback,
+                    signals,
+                    snapshot,
+                    updated_at
+                ) VALUES (
+                    NOW(),
+                    $1,
+                    $2,
+                    $3,
+                    $4,
+                    $5,
+                    $6,
+                    $7,
+                    $8,
+                    $9::jsonb,
+                    $10::jsonb,
+                    $11::timestamptz,
+                    $12,
+                    $13,
+                    $14,
+                    $15::jsonb,
+                    $16::jsonb,
+                    $17::jsonb,
+                    $18::timestamptz
+                )
+                RETURNING *`,
+                richParams
+            ));
+        } catch (error) {
+            if (!isMissingSchemaError(error)) {
+                throw error;
+            }
+            ({ rows } = await query(
+                `INSERT INTO public.system_health_state (
+                    recorded_at,
+                    state,
+                    pipeline_state,
+                    enrichment_state,
+                    quota_state,
+                    api_state,
+                    db_state,
+                    reasons,
+                    allow_publish,
+                    allow_write,
+                    use_fallback,
+                    signals,
+                    snapshot
+                ) VALUES (
+                    NOW(),
+                    $1,
+                    $2,
+                    $3,
+                    $4,
+                    $5,
+                    $6,
+                    $7::jsonb,
+                    $8,
+                    $9,
+                    $10,
+                    $11::jsonb,
+                    $12::jsonb
+                )
+                RETURNING *`,
+                legacyParams
+            ));
+        }
 
         return rows?.[0] || null;
     }

@@ -42,6 +42,10 @@ const {
     formatSastDateTime
 } = require('./services/subscriptionTiming');
 const verificationController = require('./core/verificationController');
+const verificationHydrationPromise = verificationController.hydrateFromLatestSystemHealthState().catch((error) => {
+    console.warn('[Server] Failed to seed verification controller from system health state:', error.message);
+    return null;
+});
 
 const { getPlanCapabilities, filterPredictionsForPlan } = require('./config/subscriptionMatrix');
 const { normalizeFixtureDate, getPredictionWindow, isFixtureEligibleForPrediction } = require('./utils/dateNormalization');
@@ -1878,8 +1882,10 @@ app.get('/api/admin/force-enrichment', requireAdminKey, async (_req, res) => {
 const { startSKCSHeartbeat } = require('./services/skcsHeartbeat');
 
 // Start heartbeat service after a short delay to ensure server is ready
-setTimeout(() => {
+setTimeout(async () => {
   try {
+    await verificationHydrationPromise;
+    await verificationController.hydrateFromLatestSystemHealthState();
     startSKCSHeartbeat();
     console.log('[Server] SKCS Heartbeat service started successfully');
   } catch (error) {

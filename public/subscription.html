@@ -55,7 +55,7 @@ h1 { text-align:center; color:#fff; margin-bottom:30px; font-weight: bold; }
   cursor:pointer;
   border-radius:6px;
   background:#1e293b;
-  border: None;
+  border: none;
   color: #ffffff;
   transition: all 0.3s ease;
   font-weight: bold;
@@ -88,7 +88,7 @@ h1 { text-align:center; color:#fff; margin-bottom:30px; font-weight: bold; }
 .card .price { font-size:2.2rem; font-weight:bold; color:#fff; margin:10px 0; }
 
 .skcs-list {
-  list-style:None;
+  list-style:none;
   padding:0;
   margin:0 0 20px;
   flex-grow: 1;
@@ -99,14 +99,14 @@ h1 { text-align:center; color:#fff; margin-bottom:30px; font-weight: bold; }
   font-size: 0.85rem;
   line-height: 1.6;
 }
-.skcs-list li:last-child { border-bottom: None; }
+.skcs-list li:last-child { border-bottom: none; }
 .skcs-list li strong { color: #94a3b8; display: block; margin-bottom: 4px; }
 
 button {
   width:100%;
   padding:12px;
   margin-top:auto;
-  border:None;
+  border:none;
   border-radius:6px;
   cursor:pointer;
   font-weight: bold;
@@ -258,7 +258,7 @@ button:hover { opacity: 0.9; }
   <strong>Plan access mode:</strong> Checking current billing status...
 </div>
 
-<div id="publicLockNotice" class="status-banner" style="display:None;">
+<div id="publicLockNotice" class="status-banner" style="display:none;">
   <strong>Platform opening soon. Registration available.</strong>
 </div>
 
@@ -412,7 +412,7 @@ button:hover { opacity: 0.9; }
 </div>
 
 <!-- comment -->
-<div id="elitePlans" class="grid" style="display:None;">
+<div id="elitePlans" class="grid" style="display:none;">
 
   <!-- comment -->
   <div class="card">
@@ -534,8 +534,8 @@ function waitForClient() {
     if (checkCount < 50) setTimeout(waitForClient, 100);
 }
 waitForClient();
-const supabaseClient = window.supabaseClient || None;
-let billingStatus = None;
+const supabaseClient = window.supabaseClient || null;
+let billingStatus = null;
 
 function showPublicLockNotice() {
   const notice = document.getElementById('publicLockNotice');
@@ -581,7 +581,7 @@ function showCore(){
   if (!corePlans || !elitePlans || !tabCore || !tabElite) return;
 
   corePlans.style.display='grid';
-  elitePlans.style.display='None';
+  elitePlans.style.display='none';
   tabCore.classList.add('active-core');
   tabCore.classList.remove('active-elite');
   tabCore.setAttribute('aria-pressed', 'true');
@@ -597,7 +597,7 @@ function showElite(){
   const tabElite = document.getElementById('tabElite');
   if (!corePlans || !elitePlans || !tabCore || !tabElite) return;
 
-  corePlans.style.display='None';
+  corePlans.style.display='none';
   elitePlans.style.display='grid';
   tabCore.classList.remove('active-core');
   tabCore.classList.remove('active-elite');
