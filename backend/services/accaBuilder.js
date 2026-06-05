@@ -143,9 +143,8 @@ function endOfWeekSast(now = new Date()) {
 }
 
 function riskLevelFromConfidence(avgConfidence) {
-    if (avgConfidence >= 75) return 'low_risk';
-    if (avgConfidence >= 55) return 'medium_risk';
-    return 'high_risk';
+    if (avgConfidence >= 75) return 'safe';
+    return 'medium';
 }
 
 function toLeg(p) {
@@ -770,8 +769,10 @@ function parseKickoff(prediction) {
     return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+const DEFAULT_PUBLISH_WINDOW_DAYS = Math.max(7, Number(process.env.SKCS_PUBLISH_WINDOW_DAYS || 14));
+
 function getPublishWindowDays(tier) {
-    return tier === 'deep' ? 5 : 7;
+    return tier === 'deep' ? DEFAULT_PUBLISH_WINDOW_DAYS : DEFAULT_PUBLISH_WINDOW_DAYS;
 }
 
 function normalizeSportKey(value) {
@@ -2927,9 +2928,9 @@ async function loadValidFilteredPredictions(tier, client, options = {}) {
             or k.kickoff_utc >= (now() - interval '15 minutes')
           )
           and (
-            -- 7-day forward cap: do not load inventory beyond the rolling window
+            -- Rolling forward cap: do not load inventory beyond the publish window
             k.kickoff_utc is null
-            or k.kickoff_utc <= (now() + interval '7 days')
+            or k.kickoff_utc <= (now() + interval '${DEFAULT_PUBLISH_WINDOW_DAYS} days')
           )
         order by r.confidence desc, r.created_at desc;
         `,
@@ -3855,10 +3856,6 @@ function hasMinimumMarketDiversity(card) {
 
 
 async function buildFinalForTier(tier, options = {}) {
-    if (!options || !options.matches) {
-        console.log("[accaBuilder] No matches found in payload, safely skipping.");
-        return [];
-    }
     const t = normalizeTier(tier);
     const publishRunId = options.publishRunId || null;
     const now = options.now instanceof Date ? options.now : new Date();
@@ -4150,7 +4147,7 @@ async function buildFinalForTier(tier, options = {}) {
                     megaDiagnostics.mega_rejected_for_insufficient_legs += 1;
                     console.log('[accaBuilder] %s: no candidates from pool (pool_size=%s)', step.type, candidatePool.length);
                 }
-                // continue; // BYPASSED: Allow matches to proceed
+                continue;
             }
 
             const familyCapState = exceedsFamilyCaps(candidateRow, step.legCount);
