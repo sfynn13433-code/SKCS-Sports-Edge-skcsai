@@ -95,16 +95,18 @@ External APIs → Football Adapter → Normalization → Database → AI Pipelin
 - **Mega ACCA** (Large accumulators)
 
 ### 4.2 Football Risk Framework
-- **80-100%**: High Confidence (Green) - Safe for direct betting
-- **70-79%**: Moderate Risk (Blue) - Standard risk
-- **59-69%**: High Risk (Orange) - Requires secondary insights
-- **0-58%**: Extreme Risk (Red) - Risk-adjusted markets only
+- **75-100%**: Low Risk (Green) - Safe for direct betting
+- **55-74%**: Medium Risk (Blue) - Standard risk
+- **30-54%**: High Risk (Orange) - Requires secondary insights
+- **0-29%**: Extreme Risk (Red) - Not published; risk-adjusted markets only
 
 ### 4.3 Football-Specific Rules
-- **Secondary Insights Mandate**: < 59% confidence requires exactly 4 secondary insights
+- **Secondary Insights Mandate**: High/extreme direct bands require secondary support; extreme band requires exactly 4 secondary insights
 - **Market Restrictions**: Only approved football markets allowed
+- **Double Chance**: Separate market group (not part of secondary pool)
+- **Same Match Builder**: Sizes 4, 6, 8
 - **Weekly Lock**: One prediction per fixture per ISO week
-- **Confidence Threshold**: Minimum 76% for secondary insights
+- **Confidence Threshold**: Minimum 72% for secondary insights; 75% for ACCA legs
 
 ---
 

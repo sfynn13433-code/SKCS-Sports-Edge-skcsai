@@ -19,8 +19,8 @@ You are implementing the SKCS Same Match Builder (SMB v2.0) in the existing code
 - Apply these rules:
   - winProb <50% or goalDiff <1.0 → max 2 legs
   - winProb 50-65% or goalDiff 1.0-2.5 → max 4 legs
-  - winProb 65-80% or goalDiff 2.5-4.0 → max 6 legs
-  - winProb >80% or goalDiff >4.0 → max 8 legs
+  - winProb 65-75% or goalDiff 2.5-4.0 → max 6 legs
+  - winProb >75% or goalDiff >4.0 → max 8 legs
 - Return the integer.
 
 ### 3. generatePrebuiltSMB(match, legCount)

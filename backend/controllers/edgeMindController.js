@@ -509,10 +509,10 @@ function getStageByNumber(stages, stageNumber) {
 function directTierLabelForConfidence(confidence) {
     const score = Number(confidence);
     if (!Number.isFinite(score)) return 'UNKNOWN';
-    if (score >= 80) return 'STRONG';
-    if (score >= 60) return 'MODERATE / HIGH CAUTION';
-    if (score >= 45) return 'EXTREME CAUTION';
-    return 'REJECT';
+    if (score >= 75) return 'STRONG';
+    if (score >= 55) return 'MODERATE';
+    if (score >= 30) return 'HIGH CAUTION';
+    return 'EXTREME CAUTION';
 }
 
 function buildStageBlockForPick(pick) {

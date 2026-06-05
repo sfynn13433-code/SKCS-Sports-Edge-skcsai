@@ -45,6 +45,8 @@
     "pipeline:from-context:dry": "node scripts/run-pipeline-from-context-pack.js --dry",
     "db:migrate:rules": "node scripts/run-migration.js 20260820000002_fix_secondary_governance_80_75.sql",
     "db:verify:rules": "node scripts/verify-db-rule-alignment.js",
+    "verify:rulebook": "node scripts/verify-master-rulebook-alignment.js",
+    "install:hooks": "node scripts/install-local-git-hooks.js",
     "antigravity:start": "node scripts/start-antigravity.js",
     "antigravity:test": "node scripts/test-antigravity.js",
     "antigravity:status": "curl -s http://localhost:10000/api/antigravity/status | jq .",

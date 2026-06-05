@@ -578,7 +578,7 @@ class VerificationController {
             severity = SYSTEM_STATES.BLOCKED;
             reason = `Confidence score (${confidence}) is out of bounds.`;
             failureType = FAILURE_TYPES.STRUCTURAL_FAIL;
-        } else if (Number.isFinite(confidence) && confidence < 59) {
+        } else if (Number.isFinite(confidence) && confidence < 30) {
             severity = SYSTEM_STATES.WARN;
             reason = 'Prediction is in the extreme-risk band and should not be treated as fully trusted.';
             failureType = FAILURE_TYPES.DATA_FAIL;

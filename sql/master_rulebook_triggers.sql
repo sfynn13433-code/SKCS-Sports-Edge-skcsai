@@ -156,7 +156,7 @@ BEGIN
     END IF;
 END $$;
 
--- Trigger 5: Secondary market confidence validation (>=80% primary, >=75% Safe Haven)
+-- Trigger 5: Secondary market confidence validation (72% unified floor)
 CREATE OR REPLACE FUNCTION validate_secondary_confidence()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -176,38 +176,38 @@ BEGIN
       AND is_published = true
     LIMIT 1;
     
-    -- If no main prediction, allow secondary with >=75%
+    -- If no main prediction, allow secondary with >=72%
     IF main_confidence IS NULL THEN
-        IF NEW.confidence < 75 THEN
-            RAISE EXCEPTION 'Secondary market confidence must be >= 75%% when no main prediction exists (got %%%)', NEW.confidence;
+        IF NEW.confidence < 72 THEN
+            RAISE EXCEPTION 'Secondary market confidence must be >= 72%% when no main prediction exists (got %%%)', NEW.confidence;
         END IF;
         RETURN NEW;
     END IF;
     
-    -- Check if there are any high-confidence secondary markets (>=80%)
+    -- Check if there are any high-confidence secondary markets (>=72%)
     SELECT EXISTS(
         SELECT 1 FROM direct1x2_prediction_final
         WHERE match_id = NEW.match_id
           AND market_type != '1X2'
-          AND confidence >= 80
+          AND confidence >= 72
           AND is_published = true
           AND id != COALESCE(NEW.id, 0)
     ) INTO has_high_confidence_secondary;
     
-    -- If main confidence < 80% and no high-confidence secondary exists
-    -- This is a Safe Haven scenario - require >=75% and > main confidence
-    IF main_confidence < 80 AND NOT has_high_confidence_secondary THEN
-        IF NEW.confidence < 75 THEN
-            RAISE EXCEPTION 'Safe Haven secondary market confidence must be >= 75%% (got %%%)', NEW.confidence;
+    -- If main confidence < 72% and no high-confidence secondary exists
+    -- This is a Safe Haven scenario - require >=72% and > main confidence
+    IF main_confidence < 72 AND NOT has_high_confidence_secondary THEN
+        IF NEW.confidence < 72 THEN
+            RAISE EXCEPTION 'Safe Haven secondary market confidence must be >= 72%% (got %%%)', NEW.confidence;
         END IF;
         
         IF NEW.confidence <= main_confidence THEN
             RAISE EXCEPTION 'Safe Haven secondary confidence must be > main confidence (%.2f%%, got %%%)', main_confidence, NEW.confidence;
         END IF;
     ELSE
-        -- Primary rule: require >=80%
-        IF NEW.confidence < 80 THEN
-            RAISE EXCEPTION 'Secondary market confidence must be >= 80%% (got %%%)', NEW.confidence;
+        -- Primary rule: require >=72%
+        IF NEW.confidence < 72 THEN
+            RAISE EXCEPTION 'Secondary market confidence must be >= 72%% (got %%%)', NEW.confidence;
         END IF;
     END IF;
     
@@ -254,4 +254,4 @@ END $$;
 COMMENT ON FUNCTION check_extreme_risk() IS 'Prevents extreme risk predictions (<30%) from being published and sets correct risk tiers';
 COMMENT ON FUNCTION limit_secondary_per_match() IS 'Limits secondary markets to maximum 4 per match';
 COMMENT ON FUNCTION check_acca_leg_confidence() IS 'Ensures ACCA legs have minimum 75% confidence';
-COMMENT ON FUNCTION validate_secondary_confidence() IS 'Validates secondary market confidence rules (80% primary, 75% Safe Haven)';
+COMMENT ON FUNCTION validate_secondary_confidence() IS 'Validates secondary market confidence rules (72% unified floor)';

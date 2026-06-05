@@ -1,5 +1,7 @@
 # Frontend Fixes Summary - Master Rulebook Implementation
 
+> **Current state note:** Live rules are `75/55/30` direct bands, `72%` secondary floor, separate Double Chance, and Same Match Builder `4/6/8`. Code blocks labeled `OLD` below are retained only as before/after history.
+
 ## ✅ Completed Frontend Fixes
 
 ### 1. Remove Hardcoded 58% Fallback
@@ -27,8 +29,8 @@
 **File**: `public/js/smh-hub-master-rulebook.js`
 **Features**:
 - Safe Haven market list (50+ markets)
-- Fallback trigger logic (main <80% + no secondary ≥80%)
-- Market filtering (>main confidence AND ≥75%)
+- Fallback trigger logic (main <72% + no secondary ≥72%)
+- Market filtering (>main confidence AND ≥72%)
 
 ### 5. Make EdgeMind BOT Message Dynamic
 **File**: `public/js/smh-hub-master-rulebook.js`
@@ -57,7 +59,7 @@
 **File**: `backend/services/aiPipelineOrchestrator.js`
 **Lines**: 448-456
 **Changes**:
-- Updated confidence threshold from 70% to 55%
+- Updated confidence thresholds to the current 75/55/30 direct bands and 72% secondary floor
 - Updated risk tiers to Master Rulebook standards
 
 ---
@@ -104,7 +106,7 @@ WHERE confidence >= 55 AND risk_tier IN ('LOW_RISK', 'MEDIUM_RISK')
 - Only one fixture visible
 - Static "High Variance" messages
 - Missing market categories
-- 59% confidence threshold
+- 72% secondary threshold, 75/55/30 direct bands
 
 ### After Fixes
 - Correct Master Rulebook compliance
@@ -113,7 +115,7 @@ WHERE confidence >= 55 AND risk_tier IN ('LOW_RISK', 'MEDIUM_RISK')
 - Dynamic risk-based messaging
 - 7 market categories with Best-in-Category
 - Safe Haven fallback logic
-- 75%/55%/30% confidence thresholds
+- 75%/55%/30% direct bands and 72% secondary floor
 
 ---
 

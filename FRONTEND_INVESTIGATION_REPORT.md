@@ -1,5 +1,7 @@
 # Windsurf Investigation Report: Frontend Issues
 
+> **Current state note (2026-06):** This report documents the original investigation. The live frontend now uses Master Rulebook bands `75/55/30`, secondary floor `72%`, separate Double Chance grouping, and Same Match Builder sizes `4/6/8`. Treat the findings below as historical context unless a section is explicitly marked as still open.
+
 ## 🔍 Investigation Results
 
 ### 1. ✅ "58% confidence" Ghost Number - FOUND

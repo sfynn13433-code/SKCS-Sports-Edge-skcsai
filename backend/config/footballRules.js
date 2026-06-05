@@ -9,14 +9,14 @@ const FOOTBALL_RULES = {
     },
 
     direct: {
-        minConfidence: 45,
-        strongConfidence: 80,
-        moderateMin: 60,
-        cautionMin: 45
+        minConfidence: 30,
+        strongConfidence: 75,
+        moderateMin: 55,
+        cautionMin: 30
     },
 
     secondary: {
-        minConfidence: 75,
+        minConfidence: 72,
         maxItems: 4,
         diversityCaps: {
             goals: 2,

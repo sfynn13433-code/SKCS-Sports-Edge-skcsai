@@ -1,5 +1,5 @@
 // Master Rulebook Risk Classification Service
-// Replaces old 59% thresholds with new 75%/55%/30% system
+// Replaces the older mixed thresholds with the current direct 1X2 and secondary rules
 
 /**
  * Master Rulebook Risk Tier Classification
@@ -117,8 +117,8 @@ function getRiskTierLabel(confidence) {
  * @returns {boolean} True if secondary markets should be shown
  */
 function requiresSecondaryMarkets(confidence) {
-    // Show secondary markets for all published predictions
-    return Number.isFinite(confidence) && confidence >= 30;
+    // Secondary markets now start at 72%+
+    return Number.isFinite(confidence) && confidence >= 72;
 }
 
 /**
@@ -128,10 +128,10 @@ function requiresSecondaryMarkets(confidence) {
  * @returns {boolean} True if Safe Haven should be triggered
  */
 function shouldTriggerSafeHaven(mainConfidence, secondaryMarkets = []) {
-    // Trigger if main confidence < 80% and no secondary markets >= 75%
-    if (mainConfidence >= 80) return false;
+    // Trigger if main confidence < 72% and no secondary markets >= 72%
+    if (mainConfidence >= 72) return false;
     
-    return !secondaryMarkets.some(market => (market.confidence || 0) >= 75);
+    return !secondaryMarkets.some(market => (market.confidence || 0) >= 72);
 }
 
 /**
@@ -142,7 +142,6 @@ function shouldTriggerSafeHaven(mainConfidence, secondaryMarkets = []) {
  */
 function filterSafeHavenMarkets(markets, mainConfidence) {
     const SAFE_HAVEN_MARKETS = new Set([
-        'double_chance_1x', 'double_chance_x2', 'double_chance_12',
         'over_0_5', 'over_1_5', 'under_3_5', 'under_4_5',
         'btts_no',
         'corners_over_8_5', 'corners_over_9_5', 'corners_under_10_5', 'corners_under_11_5',
@@ -157,7 +156,7 @@ function filterSafeHavenMarkets(markets, mainConfidence) {
         
         return SAFE_HAVEN_MARKETS.has(marketKey) &&
                confidence > mainConfidence &&
-               confidence >= 75;
+               confidence >= 72;
     });
 }
 
@@ -202,7 +201,11 @@ function getMasterRulebookPrompt() {
 - 30-54%: High Risk. Advise user to consider secondary markets.
 - 0-29%: Extreme Risk. Do NOT bet direct 1X2. Use Safe Haven secondary markets instead.
 
-Safe Haven markets: Double Chance, Over/Under Goals, BTTS No, Corners, Cards, First Half markets, Team Win Either Half.
+Secondary markets start at 72%+.
+Double Chance is its own separate market group.
+Same Match Builder uses 4, 6, and 8.
+
+Safe Haven markets: Over/Under Goals, BTTS No, Corners, Cards, First Half markets, Team Win Either Half.
 
 Output ONLY valid JSON with this exact structure:
 {

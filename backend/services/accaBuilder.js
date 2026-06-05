@@ -185,7 +185,7 @@ function buildAccaV2({ tier, candidates, now = new Date() }) {
     const t = normalizeTier(tier);
     const list = Array.isArray(candidates) ? candidates.slice() : [];
 
-    const minLegConfidence = 70;
+    const minLegConfidence = ACCA_MIN_LEG_CONFIDENCE;
     const minSize = 4;
     const maxSize = 6;
 
@@ -1090,7 +1090,7 @@ function deriveDirectSecondaryInsights(matches, totalConfidence) {
     for (const item of existing) {
         const candidate = normalizeSecondaryPivotCandidate(item);
         if (!candidate) continue;
-        if (candidate.confidence < 80) continue;
+        if (candidate.confidence < 72) continue;
         if (!isCompatibleWithPrimaryPrediction(firstMatch, candidate)) continue;
         const key = `${candidate.market}:${candidate.prediction}`;
         if (seen.has(key)) continue;
@@ -1361,7 +1361,7 @@ async function buildDerivedMarkets(prediction, options = {}) {
 
 async function buildSecondaryCandidates(predictions) {
     const secondary = [];
-    const minSecondaryConfidence = 75;
+    const minSecondaryConfidence = 72;
 
     for (const prediction of predictions) {
         const primaryLeg = toFinalMatchPayload(prediction);
@@ -2073,7 +2073,7 @@ function compareAccaCandidates(a, b) {
     return 0;
 }
 
-function applyConfidenceFloorToCandidate(candidate, floor = 80) {
+function applyConfidenceFloorToCandidate(candidate, floor = ACCA_MIN_LEG_CONFIDENCE) {
     const confidence = Number(candidate?.confidence);
     if (!Number.isFinite(confidence)) return null;
     return {
@@ -2083,11 +2083,11 @@ function applyConfidenceFloorToCandidate(candidate, floor = 80) {
 }
 
 function candidateMatchesAccaFallbackPass(candidate, pass, options = {}) {
-    const normalized = applyConfidenceFloorToCandidate(candidate, 80);
+    const normalized = applyConfidenceFloorToCandidate(candidate, ACCA_MIN_LEG_CONFIDENCE);
     if (!normalized) return false;
 
     const confidence = Number(normalized.confidence);
-    if (!Number.isFinite(confidence) || confidence < Number(pass?.minConfidence || 80)) return false;
+    if (!Number.isFinite(confidence) || confidence < Number(pass?.minConfidence || ACCA_MIN_LEG_CONFIDENCE)) return false;
 
     const marketKey = normalizeMarketKeyMI(normalized?.market || '');
     const tier = priorityTierForMarket(marketKey);
@@ -2106,7 +2106,7 @@ function candidateMatchesAccaFallbackPass(candidate, pass, options = {}) {
 
 function filterPoolForAccaFallbackPass(candidates, pass, options = {}) {
     return (Array.isArray(candidates) ? candidates : [])
-        .map((candidate) => applyConfidenceFloorToCandidate(candidate, 80))
+        .map((candidate) => applyConfidenceFloorToCandidate(candidate, ACCA_MIN_LEG_CONFIDENCE))
         .filter(Boolean)
         .filter((candidate) => candidateMatchesAccaFallbackPass(candidate, pass, options))
         .sort(compareAccaCandidatePreference);
@@ -2115,11 +2115,11 @@ function filterPoolForAccaFallbackPass(candidates, pass, options = {}) {
 function relaxFilters(candidates, options = {}) {
     const forMega = options.forMega === true;
     return (Array.isArray(candidates) ? candidates : [])
-        .map((candidate) => applyConfidenceFloorToCandidate(candidate, 80))
+        .map((candidate) => applyConfidenceFloorToCandidate(candidate, ACCA_MIN_LEG_CONFIDENCE))
         .filter(Boolean)
         .filter((candidate) => {
             const confidence = Number(candidate?.confidence);
-            if (!Number.isFinite(confidence) || confidence < 80) return false;
+            if (!Number.isFinite(confidence) || confidence < ACCA_MIN_LEG_CONFIDENCE) return false;
 
             const marketKey = normalizeMarketKeyMI(candidate?.market || '');
             if (forMega && (!isMegaSafeMarket(marketKey) || isTwelveLegRestrictedMarket(marketKey))) return false;
@@ -2195,7 +2195,7 @@ function buildAccumulatorRowWithFallbackLadder(step, candidatePool, usedFixtureI
     const relaxed = ensureCandidatePoolWithRetry(candidatePool, required, { forMega });
     if (relaxed.length < required) return null;
 
-    return buildAccumulatorRowForStep(step, relaxed, usedFixtureIds, 80, options);
+    return buildAccumulatorRowForStep(step, relaxed, usedFixtureIds, ACCA_MIN_LEG_CONFIDENCE, options);
 }
 
 function getAccaCandidateFixtureIds(candidate) {
@@ -2307,7 +2307,7 @@ function reserveCandidate(candidate, usedFixtureIds) {
 function finalizeAccumulatorRow(legs, options = {}) {
     const profile = String(options.profile || 'mixed_sport');
     const targetSport = normalizeSportKey(options.targetSport || legs?.[0]?.sport || 'unknown');
-    const minLegConfidenceFloor = Number(options.minLegConfidenceFloor || (MIN_CONFIDENCE || 80));
+    const minLegConfidenceFloor = Number(options.minLegConfidenceFloor || (MIN_CONFIDENCE || ACCA_MIN_LEG_CONFIDENCE));
     const isMega = options.isMega === true;
     const legCount = Number(legs?.length || 0);
     const ticketLabel = legCount >= 12 ? '12 MATCH MEGA ACCA' : '6 MATCH ACCA';

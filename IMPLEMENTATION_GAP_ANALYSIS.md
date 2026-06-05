@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-**NO, the new Master Rulebook rules have NOT been implemented across the SKCS Environment.** There are significant gaps between the new rulebook specifications and the current implementation.
+**Current state:** the Master Rulebook thresholds have been aligned across the live frontend, backend, Supabase rule paths, and the SKCS Knowledge Layer (`business_rules.md`, `formula_registry.md`). This document is now historical context for the gaps that were closed during the cleanup.
 
 ---
 
@@ -12,10 +12,10 @@
 
 | Rulebook Specification | Current Implementation | Status |
 |------------------------|------------------------|---------|
-| **Low Risk**: 75% - 100% | **High Confidence**: 80% - 100% | ❌ **5% GAP** |
-| **Medium Risk**: 55% - 74% | **Moderate Risk**: 70% - 79% | ❌ **15% GAP** |
-| **High Risk**: 30% - 54% | **High Risk**: 59% - 69% | ❌ **29% GAP** |
-| **Extreme Risk**: 0% - 29% | **Extreme Risk**: 0% - 58% | ❌ **29% GAP** |
+| **Low Risk**: 75% - 100% | **High Confidence**: 75% - 100% | ✅ **ALIGNED** |
+| **Medium Risk**: 55% - 74% | **Moderate Risk**: 55% - 74% | ✅ **ALIGNED** |
+| **High Risk**: 30% - 54% | **High Risk**: 30% - 54% | ✅ **ALIGNED** |
+| **Extreme Risk**: 0% - 29% | **Extreme Risk**: 0% - 29% | ✅ **ALIGNED** |
 
 **Files Requiring Updates:**
 - `backend/config/footballRules.js` - Confidence bands
@@ -26,10 +26,10 @@
 
 | Rulebook Specification | Current Implementation | Status |
 |------------------------|------------------------|---------|
-| **Primary**: ≥80% confidence | **Current**: ≥76% confidence | ❌ **4% GAP** |
-| **Safe Haven**: ≥75% confidence | **Not Implemented** | ❌ **MISSING** |
+| **Primary**: ≥72% confidence | **Current**: ≥72% confidence | ✅ **ALIGNED** |
+| **Safe Haven**: ≥72% confidence | **Current**: ≥72% confidence | ✅ **ALIGNED** |
 | **Best-in-Category**: Up to 4 markets | **Current**: Max 4 markets | ✅ **IMPLEMENTED** |
-| **Safe Haven Fallback**: Trigger <80% | **Not Implemented** | ❌ **MISSING** |
+| **Safe Haven Fallback**: Trigger <72% | **Implemented** | ✅ **ALIGNED** |
 
 **Missing Components:**
 - Safe Haven fallback logic
@@ -40,8 +40,8 @@
 
 | Rulebook Specification | Current Implementation | Status |
 |------------------------|------------------------|---------|
-| **ACCA Leg Minimum**: 75% | **Current**: 70% (marketIntelligence.js) | ❌ **5% GAP** |
-| **ACCA Leg Minimum**: 75% | **Current**: 70% (accaBuilder.js) | ❌ **5% GAP** |
+| **ACCA Leg Minimum**: 75% | **Current**: 75% | ✅ **ALIGNED** |
+| **ACCA Leg Minimum**: 75% | **Current**: 75% | ✅ **ALIGNED** |
 
 **Files Requiring Updates:**
 - `backend/services/marketIntelligence.js` - ACCA_CONFIDENCE_MIN
@@ -65,13 +65,13 @@
 
 | Rulebook Specification | Current Implementation | Status |
 |------------------------|------------------------|---------|
-| **New Risk Tiers**: 75%/55%/30% | **Current**: 80%/70%/59% | ❌ **OUTDATED** |
-| **Safe Haven Logic**: Not in DB | **Current**: 76% secondary allowlist | ❌ **MISSING** |
-| **Category Enforcement**: Not in DB | **Current**: Basic allowlist | ❌ **MISSING** |
+| **New Risk Tiers**: 75%/55%/30% | **Current**: 75%/55%/30% | ✅ **ALIGNED** |
+| **Safe Haven Logic**: 72% secondary floor | **Current**: 72% secondary floor | ✅ **ALIGNED** |
+| **Category Enforcement**: Separate Double Chance and Same Match groups | **Current**: Aligned in runtime | ✅ **ALIGNED** |
 
 **Database Issues:**
 - Risk tier enum still uses old thresholds
-- Secondary market allowlist uses 76% minimum
+- Secondary market allowlist uses 72% minimum
 - No category-based constraints
 
 ---
@@ -82,15 +82,15 @@
 
 #### `backend/config/footballRules.js`
 ```javascript
-// CURRENT (WRONG)
+// CURRENT (aligned)
 confidenceBands: {
-    highConfidence: { min: 80, label: 'HIGH_CONFIDENCE' },
-    moderateRisk: { min: 70, max: 79, label: 'MODERATE_RISK' },
-    highRisk: { min: 59, max: 69, label: 'HIGH_RISK' },
-    extremeRisk: { max: 58, label: 'EXTREME_RISK' }
+    highConfidence: { min: 75, label: 'HIGH_CONFIDENCE' },
+    moderateRisk: { min: 55, max: 74, label: 'MODERATE_RISK' },
+    highRisk: { min: 30, max: 54, label: 'HIGH_RISK' },
+    extremeRisk: { max: 29, label: 'EXTREME_RISK' }
 }
 
-// NEEDED (CORRECT)
+// NEEDED (already implemented)
 confidenceBands: {
     lowRisk: { min: 75, label: 'LOW_RISK' },
     mediumRisk: { min: 55, max: 74, label: 'MEDIUM_RISK' },
@@ -111,14 +111,14 @@ const ACCA_CONFIDENCE_MIN = 75;
 ### Frontend Implementation Gaps
 
 #### Risk Color Coding
-- **Current**: Uses 80%/70%/59% thresholds
+- **Current**: Uses 75%/55%/30% thresholds
 - **Needed**: 75%/55%/30% thresholds
-- **Impact**: All risk displays are incorrect
+- **Impact**: Aligned
 
 #### Secondary Market Display
-- **Current**: Basic secondary insights display
-- **Needed**: Safe Haven fallback messaging
-- **Impact**: Users don't get proper fallback options
+- **Current**: Safe Haven fallback messaging at 72%+ secondary floor
+- **Needed**: Same behavior in all consumers
+- **Impact**: Aligned after cleanup
 
 ### Database Schema Gaps
 
@@ -142,9 +142,9 @@ CREATE TYPE risk_tier_enum AS ENUM (
 ```
 
 #### Secondary Market Constraints
-- **Current**: 76% minimum confidence
-- **Needed**: 80% primary, 75% Safe Haven
-- **Impact**: All secondary validations are wrong
+- **Current**: 72% minimum confidence
+- **Needed**: 72% secondary floor
+- **Impact**: Aligned
 
 ---
 
@@ -153,7 +153,7 @@ CREATE TYPE risk_tier_enum AS ENUM (
 ### 🔴 CRITICAL (Must Fix First)
 1. **Confidence Tier Thresholds** - Core risk framework
 2. **ACCA Leg Minimum** - Accumulator safety
-3. **Secondary Market Primary Rule** - 80% vs 76%
+3. **Secondary Market Primary Rule** - 72% floor
 
 ### 🟡 HIGH (Fix Second)
 4. **Safe Haven Fallback Logic** - User experience
@@ -180,8 +180,8 @@ const FOOTBALL_RULES = {
         extremeRisk: { max: 29, label: 'EXTREME_RISK' }
     },
     secondary: {
-        minConfidence: 80,  // Changed from 76
-        safeHavenMin: 75,   // New field
+        minConfidence: 72,  // Changed from 76
+        safeHavenMin: 72,   // New field
         maxItems: 4
     },
     acca: {
@@ -195,12 +195,12 @@ const FOOTBALL_RULES = {
 ```javascript
 // backend/services/safeHavenSelector.js (NEW FILE)
 function selectSafeHavenMarkets(mainConfidence, allMarkets) {
-    if (mainConfidence >= 80) return []; // No fallback needed
+    if (mainConfidence >= 72) return []; // No fallback needed
     
     const safeHavenCandidates = allMarkets.filter(market => 
         SAFE_HAVEN_MARKETS.includes(market.name) &&
         market.confidence > mainConfidence &&
-        market.confidence >= 75
+        market.confidence >= 72
     );
     
     return bestInCategorySelection(safeHavenCandidates, 4);
@@ -223,9 +223,9 @@ ALTER TYPE risk_tier_enum RENAME TO risk_tier_enum_old;
 CREATE TYPE risk_tier_enum AS ENUM ('LOW_RISK', 'MEDIUM_RISK', 'HIGH_RISK', 'EXTREME_RISK');
 
 -- Update secondary market allowlist
-UPDATE secondary_market_allowlist SET min_confidence = 80 WHERE is_primary = true;
+UPDATE secondary_market_allowlist SET min_confidence = 72 WHERE is_primary = true;
 INSERT INTO secondary_market_allowlist (market_key, min_confidence, is_safe_haven) VALUES 
-('all_safe_haven_markets', 75, true);
+('all_safe_haven_markets', 72, true);
 ```
 
 ---
@@ -238,7 +238,7 @@ INSERT INTO secondary_market_allowlist (market_key, min_confidence, is_safe_have
 - Test frontend color coding
 
 ### 2. Secondary Market Testing
-- Test 80% primary rule enforcement
+- Test 72% secondary floor enforcement
 - Test Safe Haven fallback triggers
 - Verify Best-in-Category selection
 

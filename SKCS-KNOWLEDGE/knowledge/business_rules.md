@@ -5,15 +5,20 @@ This file captures the major business rules that shape predictions, publication,
 ## Confidence and risk
 
 - Confidence bands are enforced as a core product rule.
-- `80-100%` is treated as high confidence.
-- `70-79%` is moderate risk.
-- `59-69%` is high risk and must carry secondary insights.
-- `0-58%` is extreme risk and must be heavily constrained.
+- Direct 1X2 uses the Master Rulebook bands:
+  - `75-100%` = Low Risk
+  - `55-74%` = Medium Risk
+  - `30-54%` = High Risk (must carry secondary insights)
+  - `0-29%` = Extreme Risk (not published; heavily constrained)
+- ACCA legs require a minimum of `75%` confidence.
 
 ## Secondary market governance
 
-- Secondary insights are only valid above the required confidence threshold.
+- Secondary insights are only valid at `72%` or higher.
+- Secondary markets are limited to a maximum of 4 per match.
 - Secondary markets are limited by allowlist rules in the database.
+- Double Chance is a separate market group and is not part of the secondary pool.
+- Same Match Builder is tracked separately as sizes `4`, `6`, and `8`.
 - The application and schema must stay aligned on these constraints.
 
 ## Subscription and access

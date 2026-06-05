@@ -2,6 +2,8 @@
 **Generated:** 2026-05-24  
 **Scope:** Supabase, GitHub (backend/frontend), Vercel, Render, SKCS AI Sports Edge.co.za
 
+> **Current state note (2026-06):** Threshold bands are aligned to Master Rulebook `75/55/30`, secondary floor `72%`, separate Double Chance, and Same Match Builder `4/6/8`. Enum label notes below may still reference legacy `HIGH_CONFIDENCE` / `MODERATE_RISK` names where DB migrations have not fully renamed values.
+
 ---
 
 ## Executive Summary

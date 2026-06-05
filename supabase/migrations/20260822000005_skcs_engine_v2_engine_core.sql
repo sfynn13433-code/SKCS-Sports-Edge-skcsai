@@ -830,6 +830,6 @@ BEGIN
         (SELECT COUNT(*) FROM public.direct1x2_prediction_final) AS total_fixtures,
         (SELECT COUNT(*) FROM public.prediction_scores) AS with_scores,
         COALESCE((SELECT ROUND(AVG(confidence), 2) FROM public.prediction_scores), 0) AS avg_confidence,
-        (SELECT COUNT(*) FROM public.prediction_scores WHERE confidence >= 80) AS high_confidence_count;
+        (SELECT COUNT(*) FROM public.prediction_scores WHERE confidence >= 75) AS high_confidence_count;
 END;
 $$;

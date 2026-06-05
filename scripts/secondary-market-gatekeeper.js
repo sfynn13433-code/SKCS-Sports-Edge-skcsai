@@ -61,7 +61,7 @@ const SECONDARY_MARKET_ALLOWLIST = [
     'Cards U 1.5', 'Cards U 2.5', 'Cards U 3.5', 'Cards U 4.5', 'Cards U 5.5', 'Cards U 6.5'
 ];
 
-const SECONDARY_MIN_CONFIDENCE = 76;
+const SECONDARY_MIN_CONFIDENCE = 72;
 const EXTREME_SECONDARY_COUNT = 4;
 
 function toNumber(value, fallback = 0) {
@@ -93,13 +93,13 @@ function normalizeDirectOutcome(value) {
 function resolveDirectRiskTier(confidence) {
     const score = Math.max(0, Math.min(100, Math.round(toNumber(confidence, 0))));
 
-    if (score >= 80) {
+    if (score >= 75) {
         return { score, tier: 'safe', label: 'LOW_RISK_SAFE', requiresSecondaryPivot: false, requiresExactFourSecondary: false };
     }
-    if (score >= 70) {
+    if (score >= 55) {
         return { score, tier: 'moderate', label: 'MEDIUM_RISK', requiresSecondaryPivot: false, requiresExactFourSecondary: false };
     }
-    if (score >= 59) {
+    if (score >= 30) {
         return { score, tier: 'high', label: 'HIGH_RISK', requiresSecondaryPivot: true, requiresExactFourSecondary: false };
     }
     return { score, tier: 'extreme', label: 'EXTREME_RISK', requiresSecondaryPivot: true, requiresExactFourSecondary: true };
@@ -115,7 +115,7 @@ function filterSecondaryMarkets(allGeneratedSecondaryMarkets) {
         return [];
     }
     
-    // Step 1: Filter by confidence threshold (MUST be >= 76%)
+    // Step 1: Filter by confidence threshold (MUST be >= 72%)
     const highConfidenceMarkets = allGeneratedSecondaryMarkets.filter(market => {
         const confidence = typeof market === 'object' && market !== null 
             ? parseFloat(market.confidence) 
@@ -178,10 +178,10 @@ function generateEdgeMindReport(baselineProb, contextAdjustments, volatilityAdju
     report += `\n\n🎯 **Stage 4 (Decision Engine):** Final confidence score: **${confidence}%**`;
     
     // Direct 1X2 risk messaging (4-tier framework)
-    if (confidence >= 59 && confidence <= 69) {
+    if (confidence >= 30 && confidence <= 54) {
         report += `\n\n⚠️ **ADVISORY:** The Direct 1X2 market at ${confidence}% is classified as HIGH RISK and volatile.`;
         report += `\n\n💡 **RECOMMENDATION:** Pivot to the Secondary Insights below for safer options.`;
-    } else if (confidence >= 0 && confidence <= 58) {
+    } else if (confidence >= 0 && confidence <= 29) {
         report += `\n\n🛑 **CRITICAL WARNING:** The Direct 1X2 market at ${confidence}% is EXTREME RISK.`;
         report += `\n\n🚫 **ACTION REQUIRED:** Do NOT place a direct market bet on this fixture. Use the 4 Secondary Insights instead.`;
     }

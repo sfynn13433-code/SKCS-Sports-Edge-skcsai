@@ -105,7 +105,7 @@ function getRiskTier(confidence) {
 }
 
 function toLegacyRiskLevel(confidence) {
-    return clampConfidence(confidence) >= 70 ? 'safe' : 'medium';
+    return clampConfidence(confidence) >= 75 ? 'safe' : 'medium';
 }
 
 function normalizePrediction(prediction) {
@@ -405,7 +405,7 @@ function generateEdgeMindReport(fixture, confidence, riskTier, contextual) {
         parts.push(`Stage 3 Reality: ${volatility} volatility profile.`);
     }
 
-    if (confidence < 70 || riskTier === 'HIGH_RISK' || riskTier === 'EXTREME_RISK') {
+    if (confidence < 55 || riskTier === 'HIGH_RISK' || riskTier === 'EXTREME_RISK') {
         parts.push('Stage 4 Decision: 1X2 is fragile - see secondary markets.');
     } else {
         parts.push('Stage 4 Decision: Maintain 1X2 only with lower-variance alternatives in view.');
@@ -486,7 +486,7 @@ async function buildAndStoreDirect1X2(fixture, confidence, prediction, additiona
     const riskTier = getRiskTier(score);
 
     const contextual = { baseline, source: 'api_probability', data_sufficient: true, leagueStats: null };
-    const secondarySelection = score < 70
+    const secondarySelection = score < 72
         ? selectSecondaryMarkets(
             { ...fixture, prediction: normalizedPrediction, baseline: contextual?.baseline, leagueStats: contextual?.leagueStats },
             { baseline: contextual?.baseline, leagueStats: contextual?.leagueStats }

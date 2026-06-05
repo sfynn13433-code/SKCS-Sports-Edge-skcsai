@@ -33,6 +33,19 @@ SKCS is a scoring engine, so this file is one of the most important parts of the
 - Every formula should state whether it is authoritative in SQL or merely a helper in code.
 - Every formula should show where it is used in prediction, publication, or filtering.
 
+## Master Rulebook thresholds (authoritative)
+
+- Direct 1X2 bands: `75 / 55 / 30 / 0-29`
+- Secondary market floor: `72%`
+- ACCA leg minimum: `75%`
+- Double Chance: separate market group (not secondary pool)
+- Same Match Builder: sizes `4`, `6`, `8`
+
+Source docs:
+- `SKCS-KNOWLEDGE/knowledge/business_rules.md`
+- `SKCS_MASTER_RULEBOOK.md`
+- `STRICT_RULES.md`
+
 ## Important future entries
 
 - Confidence score versions.

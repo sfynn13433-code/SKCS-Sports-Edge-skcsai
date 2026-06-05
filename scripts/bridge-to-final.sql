@@ -52,9 +52,10 @@ SELECT
     
     -- Derive risk_level from confidence
     CASE 
-        WHEN pr.confidence >= 80 THEN 'low'
-        WHEN pr.confidence >= 65 THEN 'medium'
-        ELSE 'high'
+        WHEN pr.confidence >= 75 THEN 'low'
+        WHEN pr.confidence >= 55 THEN 'medium'
+        WHEN pr.confidence >= 30 THEN 'high'
+        ELSE 'extreme'
     END as risk_level,
     
     NULL as publish_run_id,

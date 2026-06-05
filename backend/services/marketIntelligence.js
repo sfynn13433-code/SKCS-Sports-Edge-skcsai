@@ -170,8 +170,6 @@ const BANNED_RED_CARD_MARKETS = Object.freeze(new Set([
 ]));
 
 const STANDARD_SECONDARY_MARKET_POOL = Object.freeze([
-    'double_chance_1x',
-    'double_chance_x2',
     'over_1_5',
     'under_4_5'
 ]);
@@ -187,7 +185,6 @@ function getStandardSecondaryMarkets(matchContext, primaryPrediction) {
 
     if (homeWin) {
         return [
-            { market: 'double_chance_1x', prediction: '1X', confidence: 84, source: 'rule_of_4' },
             { market: 'draw_no_bet_home', prediction: 'home', confidence: 81, source: 'rule_of_4' },
             { market: 'over_1_5', prediction: 'over', confidence: 79, source: 'rule_of_4' },
             { market: 'under_4_5', prediction: 'under', confidence: 78, source: 'rule_of_4' }
@@ -196,7 +193,6 @@ function getStandardSecondaryMarkets(matchContext, primaryPrediction) {
 
     if (awayWin) {
         return [
-            { market: 'double_chance_x2', prediction: 'X2', confidence: 84, source: 'rule_of_4' },
             { market: 'draw_no_bet_away', prediction: 'away', confidence: 81, source: 'rule_of_4' },
             { market: 'over_1_5', prediction: 'over', confidence: 79, source: 'rule_of_4' },
             { market: 'under_4_5', prediction: 'under', confidence: 78, source: 'rule_of_4' }
@@ -204,8 +200,6 @@ function getStandardSecondaryMarkets(matchContext, primaryPrediction) {
     }
 
     return [
-        { market: 'double_chance_1x', prediction: '1X', confidence: 82, source: 'rule_of_4' },
-        { market: 'double_chance_x2', prediction: 'X2', confidence: 82, source: 'rule_of_4' },
         { market: 'under_3_5', prediction: 'under', confidence: 79, source: 'rule_of_4' },
         { market: 'btts_no', prediction: 'no', confidence: 77, source: 'rule_of_4' }
     ].filter((item) => !isRedCardMarket(item.market));
@@ -245,9 +239,6 @@ const DIRECT_MARKETS_ALLOWED = Object.freeze(new Set([
 ]));
 
 const SAFE_MARKETS_ALLOWED = Object.freeze(new Set([
-    'double_chance_1x',
-    'double_chance_x2',
-    'double_chance_12',
     'draw_no_bet_home',
     'draw_no_bet_away',
     'over_0_5',
@@ -279,7 +270,7 @@ const SAFE_MARKETS_ALLOWED = Object.freeze(new Set([
 ]));
 
 const DIRECT_CONFIDENCE_MIN = 0;
-const SAFE_CONFIDENCE_MIN = 75;
+const SAFE_CONFIDENCE_MIN = 72;
 const ACCA_CONFIDENCE_MIN = 75;
 
 const SAFE_MARKET_PATTERNS = Object.freeze([
@@ -843,7 +834,7 @@ function applyFallbackLadder(candidates, options = {}) {
 
     const fallbackDirectSafe = normalized.filter((candidate) => DIRECT_SAFE_MARKETS.has(normalizeMarketKey(candidate?.market || '')));
     if (fallbackDirectSafe.length >= requireCount) {
-        const lowConfidenceDrops = normalized.filter((candidate) => Number(candidate?.confidence || 0) < 80).length;
+        const lowConfidenceDrops = normalized.filter((candidate) => Number(candidate?.confidence || 0) < ACCA_CONFIDENCE_MIN).length;
         if (lowConfidenceDrops > 0) {
             pipelineLogger.rejectionAdd({
                 run_id: telemetry.run_id,
@@ -863,7 +854,7 @@ function applyFallbackLadder(candidates, options = {}) {
             pass: 'forced_safe_pool',
             candidates: fallbackDirectSafe.map((candidate) => ({
                 ...candidate,
-                confidence: Number(candidate?.confidence || 0) < 80 ? 80 : candidate.confidence
+                confidence: Number(candidate?.confidence || 0) < ACCA_CONFIDENCE_MIN ? ACCA_CONFIDENCE_MIN : candidate.confidence
             }))
         };
     }
@@ -872,7 +863,7 @@ function applyFallbackLadder(candidates, options = {}) {
         .slice(0, Math.max(requireCount, 1))
         .map((candidate) => ({
             ...candidate,
-            confidence: Number(candidate?.confidence || 0) < 80 ? 80 : candidate.confidence
+            confidence: Number(candidate?.confidence || 0) < ACCA_CONFIDENCE_MIN ? ACCA_CONFIDENCE_MIN : candidate.confidence
         }));
     pipelineLogger.recordFallback({
         run_id: telemetry.run_id,

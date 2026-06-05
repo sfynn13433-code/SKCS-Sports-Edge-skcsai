@@ -5,7 +5,12 @@
 const MARKET_CATEGORIES = {
     'DOUBLE_CHANCE': {
         markets: ['double_chance_1x', 'double_chance_x2', 'double_chance_12', '1x', 'x2', '12', 'home_or_draw', 'draw_or_away', 'home_or_away'],
-        label: 'Double Chance / Draw No Bet',
+        label: 'Double Chance',
+        color: 'emerald'
+    },
+    'DRAW_NO_BET': {
+        markets: ['draw_no_bet_home', 'draw_no_bet_away'],
+        label: 'Draw No Bet',
         color: 'emerald'
     },
     'GOALS': {
@@ -42,7 +47,6 @@ const MARKET_CATEGORIES = {
 
 // Safe Haven market list (from Master Rulebook)
 const SAFE_HAVEN_MARKETS = new Set([
-    'double_chance_1x', 'double_chance_x2', 'double_chance_12',
     'over_0_5', 'over_1_5', 'under_3_5', 'under_4_5',
     'btts_no',
     'corners_over_8_5', 'corners_over_9_5', 'corners_under_10_5', 'corners_under_11_5',
@@ -104,23 +108,23 @@ function selectBestInCategoryMarkets(allMarkets, maxMarkets = 4) {
 // Function to implement Safe Haven fallback logic
 function selectSafeHavenMarkets(mainConfidence, allMarkets, maxMarkets = 4) {
     // Check if Safe Haven should be triggered
-    const shouldTrigger = mainConfidence < 80 && 
-                         !allMarkets.some(market => (market.confidence || 0) >= 80);
+    const shouldTrigger = mainConfidence < 72 && 
+                         !allMarkets.some(market => (market.confidence || 0) >= 72);
     
     if (!shouldTrigger) {
-        // Use primary rule: select markets >=80%
-        const highConfidenceMarkets = allMarkets.filter(market => (market.confidence || 0) >= 80);
+        // Use primary rule: select markets >=72%
+        const highConfidenceMarkets = allMarkets.filter(market => (market.confidence || 0) >= 72);
         return selectBestInCategoryMarkets(highConfidenceMarkets, maxMarkets);
     }
     
-    // Safe Haven fallback: markets > main confidence AND >=75%
+    // Safe Haven fallback: markets > main confidence AND >=72%
     const safeHavenCandidates = allMarkets.filter(market => {
         const marketKey = String(market.market || market.prediction || '').toLowerCase().replace(/\s+/g, '_');
         const confidence = market.confidence || 0;
         
         return SAFE_HAVEN_MARKETS.has(marketKey) &&
                confidence > mainConfidence &&
-               confidence >= 75;
+               confidence >= 72;
     });
     
     return selectBestInCategoryMarkets(safeHavenCandidates, maxMarkets);
@@ -129,7 +133,7 @@ function selectSafeHavenMarkets(mainConfidence, allMarkets, maxMarkets = 4) {
 // Function to generate dynamic EdgeMind BOT message
 function generateEdgeMindMessage(mainConfidence, riskTier, safeHavenTriggered, secondaryCount) {
     if (safeHavenTriggered) {
-        return `While the main market carries a ${riskTier.toLowerCase()} level of confidence (${mainConfidence}%), here are safer markets that cross the low-risk threshold of 75%.`;
+        return `While the main market carries a ${riskTier.toLowerCase()} level of confidence (${mainConfidence}%), here are safer markets that cross the low-risk threshold of 72%.`;
     } else if (riskTier === 'Low Risk') {
         return `Strong prediction confidence (${mainConfidence}%). Secondary markets are available for additional betting options.`;
     } else if (riskTier === 'Medium Risk') {
@@ -168,7 +172,7 @@ function buildSecondaryMarketsHTML(prediction, mainConfidence, riskTier) {
     
     // Apply Safe Haven selection logic
     const selectedMarkets = selectSafeHavenMarkets(mainConfidence, secInsights, 4);
-    const safeHavenTriggered = mainConfidence < 80 && !secInsights.some(m => (m.confidence || 0) >= 80);
+    const safeHavenTriggered = mainConfidence < 72 && !secInsights.some(m => (m.confidence || 0) >= 72);
     
     if (selectedMarkets.length === 0) {
         // No markets meet criteria

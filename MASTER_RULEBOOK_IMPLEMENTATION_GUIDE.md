@@ -85,8 +85,8 @@ EXECUTE FUNCTION check_acca_leg_confidence();
 ```javascript
 function selectSafeHavenMarkets(mainConfidence, allMarkets) {
     // Trigger conditions:
-    // - Main confidence < 80%
-    // - No secondary markets ≥80%
+    // - Main confidence < 72%
+    // - No secondary markets ≥72%
     // - Main confidence ≥30%
     
     const candidates = allMarkets.filter(market => 
@@ -100,7 +100,8 @@ function selectSafeHavenMarkets(mainConfidence, allMarkets) {
 ```
 
 **Safe Haven Market Categories:**
-- Double Chance / Draw No Bet (5 markets)
+- Double Chance (separate market group)
+- Draw No Bet (2 markets)
 - Goals (Totals & Team) (11 markets)  
 - BTTS (4 markets)
 - Corners (14 markets)
@@ -129,7 +130,7 @@ function selectSafeHavenMarkets(mainConfidence, allMarkets) {
     }
   ],
   "safe_haven_fallback_triggered": true,
-  "fallback_message": "While the main market carries a moderate level of confidence, here are safer markets that cross the low-risk threshold of 75%."
+  "fallback_message": "While the main market carries a moderate level of confidence, here are safer markets that cross the low-risk threshold of 72%."
 }
 ```
 
@@ -177,14 +178,14 @@ CREATE TYPE risk_tier_enum AS ENUM (
 - 30%: High Risk boundary
 - 55%: Medium Risk boundary  
 - 75%: Low Risk boundary
-- 80%: Low Risk with primary secondary rule
+- 72%: Low Risk with primary secondary rule
 
 ### Secondary Selection Tests ✅
-- Multiple 80%+ markets in same category (Best-in-Category)
-- No 80%+ markets with Safe Haven fallback
+- Multiple 72%+ markets in same category (Best-in-Category)
+- No 72%+ markets with Safe Haven fallback
 - No markets meet Safe Haven criteria
-- Main confidence 30% with Safe Haven at 75%
-- Main 85% with all secondary 80%+
+- Main confidence 30% with Safe Haven at 72%
+- Main 85% with all secondary 72%+
 
 ### Accumulator Tests ✅
 - Leg confidence exactly 75% (allowed)
@@ -261,7 +262,7 @@ node test_scenarios_master_rulebook.js
 
 ### ✅ Business Logic
 - [x] 75%/55%/30% confidence thresholds
-- [x] 80% primary, 75% Safe Haven rules
+- [x] 72% secondary floor and separate Double Chance group
 - [x] Best-in-Category selection
 - [x] 0.5 correlation limit for ACCA
 
@@ -348,7 +349,7 @@ The SKCS Master Rulebook v2.0 has been **fully implemented** with:
 - ✅ **New API Endpoints** - Modern RESTful interface
 - ✅ **Comprehensive Testing** - All edge cases covered
 - ✅ **Risk Classification** - New 4-tier system (75%/55%/30%)
-- ✅ **Secondary Market Governance** - 80% primary, 75% Safe Haven rules
+- ✅ **Secondary Market Governance** - 72% secondary floor and separate Double Chance group
 
 The system is now ready for production deployment with enhanced safety, reliability, and user experience.
 

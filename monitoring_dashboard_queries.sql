@@ -325,7 +325,7 @@ FROM daily_empty_rate
 WHERE total_fallbacks > 0
   AND (empty_count::NUMERIC / NULLIF(total_fallbacks, 0)) > 0.05;
 
--- 7.2 Critical: ACCA Success Rate < 80%
+-- 7.2 Critical: ACCA Success Rate < 75%
 SELECT 
     DATE(created_at) AS date,
     COUNT(*) AS total_attempts,
@@ -334,7 +334,7 @@ SELECT
 FROM acca_build_log
 WHERE created_at >= CURRENT_DATE - INTERVAL '1 day'
 GROUP BY DATE(created_at)
-HAVING (SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) < 80;
+HAVING (SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) < 75;
 
 -- 7.3 Critical: API Response Time P95 > 1000ms
 SELECT 

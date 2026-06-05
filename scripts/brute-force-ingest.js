@@ -169,7 +169,7 @@ async function insertPredictionsFinal(fixtures) {
             const type = types[Math.floor(Math.random() * types.length)];
             
             const confidence = 55 + Math.floor(Math.random() * 40);
-            const riskLevel = confidence >= 70 ? 'safe' : 'medium';
+            const riskLevel = confidence >= 75 ? 'safe' : 'medium';
             
             const matchId = fixture.match_id;
             

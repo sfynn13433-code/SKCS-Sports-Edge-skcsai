@@ -275,10 +275,10 @@ function buildInsightPrompt(params) {
     // 4. Stage 4 (Decision Engine): State the final confidence percentage
     //
     // IMPORTANT Direct 1X2 risk rules:
-    // - 80-100%: High Confidence / Safe.
-    // - 70-79%: Moderate Risk.
-    // - 59-69%: High Risk. Advise user to pivot to Secondary Insights.
-    // - 0-58%: Extreme Risk. Explicitly tell user NOT to bet direct 1X2 and to use Secondary Insights.
+    // - 75-100%: Low Risk / High Confidence.
+    // - 55-74%: Medium Risk / Moderate Confidence.
+    // - 30-54%: High Risk. Advise user to pivot to Secondary Insights.
+    // - 0-29%: Extreme Risk. Explicitly tell user NOT to bet direct 1X2 and to use Secondary Insights.
     //
     // Output ONLY valid JSON with this exact structure:
     // {
@@ -362,10 +362,10 @@ async function generateInsightWithGroq(params) {
     // 4. Stage 4 (Decision Engine): State the final confidence percentage
     // 
     // IMPORTANT Direct 1X2 risk rules:
-    // - 80-100%: High Confidence / Safe.
-    // - 70-79%: Moderate Risk.
-    // - 59-69%: High Risk. Advise user to pivot to Secondary Insights.
-    // - 0-58%: Extreme Risk. Explicitly tell user NOT to bet direct 1X2 and to use Secondary Insights instead.
+    // - 75-100%: Low Risk / High Confidence.
+    // - 55-74%: Medium Risk / Moderate Confidence.
+    // - 30-54%: High Risk. Advise user to pivot to Secondary Insights.
+    // - 0-29%: Extreme Risk. Explicitly tell user NOT to bet direct 1X2 and to use Secondary Insights instead.
     // 
     // Output ONLY valid JSON with this exact structure:
     // {

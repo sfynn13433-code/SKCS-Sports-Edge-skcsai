@@ -29,6 +29,7 @@ This folder is the first-pass knowledge system for SKCS.
 ## Working rule
 
 - The knowledge layer is updated before or alongside code changes whenever possible.
+- Product rule thresholds live in `knowledge/business_rules.md` and must match runtime code, Supabase governance, and `SKCS_MASTER_RULEBOOK.md`.
 
 ## First-pass scope
 

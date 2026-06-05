@@ -15,7 +15,7 @@ const {
  * Design goals:
  * - True combo math (intersection probability only).
  * - True ticket math (strict compound multiplication).
- * - Enforce 80% floor for leg selection.
+ * - Enforce 75% floor for leg selection.
  * - Preserve market variety and cap condition bloat.
  * - Avoid "junk value" auto-picks like obvious Over 0.5 / Over 1.5 traps.
  */

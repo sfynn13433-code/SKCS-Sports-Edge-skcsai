@@ -346,9 +346,9 @@ function assessAccaRisk(predictions) {
     let riskLevel = 'Low';
     let riskFactors = [];
     
-    if (minConfidence < 80) {
+    if (minConfidence < 75) {
         riskLevel = 'Medium';
-        riskFactors.push('Some legs below 80% confidence');
+        riskFactors.push('Some legs below 75% confidence');
     }
     
     if (confidenceSpread > 15) {

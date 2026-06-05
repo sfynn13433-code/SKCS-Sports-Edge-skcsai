@@ -252,7 +252,7 @@ async function step6_TestHighConfidenceMain() {
             VALUES ($1, '1X2', 'HOME_WIN', $2, 'LOW_RISK', true)
         `, [matchId, mainConfidence]);
         
-        // Insert secondary markets >=80%
+        // Insert secondary markets >=72%
         await db.query(`
             INSERT INTO direct1x2_prediction_final 
             (match_id, market_type, prediction, confidence, risk_tier, is_published)
@@ -275,18 +275,18 @@ async function step6_TestHighConfidenceMain() {
             throw new Error('Safe Haven fallback should not be triggered for 82% main');
         }
         
-        // Verify all secondary markets are >=80%
+        // Verify all secondary markets are >=72%
         const secondaryMarkets = data.secondary || [];
         for (const market of secondaryMarkets) {
-            if (market.confidence < 80) {
-                throw new Error(`Secondary market ${market.market} has confidence ${market.confidence} < 80`);
+            if (market.confidence < 72) {
+                throw new Error(`Secondary market ${market.market} has confidence ${market.confidence} < 72`);
             }
         }
         
         // Clean up
         await db.query('DELETE FROM direct1x2_prediction_final WHERE match_id = $1', [matchId]);
         
-        results.passed.push('✅ High Confidence Main: Safe Haven not triggered, secondary >=80%');
+        results.passed.push('✅ High Confidence Main: Safe Haven not triggered, secondary >=72%');
         
     } catch (error) {
         results.failed.push(`❌ High Confidence Main: ${error.message}`);

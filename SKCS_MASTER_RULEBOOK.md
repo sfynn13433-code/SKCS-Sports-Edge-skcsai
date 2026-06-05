@@ -49,24 +49,24 @@ Offer the client additional, safer market options alongside the main pick.
 
 ### 3.2 Primary Secondary Rule (Always Active)
 - Evaluate a wide pool of secondary markets.
-- Filter to those with confidence **≥ 80%**.
+- Filter to those with confidence **≥ 72%**.
 - Apply **Best‑in‑Category** (see §4) to select **up to 4 markets**, each from a different category.
 - Display as "Secondary Insights" with Low‑Risk styling.
 
 ### 3.3 Safe Haven Fallback
 **Trigger:**  
-- Main confidence **< 80%**  
-- **AND** zero secondary markets ≥80%  
+- Main confidence **< 72%**  
+- **AND** zero secondary markets ≥72%  
 - **AND** main confidence **≥ 30%** (i.e., not Extreme).
 
 **Fallback behaviour:**  
 - Use the **Safe Haven Market List** (§4.2).
 - Apply two extra filters:
   1. Confidence **> main 1X2 confidence**
-  2. Confidence **≥ 75%** (ensuring offered havens are Low Risk)
+  2. Confidence **≥ 72%** (ensuring offered havens are Low Risk)
 - Apply Best‑in‑Category to pick up to 4 markets.
 - Display with a message:  
-  *"While the main market carries a [moderate/high] level of confidence, here are safer markets that cross the low‑risk threshold of 75%."*
+  *"While the main market carries a [moderate/high] level of confidence, here are safer markets that cross the low‑risk threshold of 72%."*
 
 **If main <30%:** No secondary insights are shown; the match is too unpredictable.
 
@@ -74,12 +74,14 @@ Offer the client additional, safer market options alongside the main pick.
 ```python
 # Predefined market categories (see §4.1)
 CATEGORIES = {
-    "Double Chance / Draw No Bet": [...],
+    "Draw No Bet": [...],
+    "Double Chance": [...],
     "Goals": [...],
     "Corners": [...],
     "Cards": [...],
     "First Half Markets": [...],
-    "Team Win Either Half": [...]
+    "Team Win Either Half": [...],
+    "Same Match Builder": [...]
 }
 
 # Safe Haven market list (all markets in categories above)
@@ -93,16 +95,16 @@ def select_secondary_markets(main_confidence: float,
     # Step 1: Determine candidate pool
     candidates = []
     
-    # Primary rule: markets with confidence >= 80%
-    high_conf_markets = [m for m in all_market_predictions if m.confidence >= 80]
+# Primary rule: markets with confidence >= 72%
+high_conf_markets = [m for m in all_market_predictions if m.confidence >= 72]
     
     if high_conf_markets:
         candidates = high_conf_markets
-    elif main_confidence >= 30 and main_confidence < 80:
-        # Fallback: use Safe Haven list, filtering by > main and >= 75
+    elif main_confidence >= 30 and main_confidence < 72:
+        # Fallback: use Safe Haven list, filtering by > main and >= 72
         for market in all_market_predictions:
             if market.name in SAFE_HAVEN_LIST:
-                if market.confidence > main_confidence and market.confidence >= 75:
+                if market.confidence > main_confidence and market.confidence >= 72:
                     candidates.append(market)
     else:
         # Extreme risk main or no fallback condition met
@@ -134,18 +136,18 @@ def select_secondary_markets(main_confidence: float,
 
 | Category | Markets Included |
 |----------|------------------|
-| **Double Chance / Draw No Bet** | Double Chance (1X, X2, 12), Draw No Bet (Home), Draw No Bet (Away) |
+| **Double Chance** | Double Chance (1X, X2, 12) |
+| **Draw No Bet** | Draw No Bet (Home), Draw No Bet (Away) |
 | **Goals (Totals & Team)** | Over/Under X.5 Goals (1.5–6.5), Home Over 0.5/1.5, Away Over 0.5/1.5, BTTS Yes, BTTS No |
 | **Corners** | Over/Under X.5 Corners (6.5–12.5) |
 | **Cards** | Over/Under X.5 Yellow Cards (1.5–6.5) |
 | **First Half Markets** | Over 0.5 First Half, Under 1.5 First Half, First Half Draw |
 | **Team Win in Either Half** | Home Win Either Half, Away Win Either Half |
+| **Same Match Builder** | 4, 6, 8 |
 
 *BTTS is grouped with Goals. To make it a separate category, split Goals into "Goals" and "BTTS".*
 
-### 4.2 Full Safe Haven Market List
-Double Chance (1X, X2, 12)  
-Draw No Bet (Home, Away)  
+### 4.2 Full Secondary Market List
 Over 1.5/2.5/3.5/4.5/5.5/6.5 Goals  
 Under 2.5/3.5/4.5/5.5/6.5 Goals  
 Home Over 0.5/1.5, Away Over 0.5/1.5  
@@ -155,13 +157,21 @@ BTTS Yes, BTTS No
 Over 0.5 First Half, Under 1.5 First Half, First Half Draw  
 Home Win Either Half, Away Win Either Half
 
+### 4.3 Full Double Chance Market List
+Double Chance (1X, X2, 12)
+
+### 4.4 Same Match Builder Groups
+Same Match Builder 4  
+Same Match Builder 6  
+Same Match Builder 8
+
 ---
 
 ## 5. ACCUMULATOR CONSTRUCTION RULES
 
 ### 5.1 Rules
 - **Minimum leg confidence:** 75% (Low Risk).  
-- **Safe pool size:** Up to 12 legs selected from pre‑filtered ultra‑safe markets (Double Chance, Over 0.5 goals, etc.) where confidence ≥80%.  
+- **Safe pool size:** Up to 12 legs selected from pre‑filtered low-risk markets where confidence ≥75%.  
 - **Market conflict detection:** No two legs with correlation coefficient >0.5 (e.g., BTTS Yes + Over 2.5 Goals).  
 - **Volatile market exclusions:** Correct Score, First Goalscorer, Red Cards (already banned).
 
@@ -231,9 +241,9 @@ def validate_acca_legs(legs: list) -> bool:
 | High Risk band | 30–54% |
 | Extreme Risk max | 29% |
 | Main market publication floor | 30% |
-| Secondary primary confidence floor | 80% |
-| Safe Haven fallback trigger | Main <80% AND no ≥80% secondary AND main ≥30% |
-| Safe Haven confidence requirement | > main confidence AND ≥75% |
+| Secondary primary confidence floor | 72% |
+| Safe Haven fallback trigger | Main <72% AND no ≥72% secondary AND main ≥30% |
+| Safe Haven confidence requirement | > main confidence AND ≥72% |
 | Max secondary markets per match | 4 (one per category) |
 | Accumulator leg minimum | 75% |
 | Accumulator max legs | 12 |
