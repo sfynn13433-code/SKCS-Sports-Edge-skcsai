@@ -19,10 +19,16 @@ const {
 
 function normalizeSportKey(sport) {
     const key = String(sport || '').trim().toLowerCase();
-    if (key === 'soccer') return 'football';
-    if (key === 'american_football' || key === 'american football') return 'nfl';
-    if (key === 'icehockey' || key === 'ice hockey') return 'hockey';
-    return key || 'unknown';
+    if (!key) return 'unknown';
+    if (key === 'soccer' || key.startsWith('soccer_')) return 'football';
+    if (key === 'american_football' || key === 'american football' || key.startsWith('americanfootball_')) return 'nfl';
+    if (key === 'icehockey' || key === 'ice hockey' || key.startsWith('icehockey_')) return 'hockey';
+    if (key.startsWith('basketball_')) return 'basketball';
+    if (key.startsWith('baseball_')) return 'baseball';
+    if (key.startsWith('rugbyunion_')) return 'rugby';
+    if (key.startsWith('aussierules_')) return 'afl';
+    if (key.startsWith('mma_')) return 'mma';
+    return key;
 }
 
 function parseEnabledSports() {
