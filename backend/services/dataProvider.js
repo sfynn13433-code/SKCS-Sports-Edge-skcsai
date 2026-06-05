@@ -1452,7 +1452,10 @@ async function fetchSportsDataIO(sport) {
     const data = await client.getFixtures(sport);
     if (!data || data.length === 0) return [];
 
-    return data.map(game => client.normalizeFixture(game, sport));
+    return data
+        .map(game => client.normalizeFixture(game, sport))
+        .filter(Boolean)
+        .filter((fixture) => isPreMatchSportsDataIOStatus(fixture.status));
 }
 
 async function fetchRapidAPI(sport, leagueId, season) {
@@ -1479,6 +1482,37 @@ function futureStr(days) {
     const d = new Date();
     d.setDate(d.getDate() + days);
     return d.toISOString().slice(0, 10);
+}
+
+function isSupportedSportsDataIOSport(sport) {
+    const normalized = normalizeRequestedSport(sport);
+    return [
+        'football',
+        'soccer',
+        'basketball',
+        'nba',
+        'nfl',
+        'american_football',
+        'baseball',
+        'mlb',
+        'hockey',
+        'nhl'
+    ].includes(normalized);
+}
+
+function isPreMatchSportsDataIOStatus(status) {
+    const normalized = String(status || '').trim().toUpperCase();
+    if (!normalized) return true;
+    return [
+        'NS',
+        'TBD',
+        'SCHEDULED',
+        'NOT STARTED',
+        'UPCOMING',
+        'POSTPONED',
+        'DELAYED',
+        'PREGAME'
+    ].includes(normalized);
 }
 
 function normalizeFixture(f, sport) {
@@ -1809,6 +1843,9 @@ async function buildLiveData(options = {}) {
 
     // --- Source 4: SportsData.io (fallback) ---
     if (String(process.env.DISABLE_SPORTSDATA_IO || '').toLowerCase() !== 'true') {
+    if (!isSupportedSportsDataIOSport(sport)) {
+        console.log(`[dataProvider] ${sport}: skipping SportsData.io fallback (unsupported sport mapping)`);
+    } else {
     try {
         console.log(`[dataProvider] ${sport}: trying SportsData.io fallback`);
         const sdiData = await fetchSportsDataIO(sport);
@@ -1824,6 +1861,7 @@ async function buildLiveData(options = {}) {
         }
     } catch (sdiErr) {
         console.error(`[dataProvider] ${sport}: SportsData.io fallback failed:`, sdiErr.message);
+    }
     }
     } else {
         console.warn(`[dataProvider] ${sport}: SportsData.io disabled by DISABLE_SPORTSDATA_IO`);

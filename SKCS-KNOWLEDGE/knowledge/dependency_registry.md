@@ -37,7 +37,7 @@ This file maps the important assets to the things they depend on and the things 
 ## Ingestion dependency chain
 
 - `syncSports`
-  - Depends on: `quotaPlanner`, `buildLiveData`, provider config, active-sport gates
+  - Depends on: `quotaPlanner`, `buildLiveData`, provider config, active-sport gates, pre-match-only routing
   - Used by: pipeline routes, server endpoints, deploy triggers
 - `buildLiveData`
   - Depends on: provider clients, quota errors, normalization helpers
@@ -55,7 +55,7 @@ This file maps the important assets to the things they depend on and the things 
 ## Operational dependency chain
 
 - `startSKCSHeartbeat`
-  - Depends on: live-score sync, trends/news sync, env flags
+  - Depends on: pre-match metadata sync, optional live-score sync gates, env flags
   - Used by: server boot
 - `initCronJobs`
   - Depends on: fixture discovery, enrichment, prediction generation, cleanup queries

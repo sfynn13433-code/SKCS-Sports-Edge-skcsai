@@ -4,16 +4,16 @@
  * Primary Sources (Free):
  * 1. TheSportsDB - Rich football data, rate limited (25 calls/min)
  * 2. ESPN Hidden API - No API key, direct ESPN endpoints
- * 3. Free Livescore API - RapidAPI free tier
+ * 3. Free Livescore API - RapidAPI free tier, treated as an entity/context helper
  * 
  * Fallback: Pro Football Data API (competitions data only)
  * 
  * Strategy:
  * 1. Try TheSportsDB first for detailed match data
- * 2. Try ESPN Hidden API for live scores and schedules
- * 3. Try Free Livescore API for additional coverage
+ * 2. Try ESPN Hidden API for schedules and pre-match context
+ * 3. Try Free Livescore API for additional fixture/context coverage
  * 4. Fall back to Pro Football for competition/league info
- * 5. Merge data sources for comprehensive coverage
+ * 5. Keep live-capable helpers isolated from the pre-match default path
  */
 
 const { syncDailyFixtures, enrichMatchContext, generateEdgeMindInsight } = require('./thesportsdbPipeline');

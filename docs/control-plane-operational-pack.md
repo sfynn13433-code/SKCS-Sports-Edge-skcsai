@@ -14,7 +14,7 @@ The pipeline health feed is a **telemetry aggregation layer only**.
 
 It collects facts from the runtime ledgers and job telemetry, but it does not decide the system state.
 The control plane evaluator remains the single source of truth for `PASS`, `WARN`, `DEGRADED`, and `FAIL`.
-Execution traces themselves live in `pipeline_executions`; the control-plane snapshot lives in `system_health_state`.
+Execution traces are stored in `pipeline_executions`; the control-plane snapshot is stored in `system_health_state`.
 
 ### 1.1 Feed inputs
 
@@ -87,7 +87,7 @@ Alerts must be triggered from **state transitions** in the control plane, not fr
 ### 2.1 Routing policy
 
 - `PASS -> WARN`: send a warning to the team channel
-- `WARN -> DEGRADED`: send a higher-priority warning and suppress deep enrichment
+- `WARN -> DEGRADED`: send a higher-priority warning and suppress deep pre-match enrichment
 - `DEGRADED -> FAIL`: send a critical alert to the on-call route
 - `FAIL -> PASS`: send a recovery notice
 

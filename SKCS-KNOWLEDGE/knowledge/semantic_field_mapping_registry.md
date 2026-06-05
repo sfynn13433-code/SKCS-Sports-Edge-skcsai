@@ -23,8 +23,8 @@ The goal is to prevent semantic drift such as:
 ## Match status normalization
 
 - `Final` means the game is complete and eligible for grading.
-- `InProgress` means the game is live and should not be treated as settled.
-- `Break` means halftime and should be treated as a live pause state, not a missing-data state.
+- `InProgress` means the game is in play and should not be treated as settled.
+- `Break` means halftime and should be treated as a pause state, not a missing-data state.
 - `Postponed` should be excluded from normal grading windows unless an explicit backfill process handles it.
 
 ## Player and injury mapping
@@ -51,7 +51,7 @@ The goal is to prevent semantic drift such as:
 ## Grading impact
 
 - Wrong identity mapping causes duplicate rows, bad joins, and collapsed fixtures.
-- Wrong time mapping causes incorrect halftime evaluation and false live-state assumptions.
+- Wrong time mapping causes incorrect halftime evaluation and false in-play assumptions.
 - Wrong context assumptions create hallucinated enrichment, degraded evidence stacks, and misleading loss explanations.
 - Semantic mapping should be treated as a control layer, not a documentation luxury.
 

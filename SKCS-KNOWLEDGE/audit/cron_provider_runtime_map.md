@@ -39,7 +39,7 @@ It is the operational layer that explains when work actually happens and what it
 
 **Downstream**
 - `syncService`
-- `buildLiveData`
+- `buildLiveData` (legacy name for pre-match aggregation)
 - `predictions_raw`
 - `direct1x2_prediction_final`
 - `prediction_scores` once the SQL scoring layer is used
@@ -149,14 +149,14 @@ It is the operational layer that explains when work actually happens and what it
 - No
 - Reason: cleanup is cheap and protects the read path
 
-## 4) Heartbeat live score interval
+## 4) Heartbeat pre-match freshness interval
 
 **Job**
-- Live Score Sync
+- Pre-match metadata sync
 
 **Implementation**
 - `backend/services/skcsHeartbeat.js`
-- `setInterval(..., 1800000)`
+- `setInterval(..., 1800000)` when legacy live-style polling is explicitly enabled for compatibility
 
 **Schedule**
 - Every 30 minutes
@@ -165,19 +165,19 @@ It is the operational layer that explains when work actually happens and what it
 - Interval-based runtime loop
 
 **Provider**
-- Live score / live data sources as configured in the heartbeat pipeline
+- Pre-match metadata / optional legacy sources as configured in the heartbeat pipeline
 
 **Reads**
-- live score source feeds
+- pre-match source feeds
 - environment flags
 
 **Writes**
-- live score state
+- pre-match freshness state
 - heartbeat metadata
 
 **Downstream**
-- live dashboards
-- score freshness features
+- freshness dashboards
+- pre-match freshness features
 
 **Failure impact**
 - Medium
@@ -254,7 +254,7 @@ It is the operational layer that explains when work actually happens and what it
 - API-Sports
 - TheSportsDB
 - Odds API
-- provider fallbacks via `buildLiveData`
+- provider fallbacks via `buildLiveData` (legacy name retained in code)
 
 **Reads**
 - provider registry

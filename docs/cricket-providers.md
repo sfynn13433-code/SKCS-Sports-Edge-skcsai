@@ -50,7 +50,7 @@ Rate limit notes:
 Provider showed a 500 request window.
 Use strict call budgeting.
 Do not call detail endpoints for every fixture.
-Do not live-poll.
+Do not poll in real time.
 Only use for selected fixtures or fallback checks.
 
 Recommended future usage:

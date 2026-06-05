@@ -8,7 +8,7 @@ It focuses on what actually consumes the asset in the current repository, not ju
 ### `direct1x2_prediction_final`
 
 **What it is**
-- Main live publication table for predictions.
+- Main publication table for predictions.
 
 **Primary consumers**
 - `backend/routes/predictions.js`

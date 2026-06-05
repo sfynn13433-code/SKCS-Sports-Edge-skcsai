@@ -57,7 +57,7 @@ Categories:
 
 ## SKCS Classification
 This provider is approved only as:
-High-volume football/soccer entity resolver and ID mapping provider.
+High-volume football/soccer entity resolver and ID mapping provider for pre-match context.
 
 ## Approved Uses
 - Team search
@@ -96,4 +96,4 @@ Guessed endpoint testing returned 404 for all non-search guessed paths.
 ## Non-Wiring Rule
 Do not wire this provider into `aiPipeline` as a fixture source.
 Do not use it for final prediction logic.
-Use it only to resolve teams, stages, competitions, and IDs.
+Use it only to resolve teams, stages, competitions, and IDs for pre-match analysis.

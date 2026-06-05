@@ -29,9 +29,9 @@ const RATE_LIMITS = {
     dataQuality: 'High',
     coverage: 'Multi-sport (Football, Basketball, Baseball, etc.)',
     implementation: '✅ Complete',
-    strengths: ['No API key', 'Multi-sport', 'Live scores', 'News', 'Official data'],
+    strengths: ['No API key', 'Multi-sport', 'Schedules', 'News', 'Official data'],
     weaknesses: ['Undocumented', 'May change without notice', 'Complex data structure'],
-    optimalUse: 'Primary for live scores and multi-sport coverage'
+    optimalUse: 'Primary for multi-sport schedules and pre-match context'
   },
 
   // Free Livescore API - RapidAPI free tier
@@ -43,9 +43,9 @@ const RATE_LIMITS = {
     dataQuality: 'Medium',
     coverage: 'Multi-sport',
     implementation: '✅ Complete with rate limit tracking',
-    strengths: ['Rate limit headers', 'Multi-sport', 'Live scores'],
+    strengths: ['Rate limit headers', 'Multi-sport', 'Fixture/context lookup'],
     weaknesses: ['Unknown limits', 'Requires API key', 'RapidAPI dependency'],
-    optimalUse: 'Secondary for additional live score coverage'
+    optimalUse: 'Secondary for fixture/context coverage'
   },
 
   // Pro Football Data API - Current subscription
@@ -92,7 +92,7 @@ function calculateOptimalStrategy() {
   strategy.primary.push({
     service: 'espn',
     reason: 'No rate limits, multi-sport, official data',
-    usage: 'Live scores, schedules, multi-sport coverage'
+    usage: 'Schedules, fixtures, multi-sport coverage'
   });
 
   strategy.primary.push({
@@ -104,8 +104,8 @@ function calculateOptimalStrategy() {
   // Secondary sources (supplemental data)
   strategy.secondary.push({
     service: 'freelivescore',
-    reason: 'Additional live score coverage',
-    usage: 'Backup live scores when ESPN fails'
+    reason: 'Additional fixture/context coverage',
+    usage: 'Backup fixture context when ESPN fails'
   });
 
   strategy.secondary.push({
@@ -123,7 +123,7 @@ function calculateOptimalStrategy() {
 
   // Recommendations
   strategy.recommendations = [
-    'Use ESPN as primary for live scores and multi-sport data',
+    'Use ESPN as primary for schedules and multi-sport context',
     'Use TheSportsDB for detailed football analysis',
     'Cache ESPN data aggressively to minimize API calls',
     'Use TheSportsDB queue for rate-limited enrichment',
@@ -154,7 +154,7 @@ function calculateDailyBudget() {
  */
 function getServicePriority(dataType) {
   const priorities = {
-    'live_scores': ['espn', 'freelivescore', 'thesportsdb', 'profootball'],
+    'live_scores': ['espn', 'freelivescore', 'thesportsdb', 'profootball'], // legacy label, pre-match-only mode should keep this path disabled
     'fixtures': ['thesportsdb', 'espn', 'freelivescore', 'profootball'],
     'detailed_match': ['thesportsdb', 'espn', 'freelivescore', 'profootball'],
     'competitions': ['profootball', 'espn', 'thesportsdb', 'freelivescore'],
@@ -190,7 +190,7 @@ function generateHybridStrategy() {
       featuredGames: {
         primarySource: 'espn',
         fallbackChain: ['espn', 'thesportsdb', 'freelivescore', 'profootball'],
-        cacheDuration: '5 minutes for live, 1 hour for fixtures'
+        cacheDuration: '5 minutes for ephemeral context, 1 hour for fixtures'
       },
       detailedAnalysis: {
         primarySource: 'thesportsdb',

@@ -131,7 +131,7 @@ function showNotification(message, type = 'info') {
         if (displayIcon)  displayIcon.style.display = 'none';
         if (resultsPanel) resultsPanel.style.justifyContent = 'center';
         if (displayTitle) {
-            displayTitle.textContent  = 'Connecting to SKCS Engine\u2026';
+            displayTitle.textContent  = 'Preparing pre-match review\u2026';
             displayTitle.style.color    = '#94a3b8';
             displayTitle.style.fontSize = '0.9rem';
         }
@@ -139,7 +139,7 @@ function showNotification(message, type = 'info') {
             codesList.innerHTML =
                 '<div class="loading-spinner"></div>' +
                 '<p style="color:#3b82f6;font-size:1rem;font-weight:600;margin-top:10px;">' +
-                    'Fetching data for ' + sport + '\u2026' +
+                    'Fetching pre-match data for ' + sport + '\u2026' +
                 '</p>';
         }
 
@@ -373,7 +373,7 @@ function showNotification(message, type = 'info') {
         // ── Empty state ──────────────────────────────────────────────────────
         if (filteredPredictions.length === 0) {
             if (resultsPanel) resultsPanel.style.justifyContent = 'center';
-            if (displayTitle) displayTitle.textContent = sport + ' \u2014 Market Scan Complete';
+            if (displayTitle) displayTitle.textContent = sport + ' \u2014 Pre-match scan complete';
 
             // Assume the backend now returns `data.pipeline_metrics` from pipelineLogger.js
             var metrics = data.pipeline_metrics || { ingested: 0, analyzed: 0, rejected_confidence: 0, rejected_efficiency: 0, published: 0 };
@@ -382,9 +382,9 @@ function showNotification(message, type = 'info') {
             var funnelHtml =
                 '<div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; text-align: left; width: 100%; max-width: 400px; margin: 0 auto;">' +
                     '<h3 style="color: #38bdf8; margin-bottom: 15px; font-size: 1.1rem;">Engine Status: Healthy</h3>' +
-                    '<p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 15px;">We scanned today\'s markets but no fixtures passed our strict institutional thresholds. Here is the breakdown:</p>' +
+                    '<p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 15px;">We reviewed today\'s pre-match markets but no fixtures passed our strict institutional thresholds. Here is the breakdown:</p>' +
                     '<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">' +
-                        '<span style="color: #64748b;">Fixtures Scanned:</span>' +
+                        '<span style="color: #64748b;">Matches Reviewed:</span>' +
                         '<span style="color: #f8fafc; font-weight: bold;">' + metrics.ingested + '</span>' +
                     '</div>' +
                     '<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">' +
@@ -405,7 +405,7 @@ function showNotification(message, type = 'info') {
                 funnelHtml +=
                     '<div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">' +
                         '<h4 style="color: #f59e0b; margin-bottom: 10px; font-size: 0.95rem;">Market Watch (' + watchlistItems.length + ')</h4>' +
-                        '<p style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 10px;">Near-miss fixtures monitoring for odds drift:</p>';
+                        '<p style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 10px;">Near-miss fixtures watching for late pre-match changes:</p>';
 
                 for (var i = 0; i < Math.min(watchlistItems.length, 3); i++) {
                     var item = watchlistItems[i];
@@ -413,7 +413,7 @@ function showNotification(message, type = 'info') {
                         '<div style="background: rgba(245, 158, 11, 0.1); border-left: 3px solid #f59e0b; padding: 10px; margin-bottom: 8px; border-radius: 4px;">' +
                             '<div style="color: #f8fafc; font-size: 0.85rem; font-weight: bold;">' + (item.home_team || 'Unknown') + ' vs ' + (item.away_team || 'Unknown') + '</div>' +
                             '<div style="color: #f59e0b; font-size: 0.75rem; margin-top: 4px;">Confidence: ' + (item.confidence || 0) + '% (Below Publication Threshold)</div>' +
-                            '<div style="color: #94a3b8; font-size: 0.75rem;">Status: Monitoring for Odds Drift</div>' +
+                            '<div style="color: #94a3b8; font-size: 0.75rem;">Status: Tracking late pre-match changes</div>' +
                         '</div>';
                 }
 

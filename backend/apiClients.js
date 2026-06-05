@@ -448,6 +448,7 @@ class SportsDataIOClient {
     constructor() {
         this.apiKey = config.sportsDataIoKey;
         this.baseUrl = 'https://api.sportsdata.io/v3';
+        this.role = 'pre-match fixture/context';
     }
 
     async getFixtures(sport) {
@@ -456,19 +457,22 @@ class SportsDataIOClient {
             return [];
         }
 
+        const normalizedSport = String(sport || '').trim().toLowerCase();
         const sportMap = {
-            Football: 'soccer',
+            football: 'soccer',
+            soccer: 'soccer',
             nba: 'nba',
-            Basketball: 'basketball',
+            basketball: 'basketball',
             nfl: 'nfl',
-            american_Football: 'nfl',
+            'american football': 'nfl',
+            american_football: 'nfl',
             mlb: 'mlb',
-            MLB: 'mlb',
+            baseball: 'mlb',
             nhl: 'hockey',
-            NHL: 'hockey',
+            hockey: 'hockey'
         };
 
-        const sportEndpoint = sportMap[sport];
+        const sportEndpoint = sportMap[normalizedSport];
         if (!sportEndpoint) {
             console.log(`[SportsData.io] ${sport}: skipped (unsupported sport mapping)`);
             return [];
@@ -487,7 +491,7 @@ class SportsDataIOClient {
                 timeout: 10000,
             });
 
-            console.log(`[SportsData.io] ${sport}: returned ${Array.isArray(response.data) ? response.data.length : 0} games`);
+            console.log(`[SportsData.io] ${sport}: returned ${Array.isArray(response.data) ? response.data.length : 0} schedule rows for ${this.role}`);
             return response.data || [];
         } catch (error) {
             console.error(`[SportsData.io] ${sport} error:`, error.message);
