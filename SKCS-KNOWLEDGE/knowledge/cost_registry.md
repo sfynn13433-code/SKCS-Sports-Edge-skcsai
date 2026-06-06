@@ -21,7 +21,7 @@ It captures quotas, estimated call frequency, budget class, duplication risk, an
 
 - **Plan / registry limit**
   - `dailyLimit = 100`
-  - `perMinuteLimit = 20`
+  - `perMinuteLimit = 10` (API-Sports free plan: 10 requests/minute)
 - **Budget class**
   - `Critical`
 - **Critical jobs**
@@ -46,7 +46,7 @@ It captures quotas, estimated call frequency, budget class, duplication risk, an
 
 - **Plan / registry limit**
   - `dailyLimit = 100`
-  - `perMinuteLimit = 15`
+  - `perMinuteLimit = 10`
 - **Budget class**
   - `Important`
 - **Estimated call pattern**

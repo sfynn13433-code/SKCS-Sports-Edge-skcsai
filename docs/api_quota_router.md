@@ -19,6 +19,8 @@ apiQuotaRouter
 | `SKCS_ENABLED_SPORTS` | `football` |
 | `CRICKET_INGESTION_ENABLED` | `0` (cricket OFF unless sprint) |
 | Render cricket cron | no-ops when disabled |
+| `API_SPORTS_FOOTBALL_DAILY_LIMIT` | `100` (API-Sports free plan) |
+| `API_SPORTS_FOOTBALL_PER_MINUTE_LIMIT` | `10` (API-Sports free plan — not 20) |
 
 ## Usage
 

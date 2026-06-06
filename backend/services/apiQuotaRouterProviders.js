@@ -126,7 +126,8 @@ const PROVIDER_REGISTRY_BASE = Object.freeze({
         providerName: 'api_sports_football',
         family: 'football',
         dailyLimit: Number(process.env.API_SPORTS_FOOTBALL_DAILY_LIMIT) || 100,
-        perMinuteLimit: Number(process.env.API_SPORTS_FOOTBALL_PER_MINUTE_LIMIT) || 20,
+        // API-Sports free plan: 10 requests/minute (not 20).
+        perMinuteLimit: Number(process.env.API_SPORTS_FOOTBALL_PER_MINUTE_LIMIT) || 10,
         failClosed: false,
         usesOddsBudget: false
     },
@@ -134,7 +135,7 @@ const PROVIDER_REGISTRY_BASE = Object.freeze({
         providerName: 'api_sports_basketball',
         family: 'basketball',
         dailyLimit: Number(process.env.API_SPORTS_DAILY_LIMIT) || 100,
-        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 15,
+        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 10,
         failClosed: false,
         usesOddsBudget: false
     },
@@ -142,7 +143,7 @@ const PROVIDER_REGISTRY_BASE = Object.freeze({
         providerName: 'api_sports_baseball',
         family: 'baseball',
         dailyLimit: Number(process.env.API_SPORTS_DAILY_LIMIT) || 100,
-        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 15,
+        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 10,
         failClosed: false,
         usesOddsBudget: false
     },
@@ -150,7 +151,7 @@ const PROVIDER_REGISTRY_BASE = Object.freeze({
         providerName: 'api_sports_hockey',
         family: 'hockey',
         dailyLimit: Number(process.env.API_SPORTS_DAILY_LIMIT) || 100,
-        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 15,
+        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 10,
         failClosed: false,
         usesOddsBudget: false
     },
@@ -158,7 +159,7 @@ const PROVIDER_REGISTRY_BASE = Object.freeze({
         providerName: 'api_sports_rugby',
         family: 'rugby',
         dailyLimit: Number(process.env.API_SPORTS_DAILY_LIMIT) || 100,
-        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 15,
+        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 10,
         failClosed: false,
         usesOddsBudget: false
     },
@@ -166,7 +167,7 @@ const PROVIDER_REGISTRY_BASE = Object.freeze({
         providerName: 'api_sports_mma',
         family: 'mma',
         dailyLimit: Number(process.env.API_SPORTS_DAILY_LIMIT) || 100,
-        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 15,
+        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 10,
         failClosed: false,
         usesOddsBudget: false
     },
@@ -174,7 +175,7 @@ const PROVIDER_REGISTRY_BASE = Object.freeze({
         providerName: 'api_sports_nfl',
         family: 'nfl',
         dailyLimit: Number(process.env.API_SPORTS_DAILY_LIMIT) || 100,
-        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 15,
+        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 10,
         failClosed: false,
         usesOddsBudget: false
     },
@@ -182,7 +183,7 @@ const PROVIDER_REGISTRY_BASE = Object.freeze({
         providerName: 'api_sports_formula1',
         family: 'formula1',
         dailyLimit: Number(process.env.API_SPORTS_DAILY_LIMIT) || 100,
-        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 15,
+        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 10,
         failClosed: false,
         usesOddsBudget: false
     },
@@ -190,7 +191,7 @@ const PROVIDER_REGISTRY_BASE = Object.freeze({
         providerName: 'api_sports_volleyball',
         family: 'volleyball',
         dailyLimit: Number(process.env.API_SPORTS_DAILY_LIMIT) || 100,
-        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 15,
+        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 10,
         failClosed: false,
         usesOddsBudget: false
     },
@@ -198,7 +199,7 @@ const PROVIDER_REGISTRY_BASE = Object.freeze({
         providerName: 'api_sports_handball',
         family: 'handball',
         dailyLimit: Number(process.env.API_SPORTS_DAILY_LIMIT) || 100,
-        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 15,
+        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 10,
         failClosed: false,
         usesOddsBudget: false
     },
@@ -206,7 +207,7 @@ const PROVIDER_REGISTRY_BASE = Object.freeze({
         providerName: 'api_sports_afl',
         family: 'afl',
         dailyLimit: Number(process.env.API_SPORTS_DAILY_LIMIT) || 100,
-        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 15,
+        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 10,
         failClosed: false,
         usesOddsBudget: false
     },
@@ -214,7 +215,7 @@ const PROVIDER_REGISTRY_BASE = Object.freeze({
         providerName: 'api_sports_tennis',
         family: 'tennis',
         dailyLimit: Number(process.env.API_SPORTS_DAILY_LIMIT) || 100,
-        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 15,
+        perMinuteLimit: Number(process.env.API_SPORTS_PER_MINUTE_LIMIT) || 10,
         failClosed: false,
         usesOddsBudget: false
     },

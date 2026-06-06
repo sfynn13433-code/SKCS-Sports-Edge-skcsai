@@ -23,7 +23,8 @@ const SYNC_GRACE_MINUTES = 15;
 // Maximum future window accepted at sync time — matches beyond 7 days are ignored.
 const SYNC_FUTURE_DAYS = 7;
 const SPORT_FETCH_STAGGER_MS = Math.max(0, Number(process.env.SPORT_FETCH_STAGGER_MS || 1200));
-const TIER1_MIN_HTTP_DELAY_MS = Math.max(2400, Number(process.env.TIER1_HTTP_DELAY_MS || 2400));
+// API-Sports free tier: max 10 req/min → ≥6000ms between tier-1 football league fetches.
+const TIER1_MIN_HTTP_DELAY_MS = Math.max(6000, Number(process.env.TIER1_HTTP_DELAY_MS || 6000));
 const DEFAULT_SYNC_WINDOW_DAYS = Math.max(2, Math.min(3, Number(process.env.LIVE_FETCH_WINDOW_DAYS || 3)));
 const ACTIVE_DEPLOYMENT_SPORTS = resolveActiveDeploymentSports();
 const TIER1_SPORT_PRIORITY = Object.freeze({
