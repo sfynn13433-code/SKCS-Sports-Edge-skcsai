@@ -129,8 +129,10 @@ async function fetchBigBallsFootballFixtures(options = {}) {
     if (live.ok) {
         const scoreRows = unwrapFieldBundle(live.data, 'scores') || [];
         for (const item of scoreRows) {
+            const kickoff = item.start_time || item.updated_at || item.kickoff_utc;
+            if (!inDateWindow(kickoff, fromDate, toDate)) continue;
             const mapped = toPredictionInputFromBigBalls(item, mapRow);
-            if (mapped.match_id) rows.push(mapped);
+            if (mapped.match_id && mapped.home_team && mapped.away_team) rows.push(mapped);
         }
     }
 
