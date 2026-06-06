@@ -650,6 +650,8 @@
             const wins = data.overall?.wins || 0;
             const total = data.overall?.total || 0;
             const graded = data.overall?.graded || 0;
+            const uniqueFixtures = data.overall?.uniqueFixtures || data.window?.uniqueFixtures || 0;
+            const duplicatesRemoved = data.overall?.duplicatesRemoved || data.window?.duplicatesRemoved || 0;
             const pending = data.overall?.pending || 0;
             const voided = data.overall?.void || 0;
             const unsupported = data.overall?.unsupported || 0;
@@ -687,11 +689,14 @@
                 `).join('')
                 : '<option value="">Latest available run</option>';
             const windowNoticeEl = document.getElementById('windowNotice');
+            const noticeParts = [];
             if (data.window?.fallbackApplied && data.window?.requestedDate && data.window?.date) {
-                windowNoticeEl.textContent = `No graded results were available for ${data.window.requestedDate}. Showing latest graded window: ${data.window.date}.`;
-            } else {
-                windowNoticeEl.textContent = '';
+                noticeParts.push(`No graded results were available for ${data.window.requestedDate}. Showing latest graded window: ${data.window.date}.`);
             }
+            if (duplicatesRemoved > 0) {
+                noticeParts.push(`Collapsed ${duplicatesRemoved} duplicate graded rows from this publish run so counts reflect unique fixtures and products.`);
+            }
+            windowNoticeEl.textContent = noticeParts.join(' ');
 
             document.getElementById('heroCopy').textContent = `${(data.window?.sport || sport).toUpperCase()} for ${data.window?.date || date} is live in the accuracy engine. Football is the first fully enriched code, with the same reporting model ready for the remaining 12 sport codes as their context pipelines are upgraded.`;
 
@@ -699,7 +704,7 @@
                 <div class="stat-card">
                     <h3>${escapeHtml((data.window?.sport || sport).toUpperCase())} Window</h3>
                     <div class="stat-number">${winRate}%</div>
-                    <small>${wins} correct from ${graded} graded legs</small>
+                    <small>${wins} correct from ${graded} graded legs across ${uniqueFixtures || 0} fixture${uniqueFixtures === 1 ? '' : 's'}</small>
                 </div>
                 <div class="stat-card">
                     <h3>Total Published</h3>

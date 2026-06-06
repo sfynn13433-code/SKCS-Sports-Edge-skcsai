@@ -89,12 +89,68 @@ function determineProductStatus(rows) {
     return 'pending';
 }
 
-function aggregateAccuracyRows(accuracyRows) {
+function normalizeTeamKey(value) {
+    return String(value || '').trim().toLowerCase();
+}
+
+function buildFixtureKey(row) {
+    if (row?.event_id) {
+        return `event:${row.event_id}`;
+    }
+    const home = normalizeTeamKey(row?.home_team);
+    const away = normalizeTeamKey(row?.away_team);
+    const fixtureDate = String(row?.fixture_date || '').slice(0, 10);
+    return `teams:${home}|${away}|${fixtureDate}`;
+}
+
+function buildAccuracyDedupKey(row) {
+    const fixtureKey = buildFixtureKey(row);
+    const tierKey = normalizeTierKey(row?.prediction_tier);
+    const typeKey = normalizeTypeKey(row?.prediction_type);
+    const market = String(row?.market || '1X2').trim().toLowerCase();
+    const outcome = String(row?.predicted_outcome || '').trim().toLowerCase();
+    const matchIndex = Number.isFinite(Number(row?.prediction_match_index))
+        ? Number(row.prediction_match_index)
+        : 0;
+    return `${fixtureKey}|${tierKey}|${typeKey}|${market}|${outcome}|${matchIndex}`;
+}
+
+function deduplicateAccuracyRows(accuracyRows = []) {
+    const map = new Map();
+
+    for (const row of accuracyRows) {
+        const key = buildAccuracyDedupKey(row);
+        const existing = map.get(key);
+        if (!existing) {
+            map.set(key, row);
+            continue;
+        }
+
+        const existingTime = new Date(existing.evaluated_at || 0).getTime();
+        const rowTime = new Date(row.evaluated_at || 0).getTime();
+        const existingId = Number(existing.id || existing.prediction_final_id || 0);
+        const rowId = Number(row.id || row.prediction_final_id || 0);
+
+        if (rowTime > existingTime || (rowTime === existingTime && rowId > existingId)) {
+            map.set(key, row);
+        }
+    }
+
+    return Array.from(map.values());
+}
+
+function countUniqueFixtures(accuracyRows = []) {
+    return new Set(accuracyRows.map((row) => buildFixtureKey(row))).size;
+}
+
+function aggregateAccuracyRows(accuracyRows, options = {}) {
+    const rawRowCount = Array.isArray(accuracyRows) ? accuracyRows.length : 0;
+    const dedupedRows = options.skipDedup ? accuracyRows : deduplicateAccuracyRows(accuracyRows);
     const overall = {
         winRate: 0,
         wins: 0,
         losses: 0,
-        total: accuracyRows.length,
+        total: dedupedRows.length,
         graded: 0,
         pending: 0,
         void: 0,
@@ -102,7 +158,7 @@ function aggregateAccuracyRows(accuracyRows) {
         missingEvent: 0
     };
 
-    for (const row of accuracyRows) {
+    for (const row of dedupedRows) {
         if (row.resolution_status === 'won') {
             overall.wins += 1;
             overall.graded += 1;
@@ -122,9 +178,12 @@ function aggregateAccuracyRows(accuracyRows) {
         }
     }
     overall.winRate = overall.graded > 0 ? Math.round((overall.wins / overall.graded) * 100) : 0;
+    overall.uniqueFixtures = countUniqueFixtures(dedupedRows);
+    overall.rawRowCount = rawRowCount;
+    overall.duplicatesRemoved = Math.max(0, rawRowCount - dedupedRows.length);
 
     const products = new Map();
-    for (const row of accuracyRows) {
+    for (const row of dedupedRows) {
         if (!products.has(row.prediction_final_id)) {
             products.set(row.prediction_final_id, []);
         }
@@ -171,7 +230,7 @@ function aggregateAccuracyRows(accuracyRows) {
         }
     }
 
-    for (const row of accuracyRows) {
+    for (const row of dedupedRows) {
         const sportKey = String(row.sport || '').toLowerCase() || 'unknown';
         if (!bySportMap.has(sportKey)) {
             bySportMap.set(sportKey, { sport: sportKey, ...buildEmptyStats() });
@@ -203,7 +262,7 @@ function aggregateAccuracyRows(accuracyRows) {
         }))
     }));
 
-    const losses = accuracyRows
+    const losses = dedupedRows
         .filter((row) => row.resolution_status === 'lost')
         .map((row) => ({
             match: `${row.home_team || 'Unknown'} vs ${row.away_team || 'Unknown'}`,
@@ -228,7 +287,7 @@ function aggregateAccuracyRows(accuracyRows) {
         }));
 
     const weeklyMap = new Map();
-    for (const row of accuracyRows) {
+    for (const row of dedupedRows) {
         const fixtureDate = row.fixture_date ? new Date(row.fixture_date) : null;
         if (!fixtureDate || Number.isNaN(fixtureDate.getTime())) continue;
         const weekStart = startOfWeekUtc(fixtureDate).toISOString().slice(0, 10);
@@ -277,5 +336,7 @@ module.exports = {
     humanizeTypeKey,
     buildEmptyStats,
     finalizeStats,
+    deduplicateAccuracyRows,
+    countUniqueFixtures,
     aggregateAccuracyRows
 };

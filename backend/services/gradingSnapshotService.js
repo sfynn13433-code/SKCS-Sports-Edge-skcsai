@@ -238,19 +238,34 @@ async function fetchAvailability({ sportDb, from, to, anchorDate }) {
 
 async function fetchPublishedSummary({ sportDb, anchorDate, publishRunId }) {
     const res = await query(`
+        WITH ranked_products AS (
+            SELECT
+                pf.id,
+                CASE
+                    WHEN jsonb_typeof(pf.matches) = 'array' THEN jsonb_array_length(pf.matches)
+                    ELSE 1
+                END AS leg_count,
+                ROW_NUMBER() OVER (
+                    PARTITION BY
+                        COALESCE(
+                            NULLIF(TRIM(pf.fixture_id::text), ''),
+                            LOWER(TRIM(pf.home_team)) || '|' || LOWER(TRIM(pf.away_team))
+                        ),
+                        LOWER(COALESCE(pf.tier, 'normal')),
+                        LOWER(COALESCE(pf.type, 'direct'))
+                    ORDER BY pf.created_at DESC, pf.id DESC
+                ) AS rn
+            FROM direct1x2_prediction_final pf
+            WHERE COALESCE(pf.sport, 'Football') = $1
+              AND DATE(COALESCE(pf.match_date, pf.created_at) AT TIME ZONE 'Africa/Johannesburg') = $2::date
+              AND ($3::bigint IS NULL OR pf.publish_run_id = $3::bigint)
+              AND ${PUBLISHED_ROW_QUALITY_SQL}
+        )
         SELECT
             COUNT(*)::int AS products,
-            COALESCE(SUM(
-                CASE
-                    WHEN jsonb_typeof(matches) = 'array' THEN jsonb_array_length(matches)
-                    ELSE 1
-                END
-            ), 0)::int AS legs
-        FROM direct1x2_prediction_final pf
-        WHERE COALESCE(pf.sport, 'Football') = $1
-          AND DATE(COALESCE(pf.match_date, pf.created_at) AT TIME ZONE 'Africa/Johannesburg') = $2::date
-          AND ($3::bigint IS NULL OR pf.publish_run_id = $3::bigint)
-          AND ${PUBLISHED_ROW_QUALITY_SQL}
+            COALESCE(SUM(leg_count), 0)::int AS legs
+        FROM ranked_products
+        WHERE rn = 1
     `, [sportDb, anchorDate, publishRunId || null]);
     return res.rows?.[0] || { products: 0, legs: 0 };
 }
@@ -307,6 +322,9 @@ function toLegacyAccuracyPayload(snapshot) {
             reasonCapabilities: snapshot.window?.reasonCapabilities || { verified: [], unavailable: [] },
             contextCoverage: snapshot.window?.contextCoverage || {},
             missingEvent: snapshot.meta?.overall?.missingEvent || 0,
+            uniqueFixtures: snapshot.meta?.overall?.uniqueFixtures || 0,
+            rawRowCount: snapshot.meta?.overall?.rawRowCount || 0,
+            duplicatesRemoved: snapshot.meta?.overall?.duplicatesRemoved || 0,
             from: snapshot.window?.from,
             to: snapshot.window?.to
         },
