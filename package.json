@@ -33,6 +33,7 @@
     "sync:sportsrc": "node backend/scripts/sync-sportsrc-fixtures.js",
     "sync:ucl-context": "node scripts/sync-ucl-context.js",
     "verify:bsd": "node scripts/verify-bsd-enrichment.js",
+    "verify:bsd-crosswalk": "node scripts/verify-bsd-crosswalk.js",
     "sync:bsd-enrichment": "node scripts/sync-bsd-enrichment.js",
     "cricket:cache:daily": "node scripts/cricapi-cache-refresh.js --mode=daily",
     "cricket:cache:live": "node scripts/cricapi-cache-refresh.js --mode=live",

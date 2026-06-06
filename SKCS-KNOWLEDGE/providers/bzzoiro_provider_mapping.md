@@ -155,6 +155,25 @@ Uses existing `backend/semantic-layer/registry.js` — extend `STATUS_ALIASES` w
 
 ---
 
+## League crosswalk (verified 2026-06-11)
+
+| API-Sports `league.id` | Competition | BSD `league_id` |
+|------------------------|-------------|-----------------|
+| 39 | Premier League | 1 |
+| 140 | La Liga | 3 |
+| 78 | Bundesliga | 5 |
+| 135 | Serie A | 4 |
+| 61 | Ligue 1 | 6 |
+| 3 | UEFA Champions League | 7 |
+| 98 | J1 League | 49 |
+| 169 | Chinese Super League | 52 |
+| 253 | MLS | 18 |
+| 71 | Brasileirão Série A | 9 |
+
+Resolve live: `npm run verify:bsd-crosswalk -- --map-only`
+
+---
+
 ## Cross-provider identity resolution (required before adapter)
 
 ```text

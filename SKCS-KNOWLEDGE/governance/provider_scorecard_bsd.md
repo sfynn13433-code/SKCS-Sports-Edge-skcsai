@@ -129,6 +129,8 @@ Run API-Sports and BSD in parallel for 30 days on tier-1 leagues:
 - [ ] Live league ID crosswalk captured
 - [x] Phase 4 verification script (`npm run verify:bsd`)
 - [x] Enrichment cache writes (`npm run sync:bsd-enrichment` → `rapidapi_cache`)
-- [ ] Parallel API-Sports crosswalk comparison (Phase 4b)
+- [x] League ID crosswalk map (`npm run verify:bsd-crosswalk -- --map-only`)
+- [x] Fixture crosswalk script (`npm run verify:bsd-crosswalk`) with quota-safe degradation
+- [ ] Full parallel match-rate run (requires API-Sports quota reset)
 
 **Approver:** SKCS Governance Layer — **2026-06-11** (governance docs + gated adapter)

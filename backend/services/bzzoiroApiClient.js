@@ -77,6 +77,34 @@ async function getLineups(eventId) {
  * Verification-lane only — fixture discovery for crosswalk, not canonical ingest.
  * @see SKCS-KNOWLEDGE/governance/feature_risk_registry.md
  */
+async function listLeagues(params = {}) {
+    if (!isBzzoiroEnabled()) {
+        return { ok: false, disabled: true, reason: 'ENABLE_BZZOIRO_PROVIDER is not true', data: null };
+    }
+
+    const token = getToken();
+    if (!token) {
+        return { ok: false, disabled: true, reason: 'BZZOIRO_API_TOKEN is missing', data: null };
+    }
+
+    const url = `${BASE_URL}/leagues/`;
+    try {
+        const response = await axios.get(url, {
+            headers: { Authorization: `Token ${token}` },
+            params,
+            timeout: 20000,
+            validateStatus: () => true
+        });
+
+        if (response.status >= 200 && response.status < 300) {
+            return { ok: true, disabled: false, status: response.status, data: response.data || {} };
+        }
+        return { ok: false, disabled: false, status: response.status, reason: `BSD HTTP ${response.status}`, data: null };
+    } catch (error) {
+        return { ok: false, disabled: false, reason: error.message, data: null };
+    }
+}
+
 async function listEvents(params = {}) {
     if (!isBzzoiroEnabled()) {
         return { ok: false, disabled: true, reason: 'ENABLE_BZZOIRO_PROVIDER is not true', data: null };
@@ -112,5 +140,6 @@ module.exports = {
     getOddsComparison,
     getPolymarket,
     isBzzoiroEnabled,
-    listEvents
+    listEvents,
+    listLeagues
 };
