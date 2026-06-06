@@ -127,7 +127,8 @@ Run API-Sports and BSD in parallel for 30 days on tier-1 leagues:
 - [x] Sandboxed adapter (`backend/providers/football/bzzoiroProvider.js`)
 - [ ] Legal review of ODbL commercial use
 - [ ] Live league ID crosswalk captured
-- [ ] Parallel verification run (Phase 4)
-- [ ] Production enrichment store writes
+- [x] Phase 4 verification script (`npm run verify:bsd`)
+- [x] Enrichment cache writes (`npm run sync:bsd-enrichment` → `rapidapi_cache`)
+- [ ] Parallel API-Sports crosswalk comparison (Phase 4b)
 
 **Approver:** SKCS Governance Layer — **2026-06-11** (governance docs + gated adapter)
