@@ -10,6 +10,8 @@ This folder is the first-pass knowledge system for SKCS.
   - Drift, gaps, and risk tracking.
 - `governance/`
   - Rules for AI usage, naming, and documentation discipline.
+- `providers/`
+  - Provider discovery audits and semantic field mappings (evaluation artifacts).
 - Key files:
   - `knowledge/database_schema.md`
   - `knowledge/formula_registry.md`
@@ -20,6 +22,12 @@ This folder is the first-pass knowledge system for SKCS.
   - `knowledge/cost_registry.md`
   - `knowledge/system_topology.md`
   - `governance/verification_layer_spec.md`
+  - `governance/bsd_governance_hold.md` (lifted 2026-06-11)
+  - `governance/feature_risk_registry.md`
+  - `governance/provider_scorecard_bsd.md`
+  - `providers/bzzoiro_discovery_audit.md`
+  - `providers/bzzoiro_field_audit.md`
+  - `providers/bzzoiro_provider_mapping.md`
   - `audit/verification_runtime_audit.md`
   - `audit/observability_registry.md`
   - `audit/column_dependency_matrix.md`

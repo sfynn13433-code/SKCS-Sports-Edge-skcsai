@@ -29,6 +29,7 @@ module.exports = {
     sportsDbKey: process.env.SPORTS_DB_KEY,
     sportsDataOrgToken: process.env.X_AUTH_TOKEN,
     cricketDataApiKey: process.env.CRICKETDATA_API_KEY,
+    bzzoiroApiToken: process.env.BZZOIRO_API_TOKEN,
     newsApi: {
         apiKey: process.env.NEWSAPI_KEY,
         dailyLimit: Number(process.env.NEWSAPI_DAILY_CALL_LIMIT) || 95,
