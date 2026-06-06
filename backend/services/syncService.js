@@ -372,7 +372,8 @@ async function syncSports(options = {}) {
 
     // ── PROVIDER STATUS LOGGING ─────────────────────────────────────────────
     console.log('[Provider Status]');
-    console.log(`  API-Sports: ${String(process.env.DISABLE_APISPORTS || '').toLowerCase() === 'true' ? 'DISABLED' : 'ACTIVE'} (X_APISPORTS_KEY=${process.env.X_APISPORTS_KEY ? 'SET' : 'MISSING'})`);
+    console.log(`  API-Sports: ${String(process.env.DISABLE_APISPORTS || '').toLowerCase() === 'true' ? 'DISABLED' : 'ON HOLD / FALLBACK'} (X_APISPORTS_KEY=${process.env.X_APISPORTS_KEY ? 'SET' : 'MISSING'})`);
+    console.log(`  Big Balls Data: ${String(process.env.ENABLE_BIG_BALLS_DATA_PROVIDER || '').trim() === 'true' ? 'ACTIVE' : 'DISABLED'} PRIMARY_FOOTBALL=${String(process.env.BIG_BALLS_PRIMARY_FOOTBALL || '').trim() === 'true' ? 'YES' : 'NO'} (BIG_BALLS_DATA_API_KEY=${process.env.BIG_BALLS_DATA_API_KEY ? 'SET' : 'MISSING'})`);
     console.log(`  TheSportsDB: ${process.env.THESPORTSDB_KEY ? 'ACTIVE' : 'DISABLED'} (THESPORTSDB_KEY=${process.env.THESPORTSDB_KEY ? 'SET' : 'MISSING'})`);
     console.log(`  Odds API: ${process.env.ODDS_API_KEY ? 'ACTIVE' : 'DISABLED'} (ODDS_API_KEY=${process.env.ODDS_API_KEY ? 'SET' : 'MISSING'})`);
     console.log(`  FootballData.org: ${normalizeSportToken(requestedSports[0] || 'football') === 'football' ? 'ACTIVE' : 'N/A (football only)'}`);

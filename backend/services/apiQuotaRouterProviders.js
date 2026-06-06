@@ -86,6 +86,9 @@ const PROVIDER_ALIASES = Object.freeze({
     metrx_factory: 'metrx_factory',
     thesportsdb: 'thesportsdb',
     divanscore: 'divanscore',
+    big_balls_data: 'big_balls_data',
+    bigballs: 'big_balls_data',
+    big_balls: 'big_balls_data'
     groq: 'groq',
     dolphin: 'dolphin'
 });
@@ -257,6 +260,14 @@ const PROVIDER_REGISTRY_BASE = Object.freeze({
         dailyLimit: Number(process.env.DIVANSCORE_DAILY_LIMIT) || 100,
         perMinuteLimit: null,
         failClosed: false,
+        usesOddsBudget: false
+    },
+    big_balls_data: {
+        providerName: 'big_balls_data',
+        family: 'football',
+        dailyLimit: Number(process.env.BIG_BALLS_DAILY_LIMIT) || 1000,
+        perMinuteLimit: Number(process.env.BIG_BALLS_PER_MINUTE_LIMIT) || 100,
+        failClosed: true,
         usesOddsBudget: false
     }
 });

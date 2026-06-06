@@ -106,6 +106,38 @@ async function listLeagues(params = {}) {
 }
 
 async function listEvents(params = {}) {
+    return getEvaluationEndpoint('/events/', params);
+}
+
+async function getEvent(eventId) {
+    const id = String(eventId || '').trim();
+    if (!id) {
+        return { ok: false, disabled: false, reason: 'eventId is required', data: null };
+    }
+    return getEvaluationEndpoint(`/events/${encodeURIComponent(id)}/`);
+}
+
+async function getStandings(leagueId, params = {}) {
+    const id = String(leagueId || '').trim();
+    if (!id) {
+        return { ok: false, disabled: false, reason: 'leagueId is required', data: null };
+    }
+    return getEvaluationEndpoint(`/leagues/${encodeURIComponent(id)}/standings/`, params);
+}
+
+async function listTeams(params = {}) {
+    return getEvaluationEndpoint('/teams/', params);
+}
+
+async function listBookmakers(params = {}) {
+    return getEvaluationEndpoint('/bookmakers/', params);
+}
+
+/**
+ * Read-only evaluation lane — discovery, coverage audit, crosswalk.
+ * Does NOT write canonical truth. Blocked from prediction engine by governance.
+ */
+async function getEvaluationEndpoint(path, params = {}) {
     if (!isBzzoiroEnabled()) {
         return { ok: false, disabled: true, reason: 'ENABLE_BZZOIRO_PROVIDER is not true', data: null };
     }
@@ -115,7 +147,7 @@ async function listEvents(params = {}) {
         return { ok: false, disabled: true, reason: 'BZZOIRO_API_TOKEN is missing', data: null };
     }
 
-    const url = `${BASE_URL}/events/`;
+    const url = `${BASE_URL}${path}`;
     try {
         const response = await axios.get(url, {
             headers: { Authorization: `Token ${token}` },
@@ -136,10 +168,15 @@ async function listEvents(params = {}) {
 module.exports = {
     APPROVED_PATHS,
     BASE_URL,
+    getEvent,
     getLineups,
     getOddsComparison,
     getPolymarket,
+    getStandings,
+    getEvaluationEndpoint,
     isBzzoiroEnabled,
+    listBookmakers,
     listEvents,
-    listLeagues
+    listLeagues,
+    listTeams
 };

@@ -15,6 +15,10 @@ const {
 } = require('../apiClients');
 const { getScoreboard } = require('./espnHiddenApiService');
 const ProviderQuotaExceededError = require('../errors/ProviderQuotaExceededError');
+const {
+    fetchBigBallsFootballFixtures,
+    isBigBallsPrimaryFootball
+} = require('./bigBallsFootballBridge');
 
 const SUPPORTED_LEAGUES = ['4328', '4332', '4331', '4335', '4334', '4387', '4424', '4380', '4391'];
 /** TheSportsDB league id → API-Sports league id (see docs/SKCS_ENGINE_V2_PHASE0B5_REPLAY.md) */
@@ -1706,7 +1710,30 @@ async function buildLiveData(options = {}) {
         return aggregated.length >= minFixturesTarget;
     };
 
-    // --- Source 0: TheSportsDB (primary for supported multi-league ingestion) ---
+    // --- Source 0: Big Balls Data (gated primary for mapped football leagues) ---
+    if (isBigBallsPrimaryFootball() && (requestedSport === 'football' || String(sport).toLowerCase() === 'football') && requestedLeagueId) {
+        try {
+            console.log(`[dataProvider] football: Big Balls PRIMARY path for leagueId=${requestedLeagueId}`);
+            const bbdFixtures = await fetchBigBallsFootballFixtures({
+                leagueId: requestedLeagueId,
+                fromDate: today,
+                toDate: windowEnd,
+                limit: maxFixturesPerSource
+            });
+            const filtered = applyCompetitionAllowlist(bbdFixtures, 'football');
+            if (filtered.length > 0) {
+                console.log(`[dataProvider] football: Big Balls PRIMARY returned ${filtered.length} fixtures`);
+                if (appendAggregated(filtered, 'BigBallsData')) {
+                    return aggregated;
+                }
+            }
+            console.warn(`[dataProvider] football: Big Balls PRIMARY returned 0 fixtures for leagueId=${requestedLeagueId}`);
+        } catch (error) {
+            console.error(`[dataProvider] football: Big Balls PRIMARY error:`, error.message);
+        }
+    }
+
+    // --- Source 1: TheSportsDB (fallback for supported multi-league ingestion) ---
     console.log(`[DIAG] TheSportsDB check: requestedLeagueId=${requestedLeagueId} isSupported=${isSupportedLeagueId} shouldFetchAll=${shouldFetchAllLeagues} useTheSportsDb=${useTheSportsDbForSport} leagueIdsForSportsDb=[${leagueIdsForSportsDb.join(',')}]`);
     if (leagueIdsForSportsDb.length > 0) {
         try {
