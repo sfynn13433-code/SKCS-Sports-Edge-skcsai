@@ -88,7 +88,7 @@ const PROVIDER_ALIASES = Object.freeze({
     divanscore: 'divanscore',
     big_balls_data: 'big_balls_data',
     bigballs: 'big_balls_data',
-    big_balls: 'big_balls_data'
+    big_balls: 'big_balls_data',
     groq: 'groq',
     dolphin: 'dolphin'
 });
