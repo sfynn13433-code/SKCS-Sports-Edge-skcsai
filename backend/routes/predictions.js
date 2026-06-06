@@ -2669,19 +2669,54 @@ router.get('/', requireSupabaseUser, async (req, res) => {
         const sportKey = sport === 'Football' ? 'Football' : sport;
         const sportMetrics = pipelineSnapshot?.sports?.[sportKey] || null;
 
-        const pipelineMetrics = sportMetrics ? {
-            ingested: sportMetrics.stages.normalized_count || 0,
-            analyzed: sportMetrics.stages.market_scored_count || 0,
-            rejected_confidence: sportMetrics.rejections.low_confidence || 0,
-            rejected_efficiency: sportMetrics.rejections.validation_reject || 0,
-            published: sportMetrics.stages.published_count || 0
-        } : {
-            ingested: 0,
-            analyzed: 0,
-            rejected_confidence: 0,
-            rejected_efficiency: 0,
-            published: 0
-        };
+        const pipelineMetrics = (() => {
+            if (!sportMetrics) {
+                return {
+                    ingested: 0,
+                    analyzed: 0,
+                    rejected_confidence: 0,
+                    rejected_efficiency: 0,
+                    rejected_other: 0,
+                    rejected_total: 0,
+                    pending_analysis: 0,
+                    published: 0,
+                    empty_reason: 'no_pipeline_snapshot'
+                };
+            }
+
+            const ingested = Number(sportMetrics.stages.normalized_count) || 0;
+            const analyzed = Number(sportMetrics.stages.market_scored_count) || 0;
+            const published = Number(sportMetrics.stages.published_count) || 0;
+            const rejectedConfidence = Number(sportMetrics.rejections.low_confidence) || 0;
+            const rejectedEfficiency = Number(sportMetrics.rejections.validation_reject) || 0;
+            const rejectedTotal = Object.values(sportMetrics.rejections || {}).reduce(
+                (sum, value) => sum + (Number(value) || 0),
+                0
+            );
+            const rejectedOther = Math.max(0, rejectedTotal - rejectedConfidence - rejectedEfficiency);
+            const pendingAnalysis = Math.max(0, ingested - analyzed);
+
+            let emptyReason = 'pipeline_incomplete';
+            if (ingested === 0) {
+                emptyReason = 'no_fixtures_in_window';
+            } else if (analyzed === 0 && published === 0) {
+                emptyReason = 'sync_complete_analysis_pending';
+            } else if (published === 0 && rejectedTotal > 0) {
+                emptyReason = 'reviewed_none_approved';
+            }
+
+            return {
+                ingested,
+                analyzed,
+                rejected_confidence: rejectedConfidence,
+                rejected_efficiency: rejectedEfficiency,
+                rejected_other: rejectedOther,
+                rejected_total: rejectedTotal,
+                pending_analysis: pendingAnalysis,
+                published,
+                empty_reason: emptyReason
+            };
+        })();
 
         return sendPredictionsSuccess(res, {
             plan_id: planId,

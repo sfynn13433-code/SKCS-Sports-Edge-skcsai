@@ -25,7 +25,9 @@ const REJECTION_KEYS = Object.freeze([
     'ui_filter_exclude',
     'sport_key_mismatch',
     'plan_id_mismatch',
-    'date_window_exclude'
+    'date_window_exclude',
+    'stale_kickoff_rejected',
+    'sport_deployment_block'
 ]);
 
 const runs = new Map();

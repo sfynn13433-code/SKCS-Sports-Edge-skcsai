@@ -373,31 +373,104 @@ function showNotification(message, type = 'info') {
         // ── Empty state ──────────────────────────────────────────────────────
         if (filteredPredictions.length === 0) {
             if (resultsPanel) resultsPanel.style.justifyContent = 'center';
-            if (displayTitle) displayTitle.textContent = sport + ' \u2014 Pre-match scan complete';
 
-            // Assume the backend now returns `data.pipeline_metrics` from pipelineLogger.js
-            var metrics = data.pipeline_metrics || { ingested: 0, analyzed: 0, rejected_confidence: 0, rejected_efficiency: 0, published: 0 };
+            var metrics = data.pipeline_metrics || {
+                ingested: 0,
+                analyzed: 0,
+                rejected_confidence: 0,
+                rejected_efficiency: 0,
+                rejected_other: 0,
+                rejected_total: 0,
+                pending_analysis: 0,
+                published: 0,
+                empty_reason: 'no_pipeline_snapshot'
+            };
             var watchlistItems = cats.watchlist || [];
+            var ingested = Number(metrics.ingested) || 0;
+            var analyzed = Number(metrics.analyzed) || 0;
+            var published = Number(metrics.published) || 0;
+            var rejectedConf = Number(metrics.rejected_confidence) || 0;
+            var rejectedEff = Number(metrics.rejected_efficiency) || 0;
+            var rejectedOther = Number(metrics.rejected_other) || 0;
+            var pendingAnalysis = Number(metrics.pending_analysis);
+            if (!Number.isFinite(pendingAnalysis)) {
+                pendingAnalysis = Math.max(0, ingested - analyzed);
+            }
+            var approvedCount = Number(data.source_rows) || published || 0;
+            var emptyReason = metrics.empty_reason || 'pipeline_incomplete';
+
+            var statusLabel = 'Standing by';
+            var statusColor = '#94a3b8';
+            var panelTitle = sport + ' \u2014 No insights yet';
+            var panelMessage = 'No pre-match insights are available for this sport right now.';
+
+            if (emptyReason === 'sync_complete_analysis_pending') {
+                panelTitle = sport + ' \u2014 Fixtures synced';
+                statusLabel = 'Awaiting analysis';
+                statusColor = '#f59e0b';
+                panelMessage = 'We pulled ' + ingested + ' fixtures from data providers, but pre-match scoring has not finished yet. Insights appear here only after the AI pipeline publishes approved picks.';
+            } else if (emptyReason === 'reviewed_none_approved') {
+                panelTitle = sport + ' \u2014 Pre-match scan complete';
+                statusLabel = 'Scan complete';
+                statusColor = '#38bdf8';
+                panelMessage = 'Fixtures were scored and reviewed, but none met our publication thresholds today.';
+            } else if (emptyReason === 'no_fixtures_in_window') {
+                panelTitle = sport + ' \u2014 No fixtures in window';
+                statusLabel = 'Standing by';
+                statusColor = '#94a3b8';
+                panelMessage = 'No fixtures were found in today\'s pre-match window. This is common during off-season or before the weekly sync runs.';
+            } else if (ingested > 0 && analyzed === 0) {
+                panelTitle = sport + ' \u2014 Fixtures synced';
+                statusLabel = 'Awaiting analysis';
+                statusColor = '#f59e0b';
+                panelMessage = 'Fixtures were synced but have not been scored for publication yet.';
+            }
+
+            if (displayTitle) displayTitle.textContent = panelTitle;
 
             var funnelHtml =
                 '<div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; text-align: left; width: 100%; max-width: 400px; margin: 0 auto;">' +
-                    '<h3 style="color: #38bdf8; margin-bottom: 15px; font-size: 1.1rem;">Engine Status: Healthy</h3>' +
-                    '<p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 15px;">We reviewed today\'s pre-match markets but no fixtures passed our strict institutional thresholds. Here is the breakdown:</p>' +
+                    '<h3 style="color: ' + statusColor + '; margin-bottom: 15px; font-size: 1.1rem;">Status: ' + statusLabel + '</h3>' +
+                    '<p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 15px;">' + panelMessage + '</p>' +
                     '<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">' +
-                        '<span style="color: #64748b;">Matches Reviewed:</span>' +
-                        '<span style="color: #f8fafc; font-weight: bold;">' + metrics.ingested + '</span>' +
+                        '<span style="color: #64748b;">Fixtures Synced:</span>' +
+                        '<span style="color: #f8fafc; font-weight: bold;">' + ingested + '</span>' +
                     '</div>' +
                     '<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">' +
+                        '<span style="color: #64748b;">Scored for Publication:</span>' +
+                        '<span style="color: #f8fafc; font-weight: bold;">' + analyzed + '</span>' +
+                    '</div>';
+
+            if (pendingAnalysis > 0) {
+                funnelHtml +=
+                    '<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">' +
+                        '<span style="color: #64748b;">Not Yet Scored:</span>' +
+                        '<span style="color: #f59e0b; font-weight: bold;">' + pendingAnalysis + '</span>' +
+                    '</div>';
+            }
+
+            funnelHtml +=
+                    '<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">' +
                         '<span style="color: #64748b;">Failed Market Efficiency:</span>' +
-                        '<span style="color: #ef4444; font-weight: bold;">' + metrics.rejected_efficiency + '</span>' +
+                        '<span style="color: #ef4444; font-weight: bold;">' + rejectedEff + '</span>' +
                     '</div>' +
                     '<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">' +
                         '<span style="color: #64748b;">Failed Confidence Threshold:</span>' +
-                        '<span style="color: #f59e0b; font-weight: bold;">' + metrics.rejected_confidence + '</span>' +
-                    '</div>' +
+                        '<span style="color: #f59e0b; font-weight: bold;">' + rejectedConf + '</span>' +
+                    '</div>';
+
+            if (rejectedOther > 0) {
+                funnelHtml +=
+                    '<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">' +
+                        '<span style="color: #64748b;">Filtered (date/odds/other):</span>' +
+                        '<span style="color: #f97316; font-weight: bold;">' + rejectedOther + '</span>' +
+                    '</div>';
+            }
+
+            funnelHtml +=
                     '<div style="display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">' +
                         '<span style="color: #38bdf8; font-weight: bold;">Approved Insights:</span>' +
-                        '<span style="color: #4ade80; font-weight: bold;">0</span>' +
+                        '<span style="color: #4ade80; font-weight: bold;">' + approvedCount + '</span>' +
                     '</div>';
 
             // PHASE 3: Add watchlist section if items exist
