@@ -176,6 +176,46 @@
         .ux-feedback-status.is-success { display: block; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
         .ux-feedback-status.is-error { display: block; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
         @media (max-width: 900px) { .ux-feedback-grid { grid-template-columns: 1fr; } }
+        .scroll-to-top {
+            position: fixed;
+            left: 18px;
+            bottom: 28px;
+            z-index: 1200;
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 999px;
+            background: #0d6efd;
+            color: #ffffff;
+            font-size: 1.35rem;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(13, 110, 253, 0.35);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(12px);
+            transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease, background-color 0.2s ease;
+        }
+        .scroll-to-top.is-visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .scroll-to-top:hover {
+            background: #0b5ed7;
+        }
+        .scroll-to-top:focus-visible {
+            outline: 3px solid rgba(13, 110, 253, 0.35);
+            outline-offset: 3px;
+        }
+        @media (max-width: 640px) {
+            .scroll-to-top {
+                left: 12px;
+                bottom: 18px;
+                width: 44px;
+                height: 44px;
+            }
+        }
         .footer { background-color: #212529; color: white; padding: 3rem; text-align: center; }
         .footer-content { max-width: 1200px; margin: 0 auto; }
         .footer-company { line-height: 1.7; }
@@ -963,6 +1003,8 @@
         </div>
     </footer>
 
+    <button id="scrollToTopBtn" class="scroll-to-top" type="button" aria-label="Back to top" title="Back to top">↑</button>
+
     <!-- comment -->
     <style>
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -975,6 +1017,27 @@
     <script src="/js/vip-stress-dashboard.js"></script>
     <script src="/js/system-health-banner.js"></script>
     <script src="/js/user-experience-feedback.js"></script>
+    <script>
+    (function () {
+        var btn = document.getElementById('scrollToTopBtn');
+        if (!btn) return;
+
+        function toggleScrollButton() {
+            if (window.scrollY > 320) {
+                btn.classList.add('is-visible');
+            } else {
+                btn.classList.remove('is-visible');
+            }
+        }
+
+        btn.addEventListener('click', function () {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        window.addEventListener('scroll', toggleScrollButton, { passive: true });
+        toggleScrollButton();
+    })();
+    </script>
 
 <style>
   #skcsMatchDetailModal {
