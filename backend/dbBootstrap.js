@@ -137,10 +137,36 @@ async function cleanupInvalidPublishedRows() {
     }
 }
 
+async function ensureSemanticViolationsTable() {
+    await query(`CREATE EXTENSION IF NOT EXISTS pgcrypto;`);
+    await query(`
+        CREATE TABLE IF NOT EXISTS public.semantic_violations (
+            id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+            occurred_at timestamptz NOT NULL DEFAULT now(),
+            pipeline text NOT NULL,
+            violation_type text NOT NULL,
+            severity text NOT NULL DEFAULT 'warning',
+            rule_id text NOT NULL,
+            field_path text,
+            raw_value jsonb,
+            context jsonb NOT NULL DEFAULT '{}'::jsonb,
+            game_id bigint,
+            message text NOT NULL DEFAULT '',
+            resolved boolean NOT NULL DEFAULT false
+        );
+    `);
+    await query(`
+        CREATE INDEX IF NOT EXISTS idx_semantic_violations_time
+        ON public.semantic_violations (occurred_at DESC);
+    `);
+}
+
 async function bootstrap() {
     console.log('[dbBootstrap] Ensuring tables and seed data exist...');
 
     try {
+        await ensureSemanticViolationsTable();
+
         // Create tables if they don't exist
         await query(`
             CREATE TABLE IF NOT EXISTS prediction_publish_runs (

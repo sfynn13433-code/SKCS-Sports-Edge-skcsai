@@ -37,6 +37,14 @@ function isObject(value) {
     return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 
+function unwrapExecuteResult(operationResult) {
+    if (!operationResult || typeof operationResult !== 'object') return null;
+    if (operationResult.success === true && operationResult.result !== undefined) {
+        return operationResult.result;
+    }
+    return operationResult;
+}
+
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -620,14 +628,15 @@ async function syncSports(options = {}) {
                             }
                         })
                     });
-                    if (pipelineResult?.error) {
-                        const errorMsg = `${item.sport}: ${pipelineResult.error}`;
+                    const pipelinePayload = unwrapExecuteResult(pipelineResult);
+                    if (pipelineResult?.success === false || pipelinePayload?.error) {
+                        const errorMsg = `${item.sport}: ${pipelineResult?.error || pipelinePayload?.error || 'pipeline_blocked'}`;
                         perSportErrors.set(item.sport, errorMsg);
-                        console.warn(`[syncService] ${item.sport}: pipeline skipped (${pipelineResult.error})`);
+                        console.warn(`[syncService] ${item.sport}: pipeline skipped (${pipelineResult?.error || pipelinePayload?.error})`);
                         if (!perSport.has(item.sport)) perSport.set(item.sport, 0);
                     } else {
-                        const insertedCount = Array.isArray(pipelineResult?.inserted)
-                            ? pipelineResult.inserted.length
+                        const insertedCount = Array.isArray(pipelinePayload?.inserted)
+                            ? pipelinePayload.inserted.length
                             : normalizedMatches.length;
                         totalMatchesProcessed += insertedCount;
                         perSport.set(item.sport, (perSport.get(item.sport) || 0) + insertedCount);
@@ -695,13 +704,15 @@ async function syncSports(options = {}) {
                     total_matches_processed: totalMatchesProcessed,
                     per_sport: Array.from(perSport.entries()).map(([sport, matchesProcessed]) => ({ sport, matchesProcessed })),
                     errors: Array.from(perSportErrors.entries()).map(([sport, error]) => ({ sport, error })),
-                    publish_run_id: rebuild?.publish_run?.id || null
+                    publish_run_id: unwrapExecuteResult(rebuild)?.publish_run?.id || null
                 }
             });
             console.log('[syncService][pipeline_telemetry] %s', JSON.stringify(report, null, 2));
             console.log('[syncService] Master sync complete! Real data is now live.');
             console.log(`[syncService] Summary: ${totalMatchesProcessed} matches processed, ${perSport.size} sports covered`);
+            const rebuildPayload = unwrapExecuteResult(rebuild);
             return {
+                success: true,
                 requestedSports,
                 totalMatchesProcessed,
                 rebuiltFinalOutputs: true,
@@ -710,7 +721,7 @@ async function syncSports(options = {}) {
                     ...Array.from(perSportErrors.entries()).map(([sport, error]) => ({ sport, error })),
                     ...blockedSports.map((sport) => ({ sport, error: 'disabled_in_phase_1_football_only' }))
                 ],
-                publishRun: rebuild?.publish_run || null
+                publishRun: rebuildPayload?.publish_run || null
             };
         } else {
             console.warn('[syncService] Sync finished but 0 real matches were found. Check your API Keys and season configuration.');

@@ -4,6 +4,21 @@ function safeArray(value) {
     return Array.isArray(value) ? value : [];
 }
 
+function summarizeResultSuccess(result) {
+    if (!result || typeof result !== 'object') return null;
+    if (result.success === true) return true;
+    if (result.success === false) return false;
+    if (Number(result.totalMatchesProcessed) > 0) return true;
+    if (result.rebuiltFinalOutputs === true) return true;
+    if (Array.isArray(result.perSport) && result.perSport.some((row) => Number(row?.matchesProcessed) > 0)) {
+        return true;
+    }
+    if (String(result.publish_run?.status || result.publishRun?.status || '').toLowerCase() === 'completed') {
+        return true;
+    }
+    return null;
+}
+
 function buildDecisionFingerprint({ traceId, context, gate, health, result, verification, preflight, dryRun, strictMode, stageTimings }) {
     const rulesApplied = [];
     if (preflight?.strictMode) rulesApplied.push('strict_mode');
@@ -46,7 +61,7 @@ function buildDecisionFingerprint({ traceId, context, gate, health, result, veri
         resultType: Array.isArray(result) ? 'array' : typeof result,
         resultSummary: result && typeof result === 'object'
             ? {
-                success: result.success === true,
+                success: summarizeResultSuccess(result),
                 keys: Object.keys(result).slice(0, 20)
             }
             : null,

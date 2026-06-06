@@ -8,9 +8,28 @@ const FLUSH_INTERVAL_MS = Math.max(1000, Number(process.env.SEMANTIC_VIOLATION_F
 const queue = [];
 let flushPromise = null;
 let flushTimer = null;
+let loggerDisabled = false;
+let disableReason = null;
+
+function isMissingTableError(error) {
+    const message = String(error?.message || '').toLowerCase();
+    return message.includes('semantic_violations') && message.includes('does not exist');
+}
+
+function disableLogger(reason) {
+    if (loggerDisabled) return;
+    loggerDisabled = true;
+    disableReason = reason;
+    if (flushTimer) {
+        clearInterval(flushTimer);
+        flushTimer = null;
+    }
+    queue.length = 0;
+    console.warn('[SemanticViolationLogger] Disabled:', reason);
+}
 
 function ensureTimer() {
-    if (flushTimer) return;
+    if (loggerDisabled || flushTimer) return;
     flushTimer = setInterval(() => {
         void flushViolations('interval');
     }, FLUSH_INTERVAL_MS);
@@ -41,6 +60,9 @@ function normalizeViolation(input = {}) {
 }
 
 async function flushViolations(reason = 'manual') {
+    if (loggerDisabled) {
+        return { inserted: 0, reason, disabled: true, disableReason };
+    }
     ensureTimer();
     if (flushPromise) return flushPromise;
     if (queue.length === 0) return { inserted: 0, reason };
@@ -87,8 +109,11 @@ async function flushViolations(reason = 'manual') {
             );
             return { inserted: batch.length, reason };
         } catch (error) {
+            if (isMissingTableError(error)) {
+                disableLogger('semantic_violations table missing — apply migration or restart after dbBootstrap');
+                return { inserted: 0, reason, error, disabled: true };
+            }
             console.error('[SemanticViolationLogger] Bulk flush failed:', error.message);
-            queue.unshift(...batch);
             return { inserted: 0, reason, error };
         } finally {
             flushPromise = null;
@@ -99,6 +124,9 @@ async function flushViolations(reason = 'manual') {
 }
 
 async function logViolation(input = {}) {
+    if (loggerDisabled) {
+        return { queued: false, disabled: true, disableReason };
+    }
     ensureTimer();
     const entry = normalizeViolation(input);
     queue.push(entry);
