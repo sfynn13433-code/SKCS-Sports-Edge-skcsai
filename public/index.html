@@ -178,23 +178,30 @@
         @media (max-width: 900px) { .ux-feedback-grid { grid-template-columns: 1fr; } }
         .scroll-to-top {
             position: fixed;
-            left: 18px;
+            right: 18px;
             bottom: 28px;
             z-index: 1200;
-            width: 48px;
-            height: 48px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             border: none;
             border-radius: 999px;
             background: #0d6efd;
             color: #ffffff;
-            font-size: 1.35rem;
+            font-size: 0.95rem;
+            font-weight: 600;
             line-height: 1;
+            padding: 12px 18px;
             cursor: pointer;
             box-shadow: 0 8px 20px rgba(13, 110, 253, 0.35);
             opacity: 0;
             visibility: hidden;
             transform: translateY(12px);
             transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease, background-color 0.2s ease;
+        }
+        .scroll-to-top-arrow {
+            font-size: 1.1rem;
+            line-height: 1;
         }
         .scroll-to-top.is-visible {
             opacity: 1;
@@ -210,10 +217,10 @@
         }
         @media (max-width: 640px) {
             .scroll-to-top {
-                left: 12px;
+                right: 12px;
                 bottom: 18px;
-                width: 44px;
-                height: 44px;
+                padding: 10px 14px;
+                font-size: 0.88rem;
             }
         }
         .footer { background-color: #212529; color: white; padding: 3rem; text-align: center; }
@@ -1003,7 +1010,10 @@
         </div>
     </footer>
 
-    <button id="scrollToTopBtn" class="scroll-to-top" type="button" aria-label="Back to top" title="Back to top">↑</button>
+    <button id="scrollToTopBtn" class="scroll-to-top" type="button" aria-label="Back to top" title="Back to top">
+        <span class="scroll-to-top-arrow" aria-hidden="true">↑</span>
+        <span class="scroll-to-top-label">Back to top</span>
+    </button>
 
     <!-- comment -->
     <style>
