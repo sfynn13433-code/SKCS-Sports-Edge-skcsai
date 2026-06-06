@@ -237,6 +237,7 @@ const metricsRouter     = require('./routes/metrics');
 const semanticDriftRouter = require('./routes/semanticDrift');
 const divanscoreRouter  = require('./routes/divanscore');
 const antigravityRouter = require('./routes/antigravity');
+const feedbackRouter    = require('./routes/feedback');
 const { runTier1Stage1Bootstrap } = require('./services/tier1BootstrapService');
 const { executeOperation } = require('./core/executionPipeline');
 
@@ -739,6 +740,7 @@ app.use('/api/cron', cricketCronRouter);
 app.use('/api/scheduler', schedulerRouter);
 app.use('/api/metrics', metricsRouter);
 app.use('/api/semantic-drift-summary', semanticDriftRouter);
+app.use('/api/feedback', feedbackRouter);
 app.use('/api', divanscoreRouter);
 app.use('/api/antigravity', antigravityRouter);
 

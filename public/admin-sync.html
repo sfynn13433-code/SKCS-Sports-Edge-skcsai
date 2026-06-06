@@ -140,6 +140,14 @@
 
     <div id="semantic-drift-dashboard"></div>
 
+    <div class="container" style="margin-top: 24px; max-width: 900px;">
+        <h1>User Experience Feedback</h1>
+        <p class="subtitle">Approve or reject homepage feedback before it goes public.</p>
+        <button id="feedbackRefreshBtn" type="button" onclick="loadPendingFeedback()">Refresh Pending Feedback</button>
+        <div id="feedbackModerationStatus" class="status"></div>
+        <div id="feedbackModerationList" style="margin-top: 16px;"></div>
+    </div>
+
     <script>
         const BACKEND_URL = 'https://skcs-sports-edge-skcsai.onrender.com';
 
@@ -202,6 +210,87 @@
             } finally {
                 btn.disabled = false;
                 btn.textContent = 'Trigger Sync';
+            }
+        }
+        function showFeedbackStatus(message, type) {
+            const el = document.getElementById('feedbackModerationStatus');
+            el.className = 'status ' + type;
+            el.style.display = 'block';
+            el.innerHTML = message;
+        }
+
+        function renderPendingFeedback(items) {
+            const list = document.getElementById('feedbackModerationList');
+            if (!items.length) {
+                list.innerHTML = '<p class="hint">No pending feedback right now.</p>';
+                return;
+            }
+
+            list.innerHTML = items.map(function (item) {
+                return `
+                    <div style="border:1px solid #2a2a3a; border-radius:10px; padding:16px; margin-bottom:12px; background:#101018;">
+                        <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                            <strong>${item.display_name || 'SKCS User'}</strong>
+                            <span>${item.rating}/5 • ${new Date(item.created_at).toLocaleString()}</span>
+                        </div>
+                        <p style="margin:12px 0; color:#d1d5db;">${item.comment || ''}</p>
+                        <p class="hint" style="margin-bottom:12px;">${item.user_email || 'No email'} • ID ${item.id}</p>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <button type="button" onclick="moderateFeedback(${item.id}, 'approve')">Approve</button>
+                            <button type="button" style="background:#ef4444;" onclick="moderateFeedback(${item.id}, 'reject')">Reject</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function loadPendingFeedback() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey) {
+                showFeedbackStatus('Enter your admin API key above first.', 'error');
+                return;
+            }
+
+            showFeedbackStatus('Loading pending feedback…', 'info');
+            try {
+                const response = await fetch(BACKEND_URL + '/api/feedback/admin/pending', {
+                    headers: { 'x-api-key': apiKey }
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Request failed');
+                renderPendingFeedback(data.feedback || []);
+                showFeedbackStatus(`Loaded ${data.count || 0} pending submission(s).`, 'success');
+            } catch (error) {
+                showFeedbackStatus('Failed to load pending feedback: ' + error.message, 'error');
+            }
+        }
+
+        async function moderateFeedback(id, action) {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey) {
+                showFeedbackStatus('Enter your admin API key above first.', 'error');
+                return;
+            }
+
+            const endpoint = action === 'approve'
+                ? `/api/feedback/admin/${id}/approve`
+                : `/api/feedback/admin/${id}/reject`;
+
+            try {
+                const response = await fetch(BACKEND_URL + endpoint, {
+                    method: 'PATCH',
+                    headers: {
+                        'x-api-key': apiKey,
+                        'Content-Type': 'application/json'
+                    },
+                    body: action === 'reject' ? JSON.stringify({ note: 'Rejected from admin-sync' }) : '{}'
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Moderation failed');
+                showFeedbackStatus(`Feedback #${id} ${action}d successfully.`, 'success');
+                loadPendingFeedback();
+            } catch (error) {
+                showFeedbackStatus('Moderation failed: ' + error.message, 'error');
             }
         }
     </script>

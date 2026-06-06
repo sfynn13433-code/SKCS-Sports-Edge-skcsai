@@ -149,6 +149,33 @@
         .email-link { color: #0d6efd; text-decoration: null; font-weight: 500; }
         .email-link:hover { text-decoration: underline; }
         .contact-note { color: #6c757d; font-size: 0.9rem; margin-top: 2rem; font-style: italic; }
+        .ux-feedback-section { background: #f8fafc; padding: 4rem 2rem; margin-top: 2rem; }
+        .ux-feedback-container { max-width: 1100px; margin: 0 auto; }
+        .ux-feedback-intro { text-align: center; color: #64748b; max-width: 760px; margin: 0 auto 2rem auto; font-size: 1.05rem; }
+        .ux-feedback-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr); gap: 2rem; align-items: start; }
+        .ux-feedback-feed { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+        .ux-feedback-card { background: white; border-radius: 12px; padding: 1.25rem; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08); border: 1px solid #e2e8f0; }
+        .ux-feedback-card-top { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+        .ux-feedback-name { color: #0d6efd; font-size: 1rem; }
+        .ux-feedback-stars { color: #cbd5e1; letter-spacing: 0.08em; }
+        .ux-feedback-stars .ux-star.is-filled { color: #f59e0b; }
+        .ux-feedback-comment { color: #334155; line-height: 1.6; margin: 0 0 0.75rem 0; }
+        .ux-feedback-date { color: #94a3b8; font-size: 0.85rem; }
+        .ux-feedback-empty { grid-column: 1 / -1; background: white; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 1.5rem; text-align: center; color: #64748b; }
+        .ux-feedback-form-panel { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08); border: 1px solid #e2e8f0; }
+        .ux-feedback-form-panel h3 { color: #0d6efd; margin-bottom: 0.75rem; }
+        .ux-feedback-form-panel p { color: #64748b; font-size: 0.95rem; margin-bottom: 1rem; }
+        .ux-feedback-form-panel label { display: block; font-weight: 600; color: #334155; margin-bottom: 0.35rem; }
+        .ux-feedback-form-panel select,
+        .ux-feedback-form-panel input,
+        .ux-feedback-form-panel textarea { width: 100%; margin-bottom: 0.9rem; padding: 0.75rem 0.9rem; border: 1px solid #cbd5e1; border-radius: 8px; font: inherit; }
+        .ux-feedback-form-panel button { width: 100%; background: #0d6efd; color: white; border: none; border-radius: 8px; padding: 0.85rem 1rem; font-weight: 700; cursor: pointer; }
+        .ux-feedback-form-panel button:hover { background: #0b5ed7; }
+        .ux-feedback-login-hint { background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; border-radius: 10px; padding: 1rem; }
+        .ux-feedback-status { display: none; margin-top: 0.75rem; border-radius: 8px; padding: 0.75rem 0.9rem; font-size: 0.92rem; }
+        .ux-feedback-status.is-success { display: block; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+        .ux-feedback-status.is-error { display: block; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+        @media (max-width: 900px) { .ux-feedback-grid { grid-template-columns: 1fr; } }
         .footer { background-color: #212529; color: white; padding: 3rem; text-align: center; }
         .footer-content { max-width: 1200px; margin: 0 auto; }
         .footer-company { line-height: 1.7; }
@@ -381,6 +408,7 @@
                 <a href="#insights">🏆 Insights</a>
                 <a href="#framework">⚙️ Framework</a>
                 <a href="#about">📋 About</a>
+                <a href="#user-experience">💬 User Experience</a>
                 <a href="#contact">📧 Contact</a>
                 <a href="accuracy.html">📈 Accuracy</a>
                 <a href="/subscribe">💎 Subscribe</a>
@@ -861,6 +889,42 @@
         </div>
     </section>
     <!-- comment -->
+    <section id="user-experience" class="ux-feedback-section">
+        <div class="ux-feedback-container">
+            <h2 class="section-title">What Users Are Saying</h2>
+            <p class="ux-feedback-intro">Real feedback from SKCS members. Submissions are reviewed before they appear here, so the homepage only shows approved experiences.</p>
+            <div class="ux-feedback-grid">
+                <div id="uxFeedbackFeed" class="ux-feedback-feed" aria-live="polite">
+                    <div class="ux-feedback-empty"><p>Loading community feedback…</p></div>
+                </div>
+                <aside class="ux-feedback-form-panel">
+                    <h3>Share Your Experience</h3>
+                    <p>Signed-in members can leave a rating and short comment. We manually approve feedback before it goes public.</p>
+                    <div id="uxFeedbackLoginHint" class="ux-feedback-login-hint">
+                        Please <a href="/login.html">sign in</a> to submit your experience.
+                    </div>
+                    <form id="uxFeedbackForm" style="display:none;">
+                        <label for="uxFeedbackName">Display name (first name only)</label>
+                        <input id="uxFeedbackName" name="display_name" type="text" maxlength="40" placeholder="e.g. Stephen" required>
+                        <label for="uxFeedbackRating">Your rating</label>
+                        <select id="uxFeedbackRating" name="rating" required>
+                            <option value="">Select stars</option>
+                            <option value="5">★★★★★ Excellent</option>
+                            <option value="4">★★★★☆ Very good</option>
+                            <option value="3">★★★☆☆ Good</option>
+                            <option value="2">★★☆☆☆ Fair</option>
+                            <option value="1">★☆☆☆☆ Poor</option>
+                        </select>
+                        <label for="uxFeedbackComment">Your feedback</label>
+                        <textarea id="uxFeedbackComment" name="comment" rows="5" minlength="10" maxlength="1000" placeholder="Tell others what using SKCS has been like for you." required></textarea>
+                        <button type="submit">Submit for Review</button>
+                        <div id="uxFeedbackStatus" class="ux-feedback-status"></div>
+                    </form>
+                </aside>
+            </div>
+        </div>
+    </section>
+    <!-- comment -->
     <section id="contact" class="contact-section">
         <div class="contact-container">
             <h2 class="contact-title">Get In Touch</h2>
@@ -910,6 +974,7 @@
     <script src="/js/smh-hub.js"></script>
     <script src="/js/vip-stress-dashboard.js"></script>
     <script src="/js/system-health-banner.js"></script>
+    <script src="/js/user-experience-feedback.js"></script>
 
 <style>
   #skcsMatchDetailModal {
