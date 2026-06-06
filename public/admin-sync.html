@@ -12,9 +12,11 @@
             color: #e0e0e0;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             padding: 20px;
+            gap: 20px;
         }
         .container {
             max-width: 600px;
@@ -23,6 +25,9 @@
             border: 1px solid #2a2a3a;
             border-radius: 12px;
             padding: 32px;
+        }
+        .container.wide {
+            max-width: 900px;
         }
         h1 {
             font-size: 24px;
@@ -51,7 +56,7 @@
             margin-bottom: 16px;
         }
         input:focus, select:focus {
-            outline: None;
+            outline: none;
             border-color: #4a9eff;
         }
         button {
@@ -59,7 +64,7 @@
             padding: 14px;
             background: #4a9eff;
             color: #fff;
-            border: None;
+            border: none;
             border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
@@ -76,7 +81,7 @@
             padding: 16px;
             border-radius: 8px;
             font-size: 14px;
-            display: None;
+            display: none;
         }
         .status.success {
             display: block;
@@ -110,16 +115,37 @@
             overflow-x: auto;
             margin-top: 8px;
         }
+        .inline-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .inline-actions button {
+            width: auto;
+            flex: 1;
+            min-width: 140px;
+        }
+        .secondary-btn {
+            background: #334155;
+        }
+        .secondary-btn:hover {
+            background: #475569;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>SKCS Data Sync</h1>
-        <p class="subtitle">Trigger a fresh data pull from API-Sports</p>
+        <p class="subtitle">Trigger a fresh data pull from API-Sports. Use the button below — do not open the API URL in your browser.</p>
 
-        <label for="apiKey">API Key</label>
-        <input type="password" id="apiKey" data="Enter your SKCS_REFRESH_KEY or ADMIN_API_KEY">
-        <p class="hint">Find this in Render Dashboard → Your Service → Environment</p>
+        <label for="apiKey">Admin API Key</label>
+        <input type="password" id="apiKey" placeholder="Paste ADMIN_API_KEY from Render / .env" autocomplete="off">
+        <p class="hint">Uses the same <strong>ADMIN_API_KEY</strong> as Render. Saved only in this browser (not in the website code).</p>
+        <div class="inline-actions">
+            <button type="button" class="secondary-btn" id="saveKeyBtn">Save Key in Browser</button>
+            <button type="button" class="secondary-btn" id="clearKeyBtn">Clear Saved Key</button>
+        </div>
 
         <label for="sport">Sport to Sync</label>
         <select id="sport">
@@ -133,23 +159,52 @@
             <option value="afl">AFL Only</option>
         </select>
 
-        <button id="syncBtn" onclick="triggerSync()">Trigger Sync</button>
+        <button id="syncBtn" type="button">Trigger Sync</button>
 
         <div id="status" class="status"></div>
     </div>
 
     <div id="semantic-drift-dashboard"></div>
 
-    <div class="container" style="margin-top: 24px; max-width: 900px;">
+    <div class="container wide">
         <h1>User Experience Feedback</h1>
         <p class="subtitle">Approve or reject homepage feedback before it goes public.</p>
-        <button id="feedbackRefreshBtn" type="button" onclick="loadPendingFeedback()">Refresh Pending Feedback</button>
+        <button id="feedbackRefreshBtn" type="button">Refresh Pending Feedback</button>
         <div id="feedbackModerationStatus" class="status"></div>
         <div id="feedbackModerationList" style="margin-top: 16px;"></div>
     </div>
 
+    <script src="js/config.js"></script>
     <script>
-        const BACKEND_URL = 'https://skcs-sports-edge-skcsai.onrender.com';
+        const BACKEND_URL = (window.API_BASE_URL || 'https://skcs-sports-edge-skcsai.onrender.com').replace(/\/$/, '');
+        const ADMIN_KEY_STORAGE = 'skcs_admin_api_key';
+
+        function getApiKey() {
+            return document.getElementById('apiKey').value.trim();
+        }
+
+        function saveApiKeyToBrowser() {
+            const apiKey = getApiKey();
+            if (!apiKey) {
+                showStatus('Enter your admin API key first.', 'error');
+                return;
+            }
+            localStorage.setItem(ADMIN_KEY_STORAGE, apiKey);
+            showStatus('Admin key saved in this browser only.', 'success');
+        }
+
+        function clearSavedApiKey() {
+            localStorage.removeItem(ADMIN_KEY_STORAGE);
+            document.getElementById('apiKey').value = '';
+            showStatus('Saved admin key cleared from this browser.', 'info');
+        }
+
+        function loadSavedApiKey() {
+            const saved = localStorage.getItem(ADMIN_KEY_STORAGE);
+            if (saved) {
+                document.getElementById('apiKey').value = saved;
+            }
+        }
 
         function showStatus(message, type) {
             const el = document.getElementById('status');
@@ -157,24 +212,33 @@
             el.innerHTML = message;
         }
 
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         async function triggerSync() {
-            const apiKey = document.getElementById('apiKey').value.trim();
+            const apiKey = getApiKey();
             const sport = document.getElementById('sport').value;
             const btn = document.getElementById('syncBtn');
 
             if (!apiKey) {
-                showStatus('Please enter your API key', 'error');
+                showStatus('Please enter your admin API key', 'error');
                 return;
             }
 
             btn.disabled = true;
             btn.textContent = 'Syncing...';
-            showStatus('<strong>Starting sync...</strong><br>This will take a few minutes. The API is fetching fixtures and running AI analysis.', 'info');
+            showStatus('<strong>Starting sync...</strong><br>This runs in the background on Render. Large syncs can take several minutes.', 'info');
 
             try {
-                const url = sport === 'all' 
-                    ? `<!-- comment -->/api/refresh-predictions`
-                    : `<!-- comment -->/api/refresh-predictions?sport=<!-- comment -->`;
+                const url = sport === 'all'
+                    ? `${BACKEND_URL}/api/refresh-predictions`
+                    : `${BACKEND_URL}/api/refresh-predictions?sport=${encodeURIComponent(sport)}`;
 
                 const response = await fetch(url, {
                     method: 'POST',
@@ -184,27 +248,34 @@
                     }
                 });
 
-                const data = await response.json();
+                let data = {};
+                try {
+                    data = await response.json();
+                } catch (_err) {
+                    data = {};
+                }
 
                 if (response.ok) {
+                    localStorage.setItem(ADMIN_KEY_STORAGE, apiKey);
                     showStatus(
                         `<strong>Sync started successfully!</strong><br><br>` +
-                        `<strong>Message:</strong> <!-- comment --><br>` +
-                        `<strong>Note:</strong> <!-- comment --><br><br>` +
-                        `<em>The sync runs in the background. Refresh your main website in 3-5 minutes to see new predictions.</em>`,
+                        `<strong>Message:</strong> ${escapeHtml(data.message || 'Background sync accepted')}<br>` +
+                        `<strong>Note:</strong> ${escapeHtml(data.note || 'Check predictions in a few minutes.')}<br><br>` +
+                        `<em>The sync runs asynchronously on Render.</em>`,
                         'success'
                     );
                 } else {
                     showStatus(
-                        `<strong>Error:</strong> <!-- comment --><br>` +
-                        `<strong>Status:</strong> <!-- comment -->`,
+                        `<strong>Error:</strong> ${escapeHtml(data.error || 'Request failed')}<br>` +
+                        `<strong>Status:</strong> ${response.status}`,
                         'error'
                     );
                 }
             } catch (error) {
                 showStatus(
-                    `<strong>Connection Error:</strong> <!-- comment --><br><br>` +
-                    `Make sure your API key is correct and the backend is running.`,
+                    `<strong>Connection Error:</strong> ${escapeHtml(error.message)}<br><br>` +
+                    `Backend: ${escapeHtml(BACKEND_URL)}<br>` +
+                    `Check that Render is awake and your ADMIN_API_KEY matches Render / .env.`,
                     'error'
                 );
             } finally {
@@ -212,6 +283,7 @@
                 btn.textContent = 'Trigger Sync';
             }
         }
+
         function showFeedbackStatus(message, type) {
             const el = document.getElementById('feedbackModerationStatus');
             el.className = 'status ' + type;
@@ -230,14 +302,14 @@
                 return `
                     <div style="border:1px solid #2a2a3a; border-radius:10px; padding:16px; margin-bottom:12px; background:#101018;">
                         <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-                            <strong>${item.display_name || 'SKCS User'}</strong>
+                            <strong>${escapeHtml(item.display_name || 'SKCS User')}</strong>
                             <span>${item.rating}/5 • ${new Date(item.created_at).toLocaleString()}</span>
                         </div>
-                        <p style="margin:12px 0; color:#d1d5db;">${item.comment || ''}</p>
-                        <p class="hint" style="margin-bottom:12px;">${item.user_email || 'No email'} • ID ${item.id}</p>
+                        <p style="margin:12px 0; color:#d1d5db;">${escapeHtml(item.comment || '')}</p>
+                        <p class="hint" style="margin-bottom:12px;">${escapeHtml(item.user_email || 'No email')} • ID ${item.id}</p>
                         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                            <button type="button" onclick="moderateFeedback(${item.id}, 'approve')">Approve</button>
-                            <button type="button" style="background:#ef4444;" onclick="moderateFeedback(${item.id}, 'reject')">Reject</button>
+                            <button type="button" data-feedback-id="${item.id}" data-feedback-action="approve">Approve</button>
+                            <button type="button" style="background:#ef4444;" data-feedback-id="${item.id}" data-feedback-action="reject">Reject</button>
                         </div>
                     </div>
                 `;
@@ -245,7 +317,7 @@
         }
 
         async function loadPendingFeedback() {
-            const apiKey = document.getElementById('apiKey').value.trim();
+            const apiKey = getApiKey();
             if (!apiKey) {
                 showFeedbackStatus('Enter your admin API key above first.', 'error');
                 return;
@@ -253,7 +325,7 @@
 
             showFeedbackStatus('Loading pending feedback…', 'info');
             try {
-                const response = await fetch(BACKEND_URL + '/api/feedback/admin/pending', {
+                const response = await fetch(`${BACKEND_URL}/api/feedback/admin/pending`, {
                     headers: { 'x-api-key': apiKey }
                 });
                 const data = await response.json();
@@ -266,7 +338,7 @@
         }
 
         async function moderateFeedback(id, action) {
-            const apiKey = document.getElementById('apiKey').value.trim();
+            const apiKey = getApiKey();
             if (!apiKey) {
                 showFeedbackStatus('Enter your admin API key above first.', 'error');
                 return;
@@ -277,7 +349,7 @@
                 : `/api/feedback/admin/${id}/reject`;
 
             try {
-                const response = await fetch(BACKEND_URL + endpoint, {
+                const response = await fetch(`${BACKEND_URL}${endpoint}`, {
                     method: 'PATCH',
                     headers: {
                         'x-api-key': apiKey,
@@ -293,6 +365,21 @@
                 showFeedbackStatus('Moderation failed: ' + error.message, 'error');
             }
         }
+
+        document.getElementById('syncBtn').addEventListener('click', triggerSync);
+        document.getElementById('saveKeyBtn').addEventListener('click', saveApiKeyToBrowser);
+        document.getElementById('clearKeyBtn').addEventListener('click', clearSavedApiKey);
+        document.getElementById('feedbackRefreshBtn').addEventListener('click', loadPendingFeedback);
+        document.getElementById('feedbackModerationList').addEventListener('click', function (event) {
+            const button = event.target.closest('[data-feedback-action]');
+            if (!button) return;
+            const id = Number(button.getAttribute('data-feedback-id'));
+            const action = button.getAttribute('data-feedback-action');
+            if (!Number.isFinite(id) || !action) return;
+            moderateFeedback(id, action);
+        });
+
+        loadSavedApiKey();
     </script>
     <script src="/js/semantic-drift-dashboard.js"></script>
 </body>

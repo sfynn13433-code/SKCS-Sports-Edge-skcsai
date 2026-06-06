@@ -785,6 +785,17 @@ function requireAdminKey(req, res, next) {
     return next();
 }
 
+app.get('/api/refresh-predictions', (_req, res) => {
+    res.status(405).json({
+        ok: false,
+        error: 'Method not allowed',
+        message: 'This endpoint only accepts POST. Open admin-sync.html and click Trigger Sync, or send POST with x-api-key.',
+        method: 'POST',
+        admin_page: 'https://www.skcs.co.za/admin-sync.html',
+        example: 'POST /api/refresh-predictions?sport=football'
+    });
+});
+
 app.post('/api/refresh-predictions', requireRefreshKey, (req, res) => {
     const sport = req.query.sport || req.body?.sport || null;
     const label = `scheduler refresh${sport ? ` (${sport})` : ''}`;
