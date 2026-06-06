@@ -1,5 +1,6 @@
 // trigger-refresh.js — Hit the Render backend to trigger a full prediction refresh
-// Usage: npm run refresh:trigger [-- --sport=football] [-- --wait]
+// Usage: npm run refresh:trigger [-- --sport=football]
+// Add --wait only for local debugging; production sync always runs in background (202).
 'use strict';
 
 const https = require('https');
@@ -60,8 +61,13 @@ function httpRequest(url, options, postData) {
             : `/api/pipeline/run-full`;
         
         const syncBody = sport
-            ? JSON.stringify({ sport, wait: true })
-            : JSON.stringify({ wait: true });
+            ? JSON.stringify({ sport, wait: wait === true })
+            : JSON.stringify({ wait: wait === true });
+
+        if (wait) {
+            console.warn('⚠️  --wait holds the server connection open and can block cron-job.org triggers.');
+            console.warn('   Prefer fire-and-forget unless you are debugging locally.\n');
+        }
 
         const syncRes = await httpRequest(`${BACKEND_URL}${syncEndpoint}`, {
             method: 'POST',
@@ -94,7 +100,7 @@ function httpRequest(url, options, postData) {
             sport: sport || null
         }));
 
-        if (aiRes.status === 200) {
+        if (aiRes.status === 200 || aiRes.status === 202) {
             console.log('✅ AI pipeline triggered:', JSON.stringify(aiRes.data, null, 2));
         } else {
             console.error(`❌ AI pipeline failed (HTTP ${aiRes.status}):`, aiRes.data);

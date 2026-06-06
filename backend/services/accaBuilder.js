@@ -2847,6 +2847,26 @@ function normalizeRequestedSports(requestedSports = []) {
     return filtered.length ? filtered : [];
 }
 
+async function cleanupTierPublishedRows(client, tier, requestedSports = []) {
+    const scopedSports = normalizeRequestedSports(requestedSports);
+    if (!scopedSports.length) {
+        await client.query('DELETE FROM direct1x2_prediction_final WHERE tier = $1', [tier]);
+        console.log('[accaBuilder] Cleaned stale rows for tier=%s (all sports)', tier);
+        return;
+    }
+
+    const sportTokens = scopedSports.map((sport) => String(sport).trim().toLowerCase());
+    await client.query(
+        `
+        DELETE FROM direct1x2_prediction_final
+        WHERE tier = $1
+          AND LOWER(COALESCE(NULLIF(TRIM(sport), ''), NULLIF(TRIM(matches->0->>'sport'), ''), 'unknown')) = ANY($2::text[])
+        `,
+        [tier, sportTokens]
+    );
+    console.log('[accaBuilder] Cleaned stale rows for tier=%s sports=%s', tier, scopedSports.join(', '));
+}
+
 function getPerSportCandidateLimit(requestedSports = []) {
     const sports = normalizeRequestedSports(requestedSports);
     if (sports.length === 1) return 80 * VOLUME_CAP_MULTIPLIER;
@@ -3923,11 +3943,7 @@ async function buildFinalForTier(tier, options = {}) {
         // ---------------------------------------------------------------------
         // SKCS LAW: Clean stale rows for this tier before publishing
         // ---------------------------------------------------------------------
-        await client.query(
-            'DELETE FROM direct1x2_prediction_final WHERE tier = $1',
-            [t]
-        );
-        console.log('[accaBuilder] Cleaned stale rows for tier=%s', t);
+        await cleanupTierPublishedRows(client, t, options.requestedSports);
 
         // ---------------------------------------------------------------------
         // 1. DIRECT LAYER (First Priority - singles reserve fixtures first)

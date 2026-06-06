@@ -1790,49 +1790,46 @@ app.get('/api/debug/cricket-tables', async (_req, res) => {
 });
 
 // TEMPORARY: Admin routes for testing pipeline
-app.get('/api/admin/force-discovery', requireAdminKey, async (req, res) => {
-    try {
-        const today = new Date().toISOString().split('T')[0];
-        console.log(`[ADMIN] Force discovery triggered for ${today}`);
-        const count = await executeOperation({
-            operation: 'admin.force-discovery',
-            caller: 'backend/server-express.js',
-            payload: { today },
-            execute: async () => syncDailyFixtures(today)
-        });
-        if (count?.success === false) {
-            return res.status(503).json({ success: false, error: count.reason || count.error || 'force_discovery_blocked' });
-        }
-        const runFootballSync = req.query.football_sync !== '0';
-        let footballSync = 'skipped';
+app.get('/api/admin/force-discovery', requireAdminKey, (req, res) => {
+    const today = new Date().toISOString().split('T')[0];
+    const runFootballSync = req.query.football_sync !== '0';
+    console.log(`[ADMIN] Force discovery triggered for ${today}`);
 
-        if (runFootballSync) {
-            footballSync = 'started_in_background';
-            setImmediate(() => {
-                executeOperation({
+    res.status(202).json({
+        success: true,
+        message: `Force discovery started in background for ${today}`,
+        footballSync: runFootballSync ? 'started_in_background' : 'skipped'
+    });
+
+    setImmediate(async () => {
+        try {
+            const count = await executeOperation({
+                operation: 'admin.force-discovery',
+                caller: 'backend/server-express.js',
+                payload: { today },
+                execute: async () => syncDailyFixtures(today)
+            });
+            if (count?.success === false) {
+                console.warn('[ADMIN] Force discovery blocked:', count.reason || count.error || 'force_discovery_blocked');
+                return;
+            }
+
+            console.log('[ADMIN] Force discovery finished:', count?.result?.totalMatchesProcessed || count?.result || 0);
+
+            if (runFootballSync) {
+                const footballResult = await executeOperation({
                     operation: 'admin.force-discovery.football',
                     caller: 'backend/server-express.js',
                     payload: { sport: 'football' },
                     execute: async () => syncSports({ sports: 'football' })
-                })
-                    .then((result) => {
-                        const summary = result?.result?.summary || result?.result || result;
-                        console.log('[ADMIN] Background football sync finished:', JSON.stringify(summary));
-                    })
-                    .catch((err) => console.error('[ADMIN] Background football sync failed:', err.message));
-            });
+                });
+                const summary = footballResult?.result?.summary || footballResult?.result || footballResult;
+                console.log('[ADMIN] Background football sync finished:', JSON.stringify(summary));
+            }
+        } catch (err) {
+            console.error('[ADMIN] Force discovery failed:', err.message);
         }
-
-        res.json({
-            success: true,
-            message: `Daily soccer discovery for ${today}; hub ingest uses API-Sports league sync`,
-            fixturesSynced: count?.result?.totalMatchesProcessed || count?.result || 0,
-            footballSync
-        });
-    } catch (err) {
-        console.error('[ADMIN] Force discovery failed:', err.message);
-        res.status(500).json({ success: false, error: safeErr(err) });
-    }
+    });
 });
 
 app.get('/api/admin/force-enrichment', requireAdminKey, async (_req, res) => {

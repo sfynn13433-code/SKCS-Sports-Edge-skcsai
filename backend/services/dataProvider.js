@@ -1203,8 +1203,22 @@ function toPredictionInputFromSportsDbFixture(fixture) {
     };
 }
 
+function resolveTheSportsDbKey() {
+    const configured = String(config.theSportsDbKey || process.env.SPORTS_DB_KEY || '').trim();
+    if (configured) return configured;
+
+    const isLiveProduction = String(process.env.DATA_MODE || '').toLowerCase() === 'live'
+        && String(process.env.NODE_ENV || '').toLowerCase() === 'production';
+    if (isLiveProduction) {
+        console.warn('[dataProvider] THESPORTSDB_KEY missing on production — skipping TheSportsDB (set key on Render web service and restart).');
+        return '';
+    }
+
+    return String(process.env.THESPORTSDB_DEFAULT_KEY || '3').trim();
+}
+
 async function fetchUpcomingFixtures(options = {}) {
-    const sportsDbKey = String(config.theSportsDbKey || process.env.THESPORTSDB_DEFAULT_KEY || '3').trim();
+    const sportsDbKey = resolveTheSportsDbKey();
     if (!sportsDbKey) {
         console.warn('[dataProvider] TheSportsDB key missing (THESPORTSDB_KEY or SPORTS_DB_KEY) - skipping provider');
         return [];

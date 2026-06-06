@@ -32,9 +32,18 @@ function requirePipelineTriggerKey(req, res, next) {
     return next();
 }
 
+function isProductionRuntime() {
+    return String(process.env.NODE_ENV || '').toLowerCase() === 'production'
+        || String(process.env.DATA_MODE || '').toLowerCase() === 'live';
+}
+
 async function handleSyncRequest(res, options = {}) {
     const requestedSport = options.requestedSport ? String(options.requestedSport).toLowerCase() : null;
-    const waitForCompletion = options.waitForCompletion === true;
+    let waitForCompletion = options.waitForCompletion === true;
+    if (waitForCompletion && isProductionRuntime() && String(process.env.SKCS_ALLOW_SYNC_WAIT || '').trim() !== '1') {
+        console.warn('[pipeline] Ignoring wait=true on production to protect cron endpoints; running in background.');
+        waitForCompletion = false;
+    }
     const triggerLabel = options.triggerLabel || 'manual sync';
     const footballOnlyPhase = null;
 

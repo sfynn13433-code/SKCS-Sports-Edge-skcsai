@@ -100,13 +100,7 @@ const requireAdminKey = (req, res, next) => {
   next();
 };
 
-// Trigger full AI pipeline (using same function as syncService)
-router.post('/trigger-ai-pipeline', requireAdminKey, async (req, res) => {
-  try {
-    const { sport } = req.body;
-
-    console.log(`AI pipeline triggered via scheduler${sport ? ` for sport: ${sport}` : ' for all sports'}`);
-
+async function runSchedulerAiPipeline(sport = null) {
     const sportsToProcess = sport ? [sport] : await getActiveSports();
     const results = [];
 
@@ -181,19 +175,30 @@ router.post('/trigger-ai-pipeline', requireAdminKey, async (req, res) => {
       }
     }
 
-    res.json({
-      success: true,
-      message: 'AI pipeline completed',
-      sportsProcessed: results
-    });
+    return results;
+}
 
-  } catch (error) {
-    console.error('AI pipeline trigger error:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
-  }
+// Trigger full AI pipeline (using same function as syncService)
+router.post('/trigger-ai-pipeline', requireAdminKey, (req, res) => {
+  const { sport } = req.body || {};
+
+  console.log(`AI pipeline triggered via scheduler${sport ? ` for sport: ${sport}` : ' for all sports'}`);
+
+  res.status(202).json({
+    success: true,
+    message: 'AI pipeline started in background',
+    sport: sport || 'all'
+  });
+
+  setImmediate(() => {
+    runSchedulerAiPipeline(sport)
+      .then((results) => {
+        console.log('[scheduler] AI pipeline background run complete:', JSON.stringify(results));
+      })
+      .catch((error) => {
+        console.error('[scheduler] AI pipeline background run failed:', error.message);
+      });
+  });
 });
 
 // Helper function to get active sports (use configured sports instead of database query)
