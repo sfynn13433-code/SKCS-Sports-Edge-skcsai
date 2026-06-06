@@ -2,7 +2,17 @@
 
 const axios = require('axios');
 const config = require('../config');
-const { APISportsClient, OddsAPIClient, SportsDataOrgClient, SportsDataIOClient, RapidAPIClient, CricketDataClient } = require('../apiClients');
+const {
+    APISportsClient,
+    OddsAPIClient,
+    SportsDataOrgClient,
+    SportsDataIOClient,
+    RapidAPIClient,
+    CricketDataClient,
+    getSoccerSeasonYear,
+    resolveSportsDataIOCompetitionId,
+    resolveSportsDataIOSportEndpoint
+} = require('../apiClients');
 const { getScoreboard } = require('./espnHiddenApiService');
 const ProviderQuotaExceededError = require('../errors/ProviderQuotaExceededError');
 
@@ -1461,13 +1471,38 @@ async function fetchSportsDataOrg(sport, leagueCode) {
     return data.map(match => client.normalizeFixture(match, sport));
 }
 
+function filterSportsDataIOGamesByDate(games, date) {
+    const target = String(date || '').slice(0, 10);
+    if (!target) return games;
+
+    return (Array.isArray(games) ? games : []).filter((game) => {
+        const raw = game?.DateTime || game?.Date || game?.Day || '';
+        return String(raw).slice(0, 10) === target;
+    });
+}
+
 async function fetchSportsDataIO(sport, leagueId, date = todayStr(), options = {}) {
     const client = new SportsDataIOClient();
-    const data = await client.getFixtures(sport, leagueId, date);
+    const competitionId = resolveSportsDataIOCompetitionId(
+        options.competitionId || options.competition || leagueId
+    );
+    if (!competitionId) return [];
+
+    const sportEndpoint = resolveSportsDataIOSportEndpoint(sport);
+    let data = [];
+
+    if (sportEndpoint === 'soccer' && options.preferGamesByDate !== true) {
+        const season = options.season || getSoccerSeasonYear(date);
+        const schedule = await client.getSchedule(sport, competitionId, season);
+        data = filterSportsDataIOGamesByDate(schedule, date);
+    } else {
+        data = await client.getFixtures(sport, competitionId, date);
+    }
+
     if (!data || data.length === 0) return [];
 
     const normalized = data
-        .map(game => client.normalizeFixture(game, sport))
+        .map((game) => client.normalizeFixture(game, sport))
         .filter(Boolean);
 
     if (options.allowFinalForDisplay) {
@@ -1522,6 +1557,17 @@ function isSupportedSportsDataIOSport(sport) {
 function isPreMatchSportsDataIOStatus(status) {
     const normalized = String(status || '').trim().toUpperCase();
     if (!normalized) return true;
+    if ([
+        'FINAL',
+        'INPROGRESS',
+        'AWARDED',
+        'CANCELED',
+        'CANCELLED',
+        'SUSPENDED',
+        'BREAK'
+    ].includes(normalized)) {
+        return false;
+    }
     return [
         'NS',
         'TBD',

@@ -5,6 +5,7 @@ const CANONICAL_STATUS = Object.freeze({
     LIVE: 'InProgress',
     BREAK: 'Break',
     POSTPONED: 'Postponed',
+    SCHEDULED: 'Scheduled',
     UNKNOWN: 'Unknown'
 });
 
@@ -32,7 +33,17 @@ const STATUS_ALIASES = Object.freeze({
 
     postponed: CANONICAL_STATUS.POSTPONED,
     cancelled: CANONICAL_STATUS.POSTPONED,
-    suspended: CANONICAL_STATUS.POSTPONED
+    canceled: CANONICAL_STATUS.POSTPONED,
+    suspended: CANONICAL_STATUS.POSTPONED,
+    awarded: CANONICAL_STATUS.FINAL,
+
+    scheduled: CANONICAL_STATUS.SCHEDULED,
+    ns: CANONICAL_STATUS.SCHEDULED,
+    tbd: CANONICAL_STATUS.SCHEDULED,
+    'not started': CANONICAL_STATUS.SCHEDULED,
+    upcoming: CANONICAL_STATUS.SCHEDULED,
+    pregame: CANONICAL_STATUS.SCHEDULED,
+    delayed: CANONICAL_STATUS.SCHEDULED
 });
 
 const CONTEXT_POLICY = Object.freeze({

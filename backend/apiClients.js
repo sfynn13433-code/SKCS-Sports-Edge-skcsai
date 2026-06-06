@@ -444,6 +444,77 @@ class SportsDataOrgClient {
     }
 }
 
+const SPORTSDATAIO_FREE_TRIAL_COMPETITION_IDS = Object.freeze(['3']);
+
+const SPORTSDATAIO_COMPETITION_MAP = Object.freeze({
+    3: '3',
+    ucl: '3',
+    champions_league: '3',
+    'champions-league': '3',
+    'uefa-champions-league': '3',
+    1: '1',
+    epl: '1',
+    premier_league: '1',
+    'premier-league': '1',
+    8: '8',
+    mls: '8',
+    'major-league-soccer': '8'
+});
+
+function getSoccerSeasonYear(date = new Date()) {
+    const d = date instanceof Date ? date : new Date(date);
+    if (Number.isNaN(d.getTime())) return new Date().getUTCFullYear();
+    const year = d.getUTCFullYear();
+    const month = d.getUTCMonth() + 1;
+    return month < 7 ? year - 1 : year;
+}
+
+function isSportsDataIOCompetitionEntitled(competitionId) {
+    const id = String(competitionId || '').trim();
+    if (!id) return false;
+    if (SPORTSDATAIO_FREE_TRIAL_COMPETITION_IDS.includes(id)) return true;
+    return String(process.env.SPORTSDATAIO_ALLOW_PAID_COMPETITIONS || '').toLowerCase() === 'true';
+}
+
+function resolveSportsDataIOCompetitionId(input, options = {}) {
+    const raw = String(input || '').trim();
+    if (!raw) return null;
+
+    const aliasKey = raw.toLowerCase().replace(/\s+/g, '_');
+    const mapped = SPORTSDATAIO_COMPETITION_MAP[aliasKey]
+        || SPORTSDATAIO_COMPETITION_MAP[raw.toLowerCase()]
+        || (/^\d+$/.test(raw) ? raw : null);
+    if (!mapped) return null;
+
+    const allowPaid = options.allowPaid === true
+        || String(process.env.SPORTSDATAIO_ALLOW_PAID_COMPETITIONS || '').toLowerCase() === 'true';
+    if (SPORTSDATAIO_FREE_TRIAL_COMPETITION_IDS.includes(mapped)) return mapped;
+    if (allowPaid) return mapped;
+
+    console.log(
+        `[SportsData.io] Competition ${mapped} skipped (not entitled on current key; free trial allows: ${SPORTSDATAIO_FREE_TRIAL_COMPETITION_IDS.join(', ')})`
+    );
+    return null;
+}
+
+function resolveSportsDataIOSportEndpoint(sport) {
+    const normalizedSport = String(sport || '').trim().toLowerCase();
+    const sportMap = {
+        football: 'soccer',
+        soccer: 'soccer',
+        nba: 'nba',
+        basketball: 'basketball',
+        nfl: 'nfl',
+        'american football': 'nfl',
+        american_football: 'nfl',
+        mlb: 'mlb',
+        baseball: 'mlb',
+        nhl: 'hockey',
+        hockey: 'hockey'
+    };
+    return sportMap[normalizedSport] || null;
+}
+
 class SportsDataIOClient {
     constructor() {
         this.apiKey = config.sportsDataIoKey;
@@ -451,69 +522,98 @@ class SportsDataIOClient {
         this.role = 'pre-match fixture/context';
     }
 
-    async getFixtures(sport, competitionId, date = new Date().toISOString().slice(0, 10)) {
+    async _request(url, sport, label) {
         if (!this.apiKey) {
             console.log(`[SportsData.io] ${sport}: skipped (missing SPORTSDATA_IO_KEY or SPORTS_DB_KEY)`);
-            return [];
+            return { data: [], status: 0, error: 'missing_key' };
         }
-
-        const normalizedSport = String(sport || '').trim().toLowerCase();
-        const sportMap = {
-            football: 'soccer',
-            soccer: 'soccer',
-            nba: 'nba',
-            basketball: 'basketball',
-            nfl: 'nfl',
-            'american football': 'nfl',
-            american_football: 'nfl',
-            mlb: 'mlb',
-            baseball: 'mlb',
-            nhl: 'hockey',
-            hockey: 'hockey'
-        };
-
-        const sportEndpoint = sportMap[normalizedSport];
-        if (!sportEndpoint) {
-            console.log(`[SportsData.io] ${sport}: skipped (unsupported sport mapping)`);
-            return [];
-        }
-        const competition = String(competitionId || '').trim();
-        if (!competition) {
-            console.log(`[SportsData.io] ${sport}: skipped (missing competition id)`);
-            return [];
-        }
-        const url = `${this.baseUrl}/${sportEndpoint}/scores/json/GamesByDate/${encodeURIComponent(competition)}/${encodeURIComponent(String(date).slice(0, 10))}`;
 
         try {
             const response = await axios.get(url, {
                 headers: {
-                    'Ocp-Apim-Subscription-Key': this.apiKey,
+                    'Ocp-Apim-Subscription-Key': this.apiKey
                 },
-                timeout: 10000,
+                timeout: 15000,
+                validateStatus: () => true
             });
 
-            console.log(`[SportsData.io] ${sport}: returned ${Array.isArray(response.data) ? response.data.length : 0} game rows for ${this.role}`);
-            return response.data || [];
-        } catch (error) {
-            console.error(`[SportsData.io] ${sport} error:`, error.message);
-            if (error.response) {
-                console.error(`[SportsData.io] Response:`, error.response.status, error.response.data);
+            if (response.status >= 200 && response.status < 300) {
+                const rows = Array.isArray(response.data) ? response.data : (response.data ? [response.data] : []);
+                console.log(`[SportsData.io] ${sport}: ${label} returned ${rows.length} rows`);
+                return { data: response.data || [], status: response.status, error: null };
             }
+
+            const bodyText = typeof response.data === 'string'
+                ? response.data
+                : JSON.stringify(response.data || {});
+            if (response.status === 401 && /unauthorized competition/i.test(bodyText)) {
+                console.warn(`[SportsData.io] ${sport}: ${label} entitlement blocked (401 Unauthorized Competition)`);
+            } else {
+                console.error(`[SportsData.io] ${sport}: ${label} failed`, response.status, response.data);
+            }
+            return { data: [], status: response.status, error: bodyText };
+        } catch (error) {
+            console.error(`[SportsData.io] ${sport}: ${label} error:`, error.message);
+            return { data: [], status: 0, error: error.message };
+        }
+    }
+
+    async getSchedule(sport, competitionId, season = getSoccerSeasonYear()) {
+        const sportEndpoint = resolveSportsDataIOSportEndpoint(sport);
+        if (!sportEndpoint) {
+            console.log(`[SportsData.io] ${sport}: skipped (unsupported sport mapping)`);
             return [];
         }
+
+        const competition = resolveSportsDataIOCompetitionId(competitionId);
+        if (!competition) return [];
+
+        const url = `${this.baseUrl}/${sportEndpoint}/scores/json/Schedule/${encodeURIComponent(competition)}/${encodeURIComponent(String(season))}`;
+        const result = await this._request(url, sport, 'Schedule');
+        return Array.isArray(result.data) ? result.data : [];
+    }
+
+    async getPreGameOddsByDate(sport, competitionId, date = new Date().toISOString().slice(0, 10)) {
+        const sportEndpoint = resolveSportsDataIOSportEndpoint(sport);
+        if (sportEndpoint !== 'soccer') {
+            console.log(`[SportsData.io] ${sport}: pre-game odds skipped (soccer endpoint only in P0)`);
+            return [];
+        }
+
+        const competition = resolveSportsDataIOCompetitionId(competitionId);
+        if (!competition) return [];
+
+        const url = `${this.baseUrl}/${sportEndpoint}/odds/json/GameOddsByDate/${encodeURIComponent(competition)}/${encodeURIComponent(String(date).slice(0, 10))}`;
+        const result = await this._request(url, sport, 'GameOddsByDate');
+        return Array.isArray(result.data) ? result.data : [];
+    }
+
+    async getFixtures(sport, competitionId, date = new Date().toISOString().slice(0, 10)) {
+        const sportEndpoint = resolveSportsDataIOSportEndpoint(sport);
+        if (!sportEndpoint) {
+            console.log(`[SportsData.io] ${sport}: skipped (unsupported sport mapping)`);
+            return [];
+        }
+
+        const competition = resolveSportsDataIOCompetitionId(competitionId);
+        if (!competition) return [];
+
+        const url = `${this.baseUrl}/${sportEndpoint}/scores/json/GamesByDate/${encodeURIComponent(competition)}/${encodeURIComponent(String(date).slice(0, 10))}`;
+        const result = await this._request(url, sport, 'GamesByDate');
+        return Array.isArray(result.data) ? result.data : [];
     }
 
     normalizeFixture(game, sport) {
         if (!game) return null;
 
-        const homeTeam = game.HomeTeamName || null;
-        const awayTeam = game.AwayTeamName || null;
-        const date = game.DateTime || game.Date || null;
+        const homeTeam = game.HomeTeamName || game.HomeTeam || null;
+        const awayTeam = game.AwayTeamName || game.AwayTeam || null;
+        const date = game.DateTime || game.Date || game.Day || null;
         const status = game.Status || null;
-        const league = game.League || null;
+        const league = game.League || game.CompetitionName || game.LeagueName || null;
         const country = game.Country || game.LeagueName || null;
-        const venue = game.StadiumDetails?.Name || null;
-        const id = game.GameID || null;
+        const venue = game.StadiumDetails?.Name || game.VenueName || null;
+        const id = game.GlobalGameId || game.GameID || game.GameId || null;
 
         return {
             match_id: id ? String(id) : `sdi-${sport}-${homeTeam}-${awayTeam}`,
@@ -532,7 +632,7 @@ class SportsDataIOClient {
             league,
             country,
             venue,
-            raw_provider_data: game,
+            raw_provider_data: game
         };
     }
 }
@@ -764,4 +864,19 @@ class CricketDataClient {
     }
 }
 
-module.exports = { APISportsClient, OddsAPIClient, SportsDataOrgClient, SportsDataIOClient, RapidAPIClient, CricketDataClient, cachedFetch, clearRequestCache };
+module.exports = {
+    APISportsClient,
+    OddsAPIClient,
+    SportsDataOrgClient,
+    SportsDataIOClient,
+    RapidAPIClient,
+    CricketDataClient,
+    cachedFetch,
+    clearRequestCache,
+    SPORTSDATAIO_COMPETITION_MAP,
+    SPORTSDATAIO_FREE_TRIAL_COMPETITION_IDS,
+    getSoccerSeasonYear,
+    isSportsDataIOCompetitionEntitled,
+    resolveSportsDataIOCompetitionId,
+    resolveSportsDataIOSportEndpoint
+};

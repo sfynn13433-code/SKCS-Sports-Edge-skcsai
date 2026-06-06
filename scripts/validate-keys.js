@@ -263,14 +263,35 @@ async function testSportsDataIoKey() {
   }
 
   try {
-    const response = await axios.get('https://api.sportsdata.io/v3/soccer/scores/json/AreAnyGamesInProgress', {
-      headers: { 'Ocp-Apim-Subscription-Key': resolved.keyValue },
-      timeout: TIMEOUT_MS,
-      validateStatus: () => true
-    });
+    const seasonYear = new Date().getUTCMonth() + 1 < 7
+      ? new Date().getUTCFullYear() - 1
+      : new Date().getUTCFullYear();
+    const response = await axios.get(
+      `https://api.sportsdata.io/v4/soccer/scores/json/Schedule/3/${seasonYear}`,
+      {
+        headers: { 'Ocp-Apim-Subscription-Key': resolved.keyValue },
+        timeout: TIMEOUT_MS,
+        validateStatus: () => true
+      }
+    );
 
     if (response.status >= 200 && response.status < 300) {
-      return { name, status: 'ok', detail: `status ${response.status}; source=${resolved.keyName}` };
+      const games = Array.isArray(response.data) ? response.data.length : 0;
+      return {
+        name,
+        status: 'ok',
+        detail: `status ${response.status}; UCL Schedule probe; games=${games}; source=${resolved.keyName}`
+      };
+    }
+    const bodyText = typeof response.data === 'string'
+      ? response.data
+      : JSON.stringify(response.data || {});
+    if (response.status === 401 && /unauthorized competition/i.test(bodyText)) {
+      return {
+        name,
+        status: 'warning',
+        detail: `status 401 Unauthorized Competition; key works but UCL entitlement missing; source=${resolved.keyName}`
+      };
     }
     if (response.status === 401 || response.status === 403) {
       return { name, status: 'invalid', detail: `status ${response.status}; source=${resolved.keyName}` };
