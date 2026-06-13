@@ -158,6 +158,26 @@ function getSeasonStartYear() {
     }
 }
 
+function deriveSeasonYear(sport, leagueId, referenceDate = new Date()) {
+    const d = referenceDate instanceof Date ? referenceDate : new Date(referenceDate);
+    const month = d.getUTCMonth() + 1;
+    const year = d.getUTCFullYear();
+    
+    const normalizedSport = String(sport || '').trim().toLowerCase();
+    const id = String(leagueId || '').trim();
+
+    // Calendar-year/summer football leagues: J1 (98), J2 (99), CSL (169), China League One (170), MLS (253), USL (255), Brazil A (71), Brazil B (72)
+    const summerLeagues = ['98', '99', '169', '170', '253', '255', '71', '72'];
+    const isSummerFootballLeague = normalizedSport === 'football' && summerLeagues.includes(id);
+    const isMlb = normalizedSport === 'mlb' || id === '4424';
+
+    if (isSummerFootballLeague || isMlb) {
+        return year;
+    }
+
+    return month >= 8 ? year : year - 1;
+}
+
 const SEASON_START_YEAR = getSeasonStartYear();
 const SEASON_YEAR = String(SEASON_START_YEAR); // APIs use the starting year (e.g., 2025 for 2025-2026 season)
 const SEASON_RANGE = `${SEASON_START_YEAR}-${SEASON_START_YEAR + 1}`;
@@ -268,9 +288,13 @@ function resolveLeagueTier(item) {
 const SPORTS_CONFIG = [
     ...BASE_SPORTS_CONFIG.map((item) => ({
         ...item,
+        season: String(deriveSeasonYear(item.sport, item.leagueId)),
         leagueTier: resolveLeagueTier(item)
     })),
-    ...FOOTBALL_APISPORTS_LEAGUE_CONFIG
+    ...FOOTBALL_APISPORTS_LEAGUE_CONFIG.map((item) => ({
+        ...item,
+        season: String(deriveSeasonYear(item.sport, item.leagueId))
+    }))
 ];
 
 function normalizeSportToken(value) {
@@ -368,7 +392,7 @@ async function syncSports(options = {}) {
     if (blockedSports.length > 0) {
         console.log('[syncService] Active-sports gate blocked requested sports: %s', blockedSports.join(', '));
     }
-    console.log(`[syncService] Using season config: SEASON_YEAR=${SEASON_YEAR}, SEASON_RANGE=${SEASON_RANGE}`);
+    console.log(`[syncService] Using season config: SEASON_YEAR=${SEASON_YEAR}, SEASON_RANGE=${SEASON_RANGE} (some leagues may override dynamically)`);
 
     // ── PROVIDER STATUS LOGGING ─────────────────────────────────────────────
     console.log('[Provider Status]');

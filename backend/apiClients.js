@@ -461,11 +461,18 @@ const SPORTSDATAIO_COMPETITION_MAP = Object.freeze({
     'major-league-soccer': '8'
 });
 
-function getSoccerSeasonYear(date = new Date()) {
+function getSoccerSeasonYear(date = new Date(), leagueId = null) {
     const d = date instanceof Date ? date : new Date(date);
     if (Number.isNaN(d.getTime())) return new Date().getUTCFullYear();
     const year = d.getUTCFullYear();
     const month = d.getUTCMonth() + 1;
+
+    // Calendar-year/summer football leagues: J1 (98), J2 (99), CSL (169), China League One (170), MLS (253), USL (255), Brazil A (71), Brazil B (72)
+    const summerLeagues = ['98', '99', '169', '170', '253', '255', '71', '72'];
+    if (leagueId && summerLeagues.includes(String(leagueId).trim())) {
+        return year;
+    }
+
     return month < 7 ? year - 1 : year;
 }
 

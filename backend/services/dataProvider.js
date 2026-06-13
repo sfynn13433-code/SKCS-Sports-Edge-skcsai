@@ -1082,10 +1082,24 @@ function deriveSeasonLabel(referenceDate = new Date()) {
     return `${year - 1}-${year}`;
 }
 
-/** Same calendar rule as syncService.getSeasonStartYear — API-Sports season param (e.g. 2025 for 2025-26). */
-function deriveApiSportsSeasonYear(referenceDate = new Date()) {
-    const month = referenceDate.getUTCMonth() + 1;
-    const year = referenceDate.getUTCFullYear();
+/** Same calendar rule as syncService.getSeasonStartYear — API-Sports season param (e.g. 2025 for 2025-26), but league-aware. */
+function deriveApiSportsSeasonYear(sport, leagueId, referenceDate = new Date()) {
+    const d = referenceDate instanceof Date ? referenceDate : new Date(referenceDate);
+    const month = d.getUTCMonth() + 1;
+    const year = d.getUTCFullYear();
+    
+    const normalizedSport = String(sport || '').trim().toLowerCase();
+    const id = String(leagueId || '').trim();
+
+    // Calendar-year/summer football leagues: J1 (98), J2 (99), CSL (169), China League One (170), MLS (253), USL (255), Brazil A (71), Brazil B (72)
+    const summerLeagues = ['98', '99', '169', '170', '253', '255', '71', '72'];
+    const isSummerFootballLeague = normalizedSport === 'football' && summerLeagues.includes(id);
+    const isMlb = normalizedSport === 'mlb' || id === '4424';
+
+    if (isSummerFootballLeague || isMlb) {
+        return year;
+    }
+
     return month >= 8 ? year : year - 1;
 }
 
@@ -1496,7 +1510,7 @@ async function fetchSportsDataIO(sport, leagueId, date = todayStr(), options = {
     let data = [];
 
     if (sportEndpoint === 'soccer' && options.preferGamesByDate !== true) {
-        const season = options.season || getSoccerSeasonYear(date);
+        const season = options.season || getSoccerSeasonYear(date, competitionId);
         const schedule = await client.getSchedule(sport, competitionId, season);
         data = filterSportsDataIOGamesByDate(schedule, date);
     } else {
@@ -1783,7 +1797,7 @@ async function buildLiveData(options = {}) {
 
         let data = null;
         let fixtures = [];
-        let seasonUsed = season || String(deriveApiSportsSeasonYear());
+        let seasonUsed = season || String(deriveApiSportsSeasonYear(sport, leagueId));
         let apiSportsQuotaBlocked = false;
 
         if (apiSportsLeagueId) {
