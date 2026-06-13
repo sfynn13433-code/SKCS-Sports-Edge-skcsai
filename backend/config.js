@@ -32,6 +32,8 @@ module.exports = {
     bzzoiroApiToken: process.env.BZZOIRO_API_TOKEN,
     bigBallsDataApiKey: process.env.BIG_BALLS_DATA_API_KEY || process.env.BBS_API_KEY,
     bigBallsBaseUrl: process.env.BIG_BALLS_BASE_URL,
+    soccerDataApiKey: process.env.SOCCER_DATA_API_KEY || process.env.SOCCERDATA_API_TOKEN,
+    soccerDataBaseUrl: process.env.SOCCER_DATA_BASE_URL,
     newsApi: {
         apiKey: process.env.NEWSAPI_KEY,
         dailyLimit: Number(process.env.NEWSAPI_DAILY_CALL_LIMIT) || 95,

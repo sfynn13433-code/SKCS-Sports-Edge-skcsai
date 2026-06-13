@@ -506,12 +506,60 @@ It is the operational layer that explains when work actually happens and what it
 - Yes
 - Reason: it is a useful batch control point for staleness management
 
-## 12) High-level runtime conclusions
+## 12) BSD match preview sync (planned)
+
+**Job**
+- `match_preview_sync`
+
+**Implementation**
+- Planned: `backend/services/bigBallsFootballBridge.js` → composite endpoint calls
+
+**Schedule**
+- Scheduled sync — aligned to fixture lifecycle (not polling)
+
+**Trigger**
+- Scheduled job or manual endpoint
+
+**Provider**
+- Big Balls Sports Data (BBD)
+
+**Strategy**
+- Composite endpoint preferred (consolidates preview + odds + probabilities + context in a single request)
+- Paginated retrieval: max 200/page, page-based iteration
+- Avoid aggressive polling
+
+**Reads**
+- BBD `/v1/matches` with composite fields
+- League/fixture configuration
+
+**Writes**
+- Fixture preview cache
+- Match context enrichment
+
+**Downstream**
+- Prediction input enrichment
+- Pre-match context surfaces
+
+**Failure impact**
+- Low (evaluation lane only)
+
+**Cost impact**
+- LOWER than multi-call pattern (composite consolidation)
+
+**Budget class**
+- Important (evaluation phase)
+
+**Optimization candidate**
+- Yes
+- Reason: Composite endpoints reduce call count; pagination prevents HTTP 400 errors from oversized requests
+
+## 13) High-level runtime conclusions
 
 - The highest-cost runtime paths are the sports sync orchestration, enrichment, and AI insight generation.
 - The highest-risk data paths are `direct1x2_prediction_final` and the columns that drive confidence and publication.
 - The highest-value optimization candidates are the discovery cron, pulse check, sync orchestration, and AI insight generation.
+- BSD calls should always use paginated retrieval (≤200/page) and prefer composite endpoints to minimize cost.
 
-## 13) Next step
+## 14) Next step
 
 The next useful artifact is still `cost_registry.md`, but this runtime map now gives it a concrete execution base to reference.

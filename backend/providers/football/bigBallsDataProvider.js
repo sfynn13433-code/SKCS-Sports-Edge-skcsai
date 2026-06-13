@@ -1,6 +1,7 @@
 'use strict';
 
 const {
+    clampLimit,
     getMatch,
     getMatchOdds,
     getStandings,
@@ -60,7 +61,7 @@ async function competitions(params = {}) {
 async function fixtures(params = {}) {
     if (!isBigBallsDataEnabled()) return disabledEnvelope('ENABLE_BIG_BALLS_DATA_PROVIDER is not true');
 
-    const query = { sport: params.sport || DEFAULT_SPORT, limit: params.limit || 50, ...params };
+    const query = { sport: params.sport || DEFAULT_SPORT, ...params, limit: clampLimit(params.limit) };
     const useStored = params.source !== 'live';
 
     if (useStored) {

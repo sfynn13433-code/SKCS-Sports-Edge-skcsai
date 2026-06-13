@@ -7,6 +7,15 @@ const DEFAULT_BASE_URL = 'https://api.bigballsports.com';
 const LEGACY_BASE_URL = 'https://api.bigballsdata.com';
 const FALLBACK_BASE_URL = 'https://bbsgateway-production.up.railway.app';
 
+// BSD pagination contract — exceeding 200 causes HTTP 400
+const BSD_MAX_LIMIT = 200;
+const BSD_DEFAULT_LIMIT = 50;
+const BSD_MAX_PAGES = 20; // safety ceiling for paginated retrieval
+
+function clampLimit(n) {
+    return Math.min(Math.max(1, Number(n) || BSD_DEFAULT_LIMIT), BSD_MAX_LIMIT);
+}
+
 function getBaseUrl() {
     const configured = String(
         config.bigBallsBaseUrl
@@ -141,7 +150,7 @@ async function getLeague(id, params = {}) {
 }
 
 async function listMatches(params = {}) {
-    return request('/v1/matches', params);
+    return request('/v1/matches', { ...params, limit: clampLimit(params.limit) });
 }
 
 async function getMatch(id, params = {}) {
@@ -157,7 +166,7 @@ async function getStandings(params = {}) {
 }
 
 async function listStoredMatches(params = {}) {
-    return request('/v1/stored/matches', params);
+    return request('/v1/stored/matches', { ...params, limit: clampLimit(params.limit) });
 }
 
 async function getStoredMatch(id, params = {}) {
@@ -175,10 +184,52 @@ function unwrapFieldBundle(data, fieldName) {
     return null;
 }
 
+/**
+ * Paginated bulk retrieval — iterates pages until a page returns fewer than
+ * `limit` rows or the safety ceiling is reached.
+ *
+ * @param {string} path - API path (e.g. '/v1/matches')
+ * @param {object} params - Query params (must include sport or league)
+ * @param {object} [options] - Passed through to request()
+ * @returns {Promise<{ok: boolean, pages: number, allData: Array, lastResult: object}>}
+ */
+async function requestAllPages(path, params = {}, options = {}) {
+    const limit = clampLimit(params.limit);
+    const allData = [];
+    let page = 1;
+    let lastResult = null;
+
+    while (page <= BSD_MAX_PAGES) {
+        const pageParams = { ...params, limit, page };
+        const result = await request(path, pageParams, options);
+        lastResult = result;
+
+        if (!result.ok) break;
+
+        const batch = Array.isArray(result.data) ? result.data : [];
+        allData.push(...batch);
+
+        // Fewer than limit means this is the last page
+        if (batch.length < limit) break;
+        page += 1;
+    }
+
+    return {
+        ok: allData.length > 0 || (lastResult && lastResult.ok),
+        pages: page,
+        allData,
+        lastResult
+    };
+}
+
 module.exports = {
+    BSD_DEFAULT_LIMIT,
+    BSD_MAX_LIMIT,
+    BSD_MAX_PAGES,
     DEFAULT_BASE_URL,
     FALLBACK_BASE_URL,
     LEGACY_BASE_URL,
+    clampLimit,
     getBaseUrl,
     getBaseUrlCandidates,
     getApiKey,
@@ -193,5 +244,6 @@ module.exports = {
     listSports,
     listStoredMatches,
     request,
+    requestAllPages,
     unwrapFieldBundle
 };

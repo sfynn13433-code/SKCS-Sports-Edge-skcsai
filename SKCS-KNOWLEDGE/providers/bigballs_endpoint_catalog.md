@@ -98,6 +98,74 @@ Gated by `ENABLE_BIG_BALLS_DATA_PROVIDER=true` + `BIG_BALLS_DATA_API_KEY`.
 - WebSocket canonical writes
 - Any `meta.source: community-scraper` → canonical promotion without audit
 
+## Pagination contract (confirmed 2026-06-13)
+
+| Property | Value |
+|----------|-------|
+| Default limit | `50` |
+| Maximum limit | `200` |
+| Exceeding max | **HTTP 400** |
+| Pagination style | Page-based: `?page=1`, `?page=2`, `?page=3…` |
+| Required params on `/v1/matches` | `?sport=` **OR** `?league=` |
+| Bulk retrieval | Iterate pages until `batch.length < limit` |
+| SKCS enforcement | `clampLimit()` in `bigBallsDataApiClient.js` caps all requests |
+
+> **SKCS Rule**: Never send `limit > 200` to any BBD endpoint. The `clampLimit()` utility enforces this at the API client layer.
+
+## Composite endpoint strategy
+
+Prediction builders should prefer **composite game preview endpoints** (e.g. matchup endpoints) instead of making separate calls for preview data, odds, probabilities, and context. Composite endpoints consolidate multiple data streams into a single request.
+
+| Strategy | Description | SKCS action |
+|----------|-------------|-------------|
+| Composite preview | Single request returns preview + odds + probabilities + context | Preferred for `match_preview_sync` |
+| Scheduled fetches | Align with fixture lifecycle rather than polling | Preferred for all BSD jobs |
+| Paginated retrieval | Iterate pages for bulk data (max 200/page) | Required for all list endpoints |
+| Aggressive polling | High-frequency real-time polling | **Avoid** |
+
+## Coverage depth (confirmed 2026-06-13)
+
+### Tier 1 — Excellent coverage
+
+**WC2026 (FIFA World Cup 2026)**
+- 104 matches
+- Live odds
+- Elo win probabilities
+- Advancement probabilities
+- Monte Carlo simulations (calibrated from 301 historical World Cup matches)
+- 26-player squads
+- Golden Boot tracking
+- **Schema stability:** LOCKED June 11 – July 19, 2026
+
+**NBA**
+- Play-by-play data back to 1946
+- Box scores
+- Shot coordinates
+- Player props
+- Historical hit rates
+- Season averages
+- Backtesting value: **VERY HIGH**
+
+### Tier 2 — Good coverage
+
+**Major European Soccer** (EPL, La Liga, Bundesliga, Ligue 1, Serie A)
+- Player appearances, goals, assists, minutes played, player ratings
+- 2025–26 season ingest complete
+- Historical range: 2023–24, 2024–25, 2025–26
+- Backtesting: **MODERATE**
+
+## Schema stability guarantee
+
+| Property | Value |
+|----------|-------|
+| Tournament | WC2026 |
+| Schema stability | **LOCKED** |
+| Lock window | June 11 – July 19, 2026 |
+| Mid-tournament changes | **None** — explicitly confirmed |
+| Versioning | Protects endpoint contracts |
+| Semantic risk | LOW |
+| Drift risk | LOW |
+
 ## Regeneration
 
 ```bash

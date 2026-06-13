@@ -124,6 +124,36 @@ It captures quotas, estimated call frequency, budget class, duplication risk, an
 - **Optimization candidate**
   - Yes
 
+### Big Balls Sports Data (BBD)
+
+- **Plan / registry limit**
+  - `paginationLimit = 200` (max per page)
+  - `defaultLimit = 50` (per page)
+  - Exceeding 200 causes **HTTP 400**
+- **Budget class**
+  - `Important` (evaluation phase)
+- **Critical jobs**
+  - `match_preview_sync` (composite endpoint preferred)
+  - `bigBallsFootballBridge` fixture ingest (7 tier-1 leagues)
+  - Provider health verification scripts
+- **Estimated call pattern**
+  - Low to medium — scheduled fetches, not polling
+  - Paginated bulk retrieval iterates pages at ≤200/page
+- **Duplicate call risk**
+  - Low
+  - Single bridge entry point; no fallback retry loops
+- **Risk**
+  - Low to medium
+- **Optimization rules**
+  - Use composite endpoints whenever available (consolidates preview + odds + probabilities + context)
+  - Use scheduled sync jobs aligned to fixture lifecycle
+  - Paginate instead of oversized requests (never exceed 200/page)
+  - Avoid high-frequency polling and large page requests
+- **Cost impact**
+  - Moderate–Good
+- **Optimization candidate**
+  - Yes
+
 ## 2) AI cost registry
 
 ### Scope note

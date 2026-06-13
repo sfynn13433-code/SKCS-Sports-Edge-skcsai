@@ -30,16 +30,35 @@ This file tracks provider behavior, fallback order, and quota implications.
   - **Type:** ENRICHMENT (pre-match context)
   - UCL schedule path wired in P0 (`competition_id=3` on free trial).
   - See `docs/sportsdataio-pre-match-directive.md`.
+- Soccer Data API (SDA)
+  - **Type:** **PRIMARY CANDIDATE** (football evaluation)
+  - **Status:** **EVALUATION** (2026-06-05) — adapter + budgeted probes; not wired to `buildLiveData` until health gates pass
+  - **API:** `https://api.soccerdataapi.com/`
+  - **Auth:** `auth_token` query param — key from [dashboard/get-started](https://soccerdataapi.com/dashboard/get-started/)
+  - **Env:** `SOCCER_DATA_API_KEY`, `ENABLE_SOCCER_DATA_API=true`
+  - **Quota:** Free **75 req/day**; gzip header required; per-minute throttle (~60s)
+  - **Adapter:** `backend/providers/football/soccerDataApiProvider.js`
+  - **Scripts:** `npm run verify:soccerdata-provider` (6 calls), `npm run audit:soccerdata-discovery` (12 calls)
+  - **Blocked for SKCS:** `match-preview`, `match-previews-upcoming`, canonical `livescores` ingest
+  - See `../providers/soccerdata_call_restrictions.md`, `../providers/soccerdata_provider_health.md`
 - Big Balls Sports Data (BBD)
   - **Type:** **PRIMARY CANDIDATE** (football pilot) + multi-sport evaluation
   - **Status:** **PRIMARY PILOT** (2026-06-06) — gated by `BIG_BALLS_PRIMARY_FOOTBALL=true`
   - **API:** `https://api.bigballsdata.com/v1/`
   - **Auth:** `Authorization: Bearer bbs_live_…` — key from [dashboard/keys](https://bigballsdata.com/dashboard/keys)
   - **Env:** `BIG_BALLS_DATA_API_KEY`, `ENABLE_BIG_BALLS_DATA_PROVIDER=true`
+  - **Pagination:** `200` max/page, `50` default/page. Exceeding 200 causes **HTTP 400**. Bulk strategy: page iteration (`?page=1,2,3…`).
   - **Adapter:** `backend/providers/football/bigBallsDataProvider.js`
   - **Docs:** [bigballsdata.com/docs](https://bigballsdata.com/docs), [OpenAPI](https://bigballsdata.com/openapi.json)
   - **Not wired to:** prediction pipelines, public website canonical ingest
   - **Pilot ingest:** `backend/services/bigBallsFootballBridge.js` → `buildLiveData` (7 tier-1 leagues)
+  - **Coverage tiers:**
+    - **Tier 1 (EXCELLENT):** WC2026 (104 matches, live odds, Elo/Monte Carlo from 301 historical matches, 26-player squads, Golden Boot), NBA (1946–present, play-by-play, box scores, shot coordinates, player props, historical hit rates)
+    - **Tier 2 (GOOD):** EPL, La Liga, Bundesliga, Ligue 1, Serie A (player appearances, goals, assists, minutes, ratings; 2023–26 seasons)
+  - **Schema stability:** WC2026 schema **LOCKED** June 11 – July 19, 2026. No mid-tournament modifications. Versioning protects endpoint contracts. Semantic risk: LOW, drift risk: LOW.
+  - **Consumption strategy:** Prefer scheduled fetches + composite endpoints + paginated retrieval. Avoid high-frequency polling and large page requests.
+  - **Founder contact:** Stefano — direct escalation path, flexible commercial discussions. Strategic value: HIGH.
+  - **Provider suitability:** See `../governance/bsd_provider_suitability_scorecard.md`
   - See `../providers/bigballs_primary_assessment.md`, `../providers/bigballs_endpoint_catalog.md`, `../providers/bigballs_discovery_audit.md`, `../providers/bigballs_semantic_mapping.md`, `../providers/bigballs_provider_health.md`, `../governance/bigballs_evaluation_focus.md`
 - Bzzoiro Sports Data (BSD)
   - **Type:** ENRICHMENT + VERIFICATION

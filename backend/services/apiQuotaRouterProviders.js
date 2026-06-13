@@ -89,6 +89,8 @@ const PROVIDER_ALIASES = Object.freeze({
     big_balls_data: 'big_balls_data',
     bigballs: 'big_balls_data',
     big_balls: 'big_balls_data',
+    soccer_data_api: 'soccer_data_api',
+    soccerdata: 'soccer_data_api',
     groq: 'groq',
     dolphin: 'dolphin'
 });
@@ -267,6 +269,14 @@ const PROVIDER_REGISTRY_BASE = Object.freeze({
         family: 'football',
         dailyLimit: Number(process.env.BIG_BALLS_DAILY_LIMIT) || 1000,
         perMinuteLimit: Number(process.env.BIG_BALLS_PER_MINUTE_LIMIT) || 100,
+        failClosed: true,
+        usesOddsBudget: false
+    },
+    soccer_data_api: {
+        providerName: 'soccer_data_api',
+        family: 'football',
+        dailyLimit: Number(process.env.SOCCER_DATA_HARD_DAILY_CAP) || 75,
+        perMinuteLimit: Number(process.env.SOCCER_DATA_PER_MINUTE_LIMIT) || 2,
         failClosed: true,
         usesOddsBudget: false
     }

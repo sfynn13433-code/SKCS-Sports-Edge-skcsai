@@ -2,9 +2,13 @@
 
 const { resolveBigBallsFootballLeague } = require('../config/bigBallsLeagueMap');
 const {
+    BSD_MAX_LIMIT,
+    BSD_MAX_PAGES,
+    clampLimit,
     isBigBallsDataEnabled,
     listMatches,
     listStoredMatches,
+    requestAllPages,
     unwrapFieldBundle
 } = require('./bigBallsDataApiClient');
 
@@ -105,28 +109,34 @@ async function fetchBigBallsFootballFixtures(options = {}) {
 
     const fromDate = options.fromDate;
     const toDate = options.toDate;
-    const limit = Number(options.limit) || 50;
+    const limit = clampLimit(options.limit);
     const rows = [];
 
-    const stored = await listStoredMatches({
+    // --- Paginated stored matches retrieval ---
+    const storedBulk = await requestAllPages('/v1/stored/matches', {
         sport: 'football',
         league: mapRow.bbd_alias,
         limit
     });
-    if (stored.ok && Array.isArray(stored.data)) {
-        for (const item of stored.data) {
+    if (storedBulk.ok && storedBulk.allData.length) {
+        for (const item of storedBulk.allData) {
             if (!inDateWindow(item.kickoff_utc, fromDate, toDate)) continue;
             const mapped = toPredictionInputFromBigBalls(item, mapRow);
             if (mapped.match_id && mapped.home_team && mapped.away_team) rows.push(mapped);
         }
     }
 
-    const live = await listMatches({
-        sport: 'football',
-        league: mapRow.bbd_alias,
-        limit
-    });
-    if (live.ok) {
+    // --- Paginated live matches retrieval ---
+    let livePage = 1;
+    while (livePage <= BSD_MAX_PAGES) {
+        const live = await listMatches({
+            sport: 'football',
+            league: mapRow.bbd_alias,
+            limit,
+            page: livePage
+        });
+        if (!live.ok) break;
+
         const scoreRows = unwrapFieldBundle(live.data, 'scores') || [];
         for (const item of scoreRows) {
             const kickoff = item.start_time || item.updated_at || item.kickoff_utc;
@@ -134,6 +144,10 @@ async function fetchBigBallsFootballFixtures(options = {}) {
             const mapped = toPredictionInputFromBigBalls(item, mapRow);
             if (mapped.match_id && mapped.home_team && mapped.away_team) rows.push(mapped);
         }
+
+        // Fewer than limit means last page
+        if (scoreRows.length < limit) break;
+        livePage += 1;
     }
 
     const deduped = [];
