@@ -1446,21 +1446,21 @@ async function fetchOddsData(sportKey) {
 
         const marketView = derivePredictionFromH2HOutcomes(event);
         out.push({
-        match_id: `odds-${event.id}`,
-        sport: normalizedSport,
-        home_team: homeTeam,
-        away_team: awayTeam,
-        date: event.commence_time || null,
-        market: '1X2',
-        prediction: marketView?.prediction || null,
-        confidence: marketView?.confidence || null,
-        volatility: marketView?.volatility || null,
-        odds: null,
-        provider: 'odds-api',
-        provider_name: 'odds-api',
-        league: event.sport_title || humanizeCompetitionLabel(sportKey),
-        bookmaker: marketView?.bookmaker || null,
-        raw_provider_data: event
+            match_id: `odds-${event.id}`,
+            sport: normalizedSport,
+            home_team: homeTeam,
+            away_team: awayTeam,
+            date: event.commence_time || null,
+            market: '1X2',
+            prediction: marketView?.prediction || null,
+            confidence: marketView?.confidence || null,
+            volatility: marketView?.volatility || null,
+            odds: { bookmakers: event.bookmakers },
+            provider: 'odds-api',
+            provider_name: 'odds-api',
+            league: event.sport_title || humanizeCompetitionLabel(sportKey),
+            bookmaker: marketView?.bookmaker || null,
+            raw_provider_data: event
         });
     }
 
@@ -2006,7 +2006,7 @@ async function buildLiveData(options = {}) {
         
         // Map SKCS sport names to ESPN sport/league identifiers
         const espnSportMap = {
-            'Football': { sport: 'soccer', leagues: ['eng.1', 'esp.1', 'ita.1', 'ger.1', 'fra.1'] }, // EPL, La Liga, Serie A, Bundesliga, Ligue 1
+            'Football': { sport: 'soccer' },
             'Basketball': { sport: 'basketball', leagues: ['nba'] },
             'NFL': { sport: 'football', leagues: ['nfl'] },
             'NHL': { sport: 'hockey', leagues: ['nhl'] },
@@ -2015,13 +2015,33 @@ async function buildLiveData(options = {}) {
             'Tennis': { sport: 'tennis', leagues: ['atp'] },
             'Cricket': { sport: 'cricket', leagues: ['icc.t20'] }
         };
+
+        const espnFootballLeagueMap = {
+            '39': 'eng.1', // EPL
+            '140': 'esp.1', // La Liga
+            '135': 'ita.1', // Serie A
+            '78': 'ger.1', // Bundesliga
+            '61': 'fra.1', // Ligue 1
+            '2': 'uefa.champions', // UCL
+            '253': 'usa.1', // MLS
+        };
         
         const espnConfig = espnSportMap[requestedSport] || espnSportMap[sport];
         
         if (espnConfig) {
             const espnFixtures = [];
             
-            for (const league of espnConfig.leagues) {
+            let targetLeagues = espnConfig.leagues || [];
+            if (espnConfig.sport === 'soccer') {
+                const mappedLeague = espnFootballLeagueMap[String(leagueId)];
+                if (mappedLeague) {
+                    targetLeagues = [mappedLeague];
+                } else {
+                    targetLeagues = []; // Do not fallback to all leagues if unmapped
+                }
+            }
+            
+            for (const league of targetLeagues) {
                 try {
                     const espnData = await getScoreboard(espnConfig.sport, league);
                     
