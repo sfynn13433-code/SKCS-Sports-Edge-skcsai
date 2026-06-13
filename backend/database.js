@@ -469,33 +469,13 @@ async function initializeTables() {
             WHERE tier NOT IN ('normal', 'deep')
         `);
 
-        // Ensure tier_rules has a unique constraint or primary key on tier column
         await client.query(`
-            DO $$
-            BEGIN
-                -- Clean up any duplicates using ctid before adding constraint
-                DELETE FROM tier_rules a
-                USING tier_rules b
-                WHERE a.ctid < b.ctid AND a.tier = b.tier;
-
-                IF NOT EXISTS (
-                    SELECT 1 
-                    FROM pg_constraint 
-                    WHERE conrelid = 'tier_rules'::regclass 
-                      AND contype IN ('p', 'u')
-                ) THEN
-                    ALTER TABLE tier_rules ADD PRIMARY KEY (tier);
-                END IF;
-            EXCEPTION
-                WHEN OTHERS THEN
-                    -- Fallback to adding a unique constraint if primary key addition fails
-                    BEGIN
-                        ALTER TABLE tier_rules ADD CONSTRAINT uq_tier_rules_tier UNIQUE (tier);
-                    EXCEPTION
-                        WHEN OTHERS THEN NULL;
-                    END;
-            END $$;
-        `).catch(err => console.warn('[database] Warning: failed to ensure unique constraint on tier_rules:', err.message));
+            DELETE FROM tier_rules WHERE tier IS NULL OR tier NOT IN ('normal', 'deep');
+            DELETE FROM tier_rules a USING tier_rules b WHERE a.ctid < b.ctid AND a.tier = b.tier;
+        `);
+        await client.query(`
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_tier_rules_tier ON tier_rules (tier);
+        `).catch(err => console.warn('[database] Warning: failed to ensure unique index on tier_rules:', err.message));
 
         // Acca Rules
         await client.query(`CREATE TABLE IF NOT EXISTS acca_rules (
