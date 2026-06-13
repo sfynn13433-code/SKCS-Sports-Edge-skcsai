@@ -463,6 +463,7 @@ async function initializeTables() {
             max_acca_size INTEGER NOT NULL,
             allowed_volatility JSONB NOT NULL
         )`);
+        await client.query(`ALTER TABLE tier_rules DROP COLUMN IF EXISTS sport CASCADE;`).catch(() => {});
 
         await client.query(`
             DELETE FROM tier_rules

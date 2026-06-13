@@ -607,6 +607,8 @@ async function bootstrap() {
             );
         `);
 
+        await query(`ALTER TABLE tier_rules DROP COLUMN IF EXISTS sport CASCADE;`).catch(() => {});
+
         await query(`
             DELETE FROM tier_rules
             WHERE tier NOT IN ('normal', 'deep');
