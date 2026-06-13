@@ -2031,13 +2031,13 @@ async function buildLiveData(options = {}) {
         };
 
         const espnFootballLeagueMap = {
-            '39': 'eng.1', // EPL
-            '140': 'esp.1', // La Liga
-            '135': 'ita.1', // Serie A
-            '78': 'ger.1', // Bundesliga
-            '61': 'fra.1', // Ligue 1
-            '2': 'uefa.champions', // UCL
-            '253': 'usa.1', // MLS
+            '39': 'eng.1', '4328': 'eng.1',   // EPL
+            '140': 'esp.1', '4335': 'esp.1',  // La Liga
+            '135': 'ita.1', '4332': 'ita.1',  // Serie A
+            '78': 'ger.1', '4331': 'ger.1',   // Bundesliga
+            '61': 'fra.1', '4334': 'fra.1',   // Ligue 1
+            '2': 'uefa.champions', '3': 'uefa.champions', // UCL
+            '253': 'usa.1',                   // MLS
         };
         
         const espnConfig = espnSportMap[requestedSport] || espnSportMap[sport];
@@ -2055,9 +2055,13 @@ async function buildLiveData(options = {}) {
                 }
             }
             
+            const espnFromDate = String(today || '').replace(/-/g, '');
+            const espnToDate = String(windowEnd || '').replace(/-/g, '');
+            const espnDateParam = (espnFromDate && espnToDate) ? `${espnFromDate}-${espnToDate}` : null;
+            
             for (const league of targetLeagues) {
                 try {
-                    const espnData = await getScoreboard(espnConfig.sport, league);
+                    const espnData = await getScoreboard(espnConfig.sport, league, espnDateParam);
                     
                     if (espnData && espnData.events && Array.isArray(espnData.events)) {
                         // Transform ESPN events to match fixture format
