@@ -217,6 +217,7 @@ const BASE_SPORTS_CONFIG = [
  * @see docs/football-leagues-apisports.md
  */
 const FOOTBALL_APISPORTS_LEAGUE_CONFIG = [
+    { sport: 'Football', leagueId: '15', season: SEASON_YEAR, oddsKey: null, leagueTier: 1, competition: 'FIFA World Cup' },
     { sport: 'Football', leagueId: '3', season: SEASON_YEAR, oddsKey: null, leagueTier: 1, competition: 'UEFA Champions League', fixtureDate: '2026-05-05', allowFinalForDisplay: true },
     { sport: 'Football', leagueId: '98', season: SEASON_YEAR, oddsKey: null, leagueTier: 1, competition: 'J1 League' },
     { sport: 'Football', leagueId: '99', season: SEASON_YEAR, oddsKey: null, leagueTier: 2, competition: 'J2 League' },
@@ -229,7 +230,7 @@ const FOOTBALL_APISPORTS_LEAGUE_CONFIG = [
 ];
 
 const FOOTBALL_TIER_1_LEAGUES = new Set([
-    '3', '4328', '4335', '4331', '4332', '4334',
+    '15', '3', '4328', '4335', '4331', '4332', '4334',
     '98', '169', '253', '71'
 ]);
 const FOOTBALL_TIER_2_LEAGUES = new Set(['99', '170', '255', '72']);

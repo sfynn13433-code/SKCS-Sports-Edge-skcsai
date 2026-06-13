@@ -2031,6 +2031,7 @@ async function buildLiveData(options = {}) {
         };
 
         const espnFootballLeagueMap = {
+            '15': 'fifa.world', '4362': 'fifa.world', // FIFA World Cup
             '39': 'eng.1', '4328': 'eng.1',   // EPL
             '140': 'esp.1', '4335': 'esp.1',  // La Liga
             '135': 'ita.1', '4332': 'ita.1',  // Serie A
