@@ -143,6 +143,7 @@ function normalizeSportSRCMatch(match, sport) {
         fixture: {
             provider,
             provider_fixture_id: providerFixtureId,
+            match_id: providerFixtureId,
             fixture_key: fixtureKey,
             sport,
             league: safeString(

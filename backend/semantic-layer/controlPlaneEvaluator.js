@@ -133,7 +133,10 @@ function scoreSummary(summary, thresholds) {
     score -= summary.warningViolations * 0.75;
     score -= summary.criticalViolations * 8;
     score -= summary.blockedViolations * 12;
-    score -= violationRate * 100;
+    
+    const violationRatePenalty = batchSize > 1 ? (violationRate * 100) : 0;
+    score -= violationRatePenalty;
+    
     if (trend === 'rising') score -= 5;
     if (trend === 'falling') score += 3;
     if (summary.degradedFlag) score -= 10;
