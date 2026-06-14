@@ -39,6 +39,9 @@ module.exports = {
         dailyLimit: Number(process.env.NEWSAPI_DAILY_CALL_LIMIT) || 95,
     },
     
+    // SportSRC API key for Provider Health Layer & Data Ingestion
+    sportSrcApiKey: process.env.SPORTSRC_API_KEY,
+    
     // AI Providers for EdgeMind insights (priority: Groq > Dolphin > Template)
     groq: {
         apiKey: process.env.GROQ_API_KEY || process.env.GROQ_KEY,

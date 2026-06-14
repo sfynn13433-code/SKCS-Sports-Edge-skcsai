@@ -84,6 +84,36 @@ router.post('/trigger-context-enrichment', async (req, res) => {
   }
 });
 
+// Trigger SportSRC health & capability discovery
+router.post('/trigger-sportsrc-health', async (req, res) => {
+  try {
+    console.log('SportSRC health check triggered via API');
+    const sportsrcHealthService = require('../services/sportsrcHealthService');
+    
+    // Run both jobs concurrently
+    const [health, sports] = await Promise.all([
+        sportsrcHealthService.checkAccountHealth(),
+        sportsrcHealthService.discoverCapabilities()
+    ]);
+
+    res.json({
+      success: true,
+      message: 'SportSRC health and capability discovery completed',
+      data: {
+          health,
+          capabilities: sports
+      }
+    });
+    
+  } catch (error) {
+    console.error('SportSRC health trigger error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Admin key validation middleware
 const requireAdminKey = (req, res, next) => {
   const adminKey = req.headers['x-admin-key'];
@@ -248,12 +278,27 @@ router.get('/status', async (req, res) => {
       ORDER BY status
     `);
     
+    // Get sportsrc account health telemetry
+    const { rows: sportsrcHealth } = await query(`
+      SELECT 
+        checked_at,
+        plan,
+        daily_limit,
+        remaining,
+        reset_time,
+        status
+      FROM sportsrc_account_health
+      ORDER BY checked_at DESC
+      LIMIT 1
+    `);
+
     res.json({
       success: true,
       data: {
         recent_runs: recentRuns,
         sport_sync_status: sportSyncStatus,
         context_queue_status: queueStatus,
+        sportsrc_health: sportsrcHealth[0] || null,
         timestamp: new Date().toISOString()
       }
     });

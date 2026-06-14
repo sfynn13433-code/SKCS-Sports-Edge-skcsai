@@ -1138,6 +1138,24 @@ async function bootstrap() {
             ON same_match_combinations(match_date DESC NULLS LAST);
         `);
         // ─────────────────────────────────────────────────────────────────────────────
+        // sportsrc_account_health: telemetry table for API quota monitoring
+        await query(`
+            CREATE TABLE IF NOT EXISTS sportsrc_account_health (
+                id           BIGSERIAL PRIMARY KEY,
+                checked_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                plan         TEXT,
+                daily_limit  INTEGER,
+                remaining    INTEGER,
+                reset_time   TIMESTAMPTZ,
+                status       TEXT,
+                metadata     JSONB NOT NULL DEFAULT '{}'::jsonb
+            );
+        `);
+
+        await query(`
+            CREATE INDEX IF NOT EXISTS idx_sportsrc_account_health_checked_at
+            ON sportsrc_account_health(checked_at DESC NULLS LAST);
+        `);
 
         await query(`
             INSERT INTO table_lifecycle_registry (table_name, lifecycle_state, is_active, owner_component, notes)
