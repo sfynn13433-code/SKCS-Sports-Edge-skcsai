@@ -1786,7 +1786,7 @@ async function buildLiveData(options = {}) {
     }
 
     // --- Source 1: API-Sports (primary) ---
-    if (String(process.env.DISABLE_APISPORTS || '').toLowerCase() !== 'true') {
+    if (false /* API-SPORTS SUSPENDED BY USER */) {
     try {
         const apiSportsLeagueId = resolveApiSportsLeagueId(leagueId, sport);
         if (!apiSportsLeagueId) {

@@ -99,14 +99,8 @@ class APISportsClient {
     }
 
     async requestWithRotation(sport, endpoint, params) {
-        const baseUrl = this.getBaseUrl(sport);
-        const keys = this.getKeysForSport(sport);
-        const sportKey = normalizeSportKey(sport);
-        const providerKey = apiSportsProviderKey(sportKey);
-
-        if (!keys.length) {
-            throw new Error(`No API keys configured for sport=${sport}`);
-        }
+        // HARD SUSPEND: User explicitly requested API-Sports to be removed
+        throw new Error('API-Sports completely suspended per user request. Bypassing provider.');
 
         const gate = await reserveApiCall({
             sport: sportKey,
