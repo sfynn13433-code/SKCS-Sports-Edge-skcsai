@@ -865,6 +865,55 @@ class CricketDataClient {
     }
 }
 
+class SportSrcClient {
+    constructor() {
+        this.baseUrl = 'https://api.sportsrc.org/v2/';
+        this.apiKey = require('./config').sportSrcApiKey;
+    }
+
+    async getMatches(sport) {
+        if (!this.apiKey) throw new Error('SportSRC API key not configured');
+        const url = `${this.baseUrl}?type=matches&category=${encodeURIComponent(sport)}`;
+        try {
+            const res = await axios.get(url, {
+                headers: { 'X-API-KEY': this.apiKey },
+                timeout: 10000
+            });
+            const payload = res.data?.data || res.data;
+            
+            let allMatches = [];
+            if (Array.isArray(payload)) {
+                for (const item of payload) {
+                    if (item.matches && Array.isArray(item.matches)) {
+                        for (const m of item.matches) {
+                            if (item.league && !m.league) {
+                                m.league = item.league;
+                            }
+                            allMatches.push(m);
+                        }
+                    } else {
+                        allMatches.push(item);
+                    }
+                }
+            } else if (payload && Array.isArray(payload.matches)) {
+                allMatches = payload.matches;
+            } else if (payload && Array.isArray(payload.events)) {
+                allMatches = payload.events;
+            } else if (payload && Array.isArray(payload.results)) {
+                allMatches = payload.results;
+            }
+            return allMatches;
+        } catch (error) {
+            console.error(`[SportSrcClient] getMatches error for ${sport}:`, error.message);
+            throw error;
+        }
+    }
+
+    async getOdds(sport) {
+        throw new Error('SportSRC getOdds endpoint not yet implemented (awaiting endpoint info)');
+    }
+}
+
 module.exports = {
     APISportsClient,
     OddsAPIClient,
@@ -872,6 +921,7 @@ module.exports = {
     SportsDataIOClient,
     RapidAPIClient,
     CricketDataClient,
+    SportSrcClient,
     cachedFetch,
     clearRequestCache,
     SPORTSDATAIO_COMPETITION_MAP,

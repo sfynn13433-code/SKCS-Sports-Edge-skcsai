@@ -159,7 +159,7 @@ async function fetchOddsForSport(sport) {
     await checkRateLimit();
     
     try {
-        const apiKey = config.ODDS_API_KEY;
+        const apiKey = process.env.ODDS_API_KEY || config.oddsApiKey || config.ODDS_API_KEY;
         if (!apiKey) {
             console.error('[OddsAPI] ODDS_API_KEY not configured');
             return null;
@@ -175,7 +175,7 @@ async function fetchOddsForSport(sport) {
         const params = {
             apiKey: apiKey,
             regions: 'us,eu,uk',  // Multiple regions for better coverage
-            markets: 'h2h,ou,totals,spreads',  // Head-to-head, Over/Under, Totals, Spreads
+            markets: 'h2h,totals,spreads',  // Head-to-head, Totals, Spreads
             oddsFormat: 'decimal',
             dateFormat: 'iso'
         };
@@ -299,11 +299,24 @@ async function storeOddsInDatabase(processedOdds) {
         
         for (const [eventId, oddsData] of Object.entries(processedOdds)) {
             // Find corresponding fixture in raw_fixtures table
-            const fixtureResult = await client.query(`
+            // First try exact ID match, then fallback to fuzzy matching (essential for cross-provider mapping like SportSRC)
+            let fixtureResult = await client.query(`
                 SELECT id_event FROM raw_fixtures 
                 WHERE id_event = $1 OR raw_json->>'id' = $1
                 LIMIT 1
             `, [eventId]);
+            
+            if (fixtureResult.rows.length === 0) {
+                // Fuzzy match fallback: Match by sport, within 24 hours, and overlapping team names anywhere in raw_json
+                fixtureResult = await client.query(`
+                    SELECT id_event FROM raw_fixtures 
+                    WHERE start_time >= $1::timestamp - interval '24 hours'
+                      AND start_time <= $1::timestamp + interval '24 hours'
+                      AND raw_json::text ILIKE '%' || $2 || '%'
+                      AND raw_json::text ILIKE '%' || $3 || '%'
+                    LIMIT 1
+                `, [oddsData.commence_time, oddsData.home_team, oddsData.away_team]);
+            }
             
             if (fixtureResult.rows.length === 0) {
                 continue; // No matching fixture found

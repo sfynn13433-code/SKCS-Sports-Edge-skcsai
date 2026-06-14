@@ -99,7 +99,7 @@ async function verifyOddsData() {
         const sampleResult = await pool.query(`
             SELECT id_event, 
                    jsonb_typeof(odds) as odds_type,
-                   jsonb_array_length(jsonb_object_keys(odds)) as odds_keys_count
+                   (SELECT count(*) FROM jsonb_object_keys(odds)) as odds_keys_count
             FROM match_context_data 
             WHERE odds IS NOT NULL AND odds != '{}'::JSONB
             LIMIT 3
@@ -124,8 +124,7 @@ async function main() {
     
 
         // Step 1: Skip migrations (already run manually in Supabase)
-    cons
-    ole.log('[TEST] Skipping migrations - already run manually in Supabase');
+    console.log('[TEST] Skipping migrations - already run manually in Supabase');
     
     // Step 2: Test odds pipeline (only if ODDS_API_KEY is configured)
     if (process.env.ODDS_API_KEY) {

@@ -1034,8 +1034,8 @@ function dedupePredictionInputs(rows) {
     for (const row of Array.isArray(rows) ? rows : []) {
         if (!row) continue;
         const sport = normalizeRequestedSport(row.sport) || String(row.sport || '').trim().toLowerCase();
-        const matchId = String(row.match_id || '').trim();
-        const kickoff = String(row.date || row.commence_time || row.kickoff || row.match_time || '').trim();
+        const matchId = String(row.match_id || row.provider_fixture_id || '').trim();
+        const kickoff = String(row.date || row.commence_time || row.kickoff || row.kickoff_time || row.match_time || '').trim();
         if (!sport || !matchId) continue;
         const key = `${sport}|${matchId}|${kickoff}`;
         if (seen.has(key)) continue;
@@ -1785,126 +1785,44 @@ async function buildLiveData(options = {}) {
         }
     }
 
-    // --- Source 1: API-Sports (primary) ---
-    if (false /* API-SPORTS SUSPENDED BY USER */) {
+    // --- Source 1: SportSRC (primary) ---
     try {
-        const apiSportsLeagueId = resolveApiSportsLeagueId(leagueId, sport);
-        if (!apiSportsLeagueId) {
-            console.warn(`[dataProvider] ${sport}: no API-Sports league mapping for leagueId=${leagueId}`);
-        } else if (String(leagueId) !== String(apiSportsLeagueId)) {
-            console.log(`[dataProvider] ${sport}: API-Sports league remap ${leagueId} → ${apiSportsLeagueId}`);
-        }
-
-        let data = null;
-        let fixtures = [];
-        let seasonUsed = season || String(deriveApiSportsSeasonYear(sport, leagueId));
-        let apiSportsQuotaBlocked = false;
-
-        if (apiSportsLeagueId) {
-        const primarySeason = seasonUsed;
-        const seasonCandidates = (normalizeRequestedSport(sport) === 'football' || String(sport).toLowerCase() === 'football')
-            ? footballApiSportsSeasonFallbacks(primarySeason)
-            : [primarySeason];
-        const queryOpts = { from: today, to: windowEnd };
-        const isQuotaExceededError = (error) => (
-            error instanceof ProviderQuotaExceededError
-            || error?.code === 'provider_quota_exceeded'
-        );
-
-        for (const seasonCandidate of seasonCandidates) {
-            seasonUsed = seasonCandidate;
-            console.log(`[dataProvider] ${sport}: Fetching fixtures for league=${apiSportsLeagueId}, season=${seasonCandidate}, dateRange=${today} to ${windowEnd} (${windowDays * 24}h window)`);
-            console.log(`[DIAG] API-Sports URL: ${client.getBaseUrl(sport)}/fixtures?league=${apiSportsLeagueId}&season=${seasonCandidate}&from=${today}&to=${windowEnd}`);
-
-            try {
-                data = await client.getFixtures(apiSportsLeagueId, seasonCandidate, queryOpts, sport);
-            } catch (error) {
-                if (isQuotaExceededError(error)) {
-                    apiSportsQuotaBlocked = true;
-                    if (syncState && normalizeRequestedSport(sport) === 'football') {
-                        syncState.apiSportsFootballBlocked = true;
-                    }
-                    console.warn(`[dataProvider] ${sport}: API-Sports quota exhausted; stopping API-Sports retries for this league.`);
-                    break;
-                }
-                throw error;
-            }
-            console.log(`[DIAG] API-Sports raw response: data=${data ? 'received' : 'NULL'} results=${data?.results ?? 'N/A'} responseLength=${data?.response?.length ?? 'N/A'} errors=${JSON.stringify(data?.errors || {})}`);
-            fixtures = data?.response || [];
-
-            if (fixtures.length > 0) break;
-            if (!apiSportsSeasonPlanBlocked(data?.errors)) break;
-            console.warn(`[dataProvider] ${sport}: API-Sports season ${seasonCandidate} blocked on plan; trying fallback season`);
-        }
-
-        if (!apiSportsQuotaBlocked && fixtures.length === 0 && (normalizeRequestedSport(sport) === 'football' || String(sport).toLowerCase() === 'football')) {
-            console.log(`[dataProvider] ${sport}: No fixtures found with date range, trying single-day query`);
-            for (const seasonCandidate of seasonCandidates) {
-                seasonUsed = seasonCandidate;
-                try {
-                    data = await client.getFixtures(apiSportsLeagueId, seasonCandidate, { date: today }, sport);
-                } catch (error) {
-                    if (isQuotaExceededError(error)) {
-                        apiSportsQuotaBlocked = true;
-                        if (syncState && normalizeRequestedSport(sport) === 'football') {
-                            syncState.apiSportsFootballBlocked = true;
-                        }
-                        console.warn(`[dataProvider] ${sport}: API-Sports quota exhausted; skipping single-day retry.`);
-                        break;
-                    }
-                    throw error;
-                }
-                fixtures = data?.response || [];
-                if (fixtures.length > 0) break;
-                if (!apiSportsSeasonPlanBlocked(data?.errors)) break;
-            }
-        }
-
-        if (!apiSportsQuotaBlocked && fixtures.length === 0 && sport !== 'football') {
-            console.log(`[dataProvider] ${sport}: No fixtures found with date range, trying single-day query`);
-            try {
-                data = await client.getFixtures(apiSportsLeagueId, seasonUsed, { date: today }, sport);
-            } catch (error) {
-                if (isQuotaExceededError(error)) {
-                    apiSportsQuotaBlocked = true;
-                    if (syncState && normalizeRequestedSport(sport) === 'football') {
-                        syncState.apiSportsFootballBlocked = true;
-                    }
-                    console.warn(`[dataProvider] ${sport}: API-Sports quota exhausted; skipping single-day retry.`);
-                } else {
-                    throw error;
+        const { SportSrcClient } = require('../apiClients');
+        const sportSrcClient = new SportSrcClient();
+        console.log(`[dataProvider] ${sport}: Fetching fixtures from SportSRC`);
+        
+        let data = await sportSrcClient.getMatches(sport);
+        let rawFixtures = Array.isArray(data) ? data : [];
+        
+        if (rawFixtures.length > 0) {
+            console.log(`[dataProvider] ${sport}: SportSRC returned ${rawFixtures.length} raw fixtures`);
+            console.log("[SportSRC RAW SAMPLE]", JSON.stringify(rawFixtures[0], null, 2));
+            const { normalizeSportSRCMatch } = require('../utils/sportsrcNormalizer');
+            
+            const normalizedFixtures = [];
+            for (const match of rawFixtures) {
+                const norm = normalizeSportSRCMatch(match, sport);
+                if (norm) {
+                    normalizedFixtures.push(norm);
                 }
             }
-            fixtures = data?.response || [];
-        }
-
-        if (apiSportsQuotaBlocked) {
-            console.warn(`[dataProvider] ${sport}: API-Sports quota exhausted, skipping remaining API-Sports fallbacks.`);
-        }
-        }
-
-        if (fixtures.length > 0) {
-            const out = applyCompetitionAllowlist(dedupePredictionInputs(
-                fixtures
-                    .slice(0, maxFixturesPerSource)
-                    .map(f => normalizeFixture(f, sport))
-                    .filter(Boolean)
-            ), requestedSport || sport);
-            console.log(`[dataProvider] ${sport}: API-Sports fetched=${fixtures.length} returned=${out.length}`);
-            if (out.length > 0 && appendAggregated(out, 'API-Sports')) {
+            
+            const out = applyCompetitionAllowlist(
+                dedupePredictionInputs(normalizedFixtures.slice(0, maxFixturesPerSource)),
+                requestedSport || sport
+            );
+            
+            console.log(`[dataProvider] ${sport}: SportSRC fetched=${normalizedFixtures.length} returned=${out.length}`);
+            if (out.length > 0 && appendAggregated(out, 'SportSRC')) {
                 return aggregated;
             }
-        }
-
-        if (!apiSportsQuotaBlocked) {
-            console.warn(`[dataProvider] ${sport}: 0 fixtures from API-Sports`);
+        } else {
+            console.warn(`[dataProvider] ${sport}: 0 fixtures from SportSRC`);
         }
     } catch (error) {
-        console.error(`[dataProvider] ${sport}: API-Sports ERROR:`, error.message);
+        console.error(`[dataProvider] ${sport}: SportSRC ERROR:`, error.message);
     }
-    } else {
-        console.warn(`[dataProvider] ${sport}: API-Sports disabled by DISABLE_APISPORTS`);
-    }
+
 
     // --- Source 2: Odds API (fallback) ---
     const oddsKey = options.oddsKey;
