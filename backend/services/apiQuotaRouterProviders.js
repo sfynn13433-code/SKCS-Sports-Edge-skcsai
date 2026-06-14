@@ -8,7 +8,7 @@
 const SPORT_FAMILIES = Object.freeze({
     football: {
         label: 'Football',
-        defaultProviders: ['api_sports_football', 'odds_api'],
+        defaultProviders: ['big_balls_data', 'thesportsdb', 'odds_api'],
         ingestionEnv: null
     },
     cricket: {
@@ -18,57 +18,57 @@ const SPORT_FAMILIES = Object.freeze({
     },
     basketball: {
         label: 'Basketball',
-        defaultProviders: ['api_sports_basketball'],
+        defaultProviders: ['odds_api'],
         ingestionEnv: null
     },
     baseball: {
         label: 'Baseball',
-        defaultProviders: ['api_sports_baseball'],
+        defaultProviders: ['odds_api'],
         ingestionEnv: null
     },
     hockey: {
         label: 'Hockey',
-        defaultProviders: ['api_sports_hockey'],
+        defaultProviders: ['odds_api'],
         ingestionEnv: null
     },
     rugby: {
         label: 'Rugby',
-        defaultProviders: ['api_sports_rugby'],
+        defaultProviders: ['odds_api'],
         ingestionEnv: null
     },
     mma: {
         label: 'MMA',
-        defaultProviders: ['api_sports_mma'],
+        defaultProviders: ['odds_api'],
         ingestionEnv: null
     },
     nfl: {
         label: 'American Football',
-        defaultProviders: ['api_sports_nfl'],
+        defaultProviders: ['odds_api'],
         ingestionEnv: null
     },
     formula1: {
         label: 'Formula 1',
-        defaultProviders: ['api_sports_formula1'],
+        defaultProviders: [],
         ingestionEnv: null
     },
     volleyball: {
         label: 'Volleyball',
-        defaultProviders: ['api_sports_volleyball'],
+        defaultProviders: [],
         ingestionEnv: null
     },
     handball: {
         label: 'Handball',
-        defaultProviders: ['api_sports_handball'],
+        defaultProviders: [],
         ingestionEnv: null
     },
     afl: {
         label: 'AFL',
-        defaultProviders: ['api_sports_afl'],
+        defaultProviders: ['odds_api'],
         ingestionEnv: null
     },
     tennis: {
         label: 'Tennis',
-        defaultProviders: ['api_sports_tennis'],
+        defaultProviders: ['odds_api'],
         ingestionEnv: null
     }
 });

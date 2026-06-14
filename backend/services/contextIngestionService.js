@@ -186,37 +186,13 @@ function buildApiSportsHeaders() {
 }
 
 async function getInjuries(fixtureId) {
-    const id = String(fixtureId || '').trim();
-    if (!id) return null;
-    if (String(process.env.DISABLE_APISPORTS || '').toLowerCase() === 'true') return null;
-
-    try {
-        const res = await axios.get(
-            `${API_SPORTS_BASE_URL}/injuries?fixture=${encodeURIComponent(id)}`,
-            { headers: buildApiSportsHeaders(), timeout: 10000 }
-        );
-        return Array.isArray(res?.data?.response) ? res.data.response : null;
-    } catch (err) {
-        console.error('API ERROR:', err.message);
-        return null;
-    }
+    // API-Sports suspended per user request
+    return null;
 }
 
 async function getH2H(team1, team2) {
-    const homeId = String(team1 || '').trim();
-    const awayId = String(team2 || '').trim();
-    if (!homeId || !awayId) return null;
-
-    try {
-        const res = await axios.get(
-            `${API_SPORTS_BASE_URL}/fixtures/headtohead?h2h=${encodeURIComponent(`${homeId}-${awayId}`)}`,
-            { headers: buildApiSportsHeaders(), timeout: 10000 }
-        );
-        return Array.isArray(res?.data?.response) ? res.data.response : null;
-    } catch (err) {
-        console.error('API ERROR:', err.message);
-        return null;
-    }
+    // API-Sports suspended per user request
+    return null;
 }
 
 async function getWeather(city) {
