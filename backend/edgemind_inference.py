@@ -6,12 +6,13 @@ Bridge between Supabase and local EdgeMind server (localhost:8080)
 import os
 import json
 import asyncio
-import aiohttp
+import re
 import psycopg2
 from psycopg2.extras import Json
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 import logging
+from google.antigravity import Agent, LocalAgentConfig
 
 # Configure logging
 logging.basicConfig(
@@ -23,8 +24,10 @@ logger = logging.getLogger(__name__)
 # Configuration
 DATABASE_URL = os.getenv('DATABASE_URL')
 SUPABASE_SERVICE_ROLE_KEY = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
-EDGEMIND_URL = os.getenv('DOLPHIN_URL', 'http://127.0.0.1:8080')
-EDGEMIND_TIMEOUT = int(os.getenv('DOLPHIN_TIMEOUT', 120000)) / 1000  # Convert to seconds
+
+# Antigravity Configuration
+ANTIGRAVITY_API_KEY = os.getenv('ANTIGRAVITY_API_KEY')
+AG_MODEL = os.getenv('AG_MODEL', 'antigravity-1.0-pro')
 
 # CPU Queue: Semaphore to ensure only one inference at a time
 INFERENCE_SEMAPHORE = asyncio.Semaphore(1)
@@ -34,25 +37,25 @@ CKP_SYSTEM_PROMPT = "You are an SKCS Quant. Output exactly in this format: [Scor
 
 
 class EdgeMindInferenceBridge:
-    """Bridge between Supabase and EdgeMind inference server."""
+    """Bridge between Supabase and Antigravity inference engine."""
 
-    def __init__(self, db_url: Optional[str] = None, edgemind_url: Optional[str] = None):
+    def __init__(self, db_url: Optional[str] = None):
         """
-        Initialize the EdgeMind inference bridge.
+        Initialize the inference bridge.
 
         Args:
             db_url: PostgreSQL connection string (defaults to DATABASE_URL env var)
-            edgemind_url: EdgeMind server URL (defaults to http://127.0.0.1:8080)
         """
         self.db_url = db_url or DATABASE_URL
-        self.edgemind_url = edgemind_url or EDGEMIND_URL
-        self.timeout = EDGEMIND_TIMEOUT
 
         if not self.db_url:
             raise ValueError("DATABASE_URL environment variable must be set")
         
         if not SUPABASE_SERVICE_ROLE_KEY:
             logger.warning("SUPABASE_SERVICE_ROLE_KEY not set. Write operations may fail due to insufficient permissions.")
+
+        if not ANTIGRAVITY_API_KEY:
+            logger.error("ANTIGRAVITY_API_KEY not set. Inference will fail.")
 
     def get_db_connection(self):
         """Create a PostgreSQL database connection."""
@@ -153,14 +156,14 @@ class EdgeMindInferenceBridge:
 
     def construct_condensed_payload(self, snapshot: Dict[str, Any]) -> str:
         """
-        Construct a condensed payload for EdgeMind BOT using context-slimming strategy.
+        Construct a condensed payload for inference BOT using context-slimming strategy.
         Keeps input under 500 tokens to leave room for internal reasoning.
 
         Args:
             snapshot: Match snapshot dictionary
 
         Returns:
-            Condensed prompt string for EdgeMind inference
+            Condensed prompt string for inference
         """
         base_info = snapshot.get('base_match_info', {})
         edge_data = snapshot.get('edge_data', {})
@@ -169,11 +172,9 @@ class EdgeMindInferenceBridge:
 
         # Extract injury summary (condensed)
         injury_report = edge_data.get('injury_report', {})
+        injury_count = 0
         if isinstance(injury_report, dict):
             injury_count = len(injury_report.get('injuries', []))
-            injury_summary = f"{injury_count} injuries" if injury_count > 0 else "No injuries"
-        else:
-            injury_summary = "Unknown"
 
         # Extract momentum surge (condensed)
         odds_velocity = live_momentum.get('odds_velocity', 0)
@@ -185,29 +186,17 @@ class EdgeMindInferenceBridge:
         else:
             momentum = "Neutral"
 
-        # Extract market movement (condensed)
-        market_movement = live_momentum.get('market_movement', 0)
-        market_status = "Sharp" if abs(market_movement) > 0.03 else "Stable"
-
-        # Extract news volatility (condensed)
-        if public_intelligence:
-            avg_volatility = sum(item.get('volatility_score', 0) for item in public_intelligence) / len(public_intelligence)
-            news_status = "High" if avg_volatility > 0.7 else "Low"
-        else:
-            news_status = "None"
-
-        # Build ultra-slim payload (target: < 100 tokens)
+        # Build ultra-slim payload
         condensed = (
-            f"{CKP_SYSTEM_PROMPT}\n"
             f"Predict: {base_info.get('home_team', 'Unknown')} vs {base_info.get('away_team', 'Unknown')}. "
-            f"Odds: {odds_velocity}. Inj: {injury_count if isinstance(injury_report, dict) else 0}. Mom: {momentum}. Result:"
+            f"Odds: {odds_velocity}. Inj: {injury_count}. Mom: {momentum}. Result:"
         )
 
         return condensed
 
     async def call_edgemind(self, prompt: str) -> Dict[str, Any]:
         """
-        Send prompt to EdgeMind server and parse response.
+        Send prompt to Antigravity and parse response.
 
         Args:
             prompt: Formatted prompt string
@@ -215,106 +204,85 @@ class EdgeMindInferenceBridge:
         Returns:
             Dictionary with confidence_score, edge_detected, and reasoning
         """
-        url = f"{self.edgemind_url}/completion"
-        
-        payload = {
-            "prompt": prompt,
-            "n_predict": 40,
-            "temperature": 0.2,
-            "top_p": 0.9,
-            "stop": ["\n", "User:"]
-        }
-
         import time
         start_time = time.time()
         
         try:
-            async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=self.timeout)) as session:
-                async with session.post(url, json=payload) as response:
-                    if response.status != 200:
-                        error_text = await response.text()
-                        logger.error(f"EdgeMind server returned status {response.status}: {error_text}")
-                        raise Exception(f"EdgeMind server error: {response.status}")
+            config = LocalAgentConfig(
+                api_key=ANTIGRAVITY_API_KEY,
+                model=AG_MODEL,
+                system_instructions=CKP_SYSTEM_PROMPT
+            )
 
-                    result = await response.json()
-                    raw_response = result.get('content', '')
+            async with Agent(config) as agent:
+                response = await agent.chat(prompt)
+                raw_response = response.text.strip()
 
-                    inference_time = time.time() - start_time
-                    logger.info(f"Inference Time: {inference_time:.2f}s")
-                    logger.info(f"EdgeMind raw response: {raw_response[:200]}...")
+            inference_time = time.time() - start_time
+            logger.info(f"Inference Time: {inference_time:.2f}s")
+            logger.info(f"Antigravity raw response: {raw_response}")
 
-                    # Parse the response
-                    parsed = self.parse_edgemind_response(raw_response)
-                    parsed['inference_time_seconds'] = inference_time
-                    return parsed
+            # Parse the response
+            parsed = self.parse_edgemind_response(raw_response)
+            parsed['inference_time_seconds'] = inference_time
+            return parsed
 
-        except asyncio.TimeoutError:
-            logger.error("EdgeMind request timed out")
-            raise Exception("EdgeMind inference timed out")
-        except aiohttp.ClientError as e:
-            logger.error(f"EdgeMind client error: {e}")
-            raise Exception(f"EdgeMind connection error: {e}")
         except Exception as e:
-            logger.error(f"EdgeMind inference error: {e}")
+            logger.error(f"Antigravity inference error: {e}")
             raise
 
     def parse_edgemind_response(self, response: str) -> Dict[str, Any]:
         """
-        Parse EdgeMind response to extract confidence_score, edge_detected, and reasoning.
+        Parse Antigravity response to extract confidence_score, edge_detected, and reasoning.
+        Expects format: [Score] | [Analysis]
 
         Args:
-            response: Raw response string from EdgeMind
+            response: Raw response string from Antigravity
 
         Returns:
             Dictionary with parsed confidence_score, edge_detected, and reasoning
         """
         result = {
             'confidence_score': None,
-            'edge_detected': None,
+            'edge_detected': False,
             'reasoning': response.strip(),
             'raw_response': response
         }
 
-        lines = response.strip().split('\n')
+        # Try strict format parsing: [Score] | [Analysis]
+        match = re.match(r"(\d+)\s*\|\s*(.*)", response.strip())
+        if match:
+            try:
+                score = int(match.group(1))
+                result['confidence_score'] = float(score)
+                result['reasoning'] = match.group(2).strip()
+                result['edge_detected'] = score >= 70
+                return result
+            except ValueError:
+                pass
+
+        # Fallback parsing
+        parts = response.split('|')
+        if len(parts) >= 2:
+            try:
+                score_str = re.search(r'\d+', parts[0])
+                if score_str:
+                    score = int(score_str.group())
+                    result['confidence_score'] = float(score)
+                    result['edge_detected'] = score >= 70
+                result['reasoning'] = parts[1].strip()
+            except (ValueError, IndexError):
+                pass
         
-        for line in lines:
-            line = line.strip()
-            
-            # Extract CONFIDENCE_SCORE
-            if 'CONFIDENCE_SCORE' in line.upper():
-                try:
-                    # Look for number after colon
-                    parts = line.split(':')
-                    if len(parts) > 1:
-                        score_str = parts[1].strip().strip('[]')
-                        result['confidence_score'] = float(score_str)
-                except (ValueError, IndexError):
-                    pass
-
-            # Extract EDGE_DETECTED
-            if 'EDGE_DETECTED' in line.upper():
-                if 'TRUE' in line.upper():
-                    result['edge_detected'] = True
-                elif 'FALSE' in line.upper():
-                    result['edge_detected'] = False
-
-            # Extract REASONING
-            if 'REASONING' in line.upper():
-                try:
-                    parts = line.split(':', 1)
-                    if len(parts) > 1:
-                        result['reasoning'] = parts[1].strip()
-                except IndexError:
-                    pass
-
-        # If confidence_score not found, try to extract from reasoning
+        # Last ditch effort for score
         if result['confidence_score'] is None:
-            import re
-            score_match = re.search(r'(\d{1,3})\s*%', response)
+            score_match = re.search(r'(\d+)', response)
             if score_match:
-                result['confidence_score'] = float(score_match.group(1))
+                score = int(score_match.group(1))
+                result['confidence_score'] = float(score)
+                result['edge_detected'] = score >= 70
 
-        logger.info(f"Parsed EdgeMind response: confidence={result['confidence_score']}, edge={result['edge_detected']}")
+        logger.info(f"Parsed response: confidence={result['confidence_score']}, edge={result['edge_detected']}")
         return result
 
     async def sync_results_to_supabase(self, event_id: str, inference_result: Dict[str, Any]) -> bool:
