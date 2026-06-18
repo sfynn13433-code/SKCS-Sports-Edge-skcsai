@@ -1,0 +1,401 @@
+SKCS Test — DeepSeek Session Memory
+Date: 2026-06-16
+Phase: Cross-project connection (Scout → Edge)
+
+Session goals:
+- Map how Edge reads signals from its own Supabase.
+- Connect SKCS Scout's Supabase signals to SKCS Test's Edge.
+- Update Edge profiles to include historical signals.
+
+---
+Session Notes:
+
+Progress 2026-06-16:
+- Mapped Edge's backend: EdgeMindController, verificationSignalContract, edgemind_inference.py, syncService.js.
+- Edge reads risk signals from match metadata (weather_risk, injury_risk, etc.) via buildRealtimeDirectEvaluationFromMetadata.
+- Edge uses DATABASE_URL, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
+- Scout's scout_raw_match_signals table not yet mirrored in Edge.
+- Decision: create a mirror table in Edge's Supabase, then build sync service.
+- Next: Create migration file supabase/migrations/20260616_scout_signal_mirror.sql in SKCS Test.
+
+Milestone 2026-06-16:
+- Created supabase/migrations/20260616_scout_signal_mirror.sql (mirror table for scout_raw_match_signals).
+- Next: Build sync service (backend/services/scoutSignalSync.js) that reads from Scout's Supabase and writes to Edge's mirror table.
+- Sync will use SCOUT_DATABASE_URL env variable (user sets manually).
+- Created backend/services/scoutSignalSync.js (syncs Scout signals into Edge mirror).
+- Next: Create docs/intel_read_contract_v1.md to define how Edge consumes historical signals.
+
+Session Complete 2026-06-16 — Structural Bridge Delivered
+- Mirror table, sync service, and read contract created.
+- Sync not yet executed (needs SCOUT_DATABASE_URL in .env).
+- Next session tasks:
+  1. Set SCOUT_DATABASE_URL in SKCS Test .env (Scout's Supabase connection string).
+  2. Run node backend/services/scoutSignalSync.js once to pull historical signals.
+  3. Wire sync into Edge's match pipeline (syncService.js → runPipelineForMatches) or run on schedule.
+  4. Update edgeMindController.js to include historical_signals in volatilityScore per read contract.
+  5. Test with a historical football fixture.
+
+--- APPEND BELOW THIS LINE ---
+
+DEEPSEEK OPERATING PROTOCOL (FROZEN — 2026-06-17)
+Activated for SKCS Test sessions.
+
+Role: Free, unlimited reasoning engine for SKCS development.
+I never execute code or modify files; I provide complete, ready-to-use blueprints.
+Partner tools: Gemini CLI (soon Antigravity CLI) inside VS Code as the “hands”.
+User is the director who reviews my output and applies it via CLI.
+
+MANDATORY MODE:
+- Generation first. I state assumptions and proceed without endless clarifying questions.
+- Every output block includes: purpose, project placement, edge cases, and a GEMINI CLI INSTRUCTION BLOCK with the header “INSTRUCTION PACKET — DO NOT EXECUTE ANY CHANGES UNLESS EXPLICITLY INSTRUCTED TO APPLY THEM.”
+- I never revert to cautious/exploratory mode. Tiny clarifications get an [ASSUMPTION] tag and I continue.
+- Responses end with a “Next Steps” line telling the user exactly what to paste into the CLI.
+- For SKCS Test, I prefix Gemini commands with “Paste this into Gemini SKCS Test”. For SKCS Scout, I use “Paste this into Gemini SKCS Scout”.
+
+GEMINI CLI INSTRUCTION BLOCK FORMAT (ALWAYS INCLUDED):
+--- START GEMINI INSTRUCTIONS ---
+INSTRUCTION PACKET — DO NOT EXECUTE ANY CHANGES UNLESS EXPLICITLY INSTRUCTED TO APPLY THEM.
+[Objective]
+Files to touch (DO NOT TOUCH UNTIL READY): ...
+Step-by-step changes: ...
+Verification: ...
+DO NOT CHANGE: ...
+Apply these changes only when you receive the command: "[EXACT COMMAND]".
+--- END GEMINI INSTRUCTIONS ---
+
+PROJECT MEMORY FILES:
+- SKCS Test session memory file: DEEPSEEK_SESSION_SKCSTEST.txt
+- SKCS Scout session memory file: DEEPSEEK_SESSION_SKCSSCOUT.txt (or equivalent)
+- At session start, user pastes content of the relevant file. I read it fully and instantly adopt the project context and this protocol.
+
+END OF PROTOCOL
+--- APPEND ABOVE THIS LINE ---
+
+FINAL SESSION SUMMARY — SKCS Test, 2026‑06‑18
+
+Objective achieved:
+Implemented the ACCA fallback to secondary markets and enforced per‑match tier diversity for soccer ACCAs, extending the existing builder without breaking anything.
+
+What was changed (all in this session):
+
+Governance doc: docs/acca_rules_v2.1.md created (fallback ladder, tier definitions, diversity rules).
+
+Database: Migration 20260617_add_market_tier.sql applied to secondary_market_predictions — added market_tier column, classified markets into Tier 2 (Double Chance, BTTS, Over/Under) and Tier 3 (Correct Score, Goalscorer, Handicap).
+
+ACCA builder (backend/services/accaBuilder.js):
+
+Added primary_fallback pass to ACCA_FALLBACK_LADDER (tiers [1,2], ≥75%, allowDoubleChance: true).
+
+Added getDoubleChanceLegs helper to fetch raw Double Chance legs from secondary_market_predictions.
+
+Injected per‑match tier diversity check (usedTiersPerMatch map) into the candidate loop of buildAccaV2 — a fixture can now contribute a Tier 1 (1X2) and a Tier 2 (Double Chance) leg, but never two Tier‑2 legs.
+
+Smart combos now propagate market_tier to individual legs.
+
+API route (backend/routes/v1/acca.js):
+
+Response now includes leg_composition object with tier counts.
+
+What was NOT touched:
+
+Database triggers, isDuplicateCard logic, the 12‑leg maximum, subscription allocation, synthetic combo builder, buildFinalForTier orchestrator, or any file outside the three listed.
+
+Pending deployment tasks (in order):
+
+Supabase (production): Run the same migration on the production secondary_market_predictions table (the migration script exists at supabase/migrations/20260617_add_market_tier.sql; you can run it via Supabase SQL editor or a migration run).
+
+GitHub: Commit and push all changes — the modified accaBuilder.js, acca.js, the new migration file, and the governance doc.
+
+Render: Redeploy the backend service (auto‑deploy if connected to the repo, otherwise manual deploy).
+
+Vercel: No changes needed (frontend only).
+
+Verification after deployment:
+
+Test building a 6‑match ACCA with limited 1X2 legs — should fall back to Double Chance.
+
+Test that a match cannot supply two Tier‑2 legs (e.g., Double Chance + BTTS).
+
+Test the Mega ACCA (12‑leg) path — same fallback applies.
+
+Confirm leg_composition appears in the API response.
+
+Next session priorities:
+
+Verify production sync of historical signals from Scout (SCOUT_DATABASE_URL + run scoutSignalSync.js).
+
+Wire historical signals into edgeMindController.js for volatility scoring.
+
+Continue the overall Edge hardening (subscription matrix alignment, SMB rules integration if needed).
+
+DeepSeek protocol note:
+At session start, paste the content of DEEPSEEK_SESSION_SKCSTEST.txt. I will see only this summary + the frozen protocol. That’s exactly how we designed it.
+
+SKCS Unified Infrastructure Blueprint v1.0 (FROZEN — 2026-06-18)
+Status: FROZEN
+Date: 2026-06-18
+Scope: SKCS Scout + SKCS AI Sports Edge
+Purpose: Replace Supabase responsibilities with a resilient multi-system architecture.
+Core Philosophy
+There are two independent systems.
+
+System 1 observes reality.
+
+System 2 interprets reality.
+
+Neither system performs the other's role.
+
+SYSTEM 1 — SKCS SCOUT
+Role
+Observed Reality Engine
+
+Scout NEVER:
+
+Predicts
+
+Scores outcomes
+
+Calculates probabilities
+
+Suggests bets
+
+Scout ONLY:
+
+Observes
+
+Collects
+
+Verifies
+
+Deduplicates
+
+Classifies
+
+Archives
+
+Stores observed truth
+
+Scout Technology Stack
+GitHub
+Purpose: Source control
+Current status: KEEP
+Responsibilities: Version control, Branches, CI/CD trigger
+
+Render
+Purpose: Execution Platform
+Responsibilities: Stream workers, Historical workers, Cron jobs, Entity verification, safeFetch, Legal guard, Multi-sport loops
+KEEP
+
+Neon
+Purpose: Observed Truth Database
+Responsibilities: sport_fixtures, scout_raw_match_signals, compliance_registry, signal deduplication, entity linking, staging tables, historical signals, feature flags
+Classification: Single Source Of Truth
+ONLY Neon may permanently store observed truth.
+
+Directus
+Purpose: Human Oversight Layer
+Responsibilities: Scout review, Dashboard, Approvals, Signal inspection, Quality control, Audit trail
+Directus MAY NOT become truth.
+Directus ONLY edits approved staging areas.
+
+Google Drive
+Purpose: Cold Archive
+Responsibilities: Raw JSON, Raw articles, CSV dumps, Model snapshots, PDF evidence, Odds archives, Research, Knowledge Layer, Compliance docs, Historical exports
+Google Drive is NOT queried by Edge.
+Google Drive is storage.
+
+SCOUT DATA FLOW
+Web
+↓
+safeFetch
+↓
+Legal Guard
+↓
+Render Workers
+↓
+Neon Staging
+↓
+Deduplication
+↓
+Entity Linking
+↓
+Directus Review
+↓
+Neon Truth Tables
+↓
+Google Drive Archive
+
+SYSTEM 2 — SKCS AI SPORTS EDGE
+Role
+Intelligence Engine
+
+Edge NEVER:
+Scrapes websites
+Uses safeFetch
+Creates observed truth
+
+Edge ONLY:
+Reads truth
+Calculates
+Models
+Scores
+Verifies
+Predicts
+
+Edge Technology Stack
+GitHub
+Purpose: Version control
+KEEP
+
+Render
+Purpose: AI Compute
+Responsibilities: Stage 1, Stage 2, Stage 3, ACCA builder, Verification, Volatility, Inference, Schedulers
+KEEP
+
+Neon
+Purpose: Intelligence Database
+Responsibilities: Prediction tables, Mirror tables, Match metadata, Historical imports, Market tables, ACCA tables, Results, Scores
+Read Scout truth. Write Edge outputs.
+
+Vercel
+Purpose: Frontend delivery
+Responsibilities: Website, Portal, Predictions, Dashboards
+KEEP
+
+Google Drive
+Purpose: Cold Storage
+Responsibilities: Prediction snapshots, Research, Testing exports, Versioned reports, Audit packages
+
+EDGE DATA FLOW
+Neon (Scout)
+↓
+Signal Sync
+↓
+Edge Mirror Tables
+↓
+Stage 1
+↓
+Stage 2
+↓
+Stage 3
+↓
+Volatility
+↓
+Verification
+↓
+ACCA Builder
+↓
+Final Predictions
+↓
+Publication
+↓
+Frontend
+
+SYSTEM 3 — USER PLATFORM
+(Final Phase)
+Status: NOT IMPLEMENTED
+Estimated project phase: Last phase
+
+Appwrite
+Responsibilities: Users, Sessions, Roles, Password reset, OAuth, MFA, Email verification
+
+Stripe
+Responsibilities: Subscriptions, Payments, Invoices, VAT, Coupons, Trials, Failed payments, Upgrades, Downgrades, Webhooks
+
+Subscription Flow
+User
+↓
+Appwrite
+↓
+Stripe Checkout
+↓
+Payment Success
+↓
+Webhook
+↓
+Appwrite Role Update
+↓
+Sports Edge Access Check
+Normal / Deep / Admin
+
+GOVERNANCE RULES
+Rule 1: Scout NEVER predicts.
+Rule 2: Sports Edge NEVER scrapes.
+Rule 3: Neon is the ONLY truth database.
+Rule 4: Directus NEVER owns truth.
+Rule 5: Google Drive NEVER becomes a database.
+Rule 6: Stripe and Appwrite are implemented ONLY during the final commercialization phase.
+Rule 7: GitHub remains the source of truth for code.
+Rule 8: Render remains the execution environment.
+FINAL ARCHITECTURE
+text
+SKCS SCOUT
+────────────
+
+GitHub
+   │
+Render
+   │
+safeFetch
+   │
+Legal Guard
+   │
+Neon
+   │
+Directus
+   │
+Google Drive Archive
+
+
+SKCS SPORTS EDGE
+─────────────────
+
+GitHub
+   │
+Render
+   │
+Signal Sync
+   │
+Neon
+   │
+Stage 1
+   │
+Stage 2
+   │
+Stage 3
+   │
+Predictions
+   │
+Vercel Frontend
+
+
+COMMERCIAL LAYER (FINAL PHASE)
+─────────────────────────────
+
+Appwrite
+   │
+Stripe
+   │
+Subscriptions
+   │
+User Access
+## SKCS-INFRA-001 � Supabase Decomposition & Migration Programme (FROZEN � 2026-06-18)
+
+### Status: Active Migration Project
+### Governance: Separate initiative � no feature development in Scout or Edge until Phase 1 complete.
+
+### Phase Plan:
+- Phase 0 (NOW): Freeze all feature work. No new schemas, no new migrations, no new endpoints.
+- Phase 1: Replace Supabase PostgreSQL with Neon.
+- Phase 2: Replace pg_cron / pg_net / Edge Functions with Render cron jobs.
+- Phase 3: Introduce Directus for Scout human review.
+- Phase 4: Google Drive as cold archive / knowledge layer.
+- Phase 5: Render standardization (all execution on Render).
+- Phase 6: Vercel unchanged.
+- Phase 7: Auth migration (Appwrite, final phase).
+- Phase 8: Payments migration (Stripe, final phase).
+
+### Extensions to drop:
+- supabase_vault (unused, both projects)
+- pg_cron (Test only, replaced by Render cron)
+- pg_net (Test only, replaced by Node HTTP)
