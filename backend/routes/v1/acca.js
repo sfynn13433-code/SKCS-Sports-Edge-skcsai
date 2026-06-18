@@ -95,6 +95,8 @@ router.post('/acca/build', requireSupabaseUser, async (req, res) => {
         // Use buildAccaV2 to enforce tier diversity and duplicates
         const buildResult = accaBuilder.buildAccaV2({
             tier: 'normal',
+            minSize: validPredictions.length,
+            maxSize: req.body.max_legs || validPredictions.length,
             candidates: validPredictions.map(p => ({
                 ...p,
                 market: p.market_type,

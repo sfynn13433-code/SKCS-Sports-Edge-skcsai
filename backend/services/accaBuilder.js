@@ -201,13 +201,12 @@ async function getDoubleChanceLegs(matchIds, minConfidence, db) {
     }
 }
 
-function buildAccaV2({ tier, candidates, now = new Date() }) {
+function buildAccaV2({ tier, candidates, now = new Date(), minSize = 4, maxSize = 6 }) {
     const t = normalizeTier(tier);
     const list = Array.isArray(candidates) ? candidates.slice() : [];
 
     const minLegConfidence = ACCA_MIN_LEG_CONFIDENCE;
-    const minSize = 4;
-    const maxSize = 6;
+    // maxSize and minSize are now passed in or defaulted
 
     // Flatten smart combos into a single "selection" with multiple legs,
     // but count it as ONE combo for the max-1 rule.
