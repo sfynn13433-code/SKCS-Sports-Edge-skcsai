@@ -4612,10 +4612,11 @@ async function buildFinalForTier(tier, options = {}) {
     });
 }
 
-module.exports = { 
+module.exports = {
     buildFinalForTier, 
     buildAccaV2,
     insertStage1Rows,
     insertStage2Rows,
-    insertStage3Rows
+    insertStage3Rows,
+    getDoubleChanceLegs
 };

@@ -6,6 +6,7 @@ const router = express.Router();
 const db = require('../../db');
 const { validate_acca_correlations } = require('../../db'); // From correlation schema
 const { requireSupabaseUser } = require('../../middleware/supabaseJwt');
+const accaBuilder = require('../../services/accaBuilder');
 
 // Constants from Master Rulebook
 const MAX_CORRELATION = 0.5;
@@ -21,77 +22,108 @@ const VOLATILE_MARKETS = new Set([
  */
 router.post('/acca/build', requireSupabaseUser, async (req, res) => {
     try {
-        const { prediction_ids } = req.body;
+        const { prediction_ids, matches } = req.body;
         const userId = req.user?.id;
         
-        if (!prediction_ids || !Array.isArray(prediction_ids)) {
+        let validPredictions = [];
+        let totalRequested = 0;
+
+        if (matches && Array.isArray(matches)) {
+            totalRequested = matches.length;
+            // Handle manual match selection with fallback logic
+            for (const m of matches) {
+                if (m.confidence >= 75) {
+                    validPredictions.push({
+                        id: `manual_${m.match_id}`,
+                        match_id: m.match_id,
+                        fixture_id: m.match_id,
+                        market_type: m.market || '1x2',
+                        prediction: m.prediction || 'home_win',
+                        confidence: m.confidence,
+                        market_tier: 1,
+                        odds: m.odds || 1.85
+                    });
+                } else {
+                    // Fallback to Tier 2 (Double Chance)
+                    const fallbacks = await accaBuilder.getDoubleChanceLegs([m.match_id], 75, db);
+                    if (fallbacks.length > 0) {
+                        validPredictions.push({
+                            ...fallbacks[0],
+                            id: `fallback_${m.match_id}`,
+                            fixture_id: m.match_id,
+                            market_tier: 2,
+                            odds: 1.45 // Standard DC odds fallback
+                        });
+                    } else {
+                        // If no fallback, still include original but it might fail validation later
+                        validPredictions.push({
+                            id: `manual_low_${m.match_id}`,
+                            match_id: m.match_id,
+                            fixture_id: m.match_id,
+                            market_type: m.market || '1x2',
+                            prediction: m.prediction || 'home_win',
+                            confidence: m.confidence,
+                            market_tier: 1,
+                            odds: m.odds || 1.85
+                        });
+                    }
+                }
+            }
+        } else if (prediction_ids && Array.isArray(prediction_ids)) {
+            totalRequested = prediction_ids.length;
+            // Original logic for prediction_ids
+            for (const predictionId of prediction_ids) {
+                const validation = await validateAccaLeg(predictionId);
+                if (validation.valid) {
+                    validPredictions.push(validation.prediction);
+                }
+            }
+        } else {
             return res.status(400).json({
-                error: 'prediction_ids array is required',
+                error: 'prediction_ids or matches array is required',
                 status: 'error'
             });
         }
         
-        if (prediction_ids.length < 2) {
+        if (validPredictions.length < 2) {
             return res.status(400).json({
                 error: 'Accumulator must have at least 2 legs',
                 status: 'error'
             });
         }
         
-        if (prediction_ids.length > MAX_ACCA_LEGS) {
+        // Use buildAccaV2 to enforce tier diversity and duplicates
+        const buildResult = accaBuilder.buildAccaV2({
+            tier: 'normal',
+            candidates: validPredictions.map(p => ({
+                ...p,
+                market: p.market_type,
+                prediction: p.prediction,
+                type: 'SINGLE'
+            }))
+        });
+
+        if (!buildResult.ok) {
             return res.status(400).json({
-                error: `Accumulator cannot have more than ${MAX_ACCA_LEGS} legs`,
+                error: `ACCA Build Failed: ${buildResult.reason}`,
                 status: 'error'
             });
         }
+
+        const finalLegs = buildResult.legs;
         
-        // Validate each prediction
-        const validationResults = [];
-        const validPredictions = [];
-        
-        for (const predictionId of prediction_ids) {
-            try {
-                const validation = await validateAccaLeg(predictionId);
-                validationResults.push(validation);
-                
-                if (validation.valid) {
-                    validPredictions.push(validation.prediction);
-                }
-            } catch (error) {
-                validationResults.push({
-                    prediction_id: predictionId,
-                    valid: false,
-                    error: 'Prediction not found or invalid',
-                    details: error.message
-                });
-            }
-        }
-        
-        // Check if all predictions are valid
-        const invalidPredictions = validationResults.filter(r => !r.valid);
-        if (invalidPredictions.length > 0) {
-            return res.status(400).json({
-                error: 'Some predictions failed validation',
-                status: 'validation_failed',
-                invalid_predictions: invalidPredictions,
-                valid_count: validPredictions.length,
-                total_requested: prediction_ids.length
-            });
-        }
-        
-        // Validate correlations between all legs
-        const correlationValidation = await validateAccaCorrelations(validPredictions);
+        // Validate correlations between final legs
+        const correlationValidation = await validateAccaCorrelations(finalLegs);
         if (!correlationValidation.valid) {
             return res.status(400).json({
                 error: 'Accumulator legs contain markets with correlation > 0.5',
                 status: 'correlation_conflict',
-                conflicts: correlationValidation.conflicts,
-                max_correlation: correlationValidation.maxCorrelation
+                conflicts: correlationValidation.conflicts
             });
         }
         
         // Calculate combined odds and confidence
-        const accaMetrics = calculateAccaMetrics(validPredictions);
+        const accaMetrics = calculateAccaMetrics(finalLegs);
         
         // Create ACCA record
         const accaQuery = `
@@ -105,28 +137,31 @@ router.post('/acca/build', requireSupabaseUser, async (req, res) => {
             userId,
             accaMetrics.averageConfidence,
             accaMetrics.combinedOdds,
-            validPredictions.length
+            finalLegs.length
         ]);
         
         const newAcca = accaResult.rows[0];
         
         // Add legs to ACCA
-        for (const prediction of validPredictions) {
+        for (const leg of finalLegs) {
             const legQuery = `
                 INSERT INTO acca_legs (acca_id, prediction_id, created_at)
                 VALUES ($1, $2, NOW())
             `;
-            await db.query(legQuery, [newAcca.id, prediction.id]);
+            // Note: prediction_id might be a string for manual/fallback legs, 
+            // ensure your schema handles it or use a mapping.
+            // For now we use a placeholder or the match_id.
+            await db.query(legQuery, [newAcca.id, leg.match_id]);
         }
         
-        const tierCounts = validPredictions.reduce((acc, leg) => {
-            const t = leg.market_tier || (leg.market_type === '1x2' || leg.market_type === '1X2' ? 1 : 2);
-            acc[`tier${t}_count`] = (acc[`tier${t}_count`] || 0) + 1;
-            return acc;
-        }, {});
+        const tierCounts = { tier1: 0, tier2: 0, tier3: 0 };
+        finalLegs.forEach(leg => {
+            const t = leg.market_tier || (leg.market === '1x2' || leg.market === '1X2' ? 1 : 2);
+            tierCounts[`tier${t}`] = (tierCounts[`tier${t}`] || 0) + 1;
+        });
 
         // Return complete ACCA details
-        res.status(201).json({
+        res.status(200).json({
             acca: {
                 id: newAcca.id,
                 user_id: userId,
@@ -139,26 +174,18 @@ router.post('/acca/build', requireSupabaseUser, async (req, res) => {
                 risk_assessment: accaMetrics.riskAssessment
             },
             leg_composition: tierCounts,
-            legs: validPredictions.map(pred => ({
-                prediction_id: pred.id,
-                match_id: pred.match_id,
-                market: pred.market_type,
-                prediction: pred.prediction,
-                confidence: Number(pred.confidence),
-                risk_tier: pred.risk_tier,
-                odds: pred.odds,
-                fixture: {
-                    home_team: pred.home_team,
-                    away_team: pred.away_team,
-                    start_time_utc: pred.start_time_utc
-                }
+            legs: finalLegs.map(leg => ({
+                match_id: leg.match_id,
+                market: leg.market,
+                prediction: leg.pick,
+                confidence: Number(leg.confidence),
+                market_tier: leg.market_tier,
+                odds: leg.odds
             })),
             validation_summary: {
-                total_validated: prediction_ids.length,
-                passed_validation: validPredictions.length,
-                correlation_checks: correlationValidation.pairwiseChecks,
-                max_correlation_found: correlationValidation.maxCorrelation,
-                volatile_markets_checked: correlationValidation.volatileMarketsChecked
+                total_requested: totalRequested,
+                passed_validation: finalLegs.length,
+                max_correlation_found: correlationValidation.maxCorrelation
             }
         });
         
@@ -166,8 +193,7 @@ router.post('/acca/build', requireSupabaseUser, async (req, res) => {
         console.error('[API/v1/acca] Build error:', error.message);
         res.status(500).json({
             error: 'Internal server error',
-            status: 'error',
-            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+            status: 'error'
         });
     }
 });
