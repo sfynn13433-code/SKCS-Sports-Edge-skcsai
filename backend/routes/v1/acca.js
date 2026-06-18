@@ -282,8 +282,8 @@ async function validateAccaCorrelations(predictions) {
             const predA = predictions[i];
             const predB = predictions[j];
             
-            const marketA = normalizeMarketKey(predA.market_type);
-            const marketB = normalizeMarketKey(predB.market_type);
+            const marketA = normalizeMarketKey(predA.market || predA.market_type);
+            const marketB = normalizeMarketKey(predB.market || predB.market_type);
             
             // Get correlation from database
             const correlation = await getMarketCorrelation(marketA, marketB);
