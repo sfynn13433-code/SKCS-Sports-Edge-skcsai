@@ -17,16 +17,20 @@ const VOLATILE_MARKETS = new Set([
     'red_cards_over_0_5', 'red_cards_under_0_5', 'time_of_first_goal'
 ]);
 
+const MOCK_USER_UUID = '7dab62ea-8a25-42f7-9e28-032e7fa34a26';
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /**
  * Build accumulator with validation according to Master Rulebook
  */
 router.post('/acca/build', requireSupabaseUser, async (req, res) => {
     try {
         const { prediction_ids, matches } = req.body;
-        // Use a valid UUID for the admin user if needed, or null
         let userId = req.user?.id;
-        if (userId === 'admin-key-user') {
-            userId = '7dab62ea-8a25-42f7-9e28-032e7fa34a26'; // Mock valid UUID
+        
+        // Ensure userId is a valid UUID for the database
+        if (!userId || !UUID_REGEX.test(userId)) {
+            userId = MOCK_USER_UUID;
         }
         
         let validPredictions = [];
@@ -34,7 +38,6 @@ router.post('/acca/build', requireSupabaseUser, async (req, res) => {
 
         if (matches && Array.isArray(matches)) {
             totalRequested = matches.length;
-            // Handle manual match selection with fallback logic
             for (const m of matches) {
                 if (m.confidence >= 75) {
                     validPredictions.push({
@@ -43,39 +46,41 @@ router.post('/acca/build', requireSupabaseUser, async (req, res) => {
                         fixture_id: m.match_id,
                         market_type: m.market || '1x2',
                         prediction: m.prediction || 'home_win',
-                        confidence: m.confidence,
+                        confidence: Number(m.confidence),
                         market_tier: 1,
-                        odds: m.odds || 1.85
+                        odds: Number(m.odds) || 1.85
                     });
                 } else {
-                    // Fallback to Tier 2 (Double Chance)
                     const fallbacks = await accaBuilder.getDoubleChanceLegs([m.match_id], 75, db);
                     if (fallbacks.length > 0) {
+                        const fb = fallbacks[0];
                         validPredictions.push({
-                            ...fallbacks[0],
+                            ...fb,
                             id: `fallback_${m.match_id}`,
+                            match_id: m.match_id,
                             fixture_id: m.match_id,
+                            market_type: fb.market_key,
+                            prediction: fb.recommendation,
+                            confidence: Number(fb.confidence),
                             market_tier: 2,
-                            odds: 1.45 // Standard DC odds fallback
+                            odds: 1.45
                         });
                     } else {
-                        // If no fallback, still include original but it might fail validation later
                         validPredictions.push({
                             id: `manual_low_${m.match_id}`,
                             match_id: m.match_id,
                             fixture_id: m.match_id,
                             market_type: m.market || '1x2',
                             prediction: m.prediction || 'home_win',
-                            confidence: m.confidence,
+                            confidence: Number(m.confidence),
                             market_tier: 1,
-                            odds: m.odds || 1.85
+                            odds: Number(m.odds) || 1.85
                         });
                     }
                 }
             }
         } else if (prediction_ids && Array.isArray(prediction_ids)) {
             totalRequested = prediction_ids.length;
-            // Original logic for prediction_ids
             for (const predictionId of prediction_ids) {
                 const validation = await validateAccaLeg(predictionId);
                 if (validation.valid) {
@@ -83,28 +88,23 @@ router.post('/acca/build', requireSupabaseUser, async (req, res) => {
                 }
             }
         } else {
-            return res.status(400).json({
-                error: 'prediction_ids or matches array is required',
-                status: 'error'
-            });
+            return res.status(400).json({ error: 'prediction_ids or matches array is required' });
         }
         
         if (validPredictions.length < 2) {
             return res.status(400).json({
-                error: 'Accumulator must have at least 2 legs after validation',
-                status: 'error',
+                error: 'Accumulator must have at least 2 legs',
                 valid_count: validPredictions.length
             });
         }
         
-        // Use buildAccaV2 to enforce tier diversity and duplicates
         const buildResult = accaBuilder.buildAccaV2({
             tier: 'normal',
-            minSize: 2, // Allow 2-leg manual builders
+            minSize: 2,
             maxSize: req.body.max_legs || 12,
             candidates: validPredictions.map(p => ({
                 ...p,
-                market: p.market_type || p.market,
+                market: p.market_type || p.market_key,
                 prediction: p.prediction,
                 pick: p.prediction,
                 type: 'SINGLE'
@@ -114,51 +114,34 @@ router.post('/acca/build', requireSupabaseUser, async (req, res) => {
         if (!buildResult.ok) {
             return res.status(400).json({
                 error: `ACCA Build Failed: ${buildResult.reason}`,
-                status: 'error'
+                details: {
+                    candidates_count: validPredictions.length,
+                    min_size_required: 2
+                }
             });
         }
 
         const finalLegs = buildResult.legs;
-        
-        // Validate correlations between final legs
         const correlationValidation = await validateAccaCorrelations(finalLegs);
         if (!correlationValidation.valid) {
             return res.status(400).json({
                 error: 'Accumulator legs contain markets with correlation > 0.5',
-                status: 'correlation_conflict',
                 conflicts: correlationValidation.conflicts
             });
         }
         
-        // Calculate combined odds and confidence
         const accaMetrics = calculateAccaMetrics(finalLegs);
-        
-        // Create ACCA record
-        const accaQuery = `
-            INSERT INTO accas (user_id, total_confidence, combined_odds, leg_count, 
-                             status, created_at, updated_at)
+        const accaResult = await db.query(`
+            INSERT INTO accas (user_id, total_confidence, combined_odds, leg_count, status, created_at, updated_at)
             VALUES ($1, $2, $3, $4, 'pending', NOW(), NOW())
             RETURNING id, total_confidence, combined_odds, leg_count, status, created_at
-        `;
-        
-        const accaResult = await db.query(accaQuery, [
-            userId,
-            accaMetrics.averageConfidence,
-            accaMetrics.combinedOdds,
-            finalLegs.length
-        ]);
+        `, [userId, accaMetrics.averageConfidence, accaMetrics.combinedOdds, finalLegs.length]);
         
         const newAcca = accaResult.rows[0];
-        
-        // Add legs to ACCA
         for (const leg of finalLegs) {
             const numericId = parseInt(leg.match_id);
             if (!isNaN(numericId)) {
-                const legQuery = `
-                    INSERT INTO acca_legs (acca_id, prediction_id, created_at)
-                    VALUES ($1, $2, NOW())
-                `;
-                await db.query(legQuery, [newAcca.id, numericId]);
+                await db.query(`INSERT INTO acca_legs (acca_id, prediction_id, created_at) VALUES ($1, $2, NOW())`, [newAcca.id, numericId]);
             }
         }
         
@@ -168,7 +151,6 @@ router.post('/acca/build', requireSupabaseUser, async (req, res) => {
             tierCounts[`tier${t}`] = (tierCounts[`tier${t}`] || 0) + 1;
         });
 
-        // Return complete ACCA details
         res.status(200).json({
             acca: {
                 id: newAcca.id,
@@ -199,180 +181,61 @@ router.post('/acca/build', requireSupabaseUser, async (req, res) => {
         
     } catch (error) {
         console.error('[API/v1/acca] Build error:', error.message);
-        res.status(500).json({
-            error: 'Internal server error',
-            status: 'error',
-            message: error.message
-        });
+        res.status(500).json({ error: 'Internal server error', message: error.message });
     }
 });
 
-/**
- * Validate individual ACCA leg
- */
 async function validateAccaLeg(predictionId) {
-    const query = `
-        SELECT dp.id, dp.fixture_id, dp.market_type, dp.prediction, dp.confidence, 
-               dp.risk_tier, dp.is_published, dp.created_at,
-               f.home_team, f.away_team, f.start_time_utc
-        FROM direct1x2_prediction_final dp
-        LEFT JOIN fixtures f ON f.id::text = dp.fixture_id::text
-        WHERE dp.id = $1
-    `;
-    
-    const result = await db.query(query, [predictionId]);
-    
-    if (result.rows.length === 0) {
-        return {
-            prediction_id: predictionId,
-            valid: false,
-            error: 'Prediction not found'
-        };
-    }
-    
-    const prediction = result.rows[0];
-    prediction.match_id = prediction.fixture_id;
-    
-    if (prediction.confidence < MIN_LEG_CONFIDENCE) {
-        return {
-            prediction_id: predictionId,
-            valid: false,
-            error: `Confidence ${prediction.confidence}% is below minimum ${MIN_LEG_CONFIDENCE}%`
-        };
-    }
-    
-    return {
-        prediction_id: predictionId,
-        valid: true,
-        prediction: {
-            ...prediction,
-            odds: prediction.odds || 1.85
-        }
-    };
+    const result = await db.query(`SELECT * FROM direct1x2_prediction_final WHERE id = $1`, [predictionId]);
+    if (result.rows.length === 0) return { valid: false, error: 'Not found' };
+    const p = result.rows[0];
+    if (p.confidence < MIN_LEG_CONFIDENCE) return { valid: false, error: 'Low confidence' };
+    return { valid: true, prediction: { ...p, match_id: p.fixture_id, odds: p.odds || 1.85 } };
 }
 
-/**
- * Validate correlations between ACCA legs
- */
 async function validateAccaCorrelations(predictions) {
-    const conflicts = [];
-    const pairwiseChecks = [];
     let maxCorrelation = 0;
-    
     for (let i = 0; i < predictions.length; i++) {
         for (let j = i + 1; j < predictions.length; j++) {
-            const predA = predictions[i];
-            const predB = predictions[j];
-            
-            const marketA = normalizeMarketKey(predA.market || predA.market_type);
-            const marketB = normalizeMarketKey(predB.market || predB.market_type);
-            
-            const correlation = await getMarketCorrelation(marketA, marketB);
-            maxCorrelation = Math.max(maxCorrelation, correlation);
-            
-            if (correlation > MAX_CORRELATION) {
-                conflicts.push({
-                    leg_a: predA.match_id,
-                    market_a: marketA,
-                    leg_b: predB.match_id,
-                    market_b: marketB,
-                    correlation
-                });
-            }
+            const corr = await getMarketCorrelation(normalizeMarketKey(predictions[i].market), normalizeMarketKey(predictions[j].market));
+            maxCorrelation = Math.max(maxCorrelation, corr);
+            if (corr > MAX_CORRELATION) return { valid: false, conflicts: [{ a: predictions[i].match_id, b: predictions[j].match_id, corr }] };
         }
     }
-    
-    return {
-        valid: conflicts.length === 0,
-        conflicts,
-        maxCorrelation
-    };
+    return { valid: true, maxCorrelation };
 }
 
-/**
- * Get correlation between two markets from database
- */
 async function getMarketCorrelation(marketA, marketB) {
-    try {
-        const result = await db.query(`
-            SELECT correlation 
-            FROM market_correlations 
-            WHERE (market_a = $1 AND market_b = $2) 
-               OR (market_a = $2 AND market_b = $1)
-            LIMIT 1
-        `, [marketA, marketB]);
-        
-        return result.rows.length > 0 ? Number(result.rows[0].correlation) : 0.0;
-    } catch (error) {
-        return 0.0;
-    }
+    const res = await db.query(`SELECT correlation FROM market_correlations WHERE (market_a = $1 AND market_b = $2) OR (market_a = $2 AND market_b = $1) LIMIT 1`, [marketA, marketB]);
+    return res.rows.length > 0 ? Number(res.rows[0].correlation) : 0.0;
 }
 
-/**
- * Calculate ACCA metrics
- */
 function calculateAccaMetrics(predictions) {
-    const averageConfidence = predictions.reduce((sum, pred) => sum + Number(pred.confidence), 0) / predictions.length;
-    const combinedOdds = predictions.reduce((product, pred) => product * (Number(pred.odds) || 1.85), 1.0);
-    
-    return {
-        averageConfidence,
-        combinedOdds,
-        estimatedReturn: combinedOdds,
-        riskAssessment: assessAccaRisk(predictions)
-    };
+    const avgConf = predictions.reduce((s, p) => s + Number(p.confidence), 0) / predictions.length;
+    const combinedOdds = predictions.reduce((p, leg) => p * (Number(leg.odds) || 1.85), 1.0);
+    return { averageConfidence: avgConf, combinedOdds, estimatedReturn: combinedOdds, riskAssessment: { risk_level: avgConf < 75 ? 'Medium' : 'Low' } };
 }
 
-/**
- * Assess ACCA risk based on confidence distribution
- */
-function assessAccaRisk(predictions) {
-    const confidences = predictions.map(p => Number(p.confidence));
-    const minConfidence = Math.min(...confidences);
-    const maxConfidence = Math.max(...confidences);
-    
-    let riskLevel = 'Low';
-    if (minConfidence < 75) riskLevel = 'Medium';
-    if (predictions.length > 8) riskLevel = 'High';
-    
-    return {
-        risk_level: riskLevel,
-        min_confidence: minConfidence,
-        max_confidence: maxConfidence
-    };
-}
-
-/**
- * Normalize market key
- */
 function normalizeMarketKey(market) {
     return String(market || '').trim().toLowerCase().replace(/\s+/g, '_');
 }
 
-/**
- * History and Details routes preserved
- */
 router.get('/acca/history', requireSupabaseUser, async (req, res) => {
     try {
-        const { limit = 10, offset = 0 } = req.query;
         const userId = req.user?.id;
-        const result = await db.query(`
-            SELECT id, total_confidence, combined_odds, leg_count, status, created_at
-            FROM accas WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3
-        `, [userId, limit, offset]);
+        const result = await db.query('SELECT * FROM accas WHERE user_id = $1 ORDER BY created_at DESC', [userId]);
         res.json({ accas: result.rows });
-    } catch (error) { res.status(500).json({ error: error.message }); }
+    } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 router.get('/acca/:acca_id', requireSupabaseUser, async (req, res) => {
     try {
-        const { acca_id } = req.params;
         const userId = req.user?.id;
-        const accaResult = await db.query('SELECT * FROM accas WHERE id = $1 AND user_id = $2', [acca_id, userId]);
-        if (accaResult.rows.length === 0) return res.status(404).json({ error: 'Not found' });
-        const legsResult = await db.query('SELECT * FROM acca_legs WHERE acca_id = $1', [acca_id]);
-        res.json({ acca: accaResult.rows[0], legs: legsResult.rows });
-    } catch (error) { res.status(500).json({ error: error.message }); }
+        const res1 = await db.query('SELECT * FROM accas WHERE id = $1 AND user_id = $2', [req.params.acca_id, userId]);
+        if (res1.rows.length === 0) return res.status(404).json({ error: 'Not found' });
+        const res2 = await db.query('SELECT * FROM acca_legs WHERE acca_id = $1', [req.params.acca_id]);
+        res.json({ acca: res1.rows[0], legs: res2.rows });
+    } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 module.exports = router;
