@@ -12,25 +12,28 @@ router.get('/build', async (req, res) => {
 
         // Fetch primary prediction (1X2)
         const primaryResult = await db.query(
-            `SELECT market_type as market_key, prediction, confidence, edgemind_report as reasoning
+            `SELECT market_type as market_key, prediction, confidence, edgemind_report as reasoning, id
              FROM direct1x2_prediction_final 
              WHERE fixture_id = $1 AND is_published = TRUE AND market_type IN ('1x2', '1X2') LIMIT 1`,
-            [fixture_id]
+            [String(fixture_id)]
         );
         const primary = primaryResult.rows[0];
 
         // Fetch secondary predictions (all tiers)
         const secondaryResult = await db.query(
-            `SELECT market_key, market_tier, recommendation as prediction, confidence, metadata->>'edgemind_report' as reasoning
+            `SELECT market_key, market_tier, recommendation as prediction, confidence, metadata->>'edgemind_report' as reasoning, id
              FROM secondary_market_predictions
              WHERE fixture_id = $1`,
-            [fixture_id]
+            [String(fixture_id)]
         );
         const secondary = secondaryResult.rows;
 
         if (!primary && (!secondary || secondary.length === 0)) {
-            return res.json({ combos: [] });
+            return res.json({ combos: [], reasoning: "Not enough prediction data to build combinations for this match." });
         }
+
+        console.log('[SMB] Primary found:', !!primary);
+        console.log('[SMB] Secondary count:', secondary.length);
 
         const tier2 = secondary.filter(m => m.market_tier === 2);
         const tier3 = secondary.filter(m => m.market_tier === 3);

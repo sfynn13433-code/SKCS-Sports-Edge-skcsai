@@ -277,11 +277,11 @@ router.get('/predictions/history', requireSupabaseUser, async (req, res) => {
         
         // This would need to be implemented based on user prediction tracking
         const historyQuery = `
-            SELECT dp.id, dp.match_id, dp.market_type, dp.prediction, 
-                   dp.confidence, dp.risk_tier, dp.created_at,
+            SELECT dp.id, dp.fixture_id, dp.market_type, dp.prediction, 
+                   dp.confidence, dp.risk_tier, dp.created_at, dp.edgemind_report,
                    f.home_team, f.away_team, f.start_time_utc
             FROM direct1x2_prediction_final dp
-            LEFT JOIN fixtures f ON f.id::text = dp.match_id::text
+            LEFT JOIN fixtures f ON f.id::text = dp.fixture_id::text
             WHERE dp.is_published = true
             ORDER BY dp.created_at DESC
             LIMIT $1 OFFSET $2
@@ -289,12 +289,32 @@ router.get('/predictions/history', requireSupabaseUser, async (req, res) => {
         
         const historyResult = await db.query(historyQuery, [limitNum, offsetNum]);
         
+        const fixtureIds = historyResult.rows.map(r => String(r.fixture_id));
+        
+        let countsMap = {};
+        if (fixtureIds.length > 0) {
+            const countsQuery = `
+                SELECT fixture_id, COUNT(*) as count 
+                FROM secondary_market_predictions 
+                WHERE fixture_id = ANY($1) 
+                GROUP BY fixture_id
+            `;
+            const { rows: counts } = await db.query(countsQuery, [fixtureIds]);
+            countsMap = counts.reduce((acc, row) => {
+                acc[row.fixture_id] = parseInt(row.count, 10);
+                return acc;
+            }, {});
+        }
+
         res.json({
             predictions: historyResult.rows.map(pred => ({
-                match_id: pred.match_id,
+                match_id: pred.fixture_id,
                 market: pred.market_type,
                 prediction: pred.prediction,
                 confidence: Number(pred.confidence),
+                actual_confidence: Number(pred.confidence),
+                ai_reasoning: pred.edgemind_report || "System rated prediction.",
+                secondary_market_count: countsMap[pred.fixture_id] || 0,
                 risk_tier: pred.risk_tier,
                 color: getRiskColor(pred.confidence),
                 created_at: pred.created_at,

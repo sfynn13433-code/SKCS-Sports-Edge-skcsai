@@ -574,7 +574,8 @@ function showNotification(message, type = 'info') {
                 : '';
 
             // Master Rulebook risk tier color mapping
-            var confColor = confidence >= 75 ? '#4ade80' : confidence >= 55 ? '#facc15' : confidence >= 30 ? '#fb923c' : '#ef4444';
+            var confidenceVal = pred.actual_confidence || confidence;
+            var confColor = confidenceVal >= 75 ? '#4ade80' : confidenceVal >= 55 ? '#facc15' : confidenceVal >= 30 ? '#fb923c' : '#ef4444';
             var timeHtml  = kickoffStr
                 ? '<span style="color:#475569;font-size:0.78rem;margin-left:auto;">\uD83D\uDD50 ' + kickoffStr + '</span>'
                 : '';
@@ -586,47 +587,51 @@ function showNotification(message, type = 'info') {
             // Master Rulebook risk tier classification
             var riskTier, isHighVariance, pickTypeLabel, marketLabel, pickTypeColor, marketBgColor;
 
-            if (confidence >= 75) {
+            if (confidenceVal >= 75) {
                 riskTier = 'Low Risk';
                 isHighVariance = false;
                 pickTypeLabel = 'Direct Pick';
-                marketLabel = market; // Use actual market from JSON instead of hardcoded '1X2'
+                marketLabel = market; 
                 pickTypeColor = 'text-emerald-500';
                 marketBgColor = 'bg-emerald-950/50 text-emerald-400 border border-emerald-700/50';
-            } else if (confidence >= 55) {
+            } else if (confidenceVal >= 55) {
                 riskTier = 'Medium Risk';
                 isHighVariance = true;
                 pickTypeLabel = 'Risk-Adjusted';
-                marketLabel = market; // Use actual market from JSON instead of hardcoded 'Double Chance'
+                marketLabel = market; 
                 pickTypeColor = 'text-amber-500';
                 marketBgColor = 'bg-amber-950/50 text-amber-400 border border-amber-700/50';
-            } else if (confidence >= 30) {
+            } else if (confidenceVal >= 30) {
                 riskTier = 'High Risk';
                 isHighVariance = true;
                 pickTypeLabel = 'Risk-Adjusted';
-                marketLabel = market; // Use actual market from JSON instead of hardcoded 'Double Chance'
+                marketLabel = market; 
                 pickTypeColor = 'text-orange-500';
                 marketBgColor = 'bg-orange-950/50 text-orange-400 border border-orange-700/50';
             } else {
                 riskTier = 'Extreme Risk';
                 isHighVariance = true;
                 pickTypeLabel = 'Risk-Adjusted';
-                marketLabel = market; // Use actual market from JSON instead of hardcoded 'Double Chance'
+                marketLabel = market; 
                 pickTypeColor = 'text-red-500';
                 marketBgColor = 'bg-red-950/50 text-red-400 border border-red-700/50';
             }
 
+            var secBadge = pred.secondary_market_count ? 
+                `<div style="margin-left:8px; font-size:10px; font-weight:900; background:rgba(139,92,246,0.2); color:#a78bfa; padding:2px 6px; border-radius:4px; border:1px solid rgba(139,92,246,0.3); text-transform:uppercase;">+${pred.secondary_market_count} MARKETS</div>` : '';
+
             // EDGEMIND AI UI BLOCK
-            var edgeMindHtml = pred.edgemind_report ? 
+            var reasoning = pred.ai_reasoning || pred.edgemind_report;
+            var edgeMindHtml = reasoning ? 
                 '<div style="margin-top:12px; padding:12px; background:rgba(15,23,42,0.8); border-left:3px solid ' + confColor + '; border-radius:6px;">' +
                     '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">' +
                         '<span style="font-size:0.75rem; font-weight:800; color:' + confColor + '; text-transform:uppercase; letter-spacing:0.05em;">' +
-                            (pred.risk_tier ? pred.risk_tier.replace(/_/g, ' ') : 'SYSTEM RATED') +
+                            (pred.risk_tier ? String(pred.risk_tier).replace(/_/g, ' ') : 'SYSTEM RATED') +
                         '</span>' +
                         '<span style="font-size:0.7rem; color:#94a3b8;">EDGEMIND AI</span>' +
                     '</div>' +
                     '<div style="font-size:0.85rem; color:#cbd5e1; line-height:1.5; font-style:italic;">' +
-                        '"' + pred.edgemind_report + '"' +
+                        '"' + reasoning + '"' +
                     '</div>' +
                 '</div>' : '';
 
@@ -634,11 +639,14 @@ function showNotification(message, type = 'info') {
             html +=
                 '<div class="smh-result-item" data-card-id="' + cardId + '" style="border-left:4px solid ' + accentColor + ';">' +
                     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px;flex-wrap:wrap;">' +
-                        '<div>' +
-                            '<div class="text-[10px] font-bold ' + pickTypeColor + ' uppercase tracking-wider">' + pickTypeLabel + (isAcca && !isHighVariance ? ' \u00b7 ' + legCount + ' legs' : '') + '</div>' +
-                            '<div class="text-xs font-black ' + marketBgColor + ' px-2 py-1 rounded inline-block mt-0.5">' + marketLabel + '</div>' +
+                        '<div style="display:flex;align-items:center;">' +
+                            '<div>' +
+                                '<div class="text-[10px] font-bold ' + pickTypeColor + ' uppercase tracking-wider">' + pickTypeLabel + (isAcca && !isHighVariance ? ' \u00b7 ' + legCount + ' legs' : '') + '</div>' +
+                                '<div class="text-xs font-black ' + marketBgColor + ' px-2 py-1 rounded inline-block mt-0.5">' + marketLabel + '</div>' +
+                            '</div>' +
+                            secBadge +
                         '</div>' +
-                        '<span style="font-size:0.8rem;color:' + confColor + ';font-weight:800;">' + confidence + '% CONF.</span>' +
+                        '<span style="font-size:0.8rem;color:' + confColor + ';font-weight:800;">' + confidenceVal + '% CONF.</span>' +
                     '</div>' +
                     '<div style="font-size:1.05rem;font-weight:700;color:#f1f5f9;margin-bottom:5px;line-height:1.3;">' +
                         home + ' <span style="color:#475569;font-weight:400;font-size:0.9rem;">vs</span> ' + away +
