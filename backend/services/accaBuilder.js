@@ -99,6 +99,7 @@ const MIXED_SPORT_TARGETS = new Set([
 const SAFE_TIER3_ACCA_MARKETS = new Set(['btts_no', 'under_3_5', 'first_half_draw']);
 const ACCA_FALLBACK_LADDER = Object.freeze([
     { pass: 'elite', minConfidence: 75, tiers: [1], safeTier3Only: false, directSafeOnly: false },
+    { pass: 'primary_fallback', minConfidence: 75, tiers: [1, 2], safeTier3Only: false, directSafeOnly: false, allowDoubleChance: true },
     { pass: 'strong', minConfidence: 55, tiers: [1, 2], safeTier3Only: false, directSafeOnly: false },
     { pass: 'safe', minConfidence: ACCA_MIN_LEG_CONFIDENCE, tiers: [1, 2, 3], safeTier3Only: true, directSafeOnly: false },
     { pass: 'fallback', minConfidence: ACCA_MIN_LEG_CONFIDENCE, tiers: [1, 2, 3, 4], safeTier3Only: true, directSafeOnly: true }
@@ -181,6 +182,25 @@ function withinHours(from, to, hours) {
     return Math.abs(to.getTime() - from.getTime()) <= ms;
 }
 
+async function getDoubleChanceLegs(matchIds, minConfidence, db) {
+    if (!matchIds || matchIds.length === 0) return [];
+    try {
+        const result = await db.query(
+            `SELECT fixture_id, market_key as market_type, recommendation as outcome, confidence, market_tier 
+             FROM secondary_market_predictions 
+             WHERE fixture_id = ANY($1) 
+               AND market_tier = 2 
+               AND market_key LIKE 'double_chance%' 
+               AND confidence >= $2`,
+            [matchIds, minConfidence]
+        );
+        return result.rows.map(r => ({ ...r, match_id: r.fixture_id, market: r.market_type, pick: r.outcome, market_tier: 2 }));
+    } catch (e) {
+        console.error('[accaBuilder] Failed to get double chance legs:', e.message);
+        return [];
+    }
+}
+
 function buildAccaV2({ tier, candidates, now = new Date() }) {
     const t = normalizeTier(tier);
     const list = Array.isArray(candidates) ? candidates.slice() : [];
@@ -198,18 +218,20 @@ function buildAccaV2({ tier, candidates, now = new Date() }) {
                     ...l,
                     market: l.market,
                     pick: l.pick,
-                    confidence: l.confidence
+                    confidence: l.confidence,
+                    market_tier: l.market_tier || 2
                 }));
                 const confidence = typeof p.confidence === 'number' ? p.confidence : computeTotalConfidence(legs);
                 return { kind: 'smart_combo', confidence, legs };
             }
-            return { kind: 'single', confidence: p.confidence, legs: [toLeg(p)] };
+            return { kind: 'single', confidence: p.confidence, legs: [{...toLeg(p), market_tier: p.market_tier || (p.market === '1x2' || p.market === '1X2' ? 1 : 2)}] };
         })
         .filter((x) => typeof x.confidence === 'number' && x.confidence >= minLegConfidence)
         .sort((a, b) => b.confidence - a.confidence);
 
     const picked = [];
     const usedMatchIds = new Set();
+    const usedTiersPerMatch = new Map();
     let smartComboCount = 0;
 
     for (const item of scored) {
@@ -220,7 +242,17 @@ function buildAccaV2({ tier, candidates, now = new Date() }) {
 
         const itemMatchIds = item.legs.map((l) => String(l.match_id || '').trim()).filter(Boolean);
         if (itemMatchIds.length !== item.legs.length) continue;
-        if (itemMatchIds.some((id) => usedMatchIds.has(id))) continue;
+        
+        let tierConflict = false;
+        for (const leg of item.legs) {
+            const fixtureId = String(leg.match_id || '').trim();
+            const itemTier = leg.market_tier || (leg.market === '1x2' || leg.market === '1X2' ? 1 : 2);
+            if (usedTiersPerMatch.get(fixtureId)?.has(itemTier)) {
+                tierConflict = true;
+                break;
+            }
+        }
+        if (tierConflict) continue;
 
         // Deep tier: enforce same day + kickoff window (if kickoff available)
         if (t === 'deep') {

@@ -19,7 +19,7 @@ const VOLATILE_MARKETS = new Set([
 /**
  * Build accumulator with validation according to Master Rulebook
  */
-router.post('/acca/build', requireSupababaseUser, async (req, res) => {
+router.post('/acca/build', requireSupabaseUser, async (req, res) => {
     try {
         const { prediction_ids } = req.body;
         const userId = req.user?.id;
@@ -119,6 +119,12 @@ router.post('/acca/build', requireSupababaseUser, async (req, res) => {
             await db.query(legQuery, [newAcca.id, prediction.id]);
         }
         
+        const tierCounts = validPredictions.reduce((acc, leg) => {
+            const t = leg.market_tier || (leg.market_type === '1x2' || leg.market_type === '1X2' ? 1 : 2);
+            acc[`tier${t}_count`] = (acc[`tier${t}_count`] || 0) + 1;
+            return acc;
+        }, {});
+
         // Return complete ACCA details
         res.status(201).json({
             acca: {
@@ -132,6 +138,7 @@ router.post('/acca/build', requireSupababaseUser, async (req, res) => {
                 estimated_return: accaMetrics.estimatedReturn,
                 risk_assessment: accaMetrics.riskAssessment
             },
+            leg_composition: tierCounts,
             legs: validPredictions.map(pred => ({
                 prediction_id: pred.id,
                 match_id: pred.match_id,
@@ -170,11 +177,11 @@ router.post('/acca/build', requireSupababaseUser, async (req, res) => {
  */
 async function validateAccaLeg(predictionId) {
     const query = `
-        SELECT dp.id, dp.match_id, dp.market_type, dp.prediction, dp.confidence, 
+        SELECT dp.id, dp.fixture_id, dp.market_type, dp.prediction, dp.confidence, 
                dp.risk_tier, dp.is_published, dp.created_at,
                f.home_team, f.away_team, f.start_time_utc
         FROM direct1x2_prediction_final dp
-        LEFT JOIN fixtures f ON f.id::text = dp.match_id::text
+        LEFT JOIN fixtures f ON f.id::text = dp.fixture_id::text
         WHERE dp.id = $1 AND dp.is_published = true
     `;
     
@@ -189,6 +196,9 @@ async function validateAccaLeg(predictionId) {
     }
     
     const prediction = result.rows[0];
+    
+    // Use fixture_id for response
+    prediction.match_id = prediction.fixture_id;
     
     // Check confidence threshold (>=75%)
     if (prediction.confidence < MIN_LEG_CONFIDENCE) {
@@ -454,12 +464,12 @@ router.get('/acca/:acca_id', requireSupabaseUser, async (req, res) => {
         
         // Get ACCA legs
         const legsQuery = `
-            SELECT al.prediction_id, dp.match_id, dp.market_type, dp.prediction, 
+            SELECT al.prediction_id, dp.fixture_id, dp.market_type, dp.prediction, 
                    dp.confidence, dp.risk_tier, dp.created_at,
                    f.home_team, f.away_team, f.start_time_utc
             FROM acca_legs al
             JOIN direct1x2_prediction_final dp ON dp.id = al.prediction_id
-            LEFT JOIN fixtures f ON f.id::text = dp.match_id::text
+            LEFT JOIN fixtures f ON f.id::text = dp.fixture_id::text
             WHERE al.acca_id = $1
             ORDER BY dp.confidence DESC
         `;
