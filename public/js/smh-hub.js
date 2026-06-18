@@ -1515,104 +1515,133 @@ window.updateModalWithAIData = function(aiPrediction) {
         edgemindFeedbackEl.style.display = 'block';
     }
 
-    // 1. Secondary Markets
-    if (typeof selectSecondaryMarkets === 'function') {
-        const mainConfidence = aiPrediction.total_confidence || aiPrediction.confidence || 0;
-        let allMarkets = aiPrediction.secondary_markets || aiPrediction.secondary_insights || [];
-        
-        // Robust fallback if DB doesn't have secondary markets yet
-        if (allMarkets.length === 0) {
-            allMarkets = [
-                { market: 'Over 1.5 Goals', confidence: Math.min(95, mainConfidence + 15) },
-                { market: 'Double Chance 1X', confidence: Math.min(99, mainConfidence + 20) },
-                { market: 'Under 3.5 Goals', confidence: 82 }
-            ];
-        }
-
-        const result = selectSecondaryMarkets(mainConfidence, allMarkets);
-        if (result && result.markets && result.markets.length > 0) {
-            secondaryMarketsEl.innerHTML = '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;margin-top:20px;">Secondary Markets</div>' +
-                result.markets.map(m => `<div style="margin-top:8px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
-                    <div style="display:flex;justify-content:space-between;"><span style="font-size:0.78rem;color:#94a3b8;font-weight:600;">${(m.market || m.prediction).replace(/_/g, ' ').toUpperCase()}</span><span style="font-size:0.78rem;color:#4ade80;font-weight:700;">${m.confidence}%</span></div>
-                </div>`).join('');
-        }
+    // 1. Primary Market Reasoning
+    if (typeof window.attachAIReasoning === 'function') {
+        const primaryReasoning = aiPrediction.edgemind_feedback || "Primary prediction based on core metrics.";
+        window.attachAIReasoning(document.getElementById('ai-main-prediction') || edgemindFeedbackEl, primaryReasoning);
     }
 
-    // 2. Double Chance Combos
-    if (typeof selectDoubleChanceCombos === 'function') {
-        // Parse main pick
-        let mainPick = '1';
-        let predStr = String(aiPrediction.prediction || '').toUpperCase();
-        if (predStr.includes('AWAY') || predStr === '2') mainPick = '2';
-        if (predStr.includes('DRAW') || predStr === 'X') mainPick = 'X';
+    // 2. Secondary Markets & Double Chance Combos via new endpoint
+    const fixtureId = aiPrediction.match_id || aiPrediction.fixture_id || (aiPrediction.matches && aiPrediction.matches[0] && aiPrediction.matches[0].id_event);
+    
+    if (fixtureId) {
+        fetch(`/api/v1/markets/secondary/${fixtureId}`)
+            .then(r => r.json())
+            .then(data => {
+                const markets = data.markets || [];
+                
+                // Render regular secondary markets
+                const tier3 = markets.filter(m => m.market_tier === 3 || !m.market.includes('double_chance'));
+                if (tier3.length > 0) {
+                    secondaryMarketsEl.innerHTML = '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;margin-top:20px;">Secondary Markets</div>' +
+                        tier3.map(m => {
+                            const mId = 'sec_' + Math.random().toString(36).substr(2, 9);
+                            return `<div id="${mId}" style="margin-top:8px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+                                <div style="display:flex;justify-content:space-between;"><span style="font-size:0.78rem;color:#94a3b8;font-weight:600;">${m.market.replace(/_/g, ' ').toUpperCase()}</span><span style="font-size:0.78rem;color:#4ade80;font-weight:700;">${m.confidence}%</span></div>
+                                <div class="market-reasoning-container"></div>
+                            </div>`;
+                        }).join('');
+                    
+                    // Attach reasoning
+                    setTimeout(() => {
+                        tier3.forEach((m, idx) => {
+                            const container = secondaryMarketsEl.children[idx + 1];
+                            if (container && m.reasoning && typeof window.attachAIReasoning === 'function') {
+                                window.attachAIReasoning(container, m.reasoning);
+                            }
+                        });
+                    }, 100);
+                }
 
-        // Format to strict probabilities (0.0 to 1.0)
-        const prob1X2 = {
-            home: (aiPrediction.home_win_prob || 45) / 100,
-            draw: (aiPrediction.draw_prob || 30) / 100,
-            away: (aiPrediction.away_win_prob || 25) / 100
-        };
+                // Render Double Chance Combos
+                const tier2 = markets.filter(m => m.market_tier === 2 && m.market.includes('double_chance'));
+                if (tier2.length > 0) {
+                    doubleChanceCombosEl.innerHTML = '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;margin-top:20px;">Double Chance Combos</div>' +
+                        tier2.map(c => {
+                            const tierLabel = c.confidence >= 75 ? 'Safe' : c.confidence >= 55 ? 'Moderate' : 'Risky';
+                            const color = c.confidence >= 75 ? '#22c55e' : c.confidence >= 55 ? '#facc15' : '#ef4444';
+                            return `<div style="margin-top:8px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+                                <div style="font-size:0.85rem;color:#e2e8f0;font-weight:700;">${c.market.replace(/_/g, ' ').toUpperCase()}</div>
+                                <div style="font-size:0.75rem;color:#94a3b8;margin-top:4px;">Win Rate: <span style="color:#4ade80;font-weight:600;">${c.confidence}%</span> | Risk: <span style="color:${color}">${tierLabel}</span></div>
+                                <div class="dc-reasoning-container" style="margin-top:5px;"></div>
+                            </div>`;
+                        }).join('');
 
-        const result = selectDoubleChanceCombos(
-            mainPick,
-            prob1X2,
-            (aiPrediction.over_1_5_prob || 75) / 100,
-            (aiPrediction.over_2_5_prob || 50) / 100,
-            (aiPrediction.under_2_5_prob || 55) / 100,
-            (aiPrediction.btts_yes_prob || 50) / 100,
-            (aiPrediction.btts_no_prob || 50) / 100
-        );
+                    // Attach reasoning
+                    setTimeout(() => {
+                        tier2.forEach((c, idx) => {
+                            const container = doubleChanceCombosEl.children[idx + 1];
+                            if (container && c.reasoning && typeof window.attachAIReasoning === 'function') {
+                                window.attachAIReasoning(container, c.reasoning);
+                            }
+                        });
+                    }, 100);
+                }
+            })
+            .catch(err => console.error("Failed to load secondary markets:", err));
 
-        if (result && result.combos && result.combos.length > 0) {
-            doubleChanceCombosEl.innerHTML = '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;margin-top:20px;">Double Chance Combos</div>' +
-                result.combos.map(c => `<div style="margin-top:8px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
-                    <div style="font-size:0.85rem;color:#e2e8f0;font-weight:700;">${c.name}</div>
-                    <div style="font-size:0.75rem;color:#94a3b8;margin-top:4px;">Win Rate: <span style="color:#4ade80;font-weight:600;">${c.confidence}</span> | Risk: <span style="color:${c.color}">${c.tierLabel}</span></div>
-                </div>`).join('');
-        }
-    }
+        // 3. Same Match Builder (SMB) via new endpoint
+        window.loadSMB = function(fId, legs) {
+            smbBuilderEl.innerHTML = `<div style="text-align:center;padding:20px;color:#94a3b8;">Loading SMB Combos...</div>`;
+            fetch(`/api/v1/smb/build?fixture_id=${fId}&legs=${legs}`)
+                .then(r => r.json())
+                .then(data => {
+                    let html = '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;margin-top:20px;">Same Match Builder (SMB)</div>';
+                    
+                    // Tab Header
+                    html += '<div style="display:flex;gap:8px;margin-bottom:12px;">';
+                    [4, 6, 8].forEach(count => {
+                        const active = count === legs;
+                        const bg = active ? '#3b82f6' : 'rgba(255,255,255,0.05)';
+                        const color = active ? '#fff' : '#64748b';
+                        html += `<div onclick="loadSMB('${fId}', ${count})" style="padding:4px 12px;border-radius:16px;background:${bg};color:${color};font-size:0.75rem;font-weight:bold;cursor:pointer;">${count}-Leg</div>`;
+                    });
+                    html += '</div>';
 
-    // 3. Same Match Builder (SMB)
-    if (typeof renderSMBWidget === 'function') {
-        const matchParams = {
-            homeTeamAlpha: 1.5,
-            awayTeamBeta: 1.1,
-            awayTeamAlpha: 1.2,
-            homeTeamBeta: 1.3,
-            gamma: 1.0,
-            winProb: (aiPrediction.total_confidence || 60) / 100,
-            availableMarkets: ["Favourite Win", "Over 1.5 Team Goals", "Over 2.5 Goals", "Over 4.5 Corners", "Lead Striker 1+ SOT"]
-        };
-        
-        const smbData = renderSMBWidget(matchParams);
-        
-        if (smbData && smbData.tabs) {
-            let html = '<div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px;margin-top:20px;">Same Match Builder (SMB)</div>';
-            
-            // Tab Header
-            html += '<div style="display:flex;gap:8px;margin-bottom:12px;">';
-            smbData.tabs.forEach(tab => {
-                const bg = tab.active ? '#3b82f6' : 'rgba(255,255,255,0.05)';
-                const color = tab.active ? '#fff' : '#64748b';
-                html += `<div style="padding:4px 12px;border-radius:16px;background:${bg};color:${color};font-size:0.75rem;font-weight:bold;${tab.disabled ? 'opacity:0.5;' : ''}">${tab.count}-Leg</div>`;
-            });
-            html += '</div>';
+                    if (!data.combos || data.combos.length === 0) {
+                        html += `<div style="color:#94a3b8;font-size:0.85rem;padding:10px;">No SMB combos available for this leg count.</div>`;
+                    } else {
+                        data.combos.forEach((combo, idx) => {
+                            html += `<div style="margin-top:8px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">`;
+                            html += `<div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:0.85rem;color:#e2e8f0;font-weight:700;">Story ${idx+1}</span></div>`;
+                            combo.forEach(leg => {
+                                const tClass = leg.market_tier ? ` tier${leg.market_tier}` : '';
+                                html += `<div style="font-size:0.75rem;color:#94a3b8;margin-top:4px;" class="leg${tClass}">• ${leg.market_key.replace(/_/g, ' ').toUpperCase()}: <span style="color:#fff;">${leg.prediction}</span> (${leg.confidence}%)</div>`;
+                            });
+                            if (data.reasoning) {
+                                html += `<div style="margin-top:8px;" class="smb-reasoning-container" id="smb_reasoning_${legs}_${idx}"></div>`;
+                            }
+                            html += `</div>`;
+                        });
+                    }
+                    
+                    // Grab prediction IDs for demo ACCA builder
+                    const demoLegs = data.combos && data.combos.length > 0 ? data.combos[0].filter(l => l.id).map(l => l.id) : [];
+                    if (demoLegs.length > 1) {
+                        html += `<button onclick='buildAcca(${JSON.stringify(demoLegs)})' style="margin-top:15px;width:100%;padding:10px;background:#10b981;color:#fff;border:none;border-radius:6px;font-weight:bold;cursor:pointer;">Build ACCA (Demo)</button>`;
+                    }
+                    html += `<div id="acca-results"></div>`;
 
-            // Tab Content (Combos)
-            const activeTab = smbData.tabs.find(t => t.active && !t.disabled)?.count || 4;
-            const activeCombos = smbData.combos[activeTab] || [];
-            
-            activeCombos.forEach((combo, idx) => {
-                html += `<div style="margin-top:8px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">`;
-                html += `<div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:0.85rem;color:#e2e8f0;font-weight:700;">Story ${idx+1}</span><span style="font-size:0.78rem;color:#4ade80;font-weight:700;">${(combo.confidence * 100).toFixed(1)}%</span></div>`;
-                combo.legs.forEach(leg => {
-                    html += `<div style="font-size:0.75rem;color:#94a3b8;margin-top:4px;">• ${leg.market}</div>`;
+                    smbBuilderEl.innerHTML = html;
+
+                    // Attach reasoning
+                    setTimeout(() => {
+                        if (data.reasoning && typeof window.attachAIReasoning === 'function') {
+                            data.combos.forEach((combo, idx) => {
+                                const container = document.getElementById(`smb_reasoning_${legs}_${idx}`);
+                                if (container) window.attachAIReasoning(container, data.reasoning);
+                            });
+                        }
+                    }, 100);
+                })
+                .catch(err => {
+                    console.error("SMB Error:", err);
+                    smbBuilderEl.innerHTML = `<div style="color:#ef4444;padding:10px;">Failed to load SMB combos.</div>`;
                 });
-                html += `</div>`;
-            });
-            
-            smbBuilderEl.innerHTML = html;
-        }
+        };
+
+        // Initial load
+        window.loadSMB(fixtureId, 4);
     }
 
     if (loadingEl) loadingEl.style.display = 'none';

@@ -237,6 +237,12 @@ const metricsRouter     = require('./routes/metrics');
 const semanticDriftRouter = require('./routes/semanticDrift');
 const divanscoreRouter  = require('./routes/divanscore');
 const antigravityRouter = require('./routes/antigravity');
+
+// API v1 Routers (Master Rulebook v2.0)
+const v1PredictionsRouter = require('./routes/v1/predictions');
+const v1AccaRouter = require('./routes/v1/acca');
+const v1SmbRouter = require('./routes/v1/sameMatchBuilder');
+const v1SecondaryMarketsRouter = require('./routes/v1/secondaryMarkets');
 const feedbackRouter    = require('./routes/feedback');
 const { runTier1Stage1Bootstrap } = require('./services/tier1BootstrapService');
 const { executeOperation } = require('./core/executionPipeline');
@@ -743,6 +749,12 @@ app.use('/api/semantic-drift-summary', semanticDriftRouter);
 app.use('/api/feedback', feedbackRouter);
 app.use('/api', divanscoreRouter);
 app.use('/api/antigravity', antigravityRouter);
+
+// API v1 Endpoints (Master Rulebook v2.0)
+app.use('/api/v1', v1PredictionsRouter);
+app.use('/api/v1', v1AccaRouter);
+app.use('/api/v1/smb', v1SmbRouter);
+app.use('/api/v1/markets/secondary', v1SecondaryMarketsRouter);
 
 // SKCS Sports Edge routes
 app.use('/', sportsEdgeRouter);
