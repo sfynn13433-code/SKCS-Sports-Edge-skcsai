@@ -133,13 +133,13 @@ describe("Edge Control Center Ledger v1", () => {
     assert.ok(task.current_evidence.length > 0);
   });
 
-  it("Edge Master Project Register becomes APPROVED", () => {
+  it("Edge Master Project Register becomes TESTED", () => {
     const task = loadLedger().tasks.find(
       (item) => item.task_id === "EPR-001"
     );
 
     assert.ok(task);
-    assert.equal(task.status, "APPROVED");
+    assert.equal(task.status, "TESTED");
     assert.deepEqual(task.blocked_by, ["ECC-001"]);
   });
 
@@ -149,7 +149,7 @@ describe("Edge Control Center Ledger v1", () => {
     );
 
     assert.ok(task);
-    assert.equal(task.status, "APPROVED");
+    assert.equal(task.status, "TESTED");
     assert.equal(
       task.blocked_by[0],
       "ECC-001"
@@ -290,44 +290,53 @@ describe("Edge Control Center Ledger v1", () => {
     // Next action must preserve fail-closed semantics and set closure evidence for TESTED promotion.
     assert.match(
       task.next_action,
-      /Implement the approved pre-existing untracked workspace candidate discovery and rule\/governance authority candidate graph correction/
+      /foundation closed and TESTED/i
     );
     assert.match(
       task.next_action,
-      /preserve tracked-path count semantics/
+      /Preserve the Edge Master Project Register/i
     );
     assert.match(
       task.next_action,
-      /keep unknown Control Center task bindings fail-closed/
+      /complete tracked repository asset coverage/i
     );
     assert.match(
       task.next_action,
-      /do not declare candidate authority/
+      /governed pre-existing untracked workspace candidate snapshot/i
     );
     assert.match(
       task.next_action,
-      /return closure evidence for separate EPR-001 TESTED promotion/
+      /governed unresolved final project ownership findings/i
+    );
+    assert.match(
+      task.next_action,
+      /Do not start ESA-001/i
     );
   });
 
-  it("EPR-001 becomes the single auto-startable task", () => {
+  it("EPR-001 is not startable once TESTED", () => {
     const result = runCheck({
       ledgerPath: LEDGER_PATH,
     });
 
-    assert.equal(result.startable.length, 1);
-    assert.ok(result.next);
-    assert.equal(result.next.task_id, "EPR-001");
-    assert.equal(result.next.status, "APPROVED");
-    assert.equal(result.gated, null);
+    assert.equal(result.startable.length, 0);
+    assert.equal(result.next, null);
+    assert.ok(result.gated);
+    assert.equal(result.gated.task_id, "ESA-001");
+    assert.equal(result.gated.status, "PROPOSED");
+    assert.ok(
+      Array.isArray(result.gated.blocked_by) &&
+        result.gated.blocked_by.includes("EPR-001")
+    );
   });
 
-  it("EPR-001 is not selected as gated task once APPROVED", () => {
+  it("ESA-001 is selected as gated task once TESTED", () => {
     const result = runCheck({
       ledgerPath: LEDGER_PATH,
     });
 
-    assert.equal(result.gated, null);
+    assert.ok(result.gated);
+    assert.equal(result.gated.task_id, "ESA-001");
   });
 
   it("Scout-Edge marriage gate is explicitly blocked", () => {

@@ -62,7 +62,7 @@
       "task_name": "Edge Master Project Register",
       "workstream": "Control Center",
       "description": "Inventory and register all known Edge projects, subprojects, runtime systems, legacy paths, commercial boundaries, storage concerns, and integration work before further architecture changes.",
-      "status": "APPROVED",
+      "status": "TESTED",
       "priority": "critical",
       "blocked_by": [
         "ECC-001"
@@ -124,7 +124,7 @@
         "Repository asset universe coverage law approved"
       ],
       "open_gaps": [],
-      "next_action": "Implement the approved pre-existing untracked workspace candidate discovery and rule/governance authority candidate graph correction in the Repository Asset Register checker, register, and tests only; preserve tracked-path count semantics, keep unknown Control Center task bindings fail-closed, do not declare candidate authority, and return closure evidence for separate EPR-001 TESTED promotion.",
+      "next_action": "EPR-001 foundation closed and TESTED. Preserve the Edge Master Project Register, complete tracked repository asset coverage, governed pre-existing untracked workspace candidate snapshot, governed unresolved final project ownership findings, and rule/governance authority candidate graph as Control Center truth. Do not start ESA-001 or unblock Scout ↔ Edge marriage without separate approval; preserve all blocked gates and fail-closed integrity laws.",
       "owner_note": "Do not invent the Edge backlog from memory; derive it from the repository and current architecture.",
       "last_updated": "2026-07-05"
     },

@@ -59,7 +59,7 @@
       "category": "Control Center",
       "description": "Inventory and register all known Edge projects, subprojects, runtime systems, legacy paths, commercial boundaries, storage concerns, and integration work before further architecture changes.",
       "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
-      "current_status": "APPROVED",
+      "current_status": "TESTED",
       "priority": "critical",
       "blocked_by": [
         "ECC-001"

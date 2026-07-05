@@ -250,13 +250,13 @@ Before implementation:
 
 Next allowed startable task is:
 
-Approved next allowed task:
+EPR-001 closure state:
 
-**EPR-001 — Edge Master Project Register [APPROVED]**
+**EPR-001 — Edge Master Project Register [TESTED]**
 
 Mode:
 
-**IMPLEMENT EPR-001 APPROVED BOUNDARY ONLY**
+**IMPLEMENT EPR-001 TESTED PROMOTION ONLY**
 
 Purpose:
 
@@ -289,7 +289,7 @@ Known first-party rule and governance authority candidates remain identifiable b
 
 Candidate status does not establish CURRENT_AUTHORITY. Candidate relationship edges are review relationships, not authority precedence. A candidate with no relationship edge must be explicitly identified as a standalone review candidate with a non-empty reason. Ignored dependency, environment, and cache paths are not first-party authority candidates merely because their names contain rule/governance terms. Final rule/governance authority remains subject to governed review.
 
-UNRESOLVED final project ownership may remain as a non-fatal governed cleanup finding only when the asset remains bound to a valid Control Center task and has a non-empty `next_validation`. EPR-001 remains APPROVED and must not be promoted in this approval step.
+UNRESOLVED final project ownership may remain as a non-fatal governed cleanup finding only when the asset remains bound to a valid Control Center task and has a non-empty `next_validation`. EPR-001 is closed and TESTED in this step.
 
 Do not start FIP intake.
 
@@ -298,3 +298,10 @@ Do not resume provider removal.
 Do not change Supabase schema.
 
 Do not clear the marriage gate.
+
+Startable tasks: 0
+
+Next gated task:
+**ESA-001 — Edge System and Runtime Inventory [PROPOSED]**
+
+Requires separate approval before start

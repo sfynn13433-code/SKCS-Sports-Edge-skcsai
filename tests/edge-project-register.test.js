@@ -107,17 +107,56 @@ describe("Edge Master Project Register v1", () => {
     }
   });
 
-  it("EPR-001 remains APPROVED and self-governed", () => {
+  it("EPR-001 remains TESTED and self-governed", () => {
     const epr = loadRegister().projects.find(
       (project) => project.project_id === "EPR-001"
     );
 
     assert.ok(epr);
-    assert.equal(epr.current_status, "APPROVED");
+    assert.equal(epr.current_status, "TESTED");
     assert.equal(
       epr.governed_by_control_task_id,
       "EPR-001"
     );
+
+    // Explicit mirror proof between ledger task status and register current_status.
+    const ledger = loadLedger();
+    const eprLedgerTask = getLedgerTasks(ledger).find(
+      (task) => taskId(task) === "EPR-001"
+    );
+    assert.ok(eprLedgerTask);
+    assert.equal(
+      epr.current_status,
+      eprLedgerTask.status,
+      "EPR-001 project register status must mirror canonical ledger status"
+    );
+  });
+
+  it("PROJECT_LEDGER_STATUS_DRIFT remains fail-closed for EPR-001 mismatched mirror", () => {
+    const ledger = loadLedger();
+    const ledgerTask = getLedgerTasks(ledger).find(
+      (task) => taskId(task) === "EPR-001"
+    );
+    assert.ok(ledgerTask);
+    assert.equal(ledgerTask.status, "TESTED");
+
+    const register = loadRegister();
+    const cloned = JSON.parse(JSON.stringify(register));
+    const epr = cloned.projects.find(
+      (project) => project.project_id === "EPR-001"
+    );
+    assert.ok(epr);
+
+    // Deliberate mismatch for negative test: register=APPROVED while ledger=TESTED.
+    epr.current_status = "APPROVED";
+
+    const result = validateRegister(cloned);
+    assert.ok(
+      result.errors.includes(
+        "PROJECT_LEDGER_STATUS_DRIFT: EPR-001 register=APPROVED ledger=TESTED"
+      )
+    );
+    assert.equal(result.passed, false);
   });
 
   it("backlog and dependency map exist", () => {
