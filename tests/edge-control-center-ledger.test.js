@@ -314,29 +314,78 @@ describe("Edge Control Center Ledger v1", () => {
     );
   });
 
-  it("EPR-001 is not startable once TESTED", () => {
+  it("ESA-001 is the single auto-startable task once APPROVED", () => {
     const result = runCheck({
       ledgerPath: LEDGER_PATH,
     });
 
-    assert.equal(result.startable.length, 0);
-    assert.equal(result.next, null);
-    assert.ok(result.gated);
-    assert.equal(result.gated.task_id, "ESA-001");
-    assert.equal(result.gated.status, "PROPOSED");
-    assert.ok(
-      Array.isArray(result.gated.blocked_by) &&
-        result.gated.blocked_by.includes("EPR-001")
-    );
+    assert.equal(result.startable.length, 1);
+    assert.ok(result.next);
+    assert.equal(result.next.task_id, "ESA-001");
+    assert.equal(result.next.status, "APPROVED");
+    assert.equal(result.gated, null);
   });
 
-  it("ESA-001 is selected as gated task once TESTED", () => {
+  it("EPR-001 remains TESTED and is not startable once ESA-001 is APPROVED", () => {
     const result = runCheck({
       ledgerPath: LEDGER_PATH,
     });
 
-    assert.ok(result.gated);
-    assert.equal(result.gated.task_id, "ESA-001");
+    assert.ok(result.startable.some((t) => t.task_id === "ESA-001"));
+    assert.ok(!result.startable.some((t) => t.task_id === "EPR-001"));
+  });
+
+  it("ESA-001 completion_definition preserves the inventory closure contract", () => {
+    const task = loadLedger().tasks.find(
+      (item) => item.task_id === "ESA-001"
+    );
+
+    assert.ok(task);
+    assert.equal(task.status, "APPROVED");
+
+    const cd = task.completion_definition;
+
+    // Coverage classes
+    assert.match(cd, /complete material Edge system and runtime inventory foundation exists/i);
+    assert.match(cd, /synchronized with the Edge Master Project Register/i);
+    assert.match(cd, /runtime entry points|entry points/i);
+    assert.match(cd, /mounted route surfaces/i);
+    assert.match(cd, /runtime-reachable controller and service paths|controller and service paths/i);
+    assert.match(cd, /external provider reachability/i);
+    assert.match(cd, /Scout\/FIP-related Edge surfaces/i);
+    assert.match(cd, /database and Supabase runtime read\/write surfaces/i);
+    assert.match(cd, /scheduled and background execution surfaces/i);
+    assert.match(cd, /deployment surfaces/i);
+
+    // Governed unresolved / next_validation requirements
+    assert.match(cd, /unresolved or unknown runtime relationships remain governed findings/i);
+    assert.match(cd, /non-empty next_validation/i);
+    assert.match(cd, /valid Control Center task binding/i);
+    assert.match(cd, /inventory distinguishes confirmed, candidate, legacy, parallel, unreachable, unknown, and unresolved/i);
+
+    // Rule/governance enforcement reachability inventory without declaring authority.
+    assert.match(
+      cd,
+      /runtime\/database\/build-gate rule or governance enforcement surfaces/i
+    );
+    assert.match(
+      cd,
+      /without declaring canonical rule authority|authority precedence|rule-threshold changes/i
+    );
+
+    // Forbidden future architecture declarations
+    assert.match(cd, /without declaring future Edge architecture/i);
+    assert.match(cd, /provider-retirement decisions/i);
+    assert.match(cd, /Scout\/FIP activation/i);
+    assert.match(cd, /database-retention decisions/i);
+    assert.match(cd, /canonical rule authority|authority precedence|rule-threshold changes/i);
+
+    // Canonical artifacts and fail-closed integrity
+    assert.match(cd, /canonical machine-readable Edge System Runtime Inventory/i);
+    assert.match(cd, /synchronized human-readable runtime map/i);
+    assert.match(cd, /integrity checker/i);
+    assert.match(cd, /contract tests prove complete material coverage/i);
+    assert.match(cd, /fail closed when required runtime surfaces silently disappear from governance/i);
   });
 
   it("Scout-Edge marriage gate is explicitly blocked", () => {

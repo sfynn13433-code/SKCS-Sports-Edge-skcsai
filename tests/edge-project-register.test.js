@@ -132,6 +132,31 @@ describe("Edge Master Project Register v1", () => {
     );
   });
 
+  it("ESA-001 remains APPROVED and self-governed with ledger mirror", () => {
+    const esa = loadRegister().projects.find(
+      (project) => project.project_id === "ESA-001"
+    );
+
+    assert.ok(esa);
+    assert.equal(esa.current_status, "APPROVED");
+    assert.equal(
+      esa.governed_by_control_task_id,
+      "ESA-001"
+    );
+
+    // Explicit mirror proof between ledger task status and register current_status.
+    const ledger = loadLedger();
+    const esaLedgerTask = getLedgerTasks(ledger).find(
+      (task) => taskId(task) === "ESA-001"
+    );
+    assert.ok(esaLedgerTask);
+    assert.equal(
+      esa.current_status,
+      esaLedgerTask.status,
+      "ESA-001 project register status must mirror canonical ledger status"
+    );
+  });
+
   it("PROJECT_LEDGER_STATUS_DRIFT remains fail-closed for EPR-001 mismatched mirror", () => {
     const ledger = loadLedger();
     const ledgerTask = getLedgerTasks(ledger).find(
@@ -154,6 +179,33 @@ describe("Edge Master Project Register v1", () => {
     assert.ok(
       result.errors.includes(
         "PROJECT_LEDGER_STATUS_DRIFT: EPR-001 register=APPROVED ledger=TESTED"
+      )
+    );
+    assert.equal(result.passed, false);
+  });
+
+  it("PROJECT_LEDGER_STATUS_DRIFT remains fail-closed for ESA-001 mismatched mirror", () => {
+    const ledger = loadLedger();
+    const ledgerTask = getLedgerTasks(ledger).find(
+      (task) => taskId(task) === "ESA-001"
+    );
+    assert.ok(ledgerTask);
+    assert.equal(ledgerTask.status, "APPROVED");
+
+    const register = loadRegister();
+    const cloned = JSON.parse(JSON.stringify(register));
+    const esa = cloned.projects.find(
+      (project) => project.project_id === "ESA-001"
+    );
+    assert.ok(esa);
+
+    // Deliberate mismatch for negative test: register=PROPOSED while ledger=APPROVED.
+    esa.current_status = "PROPOSED";
+
+    const result = validateRegister(cloned);
+    assert.ok(
+      result.errors.includes(
+        "PROJECT_LEDGER_STATUS_DRIFT: ESA-001 register=PROPOSED ledger=APPROVED"
       )
     );
     assert.equal(result.passed, false);

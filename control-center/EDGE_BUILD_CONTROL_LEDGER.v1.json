@@ -133,7 +133,7 @@
       "task_name": "Edge System and Runtime Inventory",
       "workstream": "Architecture Foundation",
       "description": "Map active, legacy, dead, duplicated, commercial, prediction, storage, AI, provider, scheduler, grading, and deployment surfaces in Edge.",
-      "status": "PROPOSED",
+      "status": "APPROVED",
       "priority": "critical",
       "blocked_by": [
         "EPR-001"
@@ -165,7 +165,7 @@
         "package.json"
       ],
       "affected_tables": [],
-      "completion_definition": "Edge runtime and project surfaces are classified with reachability and ownership evidence.",
+      "completion_definition": "A complete material Edge system and runtime inventory foundation exists and is synchronized with the Edge Master Project Register and EPR-001 repository asset/workspace truth; all identified material runtime entry points, mounted route surfaces, confirmed runtime-reachable controller and service paths, confirmed external provider reachability, Scout/FIP-related Edge surfaces, confirmed database and Supabase runtime read/write surfaces, scheduled and background execution surfaces, deployment surfaces, and runtime/database/build-gate rule or governance enforcement surfaces are represented with evidence-backed reachability and relationship classification; unresolved or unknown runtime relationships remain governed findings with a valid Control Center task binding and non-empty next_validation; the inventory distinguishes confirmed, candidate, legacy, parallel, unreachable, unknown, and unresolved relationships without declaring future Edge architecture, provider-retirement decisions, Scout/FIP activation, database-retention decisions, canonical rule authority, authority precedence, or rule-threshold changes; and a canonical machine-readable Edge System Runtime Inventory plus synchronized human-readable runtime map, integrity checker, and contract tests prove complete material coverage and fail closed when required runtime surfaces silently disappear from governance.",
       "proof_required": [
         "Repository inventory report",
         "Runtime entry-point map",
@@ -176,9 +176,12 @@
         "Phase 2 provider inspection already showed the original nine-file inventory was incomplete"
       ],
       "open_gaps": [
-        "Full repository-wide classification pending"
+        "Canonical machine-readable Edge System Runtime Inventory not yet implemented.",
+        "Synchronized human-readable runtime map not yet implemented.",
+        "Runtime inventory integrity checker and contract tests not yet implemented.",
+        "Complete material current-state runtime/system classification not yet executed against EPR-001 asset and workspace candidate truth."
       ],
-      "next_action": "Wait for EPR-001 register foundation.",
+      "next_action": "Implement the approved ESA-001 read-only Edge System and Runtime Inventory foundation using EPR-001 repository asset and workspace candidate truth; create the canonical machine-readable inventory, synchronized runtime map, integrity checker, and contract tests; inventory complete material current-state runtime/system reachability without modifying runtime architecture, removing providers, activating Scout/FIP, mutating Supabase, executing SQL or migrations, declaring canonical rule authority, or changing rule thresholds; return closure evidence for separate ESA-001 TESTED promotion inspection.",
       "owner_note": "This is the Edge equivalent of learning what Scout actually contained before repair.",
       "last_updated": "2026-07-05"
     },
