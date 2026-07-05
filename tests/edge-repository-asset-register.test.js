@@ -136,6 +136,31 @@ describe("Edge Repository Asset Register v1", () => {
     );
   });
 
+  it("ESA-001 implementation assets are registered with owner/gov/control and next_validation", () => {
+    const register = loadAssetRegister();
+
+    const assetsByPath = new Map(
+      register.assets.map((a) => [a.asset_path, a])
+    );
+
+    const esaAssetPaths = [
+      "control-center/EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json",
+      "control-center/EDGE_SYSTEM_RUNTIME_MAP.md",
+      "control-center/check_edge_system_runtime_inventory.js",
+      "tests/edge-system-runtime-inventory.test.js",
+    ];
+
+    for (const assetPath of esaAssetPaths) {
+      const asset = assetsByPath.get(assetPath);
+      assert.ok(asset, `${assetPath} must be registered`);
+      assert.equal(asset.owner_project_id, "ESA-001");
+      assert.equal(asset.governed_by_control_task_id, "ESA-001");
+      assert.ok(
+        String(asset.next_validation || "").trim()
+      );
+    }
+  });
+
   it("UNRESOLVED owners remain under EPR-001 bootstrap governance", () => {
     const register = loadAssetRegister();
 
