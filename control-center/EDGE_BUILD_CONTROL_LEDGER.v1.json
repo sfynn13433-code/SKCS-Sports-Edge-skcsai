@@ -1,0 +1,658 @@
+{
+  "version": "1.0",
+  "title": "SKCS Edge Build Control Ledger",
+  "generated_at": "2026-07-05",
+  "architecture_policy": "Scout is the sole governed sports-truth provider. Edge consumes validated Scout intelligence and owns analysis, scoring, prediction, explanation, publication, users, subscribers, and commercial application state.",
+  "database_separation_policy": "Scout remains on Neon. Edge/Test remains on Supabase. The systems must not be merged into one database merely to simplify integration.",
+  "supabase_storage_policy": "Supabase must not become a permanent mirror of Scout raw evidence or historical intelligence. FIP transport and Supabase retention are separate decisions. FIP reference, provenance, hash, and derived Edge outputs are preferred over permanent duplication of Scout evidence.",
+  "scout_edge_marriage_gate": "BLOCKED",
+  "supabase_storage_gate": "BLOCKED",
+  "provider_removal_state": "PARTIAL",
+  "current_workstream": "Edge Control Foundation",
+  "current_note": "Build Edge project-control foundations before resuming Scout FIP intake or mixed-provider runtime removal.",
+  "tasks": [
+    {
+      "task_id": "ECC-001",
+      "task_name": "Edge Control Center v1",
+      "workstream": "Control Center",
+      "description": "Create the canonical Edge build-control ledger, human dashboard, checker, and tests.",
+      "status": "DONE",
+      "priority": "critical",
+      "blocked_by": [],
+      "blocks": [
+        "EPR-001"
+      ],
+      "affected_layers": [
+        "governance",
+        "control-center"
+      ],
+      "related_contracts": [],
+      "affected_files": [
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "control-center/EDGE_CONTROL_CENTER.md",
+        "control-center/check_control_center.js",
+        "tests/edge-control-center-ledger.test.js",
+        "package.json"
+      ],
+      "affected_tables": [],
+      "completion_definition": "Edge ledger, human control-center document, checker, npm commands, and ledger tests exist and pass scoped validation.",
+      "proof_required": [
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json validates",
+        "node control-center/check_control_center.js exits 0",
+        "node --test tests/edge-control-center-ledger.test.js passes",
+        "npm run control:center passes",
+        "npm run test:control-center passes"
+      ],
+      "current_evidence": [
+        "Edge Control Center v1 bootstrap artifacts defined",
+        "Marriage gate and Supabase storage gate are explicit control states",
+        "Project sequencing distinguishes startable work from separately approved gated work"
+      ],
+      "open_gaps": [
+        "Edge Master Project Register not yet built",
+        "Full Edge project and runtime inventory not yet registered",
+        "Control Center UI is deferred"
+      ],
+      "next_action": "Inspect and separately approve EPR-001 Edge Master Project Register.",
+      "owner_note": "Stephen — govern Edge before resuming the deferred Scout-to-Edge bridge.",
+      "last_updated": "2026-07-05"
+    },
+    {
+      "task_id": "EPR-001",
+      "task_name": "Edge Master Project Register",
+      "workstream": "Control Center",
+      "description": "Inventory and register all known Edge projects, subprojects, runtime systems, legacy paths, commercial boundaries, storage concerns, and integration work before further architecture changes.",
+      "status": "PROPOSED",
+      "priority": "critical",
+      "blocked_by": [
+        "ECC-001"
+      ],
+      "blocks": [
+        "ESA-001"
+      ],
+      "affected_layers": [
+        "governance",
+        "control-center",
+        "all"
+      ],
+      "related_contracts": [],
+      "affected_files": [
+        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
+        "control-center/EDGE_PROJECT_BACKLOG.md",
+        "control-center/EDGE_PROJECT_DEPENDENCY_MAP.md"
+      ],
+      "affected_tables": [],
+      "completion_definition": "A complete machine-readable Edge project register, human backlog, dependency map, validation script, and tests exist and are synchronized with the Edge ledger.",
+      "proof_required": [
+        "All discovered Edge project areas are registered before implementation work resumes",
+        "Register validation exits 0",
+        "Dependency references resolve",
+        "Control Center references the canonical register"
+      ],
+      "current_evidence": [],
+      "open_gaps": [
+        "Repository-wide Edge project inventory not yet performed"
+      ],
+      "next_action": "PROPOSED-GATE INSPECTION ONLY. Determine register categories and inventory boundaries before implementation.",
+      "owner_note": "Do not invent the Edge backlog from memory; derive it from the repository and current architecture.",
+      "last_updated": "2026-07-05"
+    },
+    {
+      "task_id": "ESA-001",
+      "task_name": "Edge System and Runtime Inventory",
+      "workstream": "Architecture Foundation",
+      "description": "Map active, legacy, dead, duplicated, commercial, prediction, storage, AI, provider, scheduler, grading, and deployment surfaces in Edge.",
+      "status": "PROPOSED",
+      "priority": "critical",
+      "blocked_by": [
+        "EPR-001"
+      ],
+      "blocks": [
+        "EMG-001",
+        "EFI-001",
+        "EST-001",
+        "ESEC-001",
+        "EPI-001",
+        "EGR-001",
+        "EAI-001",
+        "EUI-001",
+        "EOPS-001"
+      ],
+      "affected_layers": [
+        "architecture",
+        "runtime",
+        "governance"
+      ],
+      "related_contracts": [],
+      "affected_files": [
+        "backend/",
+        "scripts/",
+        "public/",
+        "sql/",
+        "supabase/",
+        "render.yaml",
+        "package.json"
+      ],
+      "affected_tables": [],
+      "completion_definition": "Edge runtime and project surfaces are classified with reachability and ownership evidence.",
+      "proof_required": [
+        "Repository inventory report",
+        "Runtime entry-point map",
+        "Writer/reader map for critical Supabase objects",
+        "Legacy versus active classification"
+      ],
+      "current_evidence": [
+        "Phase 2 provider inspection already showed the original nine-file inventory was incomplete"
+      ],
+      "open_gaps": [
+        "Full repository-wide classification pending"
+      ],
+      "next_action": "Wait for EPR-001 register foundation.",
+      "owner_note": "This is the Edge equivalent of learning what Scout actually contained before repair.",
+      "last_updated": "2026-07-05"
+    },
+    {
+      "task_id": "EMG-001",
+      "task_name": "Scout-Edge Marriage Gate Contract",
+      "workstream": "Scout Handoff",
+      "description": "Define the explicit evidence and approval conditions required before Scout becomes Edge's sole sports-truth provider.",
+      "status": "PROPOSED",
+      "priority": "critical",
+      "blocked_by": [
+        "ESA-001"
+      ],
+      "blocks": [
+        "EFI-001",
+        "EST-001",
+        "ESEC-001"
+      ],
+      "affected_layers": [
+        "Scout handoff",
+        "governance",
+        "architecture"
+      ],
+      "related_contracts": [
+        "FIP-001"
+      ],
+      "affected_files": [],
+      "affected_tables": [],
+      "completion_definition": "A tested marriage-gate contract defines required FIP, storage, security, provider-removal, pipeline-integrity, and end-to-end proof conditions.",
+      "proof_required": [
+        "Marriage gate contract",
+        "Contract validator",
+        "Tests proving incomplete prerequisites cannot clear the gate"
+      ],
+      "current_evidence": [],
+      "open_gaps": [
+        "No Edge-side marriage gate contract exists"
+      ],
+      "next_action": "Wait for Edge inventory and project registration.",
+      "owner_note": "Scout and Edge integration remains explicitly blocked until this gate is separately cleared.",
+      "last_updated": "2026-07-05"
+    },
+    {
+      "task_id": "EFI-001",
+      "task_name": "FIP Intake Handshake",
+      "workstream": "Scout Handoff",
+      "description": "Define and implement the smallest governed Edge intake boundary for the canonical validated Scout Fixture Intelligence Package.",
+      "status": "PROPOSED",
+      "priority": "critical",
+      "blocked_by": [
+        "ESA-001",
+        "EMG-001"
+      ],
+      "blocks": [
+        "EPRV-001",
+        "E2E-001"
+      ],
+      "affected_layers": [
+        "Scout handoff",
+        "prediction input",
+        "runtime"
+      ],
+      "related_contracts": [
+        "FIP-001"
+      ],
+      "affected_files": [
+        "backend/services/aiPipeline.js",
+        "backend/services/dataProvider.js"
+      ],
+      "affected_tables": [],
+      "completion_definition": "Edge can receive or read an unmodified validated canonical FIP through one governed fail-closed intake boundary.",
+      "proof_required": [
+        "Canonical Scout FIP contract crosswalk",
+        "Edge intake contract",
+        "Input validation proof",
+        "Idempotency proof",
+        "Provenance preservation proof"
+      ],
+      "current_evidence": [
+        "Current configured pipeline input still originates from dataProvider.getPredictionInputs()",
+        "No committed Edge FIP intake boundary has been found"
+      ],
+      "open_gaps": [
+        "FIP materialization mechanism must be proven",
+        "Transport and retention decisions remain open"
+      ],
+      "next_action": "Do not implement until EPR-001, ESA-001, and EMG-001 sequence permits inspection.",
+      "owner_note": "This resumes the intentionally deferred Scout-to-Edge bridge.",
+      "last_updated": "2026-07-05"
+    },
+    {
+      "task_id": "EST-001",
+      "task_name": "Supabase Storage and FIP Retention Contract",
+      "workstream": "Data and Storage",
+      "description": "Define what Edge may retain from Scout/FIP while respecting the 0.5 GB Supabase capacity constraint and avoiding duplication of Scout's Neon evidence store.",
+      "status": "PROPOSED",
+      "priority": "critical",
+      "blocked_by": [
+        "ESA-001",
+        "EMG-001"
+      ],
+      "blocks": [
+        "E2E-001",
+        "EOPS-001"
+      ],
+      "affected_layers": [
+        "Supabase",
+        "storage",
+        "Scout handoff"
+      ],
+      "related_contracts": [],
+      "affected_files": [
+        "supabase/",
+        "sql/"
+      ],
+      "affected_tables": [],
+      "completion_definition": "A tested retention policy separates transient FIP processing from permanent Edge storage and defines storage-budget enforcement.",
+      "proof_required": [
+        "Current Supabase storage inventory",
+        "Retention classification by table/data class",
+        "FIP transport versus retention policy",
+        "Storage cap and warning/block thresholds",
+        "Tests or checks proving forbidden Scout evidence mirroring is not introduced"
+      ],
+      "current_evidence": [
+        "Supabase free-tier storage capacity is constrained to approximately 0.5 GB",
+        "Scout already owns governed sports evidence in Neon and Drive"
+      ],
+      "open_gaps": [
+        "Current Supabase table-size inventory not yet integrated into Edge governance",
+        "No canonical FIP retention law exists"
+      ],
+      "next_action": "Register and inventory Supabase storage before approving the FIP bridge.",
+      "owner_note": "Transporting a FIP does not mean permanently storing the whole FIP in Supabase.",
+      "last_updated": "2026-07-05"
+    },
+    {
+      "task_id": "ESEC-001",
+      "task_name": "Subscriber and Security Boundary",
+      "workstream": "Security and Commercial Boundary",
+      "description": "Map and protect Edge authentication, subscriber, service-role, RLS, admin, secrets, and commercial application boundaries independently from Scout sports data.",
+      "status": "PROPOSED",
+      "priority": "critical",
+      "blocked_by": [
+        "ESA-001",
+        "EMG-001"
+      ],
+      "blocks": [
+        "E2E-001",
+        "EUI-001",
+        "EOPS-001"
+      ],
+      "affected_layers": [
+        "Supabase",
+        "authentication",
+        "authorization",
+        "commercial"
+      ],
+      "related_contracts": [],
+      "affected_files": [
+        "backend/",
+        "public/",
+        "supabase/"
+      ],
+      "affected_tables": [],
+      "completion_definition": "Edge's user/subscriber/commercial security boundary is documented, tested, and isolated from Scout integration credentials and sports-truth transport.",
+      "proof_required": [
+        "Auth and subscriber surface inventory",
+        "Service-role use inventory",
+        "RLS/security inspection",
+        "Scout integration credential boundary",
+        "Security regression tests or proof"
+      ],
+      "current_evidence": [],
+      "open_gaps": [
+        "Full Edge security boundary has not been registered in a canonical project-control layer"
+      ],
+      "next_action": "Wait for Edge inventory.",
+      "owner_note": "Scout's lower commercial-data sensitivity does not justify weakening Edge's user-data boundary.",
+      "last_updated": "2026-07-05"
+    },
+    {
+      "task_id": "EPI-001",
+      "task_name": "Prediction Pipeline Integrity",
+      "workstream": "Prediction Pipeline",
+      "description": "Map and protect raw input, normalization, scoring, contextual adjustment, filtering, direct markets, secondary markets, same-match logic, ACCA construction, and publication.",
+      "status": "PROPOSED",
+      "priority": "critical",
+      "blocked_by": [
+        "ESA-001"
+      ],
+      "blocks": [
+        "EGR-001",
+        "EAI-001",
+        "EUI-001",
+        "E2E-001"
+      ],
+      "affected_layers": [
+        "prediction",
+        "scoring",
+        "filtering",
+        "ACCA"
+      ],
+      "related_contracts": [],
+      "affected_files": [
+        "backend/services/aiPipeline.js",
+        "backend/services/aiScoring.js",
+        "backend/services/filterEngine.js",
+        "backend/services/direct1x2Engine.js",
+        "backend/services/marketIntelligence.js",
+        "backend/services/accaBuilder.js"
+      ],
+      "affected_tables": [
+        "predictions_raw"
+      ],
+      "completion_definition": "Critical Edge prediction surfaces and invariants are registered with tests protecting existing scoring and ACCA behaviour during FIP integration.",
+      "proof_required": [
+        "Prediction execution map",
+        "Protected invariant list",
+        "Existing test coverage map",
+        "Regression proof before and after FIP intake"
+      ],
+      "current_evidence": [
+        "aiPipeline remains the primary Edge analysis/orchestration path",
+        "Existing ACCA and prediction logic must be preserved during provider removal"
+      ],
+      "open_gaps": [
+        "Canonical protected-pipeline inventory pending"
+      ],
+      "next_action": "Wait for Edge inventory.",
+      "owner_note": "Do not break the existing ACCA engine while changing the origin of sports truth.",
+      "last_updated": "2026-07-05"
+    },
+    {
+      "task_id": "EPRV-001",
+      "task_name": "External Sports Provider Removal",
+      "workstream": "Provider Boundary",
+      "description": "Remove reachable Edge sports-truth acquisition only after a governed Scout/FIP intake path can replace required runtime input.",
+      "status": "PARTIAL",
+      "priority": "critical",
+      "blocked_by": [
+        "EFI-001"
+      ],
+      "blocks": [
+        "E2E-001"
+      ],
+      "affected_layers": [
+        "runtime",
+        "provider boundary",
+        "Scout handoff"
+      ],
+      "related_contracts": [
+        "FIP-001"
+      ],
+      "affected_files": [
+        "backend/server-express.js",
+        "backend/services/dataProvider.js",
+        "backend/services/dataProviders.js",
+        "backend/services/contextIngestionService.js",
+        "backend/services/contextEnrichmentService.js",
+        "backend/services/footballHighlightsService.js",
+        "backend/services/oddsApiPipeline.js",
+        "backend/services/skcsHeartbeat.js",
+        "backend/services/hybridSportsDataService.js",
+        "backend/utils/rapidApiWaterfall.js",
+        "backend/apiClients.js",
+        "backend/services/aiPipeline.js",
+        "scripts/import-today-snapshot-pipeline.js"
+      ],
+      "affected_tables": [],
+      "completion_definition": "No reachable Edge runtime path independently acquires canonical sports truth from external sports providers.",
+      "proof_required": [
+        "Runtime reachability audit",
+        "Provider environment-key audit",
+        "External domain acquisition audit",
+        "Scout/FIP replacement proof",
+        "Fail-closed no-input proof"
+      ],
+      "current_evidence": [
+        "Phase 1 public provider routes and provider-heartbeat startup were cut",
+        "Phase 2 stopped because getPredictionInputs() still depends on buildLiveData() external acquisition",
+        "Additional acquisition surfaces were found outside the original nine-file inventory"
+      ],
+      "open_gaps": [
+        "FIP intake does not yet exist",
+        "Direct weather acquisition remains",
+        "Direct news/context acquisition remains",
+        "Direct H2H acquisition remains",
+        "Legacy snapshot acquisition remains"
+      ],
+      "next_action": "Remain PARTIAL and blocked until EFI-001 provides a governed Scout input origin.",
+      "owner_note": "Do not delete analysis logic merely because acquisition and analysis are currently mixed in the same file.",
+      "last_updated": "2026-07-05"
+    },
+    {
+      "task_id": "EGR-001",
+      "task_name": "Grading and Accuracy Governance",
+      "workstream": "Prediction Lifecycle",
+      "description": "Govern prediction settlement, grading, accuracy tracking, historical backfill, and system-review feedback as one prediction lifecycle.",
+      "status": "PROPOSED",
+      "priority": "high",
+      "blocked_by": [
+        "ESA-001",
+        "EPI-001"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "grading",
+        "settlement",
+        "accuracy"
+      ],
+      "related_contracts": [],
+      "affected_files": [
+        "scripts/trigger-grade.js",
+        "scripts/trigger-settlement.js",
+        "scripts/track-prediction-accuracy.js",
+        "scripts/audit-grading-pipeline.js",
+        "scripts/bridge-raw-predictions-for-grading.js",
+        "scripts/backfill-prediction-grading.js"
+      ],
+      "affected_tables": [],
+      "completion_definition": "Prediction issue-to-outcome-to-grade-to-accuracy flow is registered, verified, and has one canonical lifecycle map.",
+      "proof_required": [
+        "Grading lifecycle map",
+        "Settlement writer inventory",
+        "Accuracy calculation proof",
+        "Backfill safety proof"
+      ],
+      "current_evidence": [
+        "Multiple grading, settlement, accuracy, audit, bridge, and backfill scripts are exposed in package.json"
+      ],
+      "open_gaps": [
+        "Lifecycle ownership and duplicate-path risk not yet inventoried"
+      ],
+      "next_action": "Wait for system inventory.",
+      "owner_note": "Treat grading as part of Edge truth-about-its-own-predictions, not Scout sports truth.",
+      "last_updated": "2026-07-05"
+    },
+    {
+      "task_id": "EAI-001",
+      "task_name": "AI Provider and EdgeMind Boundary",
+      "workstream": "AI and Inference",
+      "description": "Define AI provider, EdgeMind, judge, explanation, and fallback responsibilities while prohibiting AI systems from becoming canonical sports-truth providers.",
+      "status": "PROPOSED",
+      "priority": "high",
+      "blocked_by": [
+        "ESA-001",
+        "EPI-001"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "AI",
+        "EdgeMind",
+        "inference"
+      ],
+      "related_contracts": [],
+      "affected_files": [
+        "backend/services/aiProvider.js",
+        "backend/controllers/edgeMindController.js",
+        "backend/edgemind_inference.py",
+        "scripts/run-edgemind-judge.js"
+      ],
+      "affected_tables": [],
+      "completion_definition": "AI and inference responsibilities are registered and cannot bypass the governed Scout sports-truth boundary.",
+      "proof_required": [
+        "AI provider inventory",
+        "Inference input map",
+        "Fallback map",
+        "Proof AI output cannot silently replace canonical sports truth"
+      ],
+      "current_evidence": [],
+      "open_gaps": [
+        "Current AI-provider and EdgeMind boundaries require inventory"
+      ],
+      "next_action": "Wait for system inventory.",
+      "owner_note": "OpenAI, Gemini, or EdgeMind may analyse supplied intelligence; they do not own canonical sports facts.",
+      "last_updated": "2026-07-05"
+    },
+    {
+      "task_id": "EUI-001",
+      "task_name": "Subscriber UI and Prediction Delivery",
+      "workstream": "UI and Delivery",
+      "description": "Register public, authenticated, subscriber, prediction, ACCA, explanation, and admin delivery surfaces.",
+      "status": "PROPOSED",
+      "priority": "high",
+      "blocked_by": [
+        "ESA-001",
+        "ESEC-001",
+        "EPI-001"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "UI",
+        "subscriber delivery",
+        "publication"
+      ],
+      "related_contracts": [],
+      "affected_files": [
+        "public/"
+      ],
+      "affected_tables": [],
+      "completion_definition": "Subscriber-facing Edge delivery surfaces and access requirements are registered and traceable to canonical prediction/publication state.",
+      "proof_required": [
+        "Route/page inventory",
+        "Authentication requirement map",
+        "Prediction publication surface map"
+      ],
+      "current_evidence": [],
+      "open_gaps": [
+        "UI and delivery inventory pending"
+      ],
+      "next_action": "Wait for security and pipeline inventory.",
+      "owner_note": "Lovable/UI work remains outside backend control-foundation implementation.",
+      "last_updated": "2026-07-05"
+    },
+    {
+      "task_id": "EOPS-001",
+      "task_name": "Deployment and Operations Governance",
+      "workstream": "Deployment and Operations",
+      "description": "Register GitHub, Render, Vercel, Supabase, environment configuration, migrations, schedulers, cron/workflows, and deployment readiness.",
+      "status": "PROPOSED",
+      "priority": "high",
+      "blocked_by": [
+        "ESA-001",
+        "EST-001",
+        "ESEC-001"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "deployment",
+        "operations",
+        "environment"
+      ],
+      "related_contracts": [],
+      "affected_files": [
+        "render.yaml",
+        "package.json",
+        "scripts/",
+        "supabase/"
+      ],
+      "affected_tables": [],
+      "completion_definition": "Edge deployment and operational systems are registered with explicit environment, scheduler, migration, and readiness ownership.",
+      "proof_required": [
+        "Deployment target inventory",
+        "Environment-key classification",
+        "Scheduler/workflow inventory",
+        "Migration ownership map"
+      ],
+      "current_evidence": [
+        "Edge package scripts expose sync, refresh, grading, settlement, provider audits, enrichment, pipeline, and Antigravity operational commands"
+      ],
+      "open_gaps": [
+        "Operational command reachability and current-use status not yet classified"
+      ],
+      "next_action": "Wait for system, storage, and security inventory.",
+      "owner_note": "Render suspension/deployment state must not be confused with local runtime correctness.",
+      "last_updated": "2026-07-05"
+    },
+    {
+      "task_id": "E2E-001",
+      "task_name": "Scout to Edge End-to-End Proof",
+      "workstream": "Scout Handoff",
+      "description": "Prove one governed validated Scout FIP can cross the approved intake boundary, drive Edge analysis, and produce derived Edge output without direct external sports acquisition or unnecessary Scout-data retention in Supabase.",
+      "status": "BLOCKED",
+      "priority": "critical",
+      "blocked_by": [
+        "EFI-001",
+        "EST-001",
+        "ESEC-001",
+        "EPI-001",
+        "EPRV-001"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "Scout handoff",
+        "prediction",
+        "Supabase",
+        "end-to-end"
+      ],
+      "related_contracts": [
+        "FIP-001"
+      ],
+      "affected_files": [],
+      "affected_tables": [],
+      "completion_definition": "A controlled end-to-end proof demonstrates Scout-to-Edge FIP intake, validation, idempotency, analysis, provenance linkage, minimal retention, and zero reachable direct external sports acquisition.",
+      "proof_required": [
+        "Canonical FIP fixture proof",
+        "Edge intake validation proof",
+        "Idempotency proof",
+        "Prediction output proof",
+        "FIP provenance/hash linkage",
+        "Supabase retention proof",
+        "Provider reachability proof"
+      ],
+      "current_evidence": [],
+      "open_gaps": [
+        "FIP intake not implemented",
+        "Storage retention law not defined",
+        "Security boundary not proven",
+        "Prediction pipeline protection not registered",
+        "Provider removal incomplete"
+      ],
+      "next_action": "Remain BLOCKED until all dependencies are satisfied.",
+      "owner_note": "This is the final technical proof before the Scout-Edge marriage gate can be separately approved.",
+      "last_updated": "2026-07-05"
+    }
+  ]
+}
