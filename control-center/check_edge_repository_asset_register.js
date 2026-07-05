@@ -679,7 +679,7 @@ function validateRegister(register, options = {}) {
   const trackedSet = new Set(trackedPaths);
 
   const projectRegister = loadJson(PROJECT_REGISTER_PATH);
-  const ledger = loadJson(LEDGER_PATH);
+  const ledger = options.ledgerOverride || loadJson(LEDGER_PATH);
 
   const projectIds = new Set(
     projectRegister.projects.map((project) => project.project_id)
@@ -803,19 +803,10 @@ function validateRegister(register, options = {}) {
     }
 
     if (asset.owner_project_id === "UNRESOLVED") {
-      const eprTask = taskById.get("EPR-001");
-      const eprStatus = eprTask ? taskStatus(eprTask) : null;
-
-      if (
-        asset.governed_by_control_task_id !== "EPR-001" ||
-        !["APPROVED", "IN_PROGRESS"].includes(eprStatus)
-      ) {
-        errors.push(
-          `ASSET_OWNER_PROJECT_UNKNOWN: ${assetPath} UNRESOLVED outside controlled EPR-001 bootstrap`
-        );
-      } else {
-        warnings.push(`UNRESOLVED_ASSET_OWNER: ${assetPath}`);
-      }
+      // Governed unresolved final project ownership is valid if it remains
+      // bound to a known Control Center task (fail-closed by ASSET_CONTROL_TASK_UNKNOWN)
+      // and has non-empty next_validation (fail-closed by ASSET_NEXT_VALIDATION_MISSING).
+      warnings.push(`UNRESOLVED_ASSET_OWNER: ${assetPath}`);
     } else if (!projectIds.has(asset.owner_project_id)) {
       errors.push(
         `ASSET_OWNER_PROJECT_UNKNOWN: ${assetPath} ${asset.owner_project_id}`

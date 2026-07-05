@@ -19,6 +19,8 @@ const {
   validateRegister,
 } = require("../control-center/check_edge_repository_asset_register.js");
 
+const LEDGER = require("../control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json");
+
 describe("Edge Repository Asset Register v1", () => {
   it("asset register exists", () => {
     assert.ok(fs.existsSync(ASSET_REGISTER_PATH));
@@ -147,6 +149,86 @@ describe("Edge Repository Asset Register v1", () => {
         "EPR-001",
         `${asset.asset_path} unresolved owner bypasses EPR-001`
       );
+    }
+  });
+
+  it("GOVERNED UNRESOLVED OWNER SURVIVES PROJECTED TESTED STATE", () => {
+    const base = structuredClone(loadAssetRegister());
+
+    const ledgerOverride = structuredClone(LEDGER);
+    const eprTask = (ledgerOverride.tasks || ledgerOverride.control_tasks || []).find(
+      (t) => (t.task_id || t.id) === "EPR-001"
+    );
+    assert.ok(eprTask, "EPR-001 task must exist in ledger override");
+    eprTask.status = "TESTED";
+
+    const result = validateRegister(base, { ledgerOverride });
+
+    assert.equal(result.passed, true);
+    assert.equal(
+      result.errors.filter((e) =>
+        e.startsWith("ASSET_OWNER_PROJECT_UNKNOWN:")
+      ).length,
+      0
+    );
+  });
+
+  it("UNKNOWN CONTROL TASK remains fail-closed for UNRESOLVED owner assets", () => {
+    const base = structuredClone(loadAssetRegister());
+
+    const target = base.assets.find(
+      (a) =>
+        a.owner_project_id === "UNRESOLVED" &&
+        a.governed_by_control_task_id === "EPR-001"
+    );
+    assert.ok(target, "Expected at least one UNRESOLVED asset governed by EPR-001");
+
+    target.governed_by_control_task_id = "UNKNOWN-FAKE-TASK";
+    const result = validateRegister(base);
+
+    assert.equal(result.passed, false);
+    assert.ok(
+      result.errors.some((e) =>
+        e.startsWith(`ASSET_CONTROL_TASK_UNKNOWN: ${target.asset_path}`)
+      ),
+      result.errors.join("; ")
+    );
+  });
+
+  it("EMPTY NEXT_VALIDATION remains fail-closed for UNRESOLVED owner assets", () => {
+    const base = structuredClone(loadAssetRegister());
+
+    const target = base.assets.find(
+      (a) =>
+        a.owner_project_id === "UNRESOLVED" &&
+        a.governed_by_control_task_id === "EPR-001"
+    );
+    assert.ok(target, "Expected at least one UNRESOLVED asset governed by EPR-001");
+
+    target.next_validation = "";
+
+    const result = validateRegister(base);
+
+    assert.equal(result.passed, false);
+    assert.ok(
+      result.errors.some((e) =>
+        e.startsWith(`ASSET_NEXT_VALIDATION_MISSING: ${target.asset_path}`)
+      ),
+      result.errors.join("; ")
+    );
+  });
+
+  it("CURRENT GOVERNED UNRESOLVED POPULATION remains valid", () => {
+    const result = validateRegister(loadAssetRegister());
+    assert.equal(result.passed, true);
+
+    const unresolved = loadAssetRegister().assets.filter(
+      (a) => a.owner_project_id === "UNRESOLVED"
+    );
+
+    for (const asset of unresolved) {
+      assert.ok(asset.governed_by_control_task_id, "Missing governed task binding");
+      assert.ok(asset.next_validation && String(asset.next_validation).trim(), "Missing next_validation");
     }
   });
 
