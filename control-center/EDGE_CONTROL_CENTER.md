@@ -261,6 +261,8 @@ Mode:
 Purpose:
 
 Implement the approved Master Project Register + Repository Asset Register foundation only, without performing Scout/FIP intake implementation, provider removal, Supabase mutation, or prediction-rule changes.
+Completion contract:
+Tracked-path coverage is 898/898 from current implementation evidence; unclassified tracked paths are 0; 886 assets currently have unresolved final project ownership and are registered and governed by valid Control Center task bindings. UNRESOLVED means final project ownership has not yet been determined; it is treated as a non-fatal governed cleanup finding only while the asset remains bound to a valid Control Center task and has a non-empty `next_validation`. Asset integrity must not fail merely because an asset is LEGACY, HISTORICAL_EVIDENCE, NO_CONSUMER, ORPHAN, CONFLICT, UNKNOWN, or awaiting final project ownership; unknown governed_by_control_task_id remains fail-closed. EPR-001 remains APPROVED and must not be promoted in this approval step.
 
 Do not start FIP intake.
 

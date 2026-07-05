@@ -143,6 +143,96 @@ describe("Edge Control Center Ledger v1", () => {
     assert.deepEqual(task.blocked_by, ["ECC-001"]);
   });
 
+  it("EPR-001 governed-unresolved ownership contract is updated", () => {
+    const task = loadLedger().tasks.find(
+      (item) => item.task_id === "EPR-001"
+    );
+
+    assert.ok(task);
+    assert.equal(task.status, "APPROVED");
+    assert.equal(
+      task.blocked_by[0],
+      "ECC-001"
+    );
+
+    // Completion definition (semantic substrings; not dependent on unresolved counts)
+    assert.match(
+      task.completion_definition,
+      /A complete Edge Master Project Register and Repository Asset Register foundation exist/
+    );
+    assert.match(
+      task.completion_definition,
+      /project register is synchronized with canonical Edge Control Center sequencing/
+    );
+    assert.match(
+      task.completion_definition,
+      /every tracked repository path is registered or explicitly excluded/
+    );
+    assert.match(
+      task.completion_definition,
+      /every registered asset declares a valid governed_by_control_task_id/
+    );
+    assert.match(
+      task.completion_definition,
+      /unresolved final project ownership may remain as a governed cleanup finding/
+    );
+    assert.match(
+      task.completion_definition,
+      /non-empty next_validation/
+    );
+    assert.match(
+      task.completion_definition,
+      /no tracked path is unclassified/
+    );
+    assert.match(
+      task.completion_definition,
+      /asset integrity does not fail merely because an asset is LEGACY, HISTORICAL_EVIDENCE, NO_CONSUMER, ORPHAN, CONFLICT, UNKNOWN, or awaiting final project ownership/i
+    );
+
+    // Proof requirements (must include all governed-unresolved semantics)
+    assert.ok(Array.isArray(task.proof_required));
+    const proofText = task.proof_required.join("\n");
+
+    assert.match(
+      proofText,
+      /Edge Repository Asset Register exists and validates\./
+    );
+    assert.match(
+      proofText,
+      /Unclassified tracked path count is zero\./
+    );
+    assert.match(
+      proofText,
+      /UNRESOLVED final project ownership remains a non-fatal governed cleanup finding only when the asset has a valid Control Center task binding and non-empty next_validation\./
+    );
+    assert.match(
+      proofText,
+      /Invalid or unknown governed_by_control_task_id remains fail-closed\./
+    );
+    assert.match(
+      proofText,
+      /No runtime provider removal, Scout\/FIP intake, Supabase mutation, prediction-rule change, ACCA-rule change, migration execution, or deployment change occurs as part of EPR-001\./
+    );
+    assert.match(
+      proofText,
+      /Tests prove EPR-001 may close without inventing final ownership for bootstrap-registered legacy\/unknown assets\./
+    );
+
+    // Next action must preserve fail-closed semantics and set closure evidence for TESTED promotion.
+    assert.match(
+      task.next_action,
+      /Implement the approved governed unresolved-ownership checker correction and tests only/
+    );
+    assert.match(
+      task.next_action,
+      /keep unknown Control Center task bindings fail-closed/
+    );
+    assert.match(
+      task.next_action,
+      /return closure evidence for separate EPR-001 TESTED promotion/
+    );
+  });
+
   it("EPR-001 becomes the single auto-startable task", () => {
     const result = runCheck({
       ledgerPath: LEDGER_PATH,

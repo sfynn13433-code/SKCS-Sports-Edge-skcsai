@@ -82,12 +82,22 @@
         "control-center/EDGE_PROJECT_DEPENDENCY_MAP.md"
       ],
       "affected_tables": [],
-      "completion_definition": "A complete machine-readable Edge project register, human backlog, dependency map, validation script, and tests exist and are synchronized with the Edge ledger.",
+      "completion_definition": "A complete Edge Master Project Register and Repository Asset Register foundation exist; the project register is synchronized with canonical Edge Control Center sequencing; every tracked repository path is registered or explicitly excluded; every registered asset declares a valid governed_by_control_task_id; unresolved final project ownership may remain as a governed cleanup finding when the asset remains bound to a valid Control Center task and has a non-empty next_validation; no tracked path is unclassified; and asset integrity does not fail merely because an asset is LEGACY, HISTORICAL_EVIDENCE, NO_CONSUMER, ORPHAN, CONFLICT, UNKNOWN, or awaiting final project ownership.",
       "proof_required": [
-        "All discovered Edge project areas are registered before implementation work resumes",
-        "Register validation exits 0",
-        "Dependency references resolve",
-        "Control Center references the canonical register"
+        "Edge Master Project Register exists and validates.",
+        "Edge Project Backlog exists.",
+        "Edge Project Dependency Map exists.",
+        "Edge Repository Asset Register exists and validates.",
+        "Project register mirrors exact ledger task ID overlaps for canonical sequencing state.",
+        "Deterministic asset universe is derived from git ls-files.",
+        "Every tracked path is registered or explicitly excluded.",
+        "Unclassified tracked path count is zero.",
+        "Every registered asset has a valid governed_by_control_task_id.",
+        "UNRESOLVED final project ownership remains a non-fatal governed cleanup finding only when the asset has a valid Control Center task binding and non-empty next_validation.",
+        "Invalid or unknown governed_by_control_task_id remains fail-closed.",
+        "Asset integrity does not fail merely because an asset is LEGACY, HISTORICAL_EVIDENCE, NO_CONSUMER, ORPHAN, CONFLICT, UNKNOWN, or awaiting final project ownership.",
+        "Tests prove EPR-001 may close without inventing final ownership for bootstrap-registered legacy/unknown assets.",
+        "No runtime provider removal, Scout/FIP intake, Supabase mutation, prediction-rule change, ACCA-rule change, migration execution, or deployment change occurs as part of EPR-001."
       ],
       "current_evidence": [
         "EPR-001 scope-resolution inspection completed",
@@ -95,7 +105,7 @@
         "Repository asset universe coverage law approved"
       ],
       "open_gaps": [],
-      "next_action": "Implement EPR-001 approved Master Project Register + Repository Asset Register foundation only. Preserve governance boundaries and do not perform Scout/FIP intake or provider removal during this implementation.",
+      "next_action": "Implement the approved governed unresolved-ownership checker correction and tests only; preserve 100% tracked-path coverage, keep unknown Control Center task bindings fail-closed, and return closure evidence for separate EPR-001 TESTED promotion.",
       "owner_note": "Do not invent the Edge backlog from memory; derive it from the repository and current architecture.",
       "last_updated": "2026-07-05"
     },
