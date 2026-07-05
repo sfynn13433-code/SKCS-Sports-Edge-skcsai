@@ -19766,5 +19766,657 @@
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP."
     }
   ],
-  "explicit_exclusions": []
+  "explicit_exclusions": [],
+  "workspace_candidate_snapshot": {
+    "discovery_scope": "NON_IGNORED_PRE_EXISTING_UNTRACKED",
+    "discovery_command": "git ls-files --others --exclude-standard",
+    "tracked_path_count_semantics_unchanged": true,
+    "underlying_artifact_commit_required": false,
+    "candidates": [
+      {
+        "asset_path": "all_acca_migrations.txt",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "backend/services/scoutSignalSync.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "docs/intel_read_contract_v1.md",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "extract_migrations.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "find_missing.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "install.cmd",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scratch/EDGE_EXTERNAL_SPORTS_SOURCE_INVENTORY.json",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scratch/EDGE_EXTERNAL_SPORTS_SOURCE_INVENTORY.md",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scratch/EDGE_PROVIDER_EDIT_CONTRACTS.json",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scratch/EDGE_PROVIDER_EDIT_CONTRACTS.md",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scratch/EDGE_PROVIDER_REACHABILITY.json",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scratch/EDGE_PROVIDER_REACHABILITY.md",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scratch/apply_edge_provider_runtime_cut.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scratch/inspect_edge_external_sources.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scratch/inspect_edge_provider_reachability.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scratch/inspect_provider_edit_contracts.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scripts/apply_acca_migration.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scripts/check_constraint.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scripts/check_enum.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scripts/check_null.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scripts/check_risk_constraint.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scripts/check_tier_constraint.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scripts/check_type_constraint.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scripts/get_user.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scripts/inspect_accas.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scripts/inspect_primary.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scripts/inspect_secondary.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scripts/seed_acca_test_data.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "scripts/seed_final.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "smb_combo_rules_refined.txt",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "sql/performance_optimizations_fixed.sql",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "supabase/migrations/20260616_scout_signal_mirror.sql",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "supabase/migrations/20260617000000_setup_accas.sql",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "targeted_smb_context.txt",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "temp_migrate.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "test_acca_1.json",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "test_acca_2.json",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "test_acca_3.json",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "test_write.txt",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "try_regions.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      }
+    ]
+  },
+  "rule_authority_candidate_graph": {
+    "candidate_status_establishes_current_authority": false,
+    "relationship_edges_establish_authority_precedence": false,
+    "nodes": [
+      {
+        "asset_path": "AGENTS.md",
+        "candidate_role": "RULE_OR_AGENT_AUTHORITY_CANDIDATE",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": false,
+        "standalone_justification": ""
+      },
+      {
+        "asset_path": "SKCS_MASTER_RULEBOOK.md",
+        "candidate_role": "RULE_OR_AGENT_AUTHORITY_CANDIDATE",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": false,
+        "standalone_justification": ""
+      },
+      {
+        "asset_path": "STRICT_RULES.md",
+        "candidate_role": "RULE_OR_AGENT_AUTHORITY_CANDIDATE",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": false,
+        "standalone_justification": ""
+      },
+      {
+        "asset_path": "COMPREHENSIVE_FOOTBALL_RULES_REPORT.md",
+        "candidate_role": "RULE_GUIDE_OR_REPORT",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": false,
+        "standalone_justification": ""
+      },
+      {
+        "asset_path": "MASTER_RULEBOOK_IMPLEMENTATION_GUIDE.md",
+        "candidate_role": "RULE_GUIDE_OR_REPORT",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": false,
+        "standalone_justification": ""
+      },
+      {
+        "asset_path": "SKCS-KNOWLEDGE/knowledge/business_rules.md",
+        "candidate_role": "GOVERNANCE_OR_RULE_REFERENCE",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": false,
+        "standalone_justification": ""
+      },
+      {
+        "asset_path": "SKCS-KNOWLEDGE/governance/provider_scorecard_bsd.md",
+        "candidate_role": "GOVERNANCE_POLICY_OR_SPEC",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": false,
+        "standalone_justification": ""
+      },
+      {
+        "asset_path": "SKCS-KNOWLEDGE/governance/bsd_provider_suitability_scorecard.md",
+        "candidate_role": "GOVERNANCE_POLICY_OR_SPEC",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": false,
+        "standalone_justification": ""
+      },
+      {
+        "asset_path": "scripts/audit-football-rules-alignment.js",
+        "candidate_role": "RULE_OR_GOVERNANCE_AUDIT_TOOL",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": false,
+        "standalone_justification": ""
+      },
+      {
+        "asset_path": "scripts/verify-master-rulebook-alignment.js",
+        "candidate_role": "RULE_OR_GOVERNANCE_AUDIT_TOOL",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": false,
+        "standalone_justification": ""
+      },
+      {
+        "asset_path": "scripts/apply-db-governance.js",
+        "candidate_role": "RULE_OR_GOVERNANCE_AUDIT_TOOL",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": false,
+        "standalone_justification": ""
+      },
+      {
+        "asset_path": "sql/master_rulebook_triggers.sql",
+        "candidate_role": "DATABASE_RULE_ENFORCEMENT",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": false,
+        "standalone_justification": ""
+      },
+      {
+        "asset_path": "supabase/migrations/20260718000001_db_rule_alignment_75_55_30.sql",
+        "candidate_role": "DATABASE_RULE_ALIGNMENT_MIGRATION",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": false,
+        "standalone_justification": ""
+      },
+      {
+        "asset_path": "supabase/migrations/20260820000002_fix_secondary_governance_80_75.sql",
+        "candidate_role": "DATABASE_RULE_ALIGNMENT_MIGRATION",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": false,
+        "standalone_justification": ""
+      },
+      {
+        "asset_path": "test_scenarios_master_rulebook.js",
+        "candidate_role": "RULE_PROOF_TEST",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": false,
+        "standalone_justification": ""
+      },
+      {
+        "asset_path": "docs/acca_rules_v2.1.md",
+        "candidate_role": "RULE_GUIDE_OR_REPORT",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": false,
+        "standalone_justification": ""
+      },
+      {
+        "asset_path": "smb_combo_rules_refined.txt",
+        "candidate_role": "RULE_GUIDE_OR_REPORT",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": false,
+        "standalone_justification": ""
+      },
+      {
+        "asset_path": "MIGRATION_FREEZE.md",
+        "candidate_role": "GOVERNANCE_OR_RULE_REFERENCE",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": true,
+        "standalone_justification": "Standalone authority-review node for migration_freeze first-party evidence; relationship edges reserved for later review graphing."
+      },
+      {
+        "asset_path": "SKCS-KNOWLEDGE/governance/ai_usage_policy.md",
+        "candidate_role": "GOVERNANCE_POLICY_OR_SPEC",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": true,
+        "standalone_justification": "Standalone authority-review node for ai_usage_policy first-party evidence; relationship edges reserved for later review graphing."
+      },
+      {
+        "asset_path": "SKCS-KNOWLEDGE/governance/bigballs_evaluation_focus.md",
+        "candidate_role": "GOVERNANCE_POLICY_OR_SPEC",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": true,
+        "standalone_justification": "Standalone authority-review node for bigballs_evaluation_focus first-party evidence; relationship edges reserved for later review graphing."
+      },
+      {
+        "asset_path": "SKCS-KNOWLEDGE/governance/bsd_governance_hold.md",
+        "candidate_role": "GOVERNANCE_POLICY_OR_SPEC",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": true,
+        "standalone_justification": "Standalone authority-review node for bsd_governance_hold first-party evidence; relationship edges reserved for later review graphing."
+      },
+      {
+        "asset_path": "SKCS-KNOWLEDGE/governance/documentation_policy.md",
+        "candidate_role": "GOVERNANCE_POLICY_OR_SPEC",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": true,
+        "standalone_justification": "Standalone authority-review node for documentation_policy first-party evidence; relationship edges reserved for later review graphing."
+      },
+      {
+        "asset_path": "SKCS-KNOWLEDGE/governance/feature_risk_registry.md",
+        "candidate_role": "GOVERNANCE_POLICY_OR_SPEC",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": true,
+        "standalone_justification": "Standalone authority-review node for feature_risk_registry first-party evidence; relationship edges reserved for later review graphing."
+      },
+      {
+        "asset_path": "SKCS-KNOWLEDGE/governance/naming_standards.md",
+        "candidate_role": "GOVERNANCE_POLICY_OR_SPEC",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": true,
+        "standalone_justification": "Standalone authority-review node for naming_standards first-party evidence; relationship edges reserved for later review graphing."
+      },
+      {
+        "asset_path": "SKCS-KNOWLEDGE/governance/verification_layer_spec.md",
+        "candidate_role": "GOVERNANCE_POLICY_OR_SPEC",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": true,
+        "standalone_justification": "Standalone authority-review node for verification_layer_spec first-party evidence; relationship edges reserved for later review graphing."
+      },
+      {
+        "asset_path": "backend/services/masterRulebookRiskClassification.js",
+        "candidate_role": "RUNTIME_RULE_OR_GOVERNANCE",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": true,
+        "standalone_justification": "Standalone authority-review node for masterRulebookRiskClassification first-party runtime governance evidence; relationship edges reserved for later review graphing."
+      },
+      {
+        "asset_path": "scripts/audit-cricket-rules.js",
+        "candidate_role": "RULE_OR_GOVERNANCE_AUDIT_TOOL",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": true,
+        "standalone_justification": "Standalone authority-review node for audit-cricket-rules first-party governance audit evidence; relationship edges reserved for later review graphing."
+      },
+      {
+        "asset_path": "scripts/master-qa.js",
+        "candidate_role": "RULE_OR_GOVERNANCE_AUDIT_TOOL",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": true,
+        "standalone_justification": "Standalone authority-review node for master-qa first-party governance audit evidence; relationship edges reserved for later review graphing."
+      },
+      {
+        "asset_path": "sql/acca_rules.sql",
+        "candidate_role": "DATABASE_RULE_ENFORCEMENT",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": true,
+        "standalone_justification": "Standalone authority-review node for acca_rules first-party database enforcement evidence; relationship edges reserved for later review graphing."
+      },
+      {
+        "asset_path": "sql/tier_rules.sql",
+        "candidate_role": "DATABASE_RULE_ENFORCEMENT",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": true,
+        "standalone_justification": "Standalone authority-review node for tier_rules first-party database enforcement evidence; relationship edges reserved for later review graphing."
+      },
+      {
+        "asset_path": "supabase/migrations/20260522000002_add_sport_to_tier_rules.sql",
+        "candidate_role": "DATABASE_RULE_ALIGNMENT_MIGRATION",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": true,
+        "standalone_justification": "Standalone authority-review node for add_sport_to_tier_rules migration evidence; relationship edges reserved for later review graphing."
+      },
+      {
+        "asset_path": "supabase/migrations/20260822000006_ai_governance_telemetry.sql",
+        "candidate_role": "DATABASE_RULE_ALIGNMENT_MIGRATION",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": true,
+        "standalone_justification": "Standalone authority-review node for ai_governance_telemetry migration evidence; relationship edges reserved for later review graphing."
+      },
+      {
+        "asset_path": "supabase/migrations/20260822000007_ai_governance_rls_policies.sql",
+        "candidate_role": "DATABASE_RULE_ALIGNMENT_MIGRATION",
+        "authority_review_status": "UNRESOLVED_REVIEW",
+        "standalone_review_candidate": true,
+        "standalone_justification": "Standalone authority-review node for ai_governance_rls_policies migration evidence; relationship edges reserved for later review graphing."
+      }
+    ],
+    "edges": [
+      {
+        "from_asset_path": "AGENTS.md",
+        "to_asset_path": "SKCS_MASTER_RULEBOOK.md",
+        "relationship_type": "RULE_CONCEPT_REVIEW_LINK"
+      },
+      {
+        "from_asset_path": "SKCS_MASTER_RULEBOOK.md",
+        "to_asset_path": "STRICT_RULES.md",
+        "relationship_type": "RULE_CONCEPT_REVIEW_LINK"
+      },
+      {
+        "from_asset_path": "STRICT_RULES.md",
+        "to_asset_path": "COMPREHENSIVE_FOOTBALL_RULES_REPORT.md",
+        "relationship_type": "RULE_CONCEPT_REVIEW_LINK"
+      },
+      {
+        "from_asset_path": "COMPREHENSIVE_FOOTBALL_RULES_REPORT.md",
+        "to_asset_path": "MASTER_RULEBOOK_IMPLEMENTATION_GUIDE.md",
+        "relationship_type": "RULE_CONCEPT_REVIEW_LINK"
+      },
+      {
+        "from_asset_path": "MASTER_RULEBOOK_IMPLEMENTATION_GUIDE.md",
+        "to_asset_path": "SKCS-KNOWLEDGE/knowledge/business_rules.md",
+        "relationship_type": "IMPLEMENTATION_REVIEW_LINK"
+      },
+      {
+        "from_asset_path": "SKCS-KNOWLEDGE/knowledge/business_rules.md",
+        "to_asset_path": "SKCS-KNOWLEDGE/governance/provider_scorecard_bsd.md",
+        "relationship_type": "RULE_CONCEPT_REVIEW_LINK"
+      },
+      {
+        "from_asset_path": "SKCS-KNOWLEDGE/governance/provider_scorecard_bsd.md",
+        "to_asset_path": "SKCS-KNOWLEDGE/governance/bsd_provider_suitability_scorecard.md",
+        "relationship_type": "RULE_CONCEPT_REVIEW_LINK"
+      },
+      {
+        "from_asset_path": "SKCS-KNOWLEDGE/governance/bsd_provider_suitability_scorecard.md",
+        "to_asset_path": "scripts/audit-football-rules-alignment.js",
+        "relationship_type": "AUDIT_REVIEW_LINK"
+      },
+      {
+        "from_asset_path": "scripts/audit-football-rules-alignment.js",
+        "to_asset_path": "scripts/verify-master-rulebook-alignment.js",
+        "relationship_type": "AUDIT_REVIEW_LINK"
+      },
+      {
+        "from_asset_path": "scripts/verify-master-rulebook-alignment.js",
+        "to_asset_path": "scripts/apply-db-governance.js",
+        "relationship_type": "IMPLEMENTATION_REVIEW_LINK"
+      },
+      {
+        "from_asset_path": "scripts/apply-db-governance.js",
+        "to_asset_path": "sql/master_rulebook_triggers.sql",
+        "relationship_type": "DATABASE_ENFORCEMENT_REVIEW_LINK"
+      },
+      {
+        "from_asset_path": "sql/master_rulebook_triggers.sql",
+        "to_asset_path": "supabase/migrations/20260718000001_db_rule_alignment_75_55_30.sql",
+        "relationship_type": "MIGRATION_ALIGNMENT_REVIEW_LINK"
+      },
+      {
+        "from_asset_path": "supabase/migrations/20260718000001_db_rule_alignment_75_55_30.sql",
+        "to_asset_path": "supabase/migrations/20260820000002_fix_secondary_governance_80_75.sql",
+        "relationship_type": "MIGRATION_ALIGNMENT_REVIEW_LINK"
+      },
+      {
+        "from_asset_path": "supabase/migrations/20260820000002_fix_secondary_governance_80_75.sql",
+        "to_asset_path": "test_scenarios_master_rulebook.js",
+        "relationship_type": "PROOF_REVIEW_LINK"
+      },
+      {
+        "from_asset_path": "test_scenarios_master_rulebook.js",
+        "to_asset_path": "docs/acca_rules_v2.1.md",
+        "relationship_type": "PROOF_REVIEW_LINK"
+      },
+      {
+        "from_asset_path": "docs/acca_rules_v2.1.md",
+        "to_asset_path": "smb_combo_rules_refined.txt",
+        "relationship_type": "RULE_CONCEPT_REVIEW_LINK"
+      },
+      {
+        "from_asset_path": "smb_combo_rules_refined.txt",
+        "to_asset_path": "AGENTS.md",
+        "relationship_type": "AUDIT_REVIEW_LINK"
+      }
+    ]
+  }
 }

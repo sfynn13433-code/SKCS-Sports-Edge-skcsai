@@ -108,6 +108,44 @@ const ARRAY_FIELDS = [
   "known_conflicts",
 ];
 
+const WORKSPACE_CANDIDATE_DISPOSITIONS = [
+  "PRESERVED_CANDIDATE",
+  "EXPLICITLY_EXCLUDED",
+];
+
+const AUTHORITY_REVIEW_STATUS = "UNRESOLVED_REVIEW";
+
+const AUTHORITY_CANDIDATE_ROLES = [
+  "RULE_OR_AGENT_AUTHORITY_CANDIDATE",
+  "RULE_GUIDE_OR_REPORT",
+  "GOVERNANCE_OR_RULE_REFERENCE",
+  "GOVERNANCE_POLICY_OR_SPEC",
+  "RUNTIME_RULE_OR_GOVERNANCE",
+  "RULE_OR_GOVERNANCE_AUDIT_TOOL",
+  "DATABASE_RULE_ENFORCEMENT",
+  "DATABASE_RULE_ALIGNMENT_MIGRATION",
+  "RULE_PROOF_TEST",
+];
+
+const GRAPH_RELATIONSHIP_TYPES = [
+  "RULE_CONCEPT_REVIEW_LINK",
+  "IMPLEMENTATION_REVIEW_LINK",
+  "DATABASE_ENFORCEMENT_REVIEW_LINK",
+  "MIGRATION_ALIGNMENT_REVIEW_LINK",
+  "RUNTIME_ENFORCEMENT_REVIEW_LINK",
+  "PROOF_REVIEW_LINK",
+  "AUDIT_REVIEW_LINK",
+];
+
+// Relationship types that imply authority precedence (must be rejected)
+const GRAPH_FORBIDDEN_RELATIONSHIP_TYPES = new Set([
+  "OVERRIDES",
+  "SUPERSEDES",
+  "AUTHORITATIVE_OVER",
+  "PRECEDES",
+  "CANONICAL_SOURCE_FOR",
+]);
+
 const EPR_IMPLEMENTATION_PATHS = new Set([
   "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
   "control-center/EDGE_PROJECT_BACKLOG.md",
@@ -175,6 +213,43 @@ function getChangedTrackedPaths() {
       .filter(Boolean)
       .map(normalizePath)
   );
+}
+
+function getWorkspaceDiscoveredPaths(overridePaths) {
+  if (overridePaths) {
+    if (!Array.isArray(overridePaths)) {
+      throw new Error("overridePaths must be an array of strings");
+    }
+    return [...new Set(overridePaths.map(normalizePath))].sort();
+  }
+
+  // Optional override for tests only (legacy path).
+  if (process.env.SKCS_WORKSPACE_CANDIDATE_DISCOVERY_OVERRIDE_JSON) {
+    const parsed = JSON.parse(
+      process.env.SKCS_WORKSPACE_CANDIDATE_DISCOVERY_OVERRIDE_JSON
+    );
+    if (!Array.isArray(parsed)) {
+      throw new Error(
+        "SKCS_WORKSPACE_CANDIDATE_DISCOVERY_OVERRIDE_JSON must be an array"
+      );
+    }
+    return [...new Set(parsed.map(normalizePath))].sort();
+  }
+
+  const raw = execFileSync(
+    "git",
+    ["ls-files", "--others", "--exclude-standard", "-z"],
+    {
+      cwd: ROOT,
+      encoding: "utf8",
+    }
+  );
+
+  return raw
+    .split("\0")
+    .filter(Boolean)
+    .map(normalizePath)
+    .sort();
 }
 
 function getLedgerTasks(ledger) {
@@ -460,7 +535,143 @@ function loadAssetRegister(filePath = ASSET_REGISTER_PATH) {
   return loadJson(filePath);
 }
 
-function validateRegister(register) {
+function isDependencyFalsePositivePath(assetPath) {
+  const p = normalizePath(assetPath).toLowerCase();
+  if (
+    p.startsWith("node_modules/") ||
+    p.includes("/node_modules/") ||
+    p.endsWith("/node_modules")
+  ) {
+    return true;
+  }
+  if (
+    p.startsWith(".venv/") ||
+    p.includes("/.venv/") ||
+    p.endsWith("/.venv")
+  ) {
+    return true;
+  }
+  if (
+    p.startsWith("venv/") ||
+    p.includes("/venv/") ||
+    p.endsWith("/venv")
+  ) {
+    return true;
+  }
+  if (p.includes("/__pycache__/") || p.endsWith("/__pycache__")) {
+    return true;
+  }
+  if (p.endsWith(".pyc")) {
+    return true;
+  }
+  return false;
+}
+
+function candidateRoleForFirstPartyAuthority(assetPath) {
+  if (isDependencyFalsePositivePath(assetPath)) return null;
+
+  const p = normalizePath(assetPath);
+  const lower = p.toLowerCase();
+  const base = p.split("/").pop().toLowerCase();
+
+  if (lower.startsWith("skcs-knowledge/governance/")) {
+    return "GOVERNANCE_POLICY_OR_SPEC";
+  }
+
+  // Explicit first-party rule/governance surfaces (role detection is path deterministic)
+  const ruleOrAgentAuthority = new Set([
+    "strict_rules.md",
+    "skcs_master_rulebook.md",
+    "agents.md",
+  ]);
+  if (ruleOrAgentAuthority.has(base)) {
+    return "RULE_OR_AGENT_AUTHORITY_CANDIDATE";
+  }
+
+  const governanceOrReference = new Set([
+    "business_rules.md",
+    "documentation_policy.md",
+    "migration_freeze.md",
+    "verification_layer_spec.md",
+    "feature_risk_registry.md",
+  ]);
+  if (governanceOrReference.has(base)) {
+    return "GOVERNANCE_OR_RULE_REFERENCE";
+  }
+
+  // Guides / reports
+  if (
+    base === "master_rulebook_implementation_guide.md" ||
+    /^acca_rules_v[0-9.]+\.md$/i.test(base) ||
+    /comprehensive_.*rules_report\.md$/i.test(base) ||
+    base === "smb_combo_rules_refined.txt" ||
+    /rules_refined/i.test(base)
+  ) {
+    return "RULE_GUIDE_OR_REPORT";
+  }
+
+  // Database enforcement and migrations (SQL surfaces)
+  if (lower.startsWith("sql/") && lower.endsWith(".sql")) {
+    if (/(rulebook|rules|governance)/.test(lower)) {
+      return "DATABASE_RULE_ENFORCEMENT";
+    }
+  }
+
+  if (lower.startsWith("supabase/migrations/") && lower.endsWith(".sql")) {
+    if (/(governance|rule_alignment|tier_rules|acca_rules|rule)/.test(lower)) {
+      return "DATABASE_RULE_ALIGNMENT_MIGRATION";
+    }
+  }
+
+  // Proof tests
+  if (
+    lower.startsWith("test") ||
+    lower.startsWith("tests/") ||
+    /_master_rulebook\.js$/i.test(base)
+  ) {
+    if (/(rulebook|rules|governance)/.test(lower)) {
+      return "RULE_PROOF_TEST";
+    }
+  }
+
+  // Runtime governance surfaces (js/ts)
+  if (
+    /^(governance|rulebookriskclassification)\.(js|ts)$/.test(base) ||
+    /rulebookriskclassification\.(js|ts)$/i.test(base)
+  ) {
+    return "RUNTIME_RULE_OR_GOVERNANCE";
+  }
+
+  // Audit/implementation tooling scripts
+  if (lower.startsWith("scripts/")) {
+    if (
+      lower.includes("master-qa") ||
+      lower.includes("rulebook") ||
+      lower.includes("governance") ||
+      /audit.*rule/.test(lower)
+    ) {
+      return "RULE_OR_GOVERNANCE_AUDIT_TOOL";
+    }
+  }
+
+  return null;
+}
+
+function detectFirstPartyAuthorityCandidates(trackedAssetPaths, preservedWorkspaceCandidatePaths) {
+  const detected = new Map(); // asset_path -> role
+
+  const allPaths = [...trackedAssetPaths, ...preservedWorkspaceCandidatePaths];
+  for (const p of allPaths) {
+    const role = candidateRoleForFirstPartyAuthority(p);
+    if (!role) continue;
+    if (!AUTHORITY_CANDIDATE_ROLES.includes(role)) continue;
+    detected.set(normalizePath(p), role);
+  }
+
+  return detected;
+}
+
+function validateRegister(register, options = {}) {
   const errors = [];
   const warnings = [];
 
@@ -654,6 +865,274 @@ function validateRegister(register) {
     }
   }
 
+  // ---- Workspace candidate snapshot validation ----
+  const workspaceSnapshot = register.workspace_candidate_snapshot;
+  if (!workspaceSnapshot || typeof workspaceSnapshot !== "object") {
+    errors.push("MISSING_WORKSPACE_CANDIDATE_SNAPSHOT");
+  }
+
+  const discoveredWorkspacePaths = getWorkspaceDiscoveredPaths(
+    options.workspaceDiscoveredPaths
+  );
+
+  const candidateByPath = new Map(); // asset_path -> candidate record
+  const preservedWorkspaceCandidates = new Map(); // asset_path -> record
+  const workspaceCandidates = Array.isArray(workspaceSnapshot?.candidates)
+    ? workspaceSnapshot.candidates
+    : [];
+
+  if (workspaceSnapshot) {
+    if (workspaceSnapshot.discovery_scope !== "NON_IGNORED_PRE_EXISTING_UNTRACKED") {
+      errors.push("WORKSPACE_DISCOVERY_SCOPE_INVALID");
+    }
+    if (workspaceSnapshot.discovery_command !== "git ls-files --others --exclude-standard") {
+      errors.push("WORKSPACE_DISCOVERY_COMMAND_INVALID");
+    }
+    if (workspaceSnapshot.tracked_path_count_semantics_unchanged !== true) {
+      errors.push("WORKSPACE_TRACKED_PATH_COUNT_SEMANTICS_INVALID");
+    }
+    if (workspaceSnapshot.underlying_artifact_commit_required !== false) {
+      errors.push("WORKSPACE_UNDERLYING_ARTIFACT_COMMIT_REQUIRED_INVALID");
+    }
+  }
+
+  const seenWorkspaceCandidatePaths = new Set();
+  for (const candidate of workspaceCandidates) {
+    if (!candidate || typeof candidate !== "object") {
+      errors.push("INVALID_WORKSPACE_CANDIDATE_RECORD");
+      continue;
+    }
+
+    const assetPath = normalizePath(candidate.asset_path || "");
+    if (!assetPath) {
+      errors.push("WORKSPACE_CANDIDATE_ASSET_PATH_MISSING");
+      continue;
+    }
+
+    if (seenWorkspaceCandidatePaths.has(assetPath)) {
+      errors.push(`DUPLICATE_WORKSPACE_CANDIDATE_PATH: ${assetPath}`);
+      continue;
+    }
+    seenWorkspaceCandidatePaths.add(assetPath);
+
+    if (candidate.source_state !== "PRE_EXISTING_UNTRACKED") {
+      errors.push(`WORKSPACE_CANDIDATE_SOURCE_STATE_INVALID: ${assetPath}`);
+      continue;
+    }
+
+    if (
+      !WORKSPACE_CANDIDATE_DISPOSITIONS.includes(
+        candidate.candidate_disposition
+      )
+    ) {
+      errors.push(
+        `INVALID_WORKSPACE_CANDIDATE_DISPOSITION: ${assetPath}`
+      );
+      continue;
+    }
+
+    if (candidate.governed_by_control_task_id !== "EPR-001") {
+      errors.push(
+        `WORKSPACE_CANDIDATE_CONTROL_TASK_UNKNOWN: ${assetPath} ${candidate.governed_by_control_task_id}`
+      );
+      continue;
+    }
+
+    if (!candidate.next_validation || !String(candidate.next_validation).trim()) {
+      errors.push(`WORKSPACE_CANDIDATE_NEXT_VALIDATION_EMPTY: ${assetPath}`);
+      continue;
+    }
+
+    if (!candidate.notes || !String(candidate.notes).trim()) {
+      errors.push(`WORKSPACE_CANDIDATE_NOTES_EMPTY: ${assetPath}`);
+      continue;
+    }
+
+    if (candidate.candidate_disposition === "EXPLICITLY_EXCLUDED") {
+      if (!candidate.exclusion_reason || !String(candidate.exclusion_reason).trim()) {
+        errors.push(
+          `WORKSPACE_CANDIDATE_EXCLUSION_REASON_EMPTY: ${assetPath}`
+        );
+        continue;
+      }
+    }
+
+    candidateByPath.set(assetPath, candidate);
+    if (candidate.candidate_disposition === "PRESERVED_CANDIDATE") {
+      preservedWorkspaceCandidates.set(assetPath, candidate);
+    }
+  }
+
+  // Fail-closed: every discovered non-ignored untracked workspace path must be governed.
+  let ungovWorkspaceCount = 0;
+  for (const discovered of discoveredWorkspacePaths) {
+    if (!candidateByPath.has(discovered)) {
+      errors.push(`WORKSPACE_CANDIDATE_UNGOVERNED: ${discovered}`);
+      ungovWorkspaceCount += 1;
+    }
+  }
+
+  // ---- Rule / governance authority candidate graph validation ----
+  const authorityGraph = register.rule_authority_candidate_graph;
+  if (!authorityGraph || typeof authorityGraph !== "object") {
+    errors.push("MISSING_RULE_AUTHORITY_CANDIDATE_GRAPH");
+  }
+
+  if (authorityGraph) {
+    if (authorityGraph.candidate_status_establishes_current_authority !== false) {
+      errors.push("AUTHORITY_GRAPH_FLAGS_INVALID_CURRENT_AUTHORITY");
+    }
+    if (authorityGraph.relationship_edges_establish_authority_precedence !== false) {
+      errors.push("AUTHORITY_GRAPH_FLAGS_INVALID_AUTHORITY_PRECEDENCE");
+    }
+  }
+
+  const graphNodes = Array.isArray(authorityGraph?.nodes)
+    ? authorityGraph.nodes
+    : [];
+  const graphEdges = Array.isArray(authorityGraph?.edges)
+    ? authorityGraph.edges
+    : [];
+
+  const trackedAssetPaths = new Set(assets.map((a) => normalizePath(a.asset_path)));
+  const preservedWorkspaceCandidatePaths = [...preservedWorkspaceCandidates.keys()];
+
+  const expectedDetectedCandidates = detectFirstPartyAuthorityCandidates(
+    [...trackedAssetPaths],
+    preservedWorkspaceCandidatePaths
+  ); // asset_path -> role
+
+  const nodeByPath = new Map(); // asset_path -> node object
+  const nodeAssetPaths = new Set();
+  const incidentEdgeCount = new Map(); // asset_path -> incident edge count
+
+  for (const node of graphNodes) {
+    if (!node || typeof node !== "object") {
+      errors.push("INVALID_AUTHORITY_CANDIDATE_GRAPH_NODE");
+      continue;
+    }
+
+    const assetPath = normalizePath(node.asset_path || "");
+    if (!assetPath) {
+      errors.push("AUTHORITY_CANDIDATE_GRAPH_NODE_ASSET_PATH_MISSING");
+      continue;
+    }
+
+    if (nodeAssetPaths.has(assetPath)) {
+      errors.push(`DUPLICATE_AUTHORITY_CANDIDATE_GRAPH_NODE: ${assetPath}`);
+      continue;
+    }
+    nodeAssetPaths.add(assetPath);
+    incidentEdgeCount.set(assetPath, 0);
+
+    if (!AUTHORITY_CANDIDATE_ROLES.includes(node.candidate_role)) {
+      errors.push(`INVALID_AUTHORITY_CANDIDATE_ROLE: ${assetPath}`);
+      continue;
+    }
+
+    if (node.authority_review_status !== AUTHORITY_REVIEW_STATUS) {
+      errors.push(`INVALID_AUTHORITY_REVIEW_STATUS: ${assetPath}`);
+      continue;
+    }
+
+    if (typeof node.standalone_review_candidate !== "boolean") {
+      errors.push(`INVALID_STANDALONE_REVIEW_CANDIDATE_FLAG: ${assetPath}`);
+      continue;
+    }
+
+    if (node.standalone_review_candidate) {
+      if (!node.standalone_justification || !String(node.standalone_justification).trim()) {
+        errors.push(`STANDALONE_REVIEW_CANDIDATE_JUSTIFICATION_EMPTY: ${assetPath}`);
+        continue;
+      }
+    }
+
+    const isTracked = trackedAssetPaths.has(assetPath);
+    const preservedWorkspace = preservedWorkspaceCandidates.has(assetPath);
+    if (!isTracked && !preservedWorkspace) {
+      errors.push(`AUTHORITY_CANDIDATE_UNKNOWN_REFERENCE: ${assetPath}`);
+      continue;
+    }
+
+    // Graph nodes must be first-party authority candidates; any detected candidate must be represented,
+    // and nodes cannot reference EXPLICITLY_EXCLUDED workspace candidates.
+    if (!isTracked && preservedWorkspaceCandidates.get(assetPath)?.candidate_disposition !== "PRESERVED_CANDIDATE") {
+      errors.push(`AUTHORITY_CANDIDATE_UNKNOWN_REFERENCE: ${assetPath}`);
+      continue;
+    }
+
+    nodeByPath.set(assetPath, node);
+  }
+
+  // Ensure every detected first-party authority candidate has a node.
+  for (const [assetPath, expectedRole] of expectedDetectedCandidates.entries()) {
+    const node = nodeByPath.get(assetPath);
+    if (!node) {
+      errors.push(`AUTHORITY_CANDIDATE_MISSING_FROM_GRAPH: ${assetPath}`);
+      continue;
+    }
+    if (node.candidate_role !== expectedRole) {
+      errors.push(
+        `AUTHORITY_CANDIDATE_ROLE_MISMATCH: ${assetPath} expected=${expectedRole} got=${node.candidate_role}`
+      );
+    }
+  }
+
+  // Validate edges and incident coverage.
+  for (const edge of graphEdges) {
+    if (!edge || typeof edge !== "object") {
+      errors.push("INVALID_AUTHORITY_CANDIDATE_GRAPH_EDGE");
+      continue;
+    }
+
+    const fromAssetPath = normalizePath(
+      edge.from_asset_path || edge.from || ""
+    );
+    const toAssetPath = normalizePath(edge.to_asset_path || edge.to || "");
+    const relationshipType = edge.relationship_type;
+
+    if (!fromAssetPath || !toAssetPath) {
+      errors.push("AUTHORITY_CANDIDATE_EDGE_ENDPOINT_MISSING");
+      continue;
+    }
+
+    if (!nodeByPath.has(fromAssetPath) || !nodeByPath.has(toAssetPath)) {
+      errors.push(
+        `AUTHORITY_CANDIDATE_EDGE_UNKNOWN_ENDPOINT: ${fromAssetPath} -> ${toAssetPath}`
+      );
+      continue;
+    }
+
+    if (!GRAPH_RELATIONSHIP_TYPES.includes(relationshipType)) {
+      errors.push(`INVALID_AUTHORITY_GRAPH_RELATIONSHIP_TYPE: ${relationshipType}`);
+      continue;
+    }
+
+    if (GRAPH_FORBIDDEN_RELATIONSHIP_TYPES.has(relationshipType)) {
+      errors.push(`AUTHORITY_RELATIONSHIP_PRECEDENCE_IMPLIED: ${relationshipType}`);
+      continue;
+    }
+
+    // Count incident edges
+    incidentEdgeCount.set(fromAssetPath, (incidentEdgeCount.get(fromAssetPath) || 0) + 1);
+    incidentEdgeCount.set(toAssetPath, (incidentEdgeCount.get(toAssetPath) || 0) + 1);
+  }
+
+  // Unlink / standalone justification integrity.
+  for (const [assetPath, node] of nodeByPath.entries()) {
+    const count = incidentEdgeCount.get(assetPath) || 0;
+    const standalone = node.standalone_review_candidate;
+
+    if (count > 0) continue;
+
+    if (standalone) {
+      // Standalone candidates must already be validated for justification existence above.
+      continue;
+    }
+
+    errors.push(`AUTHORITY_CANDIDATE_UNLINKED: ${assetPath}`);
+  }
+
   return {
     passed: errors.length === 0,
     errors,
@@ -661,6 +1140,22 @@ function validateRegister(register) {
     assets,
     exclusions,
     trackedPaths,
+    discoveredWorkspacePaths,
+    preservedWorkspaceCandidateCount: preservedWorkspaceCandidates.size,
+    discoveredWorkspaceCandidateCount: discoveredWorkspacePaths.length,
+    explicitWorkspaceCandidateExclusionsCount: [...candidateByPath.values()].filter(
+      (c) => c.candidate_disposition === "EXPLICITLY_EXCLUDED"
+    ).length,
+    ungovernedWorkspaceCandidateCount: ungovWorkspaceCount,
+    authorityCandidateCount: expectedDetectedCandidates.size,
+    authorityGraphNodeCount: nodeByPath.size,
+    authorityGraphEdgeCount: graphEdges.length,
+    unlinkedAuthorityCandidateCount: [...nodeByPath.keys()].filter(
+      (p) => (incidentEdgeCount.get(p) || 0) === 0
+    ).length,
+    standaloneReviewCandidateCount: [...nodeByPath.values()].filter(
+      (n) => n.standalone_review_candidate === true
+    ).length,
   };
 }
 
@@ -689,6 +1184,65 @@ function printReport(result) {
   console.log(`Tracked paths: ${result.trackedPaths.length}`);
   console.log(`Registered assets: ${result.assets.length}`);
   console.log(`Explicit exclusions: ${result.exclusions.length}`);
+
+  // Required reporting fields (kept separate from existing output)
+  console.log(`TRACKED PATH COUNT: ${result.trackedPaths.length}`);
+  console.log(
+    `REGISTERED TRACKED ASSETS: ${result.assets.length}`
+  );
+  console.log(
+    `EXPLICIT TRACKED EXCLUSIONS: ${result.exclusions.length}`
+  );
+  console.log(
+    `UNCLASSIFIED TRACKED PATHS: ${
+      result.errors.filter((e) => e.startsWith("UNCLASSIFIED_TRACKED_PATH")).length
+    }`
+  );
+
+  console.log(
+    `DISCOVERED NON-IGNORED UNTRACKED WORKSPACE PATH COUNT: ${
+      result.discoveredWorkspaceCandidateCount || 0
+    }`
+  );
+  console.log(
+    `PRESERVED WORKSPACE CANDIDATE COUNT: ${
+      result.preservedWorkspaceCandidateCount || 0
+    }`
+  );
+  console.log(
+    `EXPLICIT WORKSPACE CANDIDATE EXCLUSIONS: ${
+      result.explicitWorkspaceCandidateExclusionsCount || 0
+    }`
+  );
+  console.log(
+    `UNGOVERNED WORKSPACE CANDIDATES: ${
+      result.ungovernedWorkspaceCandidateCount || 0
+    }`
+  );
+
+  console.log("");
+  console.log("Governed rule / governance authority candidate graph:");
+  console.log(
+    `  RULE / GOVERNANCE AUTHORITY CANDIDATE COUNT: ${
+      result.authorityCandidateCount || 0
+    }`
+  );
+  console.log(
+    `  AUTHORITY GRAPH NODES: ${result.authorityGraphNodeCount || 0}`
+  );
+  console.log(
+    `  AUTHORITY GRAPH EDGES: ${result.authorityGraphEdgeCount || 0}`
+  );
+  console.log(
+    `  UNLINKED AUTHORITY CANDIDATES: ${
+      result.unlinkedAuthorityCandidateCount || 0
+    }`
+  );
+  console.log(
+    `  STANDALONE REVIEW CANDIDATES: ${
+      result.standaloneReviewCandidateCount || 0
+    }`
+  );
   console.log("");
   console.log("Governed cleanup findings (non-fatal):");
   console.log(`  Unresolved owners: ${unresolved}`);
@@ -734,7 +1288,10 @@ module.exports = {
   PROJECT_REGISTER_PATH,
   normalizePath,
   getTrackedPaths,
+  getWorkspaceDiscoveredPaths,
   loadAssetRegister,
   validateRegister,
   runCheck,
+  candidateRoleForFirstPartyAuthority,
+  detectFirstPartyAuthorityCandidates,
 };
