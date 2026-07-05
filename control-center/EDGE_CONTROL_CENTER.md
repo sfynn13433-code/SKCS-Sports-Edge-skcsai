@@ -262,7 +262,34 @@ Purpose:
 
 Implement the approved Master Project Register + Repository Asset Register foundation only, without performing Scout/FIP intake implementation, provider removal, Supabase mutation, or prediction-rule changes.
 Completion contract:
-Tracked-path coverage is 898/898 from current implementation evidence; unclassified tracked paths are 0; 886 assets currently have unresolved final project ownership and are registered and governed by valid Control Center task bindings. UNRESOLVED means final project ownership has not yet been determined; it is treated as a non-fatal governed cleanup finding only while the asset remains bound to a valid Control Center task and has a non-empty `next_validation`. Asset integrity must not fail merely because an asset is LEGACY, HISTORICAL_EVIDENCE, NO_CONSUMER, ORPHAN, CONFLICT, UNKNOWN, or awaiting final project ownership; unknown governed_by_control_task_id remains fail-closed. EPR-001 remains APPROVED and must not be promoted in this approval step.
+Current tracked coverage evidence is:
+- 898 tracked paths
+- 898 registered tracked assets
+- 0 unclassified tracked paths
+
+This is complete tracked repository coverage. It is not complete local workspace visibility.
+
+Current discovery evidence also identified:
+- 40 non-ignored pre-existing untracked workspace paths
+- 0 currently registered or explicitly excluded in the asset register
+- 40 outside the current asset register boundary
+
+Pre-existing untracked workspace candidates must be discovered separately from tracked repository assets. The underlying untracked artifact does not need to be committed merely to preserve governed evidence that the path was observed. Every discovered pre-existing untracked candidate must be preserved as governed workspace candidate evidence or explicitly excluded with a reason.
+
+Current rule/governance candidate evidence identified:
+- 35 total candidate paths
+- 34 tracked
+- 1 pre-existing untracked
+
+Known first-party rule and governance authority candidates remain identifiable by review role, but this proves inventory visibility rather than a connected authority-review graph:
+- 34 tracked candidates currently authority UNKNOWN
+- 34 tracked candidates currently owner UNRESOLVED
+- 34 tracked candidates governed by EPR-001
+- 34 tracked candidates currently have empty related_assets
+
+Candidate status does not establish CURRENT_AUTHORITY. Candidate relationship edges are review relationships, not authority precedence. A candidate with no relationship edge must be explicitly identified as a standalone review candidate with a non-empty reason. Ignored dependency, environment, and cache paths are not first-party authority candidates merely because their names contain rule/governance terms. Final rule/governance authority remains subject to governed review.
+
+UNRESOLVED final project ownership may remain as a non-fatal governed cleanup finding only when the asset remains bound to a valid Control Center task and has a non-empty `next_validation`. EPR-001 remains APPROVED and must not be promoted in this approval step.
 
 Do not start FIP intake.
 

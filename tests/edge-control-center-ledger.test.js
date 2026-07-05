@@ -170,7 +170,7 @@ describe("Edge Control Center Ledger v1", () => {
     );
     assert.match(
       task.completion_definition,
-      /every registered asset declares a valid governed_by_control_task_id/
+      /every registered tracked asset declares a valid governed_by_control_task_id/
     );
     assert.match(
       task.completion_definition,
@@ -186,7 +186,35 @@ describe("Edge Control Center Ledger v1", () => {
     );
     assert.match(
       task.completion_definition,
-      /asset integrity does not fail merely because an asset is LEGACY, HISTORICAL_EVIDENCE, NO_CONSUMER, ORPHAN, CONFLICT, UNKNOWN, or awaiting final project ownership/i
+      /candidate status does not establish CURRENT_AUTHORITY/
+    );
+    assert.match(
+      task.completion_definition,
+      /non-ignored pre-existing untracked workspace paths are discovered separately from the tracked repository universe/i
+    );
+    assert.match(
+      task.completion_definition,
+      /preserved as governed workspace candidate evidence or explicitly excluded with a reason/i
+    );
+    assert.match(
+      task.completion_definition,
+      /without requiring the underlying file to be committed/i
+    );
+    assert.match(
+      task.completion_definition,
+      /known first-party rule and governance authority candidates remain identifiable by review role/i
+    );
+    assert.match(
+      task.completion_definition,
+      /governed candidate relationship graph|explicitly justified as standalone review candidates/i
+    );
+    assert.match(
+      task.completion_definition,
+      /ignored dependency, environment, and cache paths are excluded from first-party authority candidate discovery/i
+    );
+    assert.match(
+      task.completion_definition,
+      /asset integrity does not fail merely because an asset is/i
     );
 
     // Proof requirements (must include all governed-unresolved semantics)
@@ -211,6 +239,47 @@ describe("Edge Control Center Ledger v1", () => {
     );
     assert.match(
       proofText,
+      /Non-ignored untracked workspace candidate discovery is performed separately from tracked-path counting\./
+    );
+    assert.match(
+      proofText,
+      /git-aware non-ignored path discovery such as git ls-files --others --exclude-standard/
+    );
+    assert.match(
+      proofText,
+      /Preserving a pre-existing untracked workspace candidate does not require committing the underlying artifact\./
+    );
+    assert.ok(
+      proofText.includes(
+        "node_modules, .venv, venv, **pycache**, and .pyc"
+      )
+    );
+    assert.match(
+      proofText,
+      /Candidate-role assignment is a review classification and does not establish CURRENT_AUTHORITY\./
+    );
+    assert.match(
+      proofText,
+      /linked through governed related-asset relationships or an equivalent candidate relationship graph\./
+    );
+    assert.match(
+      proofText,
+      /no relationship edge must be explicitly marked as a standalone review candidate with a non-empty justification\./
+    );
+    assert.match(
+      proofText,
+      /Relationship edges identify review relationships only and do not assert authority precedence\./
+    );
+    assert.match(
+      proofText,
+      /candidate relationship graph integrity fails for missing candidate references|Tests prove candidate relationship graph integrity fails for missing candidate references/
+    );
+    assert.match(
+      proofText,
+      /Final authority classification remains subject to governed review\./
+    );
+    assert.match(
+      proofText,
       /No runtime provider removal, Scout\/FIP intake, Supabase mutation, prediction-rule change, ACCA-rule change, migration execution, or deployment change occurs as part of EPR-001\./
     );
     assert.match(
@@ -221,11 +290,19 @@ describe("Edge Control Center Ledger v1", () => {
     // Next action must preserve fail-closed semantics and set closure evidence for TESTED promotion.
     assert.match(
       task.next_action,
-      /Implement the approved governed unresolved-ownership checker correction and tests only/
+      /Implement the approved pre-existing untracked workspace candidate discovery and rule\/governance authority candidate graph correction/
+    );
+    assert.match(
+      task.next_action,
+      /preserve tracked-path count semantics/
     );
     assert.match(
       task.next_action,
       /keep unknown Control Center task bindings fail-closed/
+    );
+    assert.match(
+      task.next_action,
+      /do not declare candidate authority/
     );
     assert.match(
       task.next_action,
