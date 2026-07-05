@@ -133,33 +133,34 @@ describe("Edge Control Center Ledger v1", () => {
     assert.ok(task.current_evidence.length > 0);
   });
 
-  it("Edge Master Project Register remains PROPOSED", () => {
+  it("Edge Master Project Register becomes APPROVED", () => {
     const task = loadLedger().tasks.find(
       (item) => item.task_id === "EPR-001"
     );
 
     assert.ok(task);
-    assert.equal(task.status, "PROPOSED");
+    assert.equal(task.status, "APPROVED");
     assert.deepEqual(task.blocked_by, ["ECC-001"]);
   });
 
-  it("there are no auto-startable tasks", () => {
+  it("EPR-001 becomes the single auto-startable task", () => {
     const result = runCheck({
       ledgerPath: LEDGER_PATH,
     });
 
-    assert.equal(result.startable.length, 0);
-    assert.equal(result.next, null);
+    assert.equal(result.startable.length, 1);
+    assert.ok(result.next);
+    assert.equal(result.next.task_id, "EPR-001");
+    assert.equal(result.next.status, "APPROVED");
+    assert.equal(result.gated, null);
   });
 
-  it("EPR-001 is the single next gated task selected by control logic", () => {
+  it("EPR-001 is not selected as gated task once APPROVED", () => {
     const result = runCheck({
       ledgerPath: LEDGER_PATH,
     });
 
-    assert.ok(result.gated);
-    assert.equal(result.gated.task_id, "EPR-001");
-    assert.equal(result.gated.status, "PROPOSED");
+    assert.equal(result.gated, null);
   });
 
   it("Scout-Edge marriage gate is explicitly blocked", () => {

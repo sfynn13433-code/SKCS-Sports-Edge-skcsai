@@ -62,7 +62,7 @@
       "task_name": "Edge Master Project Register",
       "workstream": "Control Center",
       "description": "Inventory and register all known Edge projects, subprojects, runtime systems, legacy paths, commercial boundaries, storage concerns, and integration work before further architecture changes.",
-      "status": "PROPOSED",
+      "status": "APPROVED",
       "priority": "critical",
       "blocked_by": [
         "ECC-001"
@@ -89,11 +89,13 @@
         "Dependency references resolve",
         "Control Center references the canonical register"
       ],
-      "current_evidence": [],
-      "open_gaps": [
-        "Repository-wide Edge project inventory not yet performed"
+      "current_evidence": [
+        "EPR-001 scope-resolution inspection completed",
+        "Two-register model (Master Project Register + Repository Asset Register) approved",
+        "Repository asset universe coverage law approved"
       ],
-      "next_action": "PROPOSED-GATE INSPECTION ONLY. Determine register categories and inventory boundaries before implementation.",
+      "open_gaps": [],
+      "next_action": "Implement EPR-001 approved Master Project Register + Repository Asset Register foundation only. Preserve governance boundaries and do not perform Scout/FIP intake or provider removal during this implementation.",
       "owner_note": "Do not invent the Edge backlog from memory; derive it from the repository and current architecture.",
       "last_updated": "2026-07-05"
     },

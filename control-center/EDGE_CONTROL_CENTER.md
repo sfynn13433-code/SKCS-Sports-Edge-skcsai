@@ -39,7 +39,7 @@ It is the governed resumption of the intentionally deferred Scout ↔ Edge integ
 | Dimension | Status |
 |---|---|
 | **Edge Control Center v1** | DONE |
-| **Edge Master Project Register** | PROPOSED |
+| **Edge Master Project Register** | APPROVED |
 | **Full Edge system/runtime inventory** | PROPOSED |
 | **Scout ↔ Edge marriage gate** | BLOCKED |
 | **Supabase storage gate** | BLOCKED |
@@ -248,19 +248,19 @@ Before implementation:
 
 ## 8. Next task
 
-There are no auto-startable tasks.
+Next allowed startable task is:
 
-The next gated task must be:
+Approved next allowed task:
 
-**EPR-001 — Edge Master Project Register [PROPOSED]**
+**EPR-001 — Edge Master Project Register [APPROVED]**
 
 Mode:
 
-**PROPOSED-GATE INSPECTION ONLY**
+**IMPLEMENT EPR-001 APPROVED BOUNDARY ONLY**
 
 Purpose:
 
-Determine the canonical project categories and repository inventory boundaries before creating the Edge Master Project Register.
+Implement the approved Master Project Register + Repository Asset Register foundation only, without performing Scout/FIP intake implementation, provider removal, Supabase mutation, or prediction-rule changes.
 
 Do not start FIP intake.
 
