@@ -189,7 +189,7 @@
       "task_name": "Edge Asset Classification and Repository Map",
       "workstream": "Repository Organization",
       "description": "Perform one controlled content skim of every governed Edge asset and capture a concise purpose description, functional grouping, truthful provisional current-state designation, relationship evidence, and next validation where evidence remains insufficient.",
-      "status": "PROPOSED",
+      "status": "APPROVED",
       "priority": "critical",
       "blocked_by": [
         "EPR-001",
@@ -206,7 +206,7 @@
       "related_contracts": [],
       "affected_files": [],
       "affected_tables": [],
-      "completion_definition": "A deterministic Edge asset-classification inventory and repository map exist for the complete governed asset universe. Every governed asset has a non-empty concise purpose description, a functional/domain grouping, a valid provisional current-state designation, structured relationship classification evidence, and a non-empty evidence/reason record. Explicit UNKNOWN classification is permitted where available evidence is insufficient and must retain a meaningful next_validation. The classification process is executed through deterministic, auditable folder/domain batches with complete asset coverage and no silently skipped asset. Existing EPR-001 asset metadata and ESA-001 runtime relationship evidence are reused where applicable rather than re-inferred without reason. Control Center reporting exposes real designation counts and proves missing purpose descriptions = 0, missing functional groupings = 0, missing provisional designations = 0, invalid provisional designations = 0, and silently undesignated governed assets = 0. EAC-001 does not make final KEEP, ALIGN, MERGE, REPLACE, RETIRE, or ARCHIVE_EVIDENCE decisions and does not activate Scout/FIP intake, retire providers, mutate storage, change prediction rules, declare rule authority, or redesign Edge architecture.",
+      "completion_definition": "A deterministic Edge asset-classification inventory and repository map exist for the complete governed asset universe. For every governed asset the future classification foundation captures exactly these four structured fields: purpose_description, functional_group, relationship_tags, and classification_evidence, while preserving existing authoritative fields: current_state, next_validation, notes, owner_project_id, and governed_by_control_task_id. functional_group uses the approved controlled enum, and relationship_tags uses the approved controlled tags; UNKNOWN is permitted but must satisfy the conservative UNKNOWN completion law with non-empty purpose_description, non-empty functional_group, at least one non-empty classification_evidence element, and a meaningful non-empty next_validation that identifies the later evidence check. The classification process is executed through a deterministic, auditable 29-batch model with fixed ordered first-match precedence, full 902-asset coverage, no silently skipped asset, and a hard batch maximum of 100 assets; the batch rules are stable enough to encode in a machine-readable manifest. Existing EPR-001 asset metadata and ESA-001 runtime/system evidence are reused where applicable rather than re-inferred without reason, and any ESA relationship evidence contradiction must be reconciled conservatively (not overwritten silently) by classification evidence and next_validation reconciliation. Control Center reporting exposes real designation counts and proves missing purpose descriptions = 0, missing functional groupings = 0, missing provisional current-state designations = 0, invalid provisional designations = 0, and silently undesignated governed assets = 0. The repository map requirement exposes total governed asset count, designation counts by current_state, functional_group counts, relationship_tags counts, UNKNOWN count, and counts of assets with non-empty next_validation, and a per-asset view that includes asset_path, purpose_description, functional_group, current_state, relationship_tags, classification_evidence summary, and next_validation. A fail-closed EAC checker proves TOTAL GOVERNED ASSETS equals TOTAL CLASSIFIED ASSETS, and validates zero missing purpose_description, missing functional_group, missing current_state, invalid current_state, missing relationship_tags field, missing classification_evidence, UNBATCHED governed assets, and DUPLICATE batch membership; UNKNOWN with empty or non-meaningful next_validation must be proven to be 0. EAC-001 does not make final KEEP, ALIGN, MERGE, REPLACE, RETIRE, or ARCHIVE_EVIDENCE decisions and does not activate Scout/FIP intake, retire providers, mutate storage, change prediction rules, declare rule authority, or redesign Edge architecture.",
       "proof_required": [
         "Deterministic batch manifest covers complete governed asset universe",
         "Missing purpose descriptions = 0",
@@ -216,19 +216,16 @@
         "Governed designation counts reported without silent skips",
         "No KEEP / ALIGN / MERGE / REPLACE / RETIRE / ARCHIVE_EVIDENCE decisions made"
       ],
-      "current_evidence": [],
-      "open_gaps": [
-        "Asset register does not currently have a dedicated structured purpose description field",
-        "Asset register does not currently have a dedicated functional/domain grouping field",
-        "Asset register does not currently have structured relationship tags",
-        "Notes provides only partial unstructured classification evidence",
-        "890 of 902 governed assets currently have current_state UNKNOWN",
-        "Deterministic skim batch model is not yet defined",
-        "Repository classification map and classification checker do not yet exist",
-        "Complete zero-missing-description / zero-missing-grouping closure proof does not yet exist"
+      "current_evidence": [
+        "Validated EAC classification contract scope: purpose_description, functional_group, relationship_tags, classification_evidence",
+        "Validated conservative UNKNOWN completion law requirements for non-empty evidence and meaningful next_validation",
+        "Validated deterministic 29-batch model with fixed ordered first-match precedence, 902/902 coverage, zero unbatched assets, zero duplicate membership, and no batch over 100 assets",
+        "Validated EPR/ESA evidence reuse and ESA contradiction reconciliation rules",
+        "Validated repository map requirements and fail-closed completion proof targets without final asset-resolution decisions"
       ],
-      "next_action": "Perform a separate EAC-001 PROPOSED-gate contract inspection. Define the minimum classification schema, controlled relationship taxonomy, deterministic folder/domain batch model, evidence reuse law, UNKNOWN law, repository map, and fail-closed completion proof before approval. Do not begin the repository skim until EAC-001 is separately APPROVED.",
-      "owner_note": "Bootstraps a repository-wide content map without changing runtime architecture, providers, database retention, or any rule authority.",
+      "open_gaps": [],
+      "next_action": "Implement the approved EAC-001 classification foundation only: extend governed asset records with purpose_description, functional_group, relationship_tags, and classification_evidence; create the deterministic 29-batch manifest; create the repository map renderer/output and per-asset indexing; create the fail-closed EAC classification checker and contract tests. Do not begin batch content classification until the foundation passes separate validation.",
+      "owner_note": "EAC-001 contract scope resolved (batch model + evidence reuse + fail-closed closure law) without starting repository skim or changing runtime architecture.",
       "last_updated": "2026-07-06"
     },
     {

@@ -319,11 +319,12 @@ describe("Edge Control Center Ledger v1", () => {
       ledgerPath: LEDGER_PATH,
     });
 
-    assert.equal(result.startable.length, 0);
-    assert.equal(result.next, null);
-    assert.ok(result.gated);
-    assert.equal(result.gated.task_id, "EAC-001");
-    assert.equal(result.gated.status, "PROPOSED");
+    assert.equal(result.startable.length, 1);
+    assert.ok(result.startable.some((t) => t.task_id === "EAC-001"));
+    assert.ok(result.next);
+    assert.equal(result.next.task_id, "EAC-001");
+    assert.equal(result.next.status, "APPROVED");
+    assert.equal(result.gated, null);
   });
 
   it("EPR-001 remains TESTED and is not startable once ESA-001 is TESTED", () => {
