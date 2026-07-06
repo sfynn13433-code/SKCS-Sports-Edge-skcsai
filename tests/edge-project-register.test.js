@@ -132,13 +132,13 @@ describe("Edge Master Project Register v1", () => {
     );
   });
 
-  it("ESA-001 remains APPROVED and self-governed with ledger mirror", () => {
+  it("ESA-001 remains TESTED and self-governed with ledger mirror", () => {
     const esa = loadRegister().projects.find(
       (project) => project.project_id === "ESA-001"
     );
 
     assert.ok(esa);
-    assert.equal(esa.current_status, "APPROVED");
+    assert.equal(esa.current_status, "TESTED");
     assert.equal(
       esa.governed_by_control_task_id,
       "ESA-001"
@@ -190,7 +190,7 @@ describe("Edge Master Project Register v1", () => {
       (task) => taskId(task) === "ESA-001"
     );
     assert.ok(ledgerTask);
-    assert.equal(ledgerTask.status, "APPROVED");
+    assert.equal(ledgerTask.status, "TESTED");
 
     const register = loadRegister();
     const cloned = JSON.parse(JSON.stringify(register));
@@ -205,7 +205,7 @@ describe("Edge Master Project Register v1", () => {
     const result = validateRegister(cloned);
     assert.ok(
       result.errors.includes(
-        "PROJECT_LEDGER_STATUS_DRIFT: ESA-001 register=PROPOSED ledger=APPROVED"
+        "PROJECT_LEDGER_STATUS_DRIFT: ESA-001 register=PROPOSED ledger=TESTED"
       )
     );
     assert.equal(result.passed, false);

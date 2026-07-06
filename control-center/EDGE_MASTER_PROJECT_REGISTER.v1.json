@@ -108,7 +108,7 @@
       "category": "Architecture Foundation",
       "description": "Map active, legacy, dead, duplicated, commercial, prediction, storage, AI, provider, scheduler, grading, and deployment surfaces in Edge.",
       "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
-      "current_status": "APPROVED",
+      "current_status": "TESTED",
       "priority": "critical",
       "blocked_by": [
         "EPR-001"
@@ -149,12 +149,16 @@
         "Control Center sequencing bypass"
       ],
       "recommended_order": 3,
-      "next_action": "Implement the approved ESA-001 read-only Edge System and Runtime Inventory foundation using EPR-001 repository asset and workspace candidate truth; create the canonical machine-readable inventory, synchronized runtime map, integrity checker, and contract tests; inventory complete material current-state runtime/system reachability without modifying runtime architecture, removing providers, activating Scout/FIP, mutating Supabase, executing SQL or migrations, declaring canonical rule authority, or changing rule thresholds; return closure evidence for separate ESA-001 TESTED promotion inspection.",
+      "next_action": "ESA-001 closed as TESTED; follow Control Center sequencing for the next governed task.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
-      "last_updated": "2026-07-05",
+      "last_updated": "2026-07-06",
       "governed_by_control_task_id": "ESA-001",
       "current_evidence": [
-        "Phase 2 provider inspection already showed the original nine-file inventory was incomplete"
+        "Canonical ESA-001 runtime inventory generated: 222 material surfaces",
+        "Canonical inventory relationship evidence drift: 0",
+        "Canonical relationship parity enabled (fail-closed) and runtime map synchronized",
+        "ESA-001 contract tests passed: 29/0",
+        "EPR / Control Center contract tests passed: 32/0 and 64/0"
       ]
     },
     {

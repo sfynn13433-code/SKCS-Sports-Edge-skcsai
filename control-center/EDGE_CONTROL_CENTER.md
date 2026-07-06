@@ -39,8 +39,8 @@ It is the governed resumption of the intentionally deferred Scout ↔ Edge integ
 | Dimension | Status |
 |---|---|
 | **Edge Control Center v1** | DONE |
-| **Edge Master Project Register** | APPROVED |
-| **Full Edge system/runtime inventory** | PROPOSED |
+| **Edge Master Project Register** | TESTED |
+| **Full Edge system/runtime inventory** | TESTED |
 | **Scout ↔ Edge marriage gate** | BLOCKED |
 | **Supabase storage gate** | BLOCKED |
 | **External sports provider removal** | PARTIAL |
@@ -302,6 +302,6 @@ Do not clear the marriage gate.
 Startable tasks: 0
 
 Next gated task:
-**ESA-001 — Edge System and Runtime Inventory [PROPOSED]**
+**EMG-001 — Scout-Edge Marriage Gate Contract [PROPOSED]**
 
 Requires separate approval before start

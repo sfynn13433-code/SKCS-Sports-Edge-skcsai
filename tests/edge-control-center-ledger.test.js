@@ -314,24 +314,24 @@ describe("Edge Control Center Ledger v1", () => {
     );
   });
 
-  it("ESA-001 is the single auto-startable task once APPROVED", () => {
+  it("ESA-001 is not auto-startable once TESTED", () => {
     const result = runCheck({
       ledgerPath: LEDGER_PATH,
     });
 
-    assert.equal(result.startable.length, 1);
-    assert.ok(result.next);
-    assert.equal(result.next.task_id, "ESA-001");
-    assert.equal(result.next.status, "APPROVED");
-    assert.equal(result.gated, null);
+    assert.equal(result.startable.length, 0);
+    assert.equal(result.next, null);
+    assert.ok(result.gated);
+    assert.equal(result.gated.task_id, "EMG-001");
+    assert.equal(result.gated.status, "PROPOSED");
   });
 
-  it("EPR-001 remains TESTED and is not startable once ESA-001 is APPROVED", () => {
+  it("EPR-001 remains TESTED and is not startable once ESA-001 is TESTED", () => {
     const result = runCheck({
       ledgerPath: LEDGER_PATH,
     });
 
-    assert.ok(result.startable.some((t) => t.task_id === "ESA-001"));
+    assert.ok(!result.startable.some((t) => t.task_id === "ESA-001"));
     assert.ok(!result.startable.some((t) => t.task_id === "EPR-001"));
   });
 
@@ -341,7 +341,7 @@ describe("Edge Control Center Ledger v1", () => {
     );
 
     assert.ok(task);
-    assert.equal(task.status, "APPROVED");
+    assert.equal(task.status, "TESTED");
 
     const cd = task.completion_definition;
 
