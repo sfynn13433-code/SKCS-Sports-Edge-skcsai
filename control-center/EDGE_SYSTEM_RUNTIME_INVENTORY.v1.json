@@ -134,8 +134,7 @@
       "source_state": "PRE_EXISTING_MODIFIED",
       "surface_classes": [
         "CONTROLLER",
-        "DATABASE_SURFACE",
-        "SCOUT_FIP_SURFACE"
+        "DATABASE_SURFACE"
       ],
       "reachability_state": "CONFIRMED",
       "mount_paths": [],
@@ -154,20 +153,10 @@
       "external_providers": [],
       "environment_key_names": [
         "BOT_ACCA_CONFIDENCE_MIN",
-        "EDGEMIND_VISIBLE_WINDOW_HOURS",
-        "SUPABASE_SERVICE_ROLE_KEY",
-        "SUPABASE_URL"
+        "EDGEMIND_VISIBLE_WINDOW_HOURS"
       ],
       "database_role": "READ",
-      "database_objects": [
-        "Scout",
-        "direct1x2_prediction_final",
-        "my",
-        "prediction_publish_runs",
-        "scout_raw_match_signals",
-        "the",
-        "these"
-      ],
+      "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
@@ -253,33 +242,23 @@
       ],
       "database_role": "READ_WRITE",
       "database_objects": [
-        "DATABASE_URL.",
         "IF",
-        "JSONB",
-        "SET",
         "acca_rules",
         "across",
         "await",
         "direct1x2_prediction_final",
         "for",
-        "information_schema.columns",
-        "information_schema.tables",
-        "injuries",
         "is",
         "leagues",
         "matches",
-        "news_mentions",
         "not",
         "pg_constraint",
-        "pg_type",
         "prediction_results",
-        "prediction_results...",
         "profiles",
         "public.direct1x2_prediction_final",
         "replaced",
         "subscriptions",
         "table_lifecycle_registry",
-        "team_stats",
         "teams",
         "tier_rules",
         "users"
@@ -309,6 +288,7 @@
         "backend/routes/accuracy.js",
         "backend/routes/debug.js",
         "backend/routes/predictions.js",
+        "backend/routes/sportsEdge.js",
         "backend/routes/user.js",
         "backend/routes/v1/acca.js",
         "backend/routes/v1/predictions.js",
@@ -322,8 +302,10 @@
         "backend/services/blockedApiCallsLog.js",
         "backend/services/cronJobs.js",
         "backend/services/direct1x2Builder.js",
+        "backend/services/enhancedMatchDetailsService.js",
         "backend/services/filterEngine.js",
         "backend/services/gradingSnapshotService.js",
+        "backend/services/hybridSportsDataService.js",
         "backend/services/pipelineMetricsService.js",
         "backend/services/semanticDriftSummaryService.js",
         "backend/services/systemTruthLogger.js",
@@ -370,29 +352,20 @@
       "database_objects": [
         "API",
         "IF",
-        "ON",
-        "SELECT",
-        "SET",
         "acca_rules",
         "across",
         "direct1x2_prediction_final",
         "fixtures",
         "for",
-        "index",
         "information_schema.columns",
-        "is_allowed",
         "jsonb_array_elements",
         "latest_run",
         "match_context_data",
-        "missing",
         "not",
         "pg_constraint",
-        "pg_type",
         "prediction_publish_runs",
-        "prediction_source",
         "predictions_accuracy",
         "predictions_filtered",
-        "public.direct1x2_prediction_final",
         "replaced",
         "secondary_market_allowlist",
         "table_lifecycle_registry",
@@ -493,7 +466,9 @@
         "backend/routes/chat.js",
         "backend/routes/cricketCount.js",
         "backend/routes/cricketInsights.js",
+        "backend/routes/divanscore.js",
         "backend/routes/feedback.js",
+        "backend/routes/metrics.js",
         "backend/routes/predictions.js",
         "backend/routes/scheduler.js",
         "backend/routes/user.js",
@@ -549,15 +524,7 @@
       "external_providers": [],
       "environment_key_names": [],
       "database_role": "READ",
-      "database_objects": [
-        "direct1x2_prediction_final",
-        "event_injury_snapshots",
-        "event_news_snapshots",
-        "event_weather_snapshots",
-        "prediction_publish_runs",
-        "predictions_accuracy",
-        "ranked_products"
-      ],
+      "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
@@ -804,11 +771,7 @@
       "external_providers": [],
       "environment_key_names": [],
       "database_role": "READ",
-      "database_objects": [
-        "direct1x2_prediction_final",
-        "predictions_filtered",
-        "predictions_raw"
-      ],
+      "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
@@ -859,6 +822,43 @@
       "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
     },
     {
+      "asset_path": "backend/routes/divanscore.js",
+      "source_state": "PRE_EXISTING_MODIFIED",
+      "surface_classes": [
+        "ROUTE"
+      ],
+      "reachability_state": "CONFIRMED",
+      "mount_paths": [
+        "/api"
+      ],
+      "runtime_callers": [],
+      "runtime_consumers": [
+        "backend/server-express.js"
+      ],
+      "runtime_dependencies": [
+        "backend/middleware/supabaseJwt.js",
+        "backend/services/apiCacheService.js",
+        "backend/services/divanscoreService.js"
+      ],
+      "external_providers": [],
+      "environment_key_names": [
+        "DIVANSCORE_CACHE_MINUTES",
+        "DIVANSCORE_DAILY_LIMIT",
+        "DIVANSCORE_RPM_LIMIT"
+      ],
+      "database_role": "NONE",
+      "database_objects": [],
+      "schedule_or_trigger": "",
+      "deployment_surface": "",
+      "governance_reachability_type": "NONE",
+      "governed_by_control_task_id": "ESA-001",
+      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
+      "evidence": [
+        "Static package/deployment/import/mount evidence."
+      ],
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+    },
+    {
       "asset_path": "backend/routes/feedback.js",
       "source_state": "COMMITTED_REPOSITORY",
       "surface_classes": [
@@ -884,6 +884,45 @@
       "database_objects": [
         "user_experience_feedback"
       ],
+      "schedule_or_trigger": "",
+      "deployment_surface": "",
+      "governance_reachability_type": "NONE",
+      "governed_by_control_task_id": "ESA-001",
+      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
+      "evidence": [
+        "Static package/deployment/import/mount evidence."
+      ],
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+    },
+    {
+      "asset_path": "backend/routes/metrics.js",
+      "source_state": "PRE_EXISTING_MODIFIED",
+      "surface_classes": [
+        "ROUTE"
+      ],
+      "reachability_state": "CONFIRMED",
+      "mount_paths": [
+        "/api/metrics"
+      ],
+      "runtime_callers": [],
+      "runtime_consumers": [
+        "backend/server-express.js"
+      ],
+      "runtime_dependencies": [
+        "backend/core/executionPipeline.js",
+        "backend/middleware/supabaseJwt.js",
+        "backend/services/apiCacheService.js",
+        "backend/services/metrxFactoryService.js",
+        "backend/services/pipelineMetricsService.js",
+        "backend/services/providerQuotaService.js",
+        "backend/utils/auth.js"
+      ],
+      "external_providers": [],
+      "environment_key_names": [
+        "METRX_FACTORY_DAILY_LIMIT"
+      ],
+      "database_role": "NONE",
+      "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
@@ -935,8 +974,6 @@
       ],
       "database_role": "READ",
       "database_objects": [
-        "APIs",
-        "Supabase.",
         "direct1x2_prediction_final",
         "predictions_raw"
       ],
@@ -994,25 +1031,16 @@
       ],
       "database_role": "READ_WRITE",
       "database_objects": [
-        "BOTH",
-        "PostgreSQL",
-        "appearing",
-        "categories",
-        "const",
         "context_intelligence_cache",
         "direct1x2_prediction_final",
         "fixture_context_cache",
         "leagues",
-        "let",
         "players",
         "prediction_publish_runs",
         "predictions_filtered",
         "predictions_raw",
         "rapidapi_cache",
-        "raw",
         "raw_kickoff",
-        "source",
-        "subscription",
         "teams"
       ],
       "schedule_or_trigger": "",
@@ -1097,13 +1125,8 @@
         "SUPABASE_URL"
       ],
       "database_role": "READ",
-      "database_objects": [
-        "context_enrichment_queue",
-        "prediction_publish_runs",
-        "sport_sync",
-        "sportsrc_account_health"
-      ],
-      "schedule_or_trigger": "",
+      "database_objects": [],
+      "schedule_or_trigger": "scheduler-path; setImmediate",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
       "governed_by_control_task_id": "ESA-001",
@@ -1176,6 +1199,46 @@
       "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
     },
     {
+      "asset_path": "backend/routes/sportsEdge.js",
+      "source_state": "PRE_EXISTING_MODIFIED",
+      "surface_classes": [
+        "DATABASE_SURFACE",
+        "ROUTE"
+      ],
+      "reachability_state": "CONFIRMED",
+      "mount_paths": [
+        "/"
+      ],
+      "runtime_callers": [],
+      "runtime_consumers": [
+        "backend/server-express.js"
+      ],
+      "runtime_dependencies": [
+        "backend/db.js",
+        "backend/services/enhancedMatchDetailsService.js",
+        "backend/services/hybridSportsDataService.js"
+      ],
+      "external_providers": [],
+      "environment_key_names": [
+        "RAPIDAPI_HOST_SPORTS_EDGE",
+        "RAPIDAPI_KEY",
+        "SKCS_PRE_MATCH_ONLY",
+        "SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_KEY",
+        "X_RAPIDAPI_KEY"
+      ],
+      "database_role": "READ_WRITE",
+      "database_objects": [],
+      "schedule_or_trigger": "",
+      "deployment_surface": "",
+      "governance_reachability_type": "NONE",
+      "governed_by_control_task_id": "ESA-001",
+      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
+      "evidence": [
+        "Static package/deployment/import/mount evidence."
+      ],
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+    },
+    {
       "asset_path": "backend/routes/tier1.js",
       "source_state": "COMMITTED_REPOSITORY",
       "surface_classes": [
@@ -1236,9 +1299,7 @@
       "external_providers": [],
       "environment_key_names": [],
       "database_role": "READ",
-      "database_objects": [
-        "get_available_market_counts"
-      ],
+      "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
@@ -1273,11 +1334,8 @@
       "environment_key_names": [],
       "database_role": "READ_WRITE",
       "database_objects": [
-        "Master",
         "acca_legs",
         "accas",
-        "correlation",
-        "direct1x2_prediction_final",
         "market_correlations"
       ],
       "schedule_or_trigger": "",
@@ -1317,7 +1375,6 @@
       ],
       "database_role": "READ",
       "database_objects": [
-        "Master",
         "direct1x2_prediction_final",
         "fixtures",
         "secondary_market_predictions"
@@ -1353,11 +1410,7 @@
       "external_providers": [],
       "environment_key_names": [],
       "database_role": "READ",
-      "database_objects": [
-        "Tier",
-        "direct1x2_prediction_final",
-        "secondary_market_predictions"
-      ],
+      "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
@@ -1389,9 +1442,7 @@
       "external_providers": [],
       "environment_key_names": [],
       "database_role": "READ",
-      "database_objects": [
-        "secondary_market_predictions"
-      ],
+      "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
@@ -1428,12 +1479,7 @@
       "environment_key_names": [],
       "database_role": "READ",
       "database_objects": [
-        "direct1x2_prediction_final",
-        "is",
-        "most",
-        "prediction_publish_runs",
-        "predictions_raw",
-        "row"
+        "prediction_publish_runs"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -1498,10 +1544,9 @@
       ],
       "database_role": "WRITE",
       "database_objects": [
-        "missing",
         "public.semantic_violations"
       ],
-      "schedule_or_trigger": "",
+      "schedule_or_trigger": "setInterval",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
       "governed_by_control_task_id": "ESA-001",
@@ -1543,13 +1588,16 @@
         "backend/routes/cricketInsights.js",
         "backend/routes/debug.js",
         "backend/routes/direct1x2.js",
+        "backend/routes/divanscore.js",
         "backend/routes/feedback.js",
+        "backend/routes/metrics.js",
         "backend/routes/pipeline.js",
         "backend/routes/predictions.js",
         "backend/routes/refresh-ai.js",
         "backend/routes/scheduler.js",
         "backend/routes/semanticDrift.js",
         "backend/routes/skcsGrading.js",
+        "backend/routes/sportsEdge.js",
         "backend/routes/tier1.js",
         "backend/routes/user.js",
         "backend/routes/v1/acca.js",
@@ -1562,6 +1610,7 @@
         "backend/services/contextEnrichmentService.js",
         "backend/services/cronJobs.js",
         "backend/services/oddsBudgetService.js",
+        "backend/services/skcsHeartbeat.js",
         "backend/services/subscriptionTiming.js",
         "backend/services/syncService.js",
         "backend/services/thesportsdbPipeline.js",
@@ -1575,6 +1624,7 @@
       ],
       "external_providers": [
         "api.odds.p.rapidapi.com",
+        "api.the-odds-api.com",
         "cdn.jsdelivr.net",
         "cdn.tailwindcss.com",
         "cricbuzz-cricket.p.rapidapi.com",
@@ -1614,9 +1664,6 @@
       ],
       "database_role": "READ_WRITE",
       "database_objects": [
-        "ESPN",
-        "SET",
-        "after",
         "ai_predictions",
         "cricket_fixtures",
         "cricket_insights_final",
@@ -1624,10 +1671,6 @@
         "database",
         "direct1x2_prediction_final",
         "direct_1x2_insights",
-        "does",
-        "doesn",
-        "exists",
-        "fetch",
         "first",
         "fixture_processing_log",
         "match_context_data",
@@ -1636,12 +1679,10 @@
         "rapidapi_cache",
         "raw_fixtures",
         "sport_sync",
-        "state",
-        "system",
         "tier_rules",
         "upsert_raw_fixture"
       ],
-      "schedule_or_trigger": "",
+      "schedule_or_trigger": "setImmediate",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
       "governed_by_control_task_id": "ESA-001",
@@ -1692,24 +1733,18 @@
       ],
       "database_role": "READ_WRITE",
       "database_objects": [
-        "SET",
-        "a",
         "acca_rules",
         "debug_published",
         "direct1x2_prediction_final",
-        "is",
         "lateral",
         "latest_week_run",
         "normalized_fixtures",
-        "pool",
         "predictions_filtered",
         "predictions_raw",
         "predictions_stage_1",
         "predictions_stage_2",
         "predictions_stage_3",
-        "same",
         "same_match_combinations",
-        "secondary_market_predictions",
         "team_week_locks",
         "tier_rules"
       ],
@@ -1728,7 +1763,6 @@
       "source_state": "PRE_EXISTING_MODIFIED",
       "surface_classes": [
         "DATABASE_SURFACE",
-        "SCOUT_FIP_SURFACE",
         "SERVICE"
       ],
       "reachability_state": "CONFIRMED",
@@ -1758,7 +1792,6 @@
         "backend/services/normalizerService.js",
         "backend/services/saveContextData.js",
         "backend/services/saveDirectInsights.js",
-        "backend/services/scoutSignalSync.js",
         "backend/src/services/contextIntelligence/adjustProbability.js",
         "backend/src/services/contextIntelligence/aiPipeline.js",
         "backend/utils/pipelineLogger.js",
@@ -1766,7 +1799,6 @@
       ],
       "external_providers": [],
       "environment_key_names": [
-        "SCOUT_DATABASE_URL",
         "SKCS_STALE_RUN_HOURS",
         "SUPABASE_ANON_KEY",
         "SUPABASE_KEY",
@@ -1816,16 +1848,10 @@
         "direct1x2_prediction_final",
         "fixture",
         "get_odds_volatility",
-        "high",
-        "match_context_data",
         "prediction_publish_runs",
         "predictions_filtered",
         "predictions_raw",
-        "publish",
-        "raw_fixtures",
-        "snapshots",
         "sport_sync",
-        "this",
         "tier_rules"
       ],
       "schedule_or_trigger": "",
@@ -1859,14 +1885,10 @@
         "backend/services/aiTelemetryService.js"
       ],
       "external_providers": [
-        "api.antigravity.ai",
-        "api.groq.com"
+        "api.groq.com",
+        "generativelanguage.googleapis.com"
       ],
       "environment_key_names": [
-        "AG_MODEL",
-        "AG_TEMPERATURE",
-        "ANTIGRAVITY_API_KEY",
-        "ANTIGRAVITY_URL",
         "DOLPHIN_MAX_TOKENS",
         "DOLPHIN_TEMPERATURE",
         "DOLPHIN_TIMEOUT",
@@ -1877,10 +1899,7 @@
         "GROQ_MODEL"
       ],
       "database_role": "WRITE",
-      "database_objects": [
-        "default",
-        "your"
-      ],
+      "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
@@ -1962,7 +1981,6 @@
       "source_state": "COMMITTED_REPOSITORY",
       "surface_classes": [
         "DATABASE_SURFACE",
-        "SCHEDULED_EXECUTION",
         "SERVICE"
       ],
       "reachability_state": "CONFIRMED",
@@ -1977,14 +1995,7 @@
         "GEMINI_API_KEY"
       ],
       "database_role": "WRITE",
-      "database_objects": [
-        "AI",
-        "TOML",
-        "now",
-        "previous",
-        "sources",
-        "sources..."
-      ],
+      "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
@@ -2006,6 +2017,8 @@
       "mount_paths": [],
       "runtime_callers": [],
       "runtime_consumers": [
+        "backend/routes/divanscore.js",
+        "backend/routes/metrics.js",
         "backend/services/dataProviders.js",
         "scripts/fetch-live-fixtures.js"
       ],
@@ -2023,7 +2036,6 @@
       ],
       "database_role": "READ_WRITE",
       "database_objects": [
-        "SET",
         "rapidapi_cache"
       ],
       "schedule_or_trigger": "",
@@ -2259,7 +2271,7 @@
         "SUPABASE_SERVICE_ROLE_KEY",
         "SUPABASE_URL"
       ],
-      "database_role": "READ",
+      "database_role": "RPC",
       "database_objects": [
         "upsert_canonical_event"
       ],
@@ -2359,17 +2371,12 @@
       ],
       "database_role": "READ_WRITE",
       "database_objects": [
-        "SET",
-        "canonical_bookmakers",
-        "const",
         "context_enrichment_queue",
         "context_intelligence_cache",
         "event_odds_snapshots",
         "match_context_data",
-        "matches",
         "raw_fixtures",
-        "teams",
-        "the"
+        "teams"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -2650,14 +2657,11 @@
       ],
       "database_role": "READ_WRITE",
       "database_objects": [
-        "TheSportsDB",
         "direct1x2_prediction_final",
-        "missing",
         "predictions_accuracy",
-        "predictions_raw",
-        "raw_fixtures"
+        "predictions_raw"
       ],
-      "schedule_or_trigger": "",
+      "schedule_or_trigger": "cron:*/30 * * * *; cron:1 0 * * *; cron:5,35 * * * *",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
       "governed_by_control_task_id": "ESA-001",
@@ -2798,14 +2802,8 @@
       ],
       "database_role": "READ_WRITE",
       "database_objects": [
-        "ON",
         "direct1x2_prediction_final",
-        "direct_1x2_predictions",
-        "information_schema.columns",
-        "league",
-        "only",
-        "pg_trigger",
-        "public.league_stats"
+        "direct_1x2_predictions"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -2848,6 +2846,73 @@
       "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
     },
     {
+      "asset_path": "backend/services/divanscoreService.js",
+      "source_state": "PRE_EXISTING_MODIFIED",
+      "surface_classes": [
+        "SERVICE"
+      ],
+      "reachability_state": "CONFIRMED",
+      "mount_paths": [],
+      "runtime_callers": [],
+      "runtime_consumers": [
+        "backend/routes/divanscore.js"
+      ],
+      "runtime_dependencies": [],
+      "external_providers": [],
+      "environment_key_names": [
+        "DIVANSCORE_BASE_URL",
+        "DIVANSCORE_DAILY_LIMIT",
+        "DIVANSCORE_RAPIDAPI_HOST",
+        "DIVANSCORE_RAPIDAPI_KEY",
+        "DIVANSCORE_TIMEOUT_MS",
+        "RAPIDAPI_KEY",
+        "X_RAPIDAPI_KEY"
+      ],
+      "database_role": "NONE",
+      "database_objects": [],
+      "schedule_or_trigger": "",
+      "deployment_surface": "",
+      "governance_reachability_type": "NONE",
+      "governed_by_control_task_id": "ESA-001",
+      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
+      "evidence": [
+        "Static package/deployment/import/mount evidence."
+      ],
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+    },
+    {
+      "asset_path": "backend/services/enhancedMatchDetailsService.js",
+      "source_state": "PRE_EXISTING_MODIFIED",
+      "surface_classes": [
+        "SERVICE"
+      ],
+      "reachability_state": "CONFIRMED",
+      "mount_paths": [],
+      "runtime_callers": [],
+      "runtime_consumers": [
+        "backend/routes/sportsEdge.js"
+      ],
+      "runtime_dependencies": [
+        "backend/config",
+        "backend/db.js",
+        "backend/services/espnHiddenApiService.js",
+        "backend/utils/apiQueue.js"
+      ],
+      "external_providers": [],
+      "environment_key_names": [],
+      "database_role": "NONE",
+      "database_objects": [],
+      "schedule_or_trigger": "",
+      "deployment_surface": "",
+      "governance_reachability_type": "NONE",
+      "governed_by_control_task_id": "ESA-001",
+      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
+      "evidence": [
+        "Static package/deployment/import/mount evidence."
+      ],
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+    },
+    {
       "asset_path": "backend/services/espnHiddenApiService.js",
       "source_state": "COMMITTED_REPOSITORY",
       "surface_classes": [
@@ -2858,7 +2923,9 @@
       "mount_paths": [],
       "runtime_callers": [],
       "runtime_consumers": [
-        "backend/services/dataProvider.js"
+        "backend/services/dataProvider.js",
+        "backend/services/enhancedMatchDetailsService.js",
+        "backend/services/hybridSportsDataService.js"
       ],
       "runtime_dependencies": [],
       "external_providers": [
@@ -2906,11 +2973,8 @@
       ],
       "database_role": "READ_WRITE",
       "database_objects": [
-        "database.",
-        "metadata",
         "predictions_filtered",
         "predictions_raw",
-        "set",
         "tier_rules"
       ],
       "schedule_or_trigger": "",
@@ -3011,6 +3075,38 @@
       "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
     },
     {
+      "asset_path": "backend/services/freeLivescoreApiService.js",
+      "source_state": "COMMITTED_REPOSITORY",
+      "surface_classes": [
+        "SERVICE"
+      ],
+      "reachability_state": "CONFIRMED",
+      "mount_paths": [],
+      "runtime_callers": [],
+      "runtime_consumers": [
+        "backend/services/hybridSportsDataService.js"
+      ],
+      "runtime_dependencies": [],
+      "external_providers": [],
+      "environment_key_names": [
+        "FREE_LIVESCORE_RAPIDAPI_HOST",
+        "FREE_LIVESCORE_RAPIDAPI_KEY",
+        "RAPIDAPI_KEY",
+        "X_RAPIDAPI_KEY"
+      ],
+      "database_role": "NONE",
+      "database_objects": [],
+      "schedule_or_trigger": "",
+      "deployment_surface": "",
+      "governance_reachability_type": "NONE",
+      "governed_by_control_task_id": "ESA-001",
+      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
+      "evidence": [
+        "Static package/deployment/import/mount evidence."
+      ],
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+    },
+    {
       "asset_path": "backend/services/gradingAccuracyCore.js",
       "source_state": "COMMITTED_REPOSITORY",
       "surface_classes": [
@@ -3061,15 +3157,52 @@
       "external_providers": [],
       "environment_key_names": [],
       "database_role": "READ",
-      "database_objects": [
-        "direct1x2_prediction_final",
-        "event_injury_snapshots",
-        "event_news_snapshots",
-        "event_weather_snapshots",
-        "prediction_publish_runs",
-        "predictions_accuracy",
-        "ranked_products"
+      "database_objects": [],
+      "schedule_or_trigger": "",
+      "deployment_surface": "",
+      "governance_reachability_type": "NONE",
+      "governed_by_control_task_id": "ESA-001",
+      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
+      "evidence": [
+        "Static package/deployment/import/mount evidence."
       ],
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+    },
+    {
+      "asset_path": "backend/services/hybridSportsDataService.js",
+      "source_state": "COMMITTED_REPOSITORY",
+      "surface_classes": [
+        "EXTERNAL_PROVIDER",
+        "SERVICE"
+      ],
+      "reachability_state": "CONFIRMED",
+      "mount_paths": [],
+      "runtime_callers": [],
+      "runtime_consumers": [
+        "backend/routes/sportsEdge.js",
+        "backend/services/skcsHeartbeat.js"
+      ],
+      "runtime_dependencies": [
+        "backend/config",
+        "backend/db.js",
+        "backend/services/espnHiddenApiService.js",
+        "backend/services/freeLivescoreApiService.js",
+        "backend/services/thesportsdbPipeline.js",
+        "backend/utils/apiQueue.js"
+      ],
+      "external_providers": [
+        "www.thesportsdb.com"
+      ],
+      "environment_key_names": [
+        "DISABLE_SPORTSAPI_PRO_FOOTBALL",
+        "ENABLE_SPORTSAPI_PRO_FOOTBALL",
+        "RAPIDAPI_KEY",
+        "SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_HOST",
+        "SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_KEY",
+        "X_RAPIDAPI_KEY"
+      ],
+      "database_role": "NONE",
+      "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
@@ -3167,12 +3300,42 @@
       "external_providers": [],
       "environment_key_names": [],
       "database_role": "WRITE",
-      "database_objects": [
-        "AI"
-      ],
+      "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
       "governance_reachability_type": "RUNTIME",
+      "governed_by_control_task_id": "ESA-001",
+      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
+      "evidence": [
+        "Static package/deployment/import/mount evidence."
+      ],
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+    },
+    {
+      "asset_path": "backend/services/metrxFactoryService.js",
+      "source_state": "PRE_EXISTING_MODIFIED",
+      "surface_classes": [
+        "SERVICE"
+      ],
+      "reachability_state": "CONFIRMED",
+      "mount_paths": [],
+      "runtime_callers": [],
+      "runtime_consumers": [
+        "backend/routes/metrics.js"
+      ],
+      "runtime_dependencies": [],
+      "external_providers": [],
+      "environment_key_names": [
+        "METRX_FACTORY_RAPIDAPI_HOST",
+        "METRX_FACTORY_RAPIDAPI_KEY",
+        "RAPIDAPI_KEY",
+        "X_RAPIDAPI_KEY"
+      ],
+      "database_role": "NONE",
+      "database_objects": [],
+      "schedule_or_trigger": "",
+      "deployment_surface": "",
+      "governance_reachability_type": "NONE",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
       "evidence": [
@@ -3250,6 +3413,7 @@
       "mount_paths": [],
       "runtime_callers": [],
       "runtime_consumers": [
+        "backend/routes/metrics.js",
         "backend/services/cronJobs.js"
       ],
       "runtime_dependencies": [
@@ -3260,9 +3424,40 @@
       "external_providers": [],
       "environment_key_names": [],
       "database_role": "READ",
-      "database_objects": [
-        "public.v_pipeline_health_feed"
+      "database_objects": [],
+      "schedule_or_trigger": "",
+      "deployment_surface": "",
+      "governance_reachability_type": "NONE",
+      "governed_by_control_task_id": "ESA-001",
+      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
+      "evidence": [
+        "Static package/deployment/import/mount evidence."
       ],
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+    },
+    {
+      "asset_path": "backend/services/proFootballDataService.js",
+      "source_state": "COMMITTED_REPOSITORY",
+      "surface_classes": [
+        "DATABASE_SURFACE",
+        "SERVICE"
+      ],
+      "reachability_state": "CONFIRMED",
+      "mount_paths": [],
+      "runtime_callers": [],
+      "runtime_consumers": [
+        "backend/services/skcsHeartbeat.js"
+      ],
+      "runtime_dependencies": [],
+      "external_providers": [],
+      "environment_key_names": [
+        "RAPIDAPI_KEY",
+        "SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_HOST",
+        "SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_KEY",
+        "X_RAPIDAPI_KEY"
+      ],
+      "database_role": "WRITE",
+      "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
@@ -3284,6 +3479,7 @@
       "mount_paths": [],
       "runtime_callers": [],
       "runtime_consumers": [
+        "backend/routes/metrics.js",
         "backend/services/apiQuotaRouter.js",
         "backend/services/quotaPlanner.js"
       ],
@@ -3355,9 +3551,7 @@
       "external_providers": [],
       "environment_key_names": [],
       "database_role": "READ",
-      "database_objects": [
-        "Master"
-      ],
+      "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
@@ -3441,13 +3635,10 @@
         "SCOUT_FIP_SURFACE",
         "SERVICE"
       ],
-      "reachability_state": "CONFIRMED",
+      "reachability_state": "CANDIDATE",
       "mount_paths": [],
       "runtime_callers": [],
-      "runtime_consumers": [
-        "backend/services/aiPipeline.js",
-        "backend/services/syncService.js"
-      ],
+      "runtime_consumers": [],
       "runtime_dependencies": [],
       "external_providers": [],
       "environment_key_names": [
@@ -3456,15 +3647,7 @@
       ],
       "database_role": "READ_WRITE",
       "database_objects": [
-        "Edge",
-        "SET",
-        "Scout",
-        "Scout.",
-        "created",
-        "environment",
-        "exists",
-        "scout_raw_match_signals",
-        "the"
+        "scout_raw_match_signals"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -3511,6 +3694,48 @@
       "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
     },
     {
+      "asset_path": "backend/services/skcsHeartbeat.js",
+      "source_state": "COMMITTED_REPOSITORY",
+      "surface_classes": [
+        "DATABASE_SURFACE",
+        "SCHEDULED_EXECUTION",
+        "SERVICE"
+      ],
+      "reachability_state": "CONFIRMED",
+      "mount_paths": [],
+      "runtime_callers": [],
+      "runtime_consumers": [
+        "backend/server-express.js"
+      ],
+      "runtime_dependencies": [
+        "backend/core/executionPipeline.js",
+        "backend/services/hybridSportsDataService.js",
+        "backend/services/proFootballDataService.js"
+      ],
+      "external_providers": [],
+      "environment_key_names": [
+        "DISABLE_LIVE_SCORES",
+        "DISABLE_SPORTSAPI_PRO_FOOTBALL",
+        "ENABLE_SPORTSAPI_PRO_FOOTBALL",
+        "RAPIDAPI_KEY",
+        "SKCS_PRE_MATCH_ONLY",
+        "SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_HOST",
+        "SPORTSAPI_PRO_FOOTBALL_RAPIDAPI_KEY",
+        "X_RAPIDAPI_KEY"
+      ],
+      "database_role": "WRITE",
+      "database_objects": [],
+      "schedule_or_trigger": "setInterval",
+      "deployment_surface": "",
+      "governance_reachability_type": "NONE",
+      "governed_by_control_task_id": "ESA-001",
+      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
+      "evidence": [
+        "Static package/deployment/import/mount evidence."
+      ],
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+    },
+    {
       "asset_path": "backend/services/sportsrcHealthService.js",
       "source_state": "COMMITTED_REPOSITORY",
       "surface_classes": [
@@ -3534,8 +3759,6 @@
       "environment_key_names": [],
       "database_role": "WRITE",
       "database_objects": [
-        "SportSRC",
-        "response",
         "sportsrc_account_health"
       ],
       "schedule_or_trigger": "",
@@ -3583,7 +3806,6 @@
       "asset_path": "backend/services/syncService.js",
       "source_state": "PRE_EXISTING_MODIFIED",
       "surface_classes": [
-        "SCOUT_FIP_SURFACE",
         "SERVICE"
       ],
       "reachability_state": "CONFIRMED",
@@ -3604,7 +3826,6 @@
         "backend/services/dataProviders.js",
         "backend/services/normalizerService.js",
         "backend/services/quotaPlanner.js",
-        "backend/services/scoutSignalSync.js",
         "backend/utils/pipelineLogger.js"
       ],
       "external_providers": [],
@@ -3654,9 +3875,6 @@
       "environment_key_names": [],
       "database_role": "READ_WRITE",
       "database_objects": [
-        "SET",
-        "information_schema.columns",
-        "is",
         "public.decision_fingerprints",
         "public.pipeline_executions"
       ],
@@ -3683,7 +3901,8 @@
       "runtime_callers": [],
       "runtime_consumers": [
         "backend/server-express.js",
-        "backend/services/cronJobs.js"
+        "backend/services/cronJobs.js",
+        "backend/services/hybridSportsDataService.js"
       ],
       "runtime_dependencies": [
         "backend/config",
@@ -3701,19 +3920,9 @@
       ],
       "database_role": "READ_WRITE",
       "database_objects": [
-        "SET",
-        "TheSportsDB",
-        "advantage",
         "ai_predictions",
-        "ai_predictions.",
-        "deep_context",
-        "event",
-        "last",
         "match_context_data",
-        "match_context_data.",
         "raw_fixtures",
-        "stats",
-        "than",
         "upsert_canonical_event"
       ],
       "schedule_or_trigger": "",
@@ -3758,7 +3967,6 @@
       ],
       "database_role": "WRITE",
       "database_objects": [
-        "SET",
         "rapidapi_cache"
       ],
       "schedule_or_trigger": "",
@@ -3821,7 +4029,6 @@
       ],
       "database_role": "READ_WRITE",
       "database_objects": [
-        "Supabase",
         "fixture_context_cache"
       ],
       "schedule_or_trigger": "",
@@ -3884,9 +4091,6 @@
       ],
       "database_role": "READ_WRITE",
       "database_objects": [
-        "API",
-        "SET",
-        "endpoint",
         "rapidapi_cache"
       ],
       "schedule_or_trigger": "",
@@ -4048,11 +4252,7 @@
       "external_providers": [],
       "environment_key_names": [],
       "database_role": "READ",
-      "database_objects": [
-        "goals",
-        "instruction",
-        "league"
-      ],
+      "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
@@ -4134,7 +4334,7 @@
       "database_role": "NONE",
       "database_objects": [],
       "schedule_or_trigger": "",
-      "deployment_surface": "",
+      "deployment_surface": "CONTAINER_BUILD",
       "governance_reachability_type": "NONE",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
@@ -4184,7 +4384,7 @@
       "database_role": "NONE",
       "database_objects": [],
       "schedule_or_trigger": "",
-      "deployment_surface": "",
+      "deployment_surface": "CONTAINER_BUILD",
       "governance_reachability_type": "NONE",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
@@ -4286,7 +4486,7 @@
       "database_role": "NONE",
       "database_objects": [],
       "schedule_or_trigger": "",
-      "deployment_surface": "",
+      "deployment_surface": "PACKAGE_RUNTIME_SCRIPTS",
       "governance_reachability_type": "NONE",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
@@ -4311,7 +4511,7 @@
       "database_role": "NONE",
       "database_objects": [],
       "schedule_or_trigger": "",
-      "deployment_surface": "",
+      "deployment_surface": "RENDER_CONFIGURATION",
       "governance_reachability_type": "NONE",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
@@ -4364,16 +4564,13 @@
       "database_role": "READ_WRITE",
       "database_objects": [
         "IF",
-        "ON",
         "direct1x2_prediction_final",
-        "is_valid_market",
         "jsonb_array_elements",
-        "secondary_markets_allowlist",
-        "the"
+        "secondary_markets_allowlist"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
-      "governance_reachability_type": "DOCUMENT_ONLY",
+      "governance_reachability_type": "UNKNOWN",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
       "evidence": [
@@ -4401,12 +4598,11 @@
       ],
       "database_role": "READ",
       "database_objects": [
-        "direct1x2_prediction_final",
-        "of"
+        "direct1x2_prediction_final"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
-      "governance_reachability_type": "DOCUMENT_ONLY",
+      "governance_reachability_type": "AUDIT_TOOL",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
       "evidence": [
@@ -4433,7 +4629,7 @@
       "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
-      "governance_reachability_type": "DOCUMENT_ONLY",
+      "governance_reachability_type": "AUDIT_TOOL",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
       "evidence": [
@@ -4490,18 +4686,9 @@
       ],
       "database_role": "READ_WRITE",
       "database_objects": [
-        "API",
-        "EVENTS",
-        "SET",
-        "command",
         "direct1x2_prediction_final",
         "events",
-        "for",
-        "instead",
-        "prediction_publish_runs",
-        "providers",
-        "schema",
-        "the"
+        "prediction_publish_runs"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -4563,17 +4750,7 @@
       ],
       "database_role": "READ_WRITE",
       "database_objects": [
-        "API",
-        "Phase",
-        "SET",
-        "_predictions",
-        "api_predictions",
-        "direct1x2_prediction_final",
-        "events",
-        "raw_provider_data",
-        "silently",
-        "target",
-        "the"
+        "events"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -4633,20 +4810,11 @@
       ],
       "database_role": "READ",
       "database_objects": [
-        "events",
-        "missing",
-        "pg_class",
-        "pg_indexes",
-        "pg_policies",
-        "predictions_accuracy",
-        "rapidapi_cache",
-        "scheduling_logs",
-        "tier_rules",
         "zz_archive_matches"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
-      "governance_reachability_type": "DOCUMENT_ONLY",
+      "governance_reachability_type": "UNKNOWN",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
       "evidence": [
@@ -4686,7 +4854,6 @@
       ],
       "database_role": "READ_WRITE",
       "database_objects": [
-        "code",
         "cricket_fixtures",
         "cricket_insights_final",
         "cricket_market_rules"
@@ -4806,7 +4973,7 @@
       "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
-      "governance_reachability_type": "DOCUMENT_ONLY",
+      "governance_reachability_type": "BUILD_GATE",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
       "evidence": [
@@ -5130,12 +5297,11 @@
       "environment_key_names": [],
       "database_role": "WRITE",
       "database_objects": [
-        "acca_rules",
-        "set"
+        "acca_rules"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
-      "governance_reachability_type": "DOCUMENT_ONLY",
+      "governance_reachability_type": "UNKNOWN",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
       "evidence": [
@@ -5158,13 +5324,8 @@
       "environment_key_names": [],
       "database_role": "SCHEMA",
       "database_objects": [
-        "COMMENT",
-        "CREATE",
         "IF",
-        "for",
-        "leg_count",
-        "market_correlations",
-        "result"
+        "market_correlations"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -5192,26 +5353,17 @@
       "environment_key_names": [],
       "database_role": "TRIGGER",
       "database_objects": [
-        "DROP",
         "IF",
-        "ON",
         "acca_legs",
         "being",
         "direct1x2_prediction_final",
-        "exists",
-        "has_high_confidence_secondary",
-        "if",
         "information_schema.tables",
-        "legs_array",
-        "main_confidence",
         "market_correlations",
-        "prediction_confidence",
-        "risk",
-        "secondary_count"
+        "pg_type"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
-      "governance_reachability_type": "DOCUMENT_ONLY",
+      "governance_reachability_type": "DATABASE",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
       "evidence": [
@@ -5235,12 +5387,9 @@
       "database_role": "SCHEMA",
       "database_objects": [
         "IF",
-        "ON",
         "normalized_fixtures",
         "predictions_final",
-        "stage",
         "subscription_plans",
-        "timestamp",
         "v_sast_time"
       ],
       "schedule_or_trigger": "",
@@ -5269,7 +5418,6 @@
       "database_role": "SEED",
       "database_objects": [
         "IF",
-        "SET",
         "auth.users",
         "information_schema.columns",
         "information_schema.tables",
@@ -5304,14 +5452,12 @@
       "database_role": "SEED",
       "database_objects": [
         "IF",
-        "SET",
         "auth.users",
         "information_schema.columns",
         "information_schema.tables",
         "public.profiles",
         "public.subscriptions",
         "public.verification",
-        "target_user_id",
         "unnest"
       ],
       "schedule_or_trigger": "",
@@ -5340,12 +5486,11 @@
       "environment_key_names": [],
       "database_role": "WRITE",
       "database_objects": [
-        "set",
         "tier_rules"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
-      "governance_reachability_type": "DOCUMENT_ONLY",
+      "governance_reachability_type": "UNKNOWN",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
       "evidence": [
@@ -5394,12 +5539,7 @@
       "database_role": "MIGRATION",
       "database_objects": [
         "IF",
-        "ON",
-        "SET",
-        "insight_usage",
-        "timestamp",
-        "to",
-        "v_available"
+        "insight_usage"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -5456,8 +5596,6 @@
       "database_role": "MIGRATION",
       "database_objects": [
         "IF",
-        "ON",
-        "SET",
         "canonical_betting_markets",
         "fixture_weekly_publication_log",
         "information_schema.columns",
@@ -5471,10 +5609,7 @@
         "skcs_secondary_market_allowlist",
         "skcs_subscription_plans",
         "source_rows",
-        "v_existing_secondary_count",
         "v_local_ts",
-        "v_matrix",
-        "v_new_balance",
         "v_now_sast"
       ],
       "schedule_or_trigger": "",
@@ -5502,10 +5637,7 @@
       "environment_key_names": [],
       "database_role": "MIGRATION",
       "database_objects": [
-        "ON",
-        "SET",
         "canonical_bookmakers",
-        "for",
         "information_schema.columns",
         "information_schema.tables"
       ],
@@ -5535,7 +5667,6 @@
       "database_role": "MIGRATION",
       "database_objects": [
         "does",
-        "for",
         "information_schema.tables",
         "match_context_data",
         "multiple"
@@ -5565,9 +5696,7 @@
       "environment_key_names": [],
       "database_role": "MIGRATION",
       "database_objects": [
-        "IF",
-        "ON",
-        "for"
+        "IF"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -5594,13 +5723,9 @@
       "environment_key_names": [],
       "database_role": "MIGRATION",
       "database_objects": [
-        "existing",
         "jsonb_array_elements",
-        "payload",
         "raw_fixtures",
-        "upsert_raw_fixture",
-        "v_existing_count",
-        "v_result"
+        "upsert_raw_fixture"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -5628,13 +5753,9 @@
       "database_role": "MIGRATION",
       "database_objects": [
         "IF",
-        "SET",
-        "context",
         "context_enrichment_queue",
         "context_intelligence_cache",
-        "if",
-        "match_context_data",
-        "upsert_raw_fixture"
+        "match_context_data"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -5663,9 +5784,7 @@
       "database_objects": [
         "IF",
         "fixture_processing_log",
-        "for",
-        "pg_constraint",
-        "relevant"
+        "pg_constraint"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -5724,7 +5843,6 @@
       "database_objects": [
         "IF",
         "event_odds_snapshots",
-        "for",
         "jsonb_each_text",
         "pg_constraint"
       ],
@@ -5779,9 +5897,7 @@
       "external_providers": [],
       "environment_key_names": [],
       "database_role": "MIGRATION",
-      "database_objects": [
-        "shape"
-      ],
+      "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
@@ -5807,9 +5923,7 @@
       "environment_key_names": [],
       "database_role": "MIGRATION",
       "database_objects": [
-        "ai_predictions",
-        "lookup",
-        "prediction_result"
+        "ai_predictions"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -5836,8 +5950,7 @@
       "environment_key_names": [],
       "database_role": "MIGRATION",
       "database_objects": [
-        "match_context_data",
-        "to"
+        "match_context_data"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -5896,7 +6009,7 @@
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
-      "governance_reachability_type": "DOCUMENT_ONLY",
+      "governance_reachability_type": "UNKNOWN",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
       "evidence": [
@@ -5919,10 +6032,7 @@
       "environment_key_names": [],
       "database_role": "MIGRATION",
       "database_objects": [
-        "DROP",
-        "IF",
-        "and",
-        "was"
+        "IF"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -5948,14 +6058,7 @@
       "external_providers": [],
       "environment_key_names": [],
       "database_role": "MIGRATION",
-      "database_objects": [
-        "direct1x2_prediction_final",
-        "fixtures",
-        "should",
-        "tables",
-        "tier_rules",
-        "zz_archive_matches"
-      ],
+      "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
@@ -5981,7 +6084,6 @@
       "environment_key_names": [],
       "database_role": "MIGRATION",
       "database_objects": [
-        "SET",
         "public.canonical_events"
       ],
       "schedule_or_trigger": "",
@@ -6010,13 +6112,10 @@
       "database_role": "MIGRATION",
       "database_objects": [
         "IF",
-        "SET",
-        "existing",
         "public.canonical_entities",
         "public.skcs_teams",
         "public.team_aliases",
-        "public.team_identity_map",
-        "v_team_id"
+        "public.team_identity_map"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -6044,7 +6143,6 @@
       "database_role": "MIGRATION",
       "database_objects": [
         "IF",
-        "SET",
         "football_canonical_events",
         "public.events",
         "public.football_canonical_events",
@@ -6076,9 +6174,6 @@
       "database_role": "MIGRATION",
       "database_objects": [
         "IF",
-        "SET",
-        "SKCS",
-        "from",
         "pg_policies",
         "public.scout_raw_match_signals",
         "public.table_lifecycle_registry"
@@ -6162,12 +6257,10 @@
       "environment_key_names": [],
       "database_role": "MIGRATION",
       "database_objects": [
-        "ON",
         "pg_class",
         "pg_namespace",
         "public.direct1x2_prediction_final",
-        "public.predictions_final",
-        "v_relkind"
+        "public.predictions_final"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -6251,7 +6344,6 @@
       "environment_key_names": [],
       "database_role": "MIGRATION",
       "database_objects": [
-        "OF",
         "public.direct1x2_prediction_final"
       ],
       "schedule_or_trigger": "",
@@ -6280,7 +6372,6 @@
       "database_role": "MIGRATION",
       "database_objects": [
         "direct1x2_prediction_final",
-        "existing",
         "predictions_accuracy",
         "predictions_raw"
       ],
@@ -6338,15 +6429,13 @@
       "database_role": "MIGRATION",
       "database_objects": [
         "CASE",
-        "DB",
         "jsonb_array_elements",
         "public.direct1x2_prediction_final",
-        "public.predictions_final",
-        "v_existing_secondary_count"
+        "public.predictions_final"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
-      "governance_reachability_type": "DOCUMENT_ONLY",
+      "governance_reachability_type": "DATABASE",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
       "evidence": [
@@ -6370,16 +6459,12 @@
       "database_role": "MIGRATION",
       "database_objects": [
         "CASE",
-        "SET",
         "information_schema.columns",
         "jsonb_array_elements",
         "pg_type",
         "public.direct1x2_prediction_final",
         "public.predictions_final",
-        "public.secondary_market_allowlist",
-        "secondary_market_allowlist",
-        "the",
-        "v_existing_secondary_count"
+        "public.secondary_market_allowlist"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -6409,14 +6494,11 @@
       "database_objects": [
         "jsonb_array_elements",
         "public.predictions_final",
-        "public.secondary_market_allowlist",
-        "the",
-        "v_existing_secondary_count",
-        "v_is_safe_haven"
+        "public.secondary_market_allowlist"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
-      "governance_reachability_type": "DOCUMENT_ONLY",
+      "governance_reachability_type": "DATABASE",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
       "evidence": [
@@ -6446,7 +6528,7 @@
         "pg_inherits",
         "pg_partitioned_table"
       ],
-      "schedule_or_trigger": "",
+      "schedule_or_trigger": "cron:maintain-partitions",
       "deployment_surface": "",
       "governance_reachability_type": "NONE",
       "governed_by_control_task_id": "ESA-001",
@@ -6471,28 +6553,21 @@
       "environment_key_names": [],
       "database_role": "MIGRATION",
       "database_objects": [
-        "CREATE",
         "IF",
-        "JSONB",
-        "ON",
         "bookmaker_levels",
         "bookmaker_odds",
         "direct1x2_prediction_final",
         "direct1x2_prediction_final.secondary_markets",
         "event_injuries",
         "event_injury_snapshots",
-        "event_injury_snapshots.",
         "event_news_scores",
         "event_news_snapshots",
-        "event_news_snapshots.",
         "jsonb_array_elements",
         "jsonb_object_keys",
         "match_context_data",
         "match_context_data.odds",
         "prediction",
-        "prediction_secondary_markets",
-        "v_odds",
-        "v_secondary"
+        "prediction_secondary_markets"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -6519,14 +6594,13 @@
       "environment_key_names": [],
       "database_role": "MIGRATION",
       "database_objects": [
-        "CREATE",
         "IF",
         "bookmaker_odds",
         "direct1x2_prediction_final.secondary_markets",
         "event_injuries",
-        "event_injury_snapshots.",
+        "event_injury_snapshots",
         "event_news_scores",
-        "event_news_snapshots.",
+        "event_news_snapshots",
         "match_context_data.odds",
         "prediction_secondary_markets"
       ],
@@ -6580,8 +6654,6 @@
       "environment_key_names": [],
       "database_role": "MIGRATION",
       "database_objects": [
-        "CREATE",
-        "ON",
         "bookmaker_odds",
         "direct1x2_prediction_final",
         "jsonb_array_elements",
@@ -6589,9 +6661,7 @@
         "match_context_data",
         "match_context_data.odds",
         "prediction",
-        "prediction_secondary_markets",
-        "v_odds",
-        "v_secondary"
+        "prediction_secondary_markets"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -6646,12 +6716,8 @@
       "environment_key_names": [],
       "database_role": "MIGRATION",
       "database_objects": [
-        "Focused",
         "IF",
-        "ON",
-        "SET",
         "direct1x2_prediction_final",
-        "into",
         "prediction_core",
         "prediction_insights",
         "prediction_metadata",
@@ -6682,7 +6748,6 @@
       "environment_key_names": [],
       "database_role": "MIGRATION",
       "database_objects": [
-        "CREATE",
         "IF",
         "prediction_core",
         "prediction_insights",
@@ -6739,8 +6804,6 @@
       "environment_key_names": [],
       "database_role": "MIGRATION",
       "database_objects": [
-        "ON",
-        "SET",
         "direct1x2_prediction_final",
         "prediction_core",
         "prediction_insights",
@@ -6836,16 +6899,8 @@
       "database_role": "MIGRATION",
       "database_objects": [
         "IF",
-        "OF",
-        "ON",
-        "SET",
-        "attack_rating",
-        "confidence",
-        "form_score",
-        "injury_penalty",
         "mr.played_at",
         "now",
-        "opp_away",
         "public.direct1x2_prediction_final",
         "public.head_to_head",
         "public.injury_impact",
@@ -6855,11 +6910,7 @@
         "public.team_form",
         "public.team_strength",
         "public.tier_rules",
-        "public.volatility_factors",
-        "rec",
-        "team_home",
-        "total_impact",
-        "v"
+        "public.volatility_factors"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -6888,19 +6939,16 @@
       "database_role": "MIGRATION",
       "database_objects": [
         "IF",
-        "SET",
-        "daily",
         "daily_agg",
         "pg_policies",
         "public.ai_pipeline_telemetry",
         "public.ai_usage_daily",
         "public.blocked_ai_calls_log",
-        "today",
-        "v_id"
+        "today"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
-      "governance_reachability_type": "DOCUMENT_ONLY",
+      "governance_reachability_type": "DATABASE",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
       "evidence": [
@@ -6931,7 +6979,7 @@
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
-      "governance_reachability_type": "DOCUMENT_ONLY",
+      "governance_reachability_type": "DATABASE",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
       "evidence": [
@@ -6955,7 +7003,7 @@
       "database_role": "MIGRATION",
       "database_objects": [
         "pg_policies",
-        "public."
+        "public"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -6983,7 +7031,7 @@
       "database_role": "MIGRATION",
       "database_objects": [
         "pg_policies",
-        "public."
+        "public"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -7011,7 +7059,7 @@
       "database_role": "MIGRATION",
       "database_objects": [
         "pg_policies",
-        "public."
+        "public"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -7039,7 +7087,6 @@
       "database_role": "MIGRATION",
       "database_objects": [
         "IF",
-        "for",
         "pg_policies",
         "public.system_health_state"
       ],
@@ -7104,7 +7151,6 @@
         "provider_drift",
         "public.semantic_violations",
         "recent_criticals",
-        "result",
         "rule_failure_heatmap",
         "severity_counts",
         "total_stats",
@@ -7232,7 +7278,6 @@
       "database_role": "MIGRATION",
       "database_objects": [
         "IF",
-        "ON",
         "pg_constraint",
         "pg_policies",
         "public.decision_fingerprints",
@@ -7264,9 +7309,6 @@
       "environment_key_names": [],
       "database_role": "MIGRATION",
       "database_objects": [
-        "attack_rating",
-        "form_score",
-        "injury_penalty",
         "public.injury_impact",
         "public.team_strength"
       ],
@@ -7385,8 +7427,7 @@
       "environment_key_names": [],
       "database_role": "SCHEMA",
       "database_objects": [
-        "IF",
-        "TheSportsDB"
+        "IF"
       ],
       "schedule_or_trigger": "",
       "deployment_surface": "",
@@ -7443,7 +7484,7 @@
       "database_objects": [],
       "schedule_or_trigger": "",
       "deployment_surface": "",
-      "governance_reachability_type": "DOCUMENT_ONLY",
+      "governance_reachability_type": "TEST_PROOF",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
       "evidence": [
@@ -7493,7 +7534,7 @@
       "database_role": "NONE",
       "database_objects": [],
       "schedule_or_trigger": "",
-      "deployment_surface": "",
+      "deployment_surface": "VERCEL_CONFIGURATION",
       "governance_reachability_type": "NONE",
       "governed_by_control_task_id": "ESA-001",
       "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",

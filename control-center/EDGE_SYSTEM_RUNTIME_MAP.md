@@ -1,14 +1,14 @@
 # Edge System Runtime Map
 
 Inventory version: 1.0.0
-Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9527
+Inventory SHA-256: 41895208e0f78ab64018feda2ab3d9adecab978a5a16b0515ff7b9abb49b7401
 
 > Synchronized review surface for `EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json`.
 > This map is observational and does not declare future Edge architecture or canonical authority.
 
 ## Summary
 
-- Runtime/system surfaces: 212
+- Runtime/system surfaces: 222
 - Candidate status establishes authority: false
 - Inventory declares future architecture: false
 
@@ -55,14 +55,14 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 
 ### backend/controllers/edgeMindController.js
 
-- Surface classes: CONTROLLER, DATABASE_SURFACE, SCOUT_FIP_SURFACE
+- Surface classes: CONTROLLER, DATABASE_SURFACE
 - Reachability: CONFIRMED
 - Source state: PRE_EXISTING_MODIFIED
 - Governed by: ESA-001
 - Runtime callers: None recorded
 - Runtime consumers: backend/routes/chat.js
 - Database role: READ
-- Database objects: Scout, direct1x2_prediction_final, my, prediction_publish_runs, scout_raw_match_signals, the, these
+- Database objects: None recorded
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -88,7 +88,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/dbBootstrap.js, backend/middleware/supabaseJwt.js, backend/routes/feedback.js, backend/routes/refresh-ai.js, backend/routes/scheduler.js, backend/routes/user.js, backend/server-express.js, backend/services/aiPipelineOrchestrator.js, backend/services/contextEnrichmentService.js, backend/services/providerQuotaService.js, backend/services/sportsrcHealthService.js, scripts/fetch-live-fixtures.js
 - Database role: READ_WRITE
-- Database objects: DATABASE_URL., IF, JSONB, SET, acca_rules, across, await, direct1x2_prediction_final, for, information_schema.columns, information_schema.tables, injuries, is, leagues, matches, news_mentions, not, pg_constraint, pg_type, prediction_results, prediction_results..., profiles, public.direct1x2_prediction_final, replaced, subscriptions, table_lifecycle_registry, team_stats, teams, tier_rules, users
+- Database objects: IF, acca_rules, across, await, direct1x2_prediction_final, for, is, leagues, matches, not, pg_constraint, prediction_results, profiles, public.direct1x2_prediction_final, replaced, subscriptions, table_lifecycle_registry, teams, tier_rules, users
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -99,7 +99,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Source state: COMMITTED_REPOSITORY
 - Governed by: ESA-001
 - Runtime callers: None recorded
-- Runtime consumers: backend/controllers/edgeMindController.js, backend/core/verificationController.js, backend/routes/accuracy.js, backend/routes/debug.js, backend/routes/predictions.js, backend/routes/user.js, backend/routes/v1/acca.js, backend/routes/v1/predictions.js, backend/routes/v1/sameMatchBuilder.js, backend/routes/v1/secondaryMarkets.js, backend/routes/vip.js, backend/semantic-layer/violationLogger.js, backend/services/accaBuilder.js, backend/services/aiPipeline.js, backend/services/aiTelemetryService.js, backend/services/blockedApiCallsLog.js, backend/services/cronJobs.js, backend/services/direct1x2Builder.js, backend/services/filterEngine.js, backend/services/gradingSnapshotService.js, backend/services/pipelineMetricsService.js, backend/services/semanticDriftSummaryService.js, backend/services/systemTruthLogger.js, backend/services/thesportsdbPipeline.js, backend/services/tier1BootstrapService.js
+- Runtime consumers: backend/controllers/edgeMindController.js, backend/core/verificationController.js, backend/routes/accuracy.js, backend/routes/debug.js, backend/routes/predictions.js, backend/routes/sportsEdge.js, backend/routes/user.js, backend/routes/v1/acca.js, backend/routes/v1/predictions.js, backend/routes/v1/sameMatchBuilder.js, backend/routes/v1/secondaryMarkets.js, backend/routes/vip.js, backend/semantic-layer/violationLogger.js, backend/services/accaBuilder.js, backend/services/aiPipeline.js, backend/services/aiTelemetryService.js, backend/services/blockedApiCallsLog.js, backend/services/cronJobs.js, backend/services/direct1x2Builder.js, backend/services/enhancedMatchDetailsService.js, backend/services/filterEngine.js, backend/services/gradingSnapshotService.js, backend/services/hybridSportsDataService.js, backend/services/pipelineMetricsService.js, backend/services/semanticDriftSummaryService.js, backend/services/systemTruthLogger.js, backend/services/thesportsdbPipeline.js, backend/services/tier1BootstrapService.js
 - Database role: CONNECTION_OR_CLIENT
 - Database objects: None recorded
 - External providers: None recorded
@@ -114,7 +114,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/server-express.js
 - Database role: READ_WRITE
-- Database objects: API, IF, ON, SELECT, SET, acca_rules, across, direct1x2_prediction_final, fixtures, for, index, information_schema.columns, is_allowed, jsonb_array_elements, latest_run, match_context_data, missing, not, pg_constraint, pg_type, prediction_publish_runs, prediction_source, predictions_accuracy, predictions_filtered, public.direct1x2_prediction_final, replaced, secondary_market_allowlist, table_lifecycle_registry, tier_rules
+- Database objects: API, IF, acca_rules, across, direct1x2_prediction_final, fixtures, for, information_schema.columns, jsonb_array_elements, latest_run, match_context_data, not, pg_constraint, prediction_publish_runs, predictions_accuracy, predictions_filtered, replaced, secondary_market_allowlist, table_lifecycle_registry, tier_rules
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -151,7 +151,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Source state: COMMITTED_REPOSITORY
 - Governed by: ESA-001
 - Runtime callers: None recorded
-- Runtime consumers: backend/routes/chat.js, backend/routes/cricketCount.js, backend/routes/cricketInsights.js, backend/routes/feedback.js, backend/routes/predictions.js, backend/routes/scheduler.js, backend/routes/user.js, backend/routes/v1/acca.js, backend/routes/v1/predictions.js, backend/server-express.js
+- Runtime consumers: backend/routes/chat.js, backend/routes/cricketCount.js, backend/routes/cricketInsights.js, backend/routes/divanscore.js, backend/routes/feedback.js, backend/routes/metrics.js, backend/routes/predictions.js, backend/routes/scheduler.js, backend/routes/user.js, backend/routes/v1/acca.js, backend/routes/v1/predictions.js, backend/server-express.js
 - Database role: CONNECTION_OR_CLIENT
 - Database objects: None recorded
 - External providers: None recorded
@@ -166,7 +166,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/server-express.js
 - Database role: READ
-- Database objects: direct1x2_prediction_final, event_injury_snapshots, event_news_snapshots, event_weather_snapshots, prediction_publish_runs, predictions_accuracy, ranked_products
+- Database objects: None recorded
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -257,7 +257,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/server-express.js
 - Database role: READ
-- Database objects: direct1x2_prediction_final, predictions_filtered, predictions_raw
+- Database objects: None recorded
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -274,6 +274,19 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
+### backend/routes/divanscore.js
+
+- Surface classes: ROUTE
+- Reachability: CONFIRMED
+- Source state: PRE_EXISTING_MODIFIED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: backend/server-express.js
+- Database role: NONE
+- Database objects: None recorded
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
 ### backend/routes/feedback.js
 
 - Surface classes: DATABASE_SURFACE, ROUTE
@@ -287,6 +300,19 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
+### backend/routes/metrics.js
+
+- Surface classes: ROUTE
+- Reachability: CONFIRMED
+- Source state: PRE_EXISTING_MODIFIED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: backend/server-express.js
+- Database role: NONE
+- Database objects: None recorded
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
 ### backend/routes/pipeline.js
 
 - Surface classes: DATABASE_SURFACE, EXTERNAL_PROVIDER, ROUTE
@@ -296,7 +322,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/server-express.js
 - Database role: READ
-- Database objects: APIs, Supabase., direct1x2_prediction_final, predictions_raw
+- Database objects: direct1x2_prediction_final, predictions_raw
 - External providers: skcsai.onrender.com
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -309,7 +335,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/server-express.js
 - Database role: READ_WRITE
-- Database objects: BOTH, PostgreSQL, appearing, categories, const, context_intelligence_cache, direct1x2_prediction_final, fixture_context_cache, leagues, let, players, prediction_publish_runs, predictions_filtered, predictions_raw, rapidapi_cache, raw, raw_kickoff, source, subscription, teams
+- Database objects: context_intelligence_cache, direct1x2_prediction_final, fixture_context_cache, leagues, players, prediction_publish_runs, predictions_filtered, predictions_raw, rapidapi_cache, raw_kickoff, teams
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -335,7 +361,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/server-express.js
 - Database role: READ
-- Database objects: context_enrichment_queue, prediction_publish_runs, sport_sync, sportsrc_account_health
+- Database objects: None recorded
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -365,6 +391,19 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
+### backend/routes/sportsEdge.js
+
+- Surface classes: DATABASE_SURFACE, ROUTE
+- Reachability: CONFIRMED
+- Source state: PRE_EXISTING_MODIFIED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: backend/server-express.js
+- Database role: READ_WRITE
+- Database objects: None recorded
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
 ### backend/routes/tier1.js
 
 - Surface classes: EXTERNAL_PROVIDER, ROUTE
@@ -387,7 +426,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/server-express.js
 - Database role: READ
-- Database objects: get_available_market_counts
+- Database objects: None recorded
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -400,7 +439,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/server-express.js
 - Database role: READ_WRITE
-- Database objects: Master, acca_legs, accas, correlation, direct1x2_prediction_final, market_correlations
+- Database objects: acca_legs, accas, market_correlations
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -413,7 +452,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/server-express.js
 - Database role: READ
-- Database objects: Master, direct1x2_prediction_final, fixtures, secondary_market_predictions
+- Database objects: direct1x2_prediction_final, fixtures, secondary_market_predictions
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -426,7 +465,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/server-express.js
 - Database role: READ
-- Database objects: Tier, direct1x2_prediction_final, secondary_market_predictions
+- Database objects: None recorded
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -439,7 +478,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/server-express.js
 - Database role: READ
-- Database objects: secondary_market_predictions
+- Database objects: None recorded
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -452,7 +491,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/server-express.js
 - Database role: READ
-- Database objects: direct1x2_prediction_final, is, most, prediction_publish_runs, predictions_raw, row
+- Database objects: prediction_publish_runs
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -478,7 +517,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/semantic-layer/enforcementGuard.js
 - Database role: WRITE
-- Database objects: missing, public.semantic_violations
+- Database objects: public.semantic_violations
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -491,8 +530,8 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: READ_WRITE
-- Database objects: ESPN, SET, after, ai_predictions, cricket_fixtures, cricket_insights_final, cricket_market_rules, database, direct1x2_prediction_final, direct_1x2_insights, does, doesn, exists, fetch, first, fixture_processing_log, match_context_data, prediction_publish_runs, public_intelligence, rapidapi_cache, raw_fixtures, sport_sync, state, system, tier_rules, upsert_raw_fixture
-- External providers: api.odds.p.rapidapi.com, cdn.jsdelivr.net, cdn.tailwindcss.com, cricbuzz-cricket.p.rapidapi.com, skcs-sports-edge-skcsai.onrender.com, skcs-sports-edge-skcsai.vercel.app, skcs-sports-edge.github.io, skcs.co.za, skcsai-z8cd.onrender.com, skcsai.vercel.app, skcsaiedge.onrender.com, skcsaisports-5ltic8509-stephens-projects-e3dd898a.vercel.app, skcsaisports-6x2zcgjq1-stephens-projects-e3dd898a.vercel.app, skcsaisports-o200aflsl-stephens-projects-e3dd898a.vercel.app, skcsaisports.vercel.app, v3.football.api-sports.io, www.skcs.co.za
+- Database objects: ai_predictions, cricket_fixtures, cricket_insights_final, cricket_market_rules, database, direct1x2_prediction_final, direct_1x2_insights, first, fixture_processing_log, match_context_data, prediction_publish_runs, public_intelligence, rapidapi_cache, raw_fixtures, sport_sync, tier_rules, upsert_raw_fixture
+- External providers: api.odds.p.rapidapi.com, api.the-odds-api.com, cdn.jsdelivr.net, cdn.tailwindcss.com, cricbuzz-cricket.p.rapidapi.com, skcs-sports-edge-skcsai.onrender.com, skcs-sports-edge-skcsai.vercel.app, skcs-sports-edge.github.io, skcs.co.za, skcsai-z8cd.onrender.com, skcsai.vercel.app, skcsaiedge.onrender.com, skcsaisports-5ltic8509-stephens-projects-e3dd898a.vercel.app, skcsaisports-6x2zcgjq1-stephens-projects-e3dd898a.vercel.app, skcsaisports-o200aflsl-stephens-projects-e3dd898a.vercel.app, skcsaisports.vercel.app, v3.football.api-sports.io, www.skcs.co.za
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
 ### backend/services/accaBuilder.js
@@ -504,13 +543,13 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/routes/v1/acca.js, backend/services/aiPipeline.js, backend/services/aiPipelineOrchestrator.js
 - Database role: READ_WRITE
-- Database objects: SET, a, acca_rules, debug_published, direct1x2_prediction_final, is, lateral, latest_week_run, normalized_fixtures, pool, predictions_filtered, predictions_raw, predictions_stage_1, predictions_stage_2, predictions_stage_3, same, same_match_combinations, secondary_market_predictions, team_week_locks, tier_rules
+- Database objects: acca_rules, debug_published, direct1x2_prediction_final, lateral, latest_week_run, normalized_fixtures, predictions_filtered, predictions_raw, predictions_stage_1, predictions_stage_2, predictions_stage_3, same_match_combinations, team_week_locks, tier_rules
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
 ### backend/services/aiPipeline.js
 
-- Surface classes: DATABASE_SURFACE, SCOUT_FIP_SURFACE, SERVICE
+- Surface classes: DATABASE_SURFACE, SERVICE
 - Reachability: CONFIRMED
 - Source state: PRE_EXISTING_MODIFIED
 - Governed by: ESA-001
@@ -530,7 +569,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/routes/scheduler.js, backend/server-express.js
 - Database role: READ_WRITE
-- Database objects: direct1x2_prediction_final, fixture, get_odds_volatility, high, match_context_data, prediction_publish_runs, predictions_filtered, predictions_raw, publish, raw_fixtures, snapshots, sport_sync, this, tier_rules
+- Database objects: direct1x2_prediction_final, fixture, get_odds_volatility, prediction_publish_runs, predictions_filtered, predictions_raw, sport_sync, tier_rules
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -543,8 +582,8 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/routes/refresh-ai.js, backend/services/aiPipelineOrchestrator.js, backend/services/aiScoring.js, backend/services/direct1x2Builder.js
 - Database role: WRITE
-- Database objects: default, your
-- External providers: api.antigravity.ai, api.groq.com
+- Database objects: None recorded
+- External providers: api.groq.com, generativelanguage.googleapis.com
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
 ### backend/services/aiScoring.js
@@ -575,14 +614,14 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 
 ### backend/services/antigravity/WorkflowEngine.js
 
-- Surface classes: DATABASE_SURFACE, SCHEDULED_EXECUTION, SERVICE
+- Surface classes: DATABASE_SURFACE, SERVICE
 - Reachability: CONFIRMED
 - Source state: COMMITTED_REPOSITORY
 - Governed by: ESA-001
 - Runtime callers: None recorded
 - Runtime consumers: backend/routes/antigravity.js
 - Database role: WRITE
-- Database objects: AI, TOML, now, previous, sources, sources...
+- Database objects: None recorded
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -593,9 +632,9 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Source state: COMMITTED_REPOSITORY
 - Governed by: ESA-001
 - Runtime callers: None recorded
-- Runtime consumers: backend/services/dataProviders.js, scripts/fetch-live-fixtures.js
+- Runtime consumers: backend/routes/divanscore.js, backend/routes/metrics.js, backend/services/dataProviders.js, scripts/fetch-live-fixtures.js
 - Database role: READ_WRITE
-- Database objects: SET, rapidapi_cache
+- Database objects: rapidapi_cache
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -672,7 +711,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Governed by: ESA-001
 - Runtime callers: None recorded
 - Runtime consumers: backend/routes/scheduler.js, backend/services/syncService.js
-- Database role: READ
+- Database role: RPC
 - Database objects: upsert_canonical_event
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
@@ -712,7 +751,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/routes/scheduler.js, backend/server-express.js, backend/services/aiPipelineOrchestrator.js
 - Database role: READ_WRITE
-- Database objects: SET, canonical_bookmakers, const, context_enrichment_queue, context_intelligence_cache, event_odds_snapshots, match_context_data, matches, raw_fixtures, teams, the
+- Database objects: context_enrichment_queue, context_intelligence_cache, event_odds_snapshots, match_context_data, raw_fixtures, teams
 - External providers: api.openweathermap.org
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -816,7 +855,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/server-express.js
 - Database role: READ_WRITE
-- Database objects: TheSportsDB, direct1x2_prediction_final, missing, predictions_accuracy, predictions_raw, raw_fixtures
+- Database objects: direct1x2_prediction_final, predictions_accuracy, predictions_raw
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -855,7 +894,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/routes/direct1x2.js, backend/services/aiPipelineOrchestrator.js
 - Database role: READ_WRITE
-- Database objects: ON, direct1x2_prediction_final, direct_1x2_predictions, information_schema.columns, league, only, pg_trigger, public.league_stats
+- Database objects: direct1x2_prediction_final, direct_1x2_predictions
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -872,6 +911,32 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
+### backend/services/divanscoreService.js
+
+- Surface classes: SERVICE
+- Reachability: CONFIRMED
+- Source state: PRE_EXISTING_MODIFIED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: backend/routes/divanscore.js
+- Database role: NONE
+- Database objects: None recorded
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
+### backend/services/enhancedMatchDetailsService.js
+
+- Surface classes: SERVICE
+- Reachability: CONFIRMED
+- Source state: PRE_EXISTING_MODIFIED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: backend/routes/sportsEdge.js
+- Database role: NONE
+- Database objects: None recorded
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
 ### backend/services/espnHiddenApiService.js
 
 - Surface classes: EXTERNAL_PROVIDER, SERVICE
@@ -879,7 +944,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Source state: COMMITTED_REPOSITORY
 - Governed by: ESA-001
 - Runtime callers: None recorded
-- Runtime consumers: backend/services/dataProvider.js
+- Runtime consumers: backend/services/dataProvider.js, backend/services/enhancedMatchDetailsService.js, backend/services/hybridSportsDataService.js
 - Database role: NONE
 - Database objects: None recorded
 - External providers: site.api.espn.com
@@ -894,7 +959,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/services/accaBuilder.js, backend/services/aiPipeline.js
 - Database role: READ_WRITE
-- Database objects: database., metadata, predictions_filtered, predictions_raw, set, tier_rules
+- Database objects: predictions_filtered, predictions_raw, tier_rules
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -937,6 +1002,19 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
+### backend/services/freeLivescoreApiService.js
+
+- Surface classes: SERVICE
+- Reachability: CONFIRMED
+- Source state: COMMITTED_REPOSITORY
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: backend/services/hybridSportsDataService.js
+- Database role: NONE
+- Database objects: None recorded
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
 ### backend/services/gradingAccuracyCore.js
 
 - Surface classes: DATABASE_SURFACE, SERVICE
@@ -959,8 +1037,21 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/routes/skcsGrading.js
 - Database role: READ
-- Database objects: direct1x2_prediction_final, event_injury_snapshots, event_news_snapshots, event_weather_snapshots, prediction_publish_runs, predictions_accuracy, ranked_products
+- Database objects: None recorded
 - External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
+### backend/services/hybridSportsDataService.js
+
+- Surface classes: EXTERNAL_PROVIDER, SERVICE
+- Reachability: CONFIRMED
+- Source state: COMMITTED_REPOSITORY
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: backend/routes/sportsEdge.js, backend/services/skcsHeartbeat.js
+- Database role: NONE
+- Database objects: None recorded
+- External providers: www.thesportsdb.com
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
 ### backend/services/marketIntelligence.js
@@ -998,7 +1089,20 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/routes/predictions.js
 - Database role: WRITE
-- Database objects: AI
+- Database objects: None recorded
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
+### backend/services/metrxFactoryService.js
+
+- Surface classes: SERVICE
+- Reachability: CONFIRMED
+- Source state: PRE_EXISTING_MODIFIED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: backend/routes/metrics.js
+- Database role: NONE
+- Database objects: None recorded
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1035,9 +1139,22 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Source state: COMMITTED_REPOSITORY
 - Governed by: ESA-001
 - Runtime callers: None recorded
-- Runtime consumers: backend/services/cronJobs.js
+- Runtime consumers: backend/routes/metrics.js, backend/services/cronJobs.js
 - Database role: READ
-- Database objects: public.v_pipeline_health_feed
+- Database objects: None recorded
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
+### backend/services/proFootballDataService.js
+
+- Surface classes: DATABASE_SURFACE, SERVICE
+- Reachability: CONFIRMED
+- Source state: COMMITTED_REPOSITORY
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: backend/services/skcsHeartbeat.js
+- Database role: WRITE
+- Database objects: None recorded
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1048,7 +1165,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Source state: COMMITTED_REPOSITORY
 - Governed by: ESA-001
 - Runtime callers: None recorded
-- Runtime consumers: backend/services/apiQuotaRouter.js, backend/services/quotaPlanner.js
+- Runtime consumers: backend/routes/metrics.js, backend/services/apiQuotaRouter.js, backend/services/quotaPlanner.js
 - Database role: READ_WRITE
 - Database objects: rapidapi_quota_usage
 - External providers: None recorded
@@ -1076,7 +1193,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/routes/v1/predictions.js
 - Database role: READ
-- Database objects: Master
+- Database objects: None recorded
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1109,13 +1226,13 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 ### backend/services/scoutSignalSync.js
 
 - Surface classes: DATABASE_SURFACE, SCOUT_FIP_SURFACE, SERVICE
-- Reachability: CONFIRMED
+- Reachability: CANDIDATE
 - Source state: PRE_EXISTING_UNTRACKED
 - Governed by: ESA-001
 - Runtime callers: None recorded
-- Runtime consumers: backend/services/aiPipeline.js, backend/services/syncService.js
+- Runtime consumers: None recorded
 - Database role: READ_WRITE
-- Database objects: Edge, SET, Scout, Scout., created, environment, exists, scout_raw_match_signals, the
+- Database objects: scout_raw_match_signals
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1132,6 +1249,19 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
+### backend/services/skcsHeartbeat.js
+
+- Surface classes: DATABASE_SURFACE, SCHEDULED_EXECUTION, SERVICE
+- Reachability: CONFIRMED
+- Source state: COMMITTED_REPOSITORY
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: backend/server-express.js
+- Database role: WRITE
+- Database objects: None recorded
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
 ### backend/services/sportsrcHealthService.js
 
 - Surface classes: DATABASE_SURFACE, EXTERNAL_PROVIDER, SERVICE
@@ -1141,7 +1271,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/routes/scheduler.js
 - Database role: WRITE
-- Database objects: SportSRC, response, sportsrc_account_health
+- Database objects: sportsrc_account_health
 - External providers: api.sportsrc.org
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1160,7 +1290,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 
 ### backend/services/syncService.js
 
-- Surface classes: SCOUT_FIP_SURFACE, SERVICE
+- Surface classes: SERVICE
 - Reachability: CONFIRMED
 - Source state: PRE_EXISTING_MODIFIED
 - Governed by: ESA-001
@@ -1180,7 +1310,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/core/executionPipeline.js, backend/services/pipelineMetricsService.js
 - Database role: READ_WRITE
-- Database objects: SET, information_schema.columns, is, public.decision_fingerprints, public.pipeline_executions
+- Database objects: public.decision_fingerprints, public.pipeline_executions
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1191,9 +1321,9 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Source state: COMMITTED_REPOSITORY
 - Governed by: ESA-001
 - Runtime callers: None recorded
-- Runtime consumers: backend/server-express.js, backend/services/cronJobs.js
+- Runtime consumers: backend/server-express.js, backend/services/cronJobs.js, backend/services/hybridSportsDataService.js
 - Database role: READ_WRITE
-- Database objects: SET, TheSportsDB, advantage, ai_predictions, ai_predictions., deep_context, event, last, match_context_data, match_context_data., raw_fixtures, stats, than, upsert_canonical_event
+- Database objects: ai_predictions, match_context_data, raw_fixtures, upsert_canonical_event
 - External providers: www.thesportsdb.com
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1206,7 +1336,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/routes/tier1.js, backend/server-express.js
 - Database role: WRITE
-- Database objects: SET, rapidapi_cache
+- Database objects: rapidapi_cache
 - External providers: www.thesportsdb.com
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1232,7 +1362,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/services/aiPipeline.js
 - Database role: READ_WRITE
-- Database objects: Supabase, fixture_context_cache
+- Database objects: fixture_context_cache
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1258,7 +1388,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/utils/rapidApiWaterfall.js
 - Database role: READ_WRITE
-- Database objects: API, SET, endpoint, rapidapi_cache
+- Database objects: rapidapi_cache
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1323,7 +1453,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/services/direct1x2Builder.js
 - Database role: READ
-- Database objects: goals, instruction, league
+- Database objects: None recorded
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1479,7 +1609,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: READ_WRITE
-- Database objects: IF, ON, direct1x2_prediction_final, is_valid_market, jsonb_array_elements, secondary_markets_allowlist, the
+- Database objects: IF, direct1x2_prediction_final, jsonb_array_elements, secondary_markets_allowlist
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1492,7 +1622,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: READ
-- Database objects: direct1x2_prediction_final, of
+- Database objects: direct1x2_prediction_final
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1518,7 +1648,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/server-express.js
 - Database role: READ_WRITE
-- Database objects: API, EVENTS, SET, command, direct1x2_prediction_final, events, for, instead, prediction_publish_runs, providers, schema, the
+- Database objects: direct1x2_prediction_final, events, prediction_publish_runs
 - External providers: v3.football.api-sports.io, www.sofascore.com
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1531,7 +1661,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: READ_WRITE
-- Database objects: API, Phase, SET, _predictions, api_predictions, direct1x2_prediction_final, events, raw_provider_data, silently, target, the
+- Database objects: events
 - External providers: api.cricapi.com, v1.afl.api-sports.io, v1.american-football.api-sports.io, v1.baseball.api-sports.io, v1.basketball.api-sports.io, v1.cricket.api-sports.io, v1.formula-1.api-sports.io, v1.handball.api-sports.io, v1.hockey.api-sports.io, v1.mma.api-sports.io, v1.rugby.api-sports.io, v1.tennis.api-sports.io, v1.volleyball.api-sports.io, v3.football.api-sports.io
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1557,7 +1687,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: READ
-- Database objects: events, missing, pg_class, pg_indexes, pg_policies, predictions_accuracy, rapidapi_cache, scheduling_logs, tier_rules, zz_archive_matches
+- Database objects: zz_archive_matches
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1570,7 +1700,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: backend/routes/cricketCron.js, backend/server-express.js
 - Database role: READ_WRITE
-- Database objects: code, cricket_fixtures, cricket_insights_final, cricket_market_rules
+- Database objects: cricket_fixtures, cricket_insights_final, cricket_market_rules
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1791,7 +1921,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: WRITE
-- Database objects: acca_rules, set
+- Database objects: acca_rules
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1804,7 +1934,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: SCHEMA
-- Database objects: COMMENT, CREATE, IF, for, leg_count, market_correlations, result
+- Database objects: IF, market_correlations
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1817,7 +1947,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: TRIGGER
-- Database objects: DROP, IF, ON, acca_legs, being, direct1x2_prediction_final, exists, has_high_confidence_secondary, if, information_schema.tables, legs_array, main_confidence, market_correlations, prediction_confidence, risk, secondary_count
+- Database objects: IF, acca_legs, being, direct1x2_prediction_final, information_schema.tables, market_correlations, pg_type
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1830,7 +1960,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: SCHEMA
-- Database objects: IF, ON, normalized_fixtures, predictions_final, stage, subscription_plans, timestamp, v_sast_time
+- Database objects: IF, normalized_fixtures, predictions_final, subscription_plans, v_sast_time
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1843,7 +1973,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: SEED
-- Database objects: IF, SET, auth.users, information_schema.columns, information_schema.tables, public.profiles, public.subscriptions, public.tiers, public.verification
+- Database objects: IF, auth.users, information_schema.columns, information_schema.tables, public.profiles, public.subscriptions, public.tiers, public.verification
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1856,7 +1986,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: SEED
-- Database objects: IF, SET, auth.users, information_schema.columns, information_schema.tables, public.profiles, public.subscriptions, public.verification, target_user_id, unnest
+- Database objects: IF, auth.users, information_schema.columns, information_schema.tables, public.profiles, public.subscriptions, public.verification, unnest
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1869,7 +1999,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: WRITE
-- Database objects: set, tier_rules
+- Database objects: tier_rules
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1895,7 +2025,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: IF, ON, SET, insight_usage, timestamp, to, v_available
+- Database objects: IF, insight_usage
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1921,7 +2051,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: IF, ON, SET, canonical_betting_markets, fixture_weekly_publication_log, information_schema.columns, jsonb_array_elements, pg_class, pg_namespace, pg_type, predictions_final, skcs_allocation_matrix, skcs_daily_wallets, skcs_secondary_market_allowlist, skcs_subscription_plans, source_rows, v_existing_secondary_count, v_local_ts, v_matrix, v_new_balance, v_now_sast
+- Database objects: IF, canonical_betting_markets, fixture_weekly_publication_log, information_schema.columns, jsonb_array_elements, pg_class, pg_namespace, pg_type, predictions_final, skcs_allocation_matrix, skcs_daily_wallets, skcs_secondary_market_allowlist, skcs_subscription_plans, source_rows, v_local_ts, v_now_sast
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1934,7 +2064,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: ON, SET, canonical_bookmakers, for, information_schema.columns, information_schema.tables
+- Database objects: canonical_bookmakers, information_schema.columns, information_schema.tables
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1947,7 +2077,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: does, for, information_schema.tables, match_context_data, multiple
+- Database objects: does, information_schema.tables, match_context_data, multiple
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1960,7 +2090,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: IF, ON, for
+- Database objects: IF
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1973,7 +2103,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: existing, jsonb_array_elements, payload, raw_fixtures, upsert_raw_fixture, v_existing_count, v_result
+- Database objects: jsonb_array_elements, raw_fixtures, upsert_raw_fixture
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1986,7 +2116,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: IF, SET, context, context_enrichment_queue, context_intelligence_cache, if, match_context_data, upsert_raw_fixture
+- Database objects: IF, context_enrichment_queue, context_intelligence_cache, match_context_data
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -1999,7 +2129,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: IF, fixture_processing_log, for, pg_constraint, relevant
+- Database objects: IF, fixture_processing_log, pg_constraint
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2025,7 +2155,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: IF, event_odds_snapshots, for, jsonb_each_text, pg_constraint
+- Database objects: IF, event_odds_snapshots, jsonb_each_text, pg_constraint
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2051,7 +2181,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: shape
+- Database objects: None recorded
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2064,7 +2194,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: ai_predictions, lookup, prediction_result
+- Database objects: ai_predictions
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2077,7 +2207,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: match_context_data, to
+- Database objects: match_context_data
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2116,7 +2246,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: DROP, IF, and, was
+- Database objects: IF
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2129,7 +2259,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: direct1x2_prediction_final, fixtures, should, tables, tier_rules, zz_archive_matches
+- Database objects: None recorded
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2142,7 +2272,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: SET, public.canonical_events
+- Database objects: public.canonical_events
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2155,7 +2285,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: IF, SET, existing, public.canonical_entities, public.skcs_teams, public.team_aliases, public.team_identity_map, v_team_id
+- Database objects: IF, public.canonical_entities, public.skcs_teams, public.team_aliases, public.team_identity_map
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2168,7 +2298,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: IF, SET, football_canonical_events, public.events, public.football_canonical_events, public.match_results
+- Database objects: IF, football_canonical_events, public.events, public.football_canonical_events, public.match_results
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2181,7 +2311,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: IF, SET, SKCS, from, pg_policies, public.scout_raw_match_signals, public.table_lifecycle_registry
+- Database objects: IF, pg_policies, public.scout_raw_match_signals, public.table_lifecycle_registry
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2220,7 +2350,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: ON, pg_class, pg_namespace, public.direct1x2_prediction_final, public.predictions_final, v_relkind
+- Database objects: pg_class, pg_namespace, public.direct1x2_prediction_final, public.predictions_final
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2259,7 +2389,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: OF, public.direct1x2_prediction_final
+- Database objects: public.direct1x2_prediction_final
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2272,7 +2402,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: direct1x2_prediction_final, existing, predictions_accuracy, predictions_raw
+- Database objects: direct1x2_prediction_final, predictions_accuracy, predictions_raw
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2298,7 +2428,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: CASE, DB, jsonb_array_elements, public.direct1x2_prediction_final, public.predictions_final, v_existing_secondary_count
+- Database objects: CASE, jsonb_array_elements, public.direct1x2_prediction_final, public.predictions_final
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2311,7 +2441,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: CASE, SET, information_schema.columns, jsonb_array_elements, pg_type, public.direct1x2_prediction_final, public.predictions_final, public.secondary_market_allowlist, secondary_market_allowlist, the, v_existing_secondary_count
+- Database objects: CASE, information_schema.columns, jsonb_array_elements, pg_type, public.direct1x2_prediction_final, public.predictions_final, public.secondary_market_allowlist
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2324,7 +2454,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: jsonb_array_elements, public.predictions_final, public.secondary_market_allowlist, the, v_existing_secondary_count, v_is_safe_haven
+- Database objects: jsonb_array_elements, public.predictions_final, public.secondary_market_allowlist
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2350,7 +2480,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: CREATE, IF, JSONB, ON, bookmaker_levels, bookmaker_odds, direct1x2_prediction_final, direct1x2_prediction_final.secondary_markets, event_injuries, event_injury_snapshots, event_injury_snapshots., event_news_scores, event_news_snapshots, event_news_snapshots., jsonb_array_elements, jsonb_object_keys, match_context_data, match_context_data.odds, prediction, prediction_secondary_markets, v_odds, v_secondary
+- Database objects: IF, bookmaker_levels, bookmaker_odds, direct1x2_prediction_final, direct1x2_prediction_final.secondary_markets, event_injuries, event_injury_snapshots, event_news_scores, event_news_snapshots, jsonb_array_elements, jsonb_object_keys, match_context_data, match_context_data.odds, prediction, prediction_secondary_markets
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2363,7 +2493,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: CREATE, IF, bookmaker_odds, direct1x2_prediction_final.secondary_markets, event_injuries, event_injury_snapshots., event_news_scores, event_news_snapshots., match_context_data.odds, prediction_secondary_markets
+- Database objects: IF, bookmaker_odds, direct1x2_prediction_final.secondary_markets, event_injuries, event_injury_snapshots, event_news_scores, event_news_snapshots, match_context_data.odds, prediction_secondary_markets
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2389,7 +2519,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: CREATE, ON, bookmaker_odds, direct1x2_prediction_final, jsonb_array_elements, jsonb_object_keys, match_context_data, match_context_data.odds, prediction, prediction_secondary_markets, v_odds, v_secondary
+- Database objects: bookmaker_odds, direct1x2_prediction_final, jsonb_array_elements, jsonb_object_keys, match_context_data, match_context_data.odds, prediction, prediction_secondary_markets
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2415,7 +2545,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: Focused, IF, ON, SET, direct1x2_prediction_final, into, prediction_core, prediction_insights, prediction_metadata, prediction_publication
+- Database objects: IF, direct1x2_prediction_final, prediction_core, prediction_insights, prediction_metadata, prediction_publication
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2428,7 +2558,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: CREATE, IF, prediction_core, prediction_insights, prediction_metadata, prediction_publication
+- Database objects: IF, prediction_core, prediction_insights, prediction_metadata, prediction_publication
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2454,7 +2584,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: ON, SET, direct1x2_prediction_final, prediction_core, prediction_insights, prediction_metadata, prediction_publication
+- Database objects: direct1x2_prediction_final, prediction_core, prediction_insights, prediction_metadata, prediction_publication
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2493,7 +2623,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: IF, OF, ON, SET, attack_rating, confidence, form_score, injury_penalty, mr.played_at, now, opp_away, public.direct1x2_prediction_final, public.head_to_head, public.injury_impact, public.match_results, public.prediction_scores, public.secondary_market_allowlist, public.team_form, public.team_strength, public.tier_rules, public.volatility_factors, rec, team_home, total_impact, v
+- Database objects: IF, mr.played_at, now, public.direct1x2_prediction_final, public.head_to_head, public.injury_impact, public.match_results, public.prediction_scores, public.secondary_market_allowlist, public.team_form, public.team_strength, public.tier_rules, public.volatility_factors
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2506,7 +2636,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: IF, SET, daily, daily_agg, pg_policies, public.ai_pipeline_telemetry, public.ai_usage_daily, public.blocked_ai_calls_log, today, v_id
+- Database objects: IF, daily_agg, pg_policies, public.ai_pipeline_telemetry, public.ai_usage_daily, public.blocked_ai_calls_log, today
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2532,7 +2662,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: pg_policies, public.
+- Database objects: pg_policies, public
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2545,7 +2675,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: pg_policies, public.
+- Database objects: pg_policies, public
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2558,7 +2688,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: pg_policies, public.
+- Database objects: pg_policies, public
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2571,7 +2701,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: IF, for, pg_policies, public.system_health_state
+- Database objects: IF, pg_policies, public.system_health_state
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2597,7 +2727,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: base, drift_velocity, hourly_counts, hourly_series, provider_drift, public.semantic_violations, recent_criticals, result, rule_failure_heatmap, severity_counts, total_stats, type_counts, window_split
+- Database objects: base, drift_velocity, hourly_counts, hourly_series, provider_drift, public.semantic_violations, recent_criticals, rule_failure_heatmap, severity_counts, total_stats, type_counts, window_split
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2649,7 +2779,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: IF, ON, pg_constraint, pg_policies, public.decision_fingerprints, public.pipeline_executions, public.system_health_state
+- Database objects: IF, pg_constraint, pg_policies, public.decision_fingerprints, public.pipeline_executions, public.system_health_state
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2662,7 +2792,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: MIGRATION
-- Database objects: attack_rating, form_score, injury_penalty, public.injury_impact, public.team_strength
+- Database objects: public.injury_impact, public.team_strength
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
@@ -2714,7 +2844,7 @@ Inventory SHA-256: 4c3d0157a8d72e5a388b8dfe275b8bf44285a8066cd5d444a6aba3f1595b9
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: SCHEMA
-- Database objects: IF, TheSportsDB
+- Database objects: IF
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 

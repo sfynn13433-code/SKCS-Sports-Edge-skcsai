@@ -312,18 +312,286 @@ function extractProviderHosts(source) {
   return [...new Set(hosts)].sort();
 }
 
-function extractDatabaseObjects(source) {
+function extractScheduleOrTrigger(relativePath, source) {
+  const triggers = [];
+
+  for (const match of source.matchAll(
+    /cron\.schedule\(\s*["'`]([^"'`]+)["'`]/gu
+  )) {
+    triggers.push(`cron:${match[1]}`);
+  }
+
+  if (/\bsetInterval\s*\(/u.test(source)) {
+    triggers.push("setInterval");
+  }
+
+  if (/\bsetImmediate\s*\(/u.test(source)) {
+    triggers.push("setImmediate");
+  }
+
+  if (/scheduler/iu.test(relativePath)) {
+    triggers.push("scheduler-path");
+  }
+
+  return [...new Set(triggers)].sort().join("; ");
+}
+
+function detectDeploymentSurface(relativePath) {
+  if (relativePath === "render.yaml") {
+    return "RENDER_CONFIGURATION";
+  }
+
+  if (relativePath === "vercel.json") {
+    return "VERCEL_CONFIGURATION";
+  }
+
+  if (relativePath === "package.json") {
+    return "PACKAGE_RUNTIME_SCRIPTS";
+  }
+
+  if (/^Dockerfile(?:\.|$)/u.test(path.posix.basename(relativePath))) {
+    return "CONTAINER_BUILD";
+  }
+
+  return "";
+}
+
+function stripSqlComments(sql) {
+  return String(sql)
+    .replace(/\/\*[\s\S]*?\*\//gu, " ")
+    .replace(/--.*$/gmu, " ");
+}
+
+function extractQualifiedIdentifiers(text) {
+  // Captures dot-qualified identifiers like `public.predictions_raw`.
+  // Does not try to parse quoted identifiers; this is intentionally conservative.
   const objects = [];
+  const ident = /^([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)$/u;
+
   const patterns = [
-    /\.from\(\s*["']([^"']+)["']\s*\)/gu,
-    /\.rpc\(\s*["']([^"']+)["']\s*/gu,
-    /\b(?:FROM|JOIN|INTO|UPDATE|TABLE)\s+["'`]?([A-Za-z_][A-Za-z0-9_.]*)/giu,
+    /\bFROM\s+([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\b/giu,
+    /\bJOIN\s+([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\b/giu,
+    /\bINSERT\s+INTO\s+([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\b/giu,
+    /\bUPDATE\s+([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\b\s+SET\b/giu,
+    /\bDELETE\s+FROM\s+([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\b/giu,
+    /\bCREATE\s+TABLE\s+([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\b/giu,
+    /\bALTER\s+TABLE\s+([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\b/giu,
+    /\bDROP\s+TABLE\s+([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\b/giu,
+    /\bTRUNCATE\s+([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\b/giu,
+    // Fallback: allow capturing identifiers after generic TABLE keyword usage.
+    /\bTABLE\s+([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\b/giu,
   ];
+
   for (const pattern of patterns) {
-    for (const match of source.matchAll(pattern)) {
-      objects.push(match[1]);
+    for (const match of text.matchAll(pattern)) {
+      const obj = match[1];
+      if (obj && ident.test(obj)) objects.push(obj);
     }
   }
+
+  return [...new Set(objects)].sort();
+}
+
+function extractSqlEvidenceObjectsFromSqlText(sqlText) {
+  const cleaned = stripSqlComments(sqlText);
+  return extractQualifiedIdentifiers(cleaned);
+}
+
+function detectGovernanceReachability(relativePath, source) {
+  const normalizedPath = String(relativePath || "")
+    .replace(/\\/g, "/")
+    .toLowerCase();
+  const text = String(source || "");
+  const lower = text.toLowerCase();
+
+  const looksLikeTestProof =
+    normalizedPath.startsWith("tests/") ||
+    normalizedPath.startsWith("test/") ||
+    /(?:^|\/)test(s)?[_-]/u.test(normalizedPath) ||
+    /(?:\.test\.[cm]?[jt]s|\.spec\.[cm]?[jt]s|\/test_)/iu.test(normalizedPath) ||
+    normalizedPath.includes("test_scenarios_master_rulebook");
+
+  if (looksLikeTestProof) return "TEST_PROOF";
+
+  const looksLikeAuditTool =
+    normalizedPath.includes("/scripts/audit-") ||
+    normalizedPath.includes("/scripts/audit_") ||
+    /(?:^|\/)(?:audit-|audit_).*\.js$/iu.test(normalizedPath) ||
+    normalizedPath.endsWith("audit-football-rules-alignment.js");
+
+  if (looksLikeAuditTool) return "AUDIT_TOOL";
+
+  const looksLikeBuildGate =
+    /(?:^|\/)(scripts\/)?(verify-|verify_|check-|check_).*\.js$/iu.test(
+      normalizedPath
+    ) ||
+    normalizedPath.endsWith("verify-master-rulebook-alignment.js") ||
+    normalizedPath.endsWith("scripts/verify-master-rulebook-alignment.js") ||
+    normalizedPath.includes("/scripts/verify-") ||
+    normalizedPath.includes("/scripts/check-") ||
+    normalizedPath.includes("/scripts/check_") ||
+    normalizedPath.includes("/scripts/verify_");
+
+  // Require enforcement/guard evidence, not just file naming.
+  if (looksLikeBuildGate) {
+    const hasFailEvidence =
+      /\bprocess\.exitCode\b/iu.test(text) ||
+      /\bprocess\.exit\s*\(\s*1\s*\)/iu.test(text) ||
+      /\bthrow\b/iu.test(text) ||
+      /\bverification\b/iu.test(text) ||
+      /\bfail\s*(?:when|closed|pass)/iu.test(text) ||
+      /\bverification failed\b/iu.test(lower) ||
+      /\bexitCode\s*=\s*1\b/iu.test(lower);
+    if (hasFailEvidence) return "BUILD_GATE";
+  }
+
+  const looksLikeSql = /\.sql$/iu.test(normalizedPath);
+  const hasDatabaseEnforcementEvidence =
+    /\bcreate\s+trigger\b/iu.test(text) ||
+    /\bcreate\s+(?:or\s+replace\s+)?function\b/iu.test(text) ||
+    /\bcreate\s+function\b/iu.test(text) ||
+    /\bcreate\s+policy\b/iu.test(text) ||
+    /\balter\s+policy\b/iu.test(text) ||
+    /\brow\s+level\s+security\b/iu.test(text) ||
+    /\braise\s+exception\b/iu.test(text) ||
+    /\breturns\s+trigger\b/iu.test(text) ||
+    /\bexecute\s+function\b/iu.test(text);
+
+  if (looksLikeSql && hasDatabaseEnforcementEvidence) return "DATABASE";
+
+  const looksLikeRuntimeEnforcement = normalizedPath.startsWith("backend/");
+  const hasRuntimeEnforcementEvidence =
+    /\b(blo(?:cked|king)|reject|forbidden|disallowed|prevent|cannot|throw)\b/iu.test(text) ||
+    /\breturn\s+false\b/iu.test(text) ||
+    /\breturn\s*\{[^}]*error\b/iu.test(text) ||
+    /\breturn\s*\{[^}]*blocked\b/iu.test(text) ||
+    /\benforce|gatekeeper|block.*publish\b/iu.test(lower);
+
+  if (looksLikeRuntimeEnforcement && hasRuntimeEnforcementEvidence) return "RUNTIME";
+
+  const looksDocumentary =
+    normalizedPath.endsWith(".md") ||
+    normalizedPath.endsWith(".txt") ||
+    normalizedPath.includes("documentation");
+
+  if (looksDocumentary) return "DOCUMENT_ONLY";
+
+  return "UNKNOWN";
+}
+
+const RELATIONSHIP_EVIDENCE_FIELDS = [
+  "database_role",
+  "database_objects",
+  "schedule_or_trigger",
+  "deployment_surface",
+  "governance_reachability",
+];
+
+function normalizeRelationshipScalar(value) {
+  if (value === undefined || value === null) return null;
+  const normalized = String(value).trim();
+  return normalized.length > 0 ? normalized : null;
+}
+
+function normalizeRelationshipList(value) {
+  const items = Array.isArray(value) ? value : [];
+  return [...new Set(items.map((item) => String(item).trim()).filter(Boolean))].sort();
+}
+
+function compareRelationshipEvidence(discoveredRecord, inventoryRecord) {
+  const findings = [];
+
+  for (const field of RELATIONSHIP_EVIDENCE_FIELDS) {
+    const discoveredValue =
+      field === "database_objects"
+        ? normalizeRelationshipList(discoveredRecord?.[field])
+        : field === "governance_reachability"
+          ? normalizeRelationshipScalar(
+              discoveredRecord?.governance_reachability ??
+                discoveredRecord?.governance_reachability_type
+            )
+          : normalizeRelationshipScalar(discoveredRecord?.[field]);
+
+    const inventoryValue =
+      field === "database_objects"
+        ? normalizeRelationshipList(inventoryRecord?.[field])
+        : field === "governance_reachability"
+          ? normalizeRelationshipScalar(
+              inventoryRecord?.governance_reachability ??
+                inventoryRecord?.governance_reachability_type
+            )
+          : normalizeRelationshipScalar(inventoryRecord?.[field]);
+
+    const matches =
+      field === "database_objects"
+        ? JSON.stringify(discoveredValue) === JSON.stringify(inventoryValue)
+        : discoveredValue === inventoryValue;
+
+    if (!matches) {
+      findings.push({
+        field,
+        discovered: discoveredValue,
+        inventoried: inventoryValue,
+      });
+    }
+  }
+
+  return findings;
+}
+
+function isLikelySqlLiteralContent(content) {
+  // Tight structural filter to avoid interpreting prose as SQL.
+  const hasSqlCore = /\b(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|TRUNCATE)\b/iu.test(
+    content
+  );
+  if (!hasSqlCore) return false;
+
+  // Require at least one structural clause typical of a statement.
+  return (
+    /\b( FROM | JOIN | INTO | SET | VALUES | TABLE )\b/iu.test(` ${content} `) ||
+    /\bINSERT\s+INTO\b/iu.test(content) ||
+    /\bDELETE\s+FROM\b/iu.test(content) ||
+    /\bUPDATE\b/iu.test(content) && /\bSET\b/iu.test(content)
+  );
+}
+
+function extractDatabaseObjects(relativePath, source) {
+  const objects = [];
+
+  // Always capture Supabase evidence from direct call sites.
+  for (const match of source.matchAll(
+    /\.from\(\s*["'`]([^"'`]+)["'`]\s*\)/gu
+  )) {
+    if (match[1]) objects.push(match[1]);
+  }
+  for (const match of source.matchAll(
+    /\.rpc\(\s*["'`]([^"'`]+)["'`]\s*/gu
+  )) {
+    if (match[1]) objects.push(match[1]);
+  }
+
+  const isSqlFile = /\.sql$/iu.test(relativePath);
+  if (isSqlFile) {
+    // For raw SQL files, scan whole content conservatively after stripping comments.
+    objects.push(...extractSqlEvidenceObjectsFromSqlText(source));
+    return [...new Set(objects)].sort();
+  }
+
+  // For JS/TS-like source, only scan string/template literal content that looks like SQL.
+  // This avoids treating prose like "update Edge ... from Scout" as executable SQL.
+  for (const match of source.matchAll(/`([\s\S]*?)`/gu)) {
+    const content = match[1] || "";
+    if (!isLikelySqlLiteralContent(content)) continue;
+    objects.push(...extractSqlEvidenceObjectsFromSqlText(content));
+  }
+
+  // Also support single/double-quoted literals *only* when the literal content itself is very SQL-like.
+  for (const match of source.matchAll(/(['"])([\s\S]*?)\1/gu)) {
+    const content = match[2] || "";
+    if (!isLikelySqlLiteralContent(content)) continue;
+    objects.push(...extractSqlEvidenceObjectsFromSqlText(content));
+  }
+
   return [...new Set(objects)].sort();
 }
 
@@ -340,8 +608,9 @@ function detectDatabaseRole(relativePath, source) {
     /\bnew\s+Pool\s*\(/u.test(source) ||
     /\bnew\s+Client\s*\(/u.test(source);
 
+  const hasRpc = /\.rpc\s*\(/u.test(source);
   const hasRead =
-    /\.select\s*\(/u.test(source) || /\bSELECT\b/iu.test(source) || /\.rpc\s*\(/u.test(source);
+    /\.select\s*\(/u.test(source) || /\bSELECT\b/iu.test(source);
 
   const hasWrite =
     /\.(?:insert|upsert|update|delete)\s*\(/iu.test(source) ||
@@ -350,18 +619,13 @@ function detectDatabaseRole(relativePath, source) {
   if (hasRead && hasWrite) return "READ_WRITE";
   if (hasWrite) return "WRITE";
   if (hasRead) return "READ";
-  if (/\.rpc\s*\(/u.test(source)) return "RPC";
+  if (hasRpc) return "RPC";
   if (hasClient) return "CONNECTION_OR_CLIENT";
   return "NONE";
 }
 
 function isScheduledExecution(relativePath, source) {
-  return (
-    /cron\.schedule\s*\(/u.test(source) ||
-    /\bsetInterval\s*\(/u.test(source) ||
-    /\bsetImmediate\s*\(/u.test(source) ||
-    /scheduler/iu.test(relativePath)
-  );
+  return extractScheduleOrTrigger(relativePath, source) !== "";
 }
 
 function isScoutFipDiscoveryInfrastructurePath(relativePath) {
@@ -584,16 +848,13 @@ function discoverMaterialSurfaces(assetRegister) {
       classes.add("DATABASE_SURFACE");
     }
 
-    if (isScheduledExecution(relativePath, source)) {
+    const scheduleOrTrigger = extractScheduleOrTrigger(relativePath, source);
+    if (scheduleOrTrigger) {
       classes.add("SCHEDULED_EXECUTION");
     }
 
-    if (
-      relativePath === "render.yaml" ||
-      relativePath === "vercel.json" ||
-      relativePath === "package.json" ||
-      /^Dockerfile(?:\.|$)/u.test(path.posix.basename(relativePath))
-    ) {
+    const deploymentSurface = detectDeploymentSurface(relativePath);
+    if (deploymentSurface) {
       classes.add("DEPLOYMENT_SURFACE");
     }
 
@@ -640,15 +901,13 @@ function discoverMaterialSurfaces(assetRegister) {
       environment_key_names: envKeyNames,
       database_role: databaseRole,
       database_objects:
-        databaseRole !== "NONE" || isSqlFile ? extractDatabaseObjects(source) : [],
+        databaseRole !== "NONE" || isSqlFile ? extractDatabaseObjects(relativePath, source) : [],
 
-      schedule_or_trigger: "",
-      deployment_surface: "",
+      schedule_or_trigger: scheduleOrTrigger || "",
+      deployment_surface: deploymentSurface || "",
 
       governance_reachability_type: ruleAuthPaths.has(relativePath)
-        ? reachable.has(relativePath)
-          ? "RUNTIME"
-          : "DOCUMENT_ONLY"
+        ? detectGovernanceReachability(relativePath, source)
         : "NONE",
 
       governed_by_control_task_id: "ESA-001",
@@ -807,6 +1066,15 @@ function validateInventory({ ledger, assetRegister, inventory, mapText }) {
         );
       }
     }
+
+    const findings = compareRelationshipEvidence(discoveredSurface, inv);
+    for (const finding of findings) {
+      errors.push(
+        `RUNTIME_RELATIONSHIP_EVIDENCE_DRIFT: ${discoveredSurface.asset_path} field=${finding.field} discovered=${JSON.stringify(
+          finding.discovered
+        )} inventoried=${JSON.stringify(finding.inventoried)}`
+      );
+    }
   }
 
   // Map sync
@@ -920,5 +1188,11 @@ module.exports = {
   discoverMaterialSurfaces,
   renderRuntimeMap,
   validateInventory,
+  detectDatabaseRole,
+  extractDatabaseObjects,
+  detectDeploymentSurface,
+  extractScheduleOrTrigger,
+  detectGovernanceReachability,
+  compareRelationshipEvidence,
   isScoutFipSurface,
 };
