@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 14,
+  "project_count": 15,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -65,7 +65,8 @@
         "ECC-001"
       ],
       "blocks": [
-        "ESA-001"
+        "ESA-001",
+        "EAC-001"
       ],
       "affected_layers": [
         "governance",
@@ -80,19 +81,48 @@
       "related_tables": [],
       "known_issues": [],
       "required_decisions": [],
-      "completion_definition": "A complete machine-readable Edge project register, human backlog, dependency map, validation script, and tests exist and are synchronized with the Edge ledger.",
+      "completion_definition": "A complete Edge Master Project Register and Repository Asset Register foundation exist; the project register is synchronized with canonical Edge Control Center sequencing; every tracked repository path is registered or explicitly excluded; every registered tracked asset declares a valid governed_by_control_task_id; unresolved final project ownership may remain as a governed cleanup finding when the asset remains bound to a valid Control Center task and has a non-empty next_validation; non-ignored pre-existing untracked workspace paths are discovered separately from the tracked repository universe and preserved as governed workspace candidate evidence or explicitly excluded with a reason without requiring the underlying file to be committed; known first-party rule and governance authority candidates remain identifiable by review role and are linked in a governed candidate relationship graph or explicitly justified as standalone review candidates; candidate status does not establish CURRENT_AUTHORITY; ignored dependency, environment, and cache paths are excluded from first-party authority candidate discovery; no tracked path is unclassified; and asset integrity does not fail merely because an asset is LEGACY, HISTORICAL_EVIDENCE, NO_CONSUMER, ORPHAN, CONFLICT, UNKNOWN, awaiting final project ownership, or awaiting authority review.",
       "proof_required": [
-        "All discovered Edge project areas are registered before implementation work resumes",
-        "Register validation exits 0",
-        "Dependency references resolve",
-        "Control Center references the canonical register"
+        "Edge Master Project Register exists and validates.",
+        "Edge Project Backlog exists.",
+        "Edge Project Dependency Map exists.",
+        "Edge Repository Asset Register exists and validates.",
+        "Exact project_id / ledger task ID overlaps preserve canonical Control Center sequencing state.",
+        "Deterministic tracked repository asset universe is derived from git ls-files.",
+        "Every tracked repository path is registered or explicitly excluded.",
+        "Unclassified tracked path count is zero.",
+        "Every registered tracked asset has a valid governed_by_control_task_id.",
+        "UNRESOLVED final project ownership remains a non-fatal governed cleanup finding only when the asset has a valid Control Center task binding and non-empty next_validation.",
+        "Invalid or unknown governed_by_control_task_id remains fail-closed.",
+        "Non-ignored untracked workspace candidate discovery is performed separately from tracked-path counting.",
+        "The untracked discovery boundary uses git-aware non-ignored path discovery such as git ls-files --others --exclude-standard or an equivalent deterministic Git mechanism.",
+        "Every discovered pre-existing untracked workspace candidate is preserved in governed workspace candidate evidence or explicitly excluded with a reason.",
+        "Preserving a pre-existing untracked workspace candidate does not require committing the underlying artifact.",
+        "tracked_path_count continues to mean tracked repository paths only.",
+        "Dependency, environment, cache, and generated package internals such as node_modules, .venv, venv, **pycache**, and .pyc are not promoted into the first-party rule/governance authority candidate universe merely because filenames contain rule or governance terms.",
+        "Known first-party rule and governance surfaces remain identifiable as authority-review candidates.",
+        "Candidate roles distinguish, at minimum where detected: RULE_OR_AGENT_AUTHORITY_CANDIDATE, GOVERNANCE_POLICY_OR_SPEC, GOVERNANCE_OR_RULE_REFERENCE, RULE_GUIDE_OR_REPORT, DATABASE_RULE_ENFORCEMENT, DATABASE_RULE_ALIGNMENT_MIGRATION, RUNTIME_RULE_OR_GOVERNANCE, RULE_PROOF_TEST, RULE_OR_GOVERNANCE_AUDIT_TOOL.",
+        "Candidate-role assignment is a review classification and does not establish CURRENT_AUTHORITY.",
+        "Known candidate assets are linked through governed related-asset relationships or an equivalent candidate relationship graph.",
+        "A candidate with no relationship edge must be explicitly marked as a standalone review candidate with a non-empty justification.",
+        "Relationship edges identify review relationships only and do not assert authority precedence.",
+        "Final authority classification remains subject to governed review.",
+        "Tests prove tracked-path coverage remains independent from pre-existing untracked candidate discovery.",
+        "Tests prove untracked candidate evidence may remain when the underlying artifact is not committed.",
+        "Tests prove rule/governance candidates are not automatically promoted to ACTIVE_GOVERNANCE or CURRENT_AUTHORITY.",
+        "Tests prove unknown Control Center task bindings remain fail-closed.",
+        "Tests prove dependency/environment false positives are excluded from first-party authority candidate discovery.",
+        "Tests prove candidate relationship graph integrity fails for missing candidate references, duplicate candidate paths, invalid roles, or invalid relationship endpoints.",
+        "Tests prove EPR-001 may close without inventing final ownership for bootstrap-registered legacy/unknown assets.",
+        "Asset integrity does not fail merely because an asset is LEGACY, HISTORICAL_EVIDENCE, NO_CONSUMER, ORPHAN, CONFLICT, UNKNOWN, awaiting final project ownership, or awaiting authority review.",
+        "No runtime provider removal, Scout/FIP intake, Supabase mutation, prediction-rule change, ACCA-rule change, migration execution, or deployment change occurs as part of EPR-001."
       ],
       "risks_if_ignored": [
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
       "recommended_order": 2,
-      "next_action": "Implement EPR-001 approved Master Project Register + Repository Asset Register foundation only. Preserve governance boundaries and do not perform Scout/FIP intake or provider removal during this implementation.",
+      "next_action": "EPR-001 foundation closed and TESTED. Preserve the Edge Master Project Register, complete tracked repository asset coverage, governed pre-existing untracked workspace candidate snapshot, governed unresolved final project ownership findings, and rule/governance authority candidate graph as Control Center truth. Do not start ESA-001 or unblock Scout ↔ Edge marriage without separate approval; preserve all blocked gates and fail-closed integrity laws.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
       "governed_by_control_task_id": "EPR-001",
@@ -114,6 +144,7 @@
         "EPR-001"
       ],
       "blocks": [
+        "EAC-001",
         "EMG-001",
         "EFI-001",
         "EST-001",
@@ -162,6 +193,55 @@
       ]
     },
     {
+      "project_id": "EAC-001",
+      "project_name": "Edge Asset Classification and Repository Map",
+      "category": "Repository Organization",
+      "description": "Perform one controlled content skim of every governed Edge asset and capture a concise purpose description, functional grouping, truthful provisional current-state designation, relationship evidence, and next validation where evidence remains insufficient.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
+      "current_status": "PROPOSED",
+      "priority": "critical",
+      "blocked_by": [
+        "EPR-001",
+        "ESA-001"
+      ],
+      "blocks": [
+        "EMG-001"
+      ],
+      "affected_layers": [
+        "governance",
+        "repository",
+        "control-center"
+      ],
+      "related_tasks": [
+        "EAC-001"
+      ],
+      "related_contracts": [],
+      "related_files": [],
+      "related_tables": [],
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "A deterministic Edge asset-classification inventory and repository map exist for the complete governed asset universe. Every governed asset has a non-empty concise purpose description, a functional/domain grouping, a valid provisional current-state designation, structured relationship classification evidence, and a non-empty evidence/reason record. Explicit UNKNOWN classification is permitted where available evidence is insufficient and must retain a meaningful next_validation. The classification process is executed through deterministic, auditable folder/domain batches with complete asset coverage and no silently skipped asset. Existing EPR-001 asset metadata and ESA-001 runtime relationship evidence are reused where applicable rather than re-inferred without reason. Control Center reporting exposes real designation counts and proves missing purpose descriptions = 0, missing functional groupings = 0, missing provisional designations = 0, invalid provisional designations = 0, and silently undesignated governed assets = 0. EAC-001 does not make final KEEP, ALIGN, MERGE, REPLACE, RETIRE, or ARCHIVE_EVIDENCE decisions and does not activate Scout/FIP intake, retire providers, mutate storage, change prediction rules, declare rule authority, or redesign Edge architecture.",
+      "proof_required": [
+        "Deterministic batch manifest covers complete governed asset universe",
+        "Missing purpose descriptions = 0",
+        "Missing functional groupings = 0",
+        "Missing provisional current-state designations = 0",
+        "Invalid provisional designations = 0",
+        "Governed designation counts reported without silent skips",
+        "No KEEP / ALIGN / MERGE / REPLACE / RETIRE / ARCHIVE_EVIDENCE decisions made"
+      ],
+      "risks_if_ignored": [
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
+      ],
+      "recommended_order": 4,
+      "next_action": "Perform a separate EAC-001 PROPOSED-gate contract inspection. Define the minimum classification schema, controlled relationship taxonomy, deterministic folder/domain batch model, evidence reuse law, UNKNOWN law, repository map, and fail-closed completion proof before approval. Do not begin the repository skim until EAC-001 is separately APPROVED.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
+      "last_updated": "2026-07-06",
+      "governed_by_control_task_id": "EAC-001",
+      "current_evidence": []
+    },
+    {
       "project_id": "EMG-001",
       "project_name": "Scout-Edge Marriage Gate Contract",
       "category": "Scout Handoff",
@@ -170,7 +250,8 @@
       "current_status": "PROPOSED",
       "priority": "critical",
       "blocked_by": [
-        "ESA-001"
+        "ESA-001",
+        "EAC-001"
       ],
       "blocks": [
         "EFI-001",
@@ -202,7 +283,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 4,
+      "recommended_order": 5,
       "next_action": "Wait for Edge inventory and project registration.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -252,7 +333,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 5,
+      "recommended_order": 6,
       "next_action": "Do not implement until EPR-001, ESA-001, and EMG-001 sequence permits inspection.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -303,7 +384,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 6,
+      "recommended_order": 7,
       "next_action": "Register and inventory Supabase storage before approving the FIP bridge.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -356,7 +437,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 7,
+      "recommended_order": 8,
       "next_action": "Wait for Edge inventory.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -405,7 +486,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 8,
+      "recommended_order": 9,
       "next_action": "Wait for Edge inventory.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -456,7 +537,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 9,
+      "recommended_order": 10,
       "next_action": "Remain PARTIAL and blocked until EFI-001 provides a governed Scout input origin.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -504,7 +585,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 10,
+      "recommended_order": 11,
       "next_action": "Wait for system inventory.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -550,7 +631,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 11,
+      "recommended_order": 12,
       "next_action": "Wait for system inventory.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -594,7 +675,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 12,
+      "recommended_order": 13,
       "next_action": "Wait for security and pipeline inventory.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -639,7 +720,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 13,
+      "recommended_order": 14,
       "next_action": "Wait for system, storage, and security inventory.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -694,7 +775,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 14,
+      "recommended_order": 15,
       "next_action": "Remain BLOCKED until all dependencies are satisfied.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",

@@ -11,23 +11,30 @@ Blocks: EPR-001
 
 ## EPR-001 — Edge Master Project Register
 
-Status: APPROVED
+Status: TESTED
 Governed by: EPR-001
 Blocked by: ECC-001
-Blocks: ESA-001
+Blocks: ESA-001, EAC-001
 
 ## ESA-001 — Edge System and Runtime Inventory
 
-Status: PROPOSED
+Status: TESTED
 Governed by: ESA-001
 Blocked by: EPR-001
-Blocks: EMG-001, EFI-001, EST-001, ESEC-001, EPI-001, EGR-001, EAI-001, EUI-001, EOPS-001
+Blocks: EAC-001, EMG-001, EFI-001, EST-001, ESEC-001, EPI-001, EGR-001, EAI-001, EUI-001, EOPS-001
+
+## EAC-001 — Edge Asset Classification and Repository Map
+
+Status: PROPOSED
+Governed by: EAC-001
+Blocked by: EPR-001, ESA-001
+Blocks: EMG-001
 
 ## EMG-001 — Scout-Edge Marriage Gate Contract
 
 Status: PROPOSED
 Governed by: EMG-001
-Blocked by: ESA-001
+Blocked by: ESA-001, EAC-001
 Blocks: EFI-001, EST-001, ESEC-001
 
 ## EFI-001 — FIP Intake Handshake

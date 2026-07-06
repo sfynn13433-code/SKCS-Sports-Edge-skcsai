@@ -322,7 +322,7 @@ describe("Edge Control Center Ledger v1", () => {
     assert.equal(result.startable.length, 0);
     assert.equal(result.next, null);
     assert.ok(result.gated);
-    assert.equal(result.gated.task_id, "EMG-001");
+    assert.equal(result.gated.task_id, "EAC-001");
     assert.equal(result.gated.status, "PROPOSED");
   });
 

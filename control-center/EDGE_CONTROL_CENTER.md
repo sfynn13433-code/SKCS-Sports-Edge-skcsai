@@ -302,6 +302,6 @@ Do not clear the marriage gate.
 Startable tasks: 0
 
 Next gated task:
-**EMG-001 — Scout-Edge Marriage Gate Contract [PROPOSED]**
+**EAC-001 — Edge Asset Classification and Repository Map [PROPOSED]**
 
 Requires separate approval before start
