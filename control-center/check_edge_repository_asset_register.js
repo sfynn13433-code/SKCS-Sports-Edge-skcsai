@@ -95,6 +95,12 @@ const REQUIRED_ASSET_FIELDS = [
   "validation_status",
   "next_validation",
   "notes",
+  // EAC-001 foundation/implementation classification contract fields.
+  // At foundation stage they may be empty to represent classification-pending.
+  "purpose_description",
+  "functional_group",
+  "relationship_tags",
+  "classification_evidence",
 ];
 
 const ARRAY_FIELDS = [
@@ -106,6 +112,9 @@ const ARRAY_FIELDS = [
   "database_objects",
   "deployment_surface",
   "known_conflicts",
+  // EAC-001 classification contract fields.
+  "relationship_tags",
+  "classification_evidence",
 ];
 
 const WORKSPACE_CANDIDATE_DISPOSITIONS = [
@@ -155,6 +164,13 @@ const EPR_IMPLEMENTATION_PATHS = new Set([
   "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
   "control-center/check_edge_repository_asset_register.js",
   "tests/edge-repository-asset-register.test.js",
+]);
+
+const EAC_IMPLEMENTATION_PATHS = new Set([
+  "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
+  "control-center/EDGE_ASSET_REPOSITORY_MAP.md",
+  "control-center/check_edge_asset_classification.js",
+  "tests/edge-asset-classification.test.js",
 ]);
 
 const ECC_FOUNDATION_PATHS = new Set([
@@ -411,6 +427,13 @@ function ownershipFor(assetPath, projectIds) {
     };
   }
 
+  if (EAC_IMPLEMENTATION_PATHS.has(assetPath)) {
+    return {
+      owner_project_id: "EAC-001",
+      governed_by_control_task_id: "EAC-001",
+    };
+  }
+
   if (ECC_FOUNDATION_PATHS.has(assetPath) && projectIds.has("ECC-001")) {
     return {
       owner_project_id: "ECC-001",
@@ -431,6 +454,8 @@ function buildDefaultAsset(assetPath, projectIds, changedPaths) {
   const controlFoundation =
     EPR_IMPLEMENTATION_PATHS.has(assetPath) ||
     ECC_FOUNDATION_PATHS.has(assetPath);
+
+  const isEacImplementation = EAC_IMPLEMENTATION_PATHS.has(assetPath);
 
   return {
     asset_path: assetPath,
@@ -453,10 +478,20 @@ function buildDefaultAsset(assetPath, projectIds, changedPaths) {
     validation_status: "REGISTERED",
     next_validation: controlFoundation
       ? "Validate with the governing Control Center project proof."
+      : isEacImplementation
+      ? "Classify this EAC implementation asset during its assigned EAC-001 shallow-skim batch using the approved classification contract."
       : "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
     notes: controlFoundation
       ? "Control Center foundation asset."
+      : isEacImplementation
+      ? "EAC-001 classification foundation / manifest / checker / test asset. Registration only; classification pending."
       : "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
+    // EAC-001 classification contract fields.
+    // Foundation mode permits empty values to represent "classification pending".
+    purpose_description: "",
+    functional_group: "",
+    relationship_tags: [],
+    classification_evidence: [],
   };
 }
 
@@ -503,13 +538,37 @@ function bootstrap() {
         return {
           ...existing,
           asset_path: assetPath,
+          // Ensure EAC-001 structured classification fields exist on all assets,
+          // including pre-existing ones from earlier register versions.
+          purpose_description:
+            Object.prototype.hasOwnProperty.call(existing, "purpose_description")
+              ? existing.purpose_description
+              : "",
+          functional_group:
+            Object.prototype.hasOwnProperty.call(existing, "functional_group")
+              ? existing.functional_group
+              : "",
+          relationship_tags:
+            Object.prototype.hasOwnProperty.call(existing, "relationship_tags") &&
+            Array.isArray(existing.relationship_tags)
+              ? existing.relationship_tags
+              : [],
+          classification_evidence:
+            Object.prototype.hasOwnProperty.call(existing, "classification_evidence") &&
+            Array.isArray(existing.classification_evidence)
+              ? existing.classification_evidence
+              : [],
         };
       }
 
       return buildDefaultAsset(assetPath, projectIds, changedPaths);
     });
 
+  // Preserve any non-asset metadata already present in the canonical register.
+  // The EPR checker expects the workspace-candidate snapshot and governance graph
+  // to exist; bootstrap must not erase them.
   const register = {
+    ...(previous && typeof previous === "object" ? previous : {}),
     version: "1.0",
     title: "SKCS Edge Repository Asset Register",
     generated_at: BOOTSTRAP_DATE,

@@ -59,6 +59,39 @@ describe("Edge Repository Asset Register v1", () => {
     }
   });
 
+  it("EAC-001 structured classification fields have correct types", () => {
+    const register = loadAssetRegister();
+
+    for (const asset of register.assets) {
+      assert.equal(
+        typeof asset.purpose_description,
+        "string",
+        `${asset.asset_path} purpose_description must be string`
+      );
+      assert.equal(
+        typeof asset.functional_group,
+        "string",
+        `${asset.asset_path} functional_group must be string`
+      );
+
+      assert.ok(
+        Array.isArray(asset.relationship_tags),
+        `${asset.asset_path} relationship_tags must be array`
+      );
+      assert.ok(
+        Array.isArray(asset.classification_evidence),
+        `${asset.asset_path} classification_evidence must be array`
+      );
+
+      for (const t of asset.relationship_tags) {
+        assert.equal(typeof t, "string");
+      }
+      for (const e of asset.classification_evidence) {
+        assert.equal(typeof e, "string");
+      }
+    }
+  });
+
   it("every asset enum value is legal", () => {
     const register = loadAssetRegister();
 
