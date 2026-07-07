@@ -37,7 +37,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "ea9a88ee2259f89abf6159c46cb905e61dab80f8d04c451756ba6536f2802d99",
+        "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/apiClients.js",
@@ -98,7 +103,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "db20300c0d644277ac60a830673c01cfec892fa8acca725703bf622c14d04b9e",
+        "relationship_evidence_sha256": "cbc02f1fc69215905bd8a76fac5069d28ce66acb1e94f306e811dc6b62b1991e",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/config/bigBallsLeagueMap.js",
@@ -127,7 +137,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "3c3a08ee1c563db8cd678751a42e9719e5b71a62480aae4bc4172b0541ff2d71",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/controllers/edgeMindController.js",
@@ -165,7 +180,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "cbd29374e91c3e25d99949af51cccdc4ba64f7ae795dbfa521f2f75e947722b9",
+        "relationship_evidence_sha256": "b268ca1e551ba86a4fccfad4d84c20838b914d19f781682b6c9efa1aa77f41a7",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/core/verificationController.js",
@@ -208,7 +228,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "cc5a122415271ea11a99e1901274c41f512394b457b1455063b622dc44cdb918",
+        "relationship_evidence_sha256": "f3d7be921da89f807cc5a2c285cca05a4a622a022fed8920d8987f9b6884df93",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/database.js",
@@ -271,7 +296,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "d830f2e7bd56ea036da1bb3c08c462d67351b5b168f82cfc2756fd2ce0cefb9a",
+        "relationship_evidence_sha256": "467da11a381494f327150b68502da18d539cdfa668c427baefb61bb9488644e8",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/db.js",
@@ -327,7 +357,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "b05613b0141314faed7ee7ab889349ff35b0336b54391c59d10a06384e27a746",
+        "relationship_evidence_sha256": "7bc8a3c8d4b1a8a699f68f29ebb83a5ad6bee20d6982e31a6de2520ea5ba6fd8",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/dbBootstrap.js",
@@ -379,7 +414,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "d5db9418597354cf2e917f537827183c48e28a003257e32ac93daf2653870374",
+        "relationship_evidence_sha256": "dda597fe7b5ea11d49b7bc3df8297e4292a7ba390473046064c9801f9650ae92",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/deploy-trigger-cricket.js",
@@ -415,7 +455,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "12579a2f624568e74489675fe87ef7ffd6b29e69ba15930771ce73a9561b076a",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/deploy-trigger.js",
@@ -451,7 +496,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "542113eda1fd24c9f47889c9f8b3e1621ae2356bdb106a6cb387df6962ff7dc5",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/middleware/supabaseJwt.js",
@@ -500,7 +550,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "cd87385c536222543f48670beb3f4c7a613d88c3426e5cd8b064183070995e89",
+        "relationship_evidence_sha256": "7bc8a3c8d4b1a8a699f68f29ebb83a5ad6bee20d6982e31a6de2520ea5ba6fd8",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/accuracy.js",
@@ -533,7 +588,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "296b5e3d27a65a31e7ebe023787c5cf35ef71797cacd962b0c77e14f46352d34",
+        "relationship_evidence_sha256": "b268ca1e551ba86a4fccfad4d84c20838b914d19f781682b6c9efa1aa77f41a7",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/antigravity.js",
@@ -564,7 +624,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "ceae7b0d85a2d6ab462a46b7bee9c94ec2ecba804bd7ce2d550ebe3516854cd4",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/chat.js",
@@ -598,7 +663,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "0e2fa83b927963475ef7baec6b3bed891560820f1c509da9ccedfcdd4e157dcc",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/cricketCache.js",
@@ -629,7 +699,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "c3e7102e22866fa6448341009b9753eef096486e4898c37fc8e751c40985ba05",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/cricketCount.js",
@@ -668,7 +743,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "b74210421027aa8f974bb7337cecc5f2fa206a2c3d323fb8e5a1d620e6ac3f38",
+        "relationship_evidence_sha256": "9bea80f56ecfbd0f7a67662e86653a56c073566bda9097da328d38310c1c0259",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/cricketCron.js",
@@ -705,7 +785,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "c8d66db41a979f70fcc62253af07f91ac39a1afab4accc67559e60a85248323e",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/cricketInsights.js",
@@ -745,7 +830,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "4cb4b187e40e5085bbabe13cc20bc914c41d065b9ece3a7bc39d6920393cf4b2",
+        "relationship_evidence_sha256": "9bea80f56ecfbd0f7a67662e86653a56c073566bda9097da328d38310c1c0259",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/debug.js",
@@ -780,7 +870,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "b89caf3616847a46ec25e6f14295a5ed8f74447769648fe037cbf7f4c30b5e97",
+        "relationship_evidence_sha256": "b268ca1e551ba86a4fccfad4d84c20838b914d19f781682b6c9efa1aa77f41a7",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/direct1x2.js",
@@ -819,7 +914,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "0305c052075d937698dc7b45d4a71eb0454777eb6fc0e125f7da38c8298a3351",
+        "relationship_evidence_sha256": "d07f069faf7c78a848fe82d5dffad778f3ef969ec644d1cc41577640c9814c50",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/divanscore.js",
@@ -856,7 +956,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "e8cbd39602dddead1867b8bef967c0ff641fb4cd52649eac4c895acd1d349342",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/feedback.js",
@@ -892,7 +997,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "2cedc66aba503e7e8e52e1944c85e18bbf4a220363790177b955ead1f86a84bb",
+        "relationship_evidence_sha256": "14fe147e3c07f2c8129844ca7fc4a5f1c5f1b635c37f873b93cdd7ad5ec3f6f2",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/metrics.js",
@@ -931,7 +1041,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "dcd20cd3990ee9b38a8d2f26f6e791bcc7da7402af3742cafee487778bf15c0d",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/pipeline.js",
@@ -985,7 +1100,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "a7657c0bb739782372eb82179552de2e3baf51d8ce2f9685919d07cb99445184",
+        "relationship_evidence_sha256": "5964a88f4efcdaffc0c5c4404f54a67212741c33126d43bb84ac911d4bd73dad",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/predictions.js",
@@ -1051,7 +1171,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "be1f41d9ef0882981d4e33350a51423e2ae6c8e7f9616b8734ecc43219a0f6c7",
+        "relationship_evidence_sha256": "f8b35f2e7169ee81f9b3b66c5d25560e7cf90c8877b6e877e17f24fbfbd3737b",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/refresh-ai.js",
@@ -1088,7 +1213,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "e6f526c2a129c35b8ed963c8b65692532783b4d7026bda87a438e01c04984cb3",
+        "relationship_evidence_sha256": "a15ef9af963818102f696999259c5c5bd2a58db8a0e9636693c487a9a1dab96c",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/scheduler.js",
@@ -1134,7 +1264,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "10ca5823f57dfb41314c4494646472dd884e3995fdff6ad829a3476b5859588a",
+        "relationship_evidence_sha256": "326a9573bbca6d1226a1fbff6900d39b6b30f32b194688b379a02bb214a5fb47",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/semanticDrift.js",
@@ -1165,7 +1300,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "b800f729526b7316282567a70438d8e6db74d743d976f394f3997d79f472ba00",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/skcsGrading.js",
@@ -1196,7 +1336,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "7ef1860454fb5da2e7dd69821b97ae5a3427af47a2b947960bd0553ff10c3251",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/sportsEdge.js",
@@ -1236,7 +1381,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "2cf14d59770865d7065cde57381506ea5396dde8bc4f28f216a25de382ba08ee",
+        "relationship_evidence_sha256": "ce4b635864dac7c4bbaee0ac4dd982d38dc90d6f4b18cc25daf33e68ab7d8697",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/tier1.js",
@@ -1271,7 +1421,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "5d1e1940dab09b3fbe2b737a7f4eb269c722c8ba63b6f2fbca7e456e81365c52",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/user.js",
@@ -1308,7 +1463,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "0bc55d2f78a0d4e5c43e4453cb439f066c05c460847f990d26f03cb17c0f0d44",
+        "relationship_evidence_sha256": "b268ca1e551ba86a4fccfad4d84c20838b914d19f781682b6c9efa1aa77f41a7",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/v1/acca.js",
@@ -1346,7 +1506,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "5cb501a8bae0741d8a214ad67732db3c1ea9c7030b8ec041078872766005f6e9",
+        "relationship_evidence_sha256": "5d687df2c23c617d11370e7b96ef28f6d4b94e27947c497443e72253304ddd67",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/v1/predictions.js",
@@ -1387,7 +1552,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "46604ff729dfe219e97c51c867f95629be824b77a58d6a53b5623c5f308b7d3b",
+        "relationship_evidence_sha256": "627652c46efcf6c328a9fd8e6369b2ae4ae217e582b6738a4449353bfd297934",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/v1/sameMatchBuilder.js",
@@ -1419,7 +1589,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "83e3598aecb136e278d87f3de65e51b8705d0f904df6556eb9cdd22d5aff556c",
+        "relationship_evidence_sha256": "b268ca1e551ba86a4fccfad4d84c20838b914d19f781682b6c9efa1aa77f41a7",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/v1/secondaryMarkets.js",
@@ -1451,7 +1626,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "ad1abb3865dcabd4f4212f55b9464ad9dd0922521d59136430cd1d0155fc152b",
+        "relationship_evidence_sha256": "b268ca1e551ba86a4fccfad4d84c20838b914d19f781682b6c9efa1aa77f41a7",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/routes/vip.js",
@@ -1489,7 +1669,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "82c4764873bf5192c17756a9f17379eae3e6ab67f79e9b0520771d98372799a5",
+        "relationship_evidence_sha256": "4296cb4261f62a2367347f41c0a213ac79ee086e76ab77bafbba5fcdf350db23",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/semantic-layer/enforcementGuard.js",
@@ -1519,7 +1704,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "355cc2872ff23387d11cc51c9b8413343213f3c4b2f0df0407f0b166d5f010a8",
+        "relationship_evidence_sha256": "cbc02f1fc69215905bd8a76fac5069d28ce66acb1e94f306e811dc6b62b1991e",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/semantic-layer/violationLogger.js",
@@ -1554,7 +1744,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "fc17c9626a1d6b67b12aa101b0af4c7a265dbb81eabde68de13fbbc94d43d8c3",
+        "relationship_evidence_sha256": "3df15f769479c6127df9a989eec7b0697fc4738ec518fcffc361567446bc71b0",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/server-express.js",
@@ -1690,7 +1885,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "429bf1f7fc871a7670acfcb597dc5f6ef4eb70bc8c22c16d61b6ef0c247faa0e",
+        "relationship_evidence_sha256": "a20e081592d59e638906ae9643942e8ce984729136bcc7aafa0fe304a1ada3eb",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/accaBuilder.js",
@@ -1756,7 +1956,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "c68a57961176d2db0a08396b505bd5e110639b7ae1ccd5ef4a31b8bc8a811a88",
+        "relationship_evidence_sha256": "081fe57dd6255339d43a9c48595d814e5bc057d3da018537aea91542f8a4a0f0",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/aiPipeline.js",
@@ -1818,7 +2023,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "92a3115bb2d28292a4408587e592cb3cc806589830d6ccb3db52126137735ce0",
+        "relationship_evidence_sha256": "30d8a7629c6c5d2b11dfeec78c560bbb114eb4b65833f78d22aabede9f0c8f6c",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/aiPipelineOrchestrator.js",
@@ -1862,7 +2072,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "ff5cd81b00835932afa03ac2cec5196c0c354c86af394a33ca7b05453e20f9bb",
+        "relationship_evidence_sha256": "842ddc5d41baa3d512ca76279c7e84963a05532dc75ffdffd7d8d71c509ed92b",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/aiProvider.js",
@@ -1908,7 +2123,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "2489bc171aa2ee50dc4c5c88c6973fe73610ee2fef7dc0f818d634ff313bae71",
+        "relationship_evidence_sha256": "cbc02f1fc69215905bd8a76fac5069d28ce66acb1e94f306e811dc6b62b1991e",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/aiScoring.js",
@@ -1941,7 +2161,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "862a0a84f6e0970081f71506666704f8e372fbb1c6ffc7e7d159e21d995b45ca",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/aiTelemetryService.js",
@@ -1974,7 +2199,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "6ad8e129355a4711de84f8658fb9f0db73fb7a5e3407192884fb1f1a10ab2b11",
+        "relationship_evidence_sha256": "58c86d2f618c37a8070107a3ce3d905f0646188f0d40863eda5f6c7ac40a77d9",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/antigravity/WorkflowEngine.js",
@@ -2004,7 +2234,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "cfd362e1465116223e58ffa6eed35e9caa23d31a905d8550873b02d5e4ce2342",
+        "relationship_evidence_sha256": "cbc02f1fc69215905bd8a76fac5069d28ce66acb1e94f306e811dc6b62b1991e",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/apiCacheService.js",
@@ -2046,7 +2281,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "076dab15de35b4815f880921ffe78984d256adce8ea01fbe1923a7e6cde2f71f",
+        "relationship_evidence_sha256": "43056a59f72a1e9e6a98eb21b4e3b782355fb85f65aa279beb417fdab37927b3",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/apiQuotaRouter.js",
@@ -2093,7 +2333,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "01f7f78d07a45b988250b43c01c90877b9c2d10400ecff75f49b396e2f48b0ce",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/apiQuotaRouterProviders.js",
@@ -2142,7 +2387,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "e02a9696627148e422c0520aa87e97324534e407de25a0ac0a869b7c8dd75b18",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/bigBallsDataApiClient.js",
@@ -2181,7 +2431,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "69aeb271c6e77388f4e16e6d1c5a38fa06527654d093bea105ba7ca29a9d898c",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/bigBallsFootballBridge.js",
@@ -2213,7 +2468,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "3cda8f5a60c018556d862b1d0e9c4b784a2dbc7597c7214a72b47200f8b62822",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/blockedApiCallsLog.js",
@@ -2246,7 +2506,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "49d5206ee219cc372f774044a723fe18b295c3c4f6f3d1096e260cd930f313d3",
+        "relationship_evidence_sha256": "b1702b089f1ffbcd587e7fe05269f7295f42367e0e84a41c7afe3d34306d507f",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/canonicalEvents.js",
@@ -2283,7 +2548,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "a0a03b3da2fa9588d3730623267aa68f81ced33b4d7b5990f423d1a84d4d5936",
+        "relationship_evidence_sha256": "8dbc5ebfb6ffa6c0fc68df0ff875564606a3ca9bd42a002ddccdbefc4c65eb77",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/canonicalIngestFirewall.js",
@@ -2310,7 +2580,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "2371724194ec2b4f0abf36dbafba0ca6ef845cdd42edde8eb88201b097a19ac7",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/conflictEngine.js",
@@ -2340,7 +2615,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "55a28dc01ea0accd9275b3e78ec0f6097dc97df86a0d5c0624b1248e14b1bc7b",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/contextEnrichmentService.js",
@@ -2386,7 +2666,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "07d2239d7cf38fb547789f659e3e787be74b5506ccbdf72a21ac18ad05167c63",
+        "relationship_evidence_sha256": "d1fcf5717a644462c8a4bafdb3c26af3f55a878bf86ed2e3c2c4d68548e1ed82",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/contextIngestionService.js",
@@ -2425,7 +2710,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "1512197715c3994e5135793c4547140d5ea5dea1be9783152643467a7fdc8588",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/contradictionGovernance.js",
@@ -2453,7 +2743,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "d1cfd1a685e0a358cf3c726ae481a1042d0392b722eb3406c430e886a8282e0a",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/cricApiCacheService.js",
@@ -2490,7 +2785,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "db160e5d5410c89ddfbd1402f5e97aa5e5cdc4c57d40b9b5e7944604b47e63a2",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/cricbuzzService.js",
@@ -2523,7 +2823,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "99dd544fdd570f11ff558a8e8aeeca7af6c51ba3543516c77afe404d51e1bbda",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/cricketLiveEnrichmentService.js",
@@ -2562,7 +2867,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "bfb62b9b58d19055ed70fbe5edb38604b2b247fd21e00990a98db018aaa613fa",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/cricketLiveMatchResolver.js",
@@ -2600,7 +2910,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "018ae008312ca2002ad13cc441aa8a5d6bbb43305a92a5c6d1d7edce696393fa",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/cricketRulesEngine.js",
@@ -2627,7 +2942,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "75f98a00b5a8b3a9489f152fafa83ecc04371c1974d27f8b5bf649b33abd7c6d",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/cronJobs.js",
@@ -2669,7 +2989,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "2d50b2a9c5c258960862b59d1cf795ab484a9d1cb70dda1d9849b7a51b5d1765",
+        "relationship_evidence_sha256": "5592995b57cc42f123448eb293ac52ffb95c24074278300d476807245919a155",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/dataProvider.js",
@@ -2731,7 +3056,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "585355d3d3656d14d2c3e5a0f101ce7c4d75a713ba6f8634623383d5ddf54482",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/dataProviders.js",
@@ -2769,7 +3099,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "a11e1ee7042e0dc6c235fe7d6fb41be39bb85e539d9b90ce64b216342972fd80",
+        "relationship_evidence_sha256": "cbc02f1fc69215905bd8a76fac5069d28ce66acb1e94f306e811dc6b62b1991e",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/direct1x2Builder.js",
@@ -2813,7 +3148,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "39f5e9f056f5f289499bbcc39a102d2ebd4b1685ea9d1bc2b6728ab46cb871f8",
+        "relationship_evidence_sha256": "9a47e16b1957ba594e05b4215d1e59c7e0a2c1065d2cc0e6184619e440ecc30a",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/direct1x2Engine.js",
@@ -2843,7 +3183,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "e11e7f7eb2a7bfb63631e31a8e6c5f8104d0e12e07ef1091fce3abbe8a6a6f7d",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/divanscoreService.js",
@@ -2878,7 +3223,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "4d2dff02562a8af139050681d7b105fdd27dae60869529ed5b4998566987fc39",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/enhancedMatchDetailsService.js",
@@ -2910,7 +3260,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "92332de357779878db14959b84e341cf040e49bc70c7d7c9b98c8ea44eef5e8d",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/espnHiddenApiService.js",
@@ -2942,7 +3297,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "e12799a172ff85d6d381d648dcc7b749c0f239c565bf98c3b503c5578ac757cf",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/filterEngine.js",
@@ -2985,7 +3345,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "a010cf3de6d587613e10671216b9ddc5dc3a2c6b93f96b569a34d225ed5ee2dd",
+        "relationship_evidence_sha256": "92be3dacaafa5b7ff986d00bd19bdb4df70485549f7c640cc1abeeff826b6976",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/footballH2HExtractor.js",
@@ -3012,7 +3377,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "efe7e3e9b1b3304314cbe57c6d8a54bca801f1cfc17d0a5000af31ef378e43a0",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/footballHighlightsService.js",
@@ -3045,7 +3415,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "d752b5eeebda1d7049c0c1c8e94a2768fe907de09c692466955e80590f5c9362",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/footballRankExtractor.js",
@@ -3072,7 +3447,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "b72fbc86fa3a20ba320d1f37dd26fdd02f925a95da7598749b3e2d8b64b48b9d",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/freeLivescoreApiService.js",
@@ -3104,7 +3484,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "f6a5124dc72cb525862de48ba7ee839b688d74f42534934995bdc3a62dabaec3",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/gradingAccuracyCore.js",
@@ -3135,7 +3520,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "957c4600b15f4663ba603c8e0a64cda21d4221cb90f8a5706edb2c9a7340a9c6",
+        "relationship_evidence_sha256": "d07f069faf7c78a848fe82d5dffad778f3ef969ec644d1cc41577640c9814c50",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/gradingSnapshotService.js",
@@ -3166,7 +3556,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "3b8349a13ed52c09ab39e388ceb3022bb5650b9b346ad2ea9b2203a2f825725e",
+        "relationship_evidence_sha256": "b268ca1e551ba86a4fccfad4d84c20838b914d19f781682b6c9efa1aa77f41a7",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/hybridSportsDataService.js",
@@ -3211,7 +3606,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "483869e707235e5748454df192357ea4f74a376e793c6f9fb282f3367c0d9845",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/marketIntelligence.js",
@@ -3248,7 +3648,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "3934a6f60ddbb764f5ea42e07aef5515a55c27c18c1123d3198d1c5d783640c6",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/marketScoringEngine.js",
@@ -3280,7 +3685,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "e4e8cf7ab3a22bdd4bb7bde8085eb37f42b8a5fc645d5d973668517bf684a01f",
+        "relationship_evidence_sha256": "cbc02f1fc69215905bd8a76fac5069d28ce66acb1e94f306e811dc6b62b1991e",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/masterRulebookRiskClassification.js",
@@ -3309,7 +3719,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "5dbd8ffc4a529f593aaa5460fa242d41f5ab42bc95491192ffa92033dcc810a1",
+        "relationship_evidence_sha256": "23a06f5b570ec4c1145610e0a7ae0f1f125272e209e1339292957668222b3b8a",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/metrxFactoryService.js",
@@ -3341,7 +3756,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "be69201e06759cbe9b445c34d78cb339dbad1c610a7c9c4a6af721aec27131a1",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/normalizerService.js",
@@ -3369,7 +3789,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "b0fe27e38ef72d307bc688228f30dc253bb09e31f8fe676a51818cd599a6aad6",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/oddsBudgetService.js",
@@ -3400,7 +3825,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "64525332db5ca10a3ea8f87b4723d7368854a75a2d9a6ecaf04985a375f0a8f9",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/pipelineMetricsService.js",
@@ -3433,7 +3863,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "41c32078d56eda7a5a392178f2caa4c00013e49da49e295e78fd77b0948cbb62",
+        "relationship_evidence_sha256": "b268ca1e551ba86a4fccfad4d84c20838b914d19f781682b6c9efa1aa77f41a7",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/proFootballDataService.js",
@@ -3466,7 +3901,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "4d3791e4a35496b546269ac5de5f07da3969ddc6eeb59cf8610e25ec34a0e22b",
+        "relationship_evidence_sha256": "cbc02f1fc69215905bd8a76fac5069d28ce66acb1e94f306e811dc6b62b1991e",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/providerQuotaService.js",
@@ -3501,7 +3941,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "971d7e33b60f68ebfc060f648eea2de99b46453367e307755ddadddc265dd096",
+        "relationship_evidence_sha256": "0f6e0ef042cf417d0465246c6c4a6590371dc53641e2178968372008516ededf",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/quotaPlanner.js",
@@ -3530,7 +3975,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "cd445b85c2fbafd764f09a76bc2937071b6493ef161e8503e79eff875921f2f8",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/safeHavenSelector.js",
@@ -3560,7 +4010,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "033c8031585e6545e8fcda6a758a96b2e7dddf4f519fe7dccd3e723c35c9ba12",
+        "relationship_evidence_sha256": "b268ca1e551ba86a4fccfad4d84c20838b914d19f781682b6c9efa1aa77f41a7",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/saveContextData.js",
@@ -3594,7 +4049,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "5944864e900d86f536f36151a9b1dd3691cde3e51e76035a9673dc274e9bf8d0",
+        "relationship_evidence_sha256": "ceb1b5b1d6239dcb99049798b97069b7061c907b5cd521e456359ba970dc08d6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/saveDirectInsights.js",
@@ -3625,7 +4085,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "f9fa47593c922550180cf63426663b5aaed3eaac54e83cf0c3de048ada19e540",
+        "relationship_evidence_sha256": "b92728ff68461e9f51dd53e45a6d68f7936f1a6fbb5b80ea37b5191354969457",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/scoutSignalSync.js",
@@ -3657,7 +4122,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "19308457fe5b7770857c05c75ca8ba3e53a663d4d6f707c665e35a73c798d470",
+        "relationship_evidence_sha256": "8acaaa54272d9504ba8a50a49c8832fe896ff4c9b9656796e770367482d53549",
+        "captured_source_presence_state": "PRESENT_PRESERVED_CANDIDATE"
+      }
     },
     {
       "asset_path": "backend/services/semanticDriftSummaryService.js",
@@ -3691,7 +4161,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "ab29a23f8f1983016271ab7237b8367214acaf272a04ba99e86edc94ccb5ee71",
+        "relationship_evidence_sha256": "b268ca1e551ba86a4fccfad4d84c20838b914d19f781682b6c9efa1aa77f41a7",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/skcsHeartbeat.js",
@@ -3733,7 +4208,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "5814626f1dc364cba95a4ad7d9101e94edbab319098b3dd50fc1831dc8c29b1b",
+        "relationship_evidence_sha256": "aeab6d8bf53c1b50256f1780dc1e66806150496f38243b3e1b390e37d65fef41",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/sportsrcHealthService.js",
@@ -3769,7 +4249,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "576c048675c7522de9de41ac34abe2d0776659c9f02840e43b3b6fd6ff2be5dc",
+        "relationship_evidence_sha256": "580613854182317199aaea06c962cf5205bb71d529b93b2fd6d6598a33e089a1",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/subscriptionTiming.js",
@@ -3800,7 +4285,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "da8a73b5320664f9f34712f1c4824511eff80b0eca3cee876973a0eb4102e985",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/syncService.js",
@@ -3852,7 +4342,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "bdfe9e17327e2e0c1898e35862a852b55968a1c3fa0fe5e23e92ccee2dea94bd",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/systemTruthLogger.js",
@@ -3886,7 +4381,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "860be8819c09c7e6f2080bec7bd5c27186c5b2f2e6653bb24e8b77ee32378f63",
+        "relationship_evidence_sha256": "38e56f51eed79c3c2e79604bb94e6e0a37186845a18b534ef9997596079cb75f",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/thesportsdbPipeline.js",
@@ -3933,7 +4433,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "c829056670b9e89cf3a72c59e26943299599d10af5fcd9442a82de4dad7f7095",
+        "relationship_evidence_sha256": "b205663b647ef1249700ce0727c52d93192fbc52b41fbfca540056f8d8c51c40",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/tier1BootstrapService.js",
@@ -3977,7 +4482,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "9c95f090add962ae653d025c0c1ebed6474dfc4bdc5b3f17f59ec6a07aecaf71",
+        "relationship_evidence_sha256": "c9a83db87531d8ec57400a44b1cee59b5fba722edb4b95c7def5089eb21a2dc1",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/services/tier1SchemaProfile.js",
@@ -4005,7 +4515,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "b6c43ad8ad6f0e5e7656f87048a213470635596e9c157fd12a0c37c8a793fd74",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/src/services/contextIntelligence/aiPipeline.js",
@@ -4039,7 +4554,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "c52f3c5e960d18061970a85ad839f39442c4c01aa2b63d966c830f1795071dec",
+        "relationship_evidence_sha256": "bab1eddef93b36a63f5f00531e418365f68e690692a34b85b3a13365faa6a185",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/src/services/contextIntelligence/weatherSignal.js",
@@ -4070,7 +4590,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "651f521a42066ee6a48c4eb3640ca1730fa4f3b6b4b333e3cb0fc385266f3268",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/utils/apiCache.js",
@@ -4101,7 +4626,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "7b4da959b0d657c25ffc63ee0f6d0c46e2c99e135d395c9444cf822e331ffb1b",
+        "relationship_evidence_sha256": "43056a59f72a1e9e6a98eb21b4e3b782355fb85f65aa279beb417fdab37927b3",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/utils/availability.js",
@@ -4135,7 +4665,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "6d251d118a69e476e9fb49756eaa35adafbd5e183b75dcc8876bb520d431a1ea",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/utils/jobLogger.js",
@@ -4166,7 +4701,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "feb6ac6dd7f04a71a062204b65dfe4900f38121cd7597baba12ee618c688d41c",
+        "relationship_evidence_sha256": "c51d6cef4b37acf24b4b4542b18673abab442e73ba6869ae342a14480dd6b6f7",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/utils/pipelineLogger.js",
@@ -4199,7 +4739,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "4aab9ff9550453a733433841993f9b3fad7a77a4e28f5f28225103c0bbcbbb9f",
+        "relationship_evidence_sha256": "cbc02f1fc69215905bd8a76fac5069d28ce66acb1e94f306e811dc6b62b1991e",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/utils/providerCircuitBreaker.js",
@@ -4232,7 +4777,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "6dba5213025e44d854a8c9f37b8f7f8cea1bedd6ad22445fd8b9dea8a76c3337",
+        "relationship_evidence_sha256": "cbc02f1fc69215905bd8a76fac5069d28ce66acb1e94f306e811dc6b62b1991e",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/utils/secondaryMarketSelector.js",
@@ -4261,7 +4811,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "518f74dff29b278da972bdf8931812c6e3bced3a4540d8e3e0b3c0ef7bb8816e",
+        "relationship_evidence_sha256": "b268ca1e551ba86a4fccfad4d84c20838b914d19f781682b6c9efa1aa77f41a7",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "backend/utils/weather.js",
@@ -4291,7 +4846,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "4060c0168248b4b6748d4cee090caa500bec0946e271a3ff9be4dcbb8a0f504d",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "COMPREHENSIVE_FOOTBALL_RULES_REPORT.md",
@@ -4316,7 +4876,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "cc9ad44a9879584af733bd73a0356c09fbc5080f2611151021fb30e86b72980f",
+        "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "Dockerfile",
@@ -4341,7 +4906,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "cf8999d014d7b1700596087fc2b62bf944d11a80e1ccd7e329e060c85a95e8cb",
+        "relationship_evidence_sha256": "04ec8464cd55b4dce676a24974593e57504b1c349218ae426379d61c2e28cfe2",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "docs/acca_rules_v2.1.md",
@@ -4366,7 +4936,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "03c4cca4b2166982c53f8653228822370eb15aef8e36e37814ce4b580f378f8b",
+        "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "dolphin-server/Dockerfile",
@@ -4391,7 +4966,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "bbda91c3772b93258e40f6df289db6e03dcfac076568b388bccc345a0b2bd854",
+        "relationship_evidence_sha256": "04ec8464cd55b4dce676a24974593e57504b1c349218ae426379d61c2e28cfe2",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "force-seed.js",
@@ -4418,7 +4998,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "8b491deb888c1fb29313c74e9b499411efce54aff9abdada4768b58b447c616a",
+        "relationship_evidence_sha256": "c34f45fb6bec750fc3bce95d91e45688e5c79745c2eb1b26d4cc98ce4f865f80",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "MASTER_RULEBOOK_IMPLEMENTATION_GUIDE.md",
@@ -4443,7 +5028,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "4b3b82da734e930b6b484941e89fa18ace95a92ac58721776b9251c3ae8ff0c7",
+        "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "MIGRATION_FREEZE.md",
@@ -4468,7 +5058,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "718fc647f6d77cd55a2c433eda474513d37b37018fa52e6c0116e8f9b796f1ba",
+        "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "package.json",
@@ -4493,7 +5088,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "5d04d3d7e790a84e5b60b7664536e1dafba85d4b0841c3d5fb8181e24d104a47",
+        "relationship_evidence_sha256": "bfec5297138b7770aaa6d169c0d166b4eedb837d2dfacb4ee10ce67e634c0f01",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "render.yaml",
@@ -4518,32 +5118,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
-    },
-    {
-      "asset_path": "scratch/inspect_edge_external_sources.js",
-      "source_state": "PRE_EXISTING_UNTRACKED",
-      "surface_classes": [
-        "SCOUT_FIP_SURFACE"
-      ],
-      "reachability_state": "CANDIDATE",
-      "mount_paths": [],
-      "runtime_callers": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [],
-      "external_providers": [],
-      "environment_key_names": [],
-      "database_role": "NONE",
-      "database_objects": [],
-      "schedule_or_trigger": "",
-      "deployment_surface": "",
-      "governance_reachability_type": "NONE",
-      "governed_by_control_task_id": "ESA-001",
-      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
-      "evidence": [
-        "Static package/deployment/import/mount evidence."
-      ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "62d1d6b0a5be135fba73787c32fd05dd6bf0824108d8301c25e16e867eff5018",
+        "relationship_evidence_sha256": "198bab2590a4dc0a1a6f523fae1284477e7835162beaabaa6755d163cd0f2d03",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "scripts/apply-db-governance.js",
@@ -4576,7 +5156,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "2f842d6fe91e80de0ec2b653a3ecadb07b74b053c9ea01656fd8b9b73798e22e",
+        "relationship_evidence_sha256": "43f68e5ee1b0a5355b9605bb69fd38313bdfa711dac9d44afa17d5570e13dea7",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "scripts/audit-cricket-rules.js",
@@ -4608,7 +5193,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "d5ab5912752afefb9e40a898575d1cd9af565e801f1b438510394d69c42a1e7d",
+        "relationship_evidence_sha256": "d7d0fb73f0b75045d78ac7c1b2155f1f47af6efeb7b3adbbeb94e0aac32a63d9",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "scripts/audit-football-rules-alignment.js",
@@ -4635,7 +5225,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "f52005258eb44f6a5ccc4f2005e062a5fda3e6eae9eb810be997a6e434549049",
+        "relationship_evidence_sha256": "1083d7fdd5b0048828e7c0e044e9ca64049478fb8678929b5b63fab70fa948b9",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "scripts/fetch-live-fixtures.js",
@@ -4698,7 +5293,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "64f7ceab9b1c56aa4bbe4402b93065d0c770cec15b879d6982d17a75d9ec0808",
+        "relationship_evidence_sha256": "522852fc5d50669be58e0a8f654288fffe0c617b6fa2dad70245fea5dc2f8e0f",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "scripts/import-today-snapshot-pipeline.js",
@@ -4760,37 +5360,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
-    },
-    {
-      "asset_path": "scripts/inspect_secondary.js",
-      "source_state": "PRE_EXISTING_UNTRACKED",
-      "surface_classes": [
-        "DATABASE_SURFACE",
-        "SCOUT_FIP_SURFACE"
-      ],
-      "reachability_state": "CANDIDATE",
-      "mount_paths": [],
-      "runtime_callers": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [
-        "backend/database.js"
-      ],
-      "external_providers": [],
-      "environment_key_names": [],
-      "database_role": "READ",
-      "database_objects": [
-        "information_schema.columns"
-      ],
-      "schedule_or_trigger": "",
-      "deployment_surface": "",
-      "governance_reachability_type": "NONE",
-      "governed_by_control_task_id": "ESA-001",
-      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
-      "evidence": [
-        "Static package/deployment/import/mount evidence."
-      ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "b388840dc65f9f31a96c579175faa0340d7e84f954357402b60376d379ccea8d",
+        "relationship_evidence_sha256": "0837b5e627744bb94bbb638babac82d841302632c0949fa0b16222f101cd39d9",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "scripts/master-qa.js",
@@ -4820,7 +5395,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "a22e543f26a9f63deddf1d2d955a8e53a27ccd18d284f2900bda0fe533af7040",
+        "relationship_evidence_sha256": "c7bf0807d7083f1558410cf943953fadd57dd158965e209493ea81927604521a",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "scripts/publish-cricbuzz-cricket.js",
@@ -4866,67 +5446,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
-    },
-    {
-      "asset_path": "scripts/seed_acca_test_data.js",
-      "source_state": "PRE_EXISTING_UNTRACKED",
-      "surface_classes": [
-        "DATABASE_SURFACE"
-      ],
-      "reachability_state": "CANDIDATE",
-      "mount_paths": [],
-      "runtime_callers": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [
-        "backend/database.js"
-      ],
-      "external_providers": [],
-      "environment_key_names": [],
-      "database_role": "SEED",
-      "database_objects": [
-        "secondary_market_predictions"
-      ],
-      "schedule_or_trigger": "",
-      "deployment_surface": "",
-      "governance_reachability_type": "NONE",
-      "governed_by_control_task_id": "ESA-001",
-      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
-      "evidence": [
-        "Static package/deployment/import/mount evidence."
-      ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
-    },
-    {
-      "asset_path": "scripts/seed_final.js",
-      "source_state": "PRE_EXISTING_UNTRACKED",
-      "surface_classes": [
-        "DATABASE_SURFACE"
-      ],
-      "reachability_state": "CANDIDATE",
-      "mount_paths": [],
-      "runtime_callers": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [
-        "backend/database.js"
-      ],
-      "external_providers": [],
-      "environment_key_names": [],
-      "database_role": "SEED",
-      "database_objects": [
-        "acca_legs",
-        "direct1x2_prediction_final",
-        "secondary_market_predictions"
-      ],
-      "schedule_or_trigger": "",
-      "deployment_surface": "",
-      "governance_reachability_type": "NONE",
-      "governed_by_control_task_id": "ESA-001",
-      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
-      "evidence": [
-        "Static package/deployment/import/mount evidence."
-      ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "80ef4f682110521aae3059e9334b97dce3f148966348a6bd266f549713bc27fd",
+        "relationship_evidence_sha256": "6dec264268ece5a9b3a536f555aae0feb4377ecc659ea8c2e80226bb4a1392dc",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "scripts/test-sportsapi-pro-football.js",
@@ -4954,7 +5479,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "d9cd17e1c984b4f2d3b4ee37607e9e4344ce2f2c56587366ce3e52a62ceb0c64",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "scripts/verify-master-rulebook-alignment.js",
@@ -4979,7 +5509,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "bfd0e268628f39f8e557f33f5c260c2aabd9e49dc5f22fbeacd95bbed2d3c103",
+        "relationship_evidence_sha256": "e1cd3927369ee603512cd217194de97e6f7fcb0fcb20b3e6734824b77fe04764",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "SKCS_MASTER_RULEBOOK.md",
@@ -5004,7 +5539,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "964f79a3dca3554ee06bf6abdb9e291237e15dffe393ff508c9a141add9e6685",
+        "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/governance/ai_usage_policy.md",
@@ -5029,7 +5569,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "c043597e14008cd950b690aa1c2895abfd9d157f8b2e7410db6d82369ede0bab",
+        "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/governance/bigballs_evaluation_focus.md",
@@ -5054,7 +5599,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "44576ad52d1d760b2f7b146197dc11dd1f18de08b32bc421a08d8f3144a00508",
+        "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/governance/bsd_governance_hold.md",
@@ -5079,7 +5629,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "400013c9d892b69ff06aa130eebc3225d2ccf59c1ce48049172e6ff12ba554e5",
+        "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/governance/bsd_provider_suitability_scorecard.md",
@@ -5104,7 +5659,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "0b2c185e0342763a56e9f5f070f3e767ab8ec0db38212f1cd2d30293b5c256d2",
+        "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/governance/documentation_policy.md",
@@ -5129,7 +5689,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "41fdbec8d5d482f306384832b36fc652c2d187430e83713db387fbc09c62fa91",
+        "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/governance/feature_risk_registry.md",
@@ -5154,7 +5719,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "15c60b81fdb81aa702e0eec5fdfb8c03fd7b3e53f77f154ee876ce41cb9c60f6",
+        "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/governance/naming_standards.md",
@@ -5179,7 +5749,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "3aa4e995940c5a55248669f6d837ac6c2cac7048bf1e9ac17f5bf46b7d137fa9",
+        "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/governance/provider_scorecard_bsd.md",
@@ -5204,7 +5779,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "7ed56c6599fce5e2f8b58ab06a36c2132a8997ff8435efecaefabf586edd5a92",
+        "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/governance/verification_layer_spec.md",
@@ -5229,7 +5809,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "b4e8ee08bd6d06b44e3d84fc4caea72d0665d1dee9f60bd52ed73d279e55cc77",
+        "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/knowledge/business_rules.md",
@@ -5254,7 +5839,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "84876b3bba504635d9129f660f060d4a5dbb74f6e316bb00a8996a9b24503dde",
+        "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "smb_combo_rules_refined.txt",
@@ -5271,7 +5861,7 @@
       "environment_key_names": [],
       "database_role": "NONE",
       "database_objects": [],
-      "schedule_or_trigger": "",
+      "schedule_or_trigger": "setImmediate",
       "deployment_surface": "",
       "governance_reachability_type": "DOCUMENT_ONLY",
       "governed_by_control_task_id": "ESA-001",
@@ -5279,7 +5869,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "694b9a3f22a1630ff99a2e31b9bda14ead7fd9a59499595326b2ed9ac860d5d6",
+        "relationship_evidence_sha256": "4ecb7cf7eaabcde5736c95fc9fcb0b3f102aefa7acea2402a019f269962261fd",
+        "captured_source_presence_state": "PRESENT_PRESERVED_CANDIDATE"
+      }
     },
     {
       "asset_path": "sql/acca_rules.sql",
@@ -5307,7 +5902,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "0d1a4215cd6447986faf320d674a64c7d23a606f7c82a10b7030ac5314845e37",
+        "relationship_evidence_sha256": "acd505cfa545f5e1d6368358c415c3e115eeeb3fdce0461fa6394cdb2010a843",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "sql/market_correlations_schema.sql",
@@ -5335,7 +5935,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "b40460d876e5e3574cf6ebace3e8b724c228796e9bb3df8153325bf04a763933",
+        "relationship_evidence_sha256": "caea89fdf33bacbd786efc356f08740528533177d3f5fa37889f74832da357e9",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "sql/master_rulebook_triggers.sql",
@@ -5369,7 +5974,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "1290999947102ed1b33937401e6e496c8c40e9b37575846bf8c08bd1c47ae675",
+        "relationship_evidence_sha256": "96a8c537e33123072b64142eba28ca27230f29512522c9335c2a09798c379d78",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "sql/schema_refactor.sql",
@@ -5400,7 +6010,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "f2721c08b36b34727e64590aed97f3c25f7f92ca3448aad78c7a3c6b7b141ec8",
+        "relationship_evidence_sha256": "8816c5e0a5c0cc0a188e276d80cc00e7e3907c5ff13a56bad7a653300b7182a6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "sql/supabase_test_user_reset_and_seed.sql",
@@ -5434,7 +6049,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "05867880fe5a5334e2a785ed4e6456be437f860d3ff4d66e45f2e6a8e40b585d",
+        "relationship_evidence_sha256": "38b27540122c7e1df49f741612d095029072242a26048b60ce80078bbdb932c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "sql/supabase_test_user_seed_access.sql",
@@ -5468,7 +6088,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "fe846228eb7939c1001c91c46694bb12883ffcf8972a8aca2f1fd5f712db5ca4",
+        "relationship_evidence_sha256": "83850350753d117a2aee226aae71e42696a966a6c55023c1fe5821a3589ec624",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "sql/tier_rules.sql",
@@ -5496,7 +6121,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "a9355eae804fe0e48e5ed0fb499032e20ab3099495c886ad59d858b505624c3b",
+        "relationship_evidence_sha256": "29d65384010d05cf222a8b27a9033ed9c358c989447c5bb641b13f8fe8cd2596",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "STRICT_RULES.md",
@@ -5521,7 +6151,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "660798fb2e82e8eed2f08eb570f737c5015bba7ced90b582d8c367cc7951512b",
+        "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260415000001_create_insight_usage.sql",
@@ -5549,7 +6184,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "87598c25d6357df5befb07c20757e3199664827a4505028ce1ee0ae78eb68413",
+        "relationship_evidence_sha256": "3e3f38f27c4f4f5ce478fe69768161d335192412f4946f06438d362310624921",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260418000002_update_predictions_final_risk_level_check.sql",
@@ -5578,7 +6218,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "a5fd33e83b88f4dd077ab75fca7cd810e1212c60c31d3172dcfdddc610f20219",
+        "relationship_evidence_sha256": "3897c91fc5983974dda29850f0de6d602e83e556a0818fb65b21f3f562f15bc8",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260501_skcs_comprehensive_engine.sql",
@@ -5620,7 +6265,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "55b2b839e0a6f407271d423726062bbb4029057cb72d5cb16eff8b72b1a75176",
+        "relationship_evidence_sha256": "2c99c60744de1a5cce829cd8c5fc93f56ee621e8cf17006749f87b2ae6a60254",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260512000001_create_canonical_bookmakers.sql",
@@ -5649,7 +6299,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "a5ab10857cdef13e42dd6f761e5b67aae46b679c66e91d5c12613d0e4cf27705",
+        "relationship_evidence_sha256": "ae611b0b2bf33ebee479b5d017a9e942c9493bc45582c7975fa31520c4a76946",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260512000002_add_odds_to_match_context.sql",
@@ -5679,7 +6334,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "3cbf599c97cb1dda92e00634706586597ed9ea04421e10dbdf48484497e253e3",
+        "relationship_evidence_sha256": "5f7c4550ca77274763d35a8726c7eeb4a96db199c4b04d323fbd4ed0dc384833",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260512000003_create_sport_sync_table.sql",
@@ -5706,7 +6366,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "0463cb95fe792d3f4b884a7f896f697cf18e6157ed2ec778b31eab9e1423a9f2",
+        "relationship_evidence_sha256": "ae6a55996e82bbe2394b9ab486c684606a4146fe6136c740038d095294313802",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260512000004_create_upsert_raw_fixture_rpc.sql",
@@ -5735,7 +6400,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "79a40ce23e0270feadfcd343028efe6948563a98532d9dd9dc5cc398f8a30fa5",
+        "relationship_evidence_sha256": "269771582b70a8e413e32d7b1930c341b8e9e3cfbdd38935cbe33dc2e0a1fafe",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260512000005_create_context_enrichment_trigger.sql",
@@ -5765,7 +6435,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "25c2fe8aa0d16c9fb1480efda38a3d2b79e654c50d11d60ae3ac9202d86537bd",
+        "relationship_evidence_sha256": "99d565986e62808d3f5eb02671486524067c7851de730376bd7767533c583dfd",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260512000006_create_fixture_processing_log.sql",
@@ -5794,7 +6469,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "0f7f81d7109e9c7686696e09525fdbf48658459442b35456e56de70a637a7d02",
+        "relationship_evidence_sha256": "23c6037357311453d8e85c80d50aa23eaf128678776fbfc6ecaafb1aab1a86c1",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260512000007_create_admin_views.sql",
@@ -5824,7 +6504,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "0c70621df87b299003f51c613435f71fce706995b80c15286e0c6f1fdc8fc456",
+        "relationship_evidence_sha256": "bf0a3a7250e8136bb39bea4db894a702b8cfdac9cec83f300af7ea827e05a635",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260512000008_create_event_odds_snapshots.sql",
@@ -5854,7 +6539,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "788ce2b106e872b0090d898941599ba7ac281fb01af513b61bca7ffe8a027b2c",
+        "relationship_evidence_sha256": "a4f02814759dcfffd1212bbc8553e36a4a5fb6063b6dae7a10e6e306c5a5af6a",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260512000009_create_get_prediction_rpc.sql",
@@ -5881,7 +6571,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "66397488de0a2b17145fc1166ec50d3f2574a2f4619c919d23d63a61617b25e9",
+        "relationship_evidence_sha256": "8b40eaa907348277f0e2a191abd8ffed6b46a15739c83676b15c4ec44726c505",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260512000010_populate_sport_sync.sql",
@@ -5906,7 +6601,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "396cfa4a195aec6a67bd9ef2739d999cb5a2bf56568d8d2e67f9cc23a2a5c536",
+        "relationship_evidence_sha256": "be1f89413f392ba7dfa7f3e2b6755ced66568bda3ef05adcb33688abdcc9916d",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260512000012_create_get_prediction_function.sql",
@@ -5933,7 +6633,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "3287fdb1e575ece67408e5532374b2f7b1e951978465a5f9dc4b56be73b83c70",
+        "relationship_evidence_sha256": "35804fab4fac2299391c6530e2a9c7195e099a609b7a1eda988cfb104f5d5120",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260512000013_disable_rls_match_context.sql",
@@ -5960,7 +6665,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "16f98096c28ccfffe27ebe126e667a7a3734adc24452c25f9be25d5074720a48",
+        "relationship_evidence_sha256": "7f1b8c0a465b91a41194ef7e0d1664a6e33e44127889c3df870bc8f4042f06cf",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260522000001_add_watchlist_column.sql",
@@ -5987,7 +6697,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "125d1c79334b872e84b7f1dde6181801196f79878105cf891cee9e219b85877c",
+        "relationship_evidence_sha256": "3b4ff5a4ff11342afed4a4018ad1758e179fb99a5f543dc47aeef902529354c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260522000002_add_sport_to_tier_rules.sql",
@@ -6015,7 +6730,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "30f298fb6a99d1917fb128a59055645cff687a902f6d2a905659f80c7c521e68",
+        "relationship_evidence_sha256": "dfe7d6c6d2f11a0236adbdb51619393e7bba92f2e7b26406702a8340a4ffdffd",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260523000001_drop_insight_usage.sql",
@@ -6042,7 +6762,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "f3c873769b028b689b7479ed8766389fe4c45676741d2abd114c6f1b82dc5549",
+        "relationship_evidence_sha256": "ae6a55996e82bbe2394b9ab486c684606a4146fe6136c740038d095294313802",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260524000001_remove_dev_rls_policies.sql",
@@ -6067,7 +6792,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "8a3fe50446fe7013255887a10dfa5754bf080704bd73fa2e6e0b56046405657d",
+        "relationship_evidence_sha256": "be1f89413f392ba7dfa7f3e2b6755ced66568bda3ef05adcb33688abdcc9916d",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260524000002_create_upsert_canonical_event_rpc.sql",
@@ -6094,7 +6824,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "e1aa49c8867fbeb66ea214c38332333be5c94925cf62e9cad8528f005e638922",
+        "relationship_evidence_sha256": "ff771965fdb8c1e1b14a2ffba031acdac30f52d535443e9833da64000822d5dc",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260531000001_skcs_engine_v2_phase0_identity.sql",
@@ -6125,7 +6860,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "f26eabecec608d86329b68a0dcc13121ed087c39c9defe91b20a71b079ffd1e3",
+        "relationship_evidence_sha256": "6b0f5137ba6deb43f55f60dbc0142d2fdb988c31aa713c8db2337f998e4c333b",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260531000002_skcs_engine_v2_phase0b_match_results.sql",
@@ -6156,37 +6896,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
-    },
-    {
-      "asset_path": "supabase/migrations/20260616_scout_signal_mirror.sql",
-      "source_state": "PRE_EXISTING_UNTRACKED",
-      "surface_classes": [
-        "DATABASE_SURFACE"
-      ],
-      "reachability_state": "CANDIDATE",
-      "mount_paths": [],
-      "runtime_callers": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [],
-      "external_providers": [],
-      "environment_key_names": [],
-      "database_role": "MIGRATION",
-      "database_objects": [
-        "IF",
-        "pg_policies",
-        "public.scout_raw_match_signals",
-        "public.table_lifecycle_registry"
-      ],
-      "schedule_or_trigger": "",
-      "deployment_surface": "",
-      "governance_reachability_type": "NONE",
-      "governed_by_control_task_id": "ESA-001",
-      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
-      "evidence": [
-        "Static package/deployment/import/mount evidence."
-      ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "bbdfff05503c41bfe69f9cbba23626d653093ce58503bea798594f0a4573a067",
+        "relationship_evidence_sha256": "2ac2849dce9d478c6ebe9fd35d486ae9c1ddd51a72820c024e0d0235f7e689e3",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260617_add_market_tier.sql",
@@ -6213,34 +6928,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
-    },
-    {
-      "asset_path": "supabase/migrations/20260617000000_setup_accas.sql",
-      "source_state": "PRE_EXISTING_UNTRACKED",
-      "surface_classes": [
-        "DATABASE_SURFACE"
-      ],
-      "reachability_state": "CANDIDATE",
-      "mount_paths": [],
-      "runtime_callers": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [],
-      "external_providers": [],
-      "environment_key_names": [],
-      "database_role": "MIGRATION",
-      "database_objects": [
-        "IF"
-      ],
-      "schedule_or_trigger": "",
-      "deployment_surface": "",
-      "governance_reachability_type": "NONE",
-      "governed_by_control_task_id": "ESA-001",
-      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
-      "evidence": [
-        "Static package/deployment/import/mount evidence."
-      ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "ec9ae1d324f9c294c6946a880e5d945d36775e8c41bfa76dcae38142d4e1b0da",
+        "relationship_evidence_sha256": "077f517bcf028c28c3704dd85c9f023a80fd0b2a624207abeebe510a6f126d6a",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260619000001_rename_predictions_final_to_direct1x2.sql",
@@ -6270,7 +6963,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "a44fbf9fc851ceb723f1977d399a17ff0534979e417bc36d61175d90fe07d1af",
+        "relationship_evidence_sha256": "90764dfd73519f007942f029a5d64ad127ffe4082bf79fb4c1b05b115b5e6895",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260619000002_align_direct1x2_columns.sql",
@@ -6297,7 +6995,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "176818a6d07a0511e94dcb58e4a7fa2478226e98e3756b07a19071e4d2575ff2",
+        "relationship_evidence_sha256": "19668485fa642f5f0b4302fc02cf32b147c86172e47e9f4b113a9ce45f756100",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260619000003_direct1x2_risk_tier_and_secondary_markets.sql",
@@ -6327,7 +7030,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "9f7d0cdb31be4f059227662d4852d8a0b3b2b50dec84d15d44362e395622ebed",
+        "relationship_evidence_sha256": "bdb8efa94da2e56075d86b4d20f6f96df9928e63c6ea9ba7f6e87723588407b5",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260621000001_enforce_league_country_on_direct_matches.sql",
@@ -6354,7 +7062,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "b176f6fa970229161f8c6c7681fccd6c903998e60067893e80ef50a79b0f9588",
+        "relationship_evidence_sha256": "19668485fa642f5f0b4302fc02cf32b147c86172e47e9f4b113a9ce45f756100",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260701000001_normalize_sport_names.sql",
@@ -6383,7 +7096,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "a5278c3af894adf3c4d12bf962a414bcc53115b846a88e141cf3633450ab40fc",
+        "relationship_evidence_sha256": "29c522a267b7705621aedd60d296b89c7ee3036aa8540fe130ef17186bd9b62e",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260717000001_create_f1_schema.sql",
@@ -6410,7 +7128,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "723f6174faba1eceffb461ebe79d83e2e8551466e3a86b04075b54e465538516",
+        "relationship_evidence_sha256": "127329cb99d529662fd78106366359b622422f74563092c2bbf3910abab4837f",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260718000001_db_rule_alignment_75_55_30.sql",
@@ -6441,7 +7164,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "24b92b0516f7757f2bfb32f06a880bfdabef9d275e8bc03a6ffba77cd7b6a0f2",
+        "relationship_evidence_sha256": "03326544a02cdd35001141a3421a1a7d707d139e95964a737f92192c2d67054e",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260820000001_rename_risk_tiers_and_safe_haven.sql",
@@ -6474,7 +7202,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "bc35b87d4e66bf21a98f9804bce49e5d842afd1a0dfc6d031f2f2c9ecf3a8010",
+        "relationship_evidence_sha256": "302b57623eb139eaf845b954f9edfd4e4593a6537ca24a55d0c570d904739eb4",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260820000002_fix_secondary_governance_80_75.sql",
@@ -6504,7 +7237,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "49088be6185590ed74b67e3a6cd79d147999831dea273c8ab1144e7dc763ce0e",
+        "relationship_evidence_sha256": "e3e74a092b0dc7dd80e497bcdbf322bb301c78f23ec5ac50df419a76a56e13ba",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000001_add_partitioning.sql",
@@ -6536,7 +7274,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "8dba533c254d0e323a1cb3ee863457d5185f9ac05ddd76665fd951adf18262c6",
+        "relationship_evidence_sha256": "b43d5f421e36545484af037c8a65063163573079c4bc72eaf8507d05e2fe9c9f",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000002_create_relational_odds_tables.sql",
@@ -6577,7 +7320,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "7f692a66e67b11b43fb9b7e2ffa0028f36df8c7a255b22dd29b57a07bf57f4e7",
+        "relationship_evidence_sha256": "e2baa65cbd6ff1865c36d9ec0cd62e27f36c86719c5083cf91161ebcdb19c708",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000002a_create_relational_tables.sql",
@@ -6612,7 +7360,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "b29240ebc6f07639abdb6e06486bda1db75d52eb5da25735a3959c1d55566f02",
+        "relationship_evidence_sha256": "d7564c3cef263cde61333d18b2abe83d1c71876e29c4139bf5b8d4a4c0fde217",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000002b_create_relational_indexes.sql",
@@ -6637,7 +7390,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "31b23b3338f87d52d82369c2e5026481c72513f4ab0ca063209017e971f8d921",
+        "relationship_evidence_sha256": "be1f89413f392ba7dfa7f3e2b6755ced66568bda3ef05adcb33688abdcc9916d",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000002c_create_relational_functions_triggers.sql",
@@ -6671,7 +7429,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "f68614d61bffb988efc3ef431cce913192788e0c87417897e22d7dffcc88f192",
+        "relationship_evidence_sha256": "ae1f93bbfd8c9801f08cbf6f11eb45ea194e51dbafc2f72ee3c53f35b811b667",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000002d_create_relational_views.sql",
@@ -6699,7 +7462,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "b6a1bcb2279dea0457a533ac736b641224033beda7cee3a63996a430ec92b054",
+        "relationship_evidence_sha256": "b5e9d859fa94af9e410c36e429fc4a39d5e49492bf48eb71786bfe103338460f",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000003_normalize_prediction_tables.sql",
@@ -6731,7 +7499,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "cd7390b5839d1d7774672f5ed4d01a8e4c254e56aac7cdf44178531071cba049",
+        "relationship_evidence_sha256": "c52b0c1b73b1f60df9e4e7cba8c8bae2eb4e8ae25cc862cd44fa70f6ab8c2978",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000003a_create_prediction_tables.sql",
@@ -6762,7 +7535,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "03510d72ec89c1243c458254a8def01ceff350183244295a1a8182c508e7bb4e",
+        "relationship_evidence_sha256": "a1a9a12f852e6ac809eea0977b681eaf01fc9f4dbab89536c2a007be3ed81aa0",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000003b_create_prediction_indexes.sql",
@@ -6787,7 +7565,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "6243637f3c90d1ec7628fb6cb11e0e266a31f8430602365ba7433d2f5c5d15d4",
+        "relationship_evidence_sha256": "be1f89413f392ba7dfa7f3e2b6755ced66568bda3ef05adcb33688abdcc9916d",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000003c_create_prediction_functions_triggers.sql",
@@ -6818,7 +7601,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "cc22b5ce80484efb21890fabcc8c0e8433ec0c45cdd2443bcfbd1d7e13147c44",
+        "relationship_evidence_sha256": "cd8bcda6a04b3c2d0dd1d59b95154dd2141db838bb47d2a63ae48cbc79d5ecf6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000003d_create_prediction_views.sql",
@@ -6848,7 +7636,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "f910d2dc6badc44bb3235e28e9c972f5ab3c1b51ecd90cc8931c4514b0341308",
+        "relationship_evidence_sha256": "2ed20408b5088137acf12499206b455bf7624a35a5f4b974f2ff8df545df6e1c",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000004_create_materialized_admin_views.sql",
@@ -6881,7 +7674,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "0cdc1094ccb3d578fb858032f0d459cb5c03b49dd6180b39cc30577dfba38dda",
+        "relationship_evidence_sha256": "9ccd287a4122568976baab16424c524f9539cfc8d6c098d15ec4486ad9a7ea51",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000005_skcs_engine_v2_engine_core.sql",
@@ -6920,7 +7718,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "a5dbf6db09854bfded9cd1abd80cce2cc9b3e45a0bb34333423a78c29bcd6c53",
+        "relationship_evidence_sha256": "e7a257f4310a34cf462658a862060d81077f42b584b5a692ce764d33e7d4f84f",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000006_ai_governance_telemetry.sql",
@@ -6954,7 +7757,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "3ea4bbbeb706125206b39930bc18c364fc19b0a2d442b6703b75d613b5f6f2b4",
+        "relationship_evidence_sha256": "7485795523115791ca233f55064e9984b86a029b2177dd3150e4059fd0709d95",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000007_ai_governance_rls_policies.sql",
@@ -6985,7 +7793,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "d7ef450dec006ffc8c50754850b577a2c26157ffde91c35be94cc9ef9471abae",
+        "relationship_evidence_sha256": "26024c2ffe989e458bb730174e3b6b3aac3e914d495ae94f8fbe59c6e5532a4a",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000008_service_role_rls_policies.sql",
@@ -7013,7 +7826,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "5734fb289ce92be993569861a463d1b854197b40249806d9d955d286096eb5ec",
+        "relationship_evidence_sha256": "e10954ca0a28e5074e368709ee4b07b75f922937b67b314c3569814d4be482a5",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000009_public_read_config_rls_policies.sql",
@@ -7041,7 +7859,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "920296f9dea5ed8f85efd11629d7076827db552262ae8e4f3c044bdf3891e48a",
+        "relationship_evidence_sha256": "e10954ca0a28e5074e368709ee4b07b75f922937b67b314c3569814d4be482a5",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000010_public_read_reference_rls.sql",
@@ -7069,7 +7892,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "156fe2b7a657c2d76887239339080619d3452b4b8304f6a5f5f5cb74a8392d1b",
+        "relationship_evidence_sha256": "e10954ca0a28e5074e368709ee4b07b75f922937b67b314c3569814d4be482a5",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000011_system_health_state.sql",
@@ -7098,7 +7926,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "74608ce33813b341308cddffe20ff2d2d2bd8758e07399a0e5e558741167a496",
+        "relationship_evidence_sha256": "1ac672951d1e92bb7221e118eeb2e5c9aef2d227b0e9ec7b3bf92cbbb4c72dd1",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000012_semantic_violations.sql",
@@ -7127,7 +7960,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "f96a26b105626e8483b793f7d5258fa6b50c409b0c626669ea6833e4334e736b",
+        "relationship_evidence_sha256": "1a0c8849f9976a4d579dd48c5e2f9f08505acb11afedd805518dbe727ee8035b",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000013_semantic_violation_summary.sql",
@@ -7165,7 +8003,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "6c74499ecccbe1176c7ba3ded21a040c9eb0124baa48ad20a2e80b9b6b37df91",
+        "relationship_evidence_sha256": "46ea3dd37bccec7ccd41ccb8491b2092ad3acfa8829d7bed2f57131a7285113d",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260822000014_system_health_state_contract.sql",
@@ -7193,7 +8036,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "10879ea9e3d79a7956bafcfaf1ae7a69bb95f7442cb2f02d384053750e31b8c9",
+        "relationship_evidence_sha256": "b5b082b9ebc5d5e855995d5b301c756af12ae2776b31d0c1d8bacce8e3baf58a",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20260902000000_pipeline_health_feed.sql",
@@ -7226,7 +8074,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "3f924fe461babec48e02ee74d07310883a389d8dc4eb426c1917a73ae5cafea4",
+        "relationship_evidence_sha256": "3346516936c626f17bf8b1a0eb4ed51f908900e7ef3d0c03ad48afc4d6b5f08c",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20261001000000_runtime_truth_mirror.sql",
@@ -7260,7 +8113,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "b691c7b3ae8dc0bbec35b72a3f05a0d3ed5b6ba1d66e4cb2871a1d9d0ec1bc72",
+        "relationship_evidence_sha256": "3692605343c666c8e49d0cdf57086a46a2a411a59367e65df7ba2e30b9527451",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20261005000000_runtime_truth_mirror_alignment.sql",
@@ -7292,7 +8150,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "907d533e7deee05508b353bf970a2f42ae7142b2a29b1b7f8ebc9b96dfab647a",
+        "relationship_evidence_sha256": "fd72e5fa58a4f93a7d2b3b50c889a5e5113e51f224159b2a45414abe2a340764",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20261005000001_fix_calculate_team_strength_ambiguity.sql",
@@ -7320,7 +8183,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "b39e373f12c4d412347aba499d6d16fc9716fe9350889fb0f911f266cf6a5068",
+        "relationship_evidence_sha256": "60690d5fb2aed04f48310a6925b2b6e247f706806fdd61a34c84a80c9931cb8d",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20261006000000_sportsdataio_contract_alignment.sql",
@@ -7353,7 +8221,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "c80ea1cafe93396c2eefd0d966be27193abfa0cdad500ed29fd94d84fcef44ad",
+        "relationship_evidence_sha256": "d3a2aacd609fc12fa1d6a3461299b49c6f7b23d908a9f63e1a1db23de420561c",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20261006000001_canonical_events.sql",
@@ -7382,7 +8255,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "f929192a75772c48c3d5878b8d29544e4c9201317ee1e8371aefc129cdb06494",
+        "relationship_evidence_sha256": "6258026f388524934655e1243378792ff5322d9cade0fc3f242cba07e618d3fe",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/migrations/20261007000000_user_experience_feedback.sql",
@@ -7410,7 +8288,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "1b9fb789f9e1b8983c5544db274671c5e29d2dbac7ab0e61a78ec91787891c75",
+        "relationship_evidence_sha256": "3f551ac54d7cf9b80c447b4f3124b38ae6af884c01fad628d0f30eeb49d9f987",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "supabase/schema/ai_pipeline_schema.sql",
@@ -7437,33 +8320,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
-    },
-    {
-      "asset_path": "temp_migrate.js",
-      "source_state": "PRE_EXISTING_UNTRACKED",
-      "surface_classes": [
-        "DATABASE_SURFACE",
-        "SCOUT_FIP_SURFACE"
-      ],
-      "reachability_state": "CANDIDATE",
-      "mount_paths": [],
-      "runtime_callers": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [],
-      "external_providers": [],
-      "environment_key_names": [],
-      "database_role": "CONNECTION_OR_CLIENT",
-      "database_objects": [],
-      "schedule_or_trigger": "",
-      "deployment_surface": "",
-      "governance_reachability_type": "NONE",
-      "governed_by_control_task_id": "ESA-001",
-      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
-      "evidence": [
-        "Static package/deployment/import/mount evidence."
-      ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "e4759b749a7741fe87fe4eca73680b921450ed1253313e5cf2da26cb1e02f7e2",
+        "relationship_evidence_sha256": "0bab0b71c0d491320bfa725d7a3bce6a481b3740220d9f95c55cfeaac16f27da",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "test_scenarios_master_rulebook.js",
@@ -7490,33 +8352,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
-    },
-    {
-      "asset_path": "try_regions.js",
-      "source_state": "PRE_EXISTING_UNTRACKED",
-      "surface_classes": [
-        "DATABASE_SURFACE",
-        "SCOUT_FIP_SURFACE"
-      ],
-      "reachability_state": "CANDIDATE",
-      "mount_paths": [],
-      "runtime_callers": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [],
-      "external_providers": [],
-      "environment_key_names": [],
-      "database_role": "CONNECTION_OR_CLIENT",
-      "database_objects": [],
-      "schedule_or_trigger": "",
-      "deployment_surface": "",
-      "governance_reachability_type": "NONE",
-      "governed_by_control_task_id": "ESA-001",
-      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
-      "evidence": [
-        "Static package/deployment/import/mount evidence."
-      ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "1960e7275ca4bd511ab9c1d5c9f7e9d3e7697206dfd618f2131c6c41cf2eb461",
+        "relationship_evidence_sha256": "9721dec61bddc59bd63f40b73d4283bf24271ef400d50c0a7fc925f3601ca2cd",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     },
     {
       "asset_path": "vercel.json",
@@ -7541,7 +8382,12 @@
       "evidence": [
         "Static package/deployment/import/mount evidence."
       ],
-      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture."
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "01509ce28cb9dcb4e7bd0281bfc56af24888ed92e8cc1920bd99efcb9e8c857c",
+        "relationship_evidence_sha256": "66f31c60c403506e96eaf175c3789e9e333b726050053482ea7f6de2c1c3d6f4",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
     }
   ]
 }

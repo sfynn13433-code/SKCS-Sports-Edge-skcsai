@@ -101,6 +101,180 @@ const INVENTORY_SEMANTICS_DEFAULTS = {
   database_visibility_establishes_retention: false,
 };
 
+// ESA-RR-002 Option A — provenance-backed runtime inventory reproducibility.
+// Contract Phase B/G/H: runtime-derived three-state source presence.
+const SOURCE_PRESENCE_STATES = new Set([
+  "PRESENT_TRACKED",
+  "PRESENT_PRESERVED_CANDIDATE",
+  "ABSENT_PRESERVED_CANDIDATE",
+]);
+
+const RELATIONSHIP_EVIDENCE_PROVENANCE_FIELDS = [
+  "source_content_sha256",
+  "relationship_evidence_sha256",
+  "captured_source_presence_state",
+];
+
+function isValidSha256Hex(value) {
+  return typeof value === "string" && /^[0-9a-f]{64}$/u.test(value);
+}
+
+function sha256HexOfBuffer(buffer) {
+  return crypto.createHash("sha256").update(buffer).digest("hex");
+}
+
+function readSourceBytesIfPresent(relativePath) {
+  const filePath = path.join(ROOT, relativePath);
+  if (!fs.existsSync(filePath)) return null;
+  const st = fs.statSync(filePath);
+  if (!st.isFile()) return null;
+  // IMPORTANT: hash the exact current bytes (no UTF-8 re-encoding).
+  return fs.readFileSync(filePath);
+}
+
+function computeSourcePresenceStateForPath({
+  assetRegister,
+  relativePath,
+  trackedSet,
+  preservedCandidateSet,
+}) {
+  const rel = normalizePath(relativePath);
+  const isTracked = trackedSet.has(rel);
+  const isPreservedCandidate = preservedCandidateSet.has(rel);
+  const filePath = path.join(ROOT, rel);
+  const sourcePresent = fs.existsSync(filePath) && fs.statSync(filePath).isFile();
+
+  // Contract Phase B: exactly one of the three approved states.
+  if (isTracked && sourcePresent) return "PRESENT_TRACKED";
+  if (isPreservedCandidate && sourcePresent)
+    return "PRESENT_PRESERVED_CANDIDATE";
+  if (isPreservedCandidate && !sourcePresent)
+    return "ABSENT_PRESERVED_CANDIDATE";
+
+  // "Unclassifiable" is governed by existing fail-closed candidate/runtime discovery law.
+  return null;
+}
+
+function normalizeRelationshipCanonicalScalar(value) {
+  if (value === undefined || value === null) return null;
+  const normalized = String(value).trim();
+  return normalized.length > 0 ? normalized : null;
+}
+
+function normalizeRelationshipCanonicalList(value) {
+  const items = Array.isArray(value) ? value : [];
+  return [...new Set(items.map((item) => String(item).trim()).filter(Boolean))].sort();
+}
+
+function canonicalRelationshipEvidenceObjectForFingerprint(fields) {
+  // Contract Phase E: five keys in this exact order.
+  return {
+    database_role: normalizeRelationshipCanonicalScalar(fields.database_role),
+    database_objects: normalizeRelationshipCanonicalList(
+      fields.database_objects
+    ),
+    schedule_or_trigger: normalizeRelationshipCanonicalScalar(fields.schedule_or_trigger),
+    deployment_surface: normalizeRelationshipCanonicalScalar(fields.deployment_surface),
+    governance_reachability: normalizeRelationshipCanonicalScalar(
+      fields.governance_reachability
+    ),
+  };
+}
+
+function relationshipEvidenceSha256FromCanonicalSemantic(fields) {
+  const canonical = canonicalRelationshipEvidenceObjectForFingerprint(fields);
+  const json = JSON.stringify(canonical);
+  const buf = Buffer.from(json, "utf8");
+  return sha256HexOfBuffer(buf);
+}
+
+function computeRelationshipEvidenceFingerprintFromInventorySurface(surface) {
+  return relationshipEvidenceSha256FromCanonicalSemantic({
+    database_role: surface.database_role,
+    database_objects: surface.database_objects,
+    schedule_or_trigger: surface.schedule_or_trigger,
+    deployment_surface: surface.deployment_surface,
+    governance_reachability: surface.governance_reachability_type,
+  });
+}
+
+function computeRelationshipEvidenceFingerprintFromExtractedFields(fields) {
+  return relationshipEvidenceSha256FromCanonicalSemantic({
+    database_role: fields.database_role,
+    database_objects: fields.database_objects,
+    schedule_or_trigger: fields.schedule_or_trigger,
+    deployment_surface: fields.deployment_surface,
+    governance_reachability: fields.governance_reachability_type,
+  });
+}
+
+function readRelationshipEvidenceFieldsFromSource(relativePath, sourceText, ruleAuthPaths) {
+  const isCodeLikeFile = isCodeLike(relativePath);
+  const isSqlFile = /\.sql$/iu.test(relativePath);
+
+  const databaseRole =
+    isCodeLikeFile || isSqlFile
+      ? detectDatabaseRole(relativePath, sourceText)
+      : "NONE";
+
+  const databaseObjects =
+    databaseRole !== "NONE" || isSqlFile
+      ? extractDatabaseObjects(relativePath, sourceText)
+      : [];
+
+  const scheduleOrTrigger = extractScheduleOrTrigger(relativePath, sourceText);
+
+  const deploymentSurface = detectDeploymentSurface(relativePath);
+
+  const governanceReachabilityType = ruleAuthPaths.has(relativePath)
+    ? detectGovernanceReachability(relativePath, sourceText)
+    : "NONE";
+
+  return {
+    database_role: databaseRole,
+    database_objects: databaseObjects,
+    schedule_or_trigger: scheduleOrTrigger || "",
+    deployment_surface: deploymentSurface || "",
+    governance_reachability_type: governanceReachabilityType || "NONE",
+  };
+}
+
+function validateRelationshipEvidenceProvenanceSchema({ assetPath, provenance, capturedAllowedOnly }) {
+  const requiredKeys = RELATIONSHIP_EVIDENCE_PROVENANCE_FIELDS;
+  if (!provenance || typeof provenance !== "object" || Array.isArray(provenance)) {
+    return [`ESA_RR_002_PROVENANCE_SCHEMA_INVALID: ${assetPath}: not an object`];
+  }
+
+  const keys = Object.keys(provenance).sort();
+  const requiredSorted = [...requiredKeys].sort();
+  if (JSON.stringify(keys) !== JSON.stringify(requiredSorted)) {
+    return [
+      `ESA_RR_002_PROVENANCE_SCHEMA_INVALID: ${assetPath}: wrong keys`,
+    ];
+  }
+
+  if (capturedAllowedOnly) {
+    if (!capturedAllowedOnly.has(provenance.captured_source_presence_state)) {
+      return [
+        `ESA_RR_002_PROVENANCE_SCHEMA_INVALID: ${assetPath}: captured_source_presence_state invalid`,
+      ];
+    }
+  }
+
+  if (!isValidSha256Hex(provenance.source_content_sha256)) {
+    return [
+      `ESA_RR_002_PROVENANCE_SCHEMA_INVALID: ${assetPath}: source_content_sha256 invalid`,
+    ];
+  }
+  if (!isValidSha256Hex(provenance.relationship_evidence_sha256)) {
+    return [
+      `ESA_RR_002_PROVENANCE_SCHEMA_INVALID: ${assetPath}: relationship_evidence_sha256 invalid`,
+    ];
+  }
+
+  return [];
+}
+
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
@@ -783,6 +957,9 @@ function discoverMaterialSurfaces(assetRegister) {
   const deploymentRoots = deploymentRuntimeRoots(universe);
   const runtimeRoots = uniqueSorted([...packageRoots, ...deploymentRoots]);
 
+  const trackedSet = new Set(trackedPaths());
+  const preservedCandidateSet = new Set(governedCandidatePaths(assetRegister));
+
   const reachableList = discoverReachableGraph(runtimeRoots);
   const reachable = new Set(reachableList);
   const reachableRootsSet = new Set(reachableList);
@@ -803,6 +980,14 @@ function discoverMaterialSurfaces(assetRegister) {
   const surfaces = [];
 
   for (const relativePath of universe) {
+    const relNorm = normalizePath(relativePath);
+    const isAbsentPreservedCandidate =
+      preservedCandidateSet.has(relNorm) &&
+      !(
+        fs.existsSync(path.join(ROOT, relNorm)) &&
+        fs.statSync(path.join(ROOT, relNorm)).isFile()
+      );
+
     // Avoid scanning binaries/zips/archives as UTF-8, which can produce massive false positives.
     // Discovery must be observational only, so for non-text artifacts we treat "source" as empty.
     const isCodeLikeFile = isCodeLike(relativePath);
@@ -821,7 +1006,9 @@ function discoverMaterialSurfaces(assetRegister) {
       isDock ||
       isYamlOrJson;
 
-    const source = isTextLike ? readTextIfPresent(relativePath) : "";
+    const source = isTextLike && !isAbsentPreservedCandidate
+      ? readTextIfPresent(relativePath)
+      : "";
 
     const classes = new Set();
     if (runtimeRoots.includes(relativePath)) classes.add("RUNTIME_ENTRY_POINT");
@@ -830,8 +1017,14 @@ function discoverMaterialSurfaces(assetRegister) {
     if (relativePath.startsWith("backend/services/")) classes.add("SERVICE");
 
     // Only extract env/provider/db evidence from code or sql.
-    const envKeyNames = isCodeLikeFile ? extractEnvironmentKeyNames(source) : [];
-    const providerHosts = isCodeLikeFile ? extractProviderHosts(source) : [];
+    const envKeyNames =
+      isCodeLikeFile && !isAbsentPreservedCandidate
+        ? extractEnvironmentKeyNames(source)
+        : [];
+    const providerHosts =
+      isCodeLikeFile && !isAbsentPreservedCandidate
+        ? extractProviderHosts(source)
+        : [];
 
     if (providerHosts.length > 0 && reachable.has(relativePath)) {
       classes.add("EXTERNAL_PROVIDER");
@@ -841,14 +1034,17 @@ function discoverMaterialSurfaces(assetRegister) {
       classes.add("SCOUT_FIP_SURFACE");
     }
 
-    const databaseRole = isCodeLikeFile || isSqlFile
-      ? detectDatabaseRole(relativePath, source)
-      : "NONE";
+    const databaseRole =
+      isAbsentPreservedCandidate || (!isCodeLikeFile && !isSqlFile)
+        ? "NONE"
+        : detectDatabaseRole(relativePath, source);
     if (databaseRole !== "NONE") {
       classes.add("DATABASE_SURFACE");
     }
 
-    const scheduleOrTrigger = extractScheduleOrTrigger(relativePath, source);
+    const scheduleOrTrigger = isAbsentPreservedCandidate
+      ? ""
+      : extractScheduleOrTrigger(relativePath, source);
     if (scheduleOrTrigger) {
       classes.add("SCHEDULED_EXECUTION");
     }
@@ -901,13 +1097,19 @@ function discoverMaterialSurfaces(assetRegister) {
       environment_key_names: envKeyNames,
       database_role: databaseRole,
       database_objects:
-        databaseRole !== "NONE" || isSqlFile ? extractDatabaseObjects(relativePath, source) : [],
+        isAbsentPreservedCandidate
+          ? []
+          : databaseRole !== "NONE" || isSqlFile
+            ? extractDatabaseObjects(relativePath, source)
+            : [],
 
       schedule_or_trigger: scheduleOrTrigger || "",
       deployment_surface: deploymentSurface || "",
 
       governance_reachability_type: ruleAuthPaths.has(relativePath)
-        ? detectGovernanceReachability(relativePath, source)
+        ? isAbsentPreservedCandidate
+          ? "NONE"
+          : detectGovernanceReachability(relativePath, source)
         : "NONE",
 
       governed_by_control_task_id: "ESA-001",
@@ -1043,6 +1245,115 @@ function validateInventory({ ledger, assetRegister, inventory, mapText }) {
     }
   }
 
+  // ESA-RR-002 Option A provenance-backed retention validation (sealed).
+  const trackedSet = new Set(trackedPaths());
+  const preservedCandidateSet = new Set(governedCandidatePaths(assetRegister));
+  const ruleAuthPaths = authorityCandidatePaths(assetRegister);
+  const capturedPresentOnly = new Set([
+    "PRESENT_TRACKED",
+    "PRESENT_PRESERVED_CANDIDATE",
+  ]);
+
+  for (const surface of inventory.surfaces) {
+    const assetPath = normalizePath(surface.asset_path);
+
+    const presenceState = computeSourcePresenceStateForPath({
+      assetRegister,
+      relativePath: assetPath,
+      trackedSet,
+      preservedCandidateSet,
+    });
+
+    if (!presenceState || !SOURCE_PRESENCE_STATES.has(presenceState)) {
+      errors.push(
+        `ESA_RR_002_SOURCE_PRESENCE_UNCLASSIFIABLE: ${surface.asset_path}`
+      );
+      continue;
+    }
+
+    const provenance = surface.relationship_evidence_provenance;
+
+    const schemaErrors = validateRelationshipEvidenceProvenanceSchema({
+      assetPath: surface.asset_path,
+      provenance,
+      capturedAllowedOnly: capturedPresentOnly,
+    });
+    if (schemaErrors.length) {
+      errors.push(...schemaErrors);
+      continue;
+    }
+
+    // Binding law: provenance.relationship_evidence_sha256 must bind to the
+    // committed governed relationship-evidence fields in the inventory.
+    const committedRelEvidenceFingerprint =
+      computeRelationshipEvidenceFingerprintFromInventorySurface(surface);
+
+    if (
+      provenance.relationship_evidence_sha256 !==
+      committedRelEvidenceFingerprint
+    ) {
+      errors.push(
+        `ESA_RR_002_RELATIONSHIP_EVIDENCE_PROVENANCE_BINDING_FAIL: ${surface.asset_path}`
+      );
+      continue;
+    }
+
+    if (presenceState === "ABSENT_PRESERVED_CANDIDATE") {
+      // Phase F: fail-closed absent-candidate retention.
+      // IMPORTANT: no synthetic source text reads and no relationship extractors.
+      continue;
+    }
+
+    // Phase G: returning-source conflict (and present-source validation).
+    const sourceBytes = readSourceBytesIfPresent(assetPath);
+    if (!sourceBytes) {
+      errors.push(`ESA_RR_002_SOURCE_BYTES_MISSING: ${surface.asset_path}`);
+      continue;
+    }
+
+    const currentSourceContentSha256 = sha256HexOfBuffer(sourceBytes);
+    if (currentSourceContentSha256 !== provenance.source_content_sha256) {
+      errors.push(
+        `ESA_RR_002_SOURCE_CONTENT_SHA_DRIFT: ${surface.asset_path}`
+      );
+    }
+
+    const sourceText = readTextIfPresent(assetPath);
+    const extractedFields = readRelationshipEvidenceFieldsFromSource(
+      assetPath,
+      sourceText,
+      ruleAuthPaths
+    );
+    const currentRelEvidenceFingerprint =
+      computeRelationshipEvidenceFingerprintFromExtractedFields(extractedFields);
+
+    if (
+      currentRelEvidenceFingerprint !==
+      provenance.relationship_evidence_sha256
+    ) {
+      errors.push(
+        `ESA_RR_002_RELATIONSHIP_EVIDENCE_HASH_DRIFT: ${surface.asset_path}`
+      );
+    }
+
+    // Semantic relationship comparator check against committed inventory.
+    const discoveredRecord = {
+      asset_path: surface.asset_path,
+      database_role: extractedFields.database_role,
+      database_objects: extractedFields.database_objects,
+      schedule_or_trigger: extractedFields.schedule_or_trigger,
+      deployment_surface: extractedFields.deployment_surface,
+      governance_reachability_type: extractedFields.governance_reachability_type,
+    };
+
+    const findings = compareRelationshipEvidence(discoveredRecord, surface);
+    for (const finding of findings) {
+      errors.push(
+        `ESA_RR_002_RELATIONSHIP_SEMANTIC_DRIFT: ${surface.asset_path} field=${finding.field}`
+      );
+    }
+  }
+
   // Completeness + fail-closed: every discovered material surface must exist in the inventory.
   const discovered = discoverMaterialSurfaces(assetRegister);
   const discoveredByPath = new Map(discovered.map((s) => [normalizePath(s.asset_path), s]));
@@ -1058,6 +1369,16 @@ function validateInventory({ ledger, assetRegister, inventory, mapText }) {
       errors.push(`MATERIAL_RUNTIME_SURFACE_UNGOVERNED: ${discoveredSurface.asset_path}`);
       continue;
     }
+
+    // Phase F: absent preserved candidates must not be drift-compared using
+    // synthetic empty source content; provenance checks cover fail-closed behavior.
+    const discoveredIsAbsentPreservedCandidate =
+      preservedCandidateSet.has(assetPath) &&
+      !(
+        fs.existsSync(path.join(ROOT, assetPath)) &&
+        fs.statSync(path.join(ROOT, assetPath)).isFile()
+      );
+    if (discoveredIsAbsentPreservedCandidate) continue;
 
     for (const surfaceClass of discoveredSurface.surface_classes) {
       if (!inv.surface_classes.includes(surfaceClass)) {
@@ -1079,7 +1400,10 @@ function validateInventory({ ledger, assetRegister, inventory, mapText }) {
 
   // Map sync
   const expectedMap = renderRuntimeMap(inventory);
-  if (mapText !== expectedMap) {
+  const normalizeNewlines = (s) =>
+    String(s).replace(/\r\n/gu, "\n").replace(/\r/gu, "\n");
+
+  if (normalizeNewlines(mapText) !== normalizeNewlines(expectedMap)) {
     errors.push("RUNTIME_MAP_OUT_OF_SYNC");
   }
 
@@ -1102,34 +1426,154 @@ function main() {
     const surfaces = discoverMaterialSurfaces(assetRegister);
 
     if (args.has("--write-inventory")) {
-      const existing = fs.existsSync(INVENTORY_PATH)
-        ? readJson(INVENTORY_PATH)
-        : null;
+        const existing = fs.existsSync(INVENTORY_PATH)
+          ? readJson(INVENTORY_PATH)
+          : null;
 
-      const inventory =
-        existing && existing.surfaces && Array.isArray(existing.surfaces)
-          ? existing
-          : {
-              inventory_version: "1.0.0",
-              source_contract: {
-                control_task_id: "ESA-001",
-                repository_asset_truth:
-                  "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
-                inventory_scope:
-                  "CURRENT_STATE_STATIC_RUNTIME_AND_SYSTEM_REACHABILITY",
+        const inventory =
+          existing && existing.surfaces && Array.isArray(existing.surfaces)
+            ? existing
+            : {
+                inventory_version: "1.0.0",
+                source_contract: {
+                  control_task_id: "ESA-001",
+                  repository_asset_truth:
+                    "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
+                  inventory_scope:
+                    "CURRENT_STATE_STATIC_RUNTIME_AND_SYSTEM_REACHABILITY",
+                },
+                semantics: { ...INVENTORY_SEMANTICS_DEFAULTS },
+                surfaces: [],
+              };
+
+        // ESA-RR-002 Option A bootstrap: evidence/provenance creation for PRESENT_* only.
+        const trackedSet = new Set(trackedPaths());
+        const preservedCandidateSet = new Set(
+          governedCandidatePaths(assetRegister)
+        );
+        const ruleAuthPaths = authorityCandidatePaths(assetRegister);
+        const existingByPath = new Map(
+          (inventory.surfaces || []).map((s) => [
+            normalizePath(s.asset_path),
+            s,
+          ])
+        );
+        const capturedPresentOnly = new Set([
+          "PRESENT_TRACKED",
+          "PRESENT_PRESERVED_CANDIDATE",
+        ]);
+
+        const bootstrappedSurfaces = surfaces
+          .map((discovered) => {
+            const assetPath = normalizePath(discovered.asset_path);
+            const presenceState = computeSourcePresenceStateForPath({
+              assetRegister,
+              relativePath: assetPath,
+              trackedSet,
+              preservedCandidateSet,
+            });
+
+            if (!presenceState || !SOURCE_PRESENCE_STATES.has(presenceState)) {
+              return {
+                ...discovered,
+                // This will fail validation later; fail-closed is enforced in tests/validation.
+                relationship_evidence_provenance: undefined,
+              };
+            }
+
+            if (presenceState === "ABSENT_PRESERVED_CANDIDATE") {
+              // Phase F + H: carry-forward only; no newly created provenance.
+              const committed = existingByPath.get(assetPath);
+              if (!committed) {
+                return {
+                  ...discovered,
+                  relationship_evidence_provenance: undefined,
+                };
+              }
+
+              const schemaErrors = validateRelationshipEvidenceProvenanceSchema(
+                {
+                  assetPath: committed.asset_path,
+                  provenance: committed.relationship_evidence_provenance,
+                  capturedAllowedOnly: capturedPresentOnly,
+                }
+              );
+              if (schemaErrors.length) {
+                return {
+                  ...discovered,
+                  relationship_evidence_provenance: undefined,
+                };
+              }
+
+              const committedFingerprint =
+                computeRelationshipEvidenceFingerprintFromInventorySurface(
+                  committed
+                );
+
+              if (
+                committed.relationship_evidence_provenance
+                  .relationship_evidence_sha256 !== committedFingerprint
+              ) {
+                return {
+                  ...discovered,
+                  relationship_evidence_provenance: undefined,
+                };
+              }
+
+              return committed;
+            }
+
+            // PRESENT_TRACKED / PRESENT_PRESERVED_CANDIDATE: regenerate from present source.
+            const sourceBytes = readSourceBytesIfPresent(assetPath);
+            if (!sourceBytes) {
+              return {
+                ...discovered,
+                relationship_evidence_provenance: undefined,
+              };
+            }
+
+            const sourceText = readTextIfPresent(assetPath);
+            const extractedFields = readRelationshipEvidenceFieldsFromSource(
+              assetPath,
+              sourceText,
+              ruleAuthPaths
+            );
+
+            const relationshipEvidenceSha256 =
+              computeRelationshipEvidenceFingerprintFromExtractedFields(
+                extractedFields
+              );
+
+            const sourceContentSha256 = sha256HexOfBuffer(sourceBytes);
+
+            return {
+              ...discovered,
+              database_role: extractedFields.database_role,
+              database_objects: extractedFields.database_objects,
+              schedule_or_trigger: extractedFields.schedule_or_trigger,
+              deployment_surface: extractedFields.deployment_surface,
+              governance_reachability_type:
+                extractedFields.governance_reachability_type,
+              relationship_evidence_provenance: {
+                source_content_sha256: sourceContentSha256,
+                relationship_evidence_sha256: relationshipEvidenceSha256,
+                captured_source_presence_state: presenceState,
               },
-              semantics: { ...INVENTORY_SEMANTICS_DEFAULTS },
-              surfaces: [],
             };
+          })
+          // Keep deterministic ordering.
+          .sort((a, b) => a.asset_path.localeCompare(b.asset_path));
 
-      inventory.surfaces = surfaces;
-      if (!inventory.semantics) inventory.semantics = { ...INVENTORY_SEMANTICS_DEFAULTS };
-      fs.writeFileSync(
-        INVENTORY_PATH,
-        `${JSON.stringify(inventory, null, 2)}\n`,
-        "utf8"
-      );
-      return;
+        inventory.surfaces = bootstrappedSurfaces;
+        if (!inventory.semantics)
+          inventory.semantics = { ...INVENTORY_SEMANTICS_DEFAULTS };
+
+        fs.writeFileSync(
+          INVENTORY_PATH,
+          `${JSON.stringify(inventory, null, 2)}\n`,
+          "utf8"
+        );
+        return;
     }
 
     process.stdout.write(`${JSON.stringify(surfaces, null, 2)}\n`);
@@ -1188,6 +1632,10 @@ module.exports = {
   discoverMaterialSurfaces,
   renderRuntimeMap,
   validateInventory,
+  computeRelationshipEvidenceFingerprintFromInventorySurface,
+  computeRelationshipEvidenceFingerprintFromExtractedFields,
+  computeSourcePresenceStateForPath,
+  readRelationshipEvidenceFieldsFromSource,
   detectDatabaseRole,
   extractDatabaseObjects,
   detectDeploymentSurface,

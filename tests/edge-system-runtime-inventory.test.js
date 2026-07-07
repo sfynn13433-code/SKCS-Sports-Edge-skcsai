@@ -1,7 +1,9 @@
 "use strict";
 
 const assert = require("node:assert/strict");
+const crypto = require("node:crypto");
 const fs = require("node:fs");
+const { execFileSync } = require("node:child_process");
 const path = require("node:path");
 const test = require("node:test");
 
@@ -9,6 +11,10 @@ const {
   discoverMaterialSurfaces,
   renderRuntimeMap,
   validateInventory,
+  computeRelationshipEvidenceFingerprintFromInventorySurface,
+  computeRelationshipEvidenceFingerprintFromExtractedFields,
+  computeSourcePresenceStateForPath,
+  readRelationshipEvidenceFieldsFromSource,
   detectDatabaseRole,
   detectDeploymentSurface,
   extractScheduleOrTrigger,
@@ -560,4 +566,440 @@ test("Canonical checker emits RUNTIME_RELATIONSHIP_EVIDENCE_DRIFT when supported
 
   assert.equal(driftErrors.length, 1);
   assert.ok(driftErrors[0].includes("field=governance_reachability"));
+});
+
+// ESA-RR-002 Option A — Provenance-backed runtime inventory reproducibility contract tests.
+const normalizePathForTest = (value) =>
+  String(value || "")
+    .replaceAll("\\", "/")
+    .replace(/^\.\/+/u, "");
+
+const preservedCandidateAssetPathSet = new Set(
+  (assetRegister.workspace_candidate_snapshot?.candidates || [])
+    .filter((c) => c.candidate_disposition === "PRESERVED_CANDIDATE")
+    .map((c) => normalizePathForTest(c.asset_path))
+);
+
+const trackedAssetPathSet = new Set(
+  execFileSync("git", ["ls-files"], { cwd: ROOT, encoding: "utf8" })
+    .split(/\r?\n/u)
+    .map((p) => normalizePathForTest(p))
+    .filter(Boolean)
+);
+
+function absPathFromAssetPath(assetPath) {
+  return path.join(ROOT, normalizePathForTest(assetPath));
+}
+
+function getFirstSurfaceWithPresenceState(targetPresenceState) {
+  for (const surface of canonicalInventory.surfaces) {
+    const presenceState = computeSourcePresenceStateForPath({
+      assetRegister,
+      relativePath: surface.asset_path,
+      trackedSet: trackedAssetPathSet,
+      preservedCandidateSet: preservedCandidateAssetPathSet,
+    });
+    if (presenceState === targetPresenceState) return surface;
+  }
+  throw new Error(`No canonical surface found with presence=${targetPresenceState}`);
+}
+
+function renameFileOutOfWay(absPath) {
+  const tmp = `${absPath}.ESA-RR-TMP-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  fs.renameSync(absPath, tmp);
+  return tmp;
+}
+
+test("ESA-RR-T01 (R1 OPTION A): canonical inventory includes required provenance object schema", () => {
+  const surface = canonicalInventory.surfaces[0];
+  assert.ok(surface.relationship_evidence_provenance);
+  const prov = surface.relationship_evidence_provenance;
+  assert.deepEqual(
+    Object.keys(prov).sort(),
+    [
+      "captured_source_presence_state",
+      "relationship_evidence_sha256",
+      "source_content_sha256",
+    ].sort()
+  );
+  assert.ok(isValidHex(prov.source_content_sha256));
+  assert.ok(isValidHex(prov.relationship_evidence_sha256));
+  assert.ok(
+    ["PRESENT_TRACKED", "PRESENT_PRESERVED_CANDIDATE"].includes(
+      prov.captured_source_presence_state
+    )
+  );
+});
+
+function isValidHex(value) {
+  return typeof value === "string" && /^[0-9a-f]{64}$/u.test(value);
+}
+
+test("ESA-RR-T02 (R2 EXACT-BYTE SOURCE IDENTITY): changing bytes causes SOURCE_CONTENT_SHA drift", () => {
+  const surface = getFirstSurfaceWithPresenceState("PRESENT_PRESERVED_CANDIDATE");
+  const absPath = absPathFromAssetPath(surface.asset_path);
+
+  const originalBytes = fs.readFileSync(absPath);
+  const modifiedBytes = Buffer.concat([
+    originalBytes,
+    Buffer.from("\nESA-RR-T02-append\n", "utf8"),
+  ]);
+
+  try {
+    fs.writeFileSync(absPath, modifiedBytes);
+
+    const result = validate(clone(canonicalInventory));
+    const drift = result.errors.filter((e) =>
+      e.includes("ESA_RR_002_SOURCE_CONTENT_SHA_DRIFT")
+    );
+    assert.ok(drift.length >= 1);
+  } finally {
+    fs.writeFileSync(absPath, originalBytes);
+  }
+});
+
+test("ESA-RR-T03 (R3 SOURCE-PRESENCE STATES): present preserved-candidate becomes ABSENT preserved-candidate", () => {
+  const surface = getFirstSurfaceWithPresenceState("PRESENT_PRESERVED_CANDIDATE");
+  const absPath = absPathFromAssetPath(surface.asset_path);
+
+  const originalState = computeSourcePresenceStateForPath({
+    assetRegister,
+    relativePath: surface.asset_path,
+    trackedSet: trackedAssetPathSet,
+    preservedCandidateSet: preservedCandidateAssetPathSet,
+  });
+  assert.equal(originalState, "PRESENT_PRESERVED_CANDIDATE");
+
+  const tmpPath = renameFileOutOfWay(absPath);
+  try {
+    const absentState = computeSourcePresenceStateForPath({
+      assetRegister,
+      relativePath: surface.asset_path,
+      trackedSet: trackedAssetPathSet,
+      preservedCandidateSet: preservedCandidateAssetPathSet,
+    });
+    assert.equal(absentState, "ABSENT_PRESERVED_CANDIDATE");
+  } finally {
+    fs.renameSync(tmpPath, absPath);
+  }
+});
+
+test("ESA-RR-T05 (R5 ABSENT EVIDENCE RETENTION): absent preserved candidate retains canonical validation", () => {
+  const surface = getFirstSurfaceWithPresenceState("PRESENT_PRESERVED_CANDIDATE");
+  const absPath = absPathFromAssetPath(surface.asset_path);
+
+  const originalState = computeSourcePresenceStateForPath({
+    assetRegister,
+    relativePath: surface.asset_path,
+    trackedSet: trackedAssetPathSet,
+    preservedCandidateSet: preservedCandidateAssetPathSet,
+  });
+  assert.equal(originalState, "PRESENT_PRESERVED_CANDIDATE");
+
+  const tmpPath = renameFileOutOfWay(absPath);
+  try {
+    const result = validate(clone(canonicalInventory));
+    assert.equal(result.errors.length, 0, result.errors.join("; "));
+  } finally {
+    fs.renameSync(tmpPath, absPath);
+  }
+});
+
+test("ESA-RR-T04 (R4 NO SYNTHETIC EMPTY SOURCE): absent validation passes even when evidence differs from what empty source would yield", () => {
+  const surface = getFirstSurfaceWithPresenceState("PRESENT_PRESERVED_CANDIDATE");
+  const absPath = absPathFromAssetPath(surface.asset_path);
+
+  const tmpPath = renameFileOutOfWay(absPath);
+  try {
+    const inventory = clone(canonicalInventory);
+    const s = inventory.surfaces.find((x) => x.asset_path === surface.asset_path);
+    assert.ok(s);
+
+    // Mutate the committed governed relationship evidence fields.
+    s.database_role = "NONE";
+    s.database_objects = [];
+    s.schedule_or_trigger = "";
+    s.deployment_surface = s.deployment_surface || "";
+
+    // Update only the governed relationship fingerprint to keep absent-retained provenance bound.
+    s.relationship_evidence_provenance.relationship_evidence_sha256 =
+      computeRelationshipEvidenceFingerprintFromInventorySurface(s);
+
+    const result = validate(inventory);
+    assert.equal(result.errors.length, 0, result.errors.join("; "));
+  } finally {
+    fs.renameSync(tmpPath, absPath);
+  }
+});
+
+test("ESA-RR-T06 (R6 PROVENANCE BINDING): absent preserved-candidate fails closed when provenance fingerprint no longer binds", () => {
+  const surface = getFirstSurfaceWithPresenceState("PRESENT_PRESERVED_CANDIDATE");
+  const absPath = absPathFromAssetPath(surface.asset_path);
+  const tmpPath = renameFileOutOfWay(absPath);
+  try {
+    const inventory = clone(canonicalInventory);
+    const s = inventory.surfaces.find((x) => x.asset_path === surface.asset_path);
+    assert.ok(s);
+
+    // Break the relationship-evidence binding while source is absent.
+    const prov = s.relationship_evidence_provenance;
+    assert.ok(prov && prov.relationship_evidence_sha256);
+    prov.relationship_evidence_sha256 =
+      prov.relationship_evidence_sha256.slice(0, -1) + (prov.relationship_evidence_sha256.slice(-1) === "a" ? "b" : "a");
+
+    const result = validate(inventory);
+    assert.ok(result.errors.some((e) => e.includes("ESA_RR_002_RELATIONSHIP_EVIDENCE_PROVENANCE_BINDING_FAIL")));
+  } finally {
+    fs.renameSync(tmpPath, absPath);
+  }
+});
+
+test("ESA-RR-T07 (R7 FAIL-CLOSED INVALID PROVENANCE): absent preserved-candidate fails closed on schema invalid provenance", () => {
+  const surface = getFirstSurfaceWithPresenceState("PRESENT_PRESERVED_CANDIDATE");
+  const absPath = absPathFromAssetPath(surface.asset_path);
+  const tmpPath = renameFileOutOfWay(absPath);
+  try {
+    const inventory = clone(canonicalInventory);
+    const s = inventory.surfaces.find((x) => x.asset_path === surface.asset_path);
+    assert.ok(s);
+
+    s.relationship_evidence_provenance = {
+      // Missing required keys intentionally.
+      source_content_sha256: s.relationship_evidence_provenance.source_content_sha256,
+    };
+
+    const result = validate(inventory);
+    assert.ok(
+      result.errors.some((e) => e.includes("ESA_RR_002_PROVENANCE_SCHEMA_INVALID")),
+      result.errors.join("; ")
+    );
+  } finally {
+    fs.renameSync(tmpPath, absPath);
+  }
+});
+
+test("ESA-RR-T08 (R8 RETURNING-SOURCE REREAD): absent then returning modified bytes triggers SOURCE_CONTENT_SHA drift", () => {
+  const surface = getFirstSurfaceWithPresenceState("PRESENT_PRESERVED_CANDIDATE");
+  const absPath = absPathFromAssetPath(surface.asset_path);
+
+  const originalBytes = fs.readFileSync(absPath);
+  const tmpPath = renameFileOutOfWay(absPath);
+  let restored = false;
+  try {
+    const absentResult = validate(clone(canonicalInventory));
+    assert.equal(absentResult.errors.length, 0, absentResult.errors.join("; "));
+
+    const modifiedBytes = Buffer.concat([
+      originalBytes,
+      Buffer.from("\nESA-RR-T08-mod\n", "utf8"),
+    ]);
+    fs.renameSync(tmpPath, absPath);
+    restored = true;
+    fs.writeFileSync(absPath, modifiedBytes);
+
+    const returningResult = validate(clone(canonicalInventory));
+    assert.ok(
+      returningResult.errors.some((e) =>
+        e.includes("ESA_RR_002_SOURCE_CONTENT_SHA_DRIFT")
+      ),
+      returningResult.errors.join("; ")
+    );
+  } finally {
+    // Restore original bytes and source.
+    fs.writeFileSync(absPath, originalBytes);
+    if (!restored) fs.renameSync(tmpPath, absPath);
+  }
+});
+
+test("ESA-RR-T09 (R9 RETURNING-SOURCE RE-EXTRACTION): present-source semantic evidence mismatches after inventory evidence tampering", () => {
+  const surface = getFirstSurfaceWithPresenceState("PRESENT_PRESERVED_CANDIDATE");
+  const inventory = clone(canonicalInventory);
+  const s = inventory.surfaces.find((x) => x.asset_path === surface.asset_path);
+  assert.ok(s);
+
+  // Tamper with governed semantic evidence fields.
+  s.database_role = "NONE";
+  s.database_objects = [];
+
+  // Keep provenance fingerprint "internally" bound to the tampered inventory fields.
+  // Validation must still re-extract from the real source and reject mismatches.
+  s.relationship_evidence_provenance.relationship_evidence_sha256 =
+    computeRelationshipEvidenceFingerprintFromInventorySurface(s);
+
+  const result = validate(inventory);
+  assert.ok(
+    result.errors.some((e) => e.includes("ESA_RR_002_RELATIONSHIP_EVIDENCE_HASH_DRIFT")) ||
+      result.errors.some((e) => e.includes("ESA_RR_002_RELATIONSHIP_SEMANTIC_DRIFT")),
+    result.errors.join("; ")
+  );
+});
+
+test("ESA-RR-T10 (R10 GOVERNED RELATIONSHIP FIELDS): non-governed inventory fields can change without failing provenance validation", () => {
+  const inventory = clone(canonicalInventory);
+  const s = inventory.surfaces[0];
+  assert.ok(s);
+  s.evidence = ["Non-governed note changed for T10 proof"];
+
+  const result = validate(inventory);
+  assert.equal(result.errors.length, 0, result.errors.join("; "));
+});
+
+test("ESA-RR-T11 (R11 CLEAN-CHECKOUT REPRODUCIBILITY): validation passes when all preserved-candidate sources are absent", () => {
+  const preservedSurfaces = canonicalInventory.surfaces.filter((s) =>
+    preservedCandidateAssetPathSet.has(normalizePathForTest(s.asset_path))
+  );
+  assert.ok(preservedSurfaces.length > 0);
+
+  const absPaths = preservedSurfaces
+    .map((s) => absPathFromAssetPath(s.asset_path))
+    .filter((p) => fs.existsSync(p) && fs.statSync(p).isFile());
+
+  const renames = [];
+  try {
+    for (const p of absPaths) {
+      renames.push({ from: p, to: renameFileOutOfWay(p) });
+    }
+
+    const result = validate(clone(canonicalInventory));
+    assert.equal(result.errors.length, 0, result.errors.join("; "));
+  } finally {
+    for (const r of renames) {
+      fs.renameSync(r.to, r.from);
+    }
+  }
+});
+
+test("ESA-RR-T12 (R12 RETURNING-SOURCE DRIFT): returning modified bytes after clean checkout fails closed", () => {
+  const preservedSurfaces = canonicalInventory.surfaces.filter((s) =>
+    preservedCandidateAssetPathSet.has(normalizePathForTest(s.asset_path))
+  );
+  assert.ok(preservedSurfaces.length > 0);
+
+  const originalBytesByAbsPath = new Map();
+  const absPaths = preservedSurfaces
+    .map((s) => absPathFromAssetPath(s.asset_path))
+    .filter((p) => fs.existsSync(p) && fs.statSync(p).isFile());
+
+  for (const p of absPaths) {
+    originalBytesByAbsPath.set(p, fs.readFileSync(p));
+  }
+
+  const renames = [];
+  try {
+    // Clean-checkout simulation: all preserved-candidate sources are absent.
+    for (const p of absPaths) {
+      renames.push({ from: p, to: renameFileOutOfWay(p) });
+    }
+
+    const absentResult = validate(clone(canonicalInventory));
+    assert.equal(absentResult.errors.length, 0, absentResult.errors.join("; "));
+
+    // Returning-source drift: restore one file but change its bytes.
+    const firstAbs = renames[0].from;
+    const firstTmp = renames[0].to;
+    const modifiedBytes = Buffer.concat([
+      originalBytesByAbsPath.get(firstAbs),
+      Buffer.from("\nESA-RR-T12-drift\n", "utf8"),
+    ]);
+
+    fs.renameSync(firstTmp, firstAbs);
+    fs.writeFileSync(firstAbs, modifiedBytes);
+
+    const returningResult = validate(clone(canonicalInventory));
+    assert.ok(
+      returningResult.errors.some((e) =>
+        e.includes("ESA_RR_002_SOURCE_CONTENT_SHA_DRIFT")
+      ),
+      returningResult.errors.join("; ")
+    );
+  } finally {
+    // Restore everything.
+    for (const r of renames) {
+      if (!fs.existsSync(r.from)) {
+        fs.renameSync(r.to, r.from);
+      }
+      fs.writeFileSync(r.from, originalBytesByAbsPath.get(r.from));
+    }
+  }
+});
+
+test("ESA-RR-T13 (R13 MAP NEWLINE NORMALIZATION): CRLF map text still validates", () => {
+  const mapTextCRLF = canonicalMap.replace(/\n/gu, "\r\n");
+
+  const result = validateInventory({
+    ledger,
+    assetRegister,
+    inventory: canonicalInventory,
+    mapText: mapTextCRLF,
+  });
+
+  assert.equal(result.errors.length, 0, result.errors.join("; "));
+});
+
+test("ESA-RR-T14 (R14 BOOTSTRAP / VALIDATION SEPARATION): validateInventory does not mutate the provided inventory object", () => {
+  const inventory = clone(canonicalInventory);
+  const before = JSON.stringify(inventory);
+
+  const result = validate(inventory);
+  assert.equal(result.errors.length, 0, result.errors.join("; "));
+  assert.equal(JSON.stringify(inventory), before);
+});
+
+test("ESA-RR-T15 (R6 PROVENANCE BINDING + R5 ABSENT EVIDENCE RETENTION): absent validation enforces binding when evidence fields are tampered but provenance fingerprint is unchanged", () => {
+  const surface = getFirstSurfaceWithPresenceState("PRESENT_PRESERVED_CANDIDATE");
+  const absPath = absPathFromAssetPath(surface.asset_path);
+  const tmpPath = renameFileOutOfWay(absPath);
+  try {
+    const inventory = clone(canonicalInventory);
+    const s = inventory.surfaces.find((x) => x.asset_path === surface.asset_path);
+    assert.ok(s);
+
+    // Tamper with governed fields without updating provenance fingerprint.
+    s.database_role = "NONE";
+    s.database_objects = [];
+
+    const result = validate(inventory);
+    assert.ok(
+      result.errors.some((e) =>
+        e.includes("ESA_RR_002_RELATIONSHIP_EVIDENCE_PROVENANCE_BINDING_FAIL")
+      ),
+      result.errors.join("; ")
+    );
+  } finally {
+    fs.renameSync(tmpPath, absPath);
+  }
+});
+
+test("ESA-RR-T16 (R11 CLEAN-CHECKOUT REPRODUCIBILITY + R14 BOOTSTRAP / VALIDATION SEPARATION): validation is read-only during clean checkout simulation", () => {
+  const invPath = path.join(ROOT, "control-center", "EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json");
+  const mapPath = path.join(ROOT, "control-center", "EDGE_SYSTEM_RUNTIME_MAP.md");
+  const invBefore = fs.readFileSync(invPath, "utf8");
+  const mapBefore = fs.readFileSync(mapPath, "utf8");
+
+  const preservedSurfaces = canonicalInventory.surfaces.filter((s) =>
+    preservedCandidateAssetPathSet.has(normalizePathForTest(s.asset_path))
+  );
+
+  const absPaths = preservedSurfaces
+    .map((s) => absPathFromAssetPath(s.asset_path))
+    .filter((p) => fs.existsSync(p) && fs.statSync(p).isFile());
+
+  const renames = [];
+  try {
+    for (const p of absPaths) {
+      renames.push({ from: p, to: renameFileOutOfWay(p) });
+    }
+
+    const result = validate(clone(canonicalInventory));
+    assert.equal(result.errors.length, 0, result.errors.join("; "));
+  } finally {
+    for (const r of renames) {
+      fs.renameSync(r.to, r.from);
+    }
+  }
+
+  const invAfter = fs.readFileSync(invPath, "utf8");
+  const mapAfter = fs.readFileSync(mapPath, "utf8");
+  assert.equal(invAfter, invBefore);
+  assert.equal(mapAfter, mapBefore);
 });
