@@ -4580,10 +4580,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Git ignore rules for backend-local and generated artifacts (e.g., deps, secrets, sqlite/cache files).",
+      "functional_group": "UNCATEGORIZED",
+      "relationship_tags": ["CONFIGURATION"],
+      "classification_evidence": ["Contains backend ignore patterns for `node_modules/`, `.env*`, sqlite, and local backup directories."]
     },
     {
       "asset_path": "backend/adapters/f1Adapter.js",
@@ -4710,10 +4710,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Provider client layer for external sports/data calls (API-Sports + RapidAPI) with quota/circuit handling.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": ["PROVIDER", "API", "RUNTIME"],
+      "classification_evidence": ["Defines provider client wrappers (e.g., `APISportsClient`) using `axios`, key rotation (`keyPool`), and provider circuit breaker/quota gating."]
     },
     {
       "asset_path": "backend/audit/system_integrity_audit.md",
@@ -4762,10 +4762,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase audit script that inspects `canonical_events` counts and sample rows (date/sport/status distribution).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": ["DATABASE", "AUDIT", "SCRIPT_TOOL"],
+      "classification_evidence": ["Queries Supabase `canonical_events` via `supabase-js` to count total/future events and print the oldest/future samples."]
     },
     {
       "asset_path": "backend/config.js",
@@ -4788,10 +4788,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend configuration centralization: maps environment variables into runtime settings for APIs, DB, and AI providers.",
+      "functional_group": "BACKEND_RUNTIME",
+      "relationship_tags": ["CONFIGURATION", "RUNTIME"],
+      "classification_evidence": ["Exports `DATA_MODE`, DB/Supabase URLs, API keys (RapidAPI/API-Sports), and AI provider (Groq/Dolphin) parameters used across backend."]
     },
     {
       "asset_path": "backend/config/activeSports.js",
@@ -5152,10 +5152,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Primary PostgreSQL data-access layer used by the backend (pool creation + query/transaction helpers).",
+      "functional_group": "DATABASE",
+      "relationship_tags": ["DATABASE", "RUNTIME", "SQL"],
+      "classification_evidence": ["Creates a `pg` `Pool` using `config.database.url` (with Supabase pooler conversion) and exports `query()` + `withTransaction()` wrappers."]
     },
     {
       "asset_path": "backend/db.js",
@@ -5178,10 +5178,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Secondary DB abstraction: thin `pg` wrapper that exports `pool`, `query()`, and `withTransaction()` for callers that import `./db`.",
+      "functional_group": "DATABASE",
+      "relationship_tags": ["DATABASE", "RUNTIME"],
+      "classification_evidence": ["Uses `config.database.url` to build a `pg.Pool` and provides reusable `query()` and transaction helper exports."]
     },
     {
       "asset_path": "backend/dbBootstrap.js",
@@ -5204,10 +5204,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database bootstrap/migration initializer: creates required tables, views, and seed/support structures on startup.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": ["DATABASE", "MIGRATION", "SQL"],
+      "classification_evidence": ["Defines `bootstrap()` plus `ensureFinalPredictionsCompatibility()` and multiple `CREATE TABLE IF NOT EXISTS` / `CREATE OR REPLACE VIEW` statements."]
     },
     {
       "asset_path": "backend/deploy-trigger-cricket.js",
@@ -5230,10 +5230,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Operational trigger script for cricket fixture cron: calls the backend cron endpoint with `x-cron-secret`.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": ["DEPLOYMENT", "SECURITY", "SCRIPT_TOOL"],
+      "classification_evidence": ["Fetches `GET /api/cron/cricket-daily-fixtures` on the configured host and authenticates via `x-cron-secret` header."]
     },
     {
       "asset_path": "backend/deploy-trigger.js",
@@ -5256,10 +5256,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Operational trigger script for full pipeline runs: calls `/api/pipeline/run-full` using `x-api-key` auth.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": ["DEPLOYMENT", "SECURITY", "SCRIPT_TOOL"],
+      "classification_evidence": ["POSTs to `/api/pipeline/run-full` with JSON `{ source: 'weekly_rolling_scrape' }` and authenticates using `x-api-key`."]
     },
     {
       "asset_path": "backend/edgemind_inference.py",
@@ -5282,10 +5282,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Python bridge between Supabase data and the local EdgeMind (Antigravity) inference engine.",
+      "functional_group": "AI_EDGEMIND",
+      "relationship_tags": ["AI_EDGEMIND", "DATABASE", "RUNTIME"],
+      "classification_evidence": ["Fetches match snapshots from Supabase (e.g., `events`, `edge_data`, `live_momentum`, `public_intelligence`) and calls Antigravity `Agent.chat()` for inference."]
     },
     {
       "asset_path": "backend/errors/ProviderQuotaExceededError.js",
@@ -5386,10 +5386,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "npm lockfile that pins backend dependency versions (package-lock metadata and resolved package graph).",
+      "functional_group": "UNCATEGORIZED",
+      "relationship_tags": ["CONFIGURATION", "GENERATED"],
+      "classification_evidence": ["Contains `lockfileVersion` and pinned dependency graph for the backend `package.json`."]
     },
     {
       "asset_path": "backend/parsers/base_sport_parser.py",
@@ -7076,10 +7076,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Express server entrypoint: defines backend API endpoints and wires runtime services, middleware, and routers.",
+      "functional_group": "BACKEND_RUNTIME",
+      "relationship_tags": ["API", "RUNTIME", "SECURITY"],
+      "classification_evidence": ["Creates the Express app, registers `/api/*` routes (pipeline trigger, grading, sync, debug), and imports auth/subscription middleware for request gating."]
     },
     {
       "asset_path": "backend/services/accaBuilder.js",
@@ -9546,10 +9546,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Manual test harness for EdgeMind/Dolphin ultra-slim inference: sends a prompt to the Dolphin `/completion` endpoint and reports latency/response.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": ["TEST_PROOF", "AI_EDGEMIND", "RUNTIME"],
+      "classification_evidence": ["POSTs an ultra-slim prompt payload to `${DOLPHIN_URL}/completion` and logs timing, tokens, and raw content."]
     },
     {
       "asset_path": "backend/test/smoke-test-insight-engine.js",

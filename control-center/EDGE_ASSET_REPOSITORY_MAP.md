@@ -17,22 +17,38 @@ CURRENT_STATE_COUNTS
 - GENERATED: 0
 
 FUNCTIONAL_GROUP_COUNTS
-- (PENDING): 891
-- TEST_PROOF: 4
+- (PENDING): 878
+- TEST_PROOF: 5
+- BACKEND_RUNTIME: 4
 - DOCUMENTATION_KNOWLEDGE: 3
 - GENERATED_OUTPUT: 3
 - GOVERNANCE: 3
-- BACKEND_RUNTIME: 2
+- DATABASE: 2
+- DEPLOYMENT_OPERATIONS: 2
+- UNCATEGORIZED: 2
+- AI_EDGEMIND: 1
+- DATABASE_MIGRATION: 1
+- PROVIDER_INTEGRATION: 1
+- SCRIPT_TOOL: 1
 
 RELATIONSHIP_TAG_COUNTS
 - GOVERNANCE: 15
-- GENERATED: 10
+- GENERATED: 11
+- RUNTIME: 10
+- AUDIT: 8
 - RULEBOOK: 8
-- AUDIT: 7
+- DATABASE: 7
 - DOCUMENTATION: 7
-- RUNTIME: 3
-- CONFIGURATION: 2
-- DATABASE: 2
+- CONFIGURATION: 5
+- SCRIPT_TOOL: 3
+- SECURITY: 3
+- AI_EDGEMIND: 2
+- API: 2
+- DEPLOYMENT: 2
+- SQL: 2
+- MIGRATION: 1
+- PROVIDER: 1
+- TEST_PROOF: 1
 
 NEXT_VALIDATION_NON_EMPTY_ASSETS: 906
 
@@ -91,19 +107,19 @@ PER_ASSET_BY_BATCH
 ## B02 BACKEND_DIRECT_FILES
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |
 |---|---|---|---|---|---|---|
-| backend/.gitignore | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| backend/apiClients.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| backend/checkCanonicalEvents.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| backend/config.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| backend/database.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| backend/db.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| backend/dbBootstrap.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| backend/deploy-trigger-cricket.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| backend/deploy-trigger.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| backend/edgemind_inference.py | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| backend/package-lock.json | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| backend/server-express.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| backend/test-ultra-slim.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| backend/.gitignore | Git ignore rules for backend-local and generated artifacts (e.g., deps, secrets, sqlite/cache files). | UNCATEGORIZED | UNKNOWN | ["CONFIGURATION"] | ["Contains backend ignore patterns for `node_modules/`, `.env*`, sqlite, and local backup directories."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| backend/apiClients.js | Provider client layer for external sports/data calls (API-Sports + RapidAPI) with quota/circuit handling. | PROVIDER_INTEGRATION | UNKNOWN | ["PROVIDER","API","RUNTIME"] | ["Defines provider client wrappers (e.g., `APISportsClient`) using `axios`, key rotation (`keyPool`), and provider circuit breaker/quota gating."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| backend/checkCanonicalEvents.js | Supabase audit script that inspects `canonical_events` counts and sample rows (date/sport/status distribution). | SCRIPT_TOOL | UNKNOWN | ["DATABASE","AUDIT","SCRIPT_TOOL"] | ["Queries Supabase `canonical_events` via `supabase-js` to count total/future events and print the oldest/future samples."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| backend/config.js | Backend configuration centralization: maps environment variables into runtime settings for APIs, DB, and AI providers. | BACKEND_RUNTIME | UNKNOWN | ["CONFIGURATION","RUNTIME"] | ["Exports `DATA_MODE`, DB/Supabase URLs, API keys (RapidAPI/API-Sports), and AI provider (Groq/Dolphin) parameters used across backend."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| backend/database.js | Primary PostgreSQL data-access layer used by the backend (pool creation + query/transaction helpers). | DATABASE | UNKNOWN | ["DATABASE","RUNTIME","SQL"] | ["Creates a `pg` `Pool` using `config.database.url` (with Supabase pooler conversion) and exports `query()` + `withTransaction()` wrappers."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| backend/db.js | Secondary DB abstraction: thin `pg` wrapper that exports `pool`, `query()`, and `withTransaction()` for callers that import `./db`. | DATABASE | UNKNOWN | ["DATABASE","RUNTIME"] | ["Uses `config.database.url` to build a `pg.Pool` and provides reusable `query()` and transaction helper exports."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| backend/dbBootstrap.js | Database bootstrap/migration initializer: creates required tables, views, and seed/support structures on startup. | DATABASE_MIGRATION | UNKNOWN | ["DATABASE","MIGRATION","SQL"] | ["Defines `bootstrap()` plus `ensureFinalPredictionsCompatibility()` and multiple `CREATE TABLE IF NOT EXISTS` / `CREATE OR REPLACE VIEW` statements."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| backend/deploy-trigger-cricket.js | Operational trigger script for cricket fixture cron: calls the backend cron endpoint with `x-cron-secret`. | DEPLOYMENT_OPERATIONS | UNKNOWN | ["DEPLOYMENT","SECURITY","SCRIPT_TOOL"] | ["Fetches `GET /api/cron/cricket-daily-fixtures` on the configured host and authenticates via `x-cron-secret` header."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| backend/deploy-trigger.js | Operational trigger script for full pipeline runs: calls `/api/pipeline/run-full` using `x-api-key` auth. | DEPLOYMENT_OPERATIONS | UNKNOWN | ["DEPLOYMENT","SECURITY","SCRIPT_TOOL"] | ["POSTs to `/api/pipeline/run-full` with JSON `{ source: 'weekly_rolling_scrape' }` and authenticates using `x-api-key`."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| backend/edgemind_inference.py | Python bridge between Supabase data and the local EdgeMind (Antigravity) inference engine. | AI_EDGEMIND | UNKNOWN | ["AI_EDGEMIND","DATABASE","RUNTIME"] | ["Fetches match snapshots from Supabase (e.g., `events`, `edge_data`, `live_momentum`, `public_intelligence`) and calls Antigravity `Agent.chat()` for inference."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| backend/package-lock.json | npm lockfile that pins backend dependency versions (package-lock metadata and resolved package graph). | UNCATEGORIZED | UNKNOWN | ["CONFIGURATION","GENERATED"] | ["Contains `lockfileVersion` and pinned dependency graph for the backend `package.json`."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| backend/server-express.js | Express server entrypoint: defines backend API endpoints and wires runtime services, middleware, and routers. | BACKEND_RUNTIME | UNKNOWN | ["API","RUNTIME","SECURITY"] | ["Creates the Express app, registers `/api/*` routes (pipeline trigger, grading, sync, debug), and imports auth/subscription middleware for request gating."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| backend/test-ultra-slim.js | Manual test harness for EdgeMind/Dolphin ultra-slim inference: sends a prompt to the Dolphin `/completion` endpoint and reports latency/response. | TEST_PROOF | UNKNOWN | ["TEST_PROOF","AI_EDGEMIND","RUNTIME"] | ["POSTs an ultra-slim prompt payload to `${DOLPHIN_URL}/completion` and logs timing, tokens, and raw content."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 
 ## B03 BACKEND_ROUTES_AND_CONTROLLERS
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |
