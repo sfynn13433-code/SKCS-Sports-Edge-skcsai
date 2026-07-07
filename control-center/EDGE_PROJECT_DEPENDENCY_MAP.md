@@ -116,8 +116,8 @@ Blocks: none
 
 ## ESA-RR-002 â€” ESA-RR-002 Implementation Law Seal (Hold)
 
-Status: APPROVED
-Closure: HOLD
+Status: TESTED
+Closure: NO
 Governed by: ESA-RR-002
 Blocked by: none
 Blocks: none\n

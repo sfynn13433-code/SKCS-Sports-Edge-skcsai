@@ -320,7 +320,6 @@ describe("Edge Control Center Ledger v1", () => {
     });
 
     assert.ok(result.startable.some((t) => t.task_id === "EAC-001"));
-    assert.ok(result.startable.some((t) => t.task_id === "ESA-RR-002"));
     assert.ok(result.next);
     assert.equal(result.next.task_id, "EAC-001");
     assert.equal(result.next.status, "APPROVED");

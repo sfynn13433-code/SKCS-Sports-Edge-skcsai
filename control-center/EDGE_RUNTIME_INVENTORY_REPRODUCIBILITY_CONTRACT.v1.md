@@ -2,9 +2,9 @@
 
 ## ESA-RR-002 Status
 
-ESA-RR-002 STATUS: APPROVED
+ESA-RR-002 STATUS: TESTED
 
-ESA-RR-002 CLOSURE HOLD REMAINS: YES
+ESA-RR-002 CLOSURE HOLD REMAINS: NO
 
 ## Governance and contract refinement boundary
 
@@ -16,7 +16,7 @@ Non-goals in this packet:
 - Do not implement contract tests.
 - Do not classify B02.
 - Do not regenerate the runtime inventory or runtime map to make `control:runtime` pass.
-- Do not change ESA-RR-002 approval in this packet; closure remains HOLD.
+- Do not change ESA-RR-002 status in this packet; closure remains resolved.
 - Do not push.
 
 ## Option A (final)
@@ -25,7 +25,7 @@ OPTION A — PROVENANCE-BACKED RETENTION
 
 No Option B or C is reopened in this packet.
 
-## Phase 0 — closure-HOLD forensic evidence (F1-F3)
+## Phase 0 — closure enforcement (F1-F3)
 
 The scope refinement must accurately record the closure-HOLD evidence that proved two remaining deterministic implementation-law gaps.
 

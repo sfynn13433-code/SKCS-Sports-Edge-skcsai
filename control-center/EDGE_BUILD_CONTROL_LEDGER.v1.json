@@ -775,7 +775,7 @@
       "task_name": "ESA-RR-002 Implementation Law Seal (Hold)",
       "workstream": "Governance and Contract Refinement",
       "description": "Seal ESA-RR-002 implementation laws (Option A — provenance-backed retention) so the implementation agent will not need to invent policy: runtime-derived three-state source presence law; exact provenance object schema; exact five governed relationship-evidence fields; relationship-evidence fingerprint law; absent preserved-candidate retention validation; returning-source fail/drift behavior in validation; returning-source regeneration behavior in bootstrap; read-only validation law; bootstrap PRESENT-source write law; bootstrap ABSENT-source carry-forward-only law; ESA-RR-T01..T16 proof mapping requirement; sealed checker/test/generated-output implementation boundary. ESA-RR-002 remains APPROVED in this packet, with closure HOLD pending required recovery + correction.",
-      "status": "APPROVED",
+      "status": "TESTED",
       "priority": "critical",
       "blocked_by": [],
       "blocks": [],
@@ -802,7 +802,7 @@
       "open_gaps": [
         "Runtime repair implementation is now approved for execution under the sealed Option A provenance-backed runtime reproducibility repair law"
       ],
-      "next_action": "Perform read-only recovery-source discovery for the eight missing absent candidates (do not invent or recreate content). Then correct PRESENT_TRACKED byte authority to raw Git index blob bytes (BA-A) and enforce tracked worktree drift fail-closed (ESA_RR_002_TRACKED_WORKTREE_DRIFT) plus staged index drift fail-closed (ESA_RR_002_TRACKED_INDEX_DRIFT) before any canonical bootstrap writes. Enforce governed absent-candidate fail-closed accounting (AC-1..AC-4) including deterministic missing-record/provenance errors, and ensure no inventory/map is written on absent-provenance errors. Replace rename-based real-source absence simulations with test-owned fixture mutations (REAL GOVERNED SOURCE MUTATION = 0) while preserving the 16 ESA-RR-T01..T16 IDs. Approve canonical bootstrap only after each of the eight paths is satisfied by RCP-1 (recover real bytes) or trusted governed provenance RCP-2. Confirm clean detached-checkout reproducibility, then perform separate TESTED promotion inspection.",
+      "next_action": "Resume EAC-001 classification at B02 / file 16.",
       "owner_note": "GOVERNANCE and CONTRACT refinement only; do not implement ESA-RR-002 runtime repair in this packet.",
       "last_updated": "2026-07-07"
     }

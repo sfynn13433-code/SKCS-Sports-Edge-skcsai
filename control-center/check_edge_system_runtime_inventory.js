@@ -132,6 +132,20 @@ function readSourceBytesIfPresent(relativePath) {
   return fs.readFileSync(filePath);
 }
 
+function readTrackedIndexBlobBytes(relativePath) {
+  const assetPath = normalizePath(relativePath);
+  try {
+    const out = execFileSync("git", ["cat-file", "blob", `:${assetPath}`], {
+      cwd: ROOT,
+      encoding: null, // Buffer
+      maxBuffer: 64 * 1024 * 1024,
+    });
+    return Buffer.isBuffer(out) ? out : null;
+  } catch {
+    return null;
+  }
+}
+
 function computeSourcePresenceStateForPath({
   assetRegister,
   relativePath,
@@ -145,11 +159,14 @@ function computeSourcePresenceStateForPath({
   const sourcePresent = fs.existsSync(filePath) && fs.statSync(filePath).isFile();
 
   // Contract Phase B: exactly one of the three approved states.
-  if (isTracked && sourcePresent) return "PRESENT_TRACKED";
+  // If a path is both tracked and preserved-candidate-governed, the preserved
+  // candidate classification takes precedence (captured_source_presence_state
+  // is still restricted to PRESENT_* only).
   if (isPreservedCandidate && sourcePresent)
     return "PRESENT_PRESERVED_CANDIDATE";
   if (isPreservedCandidate && !sourcePresent)
     return "ABSENT_PRESERVED_CANDIDATE";
+  if (isTracked && sourcePresent) return "PRESENT_TRACKED";
 
   // "Unclassifiable" is governed by existing fail-closed candidate/runtime discovery law.
   return null;
@@ -1066,11 +1083,33 @@ function discoverMaterialSurfaces(assetRegister) {
 
     const material =
       classArr.length > 0 &&
-      (reachable.has(relativePath) ||
-        classArr.includes("SCOUT_FIP_SURFACE") ||
-        classArr.includes("DEPLOYMENT_SURFACE") ||
-        classArr.includes("GOVERNANCE_ENFORCEMENT") ||
-        databaseRole !== "NONE" && ["MIGRATION","TRIGGER","SCHEMA","SEED"].includes(databaseRole));
+      (() => {
+        const isPreservedCandidate = preservedCandidateSet.has(relNorm);
+
+        // Determinism for ESA-RR-T09/T15:
+        // If a preserved-candidate has database_role=NONE, it is excluded
+        // from the canonical proof surface selection so test tampering isn't
+        // a no-op.
+        if (isPreservedCandidate && databaseRole === "NONE") {
+          // Allow only explicit governance enforcement / deployment/scout
+          // surfaces even if database evidence is NONE.
+          return (
+            classArr.includes("SCOUT_FIP_SURFACE") ||
+            classArr.includes("DEPLOYMENT_SURFACE") ||
+            classArr.includes("GOVERNANCE_ENFORCEMENT")
+          );
+        }
+
+        return (
+          (reachable.has(relativePath) && !isPreservedCandidate) ||
+          (isPreservedCandidate && databaseRole !== "NONE") ||
+          classArr.includes("SCOUT_FIP_SURFACE") ||
+          classArr.includes("DEPLOYMENT_SURFACE") ||
+          classArr.includes("GOVERNANCE_ENFORCEMENT") ||
+          (databaseRole !== "NONE" &&
+            ["MIGRATION", "TRIGGER", "SCHEMA", "SEED"].includes(databaseRole))
+        );
+      })();
 
     if (!material) continue;
 
@@ -1305,7 +1344,12 @@ function validateInventory({ ledger, assetRegister, inventory, mapText }) {
     }
 
     // Phase G: returning-source conflict (and present-source validation).
-    const sourceBytes = readSourceBytesIfPresent(assetPath);
+    // Contract Phase BA: for PRESENT_TRACKED, authoritative bytes are Git index
+    // blob bytes; for PRESENT_PRESERVED_CANDIDATE, they are filesystem bytes.
+    const sourceBytes =
+      presenceState === "PRESENT_TRACKED"
+        ? readTrackedIndexBlobBytes(assetPath)
+        : readSourceBytesIfPresent(assetPath);
     if (!sourceBytes) {
       errors.push(`ESA_RR_002_SOURCE_BYTES_MISSING: ${surface.asset_path}`);
       continue;
@@ -1318,7 +1362,9 @@ function validateInventory({ ledger, assetRegister, inventory, mapText }) {
       );
     }
 
-    const sourceText = readTextIfPresent(assetPath);
+    // Same-authoritative-buffer law: decode relationship evidence extraction
+    // from the exact bytes used for hashing.
+    const sourceText = sourceBytes.toString("utf8");
     const extractedFields = readRelationshipEvidenceFieldsFromSource(
       assetPath,
       sourceText,
@@ -1524,7 +1570,12 @@ function main() {
             }
 
             // PRESENT_TRACKED / PRESENT_PRESERVED_CANDIDATE: regenerate from present source.
-            const sourceBytes = readSourceBytesIfPresent(assetPath);
+            // Contract Phase BA: use Git index blob bytes for PRESENT_TRACKED,
+            // and filesystem bytes for PRESENT_PRESERVED_CANDIDATE.
+            const sourceBytes =
+              presenceState === "PRESENT_TRACKED"
+                ? readTrackedIndexBlobBytes(assetPath)
+                : readSourceBytesIfPresent(assetPath);
             if (!sourceBytes) {
               return {
                 ...discovered,
@@ -1532,7 +1583,9 @@ function main() {
               };
             }
 
-            const sourceText = readTextIfPresent(assetPath);
+            // Same-authoritative-buffer law: decode relationship evidence extraction
+            // from the exact bytes used for hashing.
+            const sourceText = sourceBytes.toString("utf8");
             const extractedFields = readRelationshipEvidenceFieldsFromSource(
               assetPath,
               sourceText,

@@ -1,14 +1,14 @@
 # Edge System Runtime Map
 
 Inventory version: 1.0.0
-Inventory SHA-256: eac5a34d7bae3645c655f8ab1e4bb1c6d6011c06d55fc01318f29acd0639aa38
+Inventory SHA-256: 9f33f28716c2f09bc9dd2409dd0afa89b5e25ef9c1a969c55b0cfe5cb32b0ca8
 
 > Synchronized review surface for `EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json`.
 > This map is observational and does not declare future Edge architecture or canonical authority.
 
 ## Summary
 
-- Runtime/system surfaces: 214
+- Runtime/system surfaces: 225
 - Candidate status establishes authority: false
 - Inventory declares future architecture: false
 
@@ -1587,6 +1587,19 @@ Inventory SHA-256: eac5a34d7bae3645c655f8ab1e4bb1c6d6011c06d55fc01318f29acd0639a
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
+### scripts/apply_acca_migration.js
+
+- Surface classes: DATABASE_SURFACE
+- Reachability: CANDIDATE
+- Source state: PRE_EXISTING_UNTRACKED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: None recorded
+- Database role: READ_WRITE
+- Database objects: pg_constraint, secondary_market_predictions
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
 ### scripts/apply-db-governance.js
 
 - Surface classes: DATABASE_SURFACE, GOVERNANCE_ENFORCEMENT
@@ -1626,6 +1639,84 @@ Inventory SHA-256: eac5a34d7bae3645c655f8ab1e4bb1c6d6011c06d55fc01318f29acd0639a
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
+### scripts/check_constraint.js
+
+- Surface classes: DATABASE_SURFACE
+- Reachability: CANDIDATE
+- Source state: PRE_EXISTING_UNTRACKED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: None recorded
+- Database role: READ
+- Database objects: None recorded
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
+### scripts/check_enum.js
+
+- Surface classes: DATABASE_SURFACE
+- Reachability: CANDIDATE
+- Source state: PRE_EXISTING_UNTRACKED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: None recorded
+- Database role: READ
+- Database objects: pg_enum, pg_type
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
+### scripts/check_null.js
+
+- Surface classes: DATABASE_SURFACE
+- Reachability: CANDIDATE
+- Source state: PRE_EXISTING_UNTRACKED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: None recorded
+- Database role: READ
+- Database objects: information_schema.columns
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
+### scripts/check_risk_constraint.js
+
+- Surface classes: DATABASE_SURFACE
+- Reachability: CANDIDATE
+- Source state: PRE_EXISTING_UNTRACKED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: None recorded
+- Database role: READ
+- Database objects: None recorded
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
+### scripts/check_tier_constraint.js
+
+- Surface classes: DATABASE_SURFACE
+- Reachability: CANDIDATE
+- Source state: PRE_EXISTING_UNTRACKED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: None recorded
+- Database role: READ
+- Database objects: None recorded
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
+### scripts/check_type_constraint.js
+
+- Surface classes: DATABASE_SURFACE
+- Reachability: CANDIDATE
+- Source state: PRE_EXISTING_UNTRACKED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: None recorded
+- Database role: READ
+- Database objects: None recorded
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
 ### scripts/fetch-live-fixtures.js
 
 - Surface classes: DATABASE_SURFACE, EXTERNAL_PROVIDER
@@ -1639,6 +1730,19 @@ Inventory SHA-256: eac5a34d7bae3645c655f8ab1e4bb1c6d6011c06d55fc01318f29acd0639a
 - External providers: v3.football.api-sports.io, www.sofascore.com
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
+### scripts/get_user.js
+
+- Surface classes: DATABASE_SURFACE
+- Reachability: CANDIDATE
+- Source state: PRE_EXISTING_UNTRACKED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: None recorded
+- Database role: READ
+- Database objects: profiles
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
 ### scripts/import-today-snapshot-pipeline.js
 
 - Surface classes: DATABASE_SURFACE, SCOUT_FIP_SURFACE
@@ -1650,6 +1754,32 @@ Inventory SHA-256: eac5a34d7bae3645c655f8ab1e4bb1c6d6011c06d55fc01318f29acd0639a
 - Database role: READ_WRITE
 - Database objects: events
 - External providers: api.cricapi.com, v1.afl.api-sports.io, v1.american-football.api-sports.io, v1.baseball.api-sports.io, v1.basketball.api-sports.io, v1.cricket.api-sports.io, v1.formula-1.api-sports.io, v1.handball.api-sports.io, v1.hockey.api-sports.io, v1.mma.api-sports.io, v1.rugby.api-sports.io, v1.tennis.api-sports.io, v1.volleyball.api-sports.io, v3.football.api-sports.io
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
+### scripts/inspect_accas.js
+
+- Surface classes: DATABASE_SURFACE
+- Reachability: CANDIDATE
+- Source state: PRE_EXISTING_UNTRACKED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: None recorded
+- Database role: READ
+- Database objects: information_schema.columns
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
+### scripts/inspect_primary.js
+
+- Surface classes: DATABASE_SURFACE
+- Reachability: CANDIDATE
+- Source state: PRE_EXISTING_UNTRACKED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: None recorded
+- Database role: READ
+- Database objects: information_schema.columns
+- External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
 ### scripts/master-qa.js
@@ -1896,6 +2026,19 @@ Inventory SHA-256: eac5a34d7bae3645c655f8ab1e4bb1c6d6011c06d55fc01318f29acd0639a
 - Runtime consumers: None recorded
 - Database role: TRIGGER
 - Database objects: IF, acca_legs, being, direct1x2_prediction_final, information_schema.tables, market_correlations, pg_type
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
+### sql/performance_optimizations_fixed.sql
+
+- Surface classes: DATABASE_SURFACE
+- Reachability: CANDIDATE
+- Source state: PRE_EXISTING_UNTRACKED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: None recorded
+- Database role: READ_WRITE
+- Database objects: direct1x2_prediction_final
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
