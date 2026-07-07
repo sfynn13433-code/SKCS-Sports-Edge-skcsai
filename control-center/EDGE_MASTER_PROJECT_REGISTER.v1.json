@@ -797,9 +797,7 @@
       "current_status": "APPROVED",
       "priority": "high",
       "blocked_by": [],
-      "blocks": [
-        "ESA-RR-002"
-      ],
+      "blocks": [],
       "affected_layers": [
         "runtime",
         "governance",
@@ -837,11 +835,9 @@
       "category": "Governance and Contract Refinement",
       "description": "Seal ESA-RR-002 implementation laws (Option A — provenance-backed retention) so the implementation agent will not need to invent policy: runtime-derived three-state source presence law; exact provenance object schema; exact five governed relationship-evidence fields; relationship-evidence fingerprint law; absent preserved-candidate retention validation; returning-source fail/drift behavior in validation; returning-source regeneration behavior in bootstrap; read-only validation law; bootstrap PRESENT-source write law; bootstrap ABSENT-source carry-forward-only law; ESA-RR-T01..T16 proof mapping requirement; sealed checker/test/generated-output implementation boundary. ESA-RR-002 remains PROPOSED in this packet.",
       "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
-      "current_status": "PROPOSED",
+      "current_status": "APPROVED",
       "priority": "critical",
-      "blocked_by": [
-        "ESA-RR-001"
-      ],
+      "blocked_by": [],
       "blocks": [],
       "affected_layers": [
         "runtime",
@@ -867,13 +863,13 @@
         "Control Center sequencing bypass"
       ],
       "recommended_order": 17,
-      "next_action": "Run the requested control-center projection refresh and verify the sealed ESA-RR-002 scope; then rerun the ESA-RR-002 proposed-gate inspection separately.",
+      "next_action": "Implement ESA-RR-002 Option A provenance-backed runtime inventory reproducibility repair in the sealed checker and add the 16 ESA-RR-T01..T16 contract tests; then regenerate runtime inventory/map only through the approved checker bootstrap and capture closure evidence for separate TESTED promotion.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-07",
       "governed_by_control_task_id": "ESA-RR-002",
       "current_evidence": [
         "Contract-only ESA-RR-002 scope refinement artifact is added",
-        "ESA-RR-002 ledger task remains PROPOSED"
+        "ESA-RR-002 ledger task promoted to APPROVED for Option A runtime reproducibility implementation"
       ]
     }
   ]
