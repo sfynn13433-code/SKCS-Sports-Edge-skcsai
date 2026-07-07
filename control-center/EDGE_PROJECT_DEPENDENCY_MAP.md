@@ -25,7 +25,7 @@ Blocks: EAC-001, EMG-001, EFI-001, EST-001, ESEC-001, EPI-001, EGR-001, EAI-001,
 
 ## EAC-001 — Edge Asset Classification and Repository Map
 
-Status: PROPOSED
+Status: APPROVED
 Governed by: EAC-001
 Blocked by: EPR-001, ESA-001
 Blocks: EMG-001
@@ -78,7 +78,6 @@ Status: PROPOSED
 Governed by: EGR-001
 Blocked by: ESA-001, EPI-001
 Blocks: none
-
 ## EAI-001 — AI Provider and EdgeMind Boundary
 
 Status: PROPOSED
@@ -105,4 +104,18 @@ Blocks: none
 Status: BLOCKED
 Governed by: E2E-001
 Blocked by: EFI-001, EST-001, ESEC-001, EPI-001, EPRV-001
+Blocks: none
+
+## ESA-RR-001 — ESA-RR-001 Runtime Repair Base Contract (Approved)
+
+Status: APPROVED
+Governed by: ESA-RR-001
+Blocked by: none
+Blocks: ESA-RR-002
+
+## ESA-RR-002 — ESA-RR-002 Implementation Law Seal (Hold)
+
+Status: PROPOSED
+Governed by: ESA-RR-002
+Blocked by: ESA-RR-001
 Blocks: none

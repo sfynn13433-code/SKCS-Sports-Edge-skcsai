@@ -736,6 +736,77 @@
       "next_action": "Remain BLOCKED until all dependencies are satisfied.",
       "owner_note": "This is the final technical proof before the Scout-Edge marriage gate can be separately approved.",
       "last_updated": "2026-07-05"
+    },
+    {
+      "task_id": "ESA-RR-001",
+      "task_name": "ESA-RR-001 Runtime Repair Base Contract (Approved)",
+      "workstream": "Governance and Contract Refinement",
+      "description": "Approved base contract for runtime inventory reproducibility and provenance-based retention. ESA-RR-002 refines and seals implementation-law gaps without changing the Option A policy history.",
+      "status": "APPROVED",
+      "startable": false,
+      "priority": "high",
+      "blocked_by": [],
+      "blocks": [],
+      "affected_layers": [
+        "runtime",
+        "governance",
+        "contract"
+      ],
+      "related_contracts": [],
+      "affected_files": [
+        "control-center/EDGE_RUNTIME_INVENTORY_REPRODUCIBILITY_CONTRACT.v1.md"
+      ],
+      "affected_tables": [],
+      "completion_definition": "A stable provenance-backed retention base contract exists and is reserved as the canonical Option A policy history for ESA-RR-002.",
+      "proof_required": [
+        "Contract artifact exists and declares Option A provenance-backed retention",
+        "No runtime repair implementation, runtime checker behavior change, or runtime inventory/map regeneration-to-pass occurs as part of this contract-only scope"
+      ],
+      "current_evidence": [
+        "ESA-RR-001 is preserved as APPROVED in the Edge build-control ledger"
+      ],
+      "open_gaps": [],
+      "next_action": "Proceed to ESA-RR-002 scope refinement and sealing (contract-only).",
+      "owner_note": "Preserve ESA-RR-001 status as APPROVED; do not reopen base options in this packet.",
+      "last_updated": "2026-07-07"
+    },
+    {
+      "task_id": "ESA-RR-002",
+      "task_name": "ESA-RR-002 Implementation Law Seal (Hold)",
+      "workstream": "Governance and Contract Refinement",
+      "description": "Seal ESA-RR-002 implementation laws (Option A — provenance-backed retention) so the implementation agent will not need to invent policy: runtime-derived three-state source presence law; exact provenance object schema; exact five governed relationship-evidence fields; relationship-evidence fingerprint law; absent preserved-candidate retention validation; returning-source fail/drift behavior in validation; returning-source regeneration behavior in bootstrap; read-only validation law; bootstrap PRESENT-source write law; bootstrap ABSENT-source carry-forward-only law; ESA-RR-T01..T16 proof mapping requirement; sealed checker/test/generated-output implementation boundary. ESA-RR-002 remains PROPOSED in this packet.",
+      "status": "PROPOSED",
+      "priority": "critical",
+      "blocked_by": [
+        "ESA-RR-001"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "runtime",
+        "governance",
+        "contract"
+      ],
+      "related_contracts": [],
+      "affected_files": [
+        "control-center/EDGE_RUNTIME_INVENTORY_REPRODUCIBILITY_CONTRACT.v1.md"
+      ],
+      "affected_tables": [],
+      "completion_definition": "ESA-RR-002 contract-only scope is sealed: Option A policy history is preserved; source-presence states are defined as current-run derived; the provenance schema and relationship-evidence fingerprint canonicalization are explicitly governed; absent preserved-candidate retention and returning-source drift rules are sealed as fail-closed validation and controlled bootstrap write behavior; ESA-RR-T01..T16 proof mapping is present; and the implementation boundary is explicitly restricted to the sealed checker/test/generated-output surfaces.",
+      "proof_required": [
+        "ESA-RR-002 contract addendum exists and includes all sealed laws",
+        "ESA-RR-T01..T16 proof mapping table exists with mechanical repair-law label projection",
+        "control-center regeneration runs without modifying runtime checker behavior or runtime implementation code"
+      ],
+      "current_evidence": [
+        "Contract-only ESA-RR-002 scope refinement artifact is added",
+        "ESA-RR-002 ledger task remains PROPOSED"
+      ],
+      "open_gaps": [
+        "Runtime repair implementation is explicitly out of scope for this packet"
+      ],
+      "next_action": "Run the requested control-center projection refresh and verify the sealed ESA-RR-002 scope; then rerun the ESA-RR-002 proposed-gate inspection separately.",
+      "owner_note": "GOVERNANCE and CONTRACT refinement only; do not implement ESA-RR-002 runtime repair in this packet.",
+      "last_updated": "2026-07-07"
     }
   ]
 }
