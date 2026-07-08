@@ -4610,10 +4610,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "F1 adapter stub disabled in this deployment; fetchFixtures always throws.",
+      "functional_group": "SERVICE",
+      "relationship_tags": [
+        "SERVICE",
+        "CONFIGURATION"
+      ],
+      "classification_evidence": [
+        "Exports fetchFixtures that throws Error indicating the F1 adapter is disabled."
+      ]
     },
     {
       "asset_path": "backend/adapters/footballAdapter.js",
@@ -4636,10 +4641,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Football adapter that fetches fixtures from API-Football and maps to internal fixture shape.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Uses axios to call https://v3.football.api-sports.io/fixtures with API key header x-apisports-key.",
+        "Maps API response into objects with ids, teams, start_time, raw_json and odds."
+      ]
     },
     {
       "asset_path": "backend/adapters/index.js",
@@ -4662,10 +4673,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Adapter registry that loads sport adapters and exposes loadAdapter and adapter map.",
+      "functional_group": "SERVICE",
+      "relationship_tags": [
+        "SERVICE",
+        "CONFIGURATION"
+      ],
+      "classification_evidence": [
+        "Requires footballAdapter and tennisAdapter and builds an adapters registry plus loadAdapter()."
+      ]
     },
     {
       "asset_path": "backend/adapters/tennisAdapter.js",
@@ -4688,10 +4704,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Tennis adapter that fetches schedules from Sportradar and maps events to internal fixture objects.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Uses axios with bearer token Authorization header for Sportradar tennis schedules endpoint.",
+        "Maps sport schedules and events into fixtures with player ids, start_time, and raw_json."
+      ]
     },
     {
       "asset_path": "backend/apiClients.js",
@@ -4841,10 +4863,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Resolves active sports list from environment variable with normalization and defaults.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": [
+        "CONFIGURATION",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Reads process.env.ACTIVE_DEPLOYMENT_SPORTS, normalizes aliases, and returns a Set with defaults."
+      ]
     },
     {
       "asset_path": "backend/config/apiEndpoints.js",
@@ -4867,10 +4894,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Exports API-Sports base URLs and shared headers plus internal daily rate limit safety cap.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": [
+        "CONFIGURATION",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Defines apiSportsUrls for each supported sport and exports apiSportsHeaders using X_APISPORTS_KEY."
+      ]
     },
     {
       "asset_path": "backend/config/bigBallsLeagueMap.js",
@@ -4893,10 +4926,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Maps SKCS league identifiers to Big Balls Data football aliases for provider calls.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "CONFIGURATION"
+      ],
+      "classification_evidence": [
+        "Defines SKCS_TO_BBD_FOOTBALL array and resolves league by skcs_league_id or apisports_id."
+      ]
     },
     {
       "asset_path": "backend/config/footballRules.js",
@@ -4919,10 +4957,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Football risk, confidence band, ACCA, and timing rules configuration used by prediction logic.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": [
+        "CONFIGURATION",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Exports FOOTBALL_RULES including confidence bands, ACCA thresholds, and stale grace minutes."
+      ]
     },
     {
       "asset_path": "backend/config/predictionOutcomes.js",
@@ -4945,10 +4988,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Prediction outcomes configuration with validation for market schemas and outcomes per sport.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": [
+        "CONFIGURATION",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Validates predictionOutcomes market entries require uppercase underscore market names and primary/secondary/advanced types."
+      ]
     },
     {
       "asset_path": "backend/config/soccerDataLeagueMap.js",
@@ -4971,10 +5019,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Maps SKCS leagues to Soccer Data API league identifiers and provides probe league resolution helpers.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "CONFIGURATION"
+      ],
+      "classification_evidence": [
+        "Exports resolveSoccerDataLeague and resolveFixtureProbeLeague, including env override for probe league id."
+      ]
     },
     {
       "asset_path": "backend/config/sportRules.js",
@@ -4997,10 +5050,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Sport-wide rules such as home advantage and weather impact flags by sport.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": [
+        "CONFIGURATION",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Exports sportRules object with baseHomeAdvantage and weatherImpactsGame per sport."
+      ]
     },
     {
       "asset_path": "backend/config/subscriptionMatrix.js",
@@ -5023,10 +5081,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Defines subscription matrix with plan categories, sports coverage, market access, limits, and mega ACCA constraints.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": [
+        "CONFIGURATION",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Exports SUBSCRIPTION_MATRIX with daily limits and mega ACCA allocation/constraints; uses normalizePlanId from subscriptionPlans."
+      ]
     },
     {
       "asset_path": "backend/config/subscriptionPlans.js",
@@ -5049,10 +5112,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Defines public subscription plan ids and helpers to normalize plan ids to canonical internal tier keys.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": [
+        "CONFIGURATION",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Exports subscriptionPlans plus normalizePlanId and getTierKeyForPlan mapping plan ids/aliases to tierKey."
+      ]
     },
     {
       "asset_path": "backend/controllers/edgeMindController.js",
