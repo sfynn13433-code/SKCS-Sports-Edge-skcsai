@@ -5672,10 +5672,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "EdgeMind controller: generates tier-aware bot/explanation responses (including ACCA/pick selection) by validating request context and composing insight output.",
+      "functional_group": "AI_EDGEMIND",
+      "relationship_tags": ["AI_EDGEMIND", "CONTROLLER", "RUNTIME"],
+      "classification_evidence": ["Exports `generateBotResponse` and contains EdgeMind explanation/pick selection logic using subscription plan capability resolution and market/plan constraints; mounted by `backend/routes/chat.js` as POST handlers."]
     },
     {
       "asset_path": "backend/routes/accuracy.js",
@@ -5698,10 +5698,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Accuracy API route: returns aggregated accuracy/availability insights over a requested fixture date and sport, including optional publish_run filtering.",
+      "functional_group": "API_ROUTE",
+      "relationship_tags": ["ROUTE", "API", "DATABASE", "RUNTIME"],
+      "classification_evidence": ["Defines `router.get('/')` for `/api/accuracy` and queries `predictions_accuracy` plus `direct1x2_prediction_final` aggregates; uses `gradingAccuracyCore` helpers to compute tier/type breakdowns."]
     },
     {
       "asset_path": "backend/routes/antigravity.js",
@@ -5724,10 +5724,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Antigravity workflow API route: exposes status/workflow listing and allows triggering and toggling Antigravity workflow executions.",
+      "functional_group": "AI_EDGEMIND",
+      "relationship_tags": ["AI_EDGEMIND", "ROUTE", "API", "RUNTIME"],
+      "classification_evidence": ["Creates an Antigravity `WorkflowEngine` and defines GET `/status`, `/workflows`, `/workflows/:id` plus POST `/workflows/:id/trigger` and PUT `/workflows/:id/toggle` endpoints."]
     },
     {
       "asset_path": "backend/routes/chat.js",
@@ -5750,10 +5750,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Chat API route: authenticated user entrypoint for EdgeMind bot responses (default chat and /chat subpath) backed by `generateBotResponse`.",
+      "functional_group": "API_ROUTE",
+      "relationship_tags": ["ROUTE", "API", "CONTROLLER", "SECURITY"],
+      "classification_evidence": ["Defines POST `/` and POST `/chat` handlers guarded by `requireRole('user')` + `requireSupabaseUser`, both calling `generateBotResponse` from `backend/controllers/edgeMindController.js`."]
     },
     {
       "asset_path": "backend/routes/cricketCache.js",
@@ -5776,10 +5776,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Cricket cache read API route: returns the current cricket cache snapshot from the `cricApiCacheService` cache layer.",
+      "functional_group": "API_ROUTE",
+      "relationship_tags": ["ROUTE", "API", "RUNTIME", "SERVICE"],
+      "classification_evidence": ["Defines GET `/` endpoint which calls `readCache()` from `backend/services/cricApiCacheService` and returns cached data or 404 when missing."]
     },
     {
       "asset_path": "backend/routes/cricketCount.js",
@@ -5802,10 +5802,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Cricket count API route: returns counts of cricket insight rows by status (active/upcoming/complete/all) and direct-market subset.",
+      "functional_group": "API_ROUTE",
+      "relationship_tags": ["ROUTE", "API", "DATABASE", "RUNTIME"],
+      "classification_evidence": [
+        "Defines GET `/api/cricket-count` handler which queries `cricket_insights_final` via Supabase (`eq('sport','cricket')`) and filters rows using `filterByStatus()` based on `status` query parameter; computes `direct_count` by counting rows where `market_group === 'direct'`."
+      ]
     },
     {
       "asset_path": "backend/routes/cricketCron.js",
@@ -5828,10 +5830,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Cricket cron/control API routes: secure scheduled endpoints to publish Cricbuzz cricket insights and refresh CricAPI caches (daily/live) with control-plane gating.",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": ["ROUTE", "API", "SECURITY", "BACKGROUND_JOB", "RUNTIME", "SCHEDULER"],
+      "classification_evidence": [
+        "Defines router.get handlers for `/cricket/cricbuzz`, `/cricket/cricapi/daily`, and `/cricket/cricapi/live` that verify cron secret via `verifyCronSecret()` (CRON_SECRET/x-cron-secret), check gating via `getExecutionConstraints()` from `governanceGatekeeper`, and execute background operations through `executeOperation()` calling `publishCricbuzzCricket`, `refreshDailyCache`, and `refreshLiveScores`."
+      ]
     },
     {
       "asset_path": "backend/routes/cricketInsights.js",
@@ -5854,10 +5858,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Cricket insights read API route: serves cricket insight rows from `cricket_insights_final` with status filtering, optional grouping, and formatted explanation/selection labels.",
+      "functional_group": "API_ROUTE",
+      "relationship_tags": ["ROUTE", "API", "DATABASE", "RUNTIME"],
+      "classification_evidence": [
+        "Defines GET `/` and GET `/count` handlers (both requireSupabaseUser) that query `cricket_insights_final` for `sport='cricket'`, filter using `filterByStatus()`, normalize rows with `normalizeCricketInsightRow()`, compute `direct_count` from `market_group === 'direct'`, and optionally group by fixture via `groupByFixtures()`."
+      ]
     },
     {
       "asset_path": "backend/routes/debug.js",
@@ -5880,10 +5886,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Diagnostics/debug API route family: exposes internal observability for routes, database timestamps, prediction counts, pipeline filtering status, and governance snapshot.",
+      "functional_group": "API_ROUTE",
+      "relationship_tags": ["ROUTE", "API", "DATABASE", "OBSERVABILITY", "RUNTIME"],
+      "classification_evidence": [
+        "Defines debug endpoints including GET `/routes` (introspects `req.app._router.stack`), GET `/db` (queries `select now()`), GET `/predictions-count` (counts `direct1x2_prediction_final` rows by recency), GET `/pipeline-status` (queries `direct1x2_prediction_final` + `predictions_filtered`, filters by sport/window/plan using `getPlanCapabilities()` + `filterPredictionsForPlan`, and records rejections using `pipelineLogger.stageSet`/`rejectionAdd`), and GET `/api-governance` which calls `services/apiQuotaRouter` governance snapshot + blocked-call summary."
+      ]
     },
     {
       "asset_path": "backend/routes/direct1x2.js",
@@ -5906,10 +5914,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Direct 1x2 predictions query API: returns direct/single prediction rows from `direct1x2_prediction_final` for a sport/time window with optional risk-tier filtering and formatted output fields.",
+      "functional_group": "API_ROUTE",
+      "relationship_tags": ["ROUTE", "API", "DATABASE", "RUNTIME", "PREDICTION"],
+      "classification_evidence": [
+        "Defines GET `/` handler that creates a Supabase client and selects from `direct1x2_prediction_final` filtering by `sport`, `type in ['direct','single']`, `match_date` non-null, and `match_date` bounds (`gte`/`lte`) derived from `history_days`/`window_days`; optional query params include `risk_tier` and `latest_run` (filters by `publish_run_id`); maps results through `formatPredictionRow()` to compute `confidence`, `risk_tier` (via `getRiskTier(confidence)`), and `secondary_markets` (sliced to 4)."
+      ]
     },
     {
       "asset_path": "backend/routes/divanscore.js",
@@ -5932,10 +5942,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Divanscore provider proxy API: fetches team statistics from Divanscore using RapidAPI headers with subscription-tier gating and optional cache wall bypass.",
+      "functional_group": "API_ROUTE",
+      "relationship_tags": ["ROUTE", "API", "PROVIDER", "RUNTIME", "SECURITY"],
+      "classification_evidence": [
+        "Defines GET `/divanscore/teams/get-statistics` which is gated by `requireSupabaseUser` + `requireActiveSubscription`, checks env flags `DISABLE_DIVANSCORE`/`ENABLE_DIVANSCORE`, obtains configuration via `getDivanscoreConfig()`, sets RapidAPI headers (`x-rapidapi-host`, `x-rapidapi-key`), and either calls `fetchWithCache('divanscore', ...)` when cache wall is ready (`isCacheWallReady()`) or falls back to direct `axios.get`."
+      ]
     },
     {
       "asset_path": "backend/routes/feedback.js",
@@ -5958,10 +5970,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "User feedback API: public listing of approved feedback plus authenticated submission and admin moderation of `user_experience_feedback` rows.",
+      "functional_group": "API_ROUTE",
+      "relationship_tags": ["ROUTE", "API", "DATABASE", "SECURITY", "RUNTIME"],
+      "classification_evidence": [
+        "Defines GET `/public` to query `user_experience_feedback` where `status='approved'`, POST `/` to accept authenticated user feedback (`requireRole('user')` + `requireSupabaseUser`) and insert rows with status `pending`, and admin PATCH endpoints (`/admin/:id/approve`, `/admin/:id/reject`) that update moderation status and notes."
+      ]
     },
     {
       "asset_path": "backend/routes/metrics.js",
@@ -5984,10 +5998,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Metrics/telemetry API routes: provides Elite/VIP-gated Metrx match metrics proxy plus an admin pipeline-health telemetry refresh endpoint.",
+      "functional_group": "API_ROUTE",
+      "relationship_tags": ["ROUTE", "API", "PROVIDER", "SECURITY", "OBSERVABILITY", "RUNTIME"],
+      "classification_evidence": [
+        "Defines GET `/metrx` gated by `requireSupabaseUser` + `requireActiveSubscription` and `hasEliteAccess()`; uses `getMetrxConfig()` to build RapidAPI endpoint/headers, enforces quota via `consumeQuota('metrx_factory', ...)`, and either uses cache-wall (`fetchWithCache`) or direct `axios.get` depending on `isCacheWallReady()`. Also defines GET `/pipeline-health` which calls `refreshPipelineHealthState()` via `executeOperation`."
+      ]
     },
     {
       "asset_path": "backend/routes/pipeline.js",
@@ -6010,10 +6026,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Pipeline operations API: triggers sports sync and full pipeline runs, provides status telemetry, and supports manual pipeline execution/rebuild under admin/cron-key authorization.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": ["ROUTE", "API", "SECURITY", "DEPLOYMENT", "BACKGROUND_JOB", "DATABASE", "RUNTIME"],
+      "classification_evidence": [
+        "Defines admin-protected sync endpoints: POST `/sync` runs `syncAllSports()` or `syncSports()` through `executeOperation` after `requireRole('admin')`; POST/GET `/run-full` uses `requirePipelineTriggerKey` (x-api-key) and `handleSyncRequest` with triggerLabel 'run-full global sync'. Defines POST `/sync-detailed` for step-by-step progress. Also exposes GET `/status` which uses Supabase to count `predictions_raw` and `direct1x2_prediction_final`, plus POST `/run` and POST `/rebuild` which call `runPipelineForMatches` / `runPipelineFromConfiguredDataMode` and `rebuildFinalOutputs()` via `executeOperation`."
+      ]
     },
     {
       "asset_path": "backend/routes/predictions.js",
@@ -6036,10 +6054,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Predictions read API route: returns user-visible prediction rows filtered by plan capabilities, sport key, time windows, and conflicting secondary-market rules; also attaches watchlist and contextual enrichment.",
+      "functional_group": "API_ROUTE",
+      "relationship_tags": ["ROUTE", "API", "DATABASE", "PREDICTION", "RUNTIME", "SECURITY"],
+      "classification_evidence": [
+        "Defines GET `/api/predictions` (`router.get('/', requireSupabaseUser, ...)`) that resolves requested plan id and validates user access via `getPlanCapabilities()` + `filterPredictionsForPlan()`; performs primary DB query against `direct1x2_prediction_final` using `queryStr`/`PREDICTION_ROW_QUALITY_SQL`, filters rows via `filterByVisibility()`, deduplicates latest per fixture, and then fetches watchlist items by joining `predictions_filtered` with `predictions_raw`."
+      ]
     },
     {
       "asset_path": "backend/routes/refresh-ai.js",
@@ -6062,10 +6082,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Admin endpoint to refresh AI insights for existing predictions by re-generating and updating EdgeMind `edgemind_report` content in the final predictions table.",
+      "functional_group": "AI_EDGEMIND",
+      "relationship_tags": ["ROUTE", "API", "SECURITY", "AI_EDGEMIND", "DATABASE", "RUNTIME"],
+      "classification_evidence": [
+        "Defines POST `/refresh-ai-insights` guarded by `requireRole('admin')`; checks Groq availability via `isGroqAvailable()` and then selects prediction rows from `direct1x2_prediction_final` (id, fixture_id, home_team, away_team, match_date, prediction, confidence, edgemind_report) and conditionally regenerates insight content via `generateInsight()`; updates rows in `direct1x2_prediction_final` with `UPDATE ... SET edgemind_report = $1` when the returned report passes template checks."
+      ]
     },
     {
       "asset_path": "backend/routes/scheduler.js",
@@ -6088,10 +6110,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Scheduler/control API: triggers fixture syncing, context enrichment, sportsrc health/capability discovery, and background AI pipeline runs; also provides scheduler status and health checks.",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": ["ROUTE", "API", "SECURITY", "SCHEDULER", "BACKGROUND_JOB", "RUNTIME"],
+      "classification_evidence": [
+        "Defines POST `/trigger-fixture-sync` (executes external Supabase Edge Function via `fetch` inside `executeOperation`), POST `/trigger-context-enrichment` (calls `contextEnrichmentService.processEnrichmentQueue()`), POST `/trigger-sportsrc-health` (runs both `sportsrcHealthService.checkAccountHealth()` and `.discoverCapabilities()`), and POST `/trigger-ai-pipeline` which validates `x-admin-key` via `requireAdminKey` and starts background execution via `setImmediate()` calling `runSchedulerAiPipeline()`. Also exposes GET `/status` that reads from `prediction_publish_runs`, `sport_sync`, `context_enrichment_queue`, and `sportsrc_account_health`, plus GET `/health`."
+      ]
     },
     {
       "asset_path": "backend/routes/semanticDrift.js",
@@ -6114,10 +6138,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Semantic drift inspection API: returns a drift summary payload (since/pipeline/provider filters) for dashboard/operations use.",
+      "functional_group": "API_ROUTE",
+      "relationship_tags": ["ROUTE", "API", "OBSERVABILITY", "RUNTIME"],
+      "classification_evidence": [
+        "Defines GET `/api/semantic-drift-summary` (router mounted at `/api/semanticDrift` style) which calls `fetchSemanticDriftSummary({ since, pipeline, provider })` from `services/semanticDriftSummaryService`, sets `X-System-State` and `X-Control-State` headers from the payload, and returns JSON merged with `ok:true`."
+      ]
     },
     {
       "asset_path": "backend/routes/skcsGrading.js",
@@ -6140,10 +6166,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Grading snapshot API: unified grading contract for Accuracy Center using `buildGradingSnapshot()` with optional legacy formatting.",
+      "functional_group": "GRADING_ACCURACY",
+      "relationship_tags": ["ROUTE", "API", "SERVICE", "GRADING", "RUNTIME"],
+      "classification_evidence": [
+        "Defines GET `/grading-snapshot` endpoint that calls `buildGradingSnapshot({ sport, from, to, date, publish_run, run_id })` and, when `format=legacy`, converts with `toLegacyAccuracyPayload(snapshot)`; otherwise returns `snapshot` directly; implemented in `services/gradingSnapshotService`."
+      ]
     },
     {
       "asset_path": "backend/routes/sportsEdge.js",
@@ -6166,10 +6194,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Sports Edge integration routes & caching layer: proxies sports provider requests with explicit rate limiting and NodeCache caching; serves featured games, AI trends, live scores, and game details.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": ["ROUTE", "API", "PROVIDER", "RUNTIME", "DEPLOYMENT", "OBSERVABILITY"],
+      "classification_evidence": [
+        "Creates an API governor using `bottleneck` (minTime/maxConcurrent/reservoir) and an in-process `NodeCache`; defines endpoints like GET `/api/featured-games` calling `getFeaturedGames()` and caching results, GET `/api/trends` using `fetchFromRapidAPI('/bets/trends', ...)` with RapidAPI key/host headers, GET `/api/live-scores` using `getLiveScores()` and caching for short TTLs, and GET `/api/game-details/:gameId` with per-game cache keys; uses helper `fetchFromRapidAPI()` to call `axios.request()` with `X-RapidAPI-Key` and `X-RapidAPI-Host`."
+      ]
     },
     {
       "asset_path": "backend/routes/tier1.js",
@@ -6192,10 +6222,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Tier1 provisioning and ingestion-variables hooks API: provides hook metadata and persists ingestion variable payloads for MMA, Basketball, and sideline data.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": ["ROUTE", "API", "DEPLOYMENT", "CONFIGURATION", "SECURITY"],
+      "classification_evidence": [
+        "Defines GET `/provisioning/hooks` returning a tier-1 hook map (including routes under `/api/tier1/ingestion/*`); defines admin-protected POST endpoints `/ingestion/mma-variables`, `/ingestion/basketball-variables`, `/ingestion/soccer-sidelined`, and `/ingestion/rugby-sidelined` that call `saveProvisioningPayload(namespace, key, payload)`."
+      ]
     },
     {
       "asset_path": "backend/routes/user.js",
@@ -6218,10 +6250,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Subscriber user endpoints for plan-limited predictions: subscription summary, tier/date predictions, available market counts, and daily insight quota consumption.",
+      "functional_group": "SECURITY_SUBSCRIBER",
+      "relationship_tags": ["ROUTE", "API", "DATABASE", "SECURITY", "SUBSCRIBER", "RUNTIME"],
+      "classification_evidence": [
+        "Defines GET `/subscription-summary` using `getProfileById()` and returns plan/tier/expiry; defines GET `/predictions` gated by `requireSupabaseUser` + `requireActiveSubscription` and uses `getPredictionsByTier()` plus `filterPredictionsForSubscriptionAccess()`; defines GET `/market-counts` calling DB function `get_available_market_counts(user_id, format)`; defines POST `/consume-insight` calling DB RPC `consume_wallet_quota(user_id, category)`."
+      ]
     },
     {
       "asset_path": "backend/routes/v1/acca.js",
@@ -6244,10 +6278,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "ACCA builder v1 endpoint: builds ACCA combinations from user-selected/direct prediction legs, validates correlations, and persists pending ACCA + ACCA legs.",
+      "functional_group": "ACCA",
+      "relationship_tags": ["ROUTE", "API", "ACCA", "DATABASE", "SECURITY", "RUNTIME"],
+      "classification_evidence": [
+        "Defines POST `/acca/build` with `requireSupabaseUser`; builds candidates from provided `matches` (or validates `prediction_ids` via `validateAccaLeg()`), calls `accaBuilder.buildAccaV2(...)`, validates correlations (`validate_acca_correlations`), computes metrics, then inserts into `accas` and `acca_legs` using `db.query`. Also defines GET `/acca/history` to list prior `accas` for the authenticated user."
+      ]
     },
     {
       "asset_path": "backend/routes/v1/predictions.js",
@@ -6270,10 +6306,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "v1 match predictions endpoint: returns a published main 1X2 prediction plus Safe Haven-selected secondary legs with rule-based validation and formatted reasoning.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": ["ROUTE", "API", "PREDICTION", "DATABASE", "SECURITY", "RUNTIME"],
+      "classification_evidence": [
+        "Defines GET `/matches/:match_id/predictions` (`requireSupabaseUser`) querying `direct1x2_prediction_final` (main) and `direct1x2_prediction_final` (all markets) then uses `selectSecondaryMarkets(main.confidence, allMarkets)` and optionally validates legs with `validateSMBCLegs(...)` to filter secondary legs; returns `res.json(response)` with `edgemind_report` for main and reasoning from each leg. Also defines GET `/predictions/batch` (batching multiple match_ids) and GET `/predictions/history` (user history with joins to `fixtures` and secondary market counts)."
+      ]
     },
     {
       "asset_path": "backend/routes/v1/sameMatchBuilder.js",
@@ -6296,10 +6334,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Same-Match Builder v1: generates 4/6/8-leg same-match betting combos using primary 1X2 and tiered secondary market predictions from the DB.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": ["ROUTE", "API", "PREDICTION", "DATABASE", "GENERATED", "RUNTIME"],
+      "classification_evidence": [
+        "Defines GET `/build` which validates `legs` ∈ {4,6,8}; queries `direct1x2_prediction_final` for the fixture’s primary 1X2 prediction and queries `secondary_market_predictions` for all secondary legs. It then selects tier-2 markets and (for 8 legs) some tier-3 markets to construct `combos`, and returns `res.json({ combos, reasoning })`."
+      ]
     },
     {
       "asset_path": "backend/routes/v1/secondaryMarkets.js",
@@ -6322,10 +6362,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Secondary Markets v1 read endpoint: returns the list of secondary market predictions for a fixture (market, prediction, confidence, and EdgeMind reasoning).",
+      "functional_group": "PREDICTION",
+      "relationship_tags": ["ROUTE", "API", "PREDICTION", "DATABASE", "RUNTIME"],
+      "classification_evidence": [
+        "Defines GET `/:fixture_id` which queries `secondary_market_predictions` via `db.query`, selecting `market_key as market`, `recommendation as prediction`, `confidence`, and `metadata->>'edgemind_report' as reasoning`; responds with `res.json({ markets: result.rows })`."
+      ]
     },
     {
       "asset_path": "backend/routes/vip.js",
@@ -6348,10 +6390,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "VIP stress-payload generator endpoint: produces tier-limited UI-ready prediction buckets (direct, secondary, multi, same-match, ACCA) from prediction tables using daily allocations and confidence rules.",
+      "functional_group": "GENERATED_OUTPUT",
+      "relationship_tags": ["ROUTE", "API", "PREDICTION", "DATABASE", "SECURITY", "GENERATED", "RUNTIME", "UI"],
+      "classification_evidence": [
+        "Defines GET `/stress-payload` guarded by `requireRole('user')`; sets no-cache headers; determines latest `prediction_publish_runs` completed publish_run_id (unless include_all bypass); queries `direct1x2_prediction_final` by tier and sport (with a fallback to `predictions_raw` when empty); maps rows through `shapePrediction()` and buckets by `section_type` while applying confidence thresholds and mega/ACCA validity checks (e.g., `ELITE_CONFIDENCE_FLOOR`, `megaIsValid()`); builds a `payload` derived from tier daily limits."
+      ]
     },
     {
       "asset_path": "backend/scripts/add-avg-total-log.js",
