@@ -17,7 +17,7 @@ CURRENT_STATE_COUNTS
 - GENERATED: 0
 
 FUNCTIONAL_GROUP_COUNTS
-- (PENDING): 147
+- (PENDING): 142
 - PROVIDER_INTEGRATION: 117
 - SCRIPT_TOOL: 106
 - DOCUMENTATION_KNOWLEDGE: 89
@@ -25,8 +25,8 @@ FUNCTIONAL_GROUP_COUNTS
 - DATABASE_MIGRATION: 77
 - FRONTEND_UI: 55
 - DATABASE: 49
-- DEPLOYMENT_OPERATIONS: 34
-- SCHEDULER_BACKGROUND: 27
+- DEPLOYMENT_OPERATIONS: 37
+- SCHEDULER_BACKGROUND: 29
 - PREDICTION: 25
 - GOVERNANCE: 23
 - ACCA: 16
@@ -45,7 +45,7 @@ RELATIONSHIP_TAG_COUNTS
 - SQL: 232
 - SCRIPT_TOOL: 222
 - DATABASE: 214
-- PROVIDER: 193
+- PROVIDER: 195
 - API: 165
 - DOCUMENTATION: 124
 - GOVERNANCE: 114
@@ -57,12 +57,12 @@ RELATIONSHIP_TAG_COUNTS
 - AUDIT: 70
 - ROUTE: 64
 - SECURITY: 50
-- DEPLOYMENT: 44
+- DEPLOYMENT: 49
 - SERVICE: 42
 - GENERATED: 34
-- BACKGROUND_JOB: 28
-- CONFIGURATION: 28
-- SCHEDULER: 27
+- BACKGROUND_JOB: 31
+- CONFIGURATION: 31
+- SCHEDULER: 31
 - RULEBOOK: 25
 - ACCA: 23
 - AI_EDGEMIND: 18
@@ -968,11 +968,11 @@ PER_ASSET_BY_BATCH
 ## B26 DEPLOYMENT_CI
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |
 |---|---|---|---|---|---|---|
-| .github/workflows/daily-insights.yml | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| .github/workflows/lineups-insights.yml | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| Dockerfile | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| render.yaml | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| vercel.json | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| .github/workflows/daily-insights.yml | GitHub Actions scheduled automation to generate and commit daily Edge insight enrichment artifacts under `public/data/`. | SCHEDULER_BACKGROUND | UNKNOWN | ["SCHEDULER","BACKGROUND_JOB","DEPLOYMENT","PROVIDER"] | ["Workflow name `Daily Insights` with `on.schedule.cron: '0 5 * * *'` and `workflow_dispatch` trigger.","CI steps install deps (`npm ci`) and run enrichment commands (`npm run tsdb:day`, `form:enrich`, `h2h:enrich`, `injuries:enrich`, then travel/importance enrich) and commit/push generated JSON outputs; uses secrets like `NEWSAPI_KEY`."] | Verify current GitHub Actions activation and recent execution history for `Daily Insights`, and confirm environment/secrets dependencies (API keys) and scheduler overlap behavior versus other enrichment schedulers in the later deployment comparison phase. |
+| .github/workflows/lineups-insights.yml | GitHub Actions scheduled automation to generate and commit lineups-related enrichment artifacts under `public/data/`. | SCHEDULER_BACKGROUND | UNKNOWN | ["SCHEDULER","BACKGROUND_JOB","DEPLOYMENT","PROVIDER"] | ["Workflow name `Lineups Enrichment` with `on.schedule.cron: '0 11 * * *'` and `workflow_dispatch` trigger.","CI steps install deps (`npm ci`) and run enrichment commands (`h2h:enrich`, `injuries:enrich`, `lineups:enrich`, then travel enrich), commit/push generated JSON outputs; uses secrets like `APIFOOTBALL_KEY` and `NEWSAPI_KEY`."] | Verify current GitHub Actions activation and recent execution history for `Lineups Enrichment`, and confirm secrets dependencies and any runtime/scheduler overlap versus Render/Vercel scheduled jobs during the later deployment comparison phase. |
+| Dockerfile | Container build recipe defining how to run the backend Express server for Edge deployments. | DEPLOYMENT_OPERATIONS | UNKNOWN | ["DEPLOYMENT","CONFIGURATION"] | ["Dockerfile uses `FROM node:20-alpine`, sets `WORKDIR /usr/src/app`, installs prod deps (`npm ci --only=production`), and starts with `CMD [ \"node\", \"backend/server-express.js\" ]`.","Defines runtime port via `ENV PORT=8080` and `EXPOSE 8080`."] | Verify which deployment path(s) actually build/use this `Dockerfile` (CI/CD and platform configuration) and confirm runtime entry behavior (`node backend/server-express.js`) aligns with the live scheduler/runtime expectations in the later deployment compare phase. |
+| render.yaml | Render platform configuration defining backend web service runtime and scheduled cron job surfaces. | DEPLOYMENT_OPERATIONS | UNKNOWN | ["DEPLOYMENT","SCHEDULER","BACKGROUND_JOB","CONFIGURATION"] | ["Render config declares a web service (`type: web`, name `skcsai`, region `frankfurt`, plan `free`) with `buildCommand: npm install && npm run build:supabase` and `startCommand: node backend/server-express.js` plus health check `/api/health`.","Render config also declares multiple cron/trigger surfaces (e.g., weekly scraper and other scheduled jobs) with explicit schedule strings and `startCommand` entrypoints like `node backend/deploy-trigger.js`."] | Verify Render service/cron activation and recent executions (web + cron surfaces), validate the declared build/start commands and required environment dependencies, and confirm whether cron schedules overlap with GitHub Actions/Vercel cron in the later deployment comparison phase. |
+| vercel.json | Vercel platform configuration defining build/output behavior, API crons, and request rewrites for the backend pipeline runner. | DEPLOYMENT_OPERATIONS | UNKNOWN | ["DEPLOYMENT","SCHEDULER","CONFIGURATION"] | ["Vercel config defines `buildCommand: npm run build`, output `public`, and a cron entry for `/api/pipeline/run-full` scheduled as `0 2 * * 1`.","Defines `rewrites` for `/api/*` passthrough and SPA-like route rewrites (e.g., `/subscribe` and `/terms`), plus function `api/pipeline/run-full.js` max duration."] | Verify which Vercel runtime artifacts actually execute from this `vercel.json` (cron schedule + rewrites + function entrypoints) and confirm overlap with other schedulers (GitHub Actions/Render) and required environment/runtime dependencies in the later deployment comparison phase. |
 
 ## B27 ARCHIVE
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |

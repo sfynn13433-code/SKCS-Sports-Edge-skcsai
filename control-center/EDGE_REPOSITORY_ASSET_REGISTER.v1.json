@@ -314,12 +314,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify current GitHub Actions activation and recent execution history for `Daily Insights`, and confirm environment/secrets dependencies (API keys) and scheduler overlap behavior versus other enrichment schedulers in the later deployment comparison phase.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "GitHub Actions scheduled automation to generate and commit daily Edge insight enrichment artifacts under `public/data/`.",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "DEPLOYMENT",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Workflow name `Daily Insights` with `on.schedule.cron: '0 5 * * *'` and `workflow_dispatch` trigger.",
+        "CI steps install deps (`npm ci`) and run enrichment commands (`npm run tsdb:day`, `form:enrich`, `h2h:enrich`, `injuries:enrich`, then travel/importance enrich) and commit/push generated JSON outputs; uses secrets like `NEWSAPI_KEY`."
+      ]
     },
     {
       "asset_path": ".github/workflows/lineups-insights.yml",
@@ -340,12 +348,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify current GitHub Actions activation and recent execution history for `Lineups Enrichment`, and confirm secrets dependencies and any runtime/scheduler overlap versus Render/Vercel scheduled jobs during the later deployment comparison phase.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "GitHub Actions scheduled automation to generate and commit lineups-related enrichment artifacts under `public/data/`.",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "DEPLOYMENT",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Workflow name `Lineups Enrichment` with `on.schedule.cron: '0 11 * * *'` and `workflow_dispatch` trigger.",
+        "CI steps install deps (`npm ci`) and run enrichment commands (`h2h:enrich`, `injuries:enrich`, `lineups:enrich`, then travel enrich), commit/push generated JSON outputs; uses secrets like `APIFOOTBALL_KEY` and `NEWSAPI_KEY`."
+      ]
     },
     {
       "asset_path": ".gitignore",
@@ -936,12 +952,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify which deployment path(s) actually build/use this `Dockerfile` (CI/CD and platform configuration) and confirm runtime entry behavior (`node backend/server-express.js`) aligns with the live scheduler/runtime expectations in the later deployment compare phase.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Container build recipe defining how to run the backend Express server for Edge deployments.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DEPLOYMENT",
+        "CONFIGURATION"
+      ],
+      "classification_evidence": [
+        "Dockerfile uses `FROM node:20-alpine`, sets `WORKDIR /usr/src/app`, installs prod deps (`npm ci --only=production`), and starts with `CMD [ \"node\", \"backend/server-express.js\" ]`.",
+        "Defines runtime port via `ENV PORT=8080` and `EXPOSE 8080`."
+      ]
     },
     {
       "asset_path": "FRONTEND_FIXES_SUMMARY.md",
@@ -16683,12 +16705,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify Render service/cron activation and recent executions (web + cron surfaces), validate the declared build/start commands and required environment dependencies, and confirm whether cron schedules overlap with GitHub Actions/Vercel cron in the later deployment comparison phase.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Render platform configuration defining backend web service runtime and scheduled cron job surfaces.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DEPLOYMENT",
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "CONFIGURATION"
+      ],
+      "classification_evidence": [
+        "Render config declares a web service (`type: web`, name `skcsai`, region `frankfurt`, plan `free`) with `buildCommand: npm install && npm run build:supabase` and `startCommand: node backend/server-express.js` plus health check `/api/health`.",
+        "Render config also declares multiple cron/trigger surfaces (e.g., weekly scraper and other scheduled jobs) with explicit schedule strings and `startCommand` entrypoints like `node backend/deploy-trigger.js`."
+      ]
     },
     {
       "asset_path": "reports/execution-spine-compliance-map.json",
@@ -29243,12 +29273,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify which Vercel runtime artifacts actually execute from this `vercel.json` (cron schedule + rewrites + function entrypoints) and confirm overlap with other schedulers (GitHub Actions/Render) and required environment/runtime dependencies in the later deployment comparison phase.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Vercel platform configuration defining build/output behavior, API crons, and request rewrites for the backend pipeline runner.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DEPLOYMENT",
+        "SCHEDULER",
+        "CONFIGURATION"
+      ],
+      "classification_evidence": [
+        "Vercel config defines `buildCommand: npm run build`, output `public`, and a cron entry for `/api/pipeline/run-full` scheduled as `0 2 * * 1`.",
+        "Defines `rewrites` for `/api/*` passthrough and SPA-like route rewrites (e.g., `/subscribe` and `/terms`), plus function `api/pipeline/run-full.js` max duration."
+      ]
     }
   ],
   "explicit_exclusions": [
