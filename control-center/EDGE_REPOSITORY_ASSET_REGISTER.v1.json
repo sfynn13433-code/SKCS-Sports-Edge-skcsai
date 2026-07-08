@@ -5555,10 +5555,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Normalize Big Balls Data football fixtures, competitions, standings, odds and lineups.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Exports normalizeCompetition/normalizeFixture/normalizeStandingRow/normalizeOddsBundle/normalizeLineupsFromFields.",
+        "Maps raw provider fields into SKCS schema_version strings and uses normalizeStatus from semantic-layer/registry."
+      ]
     },
     {
       "asset_path": "backend/providers/football/bigBallsDataProvider.js",
@@ -5581,10 +5587,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Provider adapter for Big Balls Data football evaluation endpoints (read-only).",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Imports bigBallsDataApiClient functions (listLeagues/listMatches/getMatchOdds/getStandings) and calls the bigBallsDataNormalizer mapping helpers.",
+        "Implements competitions/fixtures/fixtureDetails/standings/lineups/odds returning normalized bundles (lane=evaluation)."
+      ]
     },
     {
       "asset_path": "backend/providers/football/bsdNormalizer.js",
@@ -5607,10 +5619,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Normalize BSD football competitions, fixtures, details, standings and evaluation odds structures.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Exports normalizeCompetition/normalizeFixture/normalizeFixtureDetail/normalizeStandingRow/normalizeStandings/normalizeOddsComparison (through bzzoiroNormalizer).",
+        "Uses normalizeStatus from semantic-layer/registry to map raw status into MatchStatusNormalized."
+      ]
     },
     {
       "asset_path": "backend/providers/football/bsdProvider.js",
@@ -5633,10 +5650,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Provider adapter for BSD evaluation endpoints (read-only) using bzzoiroApiClient.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Imports getEvent/getLineups/getOddsComparison/getStandings/listLeagues/listEvents from ../../services/bzzoiroApiClient and wraps results via bsdNormalizer mapping.",
+        "Provides competitions/fixtures/fixtureDetails/standings/lineups/odds functions that return {ok, provider, lane, items/data}."
+      ]
     },
     {
       "asset_path": "backend/providers/football/bzzoiroNormalizer.js",
@@ -5659,10 +5682,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Normalize Bzzoiro enrichment odds comparison, polymarket markets and lineups into SKCS structures.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Exports normalizeOddsComparison/normalizePolymarket/normalizeLineups; converts raw markets/outcomes into quotes/markets/lineup bundles.",
+        "Sets provider_event_id and lane markers (enrichment/verification) and uses normalizeStatus for lineup status normalization."
+      ]
     },
     {
       "asset_path": "backend/providers/football/bzzoiroProvider.js",
@@ -5685,10 +5713,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Enrichment adapter for Bzzoiro endpoints (read-only) that fetches odds, polymarket and lineups.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Imports getOddsComparison/getPolymarket/getLineups/isBzzoiroEnabled from ../../services/bzzoiroApiClient and normalizes via bzzoiroNormalizer.",
+        "Exports fetchEnrichmentBundle plus fetch*Normalized helpers; lane=enrichment and disabled envelope when feature flag is off."
+      ]
     },
     {
       "asset_path": "backend/providers/football/soccerDataApiNormalizer.js",
@@ -5711,10 +5745,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Normalize Soccer Data API football fixtures and odds payloads into SKCS fixture shape.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Exports normalizeFixture/normalizeMatchesPayload/hasUsableOdds/passesSkcsFixtureGate and prefixes match_id as sda- in normalizeFixture.",
+        "Parses kickoff datetime via parseKickoffUtc and maps incoming home/away/odds fields into a structured odds object."
+      ]
     },
     {
       "asset_path": "backend/providers/football/soccerDataApiProvider.js",
@@ -5737,10 +5776,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Provider adapter for Soccer Data API evaluation endpoints (read-only).",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Imports soccerDataApiClient helpers (listCountries/listLeagues/listMatches/getMatch/listStandings/getCallStats) and uses soccerDataApiNormalizer to shape items.",
+        "Implements competitions/fixtures/fixtureDetails/standings/healthSummary returning normalized evaluation objects (lane=evaluation)."
+      ]
     },
     {
       "asset_path": "backend/providers/football/sportsApiProFootballAdapter.js",
@@ -5763,10 +5808,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Adapter for SportsApiPro football current games + detail/stats normalization.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Requires sportsApiProFootballService functions (getCurrentGames/getGame/getGameStats/getSquads) and uses sportsApiProFootballNormalizer mapping helpers.",
+        "Exports fetchCurrentFootballGames/fetchGameDetail/fetchGameStats and dedupes records into normalized game records (uses provider ids)."
+      ]
     },
     {
       "asset_path": "backend/providers/football/sportsApiProFootballNormalizer.js",
@@ -5789,10 +5840,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Normalize SportsApiPro football raw game payloads into canonical competitor/team/fixture structures.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Exports functions that extract game/fixture/competition/team identifiers and builds competitor maps by walking raw JSON up to MAX_DEPTH.",
+        "Provides normalization helpers used by sportsApiProFootballAdapter (normalizeCurrentGame/normalizeGameDetail/normalizeGameStats/normalizeSquad referenced in adapter)."
+      ]
     },
     {
       "asset_path": "backend/routes/accuracy.js",
