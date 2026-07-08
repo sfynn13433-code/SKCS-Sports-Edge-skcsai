@@ -17,14 +17,14 @@ CURRENT_STATE_COUNTS
 - GENERATED: 0
 
 FUNCTIONAL_GROUP_COUNTS
-- (PENDING): 149
+- (PENDING): 147
 - PROVIDER_INTEGRATION: 117
 - SCRIPT_TOOL: 106
 - DOCUMENTATION_KNOWLEDGE: 89
 - TEST_PROOF: 80
-- DATABASE_MIGRATION: 76
+- DATABASE_MIGRATION: 77
 - FRONTEND_UI: 55
-- DATABASE: 48
+- DATABASE: 49
 - DEPLOYMENT_OPERATIONS: 34
 - SCHEDULER_BACKGROUND: 27
 - PREDICTION: 25
@@ -42,9 +42,9 @@ FUNCTIONAL_GROUP_COUNTS
 
 RELATIONSHIP_TAG_COUNTS
 - RUNTIME: 287
-- SQL: 230
-- SCRIPT_TOOL: 220
-- DATABASE: 212
+- SQL: 232
+- SCRIPT_TOOL: 222
+- DATABASE: 214
 - PROVIDER: 193
 - API: 165
 - DOCUMENTATION: 124
@@ -52,7 +52,7 @@ RELATIONSHIP_TAG_COUNTS
 - OBSERVABILITY: 97
 - PREDICTION: 91
 - UI: 87
-- MIGRATION: 79
+- MIGRATION: 80
 - TEST_PROOF: 78
 - AUDIT: 70
 - ROUTE: 64
@@ -962,8 +962,8 @@ PER_ASSET_BY_BATCH
 ## B25 SCRATCH
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |
 |---|---|---|---|---|---|---|
-| scratch/db_normalize.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scratch/db_sync.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scratch/db_normalize.js | Normalize sport labels in existing raw prediction and league records so downstream identifiers align (e.g., `nba` -> `basketball`, `american_football` -> `nfl`, `soccer_*` -> `football`). | DATABASE_MIGRATION | UNKNOWN | ["DATABASE","MIGRATION","SQL","SCRIPT_TOOL"] | ["Contains SQL `UPDATE` statements against `predictions_raw` to remap `sport` values (nba/american_football/soccer_% -> canonical sports).","Also updates `leagues`, and attempts an optional `match_context_data` update; uses `query` from `../backend/database` in a standalone `normalizeDb()` script."] | Confirm required database tables/columns exist (`predictions_raw`, `leagues`, and optional `match_context_data`) and validate the sport remap affects only intended rows; inspect runtime/DB wiring via `query()`. |
+| scratch/db_sync.js | Fetch and log distinct `sport` values from `predictions_raw` and `leagues` to support DB synchronization/diagnostics. | DATABASE | UNKNOWN | ["DATABASE","SQL","SCRIPT_TOOL"] | ["Runs SQL `SELECT DISTINCT sport` queries against `predictions_raw` and `leagues` and logs the resulting `sport` sets.","Implements a standalone `syncDb()` script using `query` from `../backend/database`."] | Inspect upstream usage of `sport` values (where they are produced/consumed) and validate DB synchronization assumptions by tracing what later pipeline stages do with the distinct `sport` lists (runtime/database). |
 
 ## B26 DEPLOYMENT_CI
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |
