@@ -12677,12 +12677,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: DATA_INGESTION.md is a DOCUMENTATION_KNOWLEDGE asset for ingestion pipeline documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "API"
+      ],
+      "classification_evidence": [
+        "Fast skim: DATA_INGESTION.md indicates DOCUMENTATION_KNOWLEDGE doc/log role (top headings and filename cues).",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/DEPLOYMENT_GUIDE.md",
@@ -12703,12 +12709,23 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: DEPLOYMENT_GUIDE.md is a DEPLOYMENT_OPERATIONS asset for deployment troubleshooting guide.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "API",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Fast skim: DEPLOYMENT_GUIDE.md indicates DEPLOYMENT_OPERATIONS doc/log role (top headings and filename cues).",
+        "Evidence: mentions health / pipeline-status style headings.",
+        "Evidence: contains Supabase references.",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/README.md",
@@ -12729,12 +12746,23 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: README.md is a DEPLOYMENT_OPERATIONS asset for deployment troubleshooting guide.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "SECURITY",
+        "API",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Fast skim: README.md indicates DEPLOYMENT_OPERATIONS doc/log role (top headings and filename cues).",
+        "Evidence: contains Supabase references.",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/SKCS_ENGINE_V2_ADR.md",
@@ -12755,12 +12783,23 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: SKCS_ENGINE_V2_ADR.md is a DOCUMENTATION_KNOWLEDGE asset for ingestion pipeline documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY",
+        "API",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Fast skim: SKCS_ENGINE_V2_ADR.md indicates DOCUMENTATION_KNOWLEDGE doc/log role (top headings and filename cues).",
+        "Evidence: contains Supabase references.",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/SKCS_ENGINE_V2_PHASE05_INGEST_MAP.md",
@@ -12781,12 +12820,24 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: SKCS_ENGINE_V2_PHASE05_INGEST_MAP.md is a DEPLOYMENT_OPERATIONS asset for ingestion pipeline documentation.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "API",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Fast skim: SKCS_ENGINE_V2_PHASE05_INGEST_MAP.md indicates DEPLOYMENT_OPERATIONS doc/log role (top headings and filename cues).",
+        "Evidence: contains Supabase references.",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/SKCS_ENGINE_V2_PHASE0B5_REPLAY.md",
@@ -12807,12 +12858,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: SKCS_ENGINE_V2_PHASE0B5_REPLAY.md is a DOCUMENTATION_KNOWLEDGE asset for ingestion pipeline documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "API"
+      ],
+      "classification_evidence": [
+        "Fast skim: SKCS_ENGINE_V2_PHASE0B5_REPLAY.md indicates DOCUMENTATION_KNOWLEDGE doc/log role (top headings and filename cues).",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/SKCS_ENGINE_V2_PHASE0_DESIGN.md",
@@ -12833,12 +12892,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: SKCS_ENGINE_V2_PHASE0_DESIGN.md is a DOCUMENTATION_KNOWLEDGE asset for ingestion pipeline documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "API",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Fast skim: SKCS_ENGINE_V2_PHASE0_DESIGN.md indicates DOCUMENTATION_KNOWLEDGE doc/log role (top headings and filename cues).",
+        "Evidence: contains Supabase references.",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/VERCEL_DEPLOY_TROUBLESHOOTING.md",
@@ -12859,12 +12928,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: VERCEL_DEPLOY_TROUBLESHOOTING.md is a DEPLOYMENT_OPERATIONS asset for deployment troubleshooting guide.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "API",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Fast skim: VERCEL_DEPLOY_TROUBLESHOOTING.md indicates DEPLOYMENT_OPERATIONS doc/log role (top headings and filename cues).",
+        "Evidence: contains Supabase references.",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/acca_rules_v2.1.md",
@@ -12885,12 +12964,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: acca_rules_v2.1.md is a DOCUMENTATION_KNOWLEDGE asset for governance/ops navigation and runbook documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: acca_rules_v2.1.md indicates DOCUMENTATION_KNOWLEDGE doc/log role (top headings and filename cues).",
+        "Evidence: markdown/text doc used for system navigation and governance review."
+      ]
     },
     {
       "asset_path": "docs/alert-routing-degraded-state.md",
@@ -12911,12 +12995,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: alert-routing-degraded-state.md is a DOCUMENTATION_KNOWLEDGE asset for health checks and diagnostics.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "OBSERVABILITY",
+        "SECURITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: alert-routing-degraded-state.md indicates DOCUMENTATION_KNOWLEDGE doc/log role (top headings and filename cues).",
+        "Evidence: mentions health / pipeline-status style headings."
+      ]
     },
     {
       "asset_path": "docs/api_quota_router.md",
@@ -12937,12 +13028,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: api_quota_router.md is a DEPLOYMENT_OPERATIONS asset for ingestion pipeline documentation.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "API"
+      ],
+      "classification_evidence": [
+        "Fast skim: api_quota_router.md indicates DEPLOYMENT_OPERATIONS doc/log role (top headings and filename cues).",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/blueprint-semantic-drift-control-plane.md",
@@ -12963,12 +13064,23 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: blueprint-semantic-drift-control-plane.md is a DEPLOYMENT_OPERATIONS asset for health checks and diagnostics.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "API",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Fast skim: blueprint-semantic-drift-control-plane.md indicates DEPLOYMENT_OPERATIONS doc/log role (top headings and filename cues).",
+        "Evidence: mentions health / pipeline-status style headings.",
+        "Evidence: contains Supabase references.",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/canonical_ingest_firewall.spec.md",
@@ -12989,12 +13101,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: canonical_ingest_firewall.spec.md is a DOCUMENTATION_KNOWLEDGE asset for ingestion pipeline documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY",
+        "API"
+      ],
+      "classification_evidence": [
+        "Fast skim: canonical_ingest_firewall.spec.md indicates DOCUMENTATION_KNOWLEDGE doc/log role (top headings and filename cues).",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/control-plane-operational-pack.md",
@@ -13015,12 +13136,24 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: control-plane-operational-pack.md is a DEPLOYMENT_OPERATIONS asset for deployment troubleshooting guide.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY",
+        "API"
+      ],
+      "classification_evidence": [
+        "Fast skim: control-plane-operational-pack.md indicates DEPLOYMENT_OPERATIONS doc/log role (top headings and filename cues).",
+        "Evidence: mentions health / pipeline-status style headings.",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/cricket-providers.md",
@@ -13041,12 +13174,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: cricket-providers.md is a DOCUMENTATION_KNOWLEDGE asset for ingestion pipeline documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "API"
+      ],
+      "classification_evidence": [
+        "Fast skim: cricket-providers.md indicates DOCUMENTATION_KNOWLEDGE doc/log role (top headings and filename cues).",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/football-leagues-apisports.md",
@@ -13067,12 +13206,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: football-leagues-apisports.md is a DOCUMENTATION_KNOWLEDGE asset for API and routing documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "API"
+      ],
+      "classification_evidence": [
+        "Fast skim: football-leagues-apisports.md indicates DOCUMENTATION_KNOWLEDGE doc/log role (top headings and filename cues).",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/pipeline-health-feed.md",
@@ -13093,12 +13238,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: pipeline-health-feed.md is a DOCUMENTATION_KNOWLEDGE asset for health checks and diagnostics.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: pipeline-health-feed.md indicates DOCUMENTATION_KNOWLEDGE doc/log role (top headings and filename cues).",
+        "Evidence: mentions health / pipeline-status style headings."
+      ]
     },
     {
       "asset_path": "docs/provider-discovery/free-livescore-api.md",
@@ -13119,12 +13270,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: free-livescore-api.md is a DOCUMENTATION_KNOWLEDGE asset for ingestion pipeline documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "API"
+      ],
+      "classification_evidence": [
+        "Fast skim: free-livescore-api.md indicates DOCUMENTATION_KNOWLEDGE doc/log role (top headings and filename cues).",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/providers/live-football-api-policy.md",
@@ -13145,12 +13302,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: live-football-api-policy.md is a DOCUMENTATION_KNOWLEDGE asset for ingestion pipeline documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY",
+        "API"
+      ],
+      "classification_evidence": [
+        "Fast skim: live-football-api-policy.md indicates DOCUMENTATION_KNOWLEDGE doc/log role (top headings and filename cues).",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/runbook_degraded_states.md",
@@ -13171,12 +13337,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: runbook_degraded_states.md is a DEPLOYMENT_OPERATIONS asset for deployment troubleshooting guide.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Fast skim: runbook_degraded_states.md indicates DEPLOYMENT_OPERATIONS doc/log role (top headings and filename cues).",
+        "Evidence: mentions health / pipeline-status style headings."
+      ]
     },
     {
       "asset_path": "docs/skcs_grading_snapshot_v1.spec.md",
@@ -13197,12 +13372,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: skcs_grading_snapshot_v1.spec.md is a DOCUMENTATION_KNOWLEDGE asset for API and routing documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "API"
+      ],
+      "classification_evidence": [
+        "Fast skim: skcs_grading_snapshot_v1.spec.md indicates DOCUMENTATION_KNOWLEDGE doc/log role (top headings and filename cues).",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/sportsdataio-pre-match-directive.md",
@@ -13223,12 +13406,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: sportsdataio-pre-match-directive.md is a DOCUMENTATION_KNOWLEDGE asset for API and routing documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "SECURITY",
+        "API"
+      ],
+      "classification_evidence": [
+        "Fast skim: sportsdataio-pre-match-directive.md indicates DOCUMENTATION_KNOWLEDGE doc/log role (top headings and filename cues).",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/supabase-tier-display-requirements.md",
@@ -13249,12 +13439,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: supabase-tier-display-requirements.md is a DOCUMENTATION_KNOWLEDGE asset for Supabase/database documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "API",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Fast skim: supabase-tier-display-requirements.md indicates DOCUMENTATION_KNOWLEDGE doc/log role (top headings and filename cues).",
+        "Evidence: contains Supabase references.",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "docs/weekly-global-scrape-scheduler.md",
@@ -13275,12 +13473,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: weekly-global-scrape-scheduler.md is a DEPLOYMENT_OPERATIONS asset for scheduler runbook documentation.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "API"
+      ],
+      "classification_evidence": [
+        "Fast skim: weekly-global-scrape-scheduler.md indicates DEPLOYMENT_OPERATIONS doc/log role (top headings and filename cues).",
+        "Evidence: contains API/routing/policy references."
+      ]
     },
     {
       "asset_path": "dolphin-server/Dockerfile",
