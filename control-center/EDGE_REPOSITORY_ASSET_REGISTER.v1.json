@@ -16943,10 +16943,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: browser_console_test.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'browser_console_test.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/brute-force-ingest.js",
@@ -18486,10 +18494,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: debug-cricket-ai-predictions.js is a diagnostic/trace script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Cricket).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'debug-cricket-ai-predictions.js' indicates a diagnostic/trace runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/debug-cricket-insights-schema.js",
@@ -18512,10 +18530,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: debug-cricket-insights-schema.js is a diagnostic/trace script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Cricket).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'debug-cricket-insights-schema.js' indicates a diagnostic/trace runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "References Supabase client/table access patterns.",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/debug-cricket-simple.js",
@@ -18538,10 +18565,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: debug-cricket-simple.js is a diagnostic/trace script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Cricket).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'debug-cricket-simple.js' indicates a diagnostic/trace runner/utility.",
+        "Contains console output (console.*) for observable runtime results."
+      ]
     },
     {
       "asset_path": "scripts/debug-key.js",
@@ -18564,10 +18597,22 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: debug-key.js is a diagnostic/trace script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'debug-key.js' indicates a diagnostic/trace runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "Mentions provider-specific integration points (sports feeds / adapters).",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/debug-matches-content.js",
@@ -18590,10 +18635,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: debug-matches-content.js is a diagnostic/trace script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'debug-matches-content.js' indicates a diagnostic/trace runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/debug-matches-json.js",
@@ -18616,10 +18671,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: debug-matches-json.js is a diagnostic/trace script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'debug-matches-json.js' indicates a diagnostic/trace runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/deployment-status.md",
@@ -18694,10 +18757,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: diagnose-filtering.js is a diagnostic/trace script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'diagnose-filtering.js' indicates a diagnostic/trace runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/diagnostic-espn-fixed.js",
@@ -18720,10 +18791,23 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: diagnostic-espn-fixed.js is a diagnostic/trace script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Cricket).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "PREDICTION",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'diagnostic-espn-fixed.js' indicates a diagnostic/trace runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "Touches prediction/odds/risk-style logic or output structures.",
+        "Mentions provider-specific integration points (sports feeds / adapters)."
+      ]
     },
     {
       "asset_path": "scripts/diagnostic-espn.js",
@@ -18746,10 +18830,24 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: diagnostic-espn.js is a diagnostic/trace script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Cricket).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "PREDICTION",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'diagnostic-espn.js' indicates a diagnostic/trace runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "Touches prediction/odds/risk-style logic or output structures.",
+        "Mentions provider-specific integration points (sports feeds / adapters).",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/diagnostic-thesportsdb.js",
@@ -18772,10 +18870,21 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: diagnostic-thesportsdb.js is a diagnostic/trace script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Cricket).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'diagnostic-thesportsdb.js' indicates a diagnostic/trace runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "Mentions provider-specific integration points (sports feeds / adapters)."
+      ]
     },
     {
       "asset_path": "scripts/discover-free-livescore-endpoints.js",
@@ -18980,10 +19089,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: examine-prediction-76412.js is a simulation/examination script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'examine-prediction-76412.js' indicates a simulation/examination runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/examine-tier-rules.js",
@@ -19006,10 +19123,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: examine-tier-rules.js is a simulation/examination script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'examine-tier-rules.js' indicates a simulation/examination runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/external-scheduler.js",
@@ -20586,10 +20711,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: simulate-filtering.js is a simulation/examination script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'simulate-filtering.js' indicates a simulation/examination runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/smoke-test.js",
@@ -20612,10 +20745,22 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: smoke-test.js is a smoke test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'smoke-test.js' indicates a smoke test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "Touches prediction/odds/risk-style logic or output structures.",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/start-rapidapi-cricket-mcp.js",
@@ -20801,10 +20946,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-ai-predictions-542703.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-ai-predictions-542703.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/test-ai-predictions-endpoint.js",
@@ -20827,10 +20982,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-ai-predictions-endpoint.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-ai-predictions-endpoint.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/test-all-rapid-hosts.js",
@@ -20853,10 +21016,24 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-all-rapid-hosts.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "PREDICTION",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-all-rapid-hosts.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "Touches prediction/odds/risk-style logic or output structures.",
+        "Mentions provider-specific integration points (sports feeds / adapters).",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/test-antigravity.js",
@@ -20879,10 +21056,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-antigravity.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Antigravity).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-antigravity.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/test-api.js",
@@ -20905,10 +21091,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-api.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-api.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/test-api2.js",
@@ -20931,10 +21127,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-api2.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-api2.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/test-cache.js",
@@ -20957,10 +21163,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-cache.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-cache.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Mentions provider-specific integration points (sports feeds / adapters).",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/test-corrected-endpoint.js",
@@ -20983,10 +21198,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-corrected-endpoint.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-corrected-endpoint.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/test-cricbuzz.js",
@@ -21009,10 +21234,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-cricbuzz.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Cricket).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-cricbuzz.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Mentions provider-specific integration points (sports feeds / adapters)."
+      ]
     },
     {
       "asset_path": "scripts/test-cricket-live-line-advance-provider.js",
@@ -21035,10 +21268,22 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-cricket-live-line-advance-provider.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Cricket).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-cricket-live-line-advance-provider.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "Mentions provider-specific integration points (sports feeds / adapters).",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/test-cricket-live-line-provider.js",
@@ -21061,10 +21306,24 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-cricket-live-line-provider.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Cricket).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "PREDICTION",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-cricket-live-line-provider.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "Touches prediction/odds/risk-style logic or output structures.",
+        "Mentions provider-specific integration points (sports feeds / adapters).",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/test-cron.js",
@@ -21087,10 +21346,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-cron.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-cron.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/test-divanscore-rankings-fallback.js",
@@ -21113,10 +21382,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-divanscore-rankings-fallback.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Ranking/Calibration).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-divanscore-rankings-fallback.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results."
+      ]
     },
     {
       "asset_path": "scripts/test-fetch.js",
@@ -21139,10 +21414,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-fetch.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-fetch.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/test-final-endpoint.js",
@@ -21165,10 +21448,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-final-endpoint.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-final-endpoint.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/test-fixed-ai-predictions.js",
@@ -21191,10 +21482,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-fixed-ai-predictions.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-fixed-ai-predictions.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/test-fixed-endpoint.js",
@@ -21217,10 +21516,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-fixed-endpoint.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-fixed-endpoint.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/test-fixed-pipeline.js",
@@ -21243,10 +21550,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-fixed-pipeline.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-fixed-pipeline.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Mentions provider-specific integration points (sports feeds / adapters)."
+      ]
     },
     {
       "asset_path": "scripts/test-football-h2h-pipeline-integration.js",
@@ -21269,10 +21584,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-football-h2h-pipeline-integration.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Football/Soccer).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-football-h2h-pipeline-integration.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/test-football-highlights-h2h.js",
@@ -21295,10 +21618,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-football-highlights-h2h.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Football/Soccer).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-football-highlights-h2h.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results."
+      ]
     },
     {
       "asset_path": "scripts/test-football-risk-tier-mapper.js",
@@ -21321,10 +21650,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-football-risk-tier-mapper.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Football/Soccer).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-football-risk-tier-mapper.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results."
+      ]
     },
     {
       "asset_path": "scripts/test-football536-endpoints.js",
@@ -21347,10 +21682,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-football536-endpoints.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Football/Soccer).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-football536-endpoints.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results."
+      ]
     },
     {
       "asset_path": "scripts/test-football536-fixtures-normalizer.js",
@@ -21373,10 +21714,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-football536-fixtures-normalizer.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Football/Soccer).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-football536-fixtures-normalizer.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results."
+      ]
     },
     {
       "asset_path": "scripts/test-free-livescore-fixtures.js",
@@ -21399,10 +21746,22 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-free-livescore-fixtures.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Cricket).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-free-livescore-fixtures.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "Mentions provider-specific integration points (sports feeds / adapters).",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/test-free-livescore-search.js",
@@ -21425,10 +21784,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-free-livescore-search.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Cricket).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-free-livescore-search.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Mentions provider-specific integration points (sports feeds / adapters)."
+      ]
     },
     {
       "asset_path": "scripts/test-live-football-api-priority.js",
@@ -21451,10 +21818,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-live-football-api-priority.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Football/Soccer).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-live-football-api-priority.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures.",
+        "Mentions provider-specific integration points (sports feeds / adapters)."
+      ]
     },
     {
       "asset_path": "scripts/test-livescore6-cricket-provider.js",
@@ -21477,10 +21854,22 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-livescore6-cricket-provider.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Cricket).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-livescore6-cricket-provider.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "Mentions provider-specific integration points (sports feeds / adapters).",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/test-logger.js",
@@ -21503,10 +21892,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-logger.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Telemetry/Logging).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-logger.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures.",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/test-metrx-factory-top-metrics.js",
@@ -21529,10 +21927,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-metrx-factory-top-metrics.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-metrx-factory-top-metrics.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/test-metrx-top-metrics.js",
@@ -21555,10 +21961,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-metrx-top-metrics.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "DATABASE",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-metrx-top-metrics.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "References Supabase client/table access patterns.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/test-network.js",
@@ -21581,10 +21997,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-network.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-network.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/test-odds-integration.js",
@@ -21607,10 +22033,23 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-odds-integration.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Odds/Markets).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "DATABASE",
+        "SQL",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-odds-integration.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "References Supabase client/table access patterns.",
+        "Contains SQL-like/query strings or SQL-template usage.",
+        "Touches prediction/odds/risk-style logic or output structures.",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/test-optimized-endpoints.js",
@@ -21633,10 +22072,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-optimized-endpoints.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-optimized-endpoints.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/test-pipeline-integration.js",
@@ -21659,10 +22106,24 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-pipeline-integration.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "DATABASE",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-pipeline-integration.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "References Supabase client/table access patterns.",
+        "Touches prediction/odds/risk-style logic or output structures.",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/test-pro-football-api.js",
@@ -21685,10 +22146,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-pro-football-api.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Football/Soccer).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-pro-football-api.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results."
+      ]
     },
     {
       "asset_path": "scripts/test-rank-calibration.js",
@@ -21711,10 +22178,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-rank-calibration.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Ranking/Calibration).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-rank-calibration.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/test-rank-injection.js",
@@ -21737,10 +22212,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-rank-injection.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Ranking/Calibration).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-rank-injection.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/test-sports-live-rankings.js",
@@ -21763,10 +22246,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-sports-live-rankings.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Ranking/Calibration).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-sports-live-rankings.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Mentions provider-specific integration points (sports feeds / adapters)."
+      ]
     },
     {
       "asset_path": "scripts/test-sportsapi-pro-football-adapter.js",
@@ -21789,10 +22280,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-sportsapi-pro-football-adapter.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Football/Soccer).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-sportsapi-pro-football-adapter.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures.",
+        "Mentions provider-specific integration points (sports feeds / adapters)."
+      ]
     },
     {
       "asset_path": "scripts/test-sportsapi-pro-football-joinability.js",
@@ -21815,10 +22316,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-sportsapi-pro-football-joinability.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Football/Soccer).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-sportsapi-pro-football-joinability.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures.",
+        "Mentions provider-specific integration points (sports feeds / adapters)."
+      ]
     },
     {
       "asset_path": "scripts/test-sportsapi-pro-football.js",
@@ -21841,10 +22352,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-sportsapi-pro-football.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Football/Soccer).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-sportsapi-pro-football.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures.",
+        "Mentions provider-specific integration points (sports feeds / adapters)."
+      ]
     },
     {
       "asset_path": "scripts/test-sportsrc-fixtures.js",
@@ -21867,10 +22388,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-sportsrc-fixtures.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-sportsrc-fixtures.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results."
+      ]
     },
     {
       "asset_path": "scripts/test-sportsrc-health.js",
@@ -21893,10 +22420,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-sportsrc-health.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-sportsrc-health.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results."
+      ]
     },
     {
       "asset_path": "scripts/test-sportsrc-odds.js",
@@ -21919,10 +22452,21 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-sportsrc-odds.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Odds/Markets).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-sportsrc-odds.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/test-telemetry-integration.js",
@@ -21945,10 +22489,24 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-telemetry-integration.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Telemetry/Logging).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "DATABASE",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-telemetry-integration.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "References Supabase client/table access patterns.",
+        "Touches prediction/odds/risk-style logic or output structures.",
+        "Reads configuration from process.env for runtime setup."
+      ]
     },
     {
       "asset_path": "scripts/test-thesportsdb-endpoints.js",
@@ -21971,10 +22529,21 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-thesportsdb-endpoints.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Cricket).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-thesportsdb-endpoints.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "Uses request primitives (fetch/axios) to exercise runtime code paths.",
+        "Mentions provider-specific integration points (sports feeds / adapters)."
+      ]
     },
     {
       "asset_path": "scripts/test-weather-pipeline.js",
@@ -21997,10 +22566,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test-weather-pipeline.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (Weather).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test-weather-pipeline.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/test_full_fallback_flow.js",
@@ -22023,10 +22600,22 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: test_full_fallback_flow.js is a test script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "API",
+        "RUNTIME",
+        "DATABASE",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'test_full_fallback_flow.js' indicates a test runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Includes HTTP/API endpoint references (http(s)://, localhost, or /api/ usage).",
+        "References Supabase client/table access patterns.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/trace-data-flow.js",
@@ -22049,10 +22638,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: trace-data-flow.js is a diagnostic/trace script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'trace-data-flow.js' indicates a diagnostic/trace runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/trace-filtering-rules.js",
@@ -22075,10 +22672,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: trace-filtering-rules.js is a diagnostic/trace script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'trace-filtering-rules.js' indicates a diagnostic/trace runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/trace-filtering-timestamp.js",
@@ -22101,10 +22706,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: trace-filtering-timestamp.js is a diagnostic/trace script used for controlled EdgeMind/Edge pipeline diagnostics and verification (EdgeMind).",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: filename 'trace-filtering-timestamp.js' indicates a diagnostic/trace runner/utility.",
+        "Contains console output (console.*) for observable runtime results.",
+        "Touches prediction/odds/risk-style logic or output structures."
+      ]
     },
     {
       "asset_path": "scripts/track-prediction-accuracy.js",
