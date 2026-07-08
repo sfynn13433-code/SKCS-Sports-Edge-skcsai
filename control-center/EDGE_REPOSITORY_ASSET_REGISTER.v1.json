@@ -15517,12 +15517,16 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this SCRIPT_TOOL classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: _bsd_league_inventory.json is a SCRIPT_TOOL asset used for inventory/ops utility.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Fast skim: _bsd_league_inventory.json indicates controlled SCRIPT_TOOL maintenance/processing utility."
+      ]
     },
     {
       "asset_path": "scripts/_check-db.js",
@@ -15741,12 +15745,16 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this SCRIPT_TOOL classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: _local-rebuild.js is a SCRIPT_TOOL asset used for inventory/ops utility.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Fast skim: _local-rebuild.js indicates controlled SCRIPT_TOOL maintenance/processing utility."
+      ]
     },
     {
       "asset_path": "scripts/_trigger-sync.js",
@@ -15801,12 +15809,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DATABASE_MIGRATION classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: add-cricket-rls-policies.sql is a DATABASE_MIGRATION asset used for schema/index/migration planning.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "MIGRATION",
+        "SQL",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Fast skim: add-cricket-rls-policies.sql indicates controlled DATABASE_MIGRATION maintenance/processing utility.",
+        "Fast skim: contains Supabase client patterns (DB reads/writes / RPC).",
+        "Fast skim: source contains SQL-like operations (schema/data changes).",
+        "Fast skim: migration/schema content detected from filename/content."
+      ]
     },
     {
       "asset_path": "scripts/add-event-columns.js",
@@ -15827,12 +15845,16 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this SCRIPT_TOOL classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: add-event-columns.js is a SCRIPT_TOOL asset used for inventory/ops utility.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Fast skim: add-event-columns.js indicates controlled SCRIPT_TOOL maintenance/processing utility."
+      ]
     },
     {
       "asset_path": "scripts/analyze-postgres-tables.js",
@@ -15853,12 +15875,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DATABASE classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: analyze-postgres-tables.js is a DATABASE asset used for database/supabase analysis and diagnostics.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: analyze-postgres-tables.js indicates controlled DATABASE maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/analyze-supabase-tables-full.js",
@@ -15879,12 +15907,23 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this ACCA classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: analyze-supabase-tables-full.js is a ACCA asset used for database/supabase analysis and diagnostics.",
+      "functional_group": "ACCA",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "ACCA",
+        "DATABASE",
+        "SQL",
+        "MIGRATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: analyze-supabase-tables-full.js indicates controlled ACCA maintenance/processing utility.",
+        "Fast skim: contains Supabase client patterns (DB reads/writes / RPC).",
+        "Fast skim: source contains SQL-like operations (schema/data changes).",
+        "Fast skim: migration/schema content detected from filename/content."
+      ]
     },
     {
       "asset_path": "scripts/analyze-supabase-tables.js",
@@ -15905,12 +15944,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DATABASE classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: analyze-supabase-tables.js is a DATABASE asset used for database/supabase analysis and diagnostics.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Fast skim: analyze-supabase-tables.js indicates controlled DATABASE maintenance/processing utility.",
+        "Fast skim: contains Supabase client patterns (DB reads/writes / RPC)."
+      ]
     },
     {
       "asset_path": "scripts/analyze-supabase-visual.js",
@@ -15931,12 +15976,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DATABASE_MIGRATION classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: analyze-supabase-visual.js is a DATABASE_MIGRATION asset used for database/supabase analysis and diagnostics.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "MIGRATION",
+        "SQL",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Fast skim: analyze-supabase-visual.js indicates controlled DATABASE_MIGRATION maintenance/processing utility.",
+        "Fast skim: contains Supabase client patterns (DB reads/writes / RPC).",
+        "Fast skim: source contains SQL-like operations (schema/data changes).",
+        "Fast skim: migration/schema content detected from filename/content."
+      ]
     },
     {
       "asset_path": "scripts/apply-db-governance.js",
@@ -17090,12 +17145,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this ACCA classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: build-acca.js is a ACCA asset used for ACCA rules/build and related maintenance.",
+      "functional_group": "ACCA",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "ACCA",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: build-acca.js indicates controlled ACCA maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/build-sportsdb-config.js",
@@ -17116,12 +17178,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this SCRIPT_TOOL classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: build-sportsdb-config.js is a SCRIPT_TOOL asset used for inventory/ops utility.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "API",
+        "ROUTE"
+      ],
+      "classification_evidence": [
+        "Fast skim: build-sportsdb-config.js indicates controlled SCRIPT_TOOL maintenance/processing utility.",
+        "Fast skim: includes HTTP/API interaction points."
+      ]
     },
     {
       "asset_path": "scripts/check-acca-data.js",
@@ -18217,12 +18286,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DEPLOYMENT_OPERATIONS classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: cleanup-competition-allowlists.js is a DEPLOYMENT_OPERATIONS asset used for inventory/ops utility.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: cleanup-competition-allowlists.js indicates controlled DEPLOYMENT_OPERATIONS maintenance/processing utility.",
+        "Fast skim: contains Supabase client patterns (DB reads/writes / RPC).",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/cleanup-duplicate-fallbacks.js",
@@ -18243,12 +18320,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DEPLOYMENT_OPERATIONS classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: cleanup-duplicate-fallbacks.js is a DEPLOYMENT_OPERATIONS asset used for inventory/ops utility.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: cleanup-duplicate-fallbacks.js indicates controlled DEPLOYMENT_OPERATIONS maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/cleanup-live-direct-duplicates.js",
@@ -18269,12 +18352,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DEPLOYMENT_OPERATIONS classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: cleanup-live-direct-duplicates.js is a DEPLOYMENT_OPERATIONS asset used for inventory/ops utility.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: cleanup-live-direct-duplicates.js indicates controlled DEPLOYMENT_OPERATIONS maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/cleanup-predictions.js",
@@ -18295,12 +18384,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DEPLOYMENT_OPERATIONS classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: cleanup-predictions.js is a DEPLOYMENT_OPERATIONS asset used for inventory/ops utility.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: cleanup-predictions.js indicates controlled DEPLOYMENT_OPERATIONS maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/cleanup-unknown-teams.js",
@@ -18321,12 +18416,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DEPLOYMENT_OPERATIONS classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: cleanup-unknown-teams.js is a DEPLOYMENT_OPERATIONS asset used for inventory/ops utility.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: cleanup-unknown-teams.js indicates controlled DEPLOYMENT_OPERATIONS maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/cleanup.js",
@@ -18347,12 +18448,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DEPLOYMENT_OPERATIONS classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: cleanup.js is a DEPLOYMENT_OPERATIONS asset used for inventory/ops utility.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: cleanup.js indicates controlled DEPLOYMENT_OPERATIONS maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/complete-phase1-testing.js",
@@ -18373,12 +18480,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this PREDICTION classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: complete-phase1-testing.js is a PREDICTION asset used for schema/index/migration planning.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL",
+        "MIGRATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: complete-phase1-testing.js indicates controlled PREDICTION maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes).",
+        "Fast skim: migration/schema content detected from filename/content."
+      ]
     },
     {
       "asset_path": "scripts/complete-phase2-rules.js",
@@ -18399,12 +18514,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this ACCA classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: complete-phase2-rules.js is a ACCA asset used for schema/index/migration planning.",
+      "functional_group": "ACCA",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "ACCA",
+        "SQL",
+        "MIGRATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: complete-phase2-rules.js indicates controlled ACCA maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes).",
+        "Fast skim: migration/schema content detected from filename/content."
+      ]
     },
     {
       "asset_path": "scripts/complete-phase3-predictions.js",
@@ -18425,12 +18549,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DEPLOYMENT_OPERATIONS classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: complete-phase3-predictions.js is a DEPLOYMENT_OPERATIONS asset used for database/supabase analysis and diagnostics.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL",
+        "MIGRATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: complete-phase3-predictions.js indicates controlled DEPLOYMENT_OPERATIONS maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes).",
+        "Fast skim: migration/schema content detected from filename/content."
+      ]
     },
     {
       "asset_path": "scripts/compose-context-pack.js",
@@ -18482,12 +18614,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DATABASE_MIGRATION classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: create-indexes.js is a DATABASE_MIGRATION asset used for schema/index/migration planning.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "MIGRATION",
+        "SQL",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Fast skim: create-indexes.js indicates controlled DATABASE_MIGRATION maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/create-migration-plan.js",
@@ -18508,12 +18648,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DATABASE_MIGRATION classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: create-migration-plan.js is a DATABASE_MIGRATION asset used for schema/index/migration planning.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "MIGRATION",
+        "SQL",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Fast skim: create-migration-plan.js indicates controlled DATABASE_MIGRATION maintenance/processing utility.",
+        "Fast skim: contains Supabase client patterns (DB reads/writes / RPC).",
+        "Fast skim: source contains SQL-like operations (schema/data changes).",
+        "Fast skim: migration/schema content detected from filename/content."
+      ]
     },
     {
       "asset_path": "scripts/cricapi-cache-refresh.js",
@@ -18567,12 +18717,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DATABASE classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: db-cleanup.js is a DATABASE asset used for inventory/ops utility.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: db-cleanup.js indicates controlled DATABASE maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/debug-cricket-ai-predictions.js",
@@ -18804,12 +18960,24 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DOCUMENTATION_KNOWLEDGE classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: deployment-status.md is a DOCUMENTATION_KNOWLEDGE asset used for inventory/ops utility.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "DOCUMENTATION",
+        "GENERATED",
+        "DATABASE",
+        "API",
+        "ROUTE",
+        "DEPLOYMENT"
+      ],
+      "classification_evidence": [
+        "Fast skim: deployment-status.md indicates controlled DOCUMENTATION_KNOWLEDGE maintenance/processing utility.",
+        "Fast skim: contains Supabase client patterns (DB reads/writes / RPC).",
+        "Fast skim: includes HTTP/API interaction points."
+      ]
     },
     {
       "asset_path": "scripts/deployment_verification.js",
@@ -18830,12 +18998,25 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this ACCA classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: deployment_verification.js is a ACCA asset used for schema/index/migration planning.",
+      "functional_group": "ACCA",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "ACCA",
+        "API",
+        "ROUTE",
+        "SQL",
+        "MIGRATION",
+        "DEPLOYMENT"
+      ],
+      "classification_evidence": [
+        "Fast skim: deployment_verification.js indicates controlled ACCA maintenance/processing utility.",
+        "Fast skim: includes HTTP/API interaction points.",
+        "Fast skim: source contains SQL-like operations (schema/data changes).",
+        "Fast skim: migration/schema content detected from filename/content."
+      ]
     },
     {
       "asset_path": "scripts/diagnose-filtering.js",
@@ -19434,12 +19615,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this API_ROUTE classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: fix-ai-predictions-endpoint.js is a API_ROUTE asset used for inventory/ops utility.",
+      "functional_group": "API_ROUTE",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "API",
+        "ROUTE",
+        "SQL",
+        "DEPLOYMENT"
+      ],
+      "classification_evidence": [
+        "Fast skim: fix-ai-predictions-endpoint.js indicates controlled API_ROUTE maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/fix-frontend-placeholders.js",
@@ -19460,12 +19650,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this FRONTEND_UI classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: fix-frontend-placeholders.js is a FRONTEND_UI asset used for front-end placeholder fixes.",
+      "functional_group": "FRONTEND_UI",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: fix-frontend-placeholders.js indicates controlled FRONTEND_UI maintenance/processing utility."
+      ]
     },
     {
       "asset_path": "scripts/fix-json-simple.js",
@@ -19486,12 +19681,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DEPLOYMENT_OPERATIONS classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: fix-json-simple.js is a DEPLOYMENT_OPERATIONS asset used for inventory/ops utility.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: fix-json-simple.js indicates controlled DEPLOYMENT_OPERATIONS maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/fix-matches-structure.js",
@@ -19512,12 +19713,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this API_ROUTE classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: fix-matches-structure.js is a API_ROUTE asset used for inventory/ops utility.",
+      "functional_group": "API_ROUTE",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "API",
+        "ROUTE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: fix-matches-structure.js indicates controlled API_ROUTE maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/fix-placeholders-and-insights.js",
@@ -19538,12 +19747,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DEPLOYMENT_OPERATIONS classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: fix-placeholders-and-insights.js is a DEPLOYMENT_OPERATIONS asset used for inventory/ops utility.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: fix-placeholders-and-insights.js indicates controlled DEPLOYMENT_OPERATIONS maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/fix-prediction-76412.js",
@@ -19564,12 +19779,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this ACCA classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: fix-prediction-76412.js is a ACCA asset used for ACCA rules/build and related maintenance.",
+      "functional_group": "ACCA",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "ACCA",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: fix-prediction-76412.js indicates controlled ACCA maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/fix-remaining-json-issues.js",
@@ -19590,12 +19812,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DEPLOYMENT_OPERATIONS classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: fix-remaining-json-issues.js is a DEPLOYMENT_OPERATIONS asset used for inventory/ops utility.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: fix-remaining-json-issues.js indicates controlled DEPLOYMENT_OPERATIONS maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/fix-sport-data.js",
@@ -19616,12 +19844,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DEPLOYMENT_OPERATIONS classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: fix-sport-data.js is a DEPLOYMENT_OPERATIONS asset used for inventory/ops utility.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: fix-sport-data.js indicates controlled DEPLOYMENT_OPERATIONS maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/force-enrich-match.js",
@@ -19713,12 +19947,16 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this SCRIPT_TOOL classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: gulf_in_class_simulation.js is a SCRIPT_TOOL asset used for inventory/ops utility.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Fast skim: gulf_in_class_simulation.js indicates controlled SCRIPT_TOOL maintenance/processing utility."
+      ]
     },
     {
       "asset_path": "scripts/hotfix-acca-rules.js",
@@ -19739,12 +19977,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this ACCA classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: hotfix-acca-rules.js is a ACCA asset used for ACCA rules/build and related maintenance.",
+      "functional_group": "ACCA",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "ACCA",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: hotfix-acca-rules.js indicates controlled ACCA maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/implement-phase1-fixtures-corrected.js",
@@ -19765,12 +20010,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this PREDICTION classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: implement-phase1-fixtures-corrected.js is a PREDICTION asset used for schema/index/migration planning.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL",
+        "MIGRATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: implement-phase1-fixtures-corrected.js indicates controlled PREDICTION maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes).",
+        "Fast skim: migration/schema content detected from filename/content."
+      ]
     },
     {
       "asset_path": "scripts/implement-phase1-fixtures.js",
@@ -19791,12 +20044,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this PREDICTION classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: implement-phase1-fixtures.js is a PREDICTION asset used for schema/index/migration planning.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL",
+        "MIGRATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: implement-phase1-fixtures.js indicates controlled PREDICTION maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes).",
+        "Fast skim: migration/schema content detected from filename/content."
+      ]
     },
     {
       "asset_path": "scripts/implement-phase2-rules-conservative.js",
@@ -19817,12 +20078,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this ACCA classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: implement-phase2-rules-conservative.js is a ACCA asset used for schema/index/migration planning.",
+      "functional_group": "ACCA",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "ACCA",
+        "SQL",
+        "MIGRATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: implement-phase2-rules-conservative.js indicates controlled ACCA maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes).",
+        "Fast skim: migration/schema content detected from filename/content."
+      ]
     },
     {
       "asset_path": "scripts/implement-phase2-rules.js",
@@ -19843,12 +20113,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this ACCA classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: implement-phase2-rules.js is a ACCA asset used for database/supabase analysis and diagnostics.",
+      "functional_group": "ACCA",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "ACCA",
+        "SQL",
+        "MIGRATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: implement-phase2-rules.js indicates controlled ACCA maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes).",
+        "Fast skim: migration/schema content detected from filename/content."
+      ]
     },
     {
       "asset_path": "scripts/implement-phase3-predictions.js",
@@ -19869,12 +20148,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DATABASE_MIGRATION classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: implement-phase3-predictions.js is a DATABASE_MIGRATION asset used for database/supabase analysis and diagnostics.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "MIGRATION",
+        "SQL",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Fast skim: implement-phase3-predictions.js indicates controlled DATABASE_MIGRATION maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes).",
+        "Fast skim: migration/schema content detected from filename/content."
+      ]
     },
     {
       "asset_path": "scripts/import-f1-formula1db.js",
@@ -19968,12 +20256,16 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this SCRIPT_TOOL classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: install-local-git-hooks.js is a SCRIPT_TOOL asset used for inventory/ops utility.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Fast skim: install-local-git-hooks.js indicates controlled SCRIPT_TOOL maintenance/processing utility."
+      ]
     },
     {
       "asset_path": "scripts/investigate-football536-current-fixtures.js",
@@ -20025,12 +20317,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this GRADING_ACCURACY classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: manual-grade.js is a GRADING_ACCURACY asset used for grading and resolution of prediction outcomes.",
+      "functional_group": "GRADING_ACCURACY",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "GRADING",
+        "PREDICTION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: manual-grade.js indicates controlled GRADING_ACCURACY maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/map-table-dependencies.js",
@@ -20051,12 +20351,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this API_ROUTE classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: map-table-dependencies.js is a API_ROUTE asset used for schema/index/migration planning.",
+      "functional_group": "API_ROUTE",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "API",
+        "ROUTE",
+        "SQL",
+        "MIGRATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: map-table-dependencies.js indicates controlled API_ROUTE maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes).",
+        "Fast skim: migration/schema content detected from filename/content."
+      ]
     },
     {
       "asset_path": "scripts/master-qa.js",
@@ -20358,12 +20668,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DATABASE classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: purge-fallback-data.js is a DATABASE asset used for inventory/ops utility.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: purge-fallback-data.js indicates controlled DATABASE maintenance/processing utility.",
+        "Fast skim: contains Supabase client patterns (DB reads/writes / RPC).",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/py_verify_thesportsdb_coverage.py",
@@ -20420,12 +20738,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DATABASE classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: quarantine-database.js is a DATABASE asset used for inventory/ops utility.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: quarantine-database.js indicates controlled DATABASE maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/rebuild-canonical-from-api-sports.js",
@@ -20481,12 +20805,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this SCRIPT_TOOL classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: render-api-deploy.js is a SCRIPT_TOOL asset used for inventory/ops utility.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "API",
+        "DEPLOYMENT"
+      ],
+      "classification_evidence": [
+        "Fast skim: render-api-deploy.js indicates controlled SCRIPT_TOOL maintenance/processing utility.",
+        "Fast skim: includes HTTP/API interaction points."
+      ]
     },
     {
       "asset_path": "scripts/repair-unknown-team-names.js",
@@ -20507,12 +20838,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this ACCA classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: repair-unknown-team-names.js is a ACCA asset used for ACCA rules/build and related maintenance.",
+      "functional_group": "ACCA",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "ACCA",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: repair-unknown-team-names.js indicates controlled ACCA maintenance/processing utility.",
+        "Fast skim: contains Supabase client patterns (DB reads/writes / RPC).",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/requirements.txt",
@@ -20533,12 +20873,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DEPLOYMENT_OPERATIONS classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: requirements.txt is a DEPLOYMENT_OPERATIONS asset used for dependency/install manifest for controlled deployment tooling.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Fast skim: requirements.txt indicates controlled DEPLOYMENT_OPERATIONS maintenance/processing utility.",
+        "Fast skim: contains Supabase client patterns (DB reads/writes / RPC)."
+      ]
     },
     {
       "asset_path": "scripts/resolve-results.js",
@@ -20559,12 +20905,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this GRADING_ACCURACY classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: resolve-results.js is a GRADING_ACCURACY asset used for grading and resolution of prediction outcomes.",
+      "functional_group": "GRADING_ACCURACY",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "GRADING",
+        "PREDICTION",
+        "API",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: resolve-results.js indicates controlled GRADING_ACCURACY maintenance/processing utility.",
+        "Fast skim: includes HTTP/API interaction points.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/run-edgemind-judge.js",
@@ -20927,12 +21283,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DATABASE_MIGRATION classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: safe-migration-plan.js is a DATABASE_MIGRATION asset used for schema/index/migration planning.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "MIGRATION",
+        "SQL",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Fast skim: safe-migration-plan.js indicates controlled DATABASE_MIGRATION maintenance/processing utility.",
+        "Fast skim: source contains SQL-like operations (schema/data changes).",
+        "Fast skim: migration/schema content detected from filename/content."
+      ]
     },
     {
       "asset_path": "scripts/scheduler.js",
@@ -21230,12 +21595,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DATABASE classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: supabase-diagnostics.js is a DATABASE asset used for database/supabase analysis and diagnostics.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: supabase-diagnostics.js indicates controlled DATABASE maintenance/processing utility.",
+        "Fast skim: contains Supabase client patterns (DB reads/writes / RPC).",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/supabase_health_check.js",
@@ -21256,12 +21629,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this DATABASE classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: supabase_health_check.js is a DATABASE asset used for inventory/ops utility.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: supabase_health_check.js indicates controlled DATABASE maintenance/processing utility.",
+        "Fast skim: contains Supabase client patterns (DB reads/writes / RPC).",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/sync-bsd-enrichment.js",
@@ -23179,12 +23560,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database/schema effects for this GRADING_ACCURACY classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: track-prediction-accuracy.js is a GRADING_ACCURACY asset used for grading and resolution of prediction outcomes.",
+      "functional_group": "GRADING_ACCURACY",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "GRADING",
+        "PREDICTION",
+        "API",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: track-prediction-accuracy.js indicates controlled GRADING_ACCURACY maintenance/processing utility.",
+        "Fast skim: includes HTTP/API interaction points.",
+        "Fast skim: source contains SQL-like operations (schema/data changes)."
+      ]
     },
     {
       "asset_path": "scripts/trigger-grade.js",
