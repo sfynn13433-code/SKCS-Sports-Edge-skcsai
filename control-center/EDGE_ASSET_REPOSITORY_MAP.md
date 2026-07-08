@@ -17,55 +17,55 @@ CURRENT_STATE_COUNTS
 - GENERATED: 0
 
 FUNCTIONAL_GROUP_COUNTS
-- (PENDING): 521
+- (PENDING): 501
 - SCRIPT_TOOL: 89
-- PROVIDER_INTEGRATION: 75
+- PROVIDER_INTEGRATION: 77
 - TEST_PROOF: 75
 - DATABASE: 26
 - GOVERNANCE: 23
-- SCHEDULER_BACKGROUND: 19
-- PREDICTION: 15
+- SCHEDULER_BACKGROUND: 22
+- PREDICTION: 19
 - API_ROUTE: 12
+- DEPLOYMENT_OPERATIONS: 12
+- DATABASE_MIGRATION: 8
 - ACCA: 7
+- AI_EDGEMIND: 7
 - BACKEND_RUNTIME: 7
-- DATABASE_MIGRATION: 7
-- AI_EDGEMIND: 6
-- DEPLOYMENT_OPERATIONS: 5
+- GENERATED_OUTPUT: 5
 - DOCUMENTATION_KNOWLEDGE: 4
-- GENERATED_OUTPUT: 4
-- GRADING_ACCURACY: 3
+- GRADING_ACCURACY: 4
 - SECURITY_SUBSCRIBER: 3
 - SERVICE: 3
 - UNCATEGORIZED: 2
 
 RELATIONSHIP_TAG_COUNTS
-- RUNTIME: 203
-- PROVIDER: 150
-- SCRIPT_TOOL: 98
-- API: 94
-- SQL: 92
-- DATABASE: 89
-- PREDICTION: 77
+- RUNTIME: 223
+- PROVIDER: 153
+- SCRIPT_TOOL: 118
+- API: 104
+- DATABASE: 96
+- SQL: 93
+- PREDICTION: 81
 - TEST_PROOF: 71
 - SERVICE: 42
 - GOVERNANCE: 35
 - CONFIGURATION: 27
 - OBSERVABILITY: 27
 - ROUTE: 26
+- BACKGROUND_JOB: 23
 - SECURITY: 23
-- BACKGROUND_JOB: 20
-- SCHEDULER: 19
-- AI_EDGEMIND: 16
+- SCHEDULER: 22
+- AI_EDGEMIND: 17
+- GENERATED: 14
 - ACCA: 13
-- GENERATED: 13
+- DEPLOYMENT: 12
 - AUDIT: 9
 - DOCUMENTATION: 9
 - RULEBOOK: 9
-- DEPLOYMENT: 5
-- GRADING: 3
+- GRADING: 4
 - SUBSCRIBER: 3
 - CONTROLLER: 2
-- MIGRATION: 1
+- MIGRATION: 2
 - UI: 1
 
 NEXT_VALIDATION_NON_EMPTY_ASSETS: 906
@@ -539,26 +539,26 @@ PER_ASSET_BY_BATCH
 ## B13 SCRIPTS_RUN_TRIGGER_SCHED
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |
 |---|---|---|---|---|---|---|
-| scripts/_trigger-sync.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/external-scheduler.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/run-edgemind-judge.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/run-master-pipeline.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/run-migration.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/run-pipeline-from-context-pack.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/run-pipeline.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/run-scheduled-sync.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/run-stage1-math.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/run-stage2-context.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/run-stage3-volatility.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/run-test.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/scheduler.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/start-rapidapi-cricket-mcp.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/trigger-grade.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/trigger-pipeline-sync.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/trigger-publication.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/trigger-refresh.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/trigger-settlement.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| scripts/wake-and-sync.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/_trigger-sync.js | Rough classification: _trigger-sync is a deployment trigger script that POSTs /api/pipeline/sync on the Edge backend. | DEPLOYMENT_OPERATIONS | UNKNOWN | ["DEPLOYMENT","API","RUNTIME","SCRIPT_TOOL"] | ["Uses HTTPS POST to trigger /api/pipeline/sync with x-api-key header.","Logs pipeline trigger status and parses returned JSON."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/external-scheduler.js | Rough classification: external-scheduler defines external cron jobs to trigger fixture sync, context enrichment, and AI pipeline stages via backend scheduler endpoints. | SCHEDULER_BACKGROUND | UNKNOWN | ["SCHEDULER","BACKGROUND_JOB","API","RUNTIME","SCRIPT_TOOL"] | ["Uses node-cron schedules with Africa/Johannesburg timezone.","Uses axios to POST to /api/scheduler/* trigger endpoints.","Triggers fixture sync, context enrichment, AI pipeline, and full pipeline daily."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/run-edgemind-judge.js | Rough classification: run-edgemind-judge wakes EdgeMind (AI judge) to analyze Stage-3 matches and write risk-tiered outcomes into Supabase. | AI_EDGEMIND | UNKNOWN | ["AI_EDGEMIND","DATABASE","PROVIDER","RUNTIME","SCRIPT_TOOL"] | ["Creates Supabase client and reads matches from stage-3 gatekeeper tables.","Builds an AI prompt and calls external model endpoints (Gemini/OpenAI and/or Groq) via fetch.","Writes inferred risk tier / confidence artifacts back to Supabase-backed tables."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/run-master-pipeline.js | Rough classification: run-master-pipeline is an orchestration runner that executes the Stage-1/2/3 pipeline scripts sequentially via child processes. | DEPLOYMENT_OPERATIONS | UNKNOWN | ["DEPLOYMENT","RUNTIME","SCRIPT_TOOL"] | ["Uses exec to run stage scripts (run-stage1-math, run-stage2-context, run-stage3-volatility, run-edgemind-judge).","Logs stdout/stderr for each stage and stops on stage execution errors."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/run-migration.js | Rough classification: run-migration executes a small set of SQL migration files against Postgres using a pg Pool. | DATABASE_MIGRATION | UNKNOWN | ["DATABASE","MIGRATION","SQL","SCRIPT_TOOL","RUNTIME"] | ["Uses pg Pool with DATABASE_URL and loads SQL from control supabase/migrations path.","Runs queries for each migration file provided via CLI args (or defaults)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/run-pipeline-from-context-pack.js | Rough classification: run-pipeline-from-context-pack runs the prediction pipeline from a packaged context JSON (public/data/context-pack-<date>.json). | PREDICTION | UNKNOWN | ["PREDICTION","RUNTIME","SCRIPT_TOOL"] | ["Reads input JSON context pack and maps events/matches into pipeline-ready payloads.","Invokes the platform execution pipeline entrypoint (executionPipeline.js)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/run-pipeline.js | Rough classification: run-pipeline triggers the Edge API pipeline sync (checks Vercel, then posts /api/pipeline/sync with wait). | DEPLOYMENT_OPERATIONS | UNKNOWN | ["DEPLOYMENT","API","RUNTIME","SCRIPT_TOOL"] | ["Checks service health by making GET /api/pipeline/status requests.","POSTs to /api/pipeline/sync on Render with {wait:true} and prints returned status/data."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/run-scheduled-sync.js | Rough classification: run-scheduled-sync triggers a Supabase Edge Function (scheduled-fixture-sync) using service-role bearer authorization. | SCHEDULER_BACKGROUND | UNKNOWN | ["SCHEDULER","BACKGROUND_JOB","API","RUNTIME","SCRIPT_TOOL"] | ["Posts to SUPABASE_EDGE_FUNCTION_URL for scheduled-fixture-sync using axios.","Sends Authorization Bearer with SUPABASE_SERVICE_ROLE_KEY."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/run-stage1-math.js | Rough classification: run-stage1-math computes Stage-1 base probabilities for upcoming fixtures and upserts into sport stage-1 tables in Supabase. | PREDICTION | UNKNOWN | ["PREDICTION","DATABASE","RUNTIME","SCRIPT_TOOL"] | ["Uses Supabase client to select upcoming fixtures from canonical events and upserts stage-1 payloads.","Computes base probabilities using sportRules and stores recommendation/confidence fields."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/run-stage2-context.js | Rough classification: run-stage2-context applies contextual adjustments (weather/injuries/home advantage) to Stage-1 matches and upserts into stage-2 tables. | PREDICTION | UNKNOWN | ["PREDICTION","DATABASE","RUNTIME","SCRIPT_TOOL"] | ["Reads stage-1 records from a Supabase stage-1 base table and upserts adjusted confidence into stage-2 context table.","Applies weather/injury impacts based on sportRules and recommendations."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/run-stage3-volatility.js | Rough classification: run-stage3-volatility computes Stage-3 volatility/risk flags and final confidence, upserting results into the stage-3 gatekeeper table. | PREDICTION | UNKNOWN | ["PREDICTION","DATABASE","RUNTIME","SCRIPT_TOOL"] | ["Selects stage-2 context matches from Supabase and derives risk_flags/volatility_score.","Upserts stage-3 payloads (final_confidence, risk_flags, volatility_score) into stage-3 gatekeeper tables."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/run-test.js | Rough classification: run-test is a script entrypoint that runs the live fixture sync routine (test-only runner). | PROVIDER_INTEGRATION | UNKNOWN | ["PROVIDER","DATABASE","RUNTIME","SCRIPT_TOOL"] | ["Imports and executes runLiveSync (live fixtures sync) and prints JSON result to stdout.","Loads dotenv configuration at startup."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/scheduler.js | Rough classification: scheduler defines cron-based background jobs for fixture fetching, accumulator building, result resolving, and daily database cleanup. | SCHEDULER_BACKGROUND | UNKNOWN | ["SCHEDULER","BACKGROUND_JOB","RUNTIME","SCRIPT_TOOL"] | ["Uses node-cron schedule expressions (*/10, */30, */15, and 0 3 * * *).","Calls runLiveSync/buildAccumulators/resolveResults/dbCleanup via jobLogger wrappers."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/start-rapidapi-cricket-mcp.js | Rough classification: start-rapidapi-cricket-mcp spawns an MCP client connected to RapidAPI cricketapi3 using an API key. | PROVIDER_INTEGRATION | UNKNOWN | ["PROVIDER","API","RUNTIME","SCRIPT_TOOL"] | ["Spawns npx mcp-remote pointed at https://mcp.rapidapi.com with x-api-key/x-api-host headers.","Requires RAPIDAPI_KEY or X_RAPIDAPI_KEY from environment variables."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/trigger-grade.js | Rough classification: trigger-grade POSTs to /api/grade-predictions to grade predictions for a sport/date window. | GRADING_ACCURACY | UNKNOWN | ["GRADING","API","RUNTIME","SCRIPT_TOOL"] | ["Builds /api/grade-predictions URL with secret and sport (and optional date) query params.","Uses fetch to POST with JSON content-type and validates response.ok."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/trigger-pipeline-sync.js | Rough classification: trigger-pipeline-sync makes an HTTPS POST to /api/pipeline/sync on Render, waking the service as needed. | DEPLOYMENT_OPERATIONS | UNKNOWN | ["DEPLOYMENT","API","RUNTIME","SCRIPT_TOOL"] | ["Uses https.request to POST to skcsai.onrender.com + /api/pipeline/sync with optional x-api-key.","Handles timeouts and prints response status and parsed JSON when available."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/trigger-publication.js | Rough classification: trigger-publication initiates publication of predictions by calling direct1x2Builder and validating final table rows via SQL. | GENERATED_OUTPUT | UNKNOWN | ["GENERATED","DATABASE","RUNTIME","SCRIPT_TOOL"] | ["Imports buildDirect1x2Payload (publication/builder) and falls back to manualPublication on error.","Runs SQL SELECT queries against direct1x2_prediction_final and predictions tables via backend/db wrapper."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/trigger-refresh.js | Rough classification: trigger-refresh triggers a full fixture sync and then triggers the AI prediction pipeline via backend HTTP endpoints. | DEPLOYMENT_OPERATIONS | UNKNOWN | ["DEPLOYMENT","API","RUNTIME","SCRIPT_TOOL"] | ["Calls /api/pipeline/sync or /api/pipeline/run-full with x-api-key ADMIN_API_KEY/CRON_SECRET.","Then calls /api/scheduler/trigger-ai-pipeline with x-admin-key and prints HTTP status/data."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/trigger-settlement.js | Rough classification: trigger-settlement POSTs /api/settlement/run to trigger settlement processing for a sport/date. | DEPLOYMENT_OPERATIONS | UNKNOWN | ["DEPLOYMENT","API","RUNTIME","SCRIPT_TOOL"] | ["Builds /api/settlement/run URL with CRON_SECRET/REFRESH_KEY secret and query params sport/date.","Uses fetch POST and throws on non-ok HTTP status."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| scripts/wake-and-sync.js | Rough classification: wake-and-sync wakes the Render backend host and then triggers /api/pipeline/sync (background-friendly). | DEPLOYMENT_OPERATIONS | UNKNOWN | ["DEPLOYMENT","API","RUNTIME","SCRIPT_TOOL"] | ["GETs the backend root URL to wake the service, then POSTs /api/pipeline/sync with x-api-key when configured.","Uses timeout handling to run the pipeline request without hanging."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 
 ## B14 SCRIPTS_INGEST_ENRICH_SYNC_IMPORT
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |

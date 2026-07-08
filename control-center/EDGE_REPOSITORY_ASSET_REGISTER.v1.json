@@ -15769,10 +15769,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: _trigger-sync is a deployment trigger script that POSTs /api/pipeline/sync on the Edge backend.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DEPLOYMENT",
+        "API",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Uses HTTPS POST to trigger /api/pipeline/sync with x-api-key header.",
+        "Logs pipeline trigger status and parses returned JSON."
+      ]
     },
     {
       "asset_path": "scripts/add-cricket-rls-policies.sql",
@@ -19157,10 +19165,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: external-scheduler defines external cron jobs to trigger fixture sync, context enrichment, and AI pipeline stages via backend scheduler endpoints.",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "API",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Uses node-cron schedules with Africa/Johannesburg timezone.",
+        "Uses axios to POST to /api/scheduler/* trigger endpoints.",
+        "Triggers fixture sync, context enrichment, AI pipeline, and full pipeline daily."
+      ]
     },
     {
       "asset_path": "scripts/fetch-live-fixtures.js",
@@ -20273,10 +20291,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: run-edgemind-judge wakes EdgeMind (AI judge) to analyze Stage-3 matches and write risk-tiered outcomes into Supabase.",
+      "functional_group": "AI_EDGEMIND",
+      "relationship_tags": [
+        "AI_EDGEMIND",
+        "DATABASE",
+        "PROVIDER",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Creates Supabase client and reads matches from stage-3 gatekeeper tables.",
+        "Builds an AI prompt and calls external model endpoints (Gemini/OpenAI and/or Groq) via fetch.",
+        "Writes inferred risk tier / confidence artifacts back to Supabase-backed tables."
+      ]
     },
     {
       "asset_path": "scripts/run-master-pipeline.js",
@@ -20299,10 +20327,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: run-master-pipeline is an orchestration runner that executes the Stage-1/2/3 pipeline scripts sequentially via child processes.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DEPLOYMENT",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Uses exec to run stage scripts (run-stage1-math, run-stage2-context, run-stage3-volatility, run-edgemind-judge).",
+        "Logs stdout/stderr for each stage and stops on stage execution errors."
+      ]
     },
     {
       "asset_path": "scripts/run-migration.js",
@@ -20325,10 +20360,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: run-migration executes a small set of SQL migration files against Postgres using a pg Pool.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL",
+        "SCRIPT_TOOL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Uses pg Pool with DATABASE_URL and loads SQL from control supabase/migrations path.",
+        "Runs queries for each migration file provided via CLI args (or defaults)."
+      ]
     },
     {
       "asset_path": "scripts/run-pipeline-from-context-pack.js",
@@ -20351,10 +20395,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: run-pipeline-from-context-pack runs the prediction pipeline from a packaged context JSON (public/data/context-pack-<date>.json).",
+      "functional_group": "PREDICTION",
+      "relationship_tags": [
+        "PREDICTION",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Reads input JSON context pack and maps events/matches into pipeline-ready payloads.",
+        "Invokes the platform execution pipeline entrypoint (executionPipeline.js)."
+      ]
     },
     {
       "asset_path": "scripts/run-pipeline.js",
@@ -20377,10 +20428,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: run-pipeline triggers the Edge API pipeline sync (checks Vercel, then posts /api/pipeline/sync with wait).",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DEPLOYMENT",
+        "API",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Checks service health by making GET /api/pipeline/status requests.",
+        "POSTs to /api/pipeline/sync on Render with {wait:true} and prints returned status/data."
+      ]
     },
     {
       "asset_path": "scripts/run-scheduled-sync.js",
@@ -20403,10 +20462,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: run-scheduled-sync triggers a Supabase Edge Function (scheduled-fixture-sync) using service-role bearer authorization.",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "API",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Posts to SUPABASE_EDGE_FUNCTION_URL for scheduled-fixture-sync using axios.",
+        "Sends Authorization Bearer with SUPABASE_SERVICE_ROLE_KEY."
+      ]
     },
     {
       "asset_path": "scripts/run-stage1-math.js",
@@ -20429,10 +20497,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: run-stage1-math computes Stage-1 base probabilities for upcoming fixtures and upserts into sport stage-1 tables in Supabase.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": [
+        "PREDICTION",
+        "DATABASE",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Uses Supabase client to select upcoming fixtures from canonical events and upserts stage-1 payloads.",
+        "Computes base probabilities using sportRules and stores recommendation/confidence fields."
+      ]
     },
     {
       "asset_path": "scripts/run-stage2-context.js",
@@ -20455,10 +20531,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: run-stage2-context applies contextual adjustments (weather/injuries/home advantage) to Stage-1 matches and upserts into stage-2 tables.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": [
+        "PREDICTION",
+        "DATABASE",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Reads stage-1 records from a Supabase stage-1 base table and upserts adjusted confidence into stage-2 context table.",
+        "Applies weather/injury impacts based on sportRules and recommendations."
+      ]
     },
     {
       "asset_path": "scripts/run-stage3-volatility.js",
@@ -20481,10 +20565,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: run-stage3-volatility computes Stage-3 volatility/risk flags and final confidence, upserting results into the stage-3 gatekeeper table.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": [
+        "PREDICTION",
+        "DATABASE",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Selects stage-2 context matches from Supabase and derives risk_flags/volatility_score.",
+        "Upserts stage-3 payloads (final_confidence, risk_flags, volatility_score) into stage-3 gatekeeper tables."
+      ]
     },
     {
       "asset_path": "scripts/run-test.js",
@@ -20507,10 +20599,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: run-test is a script entrypoint that runs the live fixture sync routine (test-only runner).",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "DATABASE",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Imports and executes runLiveSync (live fixtures sync) and prints JSON result to stdout.",
+        "Loads dotenv configuration at startup."
+      ]
     },
     {
       "asset_path": "scripts/safe-migration-plan.js",
@@ -20559,10 +20659,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: scheduler defines cron-based background jobs for fixture fetching, accumulator building, result resolving, and daily database cleanup.",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Uses node-cron schedule expressions (*/10, */30, */15, and 0 3 * * *).",
+        "Calls runLiveSync/buildAccumulators/resolveResults/dbCleanup via jobLogger wrappers."
+      ]
     },
     {
       "asset_path": "scripts/schema-introspection.js",
@@ -20783,10 +20891,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: start-rapidapi-cricket-mcp spawns an MCP client connected to RapidAPI cricketapi3 using an API key.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "API",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Spawns npx mcp-remote pointed at https://mcp.rapidapi.com with x-api-key/x-api-host headers.",
+        "Requires RAPIDAPI_KEY or X_RAPIDAPI_KEY from environment variables."
+      ]
     },
     {
       "asset_path": "scripts/supabase-diagnostics.js",
@@ -22766,10 +22882,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: trigger-grade POSTs to /api/grade-predictions to grade predictions for a sport/date window.",
+      "functional_group": "GRADING_ACCURACY",
+      "relationship_tags": [
+        "GRADING",
+        "API",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Builds /api/grade-predictions URL with secret and sport (and optional date) query params.",
+        "Uses fetch to POST with JSON content-type and validates response.ok."
+      ]
     },
     {
       "asset_path": "scripts/trigger-pipeline-sync.js",
@@ -22792,10 +22916,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: trigger-pipeline-sync makes an HTTPS POST to /api/pipeline/sync on Render, waking the service as needed.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DEPLOYMENT",
+        "API",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Uses https.request to POST to skcsai.onrender.com + /api/pipeline/sync with optional x-api-key.",
+        "Handles timeouts and prints response status and parsed JSON when available."
+      ]
     },
     {
       "asset_path": "scripts/trigger-publication.js",
@@ -22818,10 +22950,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: trigger-publication initiates publication of predictions by calling direct1x2Builder and validating final table rows via SQL.",
+      "functional_group": "GENERATED_OUTPUT",
+      "relationship_tags": [
+        "GENERATED",
+        "DATABASE",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Imports buildDirect1x2Payload (publication/builder) and falls back to manualPublication on error.",
+        "Runs SQL SELECT queries against direct1x2_prediction_final and predictions tables via backend/db wrapper."
+      ]
     },
     {
       "asset_path": "scripts/trigger-refresh.js",
@@ -22844,10 +22984,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: trigger-refresh triggers a full fixture sync and then triggers the AI prediction pipeline via backend HTTP endpoints.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DEPLOYMENT",
+        "API",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Calls /api/pipeline/sync or /api/pipeline/run-full with x-api-key ADMIN_API_KEY/CRON_SECRET.",
+        "Then calls /api/scheduler/trigger-ai-pipeline with x-admin-key and prints HTTP status/data."
+      ]
     },
     {
       "asset_path": "scripts/trigger-settlement.js",
@@ -22870,10 +23018,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: trigger-settlement POSTs /api/settlement/run to trigger settlement processing for a sport/date.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DEPLOYMENT",
+        "API",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Builds /api/settlement/run URL with CRON_SECRET/REFRESH_KEY secret and query params sport/date.",
+        "Uses fetch POST and throws on non-ok HTTP status."
+      ]
     },
     {
       "asset_path": "scripts/validate-backfill-accuracy.js",
@@ -23450,10 +23606,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: wake-and-sync wakes the Render backend host and then triggers /api/pipeline/sync (background-friendly).",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DEPLOYMENT",
+        "API",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "GETs the backend root URL to wake the service, then POSTs /api/pipeline/sync with x-api-key when configured.",
+        "Uses timeout handling to run the pipeline request without hanging."
+      ]
     },
     {
       "asset_path": "sportbook",
