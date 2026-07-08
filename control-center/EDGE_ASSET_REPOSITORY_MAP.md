@@ -17,56 +17,55 @@ CURRENT_STATE_COUNTS
 - GENERATED: 0
 
 FUNCTIONAL_GROUP_COUNTS
-- SCRIPT_TOOL: 172
-- PROVIDER_INTEGRATION: 117
+- SCRIPT_TOOL: 173
+- PROVIDER_INTEGRATION: 118
+- DOCUMENTATION_KNOWLEDGE: 99
 - TEST_PROOF: 91
-- DOCUMENTATION_KNOWLEDGE: 90
 - DATABASE_MIGRATION: 84
 - FRONTEND_UI: 55
 - DATABASE: 49
-- DEPLOYMENT_OPERATIONS: 45
+- DEPLOYMENT_OPERATIONS: 46
+- GENERATED_OUTPUT: 36
 - SCHEDULER_BACKGROUND: 29
-- GENERATED_OUTPUT: 28
-- (PENDING): 26
 - PREDICTION: 25
 - GOVERNANCE: 23
 - ACCA: 16
-- API_ROUTE: 15
-- PUBLIC_ASSET: 9
-- BACKEND_RUNTIME: 8
+- API_ROUTE: 16
+- BACKEND_RUNTIME: 10
+- PUBLIC_ASSET: 10
 - AI_EDGEMIND: 7
 - GRADING_ACCURACY: 7
-- UNCATEGORIZED: 4
+- UNCATEGORIZED: 6
 - SECURITY_SUBSCRIBER: 3
 - SERVICE: 3
 
 RELATIONSHIP_TAG_COUNTS
-- SCRIPT_TOOL: 288
+- SCRIPT_TOOL: 289
 - RUNTIME: 287
 - SQL: 239
 - DATABASE: 221
-- PROVIDER: 195
-- API: 165
-- DOCUMENTATION: 125
-- GOVERNANCE: 117
+- PROVIDER: 197
+- API: 166
+- DOCUMENTATION: 134
+- GOVERNANCE: 128
 - OBSERVABILITY: 97
 - PREDICTION: 91
 - TEST_PROOF: 89
 - UI: 88
 - MIGRATION: 87
-- AUDIT: 70
-- ROUTE: 64
-- DEPLOYMENT: 57
-- GENERATED: 54
+- AUDIT: 76
+- ROUTE: 65
+- GENERATED: 63
+- DEPLOYMENT: 58
+- CONFIGURATION: 50
 - SECURITY: 50
-- SERVICE: 42
-- CONFIGURATION: 39
+- SERVICE: 45
 - BACKGROUND_JOB: 31
 - SCHEDULER: 31
 - RULEBOOK: 25
 - ACCA: 23
 - AI_EDGEMIND: 18
-- PUBLIC_ASSET: 9
+- PUBLIC_ASSET: 10
 - GRADING: 8
 - SUBSCRIBER: 4
 - CONTROLLER: 2
@@ -1101,29 +1100,29 @@ PER_ASSET_BY_BATCH
 ## B29 DOT_TOOL_DIRS_AND_SMALL_DIRS
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |
 |---|---|---|---|---|---|---|
-| .gemini/antigravity/README.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| .gemini/antigravity/workflows/automated-data-sync.toml | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| .gemini/antigravity/workflows/intelligent-alert-system.toml | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| .gemini/antigravity/workflows/intelligent-pipeline-optimizer.toml | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| .gemini/antigravity/workflows/smart-prediction-engine.toml | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| .gemini/commands.toml | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| .githooks/pre-commit | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| .qwen/settings.json | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| .qwen/settings.json.orig | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| .stakpak/data/local.db | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| .windsurf/workflows/env.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| api/pipeline/run-full.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| dolphin-server/Dockerfile | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| dolphin-server/README.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| js/config.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| js/supabase-bundle.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| js/supabase-client-src.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| js/supabase-init.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| reports/execution-spine-compliance-map.json | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| reports/execution-spine-compliance-map.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| src/data/placeholder.txt | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| src/data/sportsdb-leagues.json | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| tmp/key-validation-1776365488298.json | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| tmp/key-validation-1776365827255.json | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| tmp/key-validation-1776482624434.json | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| tmp/today-fixture-pull-1776482706164.json | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| .gemini/antigravity/README.md | Tool/config documentation and workflow definitions retained for local assistance. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","GOVERNANCE","CONFIGURATION"] | ["Path under B29: .gemini/antigravity/README.md","First skim: # Antigravity Workflows - Intelligent Automation for SKCS AI Sports Edge\r\n\r\n## 🚀 Overview\r\n\r\nThe **Antigravity** system provides intelligent automation workflo…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| .gemini/antigravity/workflows/automated-data-sync.toml | Tool/config documentation and workflow definitions retained for local assistance. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","GOVERNANCE","CONFIGURATION"] | ["Path under B29: .gemini/antigravity/workflows/automated-data-sync.toml","First skim: [workflow]\r\nname = \"automated-data-sync\"\r\ndescription = \"Automated multi-sport data synchronization with intelligent fallback\"\r\nversion = \"1.0\"\r\nenabled = true\r…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| .gemini/antigravity/workflows/intelligent-alert-system.toml | Tool/config documentation and workflow definitions retained for local assistance. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","GOVERNANCE","CONFIGURATION"] | ["Path under B29: .gemini/antigravity/workflows/intelligent-alert-system.toml","First skim: [workflow]\r\nname = \"intelligent-alert-system\"\r\ndescription = \"AI-powered alert system with contextual awareness and smart prioritization\"\r\nversion = \"1.0\"\r\nenab…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| .gemini/antigravity/workflows/intelligent-pipeline-optimizer.toml | Tool/config documentation and workflow definitions retained for local assistance. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","GOVERNANCE","CONFIGURATION"] | ["Path under B29: .gemini/antigravity/workflows/intelligent-pipeline-optimizer.toml","First skim: [workflow]\r\nname = \"intelligent-pipeline-optimizer\"\r\ndescription = \"AI-driven pipeline optimization with self-healing capabilities\"\r\nversion = \"1.0\"\r\nenabled = …"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| .gemini/antigravity/workflows/smart-prediction-engine.toml | Tool/config documentation and workflow definitions retained for local assistance. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","GOVERNANCE","CONFIGURATION"] | ["Path under B29: .gemini/antigravity/workflows/smart-prediction-engine.toml","First skim: [workflow]\r\nname = \"smart-prediction-engine\"\r\ndescription = \"AI-powered prediction generation with adaptive learning\"\r\nversion = \"1.0\"\r\nenabled = true\r\n\r\n[workf…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| .gemini/commands.toml | Tool/config documentation and workflow definitions retained for local assistance. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","GOVERNANCE","CONFIGURATION"] | ["Path under B29: .gemini/commands.toml","First skim: [commands.risk]\r\ndescription = \"Analyzes match data and calculates the risk tier based on our AI pipeline rules.\"\r\nprompt = \"\"\"\r\nReview the following match payl…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| .githooks/pre-commit | Git pre-commit hook script retained for local developer automation. | SCRIPT_TOOL | UNKNOWN | ["SCRIPT_TOOL"] | ["Path under B29: .githooks/pre-commit","First skim: #!/bin/sh\r\n# Local-only Master Rulebook guard. Runs on your machine; no GitHub Actions billing.\r\n\r\nSTAGED_FILES=$(git diff --cached --name-only --diff-filter=AC…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| .qwen/settings.json | Local Qwen tool settings configuration retained for reference. | UNCATEGORIZED | UNKNOWN | ["CONFIGURATION","GOVERNANCE"] | ["Path under B29: .qwen/settings.json","First skim: {\r\n  \"permissions\": {\r\n    \"allow\": [\r\n      \"Bash(npm run *)\",\r\n      \"Bash(node *)\",\r\n      \"Bash(dir *)\",\r\n      \"Bash(\\\"c:\\\\program files\\\\git\\\\cmd\\\\git.exe…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| .qwen/settings.json.orig | Local Qwen tool settings configuration retained for reference. | UNCATEGORIZED | UNKNOWN | ["CONFIGURATION","GOVERNANCE"] | ["Path under B29: .qwen/settings.json.orig","First skim: {\r\n  \"permissions\": {\r\n    \"allow\": [\r\n      \"Bash(npm run *)\"\r\n    ]\r\n  }\r\n}"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| .stakpak/data/local.db | Local retained data asset (embedded DB) stored under .stakpak for tooling/reference. | GENERATED_OUTPUT | UNKNOWN | ["GENERATED"] | ["Path under B29: .stakpak/data/local.db","First skim: Binary database file under .stakpak/data/."] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| .windsurf/workflows/env.md | Tool/config documentation and workflow definitions retained for local assistance. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","GOVERNANCE","CONFIGURATION"] | ["Path under B29: .windsurf/workflows/env.md","First skim: Skim unavailable (no readable text)"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| api/pipeline/run-full.js | API pipeline runner script for full Edge processing (route-layer entrypoint). | API_ROUTE | UNKNOWN | ["API","ROUTE"] | ["Path under B29: api/pipeline/run-full.js","First skim: 'use strict';\r\n\r\nfunction normalizeHost(value) {\r\n    if (!value) return null;\r\n    return String(value).trim().replace(/\\/+$/, '');\r\n}\r\n\r\nfunction extractBeare…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| dolphin-server/Dockerfile | Container build recipe defining how the Dolphin server is packaged. | DEPLOYMENT_OPERATIONS | UNKNOWN | ["DEPLOYMENT","CONFIGURATION"] | ["Path under B29: dolphin-server/Dockerfile","First skim: # Dockerfile for Dolphin 3.0 Llama 3.2 3B Server on Render\r\nFROM ghcr.io/ggml-org/llama.cpp:server\r\n\r\n# Download the Dolphin model (Q4_K_M for faster inference,…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| dolphin-server/README.md | Dolphin server documentation retained for operational context. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","GOVERNANCE"] | ["Path under B29: dolphin-server/README.md","First skim: # Dolphin AI Server for SKCS EdgeMind\r\n\r\nThis directory contains the Docker configuration for deploying the Dolphin 3.0 Llama 3.2 3B model on Render as a web se…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| js/config.js | Supabase/backend configuration module used by runtime initialization. | BACKEND_RUNTIME | UNKNOWN | ["SERVICE","CONFIGURATION"] | ["Path under B29: js/config.js","First skim: // Default to the live Render API, but allow an earlier override for migration tests.\r\nwindow.API_BASE_URL = window.API_BASE_URL \|\| (\r\n    window.location.hostn…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| js/supabase-bundle.js | Bundled Supabase client asset intended for browser/public consumption. | PUBLIC_ASSET | UNKNOWN | ["PUBLIC_ASSET","GENERATED"] | ["Path under B29: js/supabase-bundle.js","First skim: /**\n * First-Party Supabase Bundle\n * Bundled locally to avoid tracking prevention issues with CDN\n */\n\n// Import Supabase client from node_modules (bundled)\n//…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| js/supabase-client-src.js | Supabase client integration source used to connect runtime components. | PROVIDER_INTEGRATION | UNKNOWN | ["PROVIDER","SERVICE"] | ["Path under B29: js/supabase-client-src.js","First skim: import { createClient } from '@supabase/supabase-js';\r\n\r\nconst supabaseUrl = window.SUPABASE_URL \|\| 'https://ghzjntdvaptuxfpvhybb.supabase.co';\r\nconst supabaseA…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| js/supabase-init.js | Supabase initialization helper wiring client configuration for runtime usage. | BACKEND_RUNTIME | UNKNOWN | ["SERVICE","PROVIDER"] | ["Path under B29: js/supabase-init.js","First skim: // SKCS AI Sports Edge - Supabase Client Initialization\r\n// Load directly from CDN to avoid ITP issues with localStorage\r\n\r\n(function() {\r\n    'use strict';\r\n  …"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| reports/execution-spine-compliance-map.json | Execution-spine compliance report artifact (JSON) retained for audit/inspection. | GENERATED_OUTPUT | UNKNOWN | ["GENERATED","AUDIT"] | ["Path under B29: reports/execution-spine-compliance-map.json","First skim: {\n  \"generatedAt\": \"2026-06-05T00:44:34.328Z\",\n  \"summary\": {\n    \"filesScanned\": 3738,\n    \"filesWithFindings\": 187,\n    \"wrappedFiles\": 22,\n    \"bypassCandida…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| reports/execution-spine-compliance-map.md | Execution-spine compliance/report documentation retained for audit/inspection. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","GOVERNANCE","AUDIT"] | ["Path under B29: reports/execution-spine-compliance-map.md","First skim: # SKCS Execution Spine Compliance Map\n\n## Summary\n- Files scanned: 3738\n- Files with findings: 187\n- Files already using `executeOperation`: 22\n- Bypass candida…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| src/data/placeholder.txt | Root data placeholder/fixture asset retained under src/data for tooling/inspection. | GENERATED_OUTPUT | UNKNOWN | ["GENERATED"] | ["Path under B29: src/data/placeholder.txt","First skim: This folder will contain generated TheSportsDB league configuration JSON."] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| src/data/sportsdb-leagues.json | Root data placeholder/fixture asset retained under src/data for tooling/inspection. | GENERATED_OUTPUT | UNKNOWN | ["GENERATED"] | ["Path under B29: src/data/sportsdb-leagues.json","First skim: {\n  \"sports\": {\n    \"Football (Soccer)\": {\n      \"rawSport\": \"Soccer\",\n      \"leagues\": [\n        {\n          \"id\": \"4753\",\n          \"name\": \"Algerian Ligue 1\"…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| tmp/key-validation-1776365488298.json | Temporary generated validation/fixture artifact retained for debugging/inspection. | GENERATED_OUTPUT | UNKNOWN | ["GENERATED","AUDIT"] | ["Path under B29: tmp/key-validation-1776365488298.json","First skim: {\r\n  \"startedAt\": \"2026-04-16T18:47:44.229Z\",\r\n  \"completedAt\": \"2026-04-16T18:51:28.293Z\",\r\n  \"results\": [\r\n    {\r\n      \"name\": \"SUPABASE_URL + SUPABASE_ANON_…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| tmp/key-validation-1776365827255.json | Temporary generated validation/fixture artifact retained for debugging/inspection. | GENERATED_OUTPUT | UNKNOWN | ["GENERATED","AUDIT"] | ["Path under B29: tmp/key-validation-1776365827255.json","First skim: {\r\n  \"startedAt\": \"2026-04-16T18:53:59.271Z\",\r\n  \"completedAt\": \"2026-04-16T18:57:07.254Z\",\r\n  \"results\": [\r\n    {\r\n      \"name\": \"SUPABASE_URL + SUPABASE_ANON_…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| tmp/key-validation-1776482624434.json | Temporary generated validation/fixture artifact retained for debugging/inspection. | GENERATED_OUTPUT | UNKNOWN | ["GENERATED","AUDIT"] | ["Path under B29: tmp/key-validation-1776482624434.json","First skim: {\r\n  \"startedAt\": \"2026-04-18T03:21:47.416Z\",\r\n  \"completedAt\": \"2026-04-18T03:23:44.430Z\",\r\n  \"results\": [\r\n    {\r\n      \"name\": \"SUPABASE_URL + SUPABASE_ANON_…"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |
+| tmp/today-fixture-pull-1776482706164.json | Temporary generated validation/fixture artifact retained for debugging/inspection. | GENERATED_OUTPUT | UNKNOWN | ["GENERATED","AUDIT"] | ["Path under B29: tmp/today-fixture-pull-1776482706164.json","First skim: {\r\n  \"generated_at\": \"2026-04-18T03:25:06.164Z\",\r\n  \"date\": \"2026-04-18\",\r\n  \"results\": [\r\n    {\r\n      \"sport\": \"football\",\r\n      \"provider\": \"api-sports\",\r\n …"] | Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy. |

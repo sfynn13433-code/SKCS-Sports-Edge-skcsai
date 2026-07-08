@@ -224,16 +224,16 @@ describe("Edge Asset Classification foundation", () => {
 
   it("foundation mode permits empty classification fields as pending", () => {
     const result = runCheck({ closure: false, refreshManifest: false, writeMap: false });
-    assert.equal(result.closureReady, false);
-    assert.equal(result.summary.fullyClassifiedAssets, 880);
+    assert.equal(result.closureReady, true);
+    assert.equal(result.summary.fullyClassifiedAssets, 906);
     assert.equal(
-      result.summary.classificationPendingAssets, 26
+      result.summary.classificationPendingAssets, 0
     );
   });
 
   it("foundation mode does not count pending assets as fully classified", () => {
     const result = runCheck({ closure: false, refreshManifest: false, writeMap: false });
-    assert.equal(result.summary.fullyClassifiedAssets, 880);
+    assert.equal(result.summary.fullyClassifiedAssets, 906);
   });
 
   it("strict closure rejects empty purpose_description", () => {
@@ -241,8 +241,10 @@ describe("Edge Asset Classification foundation", () => {
     const m = loadBatchManifest(MANIFEST_PATH);
     const membership = computeBatchMembership(reg.assets.map((a) => a.asset_path), m.batches);
     const mapContent = loadFile(MAP_PATH);
+    const clone = cloneJson(reg);
+    clone.assets[0].purpose_description = '';
     const result = evaluateClassification({
-      register: reg,
+      register: clone,
       manifest: m,
       membership,
       closure: true,
@@ -259,8 +261,10 @@ describe("Edge Asset Classification foundation", () => {
     const reg = loadAssetRegister(REGISTER_PATH);
     const m = loadBatchManifest(MANIFEST_PATH);
     const membership = computeBatchMembership(reg.assets.map((a) => a.asset_path), m.batches);
+    const clone = cloneJson(reg);
+    clone.assets[0].functional_group = '';
     const result = evaluateClassification({
-      register: reg,
+      register: clone,
       manifest: m,
       membership,
       closure: true,
@@ -466,15 +470,17 @@ describe("Edge Asset Classification foundation", () => {
 
   it("default checker reports closure_ready = false for current foundation state", () => {
     const result = runCheck({ closure: false, refreshManifest: false, writeMap: false });
-    assert.equal(result.closureReady, false);
+    assert.equal(result.closureReady, true);
   });
 
   it("strict closure is not satisfied by current unclassified repository", () => {
     const reg = loadAssetRegister(REGISTER_PATH);
     const m = loadBatchManifest(MANIFEST_PATH);
     const membership = computeBatchMembership(reg.assets.map((a) => a.asset_path), m.batches);
+    const clone = cloneJson(reg);
+    clone.assets[0].purpose_description = '';
     const result = evaluateClassification({
-      register: reg,
+      register: clone,
       manifest: m,
       membership,
       closure: true,
