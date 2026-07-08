@@ -31,6 +31,7 @@ function cloneJson(x) {
 }
 
 describe("Edge Asset Classification foundation", () => {
+  // Progress baseline assertions are advanced deterministically per batch closure (e.g. B13).
   it("approved functional group enum contains exactly 24 unique values", () => {
     assert.equal(FUNCTIONAL_GROUPS.length, 24);
     assert.equal(new Set(FUNCTIONAL_GROUPS).size, 24);

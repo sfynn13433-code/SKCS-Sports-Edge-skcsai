@@ -6736,7 +6736,7 @@
         "RUNTIME"
       ],
       "classification_evidence": [
-        "Defines GET `/build` which validates `legs` ∈ {4,6,8}; queries `direct1x2_prediction_final` for the fixture’s primary 1X2 prediction and queries `secondary_market_predictions` for all secondary legs. It then selects tier-2 markets and (for 8 legs) some tier-3 markets to construct `combos`, and returns `res.json({ combos, reasoning })`."
+        "Defines GET `/build` which validates `legs` Γêê {4,6,8}; queries `direct1x2_prediction_final` for the fixtureΓÇÖs primary 1X2 prediction and queries `secondary_market_predictions` for all secondary legs. It then selects tier-2 markets and (for 8 legs) some tier-3 markets to construct `combos`, and returns `res.json({ combos, reasoning })`."
       ]
     },
     {
@@ -11226,7 +11226,7 @@
         "OBSERVABILITY"
       ],
       "classification_evidence": [
-        "Defines/exports an ACCA/insight law layer: lists allowed/banned market patterns, enforces family caps and confidence guardrails (e.g., 72–97% leg confidence), and coordinates with `pipelineLogger` and `marketIntelligence` helpers."
+        "Defines/exports an ACCA/insight law layer: lists allowed/banned market patterns, enforces family caps and confidence guardrails (e.g., 72ΓÇô97% leg confidence), and coordinates with `pipelineLogger` and `marketIntelligence` helpers."
       ]
     },
     {
@@ -11545,7 +11545,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "SportsSRC provider match normalizer that converts raw SportsSRC match payloads into the platform’s canonical fixture shape (fixture_key, teams, kickoff_time, league/competition, venue, and raw_payload).",
+      "purpose_description": "SportsSRC provider match normalizer that converts raw SportsSRC match payloads into the platformΓÇÖs canonical fixture shape (fixture_key, teams, kickoff_time, league/competition, venue, and raw_payload).",
       "functional_group": "PROVIDER_INTEGRATION",
       "relationship_tags": [
         "PROVIDER",
@@ -11585,7 +11585,7 @@
         "RUNTIME"
       ],
       "classification_evidence": [
-        "Defines known market/sport/volatility sets and exposes `validateRawPredictionInput(pred)` and `validateRawPredictionForInsert(row)`; checks match_id presence, market validity, prediction confidence range (0–100), and odds positivity when provided."
+        "Defines known market/sport/volatility sets and exposes `validateRawPredictionInput(pred)` and `validateRawPredictionForInsert(row)`; checks match_id presence, market validity, prediction confidence range (0ΓÇô100), and odds positivity when provided."
       ]
     },
     {
