@@ -26467,12 +26467,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to insight usage storage/schema; evidence: CREATE TABLE IF NOT EXISTS insight_usage (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260415000001_create_insight_usage.sql is a supabase SQL migration (path: supabase/migrations/20260415000001_create_insight_usage.sql) targeting insight usage storage/schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS insight_usage ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260418000002_update_predictions_final_risk_level_check.sql",
@@ -26493,12 +26500,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to prediction final risk level checks; evidence: ALTER TABLE public.predictions_final DROP CONSTRAINT IF EXISTS predictions_final_risk_level_check.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260418000002_update_predictions_final_risk_level_check.sql is a supabase SQL migration (path: supabase/migrations/20260418000002_update_predictions_final_risk_level_check.sql) targeting prediction final risk level checks.",
+        "Fast skim: dominant SQL statement appears to be: ALTER TABLE public.predictions_final DROP CONSTRAINT IF EXISTS predictions_final_risk_level_check"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260501_skcs_comprehensive_engine.sql",
@@ -26519,12 +26533,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to SKCS engine v2 schema; evidence: CREATE TABLE IF NOT EXISTS canonical_betting_markets (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260501_skcs_comprehensive_engine.sql is a supabase SQL migration (path: supabase/migrations/20260501_skcs_comprehensive_engine.sql) targeting SKCS engine v2 schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS canonical_betting_markets ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260512000001_create_canonical_bookmakers.sql",
@@ -26545,12 +26566,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to canonical bookmakers schema; evidence: CREATE TABLE canonical_bookmakers (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260512000001_create_canonical_bookmakers.sql is a supabase SQL migration (path: supabase/migrations/20260512000001_create_canonical_bookmakers.sql) targeting canonical bookmakers schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE canonical_bookmakers ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260512000002_add_odds_to_match_context.sql",
@@ -26571,12 +26599,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to match odds schema; evidence: CREATE INDEX IF NOT EXISTS idx_match_context_odds_gin.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260512000002_add_odds_to_match_context.sql is a supabase SQL migration (path: supabase/migrations/20260512000002_add_odds_to_match_context.sql) targeting match odds schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE INDEX IF NOT EXISTS idx_match_context_odds_gin"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260512000003_create_sport_sync_table.sql",
@@ -26597,12 +26632,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to database schema evolution; evidence: CREATE TABLE IF NOT EXISTS sport_sync (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260512000003_create_sport_sync_table.sql is a supabase SQL migration (path: supabase/migrations/20260512000003_create_sport_sync_table.sql) targeting database schema evolution.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS sport_sync ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260512000004_create_upsert_raw_fixture_rpc.sql",
@@ -26623,12 +26665,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to fixture processing schema; evidence: CREATE OR REPLACE FUNCTION upsert_raw_fixture(.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260512000004_create_upsert_raw_fixture_rpc.sql is a supabase SQL migration (path: supabase/migrations/20260512000004_create_upsert_raw_fixture_rpc.sql) targeting fixture processing schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE OR REPLACE FUNCTION upsert_raw_fixture("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260512000005_create_context_enrichment_trigger.sql",
@@ -26649,12 +26698,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to context enrichment triggers/schema; evidence: CREATE TABLE IF NOT EXISTS context_enrichment_queue (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260512000005_create_context_enrichment_trigger.sql is a supabase SQL migration (path: supabase/migrations/20260512000005_create_context_enrichment_trigger.sql) targeting context enrichment triggers/schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS context_enrichment_queue ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260512000006_create_fixture_processing_log.sql",
@@ -26675,12 +26731,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to fixture processing schema; evidence: CREATE TABLE IF NOT EXISTS fixture_processing_log (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260512000006_create_fixture_processing_log.sql is a supabase SQL migration (path: supabase/migrations/20260512000006_create_fixture_processing_log.sql) targeting fixture processing schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS fixture_processing_log ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260512000007_create_admin_views.sql",
@@ -26701,12 +26764,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to admin views/schema; evidence: CREATE VIEW admin_daily_volume AS.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260512000007_create_admin_views.sql is a supabase SQL migration (path: supabase/migrations/20260512000007_create_admin_views.sql) targeting admin views/schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE VIEW admin_daily_volume AS"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260512000008_create_event_odds_snapshots.sql",
@@ -26727,12 +26797,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to match odds schema; evidence: CREATE TABLE IF NOT EXISTS event_odds_snapshots (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260512000008_create_event_odds_snapshots.sql is a supabase SQL migration (path: supabase/migrations/20260512000008_create_event_odds_snapshots.sql) targeting match odds schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS event_odds_snapshots ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260512000009_create_get_prediction_rpc.sql",
@@ -26753,12 +26830,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to RPC functions/schema; evidence: CREATE FUNCTION get_prediction_by_match_id(match_id TEXT).",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260512000009_create_get_prediction_rpc.sql is a supabase SQL migration (path: supabase/migrations/20260512000009_create_get_prediction_rpc.sql) targeting RPC functions/schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE FUNCTION get_prediction_by_match_id(match_id TEXT)"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260512000010_populate_sport_sync.sql",
@@ -26779,12 +26863,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to database schema evolution; evidence: SQL migration content (skim).",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260512000010_populate_sport_sync.sql is a supabase SQL migration (path: supabase/migrations/20260512000010_populate_sport_sync.sql) targeting database schema evolution.",
+        "Fast skim: dominant SQL statement appears to be: SQL migration content (skim)"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260512000012_create_get_prediction_function.sql",
@@ -26805,12 +26896,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to RPC functions/schema; evidence: CREATE OR REPLACE FUNCTION get_ai_prediction_by_match_id(p_match_id TEXT).",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260512000012_create_get_prediction_function.sql is a supabase SQL migration (path: supabase/migrations/20260512000012_create_get_prediction_function.sql) targeting RPC functions/schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE OR REPLACE FUNCTION get_ai_prediction_by_match_id(p_match_id TEXT)"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260512000013_disable_rls_match_context.sql",
@@ -26831,12 +26929,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to context enrichment triggers/schema; evidence: ALTER TABLE match_context_data DISABLE ROW LEVEL SECURITY.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260512000013_disable_rls_match_context.sql is a supabase SQL migration (path: supabase/migrations/20260512000013_disable_rls_match_context.sql) targeting context enrichment triggers/schema.",
+        "Fast skim: dominant SQL statement appears to be: ALTER TABLE match_context_data DISABLE ROW LEVEL SECURITY"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260522000001_add_watchlist_column.sql",
@@ -26857,12 +26962,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to watchlist columns/schema; evidence: CREATE INDEX IF NOT EXISTS idx_predictions_filtered_watchlist.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260522000001_add_watchlist_column.sql is a supabase SQL migration (path: supabase/migrations/20260522000001_add_watchlist_column.sql) targeting watchlist columns/schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE INDEX IF NOT EXISTS idx_predictions_filtered_watchlist"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260522000002_add_sport_to_tier_rules.sql",
@@ -26883,12 +26995,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to market tier rules; evidence: CREATE INDEX IF NOT EXISTS idx_tier_rules_sport ON tier_rules(sport) WHERE sport IS NOT NULL.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260522000002_add_sport_to_tier_rules.sql is a supabase SQL migration (path: supabase/migrations/20260522000002_add_sport_to_tier_rules.sql) targeting market tier rules.",
+        "Fast skim: dominant SQL statement appears to be: CREATE INDEX IF NOT EXISTS idx_tier_rules_sport ON tier_rules(sport) WHERE sport IS NOT NULL"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260523000001_drop_insight_usage.sql",
@@ -26909,12 +27028,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to insight usage storage/schema; evidence: Drop function\nDROP FUNCTION IF EXISTS update_insight_usage_timestamp().",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260523000001_drop_insight_usage.sql is a supabase SQL migration (path: supabase/migrations/20260523000001_drop_insight_usage.sql) targeting insight usage storage/schema.",
+        "Fast skim: dominant SQL statement appears to be: Drop function\nDROP FUNCTION IF EXISTS update_insight_usage_timestamp()"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260524000001_remove_dev_rls_policies.sql",
@@ -26935,12 +27061,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to RLS policies; evidence: Drop policies from direct1x2_prediction_final\nDROP POLICY IF EXISTS \"Enable read access for all users\" ON public.direct1x2_prediction_final;\nDRO.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260524000001_remove_dev_rls_policies.sql is a supabase SQL migration (path: supabase/migrations/20260524000001_remove_dev_rls_policies.sql) targeting RLS policies.",
+        "Fast skim: dominant SQL statement appears to be: Drop policies from direct1x2_prediction_final\nDROP POLICY IF EXISTS \"Enable read access for all users\" ON public.direct1x2_prediction_final;\nDRO"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260524000002_create_upsert_canonical_event_rpc.sql",
@@ -26961,12 +27094,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to fixture processing schema; evidence: CREATE OR REPLACE FUNCTION public.upsert_canonical_event(.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260524000002_create_upsert_canonical_event_rpc.sql is a supabase SQL migration (path: supabase/migrations/20260524000002_create_upsert_canonical_event_rpc.sql) targeting fixture processing schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE OR REPLACE FUNCTION public.upsert_canonical_event("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260531000001_skcs_engine_v2_phase0_identity.sql",
@@ -26987,12 +27127,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to SKCS engine v2 schema; evidence: CREATE TABLE IF NOT EXISTS public.skcs_teams (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260531000001_skcs_engine_v2_phase0_identity.sql is a supabase SQL migration (path: supabase/migrations/20260531000001_skcs_engine_v2_phase0_identity.sql) targeting SKCS engine v2 schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS public.skcs_teams ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260531000002_skcs_engine_v2_phase0b_match_results.sql",
@@ -27013,12 +27160,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to SKCS engine v2 schema; evidence: CREATE TABLE IF NOT EXISTS public.match_results (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260531000002_skcs_engine_v2_phase0b_match_results.sql is a supabase SQL migration (path: supabase/migrations/20260531000002_skcs_engine_v2_phase0b_match_results.sql) targeting SKCS engine v2 schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS public.match_results ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260617_add_market_tier.sql",
@@ -27039,12 +27193,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to market tier rules; evidence: ALTER TABLE secondary_markets ADD COLUMN IF NOT EXISTS market_tier SMALLINT DEFAULT 2.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260617_add_market_tier.sql is a supabase SQL migration (path: supabase/migrations/20260617_add_market_tier.sql) targeting market tier rules.",
+        "Fast skim: dominant SQL statement appears to be: ALTER TABLE secondary_markets ADD COLUMN IF NOT EXISTS market_tier SMALLINT DEFAULT 2"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260619000001_rename_predictions_final_to_direct1x2.sql",
@@ -27065,12 +27226,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to RPC functions/schema; evidence: ALTER TABLE public.predictions_final RENAME TO direct1x2_prediction_final.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260619000001_rename_predictions_final_to_direct1x2.sql is a supabase SQL migration (path: supabase/migrations/20260619000001_rename_predictions_final_to_direct1x2.sql) targeting RPC functions/schema.",
+        "Fast skim: dominant SQL statement appears to be: ALTER TABLE public.predictions_final RENAME TO direct1x2_prediction_final"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260619000002_align_direct1x2_columns.sql",
@@ -27091,12 +27259,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to direct1x2 prediction tables/columns; evidence: ALTER TABLE public.direct1x2_prediction_final.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260619000002_align_direct1x2_columns.sql is a supabase SQL migration (path: supabase/migrations/20260619000002_align_direct1x2_columns.sql) targeting direct1x2 prediction tables/columns.",
+        "Fast skim: dominant SQL statement appears to be: ALTER TABLE public.direct1x2_prediction_final"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260619000003_direct1x2_risk_tier_and_secondary_markets.sql",
@@ -27117,12 +27292,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to market tier rules; evidence: CREATE INDEX IF NOT EXISTS idx_direct1x2_match_date.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260619000003_direct1x2_risk_tier_and_secondary_markets.sql is a supabase SQL migration (path: supabase/migrations/20260619000003_direct1x2_risk_tier_and_secondary_markets.sql) targeting market tier rules.",
+        "Fast skim: dominant SQL statement appears to be: CREATE INDEX IF NOT EXISTS idx_direct1x2_match_date"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260621000001_enforce_league_country_on_direct_matches.sql",
@@ -27143,12 +27325,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to database schema evolution; evidence: CREATE OR REPLACE FUNCTION public.skcs_fill_league_country_from_matches().",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260621000001_enforce_league_country_on_direct_matches.sql is a supabase SQL migration (path: supabase/migrations/20260621000001_enforce_league_country_on_direct_matches.sql) targeting database schema evolution.",
+        "Fast skim: dominant SQL statement appears to be: CREATE OR REPLACE FUNCTION public.skcs_fill_league_country_from_matches()"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260701000001_normalize_sport_names.sql",
@@ -27169,12 +27358,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to sport name normalization; evidence: ALTER TABLE predictions_raw.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260701000001_normalize_sport_names.sql is a supabase SQL migration (path: supabase/migrations/20260701000001_normalize_sport_names.sql) targeting sport name normalization.",
+        "Fast skim: dominant SQL statement appears to be: ALTER TABLE predictions_raw"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260717000001_create_f1_schema.sql",
@@ -27195,12 +27391,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to F1 schema; evidence: create table if not exists public.f1_teams (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260717000001_create_f1_schema.sql is a supabase SQL migration (path: supabase/migrations/20260717000001_create_f1_schema.sql) targeting F1 schema.",
+        "Fast skim: dominant SQL statement appears to be: create table if not exists public.f1_teams ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260718000001_db_rule_alignment_75_55_30.sql",
@@ -27221,12 +27424,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to DB rule alignment thresholds; evidence: CREATE OR REPLACE FUNCTION public.trg_enforce_secondary_market_governance().",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260718000001_db_rule_alignment_75_55_30.sql is a supabase SQL migration (path: supabase/migrations/20260718000001_db_rule_alignment_75_55_30.sql) targeting DB rule alignment thresholds.",
+        "Fast skim: dominant SQL statement appears to be: CREATE OR REPLACE FUNCTION public.trg_enforce_secondary_market_governance()"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260820000001_rename_risk_tiers_and_safe_haven.sql",
@@ -27247,12 +27457,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to market tier rules; evidence: CREATE OR REPLACE FUNCTION public.trg_enforce_secondary_market_governance().",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260820000001_rename_risk_tiers_and_safe_haven.sql is a supabase SQL migration (path: supabase/migrations/20260820000001_rename_risk_tiers_and_safe_haven.sql) targeting market tier rules.",
+        "Fast skim: dominant SQL statement appears to be: CREATE OR REPLACE FUNCTION public.trg_enforce_secondary_market_governance()"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260820000002_fix_secondary_governance_80_75.sql",
@@ -27273,12 +27490,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to database schema evolution; evidence: CREATE OR REPLACE FUNCTION public.trg_enforce_secondary_market_governance().",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260820000002_fix_secondary_governance_80_75.sql is a supabase SQL migration (path: supabase/migrations/20260820000002_fix_secondary_governance_80_75.sql) targeting database schema evolution.",
+        "Fast skim: dominant SQL statement appears to be: CREATE OR REPLACE FUNCTION public.trg_enforce_secondary_market_governance()"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000001_add_partitioning.sql",
@@ -27299,12 +27523,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to partitioning; evidence: CREATE TABLE IF NOT EXISTS %I PARTITION OF event_odds_snapshots.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000001_add_partitioning.sql is a supabase SQL migration (path: supabase/migrations/20260822000001_add_partitioning.sql) targeting partitioning.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS %I PARTITION OF event_odds_snapshots"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000002_create_relational_odds_tables.sql",
@@ -27325,12 +27556,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to match odds schema; evidence: CREATE TABLE IF NOT EXISTS bookmaker_odds (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000002_create_relational_odds_tables.sql is a supabase SQL migration (path: supabase/migrations/20260822000002_create_relational_odds_tables.sql) targeting match odds schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS bookmaker_odds ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000002a_create_relational_tables.sql",
@@ -27351,12 +27589,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to relational odds schema; evidence: CREATE TABLE IF NOT EXISTS bookmaker_odds (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000002a_create_relational_tables.sql is a supabase SQL migration (path: supabase/migrations/20260822000002a_create_relational_tables.sql) targeting relational odds schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS bookmaker_odds ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000002b_create_relational_indexes.sql",
@@ -27377,12 +27622,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to relational odds schema; evidence: CREATE INDEX IF NOT EXISTS idx_bookmaker_odds_event ON bookmaker_odds(id_event).",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000002b_create_relational_indexes.sql is a supabase SQL migration (path: supabase/migrations/20260822000002b_create_relational_indexes.sql) targeting relational odds schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE INDEX IF NOT EXISTS idx_bookmaker_odds_event ON bookmaker_odds(id_event)"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000002c_create_relational_functions_triggers.sql",
@@ -27403,12 +27655,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to context enrichment triggers/schema; evidence: CREATE OR REPLACE FUNCTION trg_bookmaker_odds_updated_at().",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000002c_create_relational_functions_triggers.sql is a supabase SQL migration (path: supabase/migrations/20260822000002c_create_relational_functions_triggers.sql) targeting context enrichment triggers/schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE OR REPLACE FUNCTION trg_bookmaker_odds_updated_at()"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000002d_create_relational_views.sql",
@@ -27429,12 +27688,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to relational odds schema; evidence: Create Compatibility Views for Relational Tables\n-- ============================================================================\n\n-- View to recon.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000002d_create_relational_views.sql is a supabase SQL migration (path: supabase/migrations/20260822000002d_create_relational_views.sql) targeting relational odds schema.",
+        "Fast skim: dominant SQL statement appears to be: Create Compatibility Views for Relational Tables\n-- ============================================================================\n\n-- View to recon"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000003_normalize_prediction_tables.sql",
@@ -27455,12 +27721,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to RPC functions/schema; evidence: CREATE TABLE IF NOT EXISTS prediction_core (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000003_normalize_prediction_tables.sql is a supabase SQL migration (path: supabase/migrations/20260822000003_normalize_prediction_tables.sql) targeting RPC functions/schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS prediction_core ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000003a_create_prediction_tables.sql",
@@ -27481,12 +27754,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to RPC functions/schema; evidence: CREATE TABLE IF NOT EXISTS prediction_core (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000003a_create_prediction_tables.sql is a supabase SQL migration (path: supabase/migrations/20260822000003a_create_prediction_tables.sql) targeting RPC functions/schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS prediction_core ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000003b_create_prediction_indexes.sql",
@@ -27507,12 +27787,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to RPC functions/schema; evidence: CREATE INDEX IF NOT EXISTS idx_prediction_core_fixture ON prediction_core(fixture_id).",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000003b_create_prediction_indexes.sql is a supabase SQL migration (path: supabase/migrations/20260822000003b_create_prediction_indexes.sql) targeting RPC functions/schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE INDEX IF NOT EXISTS idx_prediction_core_fixture ON prediction_core(fixture_id)"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000003c_create_prediction_functions_triggers.sql",
@@ -27533,12 +27820,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to context enrichment triggers/schema; evidence: CREATE OR REPLACE FUNCTION trg_prediction_core_updated_at().",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000003c_create_prediction_functions_triggers.sql is a supabase SQL migration (path: supabase/migrations/20260822000003c_create_prediction_functions_triggers.sql) targeting context enrichment triggers/schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE OR REPLACE FUNCTION trg_prediction_core_updated_at()"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000003d_create_prediction_views.sql",
@@ -27559,12 +27853,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to RPC functions/schema; evidence: Create Unified View for Normalized Prediction Tables\n-- ============================================================================\n\nCREATE OR RE.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000003d_create_prediction_views.sql is a supabase SQL migration (path: supabase/migrations/20260822000003d_create_prediction_views.sql) targeting RPC functions/schema.",
+        "Fast skim: dominant SQL statement appears to be: Create Unified View for Normalized Prediction Tables\n-- ============================================================================\n\nCREATE OR RE"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000004_create_materialized_admin_views.sql",
@@ -27585,12 +27886,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to admin views/schema; evidence: CREATE OR REPLACE FUNCTION refresh_admin_materialized_views().",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000004_create_materialized_admin_views.sql is a supabase SQL migration (path: supabase/migrations/20260822000004_create_materialized_admin_views.sql) targeting admin views/schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE OR REPLACE FUNCTION refresh_admin_materialized_views()"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000005_skcs_engine_v2_engine_core.sql",
@@ -27611,12 +27919,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to SKCS engine v2 schema; evidence: CREATE TABLE IF NOT EXISTS public.team_form (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000005_skcs_engine_v2_engine_core.sql is a supabase SQL migration (path: supabase/migrations/20260822000005_skcs_engine_v2_engine_core.sql) targeting SKCS engine v2 schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS public.team_form ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000006_ai_governance_telemetry.sql",
@@ -27637,12 +27952,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to database schema evolution; evidence: CREATE TABLE IF NOT EXISTS public.ai_pipeline_telemetry (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000006_ai_governance_telemetry.sql is a supabase SQL migration (path: supabase/migrations/20260822000006_ai_governance_telemetry.sql) targeting database schema evolution.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS public.ai_pipeline_telemetry ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000007_ai_governance_rls_policies.sql",
@@ -27663,12 +27985,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to RLS policies; evidence: CREATE POLICY ai_pipeline_telemetry_service_role_all.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000007_ai_governance_rls_policies.sql is a supabase SQL migration (path: supabase/migrations/20260822000007_ai_governance_rls_policies.sql) targeting RLS policies.",
+        "Fast skim: dominant SQL statement appears to be: CREATE POLICY ai_pipeline_telemetry_service_role_all"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000008_service_role_rls_policies.sql",
@@ -27689,12 +28018,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to RLS policies; evidence: CREATE POLICY %I ON public.%I FOR ALL TO service_role USING (true) WITH CHECK (true)',.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000008_service_role_rls_policies.sql is a supabase SQL migration (path: supabase/migrations/20260822000008_service_role_rls_policies.sql) targeting RLS policies.",
+        "Fast skim: dominant SQL statement appears to be: CREATE POLICY %I ON public.%I FOR ALL TO service_role USING (true) WITH CHECK (true)',"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000009_public_read_config_rls_policies.sql",
@@ -27715,12 +28051,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to RLS policies; evidence: CREATE POLICY %I ON public.%I FOR SELECT TO anon, authenticated USING (true)',.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000009_public_read_config_rls_policies.sql is a supabase SQL migration (path: supabase/migrations/20260822000009_public_read_config_rls_policies.sql) targeting RLS policies.",
+        "Fast skim: dominant SQL statement appears to be: CREATE POLICY %I ON public.%I FOR SELECT TO anon, authenticated USING (true)',"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000010_public_read_reference_rls.sql",
@@ -27741,12 +28084,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to RLS policies; evidence: CREATE POLICY %I ON public.%I FOR SELECT TO anon, authenticated USING (true)',.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000010_public_read_reference_rls.sql is a supabase SQL migration (path: supabase/migrations/20260822000010_public_read_reference_rls.sql) targeting RLS policies.",
+        "Fast skim: dominant SQL statement appears to be: CREATE POLICY %I ON public.%I FOR SELECT TO anon, authenticated USING (true)',"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000011_system_health_state.sql",
@@ -27767,12 +28117,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to database schema evolution; evidence: CREATE TABLE IF NOT EXISTS public.system_health_state (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000011_system_health_state.sql is a supabase SQL migration (path: supabase/migrations/20260822000011_system_health_state.sql) targeting database schema evolution.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS public.system_health_state ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000012_semantic_violations.sql",
@@ -27793,12 +28150,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to database schema evolution; evidence: CREATE TABLE IF NOT EXISTS public.semantic_violations (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000012_semantic_violations.sql is a supabase SQL migration (path: supabase/migrations/20260822000012_semantic_violations.sql) targeting database schema evolution.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS public.semantic_violations ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000013_semantic_violation_summary.sql",
@@ -27819,12 +28183,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to database schema evolution; evidence: CREATE OR REPLACE FUNCTION public.get_semantic_violation_summary(.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000013_semantic_violation_summary.sql is a supabase SQL migration (path: supabase/migrations/20260822000013_semantic_violation_summary.sql) targeting database schema evolution.",
+        "Fast skim: dominant SQL statement appears to be: CREATE OR REPLACE FUNCTION public.get_semantic_violation_summary("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260822000014_system_health_state_contract.sql",
@@ -27845,12 +28216,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to database schema evolution; evidence: CREATE INDEX idx_system_health_state_last_transition.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260822000014_system_health_state_contract.sql is a supabase SQL migration (path: supabase/migrations/20260822000014_system_health_state_contract.sql) targeting database schema evolution.",
+        "Fast skim: dominant SQL statement appears to be: CREATE INDEX idx_system_health_state_last_transition"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260902000000_pipeline_health_feed.sql",
@@ -27871,12 +28249,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to database schema evolution; evidence: CREATE OR REPLACE VIEW public.v_pipeline_health_feed AS\r\nWITH ai_metrics AS (\r\n    SELECT\r\n        t.pipeline_name,\r\n        COUNT(*)::integer AS.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20260902000000_pipeline_health_feed.sql is a supabase SQL migration (path: supabase/migrations/20260902000000_pipeline_health_feed.sql) targeting database schema evolution.",
+        "Fast skim: dominant SQL statement appears to be: CREATE OR REPLACE VIEW public.v_pipeline_health_feed AS\r\nWITH ai_metrics AS (\r\n    SELECT\r\n        t.pipeline_name,\r\n        COUNT(*)::integer AS"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20261001000000_runtime_truth_mirror.sql",
@@ -27897,12 +28282,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to database schema evolution; evidence: CREATE TABLE IF NOT EXISTS public.pipeline_executions (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20261001000000_runtime_truth_mirror.sql is a supabase SQL migration (path: supabase/migrations/20261001000000_runtime_truth_mirror.sql) targeting database schema evolution.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS public.pipeline_executions ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20261005000000_runtime_truth_mirror_alignment.sql",
@@ -27923,12 +28315,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to database schema evolution; evidence: CREATE TABLE IF NOT EXISTS public.pipeline_executions (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20261005000000_runtime_truth_mirror_alignment.sql is a supabase SQL migration (path: supabase/migrations/20261005000000_runtime_truth_mirror_alignment.sql) targeting database schema evolution.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS public.pipeline_executions ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20261005000001_fix_calculate_team_strength_ambiguity.sql",
@@ -27949,12 +28348,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to database schema evolution; evidence: CREATE OR REPLACE FUNCTION public.calculate_team_strength(p_team_id text, p_season_year integer).",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20261005000001_fix_calculate_team_strength_ambiguity.sql is a supabase SQL migration (path: supabase/migrations/20261005000001_fix_calculate_team_strength_ambiguity.sql) targeting database schema evolution.",
+        "Fast skim: dominant SQL statement appears to be: CREATE OR REPLACE FUNCTION public.calculate_team_strength(p_team_id text, p_season_year integer)"
+      ]
     },
     {
       "asset_path": "supabase/migrations/20261006000000_sportsdataio_contract_alignment.sql",
@@ -27975,12 +28381,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to sportsdataio contract alignment schema; evidence: CREATE TABLE IF NOT EXISTS public.data_contracts (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20261006000000_sportsdataio_contract_alignment.sql is a supabase SQL migration (path: supabase/migrations/20261006000000_sportsdataio_contract_alignment.sql) targeting sportsdataio contract alignment schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS public.data_contracts ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20261006000001_canonical_events.sql",
@@ -28001,12 +28414,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to canonical events schema; evidence: CREATE TABLE IF NOT EXISTS public.canonical_events (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20261006000001_canonical_events.sql is a supabase SQL migration (path: supabase/migrations/20261006000001_canonical_events.sql) targeting canonical events schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS public.canonical_events ("
+      ]
     },
     {
       "asset_path": "supabase/migrations/20261007000000_user_experience_feedback.sql",
@@ -28027,12 +28447,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase SQL migration intended to user experience feedback schema; evidence: CREATE TABLE IF NOT EXISTS public.user_experience_feedback (.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: 20261007000000_user_experience_feedback.sql is a supabase SQL migration (path: supabase/migrations/20261007000000_user_experience_feedback.sql) targeting user experience feedback schema.",
+        "Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS public.user_experience_feedback ("
+      ]
     },
     {
       "asset_path": "supabase/schema/ai_pipeline_schema.sql",
