@@ -15909,10 +15909,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Governance/apply script for database/control mapping (EAC tooling).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "DATABASE",
+        "SCRIPT_TOOL",
+        "SQL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: uses Supabase client/table calls.",
+        "Skim: contains SQL-like query execution.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/apply-migrations.js",
@@ -15935,10 +15944,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Migration helper / runner for governed schema changes.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "SCRIPT_TOOL",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Skim: uses Supabase client/table calls.",
+        "Skim: contains SQL-like query execution.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-api-call-map.js",
@@ -15961,10 +15978,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-api-sports-usage.js",
@@ -15987,10 +16009,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: contains SQL-like query execution.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-bigballs-discovery.js",
@@ -16013,10 +16042,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "PROVIDER",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: performs HTTP/API calls.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-bsd-discovery.js",
@@ -16039,10 +16075,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "PROVIDER",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: performs HTTP/API calls.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-bsd-league-inventory.js",
@@ -16065,10 +16108,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-cricket-final-tables.js",
@@ -16091,10 +16139,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "DATABASE",
+        "SCRIPT_TOOL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: uses Supabase client/table calls.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-cricket-rules.js",
@@ -16117,10 +16172,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "DATABASE",
+        "SCRIPT_TOOL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: uses Supabase client/table calls.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-cricket-storage.js",
@@ -16143,10 +16205,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "DATABASE",
+        "SCRIPT_TOOL",
+        "SQL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: uses Supabase client/table calls.",
+        "Skim: contains SQL-like query execution.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-cricket-tables.js",
@@ -16169,10 +16240,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "DATABASE",
+        "SCRIPT_TOOL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: uses Supabase client/table calls.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-database.js",
@@ -16195,10 +16273,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Skim: contains SQL-like query execution.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-execution-spine.js",
@@ -16221,10 +16305,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-football-rules-alignment.js",
@@ -16247,10 +16336,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-grading-pipeline.js",
@@ -16273,10 +16366,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: contains SQL-like query execution.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-placeholders-and-insights.js",
@@ -16299,10 +16399,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: contains SQL-like query execution.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-soccerdata-discovery.js",
@@ -16325,10 +16432,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "PROVIDER",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: performs HTTP/API calls.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-soccerdata-summer-coverage.js",
@@ -16351,10 +16465,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-sport-values.js",
@@ -16377,10 +16496,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Skim: contains SQL-like query execution.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-sportsdataio-boundary.ps1",
@@ -16403,10 +16528,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "DATABASE",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Skim: uses Supabase client/table calls."
+      ]
     },
     {
       "asset_path": "scripts/audit-table-usage.js",
@@ -16429,10 +16559,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: contains SQL-like query execution.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-v2-foundation.js",
@@ -16455,10 +16592,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: contains SQL-like query execution.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-v2-identity-deep.js",
@@ -16481,10 +16625,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "DATABASE",
+        "SCRIPT_TOOL",
+        "SQL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: uses Supabase client/table calls.",
+        "Skim: contains SQL-like query execution.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/audit-v2-provider-coverage.js",
@@ -16507,10 +16660,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: contains SQL-like query execution.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/backfill-direct1x2-final-fields.js",
@@ -18899,10 +19059,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Gatekeeper pipeline runner for validation/relationship discovery.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL",
+        "PROVIDER",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: performs HTTP/API calls.",
+        "Skim: contains SQL-like query execution.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/gulf_in_class_simulation.js",
@@ -19263,10 +19432,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Master QA orchestration for repository verification.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "SQL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: contains SQL-like query execution.",
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/migration1-plan-visibility.js",
@@ -20017,10 +20193,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Gatekeeper pipeline runner for validation/relationship discovery.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Skim: emits console logs for audit/validation output."
+      ]
     },
     {
       "asset_path": "scripts/setup-rls.js",
