@@ -6736,7 +6736,7 @@
         "RUNTIME"
       ],
       "classification_evidence": [
-        "Defines GET `/build` which validates `legs` Γêê {4,6,8}; queries `direct1x2_prediction_final` for the fixtureΓÇÖs primary 1X2 prediction and queries `secondary_market_predictions` for all secondary legs. It then selects tier-2 markets and (for 8 legs) some tier-3 markets to construct `combos`, and returns `res.json({ combos, reasoning })`."
+        "Defines GET `/build` which validates `legs` ?????? {4,6,8}; queries `direct1x2_prediction_final` for the fixture??????s primary 1X2 prediction and queries `secondary_market_predictions` for all secondary legs. It then selects tier-2 markets and (for 8 legs) some tier-3 markets to construct `combos`, and returns `res.json({ combos, reasoning })`."
       ]
     },
     {
@@ -11226,7 +11226,7 @@
         "OBSERVABILITY"
       ],
       "classification_evidence": [
-        "Defines/exports an ACCA/insight law layer: lists allowed/banned market patterns, enforces family caps and confidence guardrails (e.g., 72ΓÇô97% leg confidence), and coordinates with `pipelineLogger` and `marketIntelligence` helpers."
+        "Defines/exports an ACCA/insight law layer: lists allowed/banned market patterns, enforces family caps and confidence guardrails (e.g., 72??????97% leg confidence), and coordinates with `pipelineLogger` and `marketIntelligence` helpers."
       ]
     },
     {
@@ -11545,7 +11545,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "SportsSRC provider match normalizer that converts raw SportsSRC match payloads into the platformΓÇÖs canonical fixture shape (fixture_key, teams, kickoff_time, league/competition, venue, and raw_payload).",
+      "purpose_description": "SportsSRC provider match normalizer that converts raw SportsSRC match payloads into the platform??????s canonical fixture shape (fixture_key, teams, kickoff_time, league/competition, venue, and raw_payload).",
       "functional_group": "PROVIDER_INTEGRATION",
       "relationship_tags": [
         "PROVIDER",
@@ -11585,7 +11585,7 @@
         "RUNTIME"
       ],
       "classification_evidence": [
-        "Defines known market/sport/volatility sets and exposes `validateRawPredictionInput(pred)` and `validateRawPredictionForInsert(row)`; checks match_id presence, market validity, prediction confidence range (0ΓÇô100), and odds positivity when provided."
+        "Defines known market/sport/volatility sets and exposes `validateRawPredictionInput(pred)` and `validateRawPredictionForInsert(row)`; checks match_id presence, market validity, prediction confidence range (0??????100), and odds positivity when provided."
       ]
     },
     {
@@ -16741,12 +16741,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: backfill-direct1x2-final-fields.js is a SCRIPT_TOOL script for backfilling governed database fields.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: backfill-direct1x2-final-fields.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes SQL-like query/migration strings.",
+        "Fast skim: touches prediction/risk-confidence style logic."
+      ]
     },
     {
       "asset_path": "scripts/backfill-fixture-ids.js",
@@ -16767,12 +16775,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: backfill-fixture-ids.js is a SCRIPT_TOOL script for backfilling governed database fields.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: backfill-fixture-ids.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes SQL-like query/migration strings.",
+        "Fast skim: touches prediction/risk-confidence style logic."
+      ]
     },
     {
       "asset_path": "scripts/backfill-football-context.js",
@@ -16793,12 +16809,25 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: backfill-football-context.js is a PROVIDER_INTEGRATION script for backfilling governed database fields.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "DATABASE",
+        "SQL",
+        "API",
+        "ROUTE"
+      ],
+      "classification_evidence": [
+        "Fast skim: backfill-football-context.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: uses Supabase client patterns for DB reads/writes.",
+        "Fast skim: includes HTTP/API interaction points.",
+        "Fast skim: includes SQL-like query/migration strings.",
+        "Fast skim: touches prediction/risk-confidence style logic."
+      ]
     },
     {
       "asset_path": "scripts/backfill-prediction-grading.js",
@@ -16819,12 +16848,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: backfill-prediction-grading.js is a PREDICTION script for backfilling governed database fields.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "SQL",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: backfill-prediction-grading.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes SQL-like query/migration strings.",
+        "Fast skim: touches prediction/risk-confidence style logic."
+      ]
     },
     {
       "asset_path": "scripts/backfill-predictions-accuracy.js",
@@ -16845,12 +16883,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: backfill-predictions-accuracy.js is a PREDICTION script for backfilling governed database fields.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "SQL",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: backfill-predictions-accuracy.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes SQL-like query/migration strings.",
+        "Fast skim: touches prediction/risk-confidence style logic."
+      ]
     },
     {
       "asset_path": "scripts/backfill-provider-event-id.js",
@@ -16871,12 +16918,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: backfill-provider-event-id.js is a SCRIPT_TOOL script for backfilling governed database fields.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: backfill-provider-event-id.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes SQL-like query/migration strings."
+      ]
     },
     {
       "asset_path": "scripts/bridge-raw-predictions-for-grading.js",
@@ -16897,12 +16951,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bridge-raw-predictions-for-grading.js is a PREDICTION script for bridging interim predictions into final tables.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "SQL",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: bridge-raw-predictions-for-grading.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes SQL-like query/migration strings.",
+        "Fast skim: touches prediction/risk-confidence style logic."
+      ]
     },
     {
       "asset_path": "scripts/bridge-to-final.sql",
@@ -16923,12 +16986,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bridge-to-final.sql is a DATABASE_MIGRATION script for bridging interim predictions into final tables.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: bridge-to-final.sql filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: uses Supabase client patterns for DB reads/writes.",
+        "Fast skim: includes SQL-like query/migration strings.",
+        "Fast skim: touches prediction/risk-confidence style logic."
+      ]
     },
     {
       "asset_path": "scripts/browser_console_test.js",
@@ -16983,12 +17056,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: brute-force-ingest.js is a SCRIPT_TOOL script for controlled inventory processing.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: brute-force-ingest.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes SQL-like query/migration strings.",
+        "Fast skim: touches prediction/risk-confidence style logic."
+      ]
     },
     {
       "asset_path": "scripts/build-acca.js",
@@ -18370,12 +18451,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: compose-context-pack.js is a SCRIPT_TOOL script for building context packs.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: compose-context-pack.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing."
+      ]
     },
     {
       "asset_path": "scripts/create-indexes.js",
@@ -18448,12 +18534,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: cricapi-cache-refresh.js is a SCRIPT_TOOL script for fetching/syncing external fixtures/events.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: cricapi-cache-refresh.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: references provider-specific feeds/adapters."
+      ]
     },
     {
       "asset_path": "scripts/db-cleanup.js",
@@ -18913,12 +19006,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: discover-free-livescore-endpoints.js is a PROVIDER_INTEGRATION script for fetching/syncing external fixtures/events.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: discover-free-livescore-endpoints.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: references provider-specific feeds/adapters."
+      ]
     },
     {
       "asset_path": "scripts/enrich-h2h.js",
@@ -18939,12 +19039,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: enrich-h2h.js is a PROVIDER_INTEGRATION script for enriching matches with contextual signals.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: enrich-h2h.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes HTTP/API interaction points.",
+        "Fast skim: references provider-specific feeds/adapters."
+      ]
     },
     {
       "asset_path": "scripts/enrich-importance.js",
@@ -18965,12 +19075,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: enrich-importance.js is a PROVIDER_INTEGRATION script for enriching matches with contextual signals.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: enrich-importance.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes HTTP/API interaction points.",
+        "Fast skim: references provider-specific feeds/adapters."
+      ]
     },
     {
       "asset_path": "scripts/enrich-injuries.js",
@@ -18991,12 +19111,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: enrich-injuries.js is a PROVIDER_INTEGRATION script for enriching matches with contextual signals.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "DATABASE",
+        "API",
+        "ROUTE"
+      ],
+      "classification_evidence": [
+        "Fast skim: enrich-injuries.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: uses Supabase client patterns for DB reads/writes.",
+        "Fast skim: includes HTTP/API interaction points."
+      ]
     },
     {
       "asset_path": "scripts/enrich-lineups.js",
@@ -19017,12 +19147,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: enrich-lineups.js is a PROVIDER_INTEGRATION script for enriching matches with contextual signals.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: enrich-lineups.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes HTTP/API interaction points.",
+        "Fast skim: references provider-specific feeds/adapters."
+      ]
     },
     {
       "asset_path": "scripts/enrich-team-form.js",
@@ -19043,12 +19183,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: enrich-team-form.js is a PROVIDER_INTEGRATION script for enriching matches with contextual signals.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: enrich-team-form.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes HTTP/API interaction points.",
+        "Fast skim: references provider-specific feeds/adapters."
+      ]
     },
     {
       "asset_path": "scripts/enrich-travel.js",
@@ -19069,12 +19219,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: enrich-travel.js is a PROVIDER_INTEGRATION script for enriching matches with contextual signals.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: enrich-travel.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes HTTP/API interaction points.",
+        "Fast skim: references provider-specific feeds/adapters."
+      ]
     },
     {
       "asset_path": "scripts/examine-prediction-76412.js",
@@ -19199,12 +19359,25 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: fetch-live-fixtures.js is a PROVIDER_INTEGRATION script for fetching/syncing external fixtures/events.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "SQL",
+        "API",
+        "ROUTE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: fetch-live-fixtures.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes HTTP/API interaction points.",
+        "Fast skim: includes SQL-like query/migration strings.",
+        "Fast skim: references provider-specific feeds/adapters.",
+        "Fast skim: touches prediction/risk-confidence style logic."
+      ]
     },
     {
       "asset_path": "scripts/fetch-thesportsdb-day.js",
@@ -19225,12 +19398,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: fetch-thesportsdb-day.js is a PROVIDER_INTEGRATION script for fetching/syncing external fixtures/events.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: fetch-thesportsdb-day.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes HTTP/API interaction points.",
+        "Fast skim: references provider-specific feeds/adapters."
+      ]
     },
     {
       "asset_path": "scripts/fix-ai-predictions-endpoint.js",
@@ -19459,12 +19642,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: force-enrich-match.js is a SCRIPT_TOOL script for controlled inventory processing.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "SQL",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: force-enrich-match.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes SQL-like query/migration strings.",
+        "Fast skim: references provider-specific feeds/adapters.",
+        "Fast skim: touches prediction/risk-confidence style logic."
+      ]
     },
     {
       "asset_path": "scripts/gatekeeper-pipeline.js",
@@ -19702,12 +19895,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: import-f1-formula1db.js is a PROVIDER_INTEGRATION script for controlled inventory processing.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "SQL",
+        "API",
+        "ROUTE"
+      ],
+      "classification_evidence": [
+        "Fast skim: import-f1-formula1db.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes HTTP/API interaction points.",
+        "Fast skim: includes SQL-like query/migration strings."
+      ]
     },
     {
       "asset_path": "scripts/import-today-snapshot-pipeline.js",
@@ -19728,12 +19931,23 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: import-today-snapshot-pipeline.js is a PROVIDER_INTEGRATION script for controlled inventory processing.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: import-today-snapshot-pipeline.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes HTTP/API interaction points.",
+        "Fast skim: references provider-specific feeds/adapters.",
+        "Fast skim: touches prediction/risk-confidence style logic."
+      ]
     },
     {
       "asset_path": "scripts/install-local-git-hooks.js",
@@ -19780,12 +19994,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: investigate-football536-current-fixtures.js is a PROVIDER_INTEGRATION script for controlled inventory processing.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: investigate-football536-current-fixtures.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing."
+      ]
     },
     {
       "asset_path": "scripts/manual-grade.js",
@@ -19925,12 +20144,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: normalize-frontend-sports.js is a SCRIPT_TOOL script for normalizing sport/team identifiers.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: normalize-frontend-sports.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes SQL-like query/migration strings."
+      ]
     },
     {
       "asset_path": "scripts/normalize-sport-values.js",
@@ -19951,12 +20177,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: normalize-sport-values.js is a SCRIPT_TOOL script for normalizing sport/team identifiers.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: normalize-sport-values.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes SQL-like query/migration strings.",
+        "Fast skim: touches prediction/risk-confidence style logic."
+      ]
     },
     {
       "asset_path": "scripts/populate_sports_data.py",
@@ -19977,12 +20211,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: populate_sports_data.py is a PROVIDER_INTEGRATION script for controlled inventory processing.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "DATABASE",
+        "API",
+        "ROUTE"
+      ],
+      "classification_evidence": [
+        "Fast skim: populate_sports_data.py filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: uses Supabase client patterns for DB reads/writes.",
+        "Fast skim: includes HTTP/API interaction points."
+      ]
     },
     {
       "asset_path": "scripts/publish-cricbuzz-cricket.js",
@@ -20003,12 +20247,24 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: publish-cricbuzz-cricket.js is a GENERATED_OUTPUT script for publishing predictions.",
+      "functional_group": "GENERATED_OUTPUT",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "DATABASE",
+        "SQL",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: publish-cricbuzz-cricket.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: uses Supabase client patterns for DB reads/writes.",
+        "Fast skim: includes SQL-like query/migration strings.",
+        "Fast skim: references provider-specific feeds/adapters.",
+        "Fast skim: touches prediction/risk-confidence style logic."
+      ]
     },
     {
       "asset_path": "scripts/publish-cricbuzz-direct-fixtures.js",
@@ -20029,12 +20285,24 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: publish-cricbuzz-direct-fixtures.js is a GENERATED_OUTPUT script for publishing predictions.",
+      "functional_group": "GENERATED_OUTPUT",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "DATABASE",
+        "SQL",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: publish-cricbuzz-direct-fixtures.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: uses Supabase client patterns for DB reads/writes.",
+        "Fast skim: includes SQL-like query/migration strings.",
+        "Fast skim: references provider-specific feeds/adapters.",
+        "Fast skim: touches prediction/risk-confidence style logic."
+      ]
     },
     {
       "asset_path": "scripts/publish-prediction-76412.js",
@@ -20055,12 +20323,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: publish-prediction-76412.js is a GENERATED_OUTPUT script for publishing predictions.",
+      "functional_group": "GENERATED_OUTPUT",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "SQL",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Fast skim: publish-prediction-76412.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes SQL-like query/migration strings.",
+        "Fast skim: touches prediction/risk-confidence style logic."
+      ]
     },
     {
       "asset_path": "scripts/purge-fallback-data.js",
@@ -20107,12 +20384,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: py_verify_thesportsdb_coverage.py is a PROVIDER_INTEGRATION script for controlled inventory processing.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: py_verify_thesportsdb_coverage.py filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes HTTP/API interaction points.",
+        "Fast skim: references provider-specific feeds/adapters."
+      ]
     },
     {
       "asset_path": "scripts/quarantine-database.js",
@@ -20159,12 +20446,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: rebuild-canonical-from-api-sports.js is a SCRIPT_TOOL script for rebuilding canonical fixture/event tables.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "DATABASE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: rebuild-canonical-from-api-sports.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: uses Supabase client patterns for DB reads/writes.",
+        "Fast skim: references provider-specific feeds/adapters."
+      ]
     },
     {
       "asset_path": "scripts/render-api-deploy.js",
@@ -20791,12 +21087,23 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: simple-sync.js is a PROVIDER_INTEGRATION script for fetching/syncing external fixtures/events.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "SQL",
+        "API",
+        "ROUTE"
+      ],
+      "classification_evidence": [
+        "Fast skim: simple-sync.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes HTTP/API interaction points.",
+        "Fast skim: includes SQL-like query/migration strings.",
+        "Fast skim: touches prediction/risk-confidence style logic."
+      ]
     },
     {
       "asset_path": "scripts/simulate-filtering.js",
@@ -20975,12 +21282,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: sync-bsd-enrichment.js is a PROVIDER_INTEGRATION script for fetching/syncing external fixtures/events.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "SQL",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: sync-bsd-enrichment.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes SQL-like query/migration strings.",
+        "Fast skim: references provider-specific feeds/adapters."
+      ]
     },
     {
       "asset_path": "scripts/sync-ucl-context.js",
@@ -21001,12 +21317,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: sync-ucl-context.js is a PROVIDER_INTEGRATION script for fetching/syncing external fixtures/events.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "RUNTIME",
+        "SQL",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: sync-ucl-context.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
+        "Fast skim: includes SQL-like query/migration strings.",
+        "Fast skim: references provider-specific feeds/adapters."
+      ]
     },
     {
       "asset_path": "scripts/task1-schema-update.js",
