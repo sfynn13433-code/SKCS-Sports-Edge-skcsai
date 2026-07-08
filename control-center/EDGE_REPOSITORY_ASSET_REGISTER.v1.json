@@ -9879,10 +9879,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Adjust base prediction probability using contextual risk signals and market adjustments.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": [
+        "PREDICTION",
+        "CONFIGURATION"
+      ],
+      "classification_evidence": [
+        "Exports adjustProbability plus resolveMarketAdjustment/applyMarketAdjustment and clamps output between 0.10 and 0.95.",
+        "Computes weighted risk penalty from provided signals and applies proportional decay to baseline probability."
+      ]
     },
     {
       "asset_path": "backend/src/services/contextIntelligence/aiPipeline.js",
@@ -9905,10 +9911,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Context-intelligence pipeline wrapper that caches enriched fixture context in Supabase.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": [
+        "DATABASE",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Uses Supabase client (supabase-js) to query a fixture context cache table and upsert enriched contextSignals.",
+        "On cache hit (TTL check) returns cached context; on cache miss runs aiPipeline_core and writes the result back."
+      ]
     },
     {
       "asset_path": "backend/src/services/contextIntelligence/aiPipeline_core.js",
@@ -9931,10 +9943,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Core context-intelligence pipeline that enriches a fixture with weather, availability, discipline, stability and derived risk signals.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": [
+        "PREDICTION",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Requires getWeatherSignal/availabilitySignal/disciplineSignal/stabilitySignal and merges outputs into contextSignals.",
+        "Builds extendedSignals (travel_fatigue/fixture_congestion/derby/rotation/market_movement/lineup_uncertainty) from fixture context input."
+      ]
     },
     {
       "asset_path": "backend/src/services/contextIntelligence/availabilitySignal.js",
@@ -9957,10 +9975,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Compute availability risk signal from injuries, suspensions, expected/confirmed lineups and lineup confirmation.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": [
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Implements getAvailabilitySignal and derives availability_risk from keyAbsences, squadAbsences, reliability and lineup_confirmed.",
+        "Returns availability_risk plus meta fields (reliability, counts) for the adjustment pipeline."
+      ]
     },
     {
       "asset_path": "backend/src/services/contextIntelligence/cacheService.js",
@@ -9983,10 +10006,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Postgres-backed cache helper for context-intelligence results (context_intelligence_cache).",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "DATABASE",
+        "SQL",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Imports query from ../../../db and ensures/creates the context_intelligence_cache table.",
+        "Provides getFreshContextCache and upsertContextCache that store payload jsonb with expires_at TTL."
+      ]
     },
     {
       "asset_path": "backend/src/services/contextIntelligence/disciplineSignal.js",
@@ -10009,10 +10039,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Compute discipline risk signal from suspensions/bans and card threat patterns.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": [
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Implements getDisciplineSignal and normalizes legacy/non-legacy inputs into bans, yellowCardThreats and redCards.",
+        "Produces discipline_risk clamped to 0-1 and returns meta including directRisk."
+      ]
     },
     {
       "asset_path": "backend/src/services/contextIntelligence/stabilitySignal.js",
@@ -10035,10 +10070,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Compute stability risk signal from coach/board instability, player legal incidents, fan violence, and morale.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": [
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Implements getStabilitySignal reading legacy shapes (coachConflict/execInstability/playerLegalIssues/fanViolence) or direct args.",
+        "Computes stability_risk from boolean risk factors plus moralePenalty and returns meta describing inputs."
+      ]
     },
     {
       "asset_path": "backend/src/services/contextIntelligence/weatherSignal.js",
@@ -10061,10 +10101,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Fetch and normalize weather risk (weather_risk) and market confidence adjustments via WeatherAPI.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "API",
+        "PREDICTION"
+      ],
+      "classification_evidence": [
+        "Uses axios to call WeatherAPI forecast endpoint using WEATHER_API_KEY and stadium location/kickoff time.",
+        "Builds weather_risk/clamped risk and returns marketAdjustments plus meta/status."
+      ]
     },
     {
       "asset_path": "backend/src/services/marketRouter/waterfall.js",
@@ -10087,10 +10134,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Market-router waterfall decision engine that selects a final bet market/prediction based on confidence thresholds.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": [
+        "PREDICTION",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Exports resolveDecision and normalizes probabilities into market candidates (1X2, double chance, draw-no-bet, over/under).",
+        "Runs ordered phases (apex, safe pivot, defensive floor) and returns status (locked or no_bet) with engine_log."
+      ]
     },
     {
       "asset_path": "backend/test-ultra-slim.js",
