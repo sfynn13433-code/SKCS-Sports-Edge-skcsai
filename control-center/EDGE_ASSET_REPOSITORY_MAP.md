@@ -17,18 +17,18 @@ CURRENT_STATE_COUNTS
 - GENERATED: 0
 
 FUNCTIONAL_GROUP_COUNTS
-- (PENDING): 174
+- (PENDING): 154
 - PROVIDER_INTEGRATION: 117
 - SCRIPT_TOOL: 106
 - DOCUMENTATION_KNOWLEDGE: 89
 - DATABASE_MIGRATION: 76
 - TEST_PROOF: 75
 - FRONTEND_UI: 55
+- DATABASE: 48
 - DEPLOYMENT_OPERATIONS: 34
-- DATABASE: 33
+- SCHEDULER_BACKGROUND: 27
 - PREDICTION: 25
 - GOVERNANCE: 23
-- SCHEDULER_BACKGROUND: 22
 - ACCA: 16
 - API_ROUTE: 15
 - BACKEND_RUNTIME: 8
@@ -41,34 +41,34 @@ FUNCTIONAL_GROUP_COUNTS
 - UNCATEGORIZED: 2
 
 RELATIONSHIP_TAG_COUNTS
-- RUNTIME: 281
+- RUNTIME: 286
+- SQL: 230
 - SCRIPT_TOOL: 220
-- SQL: 215
-- DATABASE: 196
-- PROVIDER: 192
+- DATABASE: 211
+- PROVIDER: 193
 - API: 165
 - DOCUMENTATION: 124
 - GOVERNANCE: 109
-- OBSERVABILITY: 95
-- PREDICTION: 88
+- OBSERVABILITY: 96
+- PREDICTION: 91
 - UI: 87
 - MIGRATION: 79
-- TEST_PROOF: 71
+- TEST_PROOF: 73
 - AUDIT: 66
 - ROUTE: 64
-- SECURITY: 49
+- SECURITY: 50
 - DEPLOYMENT: 44
 - SERVICE: 42
 - GENERATED: 34
+- BACKGROUND_JOB: 28
 - CONFIGURATION: 28
-- BACKGROUND_JOB: 23
-- RULEBOOK: 23
-- ACCA: 22
-- SCHEDULER: 22
-- AI_EDGEMIND: 17
+- SCHEDULER: 27
+- RULEBOOK: 24
+- ACCA: 23
+- AI_EDGEMIND: 18
+- GRADING: 8
 - PUBLIC_ASSET: 8
-- GRADING: 7
-- SUBSCRIBER: 3
+- SUBSCRIBER: 4
 - CONTROLLER: 2
 
 NEXT_VALIDATION_NON_EMPTY_ASSETS: 906
@@ -929,26 +929,26 @@ PER_ASSET_BY_BATCH
 ## B23 DB_SQL_AND_SUPABASE_OTHER
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |
 |---|---|---|---|---|---|---|
-| sql/acca_rules.sql | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| sql/day_zero_subscription.sql | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| sql/extreme_smb_data.sql | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| sql/fix_rls_policies.sql | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| sql/market_correlations_schema.sql | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| sql/master_rulebook_triggers.sql | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| sql/monitoring_tables.sql | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| sql/performance_optimizations.sql | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| sql/rapidapi_cache.sql | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| sql/schema_refactor.sql | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| sql/supabase_test_user_reset_and_seed.sql | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| sql/supabase_test_user_seed_access.sql | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| sql/tables.sql | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| sql/tier_rules.sql | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| supabase/edge-functions/scheduled-fixture-sync/index.ts | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| supabase/edge-functions/scheduledFixtureSync/index.ts | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| supabase/functions/scheduled-prediction-refresh/index.ts | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| supabase/functions/semantic-drift-summary/index.ts | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| supabase/functions/sync-sports-data/index.ts | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| supabase/schema/ai_pipeline_schema.sql | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| sql/acca_rules.sql | SQL asset defining ACCA rules storage and upsert behaviour. | DATABASE | UNKNOWN | ["ACCA","DATABASE","SQL"] | ["Fast skim: acca_rules.sql is a SQL database asset (path: sql/acca_rules.sql); first dominant statement: insert into acca_rules (rule_name, rule_value).","Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."] | Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers. |
+| sql/day_zero_subscription.sql | SQL asset implementing day-zero subscription schema and related user flags/seed objects. | DATABASE | UNKNOWN | ["SUBSCRIBER","DATABASE","SQL"] | ["Fast skim: day_zero_subscription.sql is a SQL database asset (path: sql/day_zero_subscription.sql); first dominant statement: CREATE TABLE subscriptions (.","Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."] | Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers. |
+| sql/extreme_smb_data.sql | SQL asset defining extreme SMB data layer tables for team strength and market correlations. | DATABASE | UNKNOWN | ["PREDICTION","DATABASE","SQL"] | ["Fast skim: extreme_smb_data.sql is a SQL database asset (path: sql/extreme_smb_data.sql); first dominant statement: CREATE TABLE IF NOT EXISTS team_strength_params (.","Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."] | Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers. |
+| sql/fix_rls_policies.sql | SQL asset providing RLS policy fixes and verification queries for selected tables. | DATABASE | UNKNOWN | ["SECURITY","DATABASE","SQL"] | ["Fast skim: fix_rls_policies.sql is a SQL database asset (path: sql/fix_rls_policies.sql); first dominant statement: ALTER TABLE direct1x2_prediction_final ENABLE ROW LEVEL SECURITY.","Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."] | Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers. |
+| sql/market_correlations_schema.sql | SQL asset defining market correlations schema and helper function. | DATABASE | UNKNOWN | ["PREDICTION","DATABASE","SQL"] | ["Fast skim: market_correlations_schema.sql is a SQL database asset (path: sql/market_correlations_schema.sql); first dominant statement: CREATE TABLE IF NOT EXISTS market_correlations (.","Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."] | Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers. |
+| sql/master_rulebook_triggers.sql | SQL asset defining database triggers enforcing master rulebook safety checks. | DATABASE | UNKNOWN | ["RULEBOOK","DATABASE","SQL"] | ["Fast skim: master_rulebook_triggers.sql is a SQL database asset (path: sql/master_rulebook_triggers.sql); first dominant statement: CREATE TABLE IF NOT EXISTS acca_legs (.","Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."] | Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers. |
+| sql/monitoring_tables.sql | SQL asset creating monitoring/observability tables for predictions and ACCA build logs. | DATABASE | UNKNOWN | ["OBSERVABILITY","DATABASE","SQL"] | ["Fast skim: monitoring_tables.sql is a SQL database asset (path: sql/monitoring_tables.sql); first dominant statement: CREATE TABLE IF NOT EXISTS prediction_request_log (.","Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."] | Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers. |
+| sql/performance_optimizations.sql | SQL asset adding performance/constraint optimizations for master rulebook triggers. | DATABASE | UNKNOWN | ["DATABASE","SQL"] | ["Fast skim: performance_optimizations.sql is a SQL database asset (path: sql/performance_optimizations.sql); first dominant statement: CREATE TABLE prediction_request_log_y2024m01 PARTITION OF prediction_request_log.","Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."] | Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers. |
+| sql/rapidapi_cache.sql | SQL asset creating RapidAPI cache table and indexes. | DATABASE | UNKNOWN | ["PROVIDER","DATABASE","SQL"] | ["Fast skim: rapidapi_cache.sql is a SQL database asset (path: sql/rapidapi_cache.sql); first dominant statement: CREATE TABLE IF NOT EXISTS public.rapidapi_cache (.","Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."] | Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers. |
+| sql/schema_refactor.sql | SQL asset refactoring prediction pipeline schema with normalized fixtures and staged prediction tables. | DATABASE | UNKNOWN | ["PREDICTION","DATABASE","SQL"] | ["Fast skim: schema_refactor.sql is a SQL database asset (path: sql/schema_refactor.sql); first dominant statement: CREATE TABLE IF NOT EXISTS normalized_fixtures (.","Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."] | Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers. |
+| sql/supabase_test_user_reset_and_seed.sql | SQL asset seeding/resetting Supabase test user subscriptions and tier bootstrap tables. | DATABASE | UNKNOWN | ["TEST_PROOF","DATABASE","SQL"] | ["Fast skim: supabase_test_user_reset_and_seed.sql is a SQL database asset (path: sql/supabase_test_user_reset_and_seed.sql); first dominant statement: CREATE TABLE IF NOT EXISTS public.tiers (.","Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."] | Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers. |
+| sql/supabase_test_user_seed_access.sql | SQL asset seeding Supabase test user profile/admin overrides and access binding tables. | DATABASE | UNKNOWN | ["TEST_PROOF","DATABASE","SQL"] | ["Fast skim: supabase_test_user_seed_access.sql is a SQL database asset (path: sql/supabase_test_user_seed_access.sql); first dominant statement: CREATE TABLE IF NOT EXISTS public.profiles (.","Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."] | Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers. |
+| sql/tables.sql | SQL asset creating core tables, types, and subscription-related schema building blocks. | DATABASE | UNKNOWN | ["DATABASE","SQL"] | ["Fast skim: tables.sql is a SQL database asset (path: sql/tables.sql); first dominant statement: create table if not exists predictions_raw (.","Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."] | Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers. |
+| sql/tier_rules.sql | SQL asset defining tier rules configuration table and seed/update values. | DATABASE | UNKNOWN | ["GRADING","DATABASE","SQL"] | ["Fast skim: tier_rules.sql is a SQL database asset (path: sql/tier_rules.sql); first dominant statement: insert into tier_rules (tier, min_confidence, allowed_markets, max_acca_size, allowed_volatility).","Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."] | Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers. |
+| supabase/edge-functions/scheduled-fixture-sync/index.ts | Supabase scheduled Edge Function to sync fixtures and trigger enrichment/AI pipeline via backend. | SCHEDULER_BACKGROUND | UNKNOWN | ["SCHEDULER","BACKGROUND_JOB","RUNTIME"] | ["Fast skim: index.ts is a Supabase scheduled/function asset (path: supabase/edge-functions/scheduled-fixture-sync/index.ts); first meaningful line: import { serve } from \"https://deno.land/std@0.168.0/http/server.ts\";.","Fast skim: observed markers: tables(sport_sync,prediction_publish_runs,sport_sync)."] | Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this function’s behaviour before relying on it in production flows. |
+| supabase/edge-functions/scheduledFixtureSync/index.ts | Supabase scheduled Edge Function to sync fixtures and trigger enrichment/AI pipeline via backend. | SCHEDULER_BACKGROUND | UNKNOWN | ["SCHEDULER","BACKGROUND_JOB","RUNTIME"] | ["Fast skim: index.ts is a Supabase scheduled/function asset (path: supabase/edge-functions/scheduledFixtureSync/index.ts); first meaningful line: import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'.","Fast skim: observed markers: rpc(update_fixture_processing_log,upsert_raw_fixtures_batch) • tables(sport_sync,sport_sync,prediction_publish_runs)."] | Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this function’s behaviour before relying on it in production flows. |
+| supabase/functions/scheduled-prediction-refresh/index.ts | Supabase scheduled function to refresh prediction pipeline on defined time windows. | SCHEDULER_BACKGROUND | UNKNOWN | ["SCHEDULER","BACKGROUND_JOB","RUNTIME"] | ["Fast skim: index.ts is a Supabase scheduled/function asset (path: supabase/functions/scheduled-prediction-refresh/index.ts); first meaningful line: import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'.","Fast skim: observed markers: rpc(normalize_fixtures_for_window,generate_stage_1_predictions) • tables(subscription_plans,normalized_fixtures)."] | Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this function’s behaviour before relying on it in production flows. |
+| supabase/functions/semantic-drift-summary/index.ts | Supabase function returning semantic drift summary via `get_semantic_violation_summary` RPC. | SCHEDULER_BACKGROUND | UNKNOWN | ["SCHEDULER","BACKGROUND_JOB","RUNTIME"] | ["Fast skim: index.ts is a Supabase scheduled/function asset (path: supabase/functions/semantic-drift-summary/index.ts); first meaningful line: import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'.","Fast skim: observed markers: rpc(get_semantic_violation_summary)."] | Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this function’s behaviour before relying on it in production flows. |
+| supabase/functions/sync-sports-data/index.ts | Supabase Edge Function that triggers backend full sync pipeline via scheduled call. | SCHEDULER_BACKGROUND | UNKNOWN | ["SCHEDULER","BACKGROUND_JOB","RUNTIME"] | ["Fast skim: index.ts is a Supabase scheduled/function asset (path: supabase/functions/sync-sports-data/index.ts); first meaningful line: Deno.serve(async (_req) => {.","Fast skim: observed markers: POST /api/pipeline/run-full."] | Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this function’s behaviour before relying on it in production flows. |
+| supabase/schema/ai_pipeline_schema.sql | SQL asset defining AI pipeline schema tables (raw fixtures, match context, AI predictions). | DATABASE | UNKNOWN | ["AI_EDGEMIND","DATABASE","SQL"] | ["Fast skim: ai_pipeline_schema.sql is a SQL database asset (path: supabase/schema/ai_pipeline_schema.sql); first dominant statement: CREATE TABLE IF NOT EXISTS raw_fixtures (.","Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."] | Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers. |
 
 ## B24 TESTS
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |

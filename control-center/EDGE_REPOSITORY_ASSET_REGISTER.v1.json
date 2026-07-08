@@ -25817,12 +25817,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "SQL asset defining ACCA rules storage and upsert behaviour.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "ACCA",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: acca_rules.sql is a SQL database asset (path: sql/acca_rules.sql); first dominant statement: insert into acca_rules (rule_name, rule_value).",
+        "Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."
+      ]
     },
     {
       "asset_path": "sql/day_zero_subscription.sql",
@@ -25843,12 +25850,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "SQL asset implementing day-zero subscription schema and related user flags/seed objects.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "SUBSCRIBER",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: day_zero_subscription.sql is a SQL database asset (path: sql/day_zero_subscription.sql); first dominant statement: CREATE TABLE subscriptions (.",
+        "Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."
+      ]
     },
     {
       "asset_path": "sql/extreme_smb_data.sql",
@@ -25869,12 +25883,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "SQL asset defining extreme SMB data layer tables for team strength and market correlations.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "PREDICTION",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: extreme_smb_data.sql is a SQL database asset (path: sql/extreme_smb_data.sql); first dominant statement: CREATE TABLE IF NOT EXISTS team_strength_params (.",
+        "Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."
+      ]
     },
     {
       "asset_path": "sql/fix_rls_policies.sql",
@@ -25895,12 +25916,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "SQL asset providing RLS policy fixes and verification queries for selected tables.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "SECURITY",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: fix_rls_policies.sql is a SQL database asset (path: sql/fix_rls_policies.sql); first dominant statement: ALTER TABLE direct1x2_prediction_final ENABLE ROW LEVEL SECURITY.",
+        "Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."
+      ]
     },
     {
       "asset_path": "sql/market_correlations_schema.sql",
@@ -25921,12 +25949,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "SQL asset defining market correlations schema and helper function.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "PREDICTION",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: market_correlations_schema.sql is a SQL database asset (path: sql/market_correlations_schema.sql); first dominant statement: CREATE TABLE IF NOT EXISTS market_correlations (.",
+        "Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."
+      ]
     },
     {
       "asset_path": "sql/master_rulebook_triggers.sql",
@@ -25947,12 +25982,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "SQL asset defining database triggers enforcing master rulebook safety checks.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "RULEBOOK",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: master_rulebook_triggers.sql is a SQL database asset (path: sql/master_rulebook_triggers.sql); first dominant statement: CREATE TABLE IF NOT EXISTS acca_legs (.",
+        "Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."
+      ]
     },
     {
       "asset_path": "sql/monitoring_tables.sql",
@@ -25973,12 +26015,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "SQL asset creating monitoring/observability tables for predictions and ACCA build logs.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "OBSERVABILITY",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: monitoring_tables.sql is a SQL database asset (path: sql/monitoring_tables.sql); first dominant statement: CREATE TABLE IF NOT EXISTS prediction_request_log (.",
+        "Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."
+      ]
     },
     {
       "asset_path": "sql/performance_optimizations.sql",
@@ -25999,12 +26048,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "SQL asset adding performance/constraint optimizations for master rulebook triggers.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: performance_optimizations.sql is a SQL database asset (path: sql/performance_optimizations.sql); first dominant statement: CREATE TABLE prediction_request_log_y2024m01 PARTITION OF prediction_request_log.",
+        "Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."
+      ]
     },
     {
       "asset_path": "sql/rapidapi_cache.sql",
@@ -26025,12 +26080,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "SQL asset creating RapidAPI cache table and indexes.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "PROVIDER",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: rapidapi_cache.sql is a SQL database asset (path: sql/rapidapi_cache.sql); first dominant statement: CREATE TABLE IF NOT EXISTS public.rapidapi_cache (.",
+        "Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."
+      ]
     },
     {
       "asset_path": "sql/schema_refactor.sql",
@@ -26051,12 +26113,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "SQL asset refactoring prediction pipeline schema with normalized fixtures and staged prediction tables.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "PREDICTION",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: schema_refactor.sql is a SQL database asset (path: sql/schema_refactor.sql); first dominant statement: CREATE TABLE IF NOT EXISTS normalized_fixtures (.",
+        "Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."
+      ]
     },
     {
       "asset_path": "sql/supabase_test_user_reset_and_seed.sql",
@@ -26077,12 +26146,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "SQL asset seeding/resetting Supabase test user subscriptions and tier bootstrap tables.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: supabase_test_user_reset_and_seed.sql is a SQL database asset (path: sql/supabase_test_user_reset_and_seed.sql); first dominant statement: CREATE TABLE IF NOT EXISTS public.tiers (.",
+        "Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."
+      ]
     },
     {
       "asset_path": "sql/supabase_test_user_seed_access.sql",
@@ -26103,12 +26179,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "SQL asset seeding Supabase test user profile/admin overrides and access binding tables.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: supabase_test_user_seed_access.sql is a SQL database asset (path: sql/supabase_test_user_seed_access.sql); first dominant statement: CREATE TABLE IF NOT EXISTS public.profiles (.",
+        "Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."
+      ]
     },
     {
       "asset_path": "sql/tables.sql",
@@ -26129,12 +26212,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "SQL asset creating core tables, types, and subscription-related schema building blocks.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: tables.sql is a SQL database asset (path: sql/tables.sql); first dominant statement: create table if not exists predictions_raw (.",
+        "Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."
+      ]
     },
     {
       "asset_path": "sql/tier_rules.sql",
@@ -26155,12 +26244,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "SQL asset defining tier rules configuration table and seed/update values.",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "GRADING",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: tier_rules.sql is a SQL database asset (path: sql/tier_rules.sql); first dominant statement: insert into tier_rules (tier, min_confidence, allowed_markets, max_acca_size, allowed_volatility).",
+        "Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."
+      ]
     },
     {
       "asset_path": "src/data/placeholder.txt",
@@ -26337,12 +26433,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this function’s behaviour before relying on it in production flows.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase scheduled Edge Function to sync fixtures and trigger enrichment/AI pipeline via backend.",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: index.ts is a Supabase scheduled/function asset (path: supabase/edge-functions/scheduled-fixture-sync/index.ts); first meaningful line: import { serve } from \"https://deno.land/std@0.168.0/http/server.ts\";.",
+        "Fast skim: observed markers: tables(sport_sync,prediction_publish_runs,sport_sync)."
+      ]
     },
     {
       "asset_path": "supabase/edge-functions/scheduledFixtureSync/index.ts",
@@ -26363,12 +26466,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this function’s behaviour before relying on it in production flows.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase scheduled Edge Function to sync fixtures and trigger enrichment/AI pipeline via backend.",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: index.ts is a Supabase scheduled/function asset (path: supabase/edge-functions/scheduledFixtureSync/index.ts); first meaningful line: import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'.",
+        "Fast skim: observed markers: rpc(update_fixture_processing_log,upsert_raw_fixtures_batch) • tables(sport_sync,sport_sync,prediction_publish_runs)."
+      ]
     },
     {
       "asset_path": "supabase/functions/scheduled-prediction-refresh/index.ts",
@@ -26389,12 +26499,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this function’s behaviour before relying on it in production flows.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase scheduled function to refresh prediction pipeline on defined time windows.",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: index.ts is a Supabase scheduled/function asset (path: supabase/functions/scheduled-prediction-refresh/index.ts); first meaningful line: import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'.",
+        "Fast skim: observed markers: rpc(normalize_fixtures_for_window,generate_stage_1_predictions) • tables(subscription_plans,normalized_fixtures)."
+      ]
     },
     {
       "asset_path": "supabase/functions/semantic-drift-summary/index.ts",
@@ -26415,12 +26532,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this function’s behaviour before relying on it in production flows.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase function returning semantic drift summary via `get_semantic_violation_summary` RPC.",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: index.ts is a Supabase scheduled/function asset (path: supabase/functions/semantic-drift-summary/index.ts); first meaningful line: import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'.",
+        "Fast skim: observed markers: rpc(get_semantic_violation_summary)."
+      ]
     },
     {
       "asset_path": "supabase/functions/sync-sports-data/index.ts",
@@ -26441,12 +26565,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this function’s behaviour before relying on it in production flows.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase Edge Function that triggers backend full sync pipeline via scheduled call.",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "RUNTIME"
+      ],
+      "classification_evidence": [
+        "Fast skim: index.ts is a Supabase scheduled/function asset (path: supabase/functions/sync-sports-data/index.ts); first meaningful line: Deno.serve(async (_req) => {.",
+        "Fast skim: observed markers: POST /api/pipeline/run-full."
+      ]
     },
     {
       "asset_path": "supabase/migrations/20260415000001_create_insight_usage.sql",
@@ -28480,12 +28611,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Verify whether this SQL/DB asset is actually applied in the target DB, whether later SQL supersedes it, and that dependent runtime/policy objects exist for the relevant relationship consumers.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "SQL asset defining AI pipeline schema tables (raw fixtures, match context, AI predictions).",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "AI_EDGEMIND",
+        "DATABASE",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Fast skim: ai_pipeline_schema.sql is a SQL database asset (path: supabase/schema/ai_pipeline_schema.sql); first dominant statement: CREATE TABLE IF NOT EXISTS raw_fixtures (.",
+        "Fast skim: file contents indicate it targets schema/rules objects based on identifiers in the first CREATE/ALTER block."
+      ]
     },
     {
       "asset_path": "table-dependency-map.json",
