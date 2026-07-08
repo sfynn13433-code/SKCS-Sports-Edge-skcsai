@@ -7737,10 +7737,22 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Scheduled job / background maintenance",
+      "functional_group": "ACCA",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "ACCA",
+        "DATABASE",
+        "SQL",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../db') | require('../utils/validation') | require('../utils/pipelineLogger') | require('../config/footballRules') | require('./filterEngine') | require('./dataProvider').",
+        "Detected Supabase usage (createClient/from/SQL-like queries).",
+        "Detected external HTTP client usage (axios/fetch).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/accaMathUtils.js",
@@ -7763,10 +7775,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "ACCA builder / ACCA ticket composition logic",
+      "functional_group": "ACCA",
+      "relationship_tags": [
+        "ACCA",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../utils/accaLogicEngine')."
+      ]
     },
     {
       "asset_path": "backend/services/aiPipeline.js",
@@ -7789,10 +7806,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: aiPipeline",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "AI_EDGEMIND",
+        "DATABASE",
+        "SQL",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('@supabase/supabase-js') | require('../db') | require('../utils/validation') | require('./filterEngine') | require('./accaBuilder') | require('./dataProvider').",
+        "Detected Supabase usage (createClient/from/SQL-like queries).",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/aiPipelineOrchestrator.js",
@@ -7815,10 +7841,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Scheduled job / background maintenance",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "AI_EDGEMIND",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../database') | require('./aiProvider') | require('./direct1x2Builder') | require('./accaBuilder') | require('./contextEnrichmentService').",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/aiProvider.js",
@@ -7841,10 +7876,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: aiProvider",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "AI_EDGEMIND",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios') | require('./aiTelemetryService').",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/aiProvider_odds_update.js",
@@ -7867,10 +7909,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: aiProvider_odds_update",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PREDICTION",
+        "AI_EDGEMIND",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Skim: file exports service functions and participates in backend pipelines."
+      ]
     },
     {
       "asset_path": "backend/services/aiScoring.js",
@@ -7893,10 +7941,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: aiScoring",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "AI_EDGEMIND",
+        "DATABASE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('./aiProvider').",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/aiTelemetryService.js",
@@ -7919,10 +7974,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: aiTelemetryService",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "AI_EDGEMIND",
+        "DATABASE",
+        "SQL",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../db').",
+        "Detected external HTTP client usage (axios/fetch).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/antigravity/WorkflowEngine.js",
@@ -7945,10 +8010,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Scheduled job / background maintenance",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "DATABASE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('fs') | require('path') | require('@iarna/toml') | require('node-cron') | require('uuid') | require('@google/generative-ai').",
+        "Detected Supabase usage (createClient/from/SQL-like queries)."
+      ]
     },
     {
       "asset_path": "backend/services/apiCacheService.js",
@@ -7971,10 +8044,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: apiCacheService",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "DATABASE",
+        "SQL",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios') | require('@supabase/supabase-js') | require('crypto') | require('pg') | require('../utils/providerCircuitBreaker') | require('./apiQuotaRouter').",
+        "Detected Supabase usage (createClient/from/SQL-like queries).",
+        "Detected external HTTP client usage (axios/fetch).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/apiQuotaRouter.js",
@@ -7997,10 +8079,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Provider quota / rate-limit management",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "RUNTIME",
+        "CONFIGURATION"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('./providerQuotaService') | require('./oddsBudgetService') | require('./blockedApiCallsLog') | require('./apiQuotaRouterProviders')."
+      ]
     },
     {
       "asset_path": "backend/services/apiQuotaRouterProviders.js",
@@ -8023,10 +8111,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Provider quota / rate-limit management",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "RUNTIME",
+        "CONFIGURATION",
+        "API"
+      ],
+      "classification_evidence": [
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/bigBallsDataApiClient.js",
@@ -8049,10 +8144,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: bigBallsDataApiClient",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios') | require('../config').",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/bigBallsFootballBridge.js",
@@ -8075,10 +8176,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: bigBallsFootballBridge",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../config/bigBallsLeagueMap') | require('./bigBallsDataApiClient').",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/blockedApiCallsLog.js",
@@ -8101,10 +8208,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: blockedApiCallsLog",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../db')."
+      ]
     },
     {
       "asset_path": "backend/services/bzzoiroApiClient.js",
@@ -8127,10 +8238,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: bzzoiroApiClient",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios') | require('../config').",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/bzzoiroCrosswalk.js",
@@ -8153,10 +8270,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: bzzoiroCrosswalk",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../apiClients') | require('./bzzoiroApiClient')."
+      ]
     },
     {
       "asset_path": "backend/services/canonicalEvents.js",
@@ -8179,10 +8300,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: canonicalEvents",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "DATABASE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('@supabase/supabase-js') | require('./canonicalIngestFirewall').",
+        "Detected Supabase usage (createClient/from/SQL-like queries)."
+      ]
     },
     {
       "asset_path": "backend/services/canonicalIngestFirewall.js",
@@ -8205,10 +8332,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: canonicalIngestFirewall",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Skim: file exports service functions and participates in backend pipelines."
+      ]
     },
     {
       "asset_path": "backend/services/comboEngine.js",
@@ -8231,10 +8362,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: comboEngine",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('./conflictEngine')."
+      ]
     },
     {
       "asset_path": "backend/services/conflictEngine.js",
@@ -8257,10 +8392,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: conflictEngine",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('./marketIntelligence')."
+      ]
     },
     {
       "asset_path": "backend/services/contextEnrichmentService.js",
@@ -8283,10 +8422,22 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Scheduled job / background maintenance",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "PREDICTION",
+        "DATABASE",
+        "SQL",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../database') | require('axios') | require('../core/verificationController').",
+        "Detected external HTTP client usage (axios/fetch).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/contextIngestionService.js",
@@ -8309,10 +8460,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: contextIngestionService",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "PREDICTION",
+        "DATABASE",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios').",
+        "Detected external HTTP client usage (axios/fetch).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/contradictionGovernance.js",
@@ -8335,10 +8495,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: contradictionGovernance",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Skim: file exports service functions and participates in backend pipelines."
+      ]
     },
     {
       "asset_path": "backend/services/cricApiCacheService.js",
@@ -8361,10 +8525,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Scheduled job / background maintenance",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "DATABASE",
+        "SQL",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('fs/promises') | require('path') | require('../apiClients').",
+        "Detected Supabase usage (createClient/from/SQL-like queries).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/cricbuzzService.js",
@@ -8387,10 +8561,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: cricbuzzService",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "DATABASE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios').",
+        "Detected Supabase usage (createClient/from/SQL-like queries).",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/cricketLiveEnrichmentService.js",
@@ -8413,10 +8594,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: cricketLiveEnrichmentService",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PREDICTION",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios') | require('./apiQuotaRouter').",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/cricketLiveMatchResolver.js",
@@ -8439,10 +8627,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: cricketLiveMatchResolver",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "DATABASE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios') | require('fs') | require('path') | require('./apiQuotaRouter').",
+        "Detected Supabase usage (createClient/from/SQL-like queries).",
+        "Detected external HTTP client usage (axios/fetch).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/cricketRulesEngine.js",
@@ -8465,10 +8661,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: cricketRulesEngine",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Skim: file exports service functions and participates in backend pipelines."
+      ]
     },
     {
       "asset_path": "backend/services/cronJobs.js",
@@ -8491,10 +8691,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Scheduled job / background maintenance",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('node-cron') | require('./thesportsdbPipeline') | require('../utils/apiQueue') | require('../db') | require('../semantic-layer/governanceGatekeeper') | require('./pipelineMetricsService')."
+      ]
     },
     {
       "asset_path": "backend/services/dataProvider.js",
@@ -8517,10 +8723,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Scheduled job / background maintenance",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios') | require('../config') | require('../apiClients') | require('./espnHiddenApiService') | require('../errors/ProviderQuotaExceededError') | require('./bigBallsFootballBridge').",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/dataProviders.js",
@@ -8543,10 +8757,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: dataProviders",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "DATABASE",
+        "SQL",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('./apiCacheService') | require('../utils/keyPool').",
+        "Detected external HTTP client usage (axios/fetch).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/direct1x2Builder.js",
@@ -8569,10 +8792,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: direct1x2Builder",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "DATABASE",
+        "SQL",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('@supabase/supabase-js') | require('../db') | require('../utils/secondaryMarketSelector') | require('./aiProvider') | require('../config/footballRules') | require('../config').",
+        "Detected Supabase usage (createClient/from/SQL-like queries).",
+        "Detected external HTTP client usage (axios/fetch).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/direct1x2Engine.js",
@@ -8595,10 +8827,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: direct1x2Engine",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../config/footballRules')."
+      ]
     },
     {
       "asset_path": "backend/services/divanscoreService.js",
@@ -8621,10 +8857,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: divanscoreService",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PREDICTION",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios').",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/enhancedMatchDetailsService.js",
@@ -8647,10 +8890,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: enhancedMatchDetailsService",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "AI_EDGEMIND",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('./espnHiddenApiService') | require('../utils/apiQueue') | require('../db') | require('../config').",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/espnHiddenApiService.js",
@@ -8673,10 +8923,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: espnHiddenApiService",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('node-fetch').",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/filterEngine.js",
@@ -8699,10 +8955,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: filterEngine",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "DATABASE",
+        "SQL",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../db') | require('../utils/validation') | require('@supabase/supabase-js') | require('../config').",
+        "Detected Supabase usage (createClient/from/SQL-like queries)."
+      ]
     },
     {
       "asset_path": "backend/services/football536Extractor.js",
@@ -8725,10 +8988,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: football536Extractor",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "DATABASE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Detected Supabase usage (createClient/from/SQL-like queries)."
+      ]
     },
     {
       "asset_path": "backend/services/football536Service.js",
@@ -8751,10 +9019,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: football536Service",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios').",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/footballH2HExtractor.js",
@@ -8777,10 +9051,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: footballH2HExtractor",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Skim: file exports service functions and participates in backend pipelines."
+      ]
     },
     {
       "asset_path": "backend/services/footballHighlightsService.js",
@@ -8803,10 +9081,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: footballHighlightsService",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "DATABASE",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios').",
+        "Detected external HTTP client usage (axios/fetch).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/footballRankExtractor.js",
@@ -8829,10 +9115,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: footballRankExtractor",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Skim: file exports service functions and participates in backend pipelines."
+      ]
     },
     {
       "asset_path": "backend/services/footballRiskTierMapper.js",
@@ -8855,10 +9145,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: footballRiskTierMapper",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PREDICTION",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Skim: file exports service functions and participates in backend pipelines."
+      ]
     },
     {
       "asset_path": "backend/services/freeLivescoreApiExtractor.js",
@@ -8881,10 +9176,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: freeLivescoreApiExtractor",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PREDICTION",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Skim: file exports service functions and participates in backend pipelines."
+      ]
     },
     {
       "asset_path": "backend/services/freeLivescoreApiService.js",
@@ -8907,10 +9207,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: freeLivescoreApiService",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PREDICTION",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios').",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/gradingAccuracyCore.js",
@@ -8933,10 +9240,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Grading/accuracy computation service",
+      "functional_group": "GRADING_ACCURACY",
+      "relationship_tags": [
+        "GRADING",
+        "DATABASE",
+        "SQL",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Detected Supabase usage (createClient/from/SQL-like queries)."
+      ]
     },
     {
       "asset_path": "backend/services/gradingSnapshotService.js",
@@ -8959,10 +9273,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Grading/accuracy computation service",
+      "functional_group": "GRADING_ACCURACY",
+      "relationship_tags": [
+        "GRADING",
+        "DATABASE",
+        "SQL",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../db') | require('./gradingAccuracyCore').",
+        "Detected Supabase usage (createClient/from/SQL-like queries).",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/hybridSportsDataService.js",
@@ -8985,10 +9308,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Scheduled job / background maintenance",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('./thesportsdbPipeline') | require('../utils/apiQueue') | require('../db') | require('node-fetch') | require('../config') | require('./espnHiddenApiService').",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/liveFootballApiExtractor.js",
@@ -9011,10 +9342,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: liveFootballApiExtractor",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "DATABASE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Detected Supabase usage (createClient/from/SQL-like queries).",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/liveFootballApiService.js",
@@ -9037,10 +9374,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: liveFootballApiService",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios').",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/marketIntelligence.js",
@@ -9063,10 +9406,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: marketIntelligence",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "PREDICTION",
+        "DATABASE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../utils/pipelineLogger').",
+        "Detected Supabase usage (createClient/from/SQL-like queries)."
+      ]
     },
     {
       "asset_path": "backend/services/marketScoringEngine.js",
@@ -9089,10 +9439,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: marketScoringEngine",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PREDICTION",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('crypto') | require('../config/predictionOutcomes') | require('./aiScoring') | require('../utils/accaLogicEngine')."
+      ]
     },
     {
       "asset_path": "backend/services/masterRulebookRiskClassification.js",
@@ -9115,10 +9470,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: masterRulebookRiskClassification",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PREDICTION",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Skim: file exports service functions and participates in backend pipelines."
+      ]
     },
     {
       "asset_path": "backend/services/metrxFactoryExtractor.js",
@@ -9141,10 +9501,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: metrxFactoryExtractor",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Skim: file exports service functions and participates in backend pipelines."
+      ]
     },
     {
       "asset_path": "backend/services/metrxFactoryService.js",
@@ -9167,10 +9531,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: metrxFactoryService",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios').",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/normalizerService.js",
@@ -9193,10 +9563,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: normalizerService",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Skim: file exports service functions and participates in backend pipelines."
+      ]
     },
     {
       "asset_path": "backend/services/oddsApiPipeline.js",
@@ -9219,10 +9593,22 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Scheduled job / background maintenance",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "PREDICTION",
+        "DATABASE",
+        "SQL",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('pg') | require('axios') | require('../config') | require('../db').",
+        "Detected external HTTP client usage (axios/fetch).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/oddsBudgetService.js",
@@ -9245,10 +9631,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: oddsBudgetService",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PREDICTION",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/pipelineMetricsService.js",
@@ -9271,10 +9663,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: pipelineMetricsService",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../db') | require('../core/verificationController') | require('./systemTruthLogger')."
+      ]
     },
     {
       "asset_path": "backend/services/proFootballDataService.js",
@@ -9297,10 +9693,21 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Scheduled job / background maintenance",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "DATABASE",
+        "SQL",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios') | require('bottleneck') | require('node-cache') | require('dotenv').",
+        "Detected external HTTP client usage (axios/fetch).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/providerQuotaService.js",
@@ -9323,10 +9730,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Provider quota / rate-limit management",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "RUNTIME",
+        "CONFIGURATION"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../database') | require('./apiQuotaRouterProviders')."
+      ]
     },
     {
       "asset_path": "backend/services/quotaPlanner.js",
@@ -9349,10 +9762,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Provider quota / rate-limit management",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "RUNTIME",
+        "CONFIGURATION"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('./providerQuotaService')."
+      ]
     },
     {
       "asset_path": "backend/services/rateLimitsAnalysis.js",
@@ -9375,10 +9794,21 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Scheduled job / background maintenance",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "PROVIDER",
+        "RUNTIME",
+        "CONFIGURATION",
+        "DATABASE",
+        "API"
+      ],
+      "classification_evidence": [
+        "Detected external HTTP client usage (axios/fetch).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/reEvaluationEngine.js",
@@ -9401,10 +9831,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: reEvaluationEngine",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('./conflictEngine') | require('./marketScoringEngine')."
+      ]
     },
     {
       "asset_path": "backend/services/safeHavenSelector.js",
@@ -9427,10 +9861,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: safeHavenSelector",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('./marketIntelligence')."
+      ]
     },
     {
       "asset_path": "backend/services/saveContextData.js",
@@ -9453,10 +9891,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: saveContextData",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "PREDICTION",
+        "DATABASE",
+        "SQL",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('./tier1SchemaProfile').",
+        "Detected Supabase usage (createClient/from/SQL-like queries)."
+      ]
     },
     {
       "asset_path": "backend/services/saveDirectInsights.js",
@@ -9479,10 +9925,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: saveDirectInsights",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "DATABASE",
+        "SQL",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Detected Supabase usage (createClient/from/SQL-like queries)."
+      ]
     },
     {
       "asset_path": "backend/services/semanticDriftSummaryService.js",
@@ -9505,10 +9957,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: semanticDriftSummaryService",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../db') | require('../core/verificationController') | require('../semantic-layer/controlPlaneEvaluator')."
+      ]
     },
     {
       "asset_path": "backend/services/skcsHeartbeat.js",
@@ -9531,10 +9987,21 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Scheduled job / background maintenance",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "DATABASE",
+        "SQL",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('./proFootballDataService') | require('../core/executionPipeline') | require('./hybridSportsDataService').",
+        "Detected external HTTP client usage (axios/fetch).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/soccerDataApiClient.js",
@@ -9557,10 +10024,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: soccerDataApiClient",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios') | require('../config').",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/sportsApiProFootballExtractor.js",
@@ -9583,10 +10056,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Scheduled job / background maintenance",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "DATABASE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Detected Supabase usage (createClient/from/SQL-like queries)."
+      ]
     },
     {
       "asset_path": "backend/services/sportsApiProFootballService.js",
@@ -9609,10 +10089,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Scheduled job / background maintenance",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios') | require('dotenv') | require('./providerQuotaService').",
+        "Detected external HTTP client usage (axios/fetch)."
+      ]
     },
     {
       "asset_path": "backend/services/sportsLiveScoresExtractor.js",
@@ -9635,10 +10123,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: sportsLiveScoresExtractor",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PREDICTION",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Skim: file exports service functions and participates in backend pipelines."
+      ]
     },
     {
       "asset_path": "backend/services/sportsLiveScoresService.js",
@@ -9661,10 +10154,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: sportsLiveScoresService",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "PREDICTION",
+        "DATABASE",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios').",
+        "Detected external HTTP client usage (axios/fetch).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/sportsrcHealthService.js",
@@ -9687,10 +10189,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: sportsrcHealthService",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "DATABASE",
+        "SQL",
+        "PROVIDER",
+        "API"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios') | require('../config') | require('../database').",
+        "Detected external HTTP client usage (axios/fetch).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/subscriptionTiming.js",
@@ -9713,10 +10224,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: subscriptionTiming",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('moment-timezone') | require('../config/subscriptionPlans')."
+      ]
     },
     {
       "asset_path": "backend/services/syncService.js",
@@ -9739,10 +10254,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Scheduled job / background maintenance",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "DATABASE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('./aiPipeline') | require('./dataProvider') | require('./canonicalEvents') | require('./dataProviders') | require('./normalizerService') | require('./quotaPlanner').",
+        "Detected Supabase usage (createClient/from/SQL-like queries).",
+        "Detected external HTTP client usage (axios/fetch).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/systemTruthLogger.js",
@@ -9765,10 +10290,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: systemTruthLogger",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../db')."
+      ]
     },
     {
       "asset_path": "backend/services/thesportsdbPipeline.js",
@@ -9791,10 +10320,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: thesportsdbPipeline",
+      "functional_group": "DATABASE",
+      "relationship_tags": [
+        "DATABASE",
+        "SQL",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../utils/apiQueue') | require('../db') | require('@supabase/supabase-js') | require('../core/verificationController') | require('../config') | require('node-fetch').",
+        "Detected Supabase usage (createClient/from/SQL-like queries).",
+        "Detected external HTTP client usage (axios/fetch).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/tier1BootstrapService.js",
@@ -9817,10 +10355,21 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Scheduled job / background maintenance",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": [
+        "SCHEDULER",
+        "BACKGROUND_JOB",
+        "DATABASE",
+        "SQL",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('axios') | require('../config') | require('../db') | require('./tier1SchemaProfile') | require('redis').",
+        "Detected Supabase usage (createClient/from/SQL-like queries).",
+        "Detected external HTTP client usage (axios/fetch).",
+        "Detected caching behavior (cache/table/key patterns)."
+      ]
     },
     {
       "asset_path": "backend/services/tier1SchemaProfile.js",
@@ -9843,10 +10392,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: tier1SchemaProfile",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Skim: file exports service functions and participates in backend pipelines."
+      ]
     },
     {
       "asset_path": "backend/services/unifiedFixturesService.js",
@@ -9869,10 +10422,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: unifiedFixturesService",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../db')."
+      ]
     },
     {
       "asset_path": "backend/services/unifiedPredictionsService.js",
@@ -9895,10 +10452,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: unifiedPredictionsService",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../db')."
+      ]
     },
     {
       "asset_path": "backend/services/unifiedRulesService.js",
@@ -9921,10 +10482,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Backend service: unifiedRulesService",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Top-level skim: require('../db')."
+      ]
     },
     {
       "asset_path": "backend/src/services/contextIntelligence/adjustProbability.js",
