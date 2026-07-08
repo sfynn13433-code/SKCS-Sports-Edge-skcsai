@@ -225,15 +225,15 @@ describe("Edge Asset Classification foundation", () => {
   it("foundation mode permits empty classification fields as pending", () => {
     const result = runCheck({ closure: false, refreshManifest: false, writeMap: false });
     assert.equal(result.closureReady, false);
-    assert.equal(result.summary.fullyClassifiedAssets, 752);
+    assert.equal(result.summary.fullyClassifiedAssets, 757);
     assert.equal(
-      result.summary.classificationPendingAssets, 154
+      result.summary.classificationPendingAssets, 149
     );
   });
 
   it("foundation mode does not count pending assets as fully classified", () => {
     const result = runCheck({ closure: false, refreshManifest: false, writeMap: false });
-    assert.equal(result.summary.fullyClassifiedAssets, 752);
+    assert.equal(result.summary.fullyClassifiedAssets, 757);
   });
 
   it("strict closure rejects empty purpose_description", () => {

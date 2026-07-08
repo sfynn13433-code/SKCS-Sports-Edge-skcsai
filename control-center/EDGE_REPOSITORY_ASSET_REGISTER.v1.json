@@ -28930,12 +28930,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Classify this EAC implementation asset during its assigned EAC-001 shallow-skim batch using the approved classification contract.",
+      "next_validation": "Revalidate this test asset’s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change.",
       "notes": "EAC-001 classification foundation / manifest / checker / test asset. Registration only; classification pending.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Contract test asset validating EAC-001 deterministic batch membership, required structured classification fields, and progress-count expectations.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "AUDIT"
+      ],
+      "classification_evidence": [
+        "File `tests/edge-asset-classification.test.js` asserts EAC enums (functional_group/relationship_tags) and uses `computeBatchMembership` + first-match semantics against `EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json`.",
+        "It validates `fullyClassifiedAssets` / `classificationPendingAssets` baseline expectations and checks repository map synchronization via the checker helpers."
+      ]
     },
     {
       "asset_path": "tests/edge-control-center-ledger.test.js",
@@ -28956,12 +28963,20 @@
       "goes_somewhere": "YES",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Validate with the governing Control Center project proof.",
+      "next_validation": "Revalidate this test asset’s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change.",
       "notes": "Control Center foundation asset.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Governance test asset validating Edge Control Center ledger structure, task dependency rules, and ledger completion evidence contracts.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "RULEBOOK",
+        "AUDIT"
+      ],
+      "classification_evidence": [
+        "File imports `loadLedger`, `validateLedger`, and checks every DONE task has `current_evidence`, while BLOCKED tasks have explicit `blocked_by` dependencies.",
+        "It asserts unique `task_id` values and that each blocked dependency resolves to another known ledger task."
+      ]
     },
     {
       "asset_path": "tests/edge-project-register.test.js",
@@ -28982,12 +28997,19 @@
       "goes_somewhere": "YES",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Validate with the governing Control Center project proof.",
+      "next_validation": "Revalidate this test asset’s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change.",
       "notes": "Control Center foundation asset.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Governance test asset validating the Edge Master Project Register schema integrity and that ledger task IDs match registered projects.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "AUDIT"
+      ],
+      "classification_evidence": [
+        "File uses `check_edge_project_register.js` helpers to assert the register loads, has canonical version `1.0`, and that every required field is present for each project.",
+        "It validates that ledger task IDs map exactly onto `register.projects` and that project status/blocked_by mirrors ledger task data."
+      ]
     },
     {
       "asset_path": "tests/edge-repository-asset-register.test.js",
@@ -29008,12 +29030,20 @@
       "goes_somewhere": "YES",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Validate with the governing Control Center project proof.",
+      "next_validation": "Revalidate this test asset’s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change.",
       "notes": "Control Center foundation asset.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Repository governance/asset-register test asset validating tracked asset register integrity and EAC structured classification field correctness.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "AUDIT",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "File asserts the asset register exists/canonical version and iterates required field sets over all assets.",
+        "It validates EAC-001 structured classification fields types (`purpose_description`/`functional_group`/`relationship_tags`/`classification_evidence`) and checks enum legality for current_state and other fields."
+      ]
     },
     {
       "asset_path": "tests/edge-system-runtime-inventory.test.js",
@@ -29034,12 +29064,20 @@
       "goes_somewhere": "YES",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Revalidate ESA-001 runtime inventory contract coverage whenever discovery, inventory schema, or runtime surface classification changes.",
+      "next_validation": "Revalidate this test asset’s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change.",
       "notes": "Contract proof of ESA-001 static discovery/inventory integrity only; no runtime execution.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Runtime inventory contract test asset validating ESA-001 discovery surfaces are governed and validation rules fail closed on removal or unknown task bindings.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "RUNTIME",
+        "OBSERVABILITY",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "File imports runtime inventory helpers (`discoverMaterialSurfaces`, `validateInventory`, `renderRuntimeMap`) and validates the canonical runtime inventory passes.",
+        "It includes fail-closed tests (e.g., removing a governed surface or altering control-task bindings) and asserts validation errors start with the expected failure markers."
+      ]
     },
     {
       "asset_path": "tmp/key-validation-1776365488298.json",

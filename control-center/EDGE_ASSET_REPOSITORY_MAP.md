@@ -17,12 +17,12 @@ CURRENT_STATE_COUNTS
 - GENERATED: 0
 
 FUNCTIONAL_GROUP_COUNTS
-- (PENDING): 154
+- (PENDING): 149
 - PROVIDER_INTEGRATION: 117
 - SCRIPT_TOOL: 106
 - DOCUMENTATION_KNOWLEDGE: 89
+- TEST_PROOF: 80
 - DATABASE_MIGRATION: 76
-- TEST_PROOF: 75
 - FRONTEND_UI: 55
 - DATABASE: 48
 - DEPLOYMENT_OPERATIONS: 34
@@ -41,20 +41,20 @@ FUNCTIONAL_GROUP_COUNTS
 - UNCATEGORIZED: 2
 
 RELATIONSHIP_TAG_COUNTS
-- RUNTIME: 286
+- RUNTIME: 287
 - SQL: 230
 - SCRIPT_TOOL: 220
-- DATABASE: 211
+- DATABASE: 212
 - PROVIDER: 193
 - API: 165
 - DOCUMENTATION: 124
-- GOVERNANCE: 109
-- OBSERVABILITY: 96
+- GOVERNANCE: 114
+- OBSERVABILITY: 97
 - PREDICTION: 91
 - UI: 87
 - MIGRATION: 79
-- TEST_PROOF: 73
-- AUDIT: 66
+- TEST_PROOF: 78
+- AUDIT: 70
 - ROUTE: 64
 - SECURITY: 50
 - DEPLOYMENT: 44
@@ -63,7 +63,7 @@ RELATIONSHIP_TAG_COUNTS
 - BACKGROUND_JOB: 28
 - CONFIGURATION: 28
 - SCHEDULER: 27
-- RULEBOOK: 24
+- RULEBOOK: 25
 - ACCA: 23
 - AI_EDGEMIND: 18
 - GRADING: 8
@@ -953,11 +953,11 @@ PER_ASSET_BY_BATCH
 ## B24 TESTS
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |
 |---|---|---|---|---|---|---|
-| tests/edge-asset-classification.test.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Classify this EAC implementation asset during its assigned EAC-001 shallow-skim batch using the approved classification contract. |
-| tests/edge-control-center-ledger.test.js | PENDING | PENDING | CURRENT | PENDING | PENDING | Validate with the governing Control Center project proof. |
-| tests/edge-project-register.test.js | PENDING | PENDING | CURRENT | PENDING | PENDING | Validate with the governing Control Center project proof. |
-| tests/edge-repository-asset-register.test.js | PENDING | PENDING | CURRENT | PENDING | PENDING | Validate with the governing Control Center project proof. |
-| tests/edge-system-runtime-inventory.test.js | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Revalidate ESA-001 runtime inventory contract coverage whenever discovery, inventory schema, or runtime surface classification changes. |
+| tests/edge-asset-classification.test.js | Contract test asset validating EAC-001 deterministic batch membership, required structured classification fields, and progress-count expectations. | TEST_PROOF | UNKNOWN | ["TEST_PROOF","GOVERNANCE","AUDIT"] | ["File `tests/edge-asset-classification.test.js` asserts EAC enums (functional_group/relationship_tags) and uses `computeBatchMembership` + first-match semantics against `EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json`.","It validates `fullyClassifiedAssets` / `classificationPendingAssets` baseline expectations and checks repository map synchronization via the checker helpers."] | Revalidate this test asset’s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change. |
+| tests/edge-control-center-ledger.test.js | Governance test asset validating Edge Control Center ledger structure, task dependency rules, and ledger completion evidence contracts. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","RULEBOOK","AUDIT"] | ["File imports `loadLedger`, `validateLedger`, and checks every DONE task has `current_evidence`, while BLOCKED tasks have explicit `blocked_by` dependencies.","It asserts unique `task_id` values and that each blocked dependency resolves to another known ledger task."] | Revalidate this test asset’s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change. |
+| tests/edge-project-register.test.js | Governance test asset validating the Edge Master Project Register schema integrity and that ledger task IDs match registered projects. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","AUDIT"] | ["File uses `check_edge_project_register.js` helpers to assert the register loads, has canonical version `1.0`, and that every required field is present for each project.","It validates that ledger task IDs map exactly onto `register.projects` and that project status/blocked_by mirrors ledger task data."] | Revalidate this test asset’s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change. |
+| tests/edge-repository-asset-register.test.js | Repository governance/asset-register test asset validating tracked asset register integrity and EAC structured classification field correctness. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","AUDIT","DATABASE"] | ["File asserts the asset register exists/canonical version and iterates required field sets over all assets.","It validates EAC-001 structured classification fields types (`purpose_description`/`functional_group`/`relationship_tags`/`classification_evidence`) and checks enum legality for current_state and other fields."] | Revalidate this test asset’s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change. |
+| tests/edge-system-runtime-inventory.test.js | Runtime inventory contract test asset validating ESA-001 discovery surfaces are governed and validation rules fail closed on removal or unknown task bindings. | TEST_PROOF | UNKNOWN | ["TEST_PROOF","RUNTIME","OBSERVABILITY","GOVERNANCE"] | ["File imports runtime inventory helpers (`discoverMaterialSurfaces`, `validateInventory`, `renderRuntimeMap`) and validates the canonical runtime inventory passes.","It includes fail-closed tests (e.g., removing a governed surface or altering control-task bindings) and asserts validation errors start with the expected failure markers."] | Revalidate this test asset’s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change. |
 
 ## B25 SCRATCH
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |
