@@ -4736,10 +4736,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "End-to-end system integrity audit document covering ingestion->surveillance->EdgeMind->prediction->frontend data flow and integration gaps.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": ["DOCUMENTATION", "AUDIT", "OBSERVABILITY"],
+      "classification_evidence": [
+        "Describes verification of admin endpoints (e.g., `/api/admin/force-discovery`, `/api/admin/cdn-live-loop`), schema compatibility concerns for `BaseSportParser`, and a system data flow diagram from ESPN APIs through Supabase tables into frontend display."
+      ]
     },
     {
       "asset_path": "backend/checkCanonicalEvents.js",
@@ -5076,10 +5078,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Execution pipeline orchestrator: runs preflight, gatekeeper constraints, verification, control-plane evaluation, and executes the provided operation with structured trace logging.",
+      "functional_group": "BACKEND_RUNTIME",
+      "relationship_tags": ["RUNTIME", "SERVICE", "OBSERVABILITY"],
+      "classification_evidence": [
+        "Implements `executeOperation()` that stages `preflightSimulator.run()`, `gatekeeper.getExecutionConstraints()`, `verificationController.verify()`, `controlPlaneEvaluator.evaluate()`, and then calls `operationContext.execute`; logs via `truthLogger.write()` and returns `fail()` objects when stages halt."
+      ]
     },
     {
       "asset_path": "backend/core/verificationController.js",
@@ -5102,10 +5106,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Verification controller: evaluates verification signals against system/control-state thresholds and produces allow/deny action decisions for pipeline execution.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": ["GOVERNANCE", "RUNTIME", "SERVICE", "OBSERVABILITY"],
+      "classification_evidence": [
+        "Exports `VerificationController` class that initializes state, normalizes verification signals via `verificationSignalContract`, hydrates from `public.system_health_state`, and maps system/control states to actions (`allowWrite`, `allowPublish`, `useFallback`)."
+      ]
     },
     {
       "asset_path": "backend/core/verificationSignalContract.js",
@@ -5128,10 +5134,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Verification signal contract: defines signal enums/types and helpers to create/validate standardized verification signal objects.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": ["GOVERNANCE", "SERVICE", "RUNTIME"],
+      "classification_evidence": [
+        "Defines `SIGNAL_TYPES`, `SIGNAL_STATUS`, `FAILURE_TYPES`, and exports `createVerificationSignal()` + `isVerificationSignal()` to normalize input into a consistent schema for the verification subsystem."
+      ]
     },
     {
       "asset_path": "backend/database.js",
@@ -5310,10 +5318,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Provider quota exceeded error type used when external provider rate/usage limits are hit.",
+      "functional_group": "BACKEND_RUNTIME",
+      "relationship_tags": ["RUNTIME", "SERVICE", "SECURITY"],
+      "classification_evidence": [
+        "Implements `ProviderQuotaExceededError extends Error` and sets `name = 'ProviderQuotaExceededError'`, `provider`, `sport`, and `code = 'provider_quota_exceeded'` for downstream quota/gate handling."
+      ]
     },
     {
       "asset_path": "backend/logic/edgeMind_manifest.json",
@@ -5336,10 +5346,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "EdgeMind logic manifest: configuration for confidence scoring formula, rules, and required table/field access points for EdgeMind predictions/explanations.",
+      "functional_group": "AI_EDGEMIND",
+      "relationship_tags": ["AI_EDGEMIND", "CONFIGURATION", "DOCUMENTATION"],
+      "classification_evidence": [
+        "JSON manifest specifying `data_sources` (weather/injuries/momentum/news_sentiment), a `confidence_formula` with base + weighted adjustments, `calculation_rules` impact tables, and `access_requirements` listing required tables/fields for scoring."
+      ]
     },
     {
       "asset_path": "backend/middleware/supabaseJwt.js",
@@ -5362,10 +5374,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Supabase/JWT authentication middleware plus tier/access-context resolver for prediction routes, including API-key and testing bypass paths.",
+      "functional_group": "SECURITY_SUBSCRIBER",
+      "relationship_tags": ["SECURITY", "SUBSCRIBER", "RUNTIME", "SERVICE"],
+      "classification_evidence": [
+        "Creates a Supabase client and validates `Authorization: Bearer ...` via `supabase.auth.getUser()`, then populates `req.user`/`req.subscription` and resolves `owned_tiers` / `access_tiers` from plan IDs."
+      ]
     },
     {
       "asset_path": "backend/package-lock.json",
@@ -5414,10 +5428,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Base ESPN sport parser abstraction that normalizes raw ESPN API JSON responses into a consistent flattened stats dictionary (with Football/Soccer implementations).",
+      "functional_group": "SERVICE",
+      "relationship_tags": ["PROVIDER", "SERVICE", "RUNTIME"],
+      "classification_evidence": [
+        "Defines `BaseSportParser.parse_raw_response()` and `extract_stats()`, with `normalize_stats()` abstract contract; includes `FootballParser` (v3 QBR/passing/rushing) and `SoccerParser` (v2 possession/shots/fouls) to return a standardized structure."
+      ]
     },
     {
       "asset_path": "backend/providers/football/bigBallsDataNormalizer.js",
@@ -6810,10 +6826,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Control-plane evaluator that scores verification signals against threshold rules and derives system control state/actions (pass/warn/degraded/fail) for the pipeline.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": ["GOVERNANCE", "RUNTIME", "SERVICE", "OBSERVABILITY"],
+      "classification_evidence": [
+        "Implements scoring via DEFAULT_THRESHOLDS, `summarizeSignals()`, `scoreSummary()`, `deriveActionProfile()`, and exports `evaluateControlPlane()` and `summarizeSignals()` for downstream pipeline decisions."
+      ]
     },
     {
       "asset_path": "backend/semantic-layer/decisionFingerprintService.js",
@@ -6836,10 +6854,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Decision fingerprint service that builds a deterministic audit-style object summarizing pipeline stage inputs/results and derived control/fallback rules.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": ["GOVERNANCE", "RUNTIME", "SERVICE", "OBSERVABILITY"],
+      "classification_evidence": [
+        "Exports `buildDecisionFingerprint()` which derives `rules_applied` (preflight strict mode, gatekeeper block, degraded/fail states, dry_run) and produces a structured trace summary for auditing/debug."
+      ]
     },
     {
       "asset_path": "backend/semantic-layer/enforcementGuard.js",
@@ -6862,10 +6882,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Semantic enforcement guard that validates a semantic envelope, records violations via violationLogger, and returns quarantine/normalized semantic context policy decisions.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": ["GOVERNANCE", "RUNTIME", "SERVICE", "OBSERVABILITY"],
+      "classification_evidence": [
+        "Exports `enforceSemanticAlignment()` which calls `normalizeSemanticEnvelope()`, iterates `violations`, and enqueues `logViolation()` with rule/type/severity/context for auditability."
+      ]
     },
     {
       "asset_path": "backend/semantic-layer/errorMemoryLayer.js",
@@ -6888,10 +6910,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "In-process error memory layer that captures observations/failures/recommendations (bounded history) for later inspection and debugging during enforcement/verification flows.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": ["OBSERVABILITY", "SERVICE", "RUNTIME"],
+      "classification_evidence": [
+        "Maintains bounded arrays `observations`, `failures`, and `recommendations` (MAX_ENTRIES) and exports `errorMemory` helpers like `observe()`, `observeFailure()`, and accessors for stored entries."
+      ]
     },
     {
       "asset_path": "backend/semantic-layer/gatekeeperAdapter.js",
@@ -6914,10 +6938,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Gatekeeper adapter that normalizes execution constraints returned from `governanceGatekeeper` and exposes `getExecutionConstraints()` for the pipeline.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": ["GOVERNANCE", "RUNTIME", "SERVICE"],
+      "classification_evidence": [
+        "Exports `gatekeeper.getExecutionConstraints()` which calls `governanceGatekeeper.getExecutionConstraints()`, merges/normalizes constraints (e.g., maxConfidence), and returns a standardized constraint object with `reason` and pipeline context."
+      ]
     },
     {
       "asset_path": "backend/semantic-layer/governanceGatekeeper.js",
@@ -6940,10 +6966,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Governance gatekeeper that translates current verification/system health snapshot into execution constraints (halt/fallback/standard) for pipeline governance.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": ["GOVERNANCE", "RUNTIME", "SERVICE", "OBSERVABILITY"],
+      "classification_evidence": [
+        "Imports `../core/verificationController`, reads `getSnapshot()`, then maps control states (`PASS`/`WARN`/`DEGRADED`/`FAIL`) into translated actions like `proceed`, `mode`, `allowEnrichment`, `confidenceCap`, and `reason`."
+      ]
     },
     {
       "asset_path": "backend/semantic-layer/normalizer.js",
@@ -6966,10 +6994,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Semantic envelope normalizer that canonicalizes game/status identifiers, detects forbidden contextual fields, and emits semantic violations/quarantine flags.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": ["GOVERNANCE", "RUNTIME", "SERVICE"],
+      "classification_evidence": [
+        "Exports `normalizeSemanticEnvelope(input)` which resolves a game ID via `resolveGameId`, normalizes status/period state, detects forbidden contexts (weather/news), and returns `{ normalized, semantic, violations, quarantined }`."
+      ]
     },
     {
       "asset_path": "backend/semantic-layer/preflightSimulator.js",
@@ -6992,10 +7022,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Preflight simulator that validates the pipeline execution context before side effects: checks required fields, strict allowlist/caller rules, and dry-run semantics.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": ["GOVERNANCE", "RUNTIME", "SERVICE"],
+      "classification_evidence": [
+        "Exports `preflightSimulator.run(context)` which verifies `context.execute` and presence of `payload`, applies strict-mode caller/allowed-callers checks, and returns `{ allowed, reason, warnings }`."
+      ]
     },
     {
       "asset_path": "backend/semantic-layer/registry.js",
@@ -7018,10 +7050,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Semantic registry of canonical status mappings and contextual policy: normalizes provider match statuses into canonical phases and defines allowed/disallowed context fields.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": ["GOVERNANCE", "RUNTIME", "SERVICE"],
+      "classification_evidence": [
+        "Defines `CANONICAL_STATUS`, `STATUS_ALIASES`, `CONTEXT_POLICY`, `normalizeStatus()`, `normalizePeriodState()`, and `isContextAllowed()` used by semantic normalization/enforcement."
+      ]
     },
     {
       "asset_path": "backend/semantic-layer/sportsdataioContractHelpers.js",
@@ -7044,10 +7078,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "SportsDataIO contract helper utilities: builds a canonical contract-view (identity/status/maturity/date) and derives contextual jersey/status extensions from provider payloads.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": ["PROVIDER", "SERVICE", "RUNTIME"],
+      "classification_evidence": [
+        "Exports `buildSportsDataIOContractView()` plus helpers like `resolveSportsDataIOIdentity()`/`resolveSportsDataIOStatus()`/`getSportsDataIOMaturity()` and `filterActiveMemberships()` for mapping external SportsDataIO objects into canonical fields."
+      ]
     },
     {
       "asset_path": "backend/semantic-layer/verificationController.js",
@@ -7070,10 +7106,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Semantic-layer verification controller wrapper that delegates to the core verification controller, optionally using enriched context (signals/status/health checks).",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": ["GOVERNANCE", "RUNTIME", "SERVICE", "OBSERVABILITY"],
+      "classification_evidence": [
+        "Exports `verificationController.verify(context)` which composes a snapshot from `../core/verificationController.getSnapshot()` and selectively calls `coreVerificationController.evaluate()` when context contains pipelineStatus/enrichmentStatus/quotaStatus/apiHealth/dbHealth or a `signal`."
+      ]
     },
     {
       "asset_path": "backend/semantic-layer/violationLogger.js",
@@ -7096,10 +7134,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Semantic violation logger that batches and persists semantic-rule violations into the `public.semantic_violations` table (with queueing and flush intervals).",
+      "functional_group": "DATABASE",
+      "relationship_tags": ["DATABASE", "SQL", "OBSERVABILITY", "GOVERNANCE"],
+      "classification_evidence": [
+        "Exports `logViolation()` and `flushViolations()`; accumulates normalized violation entries and runs a bulk `INSERT INTO public.semantic_violations (...) VALUES ...` on batch thresholds/intervals, with fallback disable when the table is missing."
+      ]
     },
     {
       "asset_path": "backend/server-express.js",
@@ -9618,10 +9658,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Smoke test suite for the SKCS insight engine: validates core insight normalization, market family/diversity, banned-market guardrails, and probability/ACCA constraints using assertions.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": ["TEST_PROOF", "RUNTIME"],
+      "classification_evidence": [
+        "Runs as `node backend/test/smoke-test-insight-engine.js`, imports `../utils/insightEngine` and uses assertions for allowed families, banned patterns, family caps, confidence guardrails, probability law, and diversity checks."
+      ]
     },
     {
       "asset_path": "backend/test/smoke-test-skcs-law.js",
@@ -9644,10 +9686,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "SKCS Law compliance smoke tests for ACCA/card building: validates weekly team locking, overlap rejection, pool rotation, and related ACCA selection logic via assertions.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": ["TEST_PROOF", "RUNTIME"],
+      "classification_evidence": [
+        "Runs as `node backend/test/smoke-test-skcs-law.js`, imports `../utils/insightEngine` and `../utils/accaLogicEngine`, and asserts ACCA constraints like weekly team lock, card overlap rejection, candidate pool rotation, and mega diagnostics."
+      ]
     },
     {
       "asset_path": "backend/utils/accaLogicEngine.js",
@@ -9670,10 +9714,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "ACCA logic engine utilities for ticket probability/compound math and ACCA leg selection constraints (including expired fixture filtering and family caps helpers).",
+      "functional_group": "ACCA",
+      "relationship_tags": ["ACCA", "SERVICE", "RUNTIME"],
+      "classification_evidence": [
+        "Defines constants like MIN/MAX confidence and banned market patterns, normalizes market families, and exposes combo/ticket math helpers (e.g., true combo confidence and compound probability functions) used by the ACCA test smoke suites."
+      ]
     },
     {
       "asset_path": "backend/utils/apiCache.js",
@@ -9696,10 +9742,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Provider response caching helper for RapidAPI-style endpoints; checks cached payloads in Postgres (`rapidapi_cache`) with endpoint-specific TTL and caches API responses via a cached axios wrapper.",
+      "functional_group": "DATABASE",
+      "relationship_tags": ["DATABASE", "SQL", "PROVIDER", "RUNTIME"],
+      "classification_evidence": [
+        "Exports `cachedAxios()` plus `checkCache()`/`saveToCache()`; queries `rapidapi_cache` by `cache_key` and `provider_name`, applies TTL logic by endpoint substring, and performs `INSERT ... ON CONFLICT DO UPDATE` for caching."
+      ]
     },
     {
       "asset_path": "backend/utils/apiQueue.js",
@@ -9722,10 +9770,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rate-limited API request queue used to throttle provider calls (notably TheSportsDB free-tier limits) by sequencing requests with a per-minute cap and 429 retry/backoff behavior.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": ["PROVIDER", "SERVICE", "RUNTIME"],
+      "classification_evidence": [
+        "Implements `ApiQueue` with an internal FIFO queue; `add(fn)` enqueues async work and `process()` enforces `interval = 60000/maxPerMinute`, catches HTTP 429 to sleep ~60s and retries by re-queueing."
+      ]
     },
     {
       "asset_path": "backend/utils/apiUsageLimiter.js",
@@ -9748,10 +9798,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "API usage limiter that enforces a daily hard cap for API-Sports calls using Supabase `api_usage_logs` (halts/returns null when the cap is reached).",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": ["PROVIDER", "DATABASE", "SECURITY", "RUNTIME"],
+      "classification_evidence": [
+        "Exports `enforceRateLimitAndFetch(operationName, fetchFn)`; reads `api_usage_logs` for today, compares to `DAILY_HARD_CAP`, aborts when over cap, and upserts `calls_made` after successful fetch."
+      ]
     },
     {
       "asset_path": "backend/utils/auth.js",
@@ -9774,10 +9826,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "API-key role-based authorization middleware (`requireRole`) that validates `x-api-key` against admin/user allowlists and blocks access to non-cron endpoints when unauthorized.",
+      "functional_group": "SECURITY_SUBSCRIBER",
+      "relationship_tags": ["SECURITY", "SUBSCRIBER", "RUNTIME"],
+      "classification_evidence": [
+        "Exports `requireRole(role)` which checks request path exemptions for cron, validates `x-api-key`, allows admin key to pass for `role='admin'`, and validates user keys (including optional legacy key) for `role='user'`."
+      ]
     },
     {
       "asset_path": "backend/utils/availability.js",
@@ -9800,10 +9854,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Availability/injury enrichment utilities that fetch absences from Sportmonks/API-Football, format them, and enrich prediction objects with availability details.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": ["PROVIDER", "SERVICE", "RUNTIME", "OBSERVABILITY"],
+      "classification_evidence": [
+        "Implements `getAbsences()` (Sportmonks first, then API-Football fallback) with an in-memory TTL cache, `enrichWithAvailability(predictions)` to attach `pred.availability` and `pred.availabilityDetails`, and helper format/mock builders."
+      ]
     },
     {
       "asset_path": "backend/utils/conflictResolver.js",
@@ -9826,10 +9882,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "ACCA conflict detection utilities that flag invalid or conflicting market combinations and block ACCA creation when conflicts exist.",
+      "functional_group": "ACCA",
+      "relationship_tags": ["ACCA", "SERVICE", "RUNTIME"],
+      "classification_evidence": [
+        "Exports `detectConflicts(predictions)` and `areMarketsConflicting()`; checks duplicate match+market, duplicate matches, and known conflicting market pairs (e.g., Over/Under totals and BTTS yes/no) using a deterministic set of conflict rules."
+      ]
     },
     {
       "asset_path": "backend/utils/contextInsights.js",
@@ -9852,10 +9910,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Context-to-insight formatter that builds human-readable weather/injuries/stability labels and structured metadata from contextual intelligence payloads.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": ["PREDICTION", "SERVICE", "RUNTIME", "OBSERVABILITY"],
+      "classification_evidence": [
+        "Exports `buildContextInsightsFromMetadata(contextIntelligence)` and `toRiskLabel()`; constructs a return object with weather labels/risk, injuries/bans labels, stability labels/risk, and `last_verified` fields derived from input metadata."
+      ]
     },
     {
       "asset_path": "backend/utils/dateNormalization.js",
@@ -9878,10 +9938,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Date/time normalization utilities: convert provider timestamps to UTC/SAST, normalize fixture kickoff dates, and compute prediction scheduling windows and eligibility logic.",
+      "functional_group": "BACKEND_RUNTIME",
+      "relationship_tags": ["RUNTIME", "SERVICE", "OBSERVABILITY"],
+      "classification_evidence": [
+        "Implements timezone conversion helpers (`toUTC`, `toSAST`) and fixture normalization that returns kickoff_utc/kickoff_sast and match date/time fields; also defines scheduling window logic for fetching eligible fixtures (morning/midday/evening windows in SAST)."
+      ]
     },
     {
       "asset_path": "backend/utils/db.js",
@@ -9904,10 +9966,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database module re-export to avoid duplicate pools: forwards to the root `backend/db` implementation.",
+      "functional_group": "DATABASE",
+      "relationship_tags": ["DATABASE", "RUNTIME", "SQL"],
+      "classification_evidence": [
+        "In `backend/utils/db.js`, imports `../db` and exports it directly (`module.exports = db`) with a comment explicitly stating it prevents duplicate pools."
+      ]
     },
     {
       "asset_path": "backend/utils/insightEngine.js",
@@ -9930,10 +9994,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Core insight/market validation engine used to normalize/validate markets and generate risk/constraints inputs for ACCA and prediction building.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": ["PREDICTION", "SERVICE", "RUNTIME", "OBSERVABILITY"],
+      "classification_evidence": [
+        "Defines/exports an ACCA/insight law layer: lists allowed/banned market patterns, enforces family caps and confidence guardrails (e.g., 72–97% leg confidence), and coordinates with `pipelineLogger` and `marketIntelligence` helpers."
+      ]
     },
     {
       "asset_path": "backend/utils/insightValidationMatrix.js",
@@ -9956,10 +10022,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Validation-matrix helper for evaluating whether a proposed insight leg/pick combination fits within min/max goal constraints and resolves market line/side semantics.",
+      "functional_group": "ACCA",
+      "relationship_tags": ["ACCA", "SERVICE", "RUNTIME"],
+      "classification_evidence": [
+        "Provides token normalization and parsing helpers (`parseLineToken`, `parseGoalLineFromMarket`, `resolveTeamSide`) plus constraint functions such as `getMinimumTotalFromLeg()`/`getMaximumTotalFromLeg()` used to validate ACCA leg feasibility."
+      ]
     },
     {
       "asset_path": "backend/utils/jobLogger.js",
@@ -9982,10 +10050,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Scheduled job logger wrapper that records job start/success/failure into the `scheduling_logs` table.",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": ["DATABASE", "SQL", "OBSERVABILITY", "RUNTIME"],
+      "classification_evidence": [
+        "Implements `jobLogger.start()` (INSERT into `scheduling_logs` returning id), `jobLogger.success()` (UPDATE status=completed with duration/stats), and `jobLogger.fail()` (UPDATE status=failed with error_message)."
+      ]
     },
     {
       "asset_path": "backend/utils/keyPool.js",
@@ -10008,10 +10078,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "API key pool utility for collecting/masking RapidAPI and API-Football keys from environment variables and dotenv files.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": ["PROVIDER", "CONFIGURATION", "SECURITY", "RUNTIME"],
+      "classification_evidence": [
+        "Exports `getApiSportsKeyPool()` and `getRapidApiKeyPool()` which scan process.env (including regex/dotenv parsing), filter likely key-shaped values, and provide `maskKey()` for safe logging."
+      ]
     },
     {
       "asset_path": "backend/utils/marketConsistency.js",
@@ -10034,10 +10106,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Market consistency/compatibility helpers for ACCA leg selection: converts legs into outcome sets, detects incompatibilities, and sanitizes same-match legs.",
+      "functional_group": "ACCA",
+      "relationship_tags": ["ACCA", "SERVICE", "RUNTIME"],
+      "classification_evidence": [
+        "Defines `areLegsCompatible()` and `sanitizeSameMatchLegs()`; uses `areMarketsConflicting()` plus explicit checks for 1X2/double-chance overlaps, BTTS yes/no contradictions, and over/under goal-line contradictions."
+      ]
     },
     {
       "asset_path": "backend/utils/pipelineLogger.js",
@@ -10060,10 +10134,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "In-memory pipeline run telemetry tracker: records per-sport stage counters, rejection counters, fallback metrics, and latest rejection reasons for debugging/observability.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": ["OBSERVABILITY", "RUNTIME", "SERVICE", "GOVERNANCE"],
+      "classification_evidence": [
+        "Maintains `runs` Map and `runOrder`; provides functions like `stageAdd()`, `rejectionAdd()`, `recordSportNormalization()`, `recordFallback()`, and snapshot getters (`getRunSnapshot`, `getLatestRunSnapshot`)."
+      ]
     },
     {
       "asset_path": "backend/utils/providerCircuitBreaker.js",
@@ -10086,10 +10162,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "In-process provider circuit breaker to temporarily block providers after repeated failures and enforce a cooldown period.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": ["PROVIDER", "SECURITY", "OBSERVABILITY", "RUNTIME"],
+      "classification_evidence": [
+        "Exports `shouldAllow(signature)` and `recordFailure(signature,status)` that tracks failure counts; when failures hit `FAILURE_THRESHOLD`, sets `blockedUntil` using `COOLDOWN_MS` and prunes entries above `MAX_ENTRIES`."
+      ]
     },
     {
       "asset_path": "backend/utils/purgeStaleData.js",
@@ -10112,10 +10190,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "One-off database cleanup script that purges stale prediction rows older than a 15-minute grace period.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": ["DATABASE", "SQL", "SCRIPT_TOOL", "OBSERVABILITY"],
+      "classification_evidence": [
+        "Deletes from `direct1x2_prediction_final` and `predictions_raw` based on kickoff timestamps stored inside JSONB fields; runs within a transaction and uses `pool.end()` on completion."
+      ]
     },
     {
       "asset_path": "backend/utils/rapidApiWaterfall.js",
@@ -10138,10 +10218,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "RapidAPI request waterfall fetcher that cycles hosts and API keys, using `cachedAxios` for TTL caching and returning live odds/fixtures/news responses.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": ["PROVIDER", "API", "RUNTIME", "CONFIGURATION", "OBSERVABILITY"],
+      "classification_evidence": [
+        "Defines `fetchWithWaterfall(endpoint, params, tier, timeoutMs)` that iterates tier host lists and RapidAPI keys from `keyPool`, calls `cachedAxios()` with `x-rapidapi-key`/`x-rapidapi-host`, and logs success/failure before returning `{ data, host }` or throwing when all attempts fail."
+      ]
     },
     {
       "asset_path": "backend/utils/secondaryMarketSelector.js",
@@ -10164,10 +10246,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Secondary market selection engine that scores and selects up to 4 allowed secondary markets for a fixture using deterministic baseline + diversity rules.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": ["PREDICTION", "SERVICE", "RUNTIME"],
+      "classification_evidence": [
+        "Implements `selectSecondaryMarkets(fixture, options)` with `ALLOWED_MARKETS`, confidence scoring via volatility/baseline context, and deterministic seeded selection (`stableFixtureSeed`) to pick markets and produce an accompanying note."
+      ]
     },
     {
       "asset_path": "backend/utils/sportsrcNormalizer.js",
@@ -10190,10 +10274,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "SportsSRC provider match normalizer that converts raw SportsSRC match payloads into the platform’s canonical fixture shape (fixture_key, teams, kickoff_time, league/competition, venue, and raw_payload).",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": ["PROVIDER", "SERVICE", "RUNTIME"],
+      "classification_evidence": [
+        "Exports `normalizeSportSRCMatch(match, sport)`; builds provider-specific identifiers and `fixture_key`, normalizes kickoff timestamps into ISO, and returns a consistent object with `home_team`, `away_team`, `league`, and `status` fields."
+      ]
     },
     {
       "asset_path": "backend/utils/validation.js",
@@ -10216,10 +10302,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Prediction input validation helper that enforces allowed market universe, sport/volatility constraints, and confidence/odds invariants for raw prediction objects.",
+      "functional_group": "PREDICTION",
+      "relationship_tags": ["PREDICTION", "SERVICE", "RUNTIME"],
+      "classification_evidence": [
+        "Defines known market/sport/volatility sets and exposes `validateRawPredictionInput(pred)` and `validateRawPredictionForInsert(row)`; checks match_id presence, market validity, prediction confidence range (0–100), and odds positivity when provided."
+      ]
     },
     {
       "asset_path": "backend/utils/weather.js",
@@ -10242,10 +10330,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Weather enrichment utilities: fetches kickoff-day weather from Open-Meteo, caches results in-memory, and attaches weather metadata to prediction objects.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": ["PROVIDER", "SERVICE", "RUNTIME", "OBSERVABILITY"],
+      "classification_evidence": [
+        "Exports `getWeather(latitude, longitude, kickoffTimestamp)` with a TTL cache, computes a description/emoji from weather_code and wind_speed, and exports `enrichWithWeather(predictions)` to attach `pred.weather`."
+      ]
     },
     {
       "asset_path": "backend/workers/now_api_pulse.py",
@@ -10268,10 +10358,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "ESPN Now surveillance background worker that polls the ESPN Now API, detects high-volatility news keywords, and builds structured intelligence payloads for storage (e.g., `public_intelligence`).",
+      "functional_group": "SCHEDULER_BACKGROUND",
+      "relationship_tags": ["PROVIDER", "SCHEDULER", "BACKGROUND_JOB", "RUNTIME", "OBSERVABILITY"],
+      "classification_evidence": [
+        "Defines `ESPNNowPulseWorker` with async polling (`fetch_espn_now_news` + volatility keyword detection) and payload construction (`create_intelligence_payload`) based on extracted headline/description and entity IDs."
+      ]
     },
     {
       "asset_path": "check-db.js",
