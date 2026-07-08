@@ -1442,12 +1442,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: README.md is a DOCUMENTATION_KNOWLEDGE artifact for semantic mapping/violation reference.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE",
+        "AUDIT"
+      ],
+      "classification_evidence": [
+        "Fast skim: README.md is a top-level knowledge/registry document.",
+        "Fast skim: contains registry/glossary headings and reference-style structure.",
+        "Fast skim: contains schema-like documentation markers (schema/DDL references).",
+        "Fast skim: includes business rules / rule-style sections."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/audit/column_dependency_matrix.md",
@@ -2220,12 +2229,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: api_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for knowledge registry / reference documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: api_registry.md is a top-level knowledge/registry document.",
+        "Fast skim: contains registry/glossary headings and reference-style structure."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/knowledge/architecture_decisions.md",
@@ -2246,12 +2260,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: architecture_decisions.md is a DOCUMENTATION_KNOWLEDGE artifact for semantic mapping/violation reference.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT"
+      ],
+      "classification_evidence": [
+        "Fast skim: architecture_decisions.md is a top-level knowledge/registry document.",
+        "Fast skim: includes business rules / rule-style sections."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/knowledge/business_rules.md",
@@ -2272,12 +2292,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: business_rules.md is a DOCUMENTATION_KNOWLEDGE artifact for formula registry reference.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Fast skim: business_rules.md is a top-level knowledge/registry document.",
+        "Fast skim: contains schema-like documentation markers (schema/DDL references).",
+        "Fast skim: includes business rules / rule-style sections."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/knowledge/cost_registry.md",
@@ -2298,12 +2325,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: cost_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for knowledge registry / reference documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Fast skim: cost_registry.md is a top-level knowledge/registry document.",
+        "Fast skim: contains registry/glossary headings and reference-style structure.",
+        "Fast skim: includes business rules / rule-style sections."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/knowledge/database_schema.md",
@@ -2324,12 +2358,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: database_schema.md is a DOCUMENTATION_KNOWLEDGE artifact for views/materialized-views reference.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Fast skim: database_schema.md is a top-level knowledge/registry document.",
+        "Fast skim: contains schema-like documentation markers (schema/DDL references).",
+        "Fast skim: includes business rules / rule-style sections."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/knowledge/dependency_registry.md",
@@ -2350,12 +2391,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: dependency_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for semantic mapping/violation reference.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE",
+        "AUDIT"
+      ],
+      "classification_evidence": [
+        "Fast skim: dependency_registry.md is a top-level knowledge/registry document.",
+        "Fast skim: contains registry/glossary headings and reference-style structure.",
+        "Fast skim: includes business rules / rule-style sections."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/knowledge/edge_functions.md",
@@ -2376,12 +2425,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: edge_functions.md is a DOCUMENTATION_KNOWLEDGE artifact for knowledge registry / reference documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: edge_functions.md is a top-level knowledge/registry document.",
+        "Fast skim: markdown/text headings indicate documentation intended for governance/navigation."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/knowledge/formula_registry.md",
@@ -2402,12 +2456,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: formula_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for formula registry reference.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Fast skim: formula_registry.md is a top-level knowledge/registry document.",
+        "Fast skim: contains registry/glossary headings and reference-style structure.",
+        "Fast skim: includes business rules / rule-style sections."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/knowledge/glossary.md",
@@ -2428,12 +2489,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: glossary.md is a DOCUMENTATION_KNOWLEDGE artifact for views/materialized-views reference.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Fast skim: glossary.md is a top-level knowledge/registry document.",
+        "Fast skim: contains registry/glossary headings and reference-style structure.",
+        "Fast skim: includes business rules / rule-style sections."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/knowledge/pipeline_metrics_registry.md",
@@ -2454,12 +2522,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: pipeline_metrics_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for semantic mapping/violation reference.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT"
+      ],
+      "classification_evidence": [
+        "Fast skim: pipeline_metrics_registry.md is a top-level knowledge/registry document.",
+        "Fast skim: contains registry/glossary headings and reference-style structure."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/knowledge/provider_registry.md",
@@ -2480,12 +2554,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: provider_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for semantic mapping/violation reference.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE",
+        "AUDIT"
+      ],
+      "classification_evidence": [
+        "Fast skim: provider_registry.md is a top-level knowledge/registry document.",
+        "Fast skim: contains registry/glossary headings and reference-style structure.",
+        "Fast skim: contains schema-like documentation markers (schema/DDL references).",
+        "Fast skim: includes business rules / rule-style sections."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/knowledge/scheduled_jobs.md",
@@ -2506,12 +2589,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: scheduled_jobs.md is a DOCUMENTATION_KNOWLEDGE artifact for views/materialized-views reference.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: scheduled_jobs.md is a top-level knowledge/registry document.",
+        "Fast skim: contains registry/glossary headings and reference-style structure."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/knowledge/semantic_field_mapping_registry.md",
@@ -2532,12 +2620,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: semantic_field_mapping_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for semantic mapping/violation reference.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE",
+        "AUDIT"
+      ],
+      "classification_evidence": [
+        "Fast skim: semantic_field_mapping_registry.md is a top-level knowledge/registry document.",
+        "Fast skim: contains registry/glossary headings and reference-style structure.",
+        "Fast skim: contains schema-like documentation markers (schema/DDL references).",
+        "Fast skim: includes business rules / rule-style sections."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/knowledge/semantic_violation_log.md",
@@ -2558,12 +2655,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: semantic_violation_log.md is a DOCUMENTATION_KNOWLEDGE artifact for semantic mapping/violation reference.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT"
+      ],
+      "classification_evidence": [
+        "Fast skim: semantic_violation_log.md is a top-level knowledge/registry document.",
+        "Fast skim: markdown/text headings indicate documentation intended for governance/navigation."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/knowledge/system_topology.md",
@@ -2584,12 +2687,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: system_topology.md is a DOCUMENTATION_KNOWLEDGE artifact for views/materialized-views reference.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Fast skim: system_topology.md is a top-level knowledge/registry document.",
+        "Fast skim: includes business rules / rule-style sections."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/knowledge/views_and_materialized_views.md",
@@ -2610,12 +2719,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: views_and_materialized_views.md is a DOCUMENTATION_KNOWLEDGE artifact for views/materialized-views reference.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Fast skim: views_and_materialized_views.md is a top-level knowledge/registry document.",
+        "Fast skim: includes business rules / rule-style sections."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/providers/bigballs_discovery_audit.md",
