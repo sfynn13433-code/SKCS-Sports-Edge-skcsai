@@ -2751,12 +2751,27 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bigballs_discovery_audit.md is a PROVIDER_INTEGRATION asset for coverage/audit review notes.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: bigballs_discovery_audit.md is a provider document (filename/topic cues) used for cataloging endpoints/mapping/health.",
+        "Evidence: top chunk includes endpoint/catalog/API-related sections.",
+        "Evidence: top chunk includes health/readiness language.",
+        "Evidence: top chunk includes semantic mapping/field mapping language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/providers/bigballs_endpoint_catalog.md",
@@ -2777,12 +2792,27 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bigballs_endpoint_catalog.md is a PROVIDER_INTEGRATION asset for coverage/audit review notes.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "DATABASE",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: bigballs_endpoint_catalog.md is a provider document (filename/topic cues) used for cataloging endpoints/mapping/health.",
+        "Evidence: top chunk includes endpoint/catalog/API-related sections.",
+        "Evidence: top chunk includes semantic mapping/field mapping language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/providers/bigballs_primary_assessment.md",
@@ -2803,12 +2833,26 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bigballs_primary_assessment.md is a PROVIDER_INTEGRATION asset for provider discovery/health documentation.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "DATABASE",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: bigballs_primary_assessment.md is a provider document (filename/topic cues) used for cataloging endpoints/mapping/health.",
+        "Evidence: top chunk includes endpoint/catalog/API-related sections."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/providers/bigballs_provider_health.md",
@@ -2829,12 +2873,25 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bigballs_provider_health.md is a PROVIDER_INTEGRATION asset for provider readiness/health verification notes.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: bigballs_provider_health.md is a provider document (filename/topic cues) used for cataloging endpoints/mapping/health.",
+        "Evidence: top chunk includes endpoint/catalog/API-related sections.",
+        "Evidence: top chunk includes health/readiness language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/providers/bigballs_semantic_mapping.md",
@@ -2855,12 +2912,25 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bigballs_semantic_mapping.md is a PROVIDER_INTEGRATION asset for provider mapping reference.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: bigballs_semantic_mapping.md is a provider document (filename/topic cues) used for cataloging endpoints/mapping/health.",
+        "Evidence: top chunk includes endpoint/catalog/API-related sections.",
+        "Evidence: top chunk includes semantic mapping/field mapping language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/providers/bsd_coverage_audit.md",
@@ -2881,12 +2951,26 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bsd_coverage_audit.md is a PROVIDER_INTEGRATION asset for coverage/audit review notes.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "DATABASE",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: bsd_coverage_audit.md is a provider document (filename/topic cues) used for cataloging endpoints/mapping/health.",
+        "Evidence: top chunk includes endpoint/catalog/API-related sections."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/providers/bsd_endpoint_catalog.md",
@@ -2907,12 +2991,28 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bsd_endpoint_catalog.md is a PROVIDER_INTEGRATION asset for coverage/audit review notes.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "DATABASE",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: bsd_endpoint_catalog.md is a provider document (filename/topic cues) used for cataloging endpoints/mapping/health.",
+        "Evidence: top chunk includes endpoint/catalog/API-related sections.",
+        "Evidence: top chunk includes health/readiness language.",
+        "Evidence: top chunk includes semantic mapping/field mapping language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/providers/bsd_league_inventory.md",
@@ -2933,12 +3033,25 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bsd_league_inventory.md is a PROVIDER_INTEGRATION asset for coverage/audit review notes.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: bsd_league_inventory.md is a provider document (filename/topic cues) used for cataloging endpoints/mapping/health.",
+        "Evidence: top chunk includes endpoint/catalog/API-related sections."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/providers/bsd_provider_health.md",
@@ -2959,12 +3072,27 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bsd_provider_health.md is a PROVIDER_INTEGRATION asset for coverage/audit review notes.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "DATABASE",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: bsd_provider_health.md is a provider document (filename/topic cues) used for cataloging endpoints/mapping/health.",
+        "Evidence: top chunk includes endpoint/catalog/API-related sections.",
+        "Evidence: top chunk includes health/readiness language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/providers/bsd_readiness_assessment.md",
@@ -2985,12 +3113,28 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bsd_readiness_assessment.md is a PROVIDER_INTEGRATION asset for coverage/audit review notes.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "DATABASE",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: bsd_readiness_assessment.md is a provider document (filename/topic cues) used for cataloging endpoints/mapping/health.",
+        "Evidence: top chunk includes endpoint/catalog/API-related sections.",
+        "Evidence: top chunk includes health/readiness language.",
+        "Evidence: top chunk includes semantic mapping/field mapping language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/providers/bsd_semantic_mapping.md",
@@ -3011,12 +3155,26 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bsd_semantic_mapping.md is a PROVIDER_INTEGRATION asset for provider mapping reference.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: bsd_semantic_mapping.md is a provider document (filename/topic cues) used for cataloging endpoints/mapping/health.",
+        "Evidence: top chunk includes endpoint/catalog/API-related sections.",
+        "Evidence: top chunk includes semantic mapping/field mapping language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/providers/bzzoiro_discovery_audit.md",
@@ -3037,12 +3195,27 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bzzoiro_discovery_audit.md is a PROVIDER_INTEGRATION asset for coverage/audit review notes.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "DATABASE",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: bzzoiro_discovery_audit.md is a provider document (filename/topic cues) used for cataloging endpoints/mapping/health.",
+        "Evidence: top chunk includes endpoint/catalog/API-related sections.",
+        "Evidence: top chunk includes semantic mapping/field mapping language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/providers/bzzoiro_field_audit.md",
@@ -3063,12 +3236,25 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bzzoiro_field_audit.md is a PROVIDER_INTEGRATION asset for provider mapping reference.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: bzzoiro_field_audit.md is a provider document (filename/topic cues) used for cataloging endpoints/mapping/health.",
+        "Evidence: top chunk includes endpoint/catalog/API-related sections.",
+        "Evidence: top chunk includes semantic mapping/field mapping language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/providers/bzzoiro_provider_mapping.md",
@@ -3089,12 +3275,27 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bzzoiro_provider_mapping.md is a PROVIDER_INTEGRATION asset for provider mapping reference.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "DATABASE",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: bzzoiro_provider_mapping.md is a provider document (filename/topic cues) used for cataloging endpoints/mapping/health.",
+        "Evidence: top chunk includes endpoint/catalog/API-related sections.",
+        "Evidence: top chunk includes semantic mapping/field mapping language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/providers/soccerdata_call_restrictions.md",
@@ -3115,12 +3316,25 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: soccerdata_call_restrictions.md is a PROVIDER_INTEGRATION asset for coverage/audit review notes.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: soccerdata_call_restrictions.md is a provider document (filename/topic cues) used for cataloging endpoints/mapping/health.",
+        "Evidence: top chunk includes endpoint/catalog/API-related sections.",
+        "Evidence: top chunk includes health/readiness language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/providers/soccerdata_endpoint_catalog.md",
@@ -3141,12 +3355,24 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: soccerdata_endpoint_catalog.md is a PROVIDER_INTEGRATION asset for provider endpoint catalog & discovery notes.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: soccerdata_endpoint_catalog.md is a provider document (filename/topic cues) used for cataloging endpoints/mapping/health.",
+        "Evidence: top chunk includes endpoint/catalog/API-related sections."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/providers/soccerdata_notebooklm_synthesis.md",
@@ -3167,12 +3393,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: soccerdata_notebooklm_synthesis.md is a PROVIDER_INTEGRATION asset for synthesis notes from prior notebook/workflow.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: soccerdata_notebooklm_synthesis.md is a provider document (filename/topic cues) used for cataloging endpoints/mapping/health.",
+        "Evidence: top chunk includes endpoint/catalog/API-related sections."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/providers/soccerdata_provider_health.md",
@@ -3193,12 +3428,26 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: soccerdata_provider_health.md is a PROVIDER_INTEGRATION asset for synthesis notes from prior notebook/workflow.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RUNTIME",
+        "API",
+        "ROUTE",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Fast skim: soccerdata_provider_health.md is a provider document (filename/topic cues) used for cataloging endpoints/mapping/health.",
+        "Evidence: top chunk includes endpoint/catalog/API-related sections.",
+        "Evidence: top chunk includes health/readiness language."
+      ]
     },
     {
       "asset_path": "SKCS_MASTER_RULEBOOK.md",
