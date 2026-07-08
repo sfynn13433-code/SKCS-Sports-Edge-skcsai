@@ -5048,10 +5048,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "EdgeMind controller: generates tier-aware bot/explanation responses (including ACCA/pick selection) by validating request context and composing insight output.",
+      "functional_group": "AI_EDGEMIND",
+      "relationship_tags": ["AI_EDGEMIND", "CONTROLLER", "RUNTIME"],
+      "classification_evidence": [
+        "Exports `generateBotResponse` and contains EdgeMind explanation/pick selection logic using subscription plan capability resolution and market/plan constraints; mounted by `backend/routes/chat.js` as POST handlers."
+      ]
     },
     {
       "asset_path": "backend/core/executionPipeline.js",
@@ -5672,10 +5674,10 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "EdgeMind controller: generates tier-aware bot/explanation responses (including ACCA/pick selection) by validating request context and composing insight output.",
-      "functional_group": "AI_EDGEMIND",
-      "relationship_tags": ["AI_EDGEMIND", "CONTROLLER", "RUNTIME"],
-      "classification_evidence": ["Exports `generateBotResponse` and contains EdgeMind explanation/pick selection logic using subscription plan capability resolution and market/plan constraints; mounted by `backend/routes/chat.js` as POST handlers."]
+      "purpose_description": "",
+      "functional_group": "",
+      "relationship_tags": [],
+      "classification_evidence": []
     },
     {
       "asset_path": "backend/routes/accuracy.js",
