@@ -548,12 +548,28 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: AGENTS.md is a PROVIDER_INTEGRATION asset for AI provider session/usage notes.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "RUNTIME",
+        "OBSERVABILITY",
+        "RULEBOOK",
+        "GOVERNANCE",
+        "AUDIT",
+        "SECURITY",
+        "DEPLOYMENT",
+        "UI",
+        "DOCUMENTATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: AGENTS.md is a top-level PROVIDER_INTEGRATION doc/log artifact used for governance/navigation.",
+        "Evidence: contains rulebook/master-rule references in text.",
+        "Evidence: contains audit headings indicating review findings.",
+        "Evidence: contains privacy/terms language (policy)."
+      ]
     },
     {
       "asset_path": "ARCHITECTURE_OVERVIEW.md",
@@ -574,12 +590,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: ARCHITECTURE_OVERVIEW.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: ARCHITECTURE_OVERVIEW.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."
+      ]
     },
     {
       "asset_path": "COMPREHENSIVE_AUDIT_REPORT.md",
@@ -600,12 +623,23 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: COMPREHENSIVE_AUDIT_REPORT.md is a DOCUMENTATION_KNOWLEDGE asset for audit report and review findings.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RULEBOOK",
+        "GOVERNANCE",
+        "AUDIT",
+        "DEPLOYMENT",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: COMPREHENSIVE_AUDIT_REPORT.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains audit headings indicating review findings.",
+        "Evidence: contains deployment status/verification language."
+      ]
     },
     {
       "asset_path": "COMPREHENSIVE_FOOTBALL_RULES_REPORT.md",
@@ -626,12 +660,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: COMPREHENSIVE_FOOTBALL_RULES_REPORT.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RULEBOOK",
+        "GOVERNANCE",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: COMPREHENSIVE_FOOTBALL_RULES_REPORT.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."
+      ]
     },
     {
       "asset_path": "CRON_SETUP.md",
@@ -652,12 +693,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: CRON_SETUP.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "DEPLOYMENT",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: CRON_SETUP.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."
+      ]
     },
     {
       "asset_path": "DASHBOARD_QUICK_START.md",
@@ -678,12 +725,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: DASHBOARD_QUICK_START.md is a DOCUMENTATION_KNOWLEDGE asset for dashboard/feature usage and refactor guide.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: DASHBOARD_QUICK_START.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains deployment status/verification language."
+      ]
     },
     {
       "asset_path": "DASHBOARD_REFACTOR_GUIDE.md",
@@ -704,12 +759,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: DASHBOARD_REFACTOR_GUIDE.md is a DOCUMENTATION_KNOWLEDGE asset for dashboard/feature usage and refactor guide.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: DASHBOARD_REFACTOR_GUIDE.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."
+      ]
     },
     {
       "asset_path": "DEEPSEEK_SESSION_SKCSTEST.txt",
@@ -730,12 +790,26 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: DEEPSEEK_SESSION_SKCSTEST.txt is a PROVIDER_INTEGRATION asset for AI provider session/usage notes.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "RUNTIME",
+        "OBSERVABILITY",
+        "AUDIT",
+        "GOVERNANCE",
+        "DEPLOYMENT",
+        "UI",
+        "DOCUMENTATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: DEEPSEEK_SESSION_SKCSTEST.txt is a top-level PROVIDER_INTEGRATION doc/log artifact used for governance/navigation.",
+        "Evidence: contains audit headings indicating review findings.",
+        "Evidence: contains deployment status/verification language.",
+        "Evidence: contains DeepSeek session/state references."
+      ]
     },
     {
       "asset_path": "DEEPSEEK_STATE.md",
@@ -756,12 +830,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: DEEPSEEK_STATE.md is a PROVIDER_INTEGRATION asset for repository governance/inventory documentation.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "RUNTIME",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: DEEPSEEK_STATE.md is a top-level PROVIDER_INTEGRATION doc/log artifact used for governance/navigation."
+      ]
     },
     {
       "asset_path": "DEPLOYMENT_STATUS.md",
@@ -782,12 +862,23 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: DEPLOYMENT_STATUS.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RULEBOOK",
+        "GOVERNANCE",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: DEPLOYMENT_STATUS.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains rulebook/master-rule references in text.",
+        "Evidence: contains deployment status/verification language."
+      ]
     },
     {
       "asset_path": "DEPLOYMENT_VERIFICATION_GUIDE.md",
@@ -808,12 +899,23 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: DEPLOYMENT_VERIFICATION_GUIDE.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RULEBOOK",
+        "GOVERNANCE",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: DEPLOYMENT_VERIFICATION_GUIDE.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains rulebook/master-rule references in text.",
+        "Evidence: contains deployment status/verification language."
+      ]
     },
     {
       "asset_path": "Dockerfile",
@@ -860,12 +962,23 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: FRONTEND_FIXES_SUMMARY.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RULEBOOK",
+        "GOVERNANCE",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: FRONTEND_FIXES_SUMMARY.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains rulebook/master-rule references in text.",
+        "Evidence: contains deployment status/verification language."
+      ]
     },
     {
       "asset_path": "FRONTEND_INVESTIGATION_REPORT.md",
@@ -886,12 +999,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: FRONTEND_INVESTIGATION_REPORT.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RULEBOOK",
+        "GOVERNANCE",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: FRONTEND_INVESTIGATION_REPORT.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains rulebook/master-rule references in text."
+      ]
     },
     {
       "asset_path": "FULL_WORKSPACE_AUDIT_REPORT.md",
@@ -912,12 +1033,26 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: FULL_WORKSPACE_AUDIT_REPORT.md is a DOCUMENTATION_KNOWLEDGE asset for audit report and review findings.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RULEBOOK",
+        "GOVERNANCE",
+        "AUDIT",
+        "SECURITY",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: FULL_WORKSPACE_AUDIT_REPORT.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains audit headings indicating review findings.",
+        "Evidence: contains privacy/terms language (policy).",
+        "Evidence: contains deployment status/verification language."
+      ]
     },
     {
       "asset_path": "GEMINI.md",
@@ -938,12 +1073,23 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this PROVIDER_INTEGRATION doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: GEMINI.md is a PROVIDER_INTEGRATION asset for AI provider session/usage notes.",
+      "functional_group": "PROVIDER_INTEGRATION",
+      "relationship_tags": [
+        "PROVIDER",
+        "RUNTIME",
+        "OBSERVABILITY",
+        "DEPLOYMENT",
+        "UI",
+        "DOCUMENTATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: GEMINI.md is a top-level PROVIDER_INTEGRATION doc/log artifact used for governance/navigation.",
+        "Evidence: contains deployment status/verification language.",
+        "Evidence: contains Gemini/Groq provider references."
+      ]
     },
     {
       "asset_path": "IMPLEMENTATION_GAP_ANALYSIS.md",
@@ -964,12 +1110,23 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: IMPLEMENTATION_GAP_ANALYSIS.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RULEBOOK",
+        "GOVERNANCE",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: IMPLEMENTATION_GAP_ANALYSIS.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains rulebook/master-rule references in text.",
+        "Evidence: contains deployment status/verification language."
+      ]
     },
     {
       "asset_path": "IMPLEMENTATION_SUMMARY.md",
@@ -990,12 +1147,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: IMPLEMENTATION_SUMMARY.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: IMPLEMENTATION_SUMMARY.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains deployment status/verification language."
+      ]
     },
     {
       "asset_path": "LICENSE",
@@ -1042,12 +1207,23 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: MASTER_RULEBOOK_IMPLEMENTATION_GUIDE.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RULEBOOK",
+        "GOVERNANCE",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: MASTER_RULEBOOK_IMPLEMENTATION_GUIDE.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains rulebook/master-rule references in text.",
+        "Evidence: contains deployment status/verification language."
+      ]
     },
     {
       "asset_path": "MIGRATION_FREEZE.md",
@@ -1068,12 +1244,16 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: MIGRATION_FREEZE.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: MIGRATION_FREEZE.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."
+      ]
     },
     {
       "asset_path": "PRIVACY_POLICY.md",
@@ -1094,12 +1274,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: PRIVACY_POLICY.md is a DOCUMENTATION_KNOWLEDGE asset for audit report and review findings.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: PRIVACY_POLICY.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains audit headings indicating review findings.",
+        "Evidence: contains privacy/terms language (policy)."
+      ]
     },
     {
       "asset_path": "README.md",
@@ -1120,12 +1309,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: README.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: README.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains deployment status/verification language."
+      ]
     },
     {
       "asset_path": "README_DASHBOARD_REFACTOR.md",
@@ -1146,12 +1343,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: README_DASHBOARD_REFACTOR.md is a DOCUMENTATION_KNOWLEDGE asset for dashboard/feature usage and refactor guide.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: README_DASHBOARD_REFACTOR.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains deployment status/verification language."
+      ]
     },
     {
       "asset_path": "README_DATA_INGESTION.md",
@@ -1172,12 +1377,16 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: README_DATA_INGESTION.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: README_DATA_INGESTION.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."
+      ]
     },
     {
       "asset_path": "SINGLE_USE_AUDIT_REPORT.md",
@@ -1198,12 +1407,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: SINGLE_USE_AUDIT_REPORT.md is a DOCUMENTATION_KNOWLEDGE asset for audit report and review findings.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: SINGLE_USE_AUDIT_REPORT.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains audit headings indicating review findings.",
+        "Evidence: contains privacy/terms language (policy)."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/README.md",
@@ -2706,12 +2924,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: SKCS_MASTER_RULEBOOK.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RULEBOOK",
+        "GOVERNANCE",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: SKCS_MASTER_RULEBOOK.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains rulebook/master-rule references in text."
+      ]
     },
     {
       "asset_path": "SKCS_START.bat",
@@ -2758,12 +2984,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: SMB_WINDSURF_FINAL_IMPLEMENTATION.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: SMB_WINDSURF_FINAL_IMPLEMENTATION.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."
+      ]
     },
     {
       "asset_path": "SMB_WINDSURF_IMPLEMENTATION_PROMPT.md",
@@ -2784,12 +3015,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: SMB_WINDSURF_IMPLEMENTATION_PROMPT.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RULEBOOK",
+        "GOVERNANCE",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: SMB_WINDSURF_IMPLEMENTATION_PROMPT.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains rulebook/master-rule references in text."
+      ]
     },
     {
       "asset_path": "SPORT_CONSISTENCY_AUDIT_REPORT.md",
@@ -2810,12 +3049,25 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: SPORT_CONSISTENCY_AUDIT_REPORT.md is a DOCUMENTATION_KNOWLEDGE asset for audit report and review findings.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RULEBOOK",
+        "GOVERNANCE",
+        "AUDIT",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: SPORT_CONSISTENCY_AUDIT_REPORT.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains rulebook/master-rule references in text.",
+        "Evidence: contains audit headings indicating review findings.",
+        "Evidence: contains deployment status/verification language."
+      ]
     },
     {
       "asset_path": "STRICT_RULES.md",
@@ -2836,12 +3088,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: STRICT_RULES.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "RULEBOOK",
+        "GOVERNANCE",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: STRICT_RULES.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."
+      ]
     },
     {
       "asset_path": "SUPABASE_DIAGNOSTIC_REPORT.md",
@@ -2862,12 +3121,16 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: SUPABASE_DIAGNOSTIC_REPORT.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: SUPABASE_DIAGNOSTIC_REPORT.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."
+      ]
     },
     {
       "asset_path": "SUPABASE_TABLES_SUMMARY.md",
@@ -2888,12 +3151,16 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: SUPABASE_TABLES_SUMMARY.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: SUPABASE_TABLES_SUMMARY.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."
+      ]
     },
     {
       "asset_path": "SUPABASE_TABLE_ANALYSIS.md",
@@ -2914,12 +3181,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: SUPABASE_TABLE_ANALYSIS.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "SECURITY",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Fast skim: SUPABASE_TABLE_ANALYSIS.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."
+      ]
     },
     {
       "asset_path": "TERMS_OF_SERVICE.md",
@@ -2940,12 +3213,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: TERMS_OF_SERVICE.md is a DOCUMENTATION_KNOWLEDGE asset for privacy/terms policy document.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "SECURITY",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Fast skim: TERMS_OF_SERVICE.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains privacy/terms language (policy)."
+      ]
     },
     {
       "asset_path": "_archive/root/cli_v1.1.0.exe",
@@ -13099,12 +13379,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: football-ecosystem-report.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "DEPLOYMENT",
+        "OBSERVABILITY",
+        "UI"
+      ],
+      "classification_evidence": [
+        "Fast skim: football-ecosystem-report.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.",
+        "Evidence: contains deployment status/verification language."
+      ]
     },
     {
       "asset_path": "force-seed.js",
@@ -15335,12 +15623,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: requirements.txt is a DEPLOYMENT_OPERATIONS asset for dependency/install manifest.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "relationship_tags": [
+        "DEPLOYMENT",
+        "CONFIGURATION",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Fast skim: requirements.txt is a top-level DEPLOYMENT_OPERATIONS doc/log artifact used for governance/navigation."
+      ]
     },
     {
       "asset_path": "run-final-test.js",
@@ -15387,12 +15681,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this BACKEND_RUNTIME doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: runtime.txt is a BACKEND_RUNTIME asset for runtime environment surface.",
+      "functional_group": "BACKEND_RUNTIME",
+      "relationship_tags": [
+        "RUNTIME",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: runtime.txt is a top-level BACKEND_RUNTIME doc/log artifact used for governance/navigation."
+      ]
     },
     {
       "asset_path": "safe-migration-plan.json",

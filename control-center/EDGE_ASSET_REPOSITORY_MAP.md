@@ -17,57 +17,57 @@ CURRENT_STATE_COUNTS
 - GENERATED: 0
 
 FUNCTIONAL_GROUP_COUNTS
-- (PENDING): 414
+- (PENDING): 378
 - SCRIPT_TOOL: 106
-- PROVIDER_INTEGRATION: 95
+- PROVIDER_INTEGRATION: 99
 - TEST_PROOF: 75
+- DOCUMENTATION_KNOWLEDGE: 35
 - DATABASE: 33
+- DEPLOYMENT_OPERATIONS: 25
 - PREDICTION: 25
-- DEPLOYMENT_OPERATIONS: 24
 - GOVERNANCE: 23
 - SCHEDULER_BACKGROUND: 22
 - ACCA: 16
 - API_ROUTE: 15
 - DATABASE_MIGRATION: 15
+- BACKEND_RUNTIME: 8
 - GENERATED_OUTPUT: 8
 - AI_EDGEMIND: 7
-- BACKEND_RUNTIME: 7
 - GRADING_ACCURACY: 7
-- DOCUMENTATION_KNOWLEDGE: 5
 - SECURITY_SUBSCRIBER: 3
 - SERVICE: 3
 - UNCATEGORIZED: 2
 - FRONTEND_UI: 1
 
 RELATIONSHIP_TAG_COUNTS
-- RUNTIME: 258
+- RUNTIME: 263
 - SCRIPT_TOOL: 205
-- PROVIDER: 170
+- PROVIDER: 174
 - SQL: 154
 - API: 127
-- DATABASE: 118
+- DATABASE: 119
 - PREDICTION: 88
 - TEST_PROOF: 71
+- GOVERNANCE: 54
+- OBSERVABILITY: 47
 - ROUTE: 46
+- DOCUMENTATION: 43
 - SERVICE: 42
-- GOVERNANCE: 35
-- CONFIGURATION: 27
-- OBSERVABILITY: 27
+- DEPLOYMENT: 35
+- SECURITY: 29
+- CONFIGURATION: 28
+- UI: 25
 - BACKGROUND_JOB: 23
-- SECURITY: 23
+- RULEBOOK: 23
 - ACCA: 22
 - SCHEDULER: 22
 - MIGRATION: 18
 - AI_EDGEMIND: 17
-- DEPLOYMENT: 16
+- AUDIT: 16
 - GENERATED: 15
-- DOCUMENTATION: 10
-- AUDIT: 9
-- RULEBOOK: 9
 - GRADING: 7
 - SUBSCRIBER: 3
 - CONTROLLER: 2
-- UI: 2
 
 NEXT_VALIDATION_NON_EMPTY_ASSETS: 906
 
@@ -659,42 +659,42 @@ PER_ASSET_BY_BATCH
 ## B16 DOCS_ROOT_MD_TXT
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |
 |---|---|---|---|---|---|---|
-| AGENTS.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| ARCHITECTURE_OVERVIEW.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| COMPREHENSIVE_AUDIT_REPORT.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| COMPREHENSIVE_FOOTBALL_RULES_REPORT.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| CRON_SETUP.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| DASHBOARD_QUICK_START.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| DASHBOARD_REFACTOR_GUIDE.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| DEEPSEEK_SESSION_SKCSTEST.txt | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| DEEPSEEK_STATE.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| DEPLOYMENT_STATUS.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| DEPLOYMENT_VERIFICATION_GUIDE.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| football-ecosystem-report.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| FRONTEND_FIXES_SUMMARY.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| FRONTEND_INVESTIGATION_REPORT.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| FULL_WORKSPACE_AUDIT_REPORT.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| GEMINI.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| IMPLEMENTATION_GAP_ANALYSIS.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| IMPLEMENTATION_SUMMARY.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| MASTER_RULEBOOK_IMPLEMENTATION_GUIDE.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| MIGRATION_FREEZE.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| PRIVACY_POLICY.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| README_DASHBOARD_REFACTOR.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| README_DATA_INGESTION.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| README.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| requirements.txt | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| runtime.txt | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| SINGLE_USE_AUDIT_REPORT.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| SKCS_MASTER_RULEBOOK.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| SMB_WINDSURF_FINAL_IMPLEMENTATION.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| SMB_WINDSURF_IMPLEMENTATION_PROMPT.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| SPORT_CONSISTENCY_AUDIT_REPORT.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| STRICT_RULES.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| SUPABASE_DIAGNOSTIC_REPORT.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| SUPABASE_TABLE_ANALYSIS.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| SUPABASE_TABLES_SUMMARY.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
-| TERMS_OF_SERVICE.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| AGENTS.md | Rough classification: AGENTS.md is a PROVIDER_INTEGRATION asset for AI provider session/usage notes. | PROVIDER_INTEGRATION | UNKNOWN | ["PROVIDER","RUNTIME","OBSERVABILITY","RULEBOOK","GOVERNANCE","AUDIT","SECURITY","DEPLOYMENT","UI","DOCUMENTATION"] | ["Fast skim: AGENTS.md is a top-level PROVIDER_INTEGRATION doc/log artifact used for governance/navigation.","Evidence: contains rulebook/master-rule references in text.","Evidence: contains audit headings indicating review findings.","Evidence: contains privacy/terms language (policy)."] | Inspect how this PROVIDER_INTEGRATION doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| ARCHITECTURE_OVERVIEW.md | Rough classification: ARCHITECTURE_OVERVIEW.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","DEPLOYMENT","OBSERVABILITY","UI"] | ["Fast skim: ARCHITECTURE_OVERVIEW.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| COMPREHENSIVE_AUDIT_REPORT.md | Rough classification: COMPREHENSIVE_AUDIT_REPORT.md is a DOCUMENTATION_KNOWLEDGE asset for audit report and review findings. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","RULEBOOK","GOVERNANCE","AUDIT","DEPLOYMENT","OBSERVABILITY"] | ["Fast skim: COMPREHENSIVE_AUDIT_REPORT.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains audit headings indicating review findings.","Evidence: contains deployment status/verification language."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| COMPREHENSIVE_FOOTBALL_RULES_REPORT.md | Rough classification: COMPREHENSIVE_FOOTBALL_RULES_REPORT.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","RULEBOOK","GOVERNANCE","UI"] | ["Fast skim: COMPREHENSIVE_FOOTBALL_RULES_REPORT.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| CRON_SETUP.md | Rough classification: CRON_SETUP.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","DEPLOYMENT","OBSERVABILITY"] | ["Fast skim: CRON_SETUP.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| DASHBOARD_QUICK_START.md | Rough classification: DASHBOARD_QUICK_START.md is a DOCUMENTATION_KNOWLEDGE asset for dashboard/feature usage and refactor guide. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","DEPLOYMENT","OBSERVABILITY","UI"] | ["Fast skim: DASHBOARD_QUICK_START.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains deployment status/verification language."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| DASHBOARD_REFACTOR_GUIDE.md | Rough classification: DASHBOARD_REFACTOR_GUIDE.md is a DOCUMENTATION_KNOWLEDGE asset for dashboard/feature usage and refactor guide. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","UI"] | ["Fast skim: DASHBOARD_REFACTOR_GUIDE.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| DEEPSEEK_SESSION_SKCSTEST.txt | Rough classification: DEEPSEEK_SESSION_SKCSTEST.txt is a PROVIDER_INTEGRATION asset for AI provider session/usage notes. | PROVIDER_INTEGRATION | UNKNOWN | ["PROVIDER","RUNTIME","OBSERVABILITY","AUDIT","GOVERNANCE","DEPLOYMENT","UI","DOCUMENTATION"] | ["Fast skim: DEEPSEEK_SESSION_SKCSTEST.txt is a top-level PROVIDER_INTEGRATION doc/log artifact used for governance/navigation.","Evidence: contains audit headings indicating review findings.","Evidence: contains deployment status/verification language.","Evidence: contains DeepSeek session/state references."] | Inspect how this PROVIDER_INTEGRATION doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| DEEPSEEK_STATE.md | Rough classification: DEEPSEEK_STATE.md is a PROVIDER_INTEGRATION asset for repository governance/inventory documentation. | PROVIDER_INTEGRATION | UNKNOWN | ["PROVIDER","RUNTIME","OBSERVABILITY"] | ["Fast skim: DEEPSEEK_STATE.md is a top-level PROVIDER_INTEGRATION doc/log artifact used for governance/navigation."] | Inspect how this PROVIDER_INTEGRATION doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| DEPLOYMENT_STATUS.md | Rough classification: DEPLOYMENT_STATUS.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","RULEBOOK","GOVERNANCE","DEPLOYMENT","OBSERVABILITY","UI"] | ["Fast skim: DEPLOYMENT_STATUS.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains rulebook/master-rule references in text.","Evidence: contains deployment status/verification language."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| DEPLOYMENT_VERIFICATION_GUIDE.md | Rough classification: DEPLOYMENT_VERIFICATION_GUIDE.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","RULEBOOK","GOVERNANCE","DEPLOYMENT","OBSERVABILITY","UI"] | ["Fast skim: DEPLOYMENT_VERIFICATION_GUIDE.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains rulebook/master-rule references in text.","Evidence: contains deployment status/verification language."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| football-ecosystem-report.md | Rough classification: football-ecosystem-report.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","DEPLOYMENT","OBSERVABILITY","UI"] | ["Fast skim: football-ecosystem-report.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains deployment status/verification language."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| FRONTEND_FIXES_SUMMARY.md | Rough classification: FRONTEND_FIXES_SUMMARY.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","RULEBOOK","GOVERNANCE","DEPLOYMENT","OBSERVABILITY","UI"] | ["Fast skim: FRONTEND_FIXES_SUMMARY.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains rulebook/master-rule references in text.","Evidence: contains deployment status/verification language."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| FRONTEND_INVESTIGATION_REPORT.md | Rough classification: FRONTEND_INVESTIGATION_REPORT.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","RULEBOOK","GOVERNANCE","UI"] | ["Fast skim: FRONTEND_INVESTIGATION_REPORT.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains rulebook/master-rule references in text."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| FULL_WORKSPACE_AUDIT_REPORT.md | Rough classification: FULL_WORKSPACE_AUDIT_REPORT.md is a DOCUMENTATION_KNOWLEDGE asset for audit report and review findings. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","RULEBOOK","GOVERNANCE","AUDIT","SECURITY","DEPLOYMENT","OBSERVABILITY","UI"] | ["Fast skim: FULL_WORKSPACE_AUDIT_REPORT.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains audit headings indicating review findings.","Evidence: contains privacy/terms language (policy).","Evidence: contains deployment status/verification language."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| GEMINI.md | Rough classification: GEMINI.md is a PROVIDER_INTEGRATION asset for AI provider session/usage notes. | PROVIDER_INTEGRATION | UNKNOWN | ["PROVIDER","RUNTIME","OBSERVABILITY","DEPLOYMENT","UI","DOCUMENTATION"] | ["Fast skim: GEMINI.md is a top-level PROVIDER_INTEGRATION doc/log artifact used for governance/navigation.","Evidence: contains deployment status/verification language.","Evidence: contains Gemini/Groq provider references."] | Inspect how this PROVIDER_INTEGRATION doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| IMPLEMENTATION_GAP_ANALYSIS.md | Rough classification: IMPLEMENTATION_GAP_ANALYSIS.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","RULEBOOK","GOVERNANCE","DEPLOYMENT","OBSERVABILITY","UI"] | ["Fast skim: IMPLEMENTATION_GAP_ANALYSIS.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains rulebook/master-rule references in text.","Evidence: contains deployment status/verification language."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| IMPLEMENTATION_SUMMARY.md | Rough classification: IMPLEMENTATION_SUMMARY.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","DEPLOYMENT","OBSERVABILITY","UI"] | ["Fast skim: IMPLEMENTATION_SUMMARY.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains deployment status/verification language."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| MASTER_RULEBOOK_IMPLEMENTATION_GUIDE.md | Rough classification: MASTER_RULEBOOK_IMPLEMENTATION_GUIDE.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","RULEBOOK","GOVERNANCE","DEPLOYMENT","OBSERVABILITY","UI"] | ["Fast skim: MASTER_RULEBOOK_IMPLEMENTATION_GUIDE.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains rulebook/master-rule references in text.","Evidence: contains deployment status/verification language."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| MIGRATION_FREEZE.md | Rough classification: MIGRATION_FREEZE.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION"] | ["Fast skim: MIGRATION_FREEZE.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| PRIVACY_POLICY.md | Rough classification: PRIVACY_POLICY.md is a DOCUMENTATION_KNOWLEDGE asset for audit report and review findings. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","AUDIT","GOVERNANCE","SECURITY"] | ["Fast skim: PRIVACY_POLICY.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains audit headings indicating review findings.","Evidence: contains privacy/terms language (policy)."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| README_DASHBOARD_REFACTOR.md | Rough classification: README_DASHBOARD_REFACTOR.md is a DOCUMENTATION_KNOWLEDGE asset for dashboard/feature usage and refactor guide. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","DEPLOYMENT","OBSERVABILITY","UI"] | ["Fast skim: README_DASHBOARD_REFACTOR.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains deployment status/verification language."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| README_DATA_INGESTION.md | Rough classification: README_DATA_INGESTION.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION"] | ["Fast skim: README_DATA_INGESTION.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| README.md | Rough classification: README.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","DEPLOYMENT","OBSERVABILITY","UI"] | ["Fast skim: README.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains deployment status/verification language."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| requirements.txt | Rough classification: requirements.txt is a DEPLOYMENT_OPERATIONS asset for dependency/install manifest. | DEPLOYMENT_OPERATIONS | UNKNOWN | ["DEPLOYMENT","CONFIGURATION","DATABASE"] | ["Fast skim: requirements.txt is a top-level DEPLOYMENT_OPERATIONS doc/log artifact used for governance/navigation."] | Inspect how this DEPLOYMENT_OPERATIONS doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| runtime.txt | Rough classification: runtime.txt is a BACKEND_RUNTIME asset for runtime environment surface. | BACKEND_RUNTIME | UNKNOWN | ["RUNTIME","OBSERVABILITY"] | ["Fast skim: runtime.txt is a top-level BACKEND_RUNTIME doc/log artifact used for governance/navigation."] | Inspect how this BACKEND_RUNTIME doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| SINGLE_USE_AUDIT_REPORT.md | Rough classification: SINGLE_USE_AUDIT_REPORT.md is a DOCUMENTATION_KNOWLEDGE asset for audit report and review findings. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","AUDIT","GOVERNANCE","SECURITY"] | ["Fast skim: SINGLE_USE_AUDIT_REPORT.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains audit headings indicating review findings.","Evidence: contains privacy/terms language (policy)."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| SKCS_MASTER_RULEBOOK.md | Rough classification: SKCS_MASTER_RULEBOOK.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","RULEBOOK","GOVERNANCE","UI"] | ["Fast skim: SKCS_MASTER_RULEBOOK.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains rulebook/master-rule references in text."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| SMB_WINDSURF_FINAL_IMPLEMENTATION.md | Rough classification: SMB_WINDSURF_FINAL_IMPLEMENTATION.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","UI"] | ["Fast skim: SMB_WINDSURF_FINAL_IMPLEMENTATION.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| SMB_WINDSURF_IMPLEMENTATION_PROMPT.md | Rough classification: SMB_WINDSURF_IMPLEMENTATION_PROMPT.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","RULEBOOK","GOVERNANCE","UI"] | ["Fast skim: SMB_WINDSURF_IMPLEMENTATION_PROMPT.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains rulebook/master-rule references in text."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| SPORT_CONSISTENCY_AUDIT_REPORT.md | Rough classification: SPORT_CONSISTENCY_AUDIT_REPORT.md is a DOCUMENTATION_KNOWLEDGE asset for audit report and review findings. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","RULEBOOK","GOVERNANCE","AUDIT","DEPLOYMENT","OBSERVABILITY","UI"] | ["Fast skim: SPORT_CONSISTENCY_AUDIT_REPORT.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains rulebook/master-rule references in text.","Evidence: contains audit headings indicating review findings.","Evidence: contains deployment status/verification language."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| STRICT_RULES.md | Rough classification: STRICT_RULES.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","RULEBOOK","GOVERNANCE","UI"] | ["Fast skim: STRICT_RULES.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| SUPABASE_DIAGNOSTIC_REPORT.md | Rough classification: SUPABASE_DIAGNOSTIC_REPORT.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION"] | ["Fast skim: SUPABASE_DIAGNOSTIC_REPORT.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| SUPABASE_TABLE_ANALYSIS.md | Rough classification: SUPABASE_TABLE_ANALYSIS.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","SECURITY","GOVERNANCE"] | ["Fast skim: SUPABASE_TABLE_ANALYSIS.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| SUPABASE_TABLES_SUMMARY.md | Rough classification: SUPABASE_TABLES_SUMMARY.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION"] | ["Fast skim: SUPABASE_TABLES_SUMMARY.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
+| TERMS_OF_SERVICE.md | Rough classification: TERMS_OF_SERVICE.md is a DOCUMENTATION_KNOWLEDGE asset for privacy/terms policy document. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","SECURITY","GOVERNANCE"] | ["Fast skim: TERMS_OF_SERVICE.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation.","Evidence: contains privacy/terms language (policy)."] | Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later. |
 
 ## B17 DOCS_DIR
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |
