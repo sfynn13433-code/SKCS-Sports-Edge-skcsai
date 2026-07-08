@@ -3799,7 +3799,7 @@
       "asset_role": "UNCLASSIFIED_ASSET_ROLE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -3812,12 +3812,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later validate retention by comparing with current non-archive artifacts and confirming no runtime activation/usage is required.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived versioned CLI executable retained under _archive/root (cli_v1.1.0.exe).",
+      "functional_group": "GENERATED_OUTPUT",
+      "relationship_tags": [
+        "GENERATED"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/root/cli_v1.1.0.exe",
+        "Content skim: Binary archive retained under _archive/"
+      ]
     },
     {
       "asset_path": "_archive/root/render.zip",
@@ -3825,7 +3830,7 @@
       "asset_role": "UNCLASSIFIED_ASSET_ROLE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -3838,12 +3843,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later validate retention by comparing with current non-archive artifacts and confirming no runtime activation/usage is required.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived deployment artifact bundle retained under _archive/root (render.zip).",
+      "functional_group": "GENERATED_OUTPUT",
+      "relationship_tags": [
+        "GENERATED"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/root/render.zip",
+        "Content skim: Binary archive retained under _archive/"
+      ]
     },
     {
       "asset_path": "_archive/root/style.css",
@@ -3851,7 +3861,7 @@
       "asset_role": "UNCLASSIFIED_ASSET_ROLE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -3864,12 +3874,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later validate retention by comparing with current non-archive artifacts and confirming no runtime activation/usage is required.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived UI style asset retained under _archive/root (style.css).",
+      "functional_group": "GENERATED_OUTPUT",
+      "relationship_tags": [
+        "GENERATED"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/root/style.css",
+        "Content skim: body {\r\n    font-family: Arial, sans-serif;\r\n    background-color: #f4f4f4;\r\n    margin: 0;\r\n    padding: 20px;\r\n    display: flex;\r\n    justify-content: center…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/analyze-routes.js",
@@ -3877,7 +3892,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -3890,12 +3905,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (analyze-routes.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/analyze-routes.js",
+        "Content skim: 'use strict';\r\n\r\nconst fs = require('fs');\r\nconst path = require('path');\r\n\r\nconst routesDir = path.join(__dirname, '..', 'backend', 'routes');\r\n\r\n// Files to a…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/analyze-table-usage.js",
@@ -3903,7 +3923,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -3916,12 +3936,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (analyze-table-usage.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/analyze-table-usage.js",
+        "Content skim: 'use strict';\r\n\r\nconst fs = require('fs');\r\nconst path = require('path');\r\n\r\nconst backendDir = path.join(__dirname, '..', 'backend');\r\n\r\n// All tables from dat…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/check-api.js",
@@ -3929,7 +3954,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -3942,12 +3967,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (check-api.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/check-api.js",
+        "Content skim: Skim unavailable"
+      ]
     },
     {
       "asset_path": "_archive/scripts/check-confidence.js",
@@ -3955,7 +3985,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -3968,12 +3998,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (check-confidence.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/check-confidence.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst pool = new Pool…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/check-connectivity.js",
@@ -3981,7 +4016,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -3994,12 +4029,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (check-connectivity.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/check-connectivity.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nlet connStr = process…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/check-constraints.js",
@@ -4007,7 +4047,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4020,12 +4060,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (check-constraints.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/check-constraints.js",
+        "Content skim: require('dotenv').config();\r\nconst { pool } = require('../backend/database');\r\n(async () => {\r\n  const r = await pool.query(\"SELECT conname, pg_get_constraintde…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/check-deployment.js",
@@ -4033,7 +4078,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4046,12 +4091,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (check-deployment.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/check-deployment.js",
+        "Content skim: 'use strict';\r\n\r\nconst https = require('https');\r\n\r\nfunction checkUrl(url, path) {\r\n    return new Promise((resolve, reject) => {\r\n        const urlObj = new UR…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/check-direct-predictions.js",
@@ -4059,7 +4109,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4072,12 +4122,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (check-direct-predictions.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/check-direct-predictions.js",
+        "Content skim: require('dotenv').config();\r\nconst { pool } = require('../backend/database');\r\n(async () => {\r\n  const r = await pool.query(\"SELECT id, type, sport, matches->0-…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/check-endpoints.js",
@@ -4085,7 +4140,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4098,12 +4153,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (check-endpoints.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/check-endpoints.js",
+        "Content skim: 'use strict';\r\n\r\nconst https = require('https');\r\n\r\nfunction makeRequest(hostname, path, method = 'GET', body = null) {\r\n    return new Promise((resolve, reject…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/check-final-schema.js",
@@ -4111,7 +4171,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4124,12 +4184,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (check-final-schema.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/check-final-schema.js",
+        "Content skim: const db = require('../backend/database');\r\n\r\n(async () => {\r\n    const client = await db.pool.connect();\r\n    try {\r\n        const { rows } = await client.quer…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/check-final-sports.js",
@@ -4137,7 +4202,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4150,12 +4215,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (check-final-sports.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/check-final-sports.js",
+        "Content skim: const db = require('../backend/database');\r\n\r\n(async () => {\r\n    const client = await db.pool.connect();\r\n    try {\r\n        // Check sport values in predictio…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/check-matches.js",
@@ -4163,7 +4233,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4176,12 +4246,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (check-matches.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/check-matches.js",
+        "Content skim: require('dotenv').config();\r\nconst { pool } = require('../backend/database');\r\n(async () => {\r\n  const r = await pool.query(\"SELECT id, tier, type, total_confid…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/check-metadata-times.js",
@@ -4189,7 +4264,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4202,12 +4277,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (check-metadata-times.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/check-metadata-times.js",
+        "Content skim: const db = require('../backend/database');\r\n\r\n(async () => {\r\n    const client = await db.pool.connect();\r\n    try {\r\n        // Check commence_time in the raw …"
+      ]
     },
     {
       "asset_path": "_archive/scripts/check-risk-constraint.js",
@@ -4215,7 +4295,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4228,12 +4308,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (check-risk-constraint.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/check-risk-constraint.js",
+        "Content skim: const db = require('../backend/database');\r\n\r\n(async () => {\r\n    const client = await db.pool.connect();\r\n    try {\r\n        const { rows } = await client.quer…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/check-schema.js",
@@ -4241,7 +4326,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4254,12 +4339,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (check-schema.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/check-schema.js",
+        "Content skim: require('dotenv').config();\r\nconst { pool } = require('../backend/database');\r\n(async () => {\r\n  const r = await pool.query(\"SELECT column_name, data_type FROM …"
+      ]
     },
     {
       "asset_path": "_archive/scripts/check-stage-schemas.js",
@@ -4267,7 +4357,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4280,12 +4370,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (check-stage-schemas.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/check-stage-schemas.js",
+        "Content skim: const db = require('../backend/database');\r\n\r\n(async () => {\r\n    const client = await db.pool.connect();\r\n    try {\r\n        const { rows } = await client.quer…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/check-supabase-tables.js",
@@ -4293,7 +4388,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4306,12 +4401,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (check-supabase-tables.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/check-supabase-tables.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nlet connStr = process…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/check-team-names.js",
@@ -4319,7 +4419,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4332,12 +4432,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (check-team-names.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/check-team-names.js",
+        "Content skim: require('dotenv').config();\r\nconst { pool } = require('../backend/database');\r\n(async () => {\r\n  const r = await pool.query(\"SELECT id, tier, type, sport, match…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/cors-test.sh",
@@ -4345,7 +4450,7 @@
       "asset_role": "UNCLASSIFIED_ASSET_ROLE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4358,12 +4463,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (cors-test.sh).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/cors-test.sh",
+        "Content skim: #!/bin/bash\r\n\r\necho \"🔍 SKCS CORS Preflight Verification\"\r\necho \"==================================\"\r\n\r\n# Test 1: Health check (should work without CORS issues)…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/debug-events.js",
@@ -4371,7 +4481,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4384,12 +4494,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (debug-events.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/debug-events.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/debug-sport-filter.js",
@@ -4397,7 +4512,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4410,12 +4525,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (debug-sport-filter.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/debug-sport-filter.js",
+        "Content skim: const db = require('../backend/database');\r\n\r\n(async () => {\r\n    const client = await db.pool.connect();\r\n    try {\r\n        // Check sport value case in predi…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/deep-table-analysis.js",
@@ -4423,7 +4543,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4436,12 +4556,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (deep-table-analysis.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/deep-table-analysis.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nlet connStr = process…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/definitive-cors-diagnosis.sh",
@@ -4449,7 +4574,7 @@
       "asset_role": "UNCLASSIFIED_ASSET_ROLE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4462,12 +4587,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (definitive-cors-diagnosis.sh).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/definitive-cors-diagnosis.sh",
+        "Content skim: #!/bin/bash\r\n\r\n# =============================================================================\r\n# SKCS CORS Definitive Diagnostic Tool\r\n# Based on expert analys…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/deploy-cloud-scheduler.sh",
@@ -4475,7 +4605,7 @@
       "asset_role": "UNCLASSIFIED_ASSET_ROLE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4488,12 +4618,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (deploy-cloud-scheduler.sh).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/deploy-cloud-scheduler.sh",
+        "Content skim: #!/bin/bash\r\n\r\n# SKCS AI Sports Edge - Cloud Scheduler Deployment Script\r\n# This script sets up reliable scheduling with SAST timezone and idempotency.\r\n# It ta…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/deploy-render.sh",
@@ -4501,7 +4636,7 @@
       "asset_role": "UNCLASSIFIED_ASSET_ROLE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4514,12 +4649,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (deploy-render.sh).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/deploy-render.sh",
+        "Content skim: #!/bin/bash\r\n\r\n# Render Deployment Script\r\n# Triggers manual redeploy of Render backend service\r\n\r\necho \"🚀 Triggering Render deployment...\"\r\n\r\n# Get the latest…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/file-walker.js",
@@ -4527,7 +4667,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4540,12 +4680,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (file-walker.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/file-walker.js",
+        "Content skim: const fs = require('fs');\r\nconst path = require('path');\r\n\r\nfunction walk(dir, depth = 0) {\r\n    let results = [];\r\n    try {\r\n        const items = fs.readdirS…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/files-report.json",
@@ -4553,7 +4698,7 @@
       "asset_role": "CONFIGURATION",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4566,12 +4711,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later validate retention by comparing with current non-archive artifacts and confirming no runtime activation/usage is required.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived generated artifact retained under _archive (files-report.json).",
+      "functional_group": "GENERATED_OUTPUT",
+      "relationship_tags": [
+        "GENERATED"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/files-report.json",
+        "Content skim: ��[\u0000\r\u0000\n\u0000 \u0000 \u0000{\u0000\r\u0000\n\u0000 \u0000 \u0000 \u0000 \u0000\"\u0000t\u0000y\u0000p\u0000e\u0000\"\u0000:\u0000 \u0000\"\u0000f\u0000i\u0000l\u0000e\u0000\"\u0000,\u0000\r\u0000\n\u0000 \u0000 \u0000 \u0000 \u0000\"\u0000n\u0000a\u0000m\u0000e\u0000\"\u0000:\u0000 \u0000\"\u0000.\u0000d\u0000o\u0000c\u0000k\u0000e\u0000r\u0000i\u0000g\u0000n\u0000o\u0000r\u0000e\u0000\"\u0000,\u0000\r\u0000\n\u0000 \u0000 \u0000 \u0000 \u0000\"\u0000p\u0000a\u0000t\u0000h\u0000\"\u0000:\u0000 \u0000\"\u0000C\u0000:\u0000\\\u0000\\\u0000U\u0000s\u0000e\u0000…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/final-status.js",
@@ -4579,7 +4729,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4592,12 +4742,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (final-status.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/final-status.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/final-verification.js",
@@ -4605,7 +4760,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4618,12 +4773,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (final-verification.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/final-verification.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/fix-matches-timestamps.sql",
@@ -4631,7 +4791,7 @@
       "asset_role": "DATABASE_DEFINITION",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4644,12 +4804,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare with current non-archive SQL migrations/rulebook set and validate schema compatibility; confirm historical-only retention.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived SQL statements for database schema/compatibility diagnostics (fix-matches-timestamps.sql).",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/fix-matches-timestamps.sql",
+        "Content skim: -- Fix the matches JSONB to have proper time fields\r\nUPDATE predictions_final \r\nSET matches = jsonb_build_object(\r\n    'match_id', (matches->>'match_id')::text,…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/fix-sport-filter.js",
@@ -4657,7 +4824,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4670,12 +4837,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (fix-sport-filter.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/fix-sport-filter.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/fix-tier-rules.js",
@@ -4683,7 +4855,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4696,12 +4868,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (fix-tier-rules.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/fix-tier-rules.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst pool = new Pool…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/fix-view.js",
@@ -4709,7 +4886,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4722,12 +4899,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (fix-view.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/fix-view.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/fix-view.sql",
@@ -4735,7 +4917,7 @@
       "asset_role": "DATABASE_DEFINITION",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4748,12 +4930,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare with current non-archive SQL migrations/rulebook set and validate schema compatibility; confirm historical-only retention.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived SQL statements for database schema/compatibility diagnostics (fix-view.sql).",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/fix-view.sql",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/full-nuke.js",
@@ -4761,7 +4950,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4774,12 +4963,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (full-nuke.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/full-nuke.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/migration2-fix.js",
@@ -4787,7 +4981,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4800,12 +4994,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (migration2-fix.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/migration2-fix.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/migration2-normalized-fixtures.js",
@@ -4813,7 +5012,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4826,12 +5025,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (migration2-normalized-fixtures.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/migration2-normalized-fixtures.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/migration2-v2.js",
@@ -4839,7 +5043,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4852,12 +5056,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (migration2-v2.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/migration2-v2.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/migration2-v3.js",
@@ -4865,7 +5074,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4878,12 +5087,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (migration2-v3.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/migration2-v3.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/normalize-sports.sql",
@@ -4891,7 +5105,7 @@
       "asset_role": "DATABASE_DEFINITION",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4904,12 +5118,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare with current non-archive SQL migrations/rulebook set and validate schema compatibility; confirm historical-only retention.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived SQL statements for database schema/compatibility diagnostics (normalize-sports.sql).",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/normalize-sports.sql",
+        "Content skim: -- Normalize sport names to match frontend expectations\r\nUPDATE predictions_final \r\nSET sport = 'basketball'\r\nWHERE sport IN ('nba', 'basketball_nba');\r\n\r\nUPDAT…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/patch-other-routes.js",
@@ -4917,7 +5138,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4930,12 +5151,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (patch-other-routes.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/patch-other-routes.js",
+        "Content skim: 'use strict';\r\n\r\n/**\r\n * PATCH SCRIPT: Add plan_visibility filtering to other routes\r\n */\r\n\r\nconst fs = require('fs');\r\nconst path = require('path');\r\n\r\nconst r…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/patch-predictions-visibility.js",
@@ -4943,7 +5169,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4956,12 +5182,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (patch-predictions-visibility.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/patch-predictions-visibility.js",
+        "Content skim: 'use strict';\r\n\r\n/**\r\n * PATCH SCRIPT: Add plan_visibility filtering to predictions.js\r\n * \r\n * This patch adds visibility filtering AFTER data is fetched,\r\n * …"
+      ]
     },
     {
       "asset_path": "_archive/scripts/phase1-immediate-patch.js",
@@ -4969,7 +5200,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -4982,12 +5213,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (phase1-immediate-patch.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/phase1-immediate-patch.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nlet connStr = process…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/phase1-patch.js",
@@ -4995,7 +5231,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -5008,12 +5244,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (phase1-patch.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/phase1-patch.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/phase2-schema-refactor.js",
@@ -5021,7 +5262,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -5034,12 +5275,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (phase2-schema-refactor.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/phase2-schema-refactor.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/phase3-cleanup.js",
@@ -5047,7 +5293,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -5060,12 +5306,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (phase3-cleanup.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/phase3-cleanup.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/sql/create_event_context_tables.sql",
@@ -5073,7 +5324,7 @@
       "asset_role": "DATABASE_DEFINITION",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -5086,12 +5337,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare with current non-archive SQL migrations/rulebook set and validate schema compatibility; confirm historical-only retention.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived SQL statements for database schema/compatibility diagnostics (create_event_context_tables.sql).",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/sql/create_event_context_tables.sql",
+        "Content skim: CREATE TABLE IF NOT EXISTS public.event_injury_snapshots (\r\n    id BIGSERIAL PRIMARY KEY,\r\n    event_id TEXT NOT NULL,\r\n    sport TEXT NOT NULL,\r\n    fixture_pr…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/sql/create_prediction_publish_runs.sql",
@@ -5099,7 +5357,7 @@
       "asset_role": "DATABASE_DEFINITION",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -5112,12 +5370,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare with current non-archive SQL migrations/rulebook set and validate schema compatibility; confirm historical-only retention.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived SQL statements for database schema/compatibility diagnostics (create_prediction_publish_runs.sql).",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/sql/create_prediction_publish_runs.sql",
+        "Content skim: CREATE TABLE IF NOT EXISTS public.prediction_publish_runs (\r\n    id BIGSERIAL PRIMARY KEY,\r\n    trigger_source TEXT NOT NULL DEFAULT 'manual',\r\n    requested_sp…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/sql/create_predictions_accuracy.sql",
@@ -5125,7 +5390,7 @@
       "asset_role": "DATABASE_DEFINITION",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -5138,12 +5403,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare with current non-archive SQL migrations/rulebook set and validate schema compatibility; confirm historical-only retention.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived SQL statements for database schema/compatibility diagnostics (create_predictions_accuracy.sql).",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "SQL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/sql/create_predictions_accuracy.sql",
+        "Content skim: CREATE TABLE IF NOT EXISTS public.predictions_accuracy (\r\n    id BIGSERIAL PRIMARY KEY,\r\n    prediction_final_id BIGINT NOT NULL REFERENCES public.predictions_f…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/test-scheduler-endpoint.sh",
@@ -5151,7 +5423,7 @@
       "asset_role": "UNCLASSIFIED_ASSET_ROLE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -5164,12 +5436,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (test-scheduler-endpoint.sh).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/test-scheduler-endpoint.sh",
+        "Content skim: #!/bin/bash\r\n\r\n# Test script for SKCS scheduler endpoints\r\n# This script validates the idempotency and conflict resolution features\r\n\r\nset -e\r\n\r\n# Configuration…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/test_math.js",
@@ -5177,7 +5454,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -5190,12 +5467,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (test_math.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/test_math.js",
+        "Content skim: Skim unavailable"
+      ]
     },
     {
       "asset_path": "_archive/scripts/trigger-grade.js",
@@ -5203,7 +5485,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -5216,12 +5498,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (trigger-grade.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/trigger-grade.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config();\r\n\r\nfunction parseArgs(argv) {\r\n    const args = {};\r\n\r\n    for (const arg of argv) {\r\n        if (!arg.startsWith('…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/trigger-refresh.js",
@@ -5229,7 +5516,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -5242,12 +5529,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (trigger-refresh.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/trigger-refresh.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config();\r\n\r\nfunction parseArgs(argv) {\r\n    const args = {};\r\n\r\n    for (const arg of argv) {\r\n        if (!arg.startsWith('…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/trigger-render-pipeline.js",
@@ -5255,7 +5547,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -5268,12 +5560,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (trigger-render-pipeline.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/trigger-render-pipeline.js",
+        "Content skim: 'use strict';\r\n\r\nconst https = require('https');\r\n\r\nfunction makeRequest(hostname, path, method = 'GET', body = null, auth = null) {\r\n    return new Promise((re…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/verify-deployment.sh",
@@ -5281,7 +5578,7 @@
       "asset_role": "UNCLASSIFIED_ASSET_ROLE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -5294,12 +5591,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (verify-deployment.sh).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/verify-deployment.sh",
+        "Content skim: #!/bin/bash\r\n\r\necho \"🔍 SKCS Deployment Verification Script\"\r\necho \"======================================\"\r\n\r\n# Test 1: Backend CORS Preflight\r\necho \"\"\r\necho \"…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/verify-predictions.js",
@@ -5307,7 +5609,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -5320,12 +5622,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (verify-predictions.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/verify-predictions.js",
+        "Content skim: require('dotenv').config();\r\nconst { pool } = require('../backend/database');\r\n(async () => {\r\n  const r = await pool.query(\"SELECT tier, type, sport, market_ty…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/verify-route-patches.js",
@@ -5333,7 +5640,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -5346,12 +5653,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (verify-route-patches.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/verify-route-patches.js",
+        "Content skim: 'use strict';\r\n\r\nconst fs = require('fs');\r\nconst path = require('path');\r\n\r\nconst routesDir = path.join(__dirname, '..', 'backend', 'routes');\r\n\r\nconsole.log('…"
+      ]
     },
     {
       "asset_path": "_archive/scripts/wipe-events-data.js",
@@ -5359,7 +5671,7 @@
       "asset_role": "APPLICATION_SOURCE",
       "source_state": "COMMITTED_REPOSITORY",
       "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
+      "current_state": "STALE_OR_SUPERSEDED",
       "owner_project_id": "UNRESOLVED",
       "governed_by_control_task_id": "EPR-001",
       "related_assets": [],
@@ -5372,12 +5684,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (wipe-events-data.js).",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Path under _archive/: _archive/scripts/wipe-events-data.js",
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce…"
+      ]
     },
     {
       "asset_path": "api/pipeline/run-full.js",
