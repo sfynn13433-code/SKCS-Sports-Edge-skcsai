@@ -1468,12 +1468,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: column_dependency_matrix.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: column_dependency_matrix.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: contains audit-style sections/headings for evidence capture.",
+        "Fast skim: contains governance/policy references."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/audit/cron_provider_runtime_map.md",
@@ -1494,12 +1503,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: cron_provider_runtime_map.md is a DOCUMENTATION_KNOWLEDGE artifact for runtime consumer/dependency audit.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: cron_provider_runtime_map.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: markdown text/doc headings used for governance navigation."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/audit/gap_report.md",
@@ -1520,12 +1535,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: gap_report.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: gap_report.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: contains audit-style sections/headings for evidence capture.",
+        "Fast skim: contains governance/policy references.",
+        "Fast skim: contains verification/validation language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/audit/knowledge_layer_completeness_audit.md",
@@ -1546,12 +1571,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: knowledge_layer_completeness_audit.md is a DOCUMENTATION_KNOWLEDGE artifact for audit evidence and review findings.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: knowledge_layer_completeness_audit.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: contains audit-style sections/headings for evidence capture.",
+        "Fast skim: contains governance/policy references.",
+        "Fast skim: contains verification/validation language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/audit/migration_history.md",
@@ -1572,12 +1607,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: migration_history.md is a DOCUMENTATION_KNOWLEDGE artifact for migration history/trace analysis.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: migration_history.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: markdown text/doc headings used for governance navigation."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/audit/observability_registry.md",
@@ -1598,12 +1638,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: observability_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: observability_registry.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: contains audit-style sections/headings for evidence capture.",
+        "Fast skim: contains verification/validation language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/audit/prediction_dependency_audit.md",
@@ -1624,12 +1673,20 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: prediction_dependency_audit.md is a DOCUMENTATION_KNOWLEDGE artifact for audit evidence and review findings.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: prediction_dependency_audit.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: contains audit-style sections/headings for evidence capture."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/audit/runtime_consumer_audit.md",
@@ -1650,12 +1707,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: runtime_consumer_audit.md is a DOCUMENTATION_KNOWLEDGE artifact for runtime consumer/dependency audit.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: runtime_consumer_audit.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: contains audit-style sections/headings for evidence capture.",
+        "Fast skim: contains governance/policy references."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/audit/runtime_consumer_audit_v2.md",
@@ -1676,12 +1742,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: runtime_consumer_audit_v2.md is a DOCUMENTATION_KNOWLEDGE artifact for runtime consumer/dependency audit.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: runtime_consumer_audit_v2.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: contains audit-style sections/headings for evidence capture.",
+        "Fast skim: contains governance/policy references."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/audit/schema_drift_log.md",
@@ -1702,12 +1777,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: schema_drift_log.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: schema_drift_log.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: markdown text/doc headings used for governance navigation."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/audit/technical_debt.md",
@@ -1728,12 +1808,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: technical_debt.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: technical_debt.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: markdown text/doc headings used for governance navigation."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/audit/undocumented_assets.md",
@@ -1754,12 +1840,17 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: undocumented_assets.md is a DOCUMENTATION_KNOWLEDGE artifact for documentation gap analysis.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION"
+      ],
+      "classification_evidence": [
+        "Fast skim: undocumented_assets.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: markdown text/doc headings used for governance navigation."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/audit/verification_runtime_audit.md",
@@ -1780,12 +1871,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: verification_runtime_audit.md is a DOCUMENTATION_KNOWLEDGE artifact for runtime consumer/dependency audit.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: verification_runtime_audit.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: contains audit-style sections/headings for evidence capture.",
+        "Fast skim: contains verification/validation language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/governance/ai_usage_policy.md",
@@ -1806,12 +1906,18 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: ai_usage_policy.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Fast skim: ai_usage_policy.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: markdown text/doc headings used for governance navigation."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/governance/bigballs_evaluation_focus.md",
@@ -1832,12 +1938,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bigballs_evaluation_focus.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "SECURITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: bigballs_evaluation_focus.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: contains audit-style sections/headings for evidence capture.",
+        "Fast skim: contains governance/policy references.",
+        "Fast skim: contains verification/validation language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/governance/bsd_governance_hold.md",
@@ -1858,12 +1974,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bsd_governance_hold.md is a DOCUMENTATION_KNOWLEDGE artifact for governance policy guidance.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: bsd_governance_hold.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: contains audit-style sections/headings for evidence capture.",
+        "Fast skim: contains governance/policy references.",
+        "Fast skim: contains verification/validation language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/governance/bsd_provider_suitability_scorecard.md",
@@ -1884,12 +2010,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: bsd_provider_suitability_scorecard.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: bsd_provider_suitability_scorecard.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: contains audit-style sections/headings for evidence capture.",
+        "Fast skim: contains governance/policy references."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/governance/documentation_policy.md",
@@ -1910,12 +2045,19 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: documentation_policy.md is a DOCUMENTATION_KNOWLEDGE artifact for documentation gap analysis.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Fast skim: documentation_policy.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: contains audit-style sections/headings for evidence capture."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/governance/feature_risk_registry.md",
@@ -1936,12 +2078,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: feature_risk_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Fast skim: feature_risk_registry.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: contains audit-style sections/headings for evidence capture.",
+        "Fast skim: contains governance/policy references.",
+        "Fast skim: contains verification/validation language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/governance/naming_standards.md",
@@ -1962,12 +2113,21 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: naming_standards.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: naming_standards.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: contains audit-style sections/headings for evidence capture.",
+        "Fast skim: contains governance/policy references."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/governance/provider_scorecard_bsd.md",
@@ -1988,12 +2148,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: provider_scorecard_bsd.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: provider_scorecard_bsd.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: contains audit-style sections/headings for evidence capture.",
+        "Fast skim: contains governance/policy references.",
+        "Fast skim: contains verification/validation language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/governance/verification_layer_spec.md",
@@ -2014,12 +2184,22 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Rough classification: verification_layer_spec.md is a DOCUMENTATION_KNOWLEDGE artifact for verification-layer instructions.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "AUDIT",
+        "GOVERNANCE",
+        "OBSERVABILITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: verification_layer_spec.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.",
+        "Fast skim: contains audit-style sections/headings for evidence capture.",
+        "Fast skim: contains governance/policy references.",
+        "Fast skim: contains verification/validation language."
+      ]
     },
     {
       "asset_path": "SKCS-KNOWLEDGE/knowledge/api_registry.md",
