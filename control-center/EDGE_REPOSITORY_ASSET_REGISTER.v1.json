@@ -7188,7 +7188,7 @@
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
       "purpose_description": "Python dependency list for backend scripts that populate/sync sports data.",
-      "functional_group": "CONFIGURATION",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
       "relationship_tags": [
         "CONFIGURATION"
       ],
