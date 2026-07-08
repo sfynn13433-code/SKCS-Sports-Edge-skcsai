@@ -15545,10 +15545,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/_check-final-table.js",
@@ -15571,10 +15578,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/_check-match-dates.js",
@@ -15597,10 +15611,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/_check-plan-visibility.js",
@@ -15623,10 +15644,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/_check-team-locks.js",
@@ -15649,10 +15677,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/_check-tier.js",
@@ -15675,10 +15710,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/_local-rebuild.js",
@@ -17005,10 +17047,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-accuracy-schema.js",
@@ -17031,10 +17081,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-accuracy-time.js",
@@ -17057,10 +17115,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-all-fixtures.js",
@@ -17083,10 +17149,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-cache-schema.js",
@@ -17109,10 +17182,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-cache.js",
@@ -17135,10 +17216,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-canonical-events-schema.js",
@@ -17161,10 +17250,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-cricket-rows.js",
@@ -17187,10 +17283,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-db-schema.js",
@@ -17213,10 +17316,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-events-schema.js",
@@ -17239,10 +17349,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-events-status.js",
@@ -17265,10 +17383,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-events.js",
@@ -17291,10 +17417,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-filtered-schema.js",
@@ -17317,10 +17451,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-final-table-columns.js",
@@ -17343,10 +17485,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-final-table-schema.js",
@@ -17369,10 +17518,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-fixtures-structure.js",
@@ -17395,10 +17551,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-french-league.js",
@@ -17421,10 +17584,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "PROVIDER",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Performs external HTTP/API calls (or checks for such calls).",
+        "Emits console output for validation/audit visibility."
+      ]
     },
     {
       "asset_path": "scripts/check-graded.js",
@@ -17447,10 +17616,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-match-details.js",
@@ -17473,10 +17650,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-match-id-mapping.js",
@@ -17499,10 +17683,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-match-prediction.js",
@@ -17525,10 +17716,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-old-events.js",
@@ -17551,10 +17749,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-predictions.js",
@@ -17577,10 +17783,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-publication-state.js",
@@ -17603,10 +17817,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-raw-json.js",
@@ -17629,10 +17851,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-raw-prediction-structure.js",
@@ -17655,10 +17884,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-scheduler-schema.js",
@@ -17681,10 +17917,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-schema.js",
@@ -17707,10 +17951,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-stages-schema.js",
@@ -17733,10 +17985,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-supabase-vs-pg-tiers.js",
@@ -17759,10 +18019,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "DATABASE",
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Uses Supabase client / table query patterns.",
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility."
+      ]
     },
     {
       "asset_path": "scripts/check-tables.js",
@@ -17785,10 +18054,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/check-timestamp-cols.js",
@@ -17811,10 +18088,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Database/DB-schema/fixture validation script for controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/cleanup-competition-allowlists.js",
@@ -19465,10 +19750,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Migration/schema visibility check for governed Edge assets.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/normalize-frontend-sports.js",
@@ -20167,10 +20460,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Validation/audit utility script for Edge controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "DATABASE",
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Uses Supabase client / table query patterns.",
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility."
+      ]
     },
     {
       "asset_path": "scripts/secondary-market-gatekeeper.js",
@@ -20224,10 +20526,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Setup/config utility for database access control (RLS) or fixtures.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/simple-sync.js",
@@ -20458,10 +20768,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Validation/audit utility script for Edge controlled assets.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/test-ai-predictions-542703.js",
@@ -21966,10 +22283,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Verification script for governed data structures and publication readiness.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/validate-keys.js",
@@ -21992,10 +22316,20 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Verification script for governed data structures and publication readiness.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "DATABASE",
+        "SQL",
+        "PROVIDER",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Uses Supabase client / table query patterns.",
+        "Performs external HTTP/API calls (or checks for such calls).",
+        "Contains SQL-like query execution or query string patterns."
+      ]
     },
     {
       "asset_path": "scripts/validate-relational-migration.js",
@@ -22018,10 +22352,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Migration/schema visibility check for governed Edge assets.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/verify-acca-legs.js",
@@ -22044,10 +22385,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Verification script for governed data structures and publication readiness.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/verify-accas.js",
@@ -22070,10 +22419,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Verification script for governed data structures and publication readiness.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/verify-bigballs-provider.js",
@@ -22096,10 +22453,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Verification script for governed data structures and publication readiness.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Emits console output for validation/audit visibility."
+      ]
     },
     {
       "asset_path": "scripts/verify-bsd-crosswalk.js",
@@ -22122,10 +22483,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Verification script for governed data structures and publication readiness.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Emits console output for validation/audit visibility."
+      ]
     },
     {
       "asset_path": "scripts/verify-bsd-enrichment.js",
@@ -22148,10 +22514,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Verification script for governed data structures and publication readiness.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/verify-bsd-provider.js",
@@ -22174,10 +22545,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Verification script for governed data structures and publication readiness.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Emits console output for validation/audit visibility."
+      ]
     },
     {
       "asset_path": "scripts/verify-db-rule-alignment.js",
@@ -22200,10 +22575,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Verification script for governed data structures and publication readiness.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/verify-end-to-end-loop.js",
@@ -22226,10 +22609,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Verification script for governed data structures and publication readiness.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/verify-master-rulebook-alignment.js",
@@ -22252,10 +22642,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Verification script for governed data structures and publication readiness.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Uses Supabase client / table query patterns.",
+        "Emits console output for validation/audit visibility.",
+        "Performs schema/migration/row-level checks visible in content."
+      ]
     },
     {
       "asset_path": "scripts/verify-new-predictions.js",
@@ -22278,10 +22675,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Verification script for governed data structures and publication readiness.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "DATABASE",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Uses Supabase client / table query patterns.",
+        "Emits console output for validation/audit visibility."
+      ]
     },
     {
       "asset_path": "scripts/verify-soccerdata-provider.js",
@@ -22304,10 +22708,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Verification script for governed data structures and publication readiness.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "PROVIDER",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Performs external HTTP/API calls (or checks for such calls).",
+        "Emits console output for validation/audit visibility."
+      ]
     },
     {
       "asset_path": "scripts/verify-sportsdb-coverage.js",
@@ -22330,10 +22741,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Verification script for governed data structures and publication readiness.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "PROVIDER",
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Performs external HTTP/API calls (or checks for such calls).",
+        "Emits console output for validation/audit visibility."
+      ]
     },
     {
       "asset_path": "scripts/verify-vercel-build.js",
@@ -22356,10 +22774,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Verification script for governed data structures and publication readiness.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "RUNTIME",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Emits console output for validation/audit visibility."
+      ]
     },
     {
       "asset_path": "scripts/verify_dom_structure.js",
@@ -22382,10 +22805,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "",
-      "functional_group": "",
-      "relationship_tags": [],
-      "classification_evidence": []
+      "purpose_description": "Verification script for governed data structures and publication readiness.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SQL",
+        "SCRIPT_TOOL"
+      ],
+      "classification_evidence": [
+        "Contains SQL-like query execution or query string patterns.",
+        "Emits console output for validation/audit visibility."
+      ]
     },
     {
       "asset_path": "scripts/wake-and-sync.js",
