@@ -166,6 +166,9 @@ const EPR_IMPLEMENTATION_PATHS = new Set([
   "tests/edge-repository-asset-register.test.js",
 ]);
 
+const EDGE_GOV_POLICY_PATH =
+  "SKCS-KNOWLEDGE/governance/edge_asset_work_sequence_policy.md";
+
 const EAC_IMPLEMENTATION_PATHS = new Set([
   "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
   "control-center/EDGE_ASSET_REPOSITORY_MAP.md",
@@ -902,6 +905,66 @@ function validateRegister(register, options = {}) {
 
     if (Array.isArray(asset.known_conflicts) && asset.known_conflicts.length > 0) {
       warnings.push(`CONFLICT_FINDING: ${assetPath}`);
+    }
+  }
+
+  const edgeGovPolicyAsset = assets.find(
+    (asset) => normalizePath(asset.asset_path) === EDGE_GOV_POLICY_PATH
+  );
+  if (!edgeGovPolicyAsset) {
+    errors.push(`POLICY_ASSET_MISSING: ${EDGE_GOV_POLICY_PATH}`);
+  } else {
+    if (edgeGovPolicyAsset.owner_project_id !== "EDGE-GOV-001") {
+      errors.push(
+        `POLICY_OWNER_PROJECT_UNKNOWN: ${EDGE_GOV_POLICY_PATH} ${edgeGovPolicyAsset.owner_project_id}`
+      );
+    }
+    if (edgeGovPolicyAsset.governed_by_control_task_id !== "EDGE-GOV-001") {
+      errors.push(
+        `POLICY_CONTROL_TASK_UNKNOWN: ${EDGE_GOV_POLICY_PATH} ${edgeGovPolicyAsset.governed_by_control_task_id}`
+      );
+    }
+
+    const policyText = fs.readFileSync(
+      path.join(ROOT, EDGE_GOV_POLICY_PATH),
+      "utf8"
+    );
+    const requiredSequence = [
+      "CLASSIFY",
+      "CLASSIFICATION CLOSURE",
+      "FINDING REVIEW",
+      "SEPARATE APPROVED MINI-PROJECT",
+      "INSPECT",
+      "REPAIR ONLY IF PROVED",
+      "VALIDATE",
+      "FORMAL CLOSE",
+    ];
+    let cursor = 0;
+    for (const step of requiredSequence) {
+      const nextIndex = policyText.indexOf(step, cursor);
+      if (nextIndex < 0) {
+        errors.push(`POLICY_SEQUENCE_MISSING: ${EDGE_GOV_POLICY_PATH} ${step}`);
+        break;
+      }
+      cursor = nextIndex + step.length;
+    }
+    if (!policyText.includes("Policy ID: EDGE-GOV-001")) {
+      errors.push(`POLICY_ID_MISSING: ${EDGE_GOV_POLICY_PATH}`);
+    }
+    if (!policyText.includes("Policy title: Edge Asset Work Sequence Policy")) {
+      errors.push(`POLICY_TITLE_MISSING: ${EDGE_GOV_POLICY_PATH}`);
+    }
+    if (!policyText.includes("A finding does not automatically become repair work.")) {
+      errors.push(`POLICY_RULE_MISSING: ${EDGE_GOV_POLICY_PATH} finding-to-repair separation`);
+    }
+    if (!policyText.includes("Only one approved mini-project may be active at a time.")) {
+      errors.push(`POLICY_RULE_MISSING: ${EDGE_GOV_POLICY_PATH} one-active-mini-project`);
+    }
+    if (!policyText.includes("Inspect before change.")) {
+      errors.push(`POLICY_RULE_MISSING: ${EDGE_GOV_POLICY_PATH} inspect-before-change`);
+    }
+    if (!policyText.includes("Canonical Control Center next_action controls work sequence")) {
+      errors.push(`POLICY_RULE_MISSING: ${EDGE_GOV_POLICY_PATH} next_action sequencing`);
     }
   }
 

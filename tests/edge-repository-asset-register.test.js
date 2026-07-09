@@ -20,6 +20,9 @@ const {
 } = require("../control-center/check_edge_repository_asset_register.js");
 
 const LEDGER = require("../control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json");
+const path = require("path");
+const EDGE_GOV_POLICY_PATH =
+  "SKCS-KNOWLEDGE/governance/edge_asset_work_sequence_policy.md";
 
 describe("Edge Repository Asset Register v1", () => {
   it("asset register exists", () => {
@@ -348,6 +351,69 @@ describe("Edge Repository Asset Register v1", () => {
 
     assert.deepEqual(result.errors, []);
     assert.equal(result.passed, true);
+  });
+
+  it("EDGE-GOV-001 policy asset is registered and governed", () => {
+    const register = loadAssetRegister();
+    const asset = register.assets.find(
+      (a) => a.asset_path === EDGE_GOV_POLICY_PATH
+    );
+
+    assert.ok(asset, "EDGE-GOV-001 policy asset must be registered");
+    assert.equal(asset.owner_project_id, "EDGE-GOV-001");
+    assert.equal(asset.governed_by_control_task_id, "EDGE-GOV-001");
+    assert.equal(asset.asset_type, "DOCUMENTATION");
+    assert.equal(asset.asset_role, "DOCUMENTATION");
+    assert.equal(asset.validation_status, "REGISTERED");
+  });
+
+  it("EDGE-GOV-001 policy text encodes the governed work sequence and rules", () => {
+    const policy = fs.readFileSync(
+      path.join(__dirname, "..", EDGE_GOV_POLICY_PATH),
+      "utf8"
+    );
+
+    const sequence = [
+      "CLASSIFY",
+      "CLASSIFICATION CLOSURE",
+      "FINDING REVIEW",
+      "SEPARATE APPROVED MINI-PROJECT",
+      "INSPECT",
+      "REPAIR ONLY IF PROVED",
+      "VALIDATE",
+      "FORMAL CLOSE",
+    ];
+
+    let cursor = 0;
+    for (const step of sequence) {
+      const nextIndex = policy.indexOf(step, cursor);
+      assert.ok(nextIndex >= cursor, `${step} missing or out of order`);
+      cursor = nextIndex + step.length;
+    }
+
+    assert.match(policy, /Policy ID:\s*EDGE-GOV-001/);
+    assert.match(policy, /Policy title:\s*Edge Asset Work Sequence Policy/);
+    assert.match(policy, /A finding does not automatically become repair work\./);
+    assert.match(policy, /Only one approved mini-project may be active at a time\./);
+    assert.match(policy, /Canonical Control Center next_action controls work sequence/);
+  });
+
+  it("EDGE-GOV-001 drift fails closed when the policy asset is missing", () => {
+    const register = structuredClone(loadAssetRegister());
+    register.assets = register.assets.filter(
+      (a) => a.asset_path !== EDGE_GOV_POLICY_PATH
+    );
+    register.registered_asset_count = register.assets.length;
+
+    const result = validateRegister(register);
+
+    assert.equal(result.passed, false);
+    assert.ok(
+      result.errors.some((e) =>
+        e.startsWith(`POLICY_ASSET_MISSING: ${EDGE_GOV_POLICY_PATH}`)
+      ),
+      result.errors.join("; ")
+    );
   });
 
   it("workspace candidate snapshot covers current git discovery", () => {

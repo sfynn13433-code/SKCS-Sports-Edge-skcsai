@@ -129,6 +129,51 @@
       "last_updated": "2026-07-05"
     },
     {
+      "task_id": "EDGE-GOV-001",
+      "task_name": "Edge Asset Work Sequence Policy",
+      "workstream": "Control Center",
+      "description": "Create and enforce the governed Edge asset work sequence policy so classification, inspection, repair, validation, and close-out remain ordered and separately governed.",
+      "status": "IN_PROGRESS",
+      "priority": "critical",
+      "blocked_by": [
+        "EPR-001"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "control-center"
+      ],
+      "related_contracts": [
+        "SKCS-KNOWLEDGE/governance/edge_asset_work_sequence_policy.md"
+      ],
+      "affected_files": [
+        "SKCS-KNOWLEDGE/governance/edge_asset_work_sequence_policy.md",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
+        "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
+        "control-center/check_edge_repository_asset_register.js",
+        "tests/edge-repository-asset-register.test.js"
+      ],
+      "affected_tables": [],
+      "completion_definition": "The Edge Asset Work Sequence Policy exists, is registered in the canonical ledger and master project register, is governed as an asset, and the repository asset register checker and tests fail closed when the policy asset or ordered work sequence law is missing or drifted.",
+      "proof_required": [
+        "Policy document exists at the governed policy path",
+        "Policy asset is registered in the repository asset register",
+        "Ledger and project register include EDGE-GOV-001",
+        "Repository asset register checker enforces the policy asset and ordered work sequence law",
+        "Focused repository asset register tests pass"
+      ],
+      "current_evidence": [
+        "Governance policy sequence defined",
+        "Inspection-before-repair law stated",
+        "One-active-mini-project law stated"
+      ],
+      "open_gaps": [],
+      "next_action": "Validate the policy asset registration and checker enforcement, then formally close EDGE-GOV-001 when the focused tests pass.",
+      "owner_note": "Governed sequencing policy for later inspection and repair work.",
+      "last_updated": "2026-07-09"
+    },
+    {
       "task_id": "ESA-001",
       "task_name": "Edge System and Runtime Inventory",
       "workstream": "Architecture Foundation",

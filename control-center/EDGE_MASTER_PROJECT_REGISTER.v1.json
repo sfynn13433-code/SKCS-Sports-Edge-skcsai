@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 18,
+  "project_count": 19,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -130,6 +130,57 @@
         "EPR-001 scope-resolution inspection completed",
         "Two-register model (Master Project Register + Repository Asset Register) approved",
         "Repository asset universe coverage law approved"
+      ]
+    },
+    {
+      "project_id": "EDGE-GOV-001",
+      "project_name": "Edge Asset Work Sequence Policy",
+      "category": "Control Center",
+      "description": "Create and enforce the governed Edge asset work sequence policy so classification, inspection, repair, validation, and close-out remain ordered and separately governed.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
+      "current_status": "IN_PROGRESS",
+      "priority": "critical",
+      "blocked_by": [
+        "EPR-001"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "control-center"
+      ],
+      "related_tasks": [
+        "EDGE-GOV-001"
+      ],
+      "related_contracts": [
+        "SKCS-KNOWLEDGE/governance/edge_asset_work_sequence_policy.md"
+      ],
+      "related_files": [
+        "SKCS-KNOWLEDGE/governance/edge_asset_work_sequence_policy.md"
+      ],
+      "related_tables": [],
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "The Edge Asset Work Sequence Policy exists, is registered in the canonical ledger and master project register, is governed as an asset, and the repository asset register checker and tests fail closed when the policy asset or ordered work sequence law is missing or drifted.",
+      "proof_required": [
+        "Policy document exists at the governed policy path",
+        "Policy asset is registered in the repository asset register",
+        "Ledger and project register include EDGE-GOV-001",
+        "Repository asset register checker enforces the policy asset and ordered work sequence law",
+        "Focused repository asset register tests pass"
+      ],
+      "risks_if_ignored": [
+        "Hidden governance work",
+        "Control Center sequencing bypass"
+      ],
+      "recommended_order": 3,
+      "next_action": "Validate the policy asset registration and checker enforcement, then formally close EDGE-GOV-001 when the focused tests pass.",
+      "owner_note": "Governed sequencing policy for later inspection and repair work.",
+      "last_updated": "2026-07-09",
+      "governed_by_control_task_id": "EDGE-GOV-001",
+      "current_evidence": [
+        "Governance policy sequence defined",
+        "Inspection-before-repair law stated",
+        "One-active-mini-project law stated"
       ]
     },
     {
