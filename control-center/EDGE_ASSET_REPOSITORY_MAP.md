@@ -1,10 +1,10 @@
 # EDGE ASSET REPOSITORY MAP
 EAC_PROJECT_ID: EAC-001
 MANIFEST_SCHEMA_VERSION: 1.0.0
-TOTAL_GOVERNED_ASSETS: 912
-TOTAL_BATCHED_ASSETS: 912
+TOTAL_GOVERNED_ASSETS: 913
+TOTAL_BATCHED_ASSETS: 913
 FULLY_CLASSIFIED_ASSETS: 0
-CLASSIFICATION_PENDING_ASSETS: 912
+CLASSIFICATION_PENDING_ASSETS: 913
 CLOSURE_READY: NO
 
 CURRENT_STATE_COUNTS
@@ -13,13 +13,13 @@ CURRENT_STATE_COUNTS
 - LEGACY: 0
 - HISTORICAL_EVIDENCE: 0
 - STALE_OR_SUPERSEDED: 61
-- UNKNOWN: 839
+- UNKNOWN: 840
 - GENERATED: 0
 
 FUNCTIONAL_GROUP_COUNTS
 - SCRIPT_TOOL: 173
 - PROVIDER_INTEGRATION: 118
-- DOCUMENTATION_KNOWLEDGE: 99
+- DOCUMENTATION_KNOWLEDGE: 100
 - TEST_PROOF: 92
 - DATABASE_MIGRATION: 84
 - FRONTEND_UI: 58
@@ -46,14 +46,14 @@ RELATIONSHIP_TAG_COUNTS
 - DATABASE: 221
 - PROVIDER: 197
 - API: 170
-- DOCUMENTATION: 134
-- GOVERNANCE: 133
+- DOCUMENTATION: 135
+- GOVERNANCE: 134
 - OBSERVABILITY: 97
 - PREDICTION: 91
 - UI: 91
 - TEST_PROOF: 90
 - MIGRATION: 87
-- AUDIT: 76
+- AUDIT: 77
 - ROUTE: 66
 - GENERATED: 63
 - DEPLOYMENT: 58
@@ -70,7 +70,7 @@ RELATIONSHIP_TAG_COUNTS
 - SUBSCRIBER: 4
 - CONTROLLER: 2
 
-NEXT_VALIDATION_NON_EMPTY_ASSETS: 912
+NEXT_VALIDATION_NON_EMPTY_ASSETS: 913
 
 BATCH_COMPLETION_SUMMARY
 - B01 | CONTROL_CENTER | ASSET_COUNT=15 | CLASSIFIED=0 | PENDING=15
@@ -90,7 +90,7 @@ BATCH_COMPLETION_SUMMARY
 - B15 | SCRIPTS_MAINT_FIX_CLEANUP_MIGRATE | ASSET_COUNT=52 | CLASSIFIED=0 | PENDING=52
 - B16 | DOCS_ROOT_MD_TXT | ASSET_COUNT=36 | CLASSIFIED=0 | PENDING=36
 - B17 | DOCS_DIR | ASSET_COUNT=24 | CLASSIFIED=0 | PENDING=24
-- B18 | SKCS_KNOWLEDGE_GOV_AND_AUDIT | ASSET_COUNT=22 | CLASSIFIED=0 | PENDING=22
+- B18 | SKCS_KNOWLEDGE_GOV_AND_AUDIT | ASSET_COUNT=23 | CLASSIFIED=0 | PENDING=23
 - B19 | SKCS_KNOWLEDGE_KNOWLEDGE | ASSET_COUNT=17 | CLASSIFIED=0 | PENDING=17
 - B20 | SKCS_KNOWLEDGE_PROVIDERS | ASSET_COUNT=18 | CLASSIFIED=0 | PENDING=18
 - B21 | PUBLIC_UI | ASSET_COUNT=65 | CLASSIFIED=0 | PENDING=65
@@ -748,6 +748,7 @@ PER_ASSET_BY_BATCH
 | SKCS-KNOWLEDGE/governance/bsd_governance_hold.md | Rough classification: bsd_governance_hold.md is a DOCUMENTATION_KNOWLEDGE artifact for governance policy guidance. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","AUDIT","GOVERNANCE","OBSERVABILITY"] | ["Fast skim: bsd_governance_hold.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.","Fast skim: contains audit-style sections/headings for evidence capture.","Fast skim: contains governance/policy references.","Fast skim: contains verification/validation language."] | Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns. |
 | SKCS-KNOWLEDGE/governance/bsd_provider_suitability_scorecard.md | Rough classification: bsd_provider_suitability_scorecard.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","AUDIT","GOVERNANCE","OBSERVABILITY"] | ["Fast skim: bsd_provider_suitability_scorecard.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.","Fast skim: contains audit-style sections/headings for evidence capture.","Fast skim: contains governance/policy references."] | Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns. |
 | SKCS-KNOWLEDGE/governance/documentation_policy.md | Rough classification: documentation_policy.md is a DOCUMENTATION_KNOWLEDGE artifact for documentation gap analysis. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","AUDIT","GOVERNANCE"] | ["Fast skim: documentation_policy.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.","Fast skim: contains audit-style sections/headings for evidence capture."] | Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns. |
+| SKCS-KNOWLEDGE/governance/edge_asset_work_sequence_policy.md | Edge governance policy that orders classification, inspection, repair, validation, and formal close into one governed work sequence. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","AUDIT","GOVERNANCE"] | ["Fast skim: edge_asset_work_sequence_policy.md filename/content indicates a DOCUMENTATION_KNOWLEDGE governance-policy artifact.","Fast skim: contains ordered work-sequence law and explicit classification/repair separation rules."] | Inspect governance-policy enforcement and ensure the asset work sequence remains classification-only until formally closed. |
 | SKCS-KNOWLEDGE/governance/feature_risk_registry.md | Rough classification: feature_risk_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","AUDIT","GOVERNANCE"] | ["Fast skim: feature_risk_registry.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.","Fast skim: contains audit-style sections/headings for evidence capture.","Fast skim: contains governance/policy references.","Fast skim: contains verification/validation language."] | Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns. |
 | SKCS-KNOWLEDGE/governance/naming_standards.md | Rough classification: naming_standards.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","AUDIT","GOVERNANCE","OBSERVABILITY"] | ["Fast skim: naming_standards.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.","Fast skim: contains audit-style sections/headings for evidence capture.","Fast skim: contains governance/policy references."] | Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns. |
 | SKCS-KNOWLEDGE/governance/provider_scorecard_bsd.md | Rough classification: provider_scorecard_bsd.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts. | DOCUMENTATION_KNOWLEDGE | UNKNOWN | ["DOCUMENTATION","AUDIT","GOVERNANCE","OBSERVABILITY"] | ["Fast skim: provider_scorecard_bsd.md filename/content indicates a DOCUMENTATION_KNOWLEDGE audit/knowledge artifact.","Fast skim: contains audit-style sections/headings for evidence capture.","Fast skim: contains governance/policy references.","Fast skim: contains verification/validation language."] | Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns. |

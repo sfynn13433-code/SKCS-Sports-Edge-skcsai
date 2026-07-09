@@ -918,7 +918,7 @@
           "SKCS-KNOWLEDGE/audit/"
         ]
       },
-      "asset_count": 22,
+      "asset_count": 23,
       "asset_paths": [
         "SKCS-KNOWLEDGE/audit/column_dependency_matrix.md",
         "SKCS-KNOWLEDGE/audit/cron_provider_runtime_map.md",
@@ -940,6 +940,7 @@
         "SKCS-KNOWLEDGE/governance/documentation_policy.md",
         "SKCS-KNOWLEDGE/governance/feature_risk_registry.md",
         "SKCS-KNOWLEDGE/governance/naming_standards.md",
+        "SKCS-KNOWLEDGE/governance/edge_asset_work_sequence_policy.md",
         "SKCS-KNOWLEDGE/governance/provider_scorecard_bsd.md",
         "SKCS-KNOWLEDGE/governance/verification_layer_spec.md"
       ]
