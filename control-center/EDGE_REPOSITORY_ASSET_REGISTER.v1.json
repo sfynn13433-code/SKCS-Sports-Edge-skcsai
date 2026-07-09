@@ -37,7 +37,7 @@
       ],
       "classification_evidence": [
         "Path: .bat",
-        "Skim: @echo off\r\necho Starting SKCS EdgeMind Quant Engine...\r\necho.\r\n\r\n:: 1. Start the Dolphin 3B Server\r\n:: We force '-c 2048' to keep RAM usage low on your CPU\r\nstart \"Dolphin Server\" …"
+        "Skim: @echo off\r\necho Starting SKCS EdgeMind Quant Engine...\r\necho.\r\n\r\n:: 1. Start the Dolphin 3B Server\r\n:: We force '-c 2048' to keep RAM usage low on your CPU\r\nstart \"Dolphin Server\" ???"
       ]
     },
     {
@@ -69,7 +69,7 @@
       ],
       "classification_evidence": [
         "Path: .dockerignore",
-        "Skim: # Node artifacts\r\nnode_modules\r\nnpm-debug.log\r\n\r\n# Security: never copy local secrets\r\n.env\r\n*.env\r\n.env.local\r\n\r\n# Python cache and environments\r\n__pycache__/\r\n*.py[cod]\r\n*$py.cla…"
+        "Skim: # Node artifacts\r\nnode_modules\r\nnpm-debug.log\r\n\r\n# Security: never copy local secrets\r\n.env\r\n*.env\r\n.env.local\r\n\r\n# Python cache and environments\r\n__pycache__/\r\n*.py[cod]\r\n*$py.cla???"
       ]
     },
     {
@@ -101,7 +101,7 @@
       ],
       "classification_evidence": [
         "Path: .env.example",
-        "Skim: # SKCS AI - Sports Edge Platform\r\n# Copy this file to .env and fill in your values.\r\n# All keys marked (required) must be set or the server will not function correctly.\r\n\r\n# ──────…"
+        "Skim: # SKCS AI - Sports Edge Platform\r\n# Copy this file to .env and fill in your values.\r\n# All keys marked (required) must be set or the server will not function correctly.\r\n\r\n# ?????????????????????"
       ]
     },
     {
@@ -133,7 +133,7 @@
       ],
       "classification_evidence": [
         "Path: .gcloudignore",
-        "Skim: .gcloudignore\n\n# Security: never upload local secrets\n.env\n*.env\n.env.local\n\n# Dependency and build directories\nnode_modules/\nbackend/node_modules/\n.venv/\nvenv/\nenv/\nbuild/\ndist/\n_…"
+        "Skim: .gcloudignore\n\n# Security: never upload local secrets\n.env\n*.env\n.env.local\n\n# Dependency and build directories\nnode_modules/\nbackend/node_modules/\n.venv/\nvenv/\nenv/\nbuild/\ndist/\n_???"
       ]
     },
     {
@@ -166,7 +166,7 @@
       ],
       "classification_evidence": [
         "Path under B29: .gemini/antigravity/README.md",
-        "First skim: # Antigravity Workflows - Intelligent Automation for SKCS AI Sports Edge\r\n\r\n## 🚀 Overview\r\n\r\nThe **Antigravity** system provides intelligent automation workflo…"
+        "First skim: # Antigravity Workflows - Intelligent Automation for SKCS AI Sports Edge\r\n\r\n## ???? Overview\r\n\r\nThe **Antigravity** system provides intelligent automation workflo???"
       ]
     },
     {
@@ -199,7 +199,7 @@
       ],
       "classification_evidence": [
         "Path under B29: .gemini/antigravity/workflows/automated-data-sync.toml",
-        "First skim: [workflow]\r\nname = \"automated-data-sync\"\r\ndescription = \"Automated multi-sport data synchronization with intelligent fallback\"\r\nversion = \"1.0\"\r\nenabled = true\r…"
+        "First skim: [workflow]\r\nname = \"automated-data-sync\"\r\ndescription = \"Automated multi-sport data synchronization with intelligent fallback\"\r\nversion = \"1.0\"\r\nenabled = true\r???"
       ]
     },
     {
@@ -232,7 +232,7 @@
       ],
       "classification_evidence": [
         "Path under B29: .gemini/antigravity/workflows/intelligent-alert-system.toml",
-        "First skim: [workflow]\r\nname = \"intelligent-alert-system\"\r\ndescription = \"AI-powered alert system with contextual awareness and smart prioritization\"\r\nversion = \"1.0\"\r\nenab…"
+        "First skim: [workflow]\r\nname = \"intelligent-alert-system\"\r\ndescription = \"AI-powered alert system with contextual awareness and smart prioritization\"\r\nversion = \"1.0\"\r\nenab???"
       ]
     },
     {
@@ -265,7 +265,7 @@
       ],
       "classification_evidence": [
         "Path under B29: .gemini/antigravity/workflows/intelligent-pipeline-optimizer.toml",
-        "First skim: [workflow]\r\nname = \"intelligent-pipeline-optimizer\"\r\ndescription = \"AI-driven pipeline optimization with self-healing capabilities\"\r\nversion = \"1.0\"\r\nenabled = …"
+        "First skim: [workflow]\r\nname = \"intelligent-pipeline-optimizer\"\r\ndescription = \"AI-driven pipeline optimization with self-healing capabilities\"\r\nversion = \"1.0\"\r\nenabled = ???"
       ]
     },
     {
@@ -298,7 +298,7 @@
       ],
       "classification_evidence": [
         "Path under B29: .gemini/antigravity/workflows/smart-prediction-engine.toml",
-        "First skim: [workflow]\r\nname = \"smart-prediction-engine\"\r\ndescription = \"AI-powered prediction generation with adaptive learning\"\r\nversion = \"1.0\"\r\nenabled = true\r\n\r\n[workf…"
+        "First skim: [workflow]\r\nname = \"smart-prediction-engine\"\r\ndescription = \"AI-powered prediction generation with adaptive learning\"\r\nversion = \"1.0\"\r\nenabled = true\r\n\r\n[workf???"
       ]
     },
     {
@@ -331,7 +331,7 @@
       ],
       "classification_evidence": [
         "Path under B29: .gemini/commands.toml",
-        "First skim: [commands.risk]\r\ndescription = \"Analyzes match data and calculates the risk tier based on our AI pipeline rules.\"\r\nprompt = \"\"\"\r\nReview the following match payl…"
+        "First skim: [commands.risk]\r\ndescription = \"Analyzes match data and calculates the risk tier based on our AI pipeline rules.\"\r\nprompt = \"\"\"\r\nReview the following match payl???"
       ]
     },
     {
@@ -362,7 +362,7 @@
       ],
       "classification_evidence": [
         "Path under B29: .githooks/pre-commit",
-        "First skim: #!/bin/sh\r\n# Local-only Master Rulebook guard. Runs on your machine; no GitHub Actions billing.\r\n\r\nSTAGED_FILES=$(git diff --cached --name-only --diff-filter=AC…"
+        "First skim: #!/bin/sh\r\n# Local-only Master Rulebook guard. Runs on your machine; no GitHub Actions billing.\r\n\r\nSTAGED_FILES=$(git diff --cached --name-only --diff-filter=AC???"
       ]
     },
     {
@@ -462,7 +462,7 @@
       ],
       "classification_evidence": [
         "Path: .gitignore",
-        "Skim: .env\r\n.env.*\r\n!.env.example\r\nbackend/.env\r\nnode_modules/\r\nbackend/node_modules/\r\n.aider*\r\ncodestoryconfig.toml\r\n.vercel\r\n.env*.local\r\n.venv/\r\n__pycache__/\r\n*.pyc\r\n*.pyo\r\n*.pyd\r\n.Py…"
+        "Skim: .env\r\n.env.*\r\n!.env.example\r\nbackend/.env\r\nnode_modules/\r\nbackend/node_modules/\r\n.aider*\r\ncodestoryconfig.toml\r\n.vercel\r\n.env*.local\r\n.venv/\r\n__pycache__/\r\n*.pyc\r\n*.pyo\r\n*.pyd\r\n.Py???"
       ]
     },
     {
@@ -526,7 +526,7 @@
       ],
       "classification_evidence": [
         "Path under B29: .qwen/settings.json",
-        "First skim: {\r\n  \"permissions\": {\r\n    \"allow\": [\r\n      \"Bash(npm run *)\",\r\n      \"Bash(node *)\",\r\n      \"Bash(dir *)\",\r\n      \"Bash(\\\"c:\\\\program files\\\\git\\\\cmd\\\\git.exe…"
+        "First skim: {\r\n  \"permissions\": {\r\n    \"allow\": [\r\n      \"Bash(npm run *)\",\r\n      \"Bash(node *)\",\r\n      \"Bash(dir *)\",\r\n      \"Bash(\\\"c:\\\\program files\\\\git\\\\cmd\\\\git.exe???"
       ]
     },
     {
@@ -621,7 +621,7 @@
       ],
       "classification_evidence": [
         "Path: .vercelignore",
-        "Skim: backend/\r\ndocs/\r\nmodels/\r\nscripts/\r\nservices/\r\nsql/\r\nsupabase/\r\ntemp_backend_backup/\r\n.venv/\r\n__pycache__/\r\n*.py\r\nrequirements.txt\r\nruntime.txt\r\nsync_run.log\r\nAPI_SETUP.md\r\nDEBUG_R…"
+        "Skim: backend/\r\ndocs/\r\nmodels/\r\nscripts/\r\nservices/\r\nsql/\r\nsupabase/\r\ntemp_backend_backup/\r\n.venv/\r\n__pycache__/\r\n*.py\r\nrequirements.txt\r\nruntime.txt\r\nsync_run.log\r\nAPI_SETUP.md\r\nDEBUG_R???"
       ]
     },
     {
@@ -1325,7 +1325,7 @@
       ],
       "classification_evidence": [
         "Path: LICENSE",
-        "Skim: Apache License\r\n                           Version 2.0, January 2004\r\n                        http://www.apache.org/licenses/\r\n\r\n   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND …"
+        "Skim: Apache License\r\n                           Version 2.0, January 2004\r\n                        http://www.apache.org/licenses/\r\n\r\n   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND ???"
       ]
     },
     {
@@ -3651,7 +3651,7 @@
       ],
       "classification_evidence": [
         "Path: SKCS_START.bat",
-        "Skim: @echo off\r\nstart \"Dolphin Server\" cmd /k \"C:\\path\\to\\llama-server.exe -m C:\\path\\to\\Dolphin3.0-Llama3.2-3B-Q5_K_M.gguf --port 8080\"\r\ntimeout /t 5\r\nstart \"Ngrok Tunnel\" cmd /k \"ngro…"
+        "Skim: @echo off\r\nstart \"Dolphin Server\" cmd /k \"C:\\path\\to\\llama-server.exe -m C:\\path\\to\\Dolphin3.0-Llama3.2-3B-Q5_K_M.gguf --port 8080\"\r\ntimeout /t 5\r\nstart \"Ngrok Tunnel\" cmd /k \"ngro???"
       ]
     },
     {
@@ -4006,7 +4006,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/root/style.css",
-        "Content skim: body {\r\n    font-family: Arial, sans-serif;\r\n    background-color: #f4f4f4;\r\n    margin: 0;\r\n    padding: 20px;\r\n    display: flex;\r\n    justify-content: centerΓÇª"
+        "Content skim: body {\r\n    font-family: Arial, sans-serif;\r\n    background-color: #f4f4f4;\r\n    margin: 0;\r\n    padding: 20px;\r\n    display: flex;\r\n    justify-content: center??????"
       ]
     },
     {
@@ -4037,7 +4037,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/analyze-routes.js",
-        "Content skim: 'use strict';\r\n\r\nconst fs = require('fs');\r\nconst path = require('path');\r\n\r\nconst routesDir = path.join(__dirname, '..', 'backend', 'routes');\r\n\r\n// Files to aΓÇª"
+        "Content skim: 'use strict';\r\n\r\nconst fs = require('fs');\r\nconst path = require('path');\r\n\r\nconst routesDir = path.join(__dirname, '..', 'backend', 'routes');\r\n\r\n// Files to a??????"
       ]
     },
     {
@@ -4068,7 +4068,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/analyze-table-usage.js",
-        "Content skim: 'use strict';\r\n\r\nconst fs = require('fs');\r\nconst path = require('path');\r\n\r\nconst backendDir = path.join(__dirname, '..', 'backend');\r\n\r\n// All tables from datΓÇª"
+        "Content skim: 'use strict';\r\n\r\nconst fs = require('fs');\r\nconst path = require('path');\r\n\r\nconst backendDir = path.join(__dirname, '..', 'backend');\r\n\r\n// All tables from dat??????"
       ]
     },
     {
@@ -4130,7 +4130,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/check-confidence.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst pool = new PoolΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst pool = new Pool??????"
       ]
     },
     {
@@ -4161,7 +4161,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/check-connectivity.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nlet connStr = processΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nlet connStr = process??????"
       ]
     },
     {
@@ -4192,7 +4192,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/check-constraints.js",
-        "Content skim: require('dotenv').config();\r\nconst { pool } = require('../backend/database');\r\n(async () => {\r\n  const r = await pool.query(\"SELECT conname, pg_get_constraintdeΓÇª"
+        "Content skim: require('dotenv').config();\r\nconst { pool } = require('../backend/database');\r\n(async () => {\r\n  const r = await pool.query(\"SELECT conname, pg_get_constraintde??????"
       ]
     },
     {
@@ -4223,7 +4223,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/check-deployment.js",
-        "Content skim: 'use strict';\r\n\r\nconst https = require('https');\r\n\r\nfunction checkUrl(url, path) {\r\n    return new Promise((resolve, reject) => {\r\n        const urlObj = new URΓÇª"
+        "Content skim: 'use strict';\r\n\r\nconst https = require('https');\r\n\r\nfunction checkUrl(url, path) {\r\n    return new Promise((resolve, reject) => {\r\n        const urlObj = new UR??????"
       ]
     },
     {
@@ -4254,7 +4254,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/check-direct-predictions.js",
-        "Content skim: require('dotenv').config();\r\nconst { pool } = require('../backend/database');\r\n(async () => {\r\n  const r = await pool.query(\"SELECT id, type, sport, matches->0-ΓÇª"
+        "Content skim: require('dotenv').config();\r\nconst { pool } = require('../backend/database');\r\n(async () => {\r\n  const r = await pool.query(\"SELECT id, type, sport, matches->0-??????"
       ]
     },
     {
@@ -4285,7 +4285,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/check-endpoints.js",
-        "Content skim: 'use strict';\r\n\r\nconst https = require('https');\r\n\r\nfunction makeRequest(hostname, path, method = 'GET', body = null) {\r\n    return new Promise((resolve, rejectΓÇª"
+        "Content skim: 'use strict';\r\n\r\nconst https = require('https');\r\n\r\nfunction makeRequest(hostname, path, method = 'GET', body = null) {\r\n    return new Promise((resolve, reject??????"
       ]
     },
     {
@@ -4316,7 +4316,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/check-final-schema.js",
-        "Content skim: const db = require('../backend/database');\r\n\r\n(async () => {\r\n    const client = await db.pool.connect();\r\n    try {\r\n        const { rows } = await client.querΓÇª"
+        "Content skim: const db = require('../backend/database');\r\n\r\n(async () => {\r\n    const client = await db.pool.connect();\r\n    try {\r\n        const { rows } = await client.quer??????"
       ]
     },
     {
@@ -4347,7 +4347,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/check-final-sports.js",
-        "Content skim: const db = require('../backend/database');\r\n\r\n(async () => {\r\n    const client = await db.pool.connect();\r\n    try {\r\n        // Check sport values in predictioΓÇª"
+        "Content skim: const db = require('../backend/database');\r\n\r\n(async () => {\r\n    const client = await db.pool.connect();\r\n    try {\r\n        // Check sport values in predictio??????"
       ]
     },
     {
@@ -4378,7 +4378,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/check-matches.js",
-        "Content skim: require('dotenv').config();\r\nconst { pool } = require('../backend/database');\r\n(async () => {\r\n  const r = await pool.query(\"SELECT id, tier, type, total_confidΓÇª"
+        "Content skim: require('dotenv').config();\r\nconst { pool } = require('../backend/database');\r\n(async () => {\r\n  const r = await pool.query(\"SELECT id, tier, type, total_confid??????"
       ]
     },
     {
@@ -4409,7 +4409,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/check-metadata-times.js",
-        "Content skim: const db = require('../backend/database');\r\n\r\n(async () => {\r\n    const client = await db.pool.connect();\r\n    try {\r\n        // Check commence_time in the raw ΓÇª"
+        "Content skim: const db = require('../backend/database');\r\n\r\n(async () => {\r\n    const client = await db.pool.connect();\r\n    try {\r\n        // Check commence_time in the raw ??????"
       ]
     },
     {
@@ -4440,7 +4440,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/check-risk-constraint.js",
-        "Content skim: const db = require('../backend/database');\r\n\r\n(async () => {\r\n    const client = await db.pool.connect();\r\n    try {\r\n        const { rows } = await client.querΓÇª"
+        "Content skim: const db = require('../backend/database');\r\n\r\n(async () => {\r\n    const client = await db.pool.connect();\r\n    try {\r\n        const { rows } = await client.quer??????"
       ]
     },
     {
@@ -4471,7 +4471,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/check-schema.js",
-        "Content skim: require('dotenv').config();\r\nconst { pool } = require('../backend/database');\r\n(async () => {\r\n  const r = await pool.query(\"SELECT column_name, data_type FROM ΓÇª"
+        "Content skim: require('dotenv').config();\r\nconst { pool } = require('../backend/database');\r\n(async () => {\r\n  const r = await pool.query(\"SELECT column_name, data_type FROM ??????"
       ]
     },
     {
@@ -4502,7 +4502,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/check-stage-schemas.js",
-        "Content skim: const db = require('../backend/database');\r\n\r\n(async () => {\r\n    const client = await db.pool.connect();\r\n    try {\r\n        const { rows } = await client.querΓÇª"
+        "Content skim: const db = require('../backend/database');\r\n\r\n(async () => {\r\n    const client = await db.pool.connect();\r\n    try {\r\n        const { rows } = await client.quer??????"
       ]
     },
     {
@@ -4533,7 +4533,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/check-supabase-tables.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nlet connStr = processΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nlet connStr = process??????"
       ]
     },
     {
@@ -4564,7 +4564,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/check-team-names.js",
-        "Content skim: require('dotenv').config();\r\nconst { pool } = require('../backend/database');\r\n(async () => {\r\n  const r = await pool.query(\"SELECT id, tier, type, sport, matchΓÇª"
+        "Content skim: require('dotenv').config();\r\nconst { pool } = require('../backend/database');\r\n(async () => {\r\n  const r = await pool.query(\"SELECT id, tier, type, sport, match??????"
       ]
     },
     {
@@ -4595,7 +4595,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/cors-test.sh",
-        "Content skim: #!/bin/bash\r\n\r\necho \"≡ƒöì SKCS CORS Preflight Verification\"\r\necho \"==================================\"\r\n\r\n# Test 1: Health check (should work without CORS issues)ΓÇª"
+        "Content skim: #!/bin/bash\r\n\r\necho \"????????? SKCS CORS Preflight Verification\"\r\necho \"==================================\"\r\n\r\n# Test 1: Health check (should work without CORS issues)??????"
       ]
     },
     {
@@ -4626,7 +4626,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/debug-events.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proceΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce??????"
       ]
     },
     {
@@ -4657,7 +4657,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/debug-sport-filter.js",
-        "Content skim: const db = require('../backend/database');\r\n\r\n(async () => {\r\n    const client = await db.pool.connect();\r\n    try {\r\n        // Check sport value case in prediΓÇª"
+        "Content skim: const db = require('../backend/database');\r\n\r\n(async () => {\r\n    const client = await db.pool.connect();\r\n    try {\r\n        // Check sport value case in predi??????"
       ]
     },
     {
@@ -4688,7 +4688,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/deep-table-analysis.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nlet connStr = processΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nlet connStr = process??????"
       ]
     },
     {
@@ -4719,7 +4719,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/definitive-cors-diagnosis.sh",
-        "Content skim: #!/bin/bash\r\n\r\n# =============================================================================\r\n# SKCS CORS Definitive Diagnostic Tool\r\n# Based on expert analysΓÇª"
+        "Content skim: #!/bin/bash\r\n\r\n# =============================================================================\r\n# SKCS CORS Definitive Diagnostic Tool\r\n# Based on expert analys??????"
       ]
     },
     {
@@ -4750,7 +4750,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/deploy-cloud-scheduler.sh",
-        "Content skim: #!/bin/bash\r\n\r\n# SKCS AI Sports Edge - Cloud Scheduler Deployment Script\r\n# This script sets up reliable scheduling with SAST timezone and idempotency.\r\n# It taΓÇª"
+        "Content skim: #!/bin/bash\r\n\r\n# SKCS AI Sports Edge - Cloud Scheduler Deployment Script\r\n# This script sets up reliable scheduling with SAST timezone and idempotency.\r\n# It ta??????"
       ]
     },
     {
@@ -4781,7 +4781,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/deploy-render.sh",
-        "Content skim: #!/bin/bash\r\n\r\n# Render Deployment Script\r\n# Triggers manual redeploy of Render backend service\r\n\r\necho \"≡ƒÜÇ Triggering Render deployment...\"\r\n\r\n# Get the latestΓÇª"
+        "Content skim: #!/bin/bash\r\n\r\n# Render Deployment Script\r\n# Triggers manual redeploy of Render backend service\r\n\r\necho \"????????? Triggering Render deployment...\"\r\n\r\n# Get the latest??????"
       ]
     },
     {
@@ -4812,7 +4812,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/file-walker.js",
-        "Content skim: const fs = require('fs');\r\nconst path = require('path');\r\n\r\nfunction walk(dir, depth = 0) {\r\n    let results = [];\r\n    try {\r\n        const items = fs.readdirSΓÇª"
+        "Content skim: const fs = require('fs');\r\nconst path = require('path');\r\n\r\nfunction walk(dir, depth = 0) {\r\n    let results = [];\r\n    try {\r\n        const items = fs.readdirS??????"
       ]
     },
     {
@@ -4843,7 +4843,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/files-report.json",
-        "Content skim: ∩┐╜∩┐╜[\u0000\r\u0000\n\u0000 \u0000 \u0000{\u0000\r\u0000\n\u0000 \u0000 \u0000 \u0000 \u0000\"\u0000t\u0000y\u0000p\u0000e\u0000\"\u0000:\u0000 \u0000\"\u0000f\u0000i\u0000l\u0000e\u0000\"\u0000,\u0000\r\u0000\n\u0000 \u0000 \u0000 \u0000 \u0000\"\u0000n\u0000a\u0000m\u0000e\u0000\"\u0000:\u0000 \u0000\"\u0000.\u0000d\u0000o\u0000c\u0000k\u0000e\u0000r\u0000i\u0000g\u0000n\u0000o\u0000r\u0000e\u0000\"\u0000,\u0000\r\u0000\n\u0000 \u0000 \u0000 \u0000 \u0000\"\u0000p\u0000a\u0000t\u0000h\u0000\"\u0000:\u0000 \u0000\"\u0000C\u0000:\u0000\\\u0000\\\u0000U\u0000s\u0000e\u0000ΓÇª"
+        "Content skim: ??????????????????[\u0000\r\u0000\n\u0000 \u0000 \u0000{\u0000\r\u0000\n\u0000 \u0000 \u0000 \u0000 \u0000\"\u0000t\u0000y\u0000p\u0000e\u0000\"\u0000:\u0000 \u0000\"\u0000f\u0000i\u0000l\u0000e\u0000\"\u0000,\u0000\r\u0000\n\u0000 \u0000 \u0000 \u0000 \u0000\"\u0000n\u0000a\u0000m\u0000e\u0000\"\u0000:\u0000 \u0000\"\u0000.\u0000d\u0000o\u0000c\u0000k\u0000e\u0000r\u0000i\u0000g\u0000n\u0000o\u0000r\u0000e\u0000\"\u0000,\u0000\r\u0000\n\u0000 \u0000 \u0000 \u0000 \u0000\"\u0000p\u0000a\u0000t\u0000h\u0000\"\u0000:\u0000 \u0000\"\u0000C\u0000:\u0000\\\u0000\\\u0000U\u0000s\u0000e\u0000??????"
       ]
     },
     {
@@ -4874,7 +4874,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/final-status.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proceΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce??????"
       ]
     },
     {
@@ -4905,7 +4905,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/final-verification.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proceΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce??????"
       ]
     },
     {
@@ -4938,7 +4938,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/fix-matches-timestamps.sql",
-        "Content skim: -- Fix the matches JSONB to have proper time fields\r\nUPDATE predictions_final \r\nSET matches = jsonb_build_object(\r\n    'match_id', (matches->>'match_id')::text,ΓÇª"
+        "Content skim: -- Fix the matches JSONB to have proper time fields\r\nUPDATE predictions_final \r\nSET matches = jsonb_build_object(\r\n    'match_id', (matches->>'match_id')::text,??????"
       ]
     },
     {
@@ -4969,7 +4969,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/fix-sport-filter.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proceΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce??????"
       ]
     },
     {
@@ -5000,7 +5000,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/fix-tier-rules.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst pool = new PoolΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst pool = new Pool??????"
       ]
     },
     {
@@ -5031,7 +5031,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/fix-view.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proceΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce??????"
       ]
     },
     {
@@ -5064,7 +5064,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/fix-view.sql",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proceΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce??????"
       ]
     },
     {
@@ -5095,7 +5095,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/full-nuke.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proceΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce??????"
       ]
     },
     {
@@ -5126,7 +5126,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/migration2-fix.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proceΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce??????"
       ]
     },
     {
@@ -5157,7 +5157,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/migration2-normalized-fixtures.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proceΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce??????"
       ]
     },
     {
@@ -5188,7 +5188,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/migration2-v2.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proceΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce??????"
       ]
     },
     {
@@ -5219,7 +5219,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/migration2-v3.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proceΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce??????"
       ]
     },
     {
@@ -5252,7 +5252,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/normalize-sports.sql",
-        "Content skim: -- Normalize sport names to match frontend expectations\r\nUPDATE predictions_final \r\nSET sport = 'basketball'\r\nWHERE sport IN ('nba', 'basketball_nba');\r\n\r\nUPDATΓÇª"
+        "Content skim: -- Normalize sport names to match frontend expectations\r\nUPDATE predictions_final \r\nSET sport = 'basketball'\r\nWHERE sport IN ('nba', 'basketball_nba');\r\n\r\nUPDAT??????"
       ]
     },
     {
@@ -5283,7 +5283,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/patch-other-routes.js",
-        "Content skim: 'use strict';\r\n\r\n/**\r\n * PATCH SCRIPT: Add plan_visibility filtering to other routes\r\n */\r\n\r\nconst fs = require('fs');\r\nconst path = require('path');\r\n\r\nconst rΓÇª"
+        "Content skim: 'use strict';\r\n\r\n/**\r\n * PATCH SCRIPT: Add plan_visibility filtering to other routes\r\n */\r\n\r\nconst fs = require('fs');\r\nconst path = require('path');\r\n\r\nconst r??????"
       ]
     },
     {
@@ -5314,7 +5314,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/patch-predictions-visibility.js",
-        "Content skim: 'use strict';\r\n\r\n/**\r\n * PATCH SCRIPT: Add plan_visibility filtering to predictions.js\r\n * \r\n * This patch adds visibility filtering AFTER data is fetched,\r\n * ΓÇª"
+        "Content skim: 'use strict';\r\n\r\n/**\r\n * PATCH SCRIPT: Add plan_visibility filtering to predictions.js\r\n * \r\n * This patch adds visibility filtering AFTER data is fetched,\r\n * ??????"
       ]
     },
     {
@@ -5345,7 +5345,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/phase1-immediate-patch.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nlet connStr = processΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nlet connStr = process??????"
       ]
     },
     {
@@ -5376,7 +5376,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/phase1-patch.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proceΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce??????"
       ]
     },
     {
@@ -5407,7 +5407,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/phase2-schema-refactor.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proceΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce??????"
       ]
     },
     {
@@ -5438,7 +5438,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/phase3-cleanup.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proceΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce??????"
       ]
     },
     {
@@ -5471,7 +5471,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/sql/create_event_context_tables.sql",
-        "Content skim: CREATE TABLE IF NOT EXISTS public.event_injury_snapshots (\r\n    id BIGSERIAL PRIMARY KEY,\r\n    event_id TEXT NOT NULL,\r\n    sport TEXT NOT NULL,\r\n    fixture_prΓÇª"
+        "Content skim: CREATE TABLE IF NOT EXISTS public.event_injury_snapshots (\r\n    id BIGSERIAL PRIMARY KEY,\r\n    event_id TEXT NOT NULL,\r\n    sport TEXT NOT NULL,\r\n    fixture_pr??????"
       ]
     },
     {
@@ -5504,7 +5504,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/sql/create_prediction_publish_runs.sql",
-        "Content skim: CREATE TABLE IF NOT EXISTS public.prediction_publish_runs (\r\n    id BIGSERIAL PRIMARY KEY,\r\n    trigger_source TEXT NOT NULL DEFAULT 'manual',\r\n    requested_spΓÇª"
+        "Content skim: CREATE TABLE IF NOT EXISTS public.prediction_publish_runs (\r\n    id BIGSERIAL PRIMARY KEY,\r\n    trigger_source TEXT NOT NULL DEFAULT 'manual',\r\n    requested_sp??????"
       ]
     },
     {
@@ -5537,7 +5537,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/sql/create_predictions_accuracy.sql",
-        "Content skim: CREATE TABLE IF NOT EXISTS public.predictions_accuracy (\r\n    id BIGSERIAL PRIMARY KEY,\r\n    prediction_final_id BIGINT NOT NULL REFERENCES public.predictions_fΓÇª"
+        "Content skim: CREATE TABLE IF NOT EXISTS public.predictions_accuracy (\r\n    id BIGSERIAL PRIMARY KEY,\r\n    prediction_final_id BIGINT NOT NULL REFERENCES public.predictions_f??????"
       ]
     },
     {
@@ -5568,7 +5568,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/test-scheduler-endpoint.sh",
-        "Content skim: #!/bin/bash\r\n\r\n# Test script for SKCS scheduler endpoints\r\n# This script validates the idempotency and conflict resolution features\r\n\r\nset -e\r\n\r\n# ConfigurationΓÇª"
+        "Content skim: #!/bin/bash\r\n\r\n# Test script for SKCS scheduler endpoints\r\n# This script validates the idempotency and conflict resolution features\r\n\r\nset -e\r\n\r\n# Configuration??????"
       ]
     },
     {
@@ -5630,7 +5630,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/trigger-grade.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config();\r\n\r\nfunction parseArgs(argv) {\r\n    const args = {};\r\n\r\n    for (const arg of argv) {\r\n        if (!arg.startsWith('ΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config();\r\n\r\nfunction parseArgs(argv) {\r\n    const args = {};\r\n\r\n    for (const arg of argv) {\r\n        if (!arg.startsWith('??????"
       ]
     },
     {
@@ -5661,7 +5661,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/trigger-refresh.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config();\r\n\r\nfunction parseArgs(argv) {\r\n    const args = {};\r\n\r\n    for (const arg of argv) {\r\n        if (!arg.startsWith('ΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config();\r\n\r\nfunction parseArgs(argv) {\r\n    const args = {};\r\n\r\n    for (const arg of argv) {\r\n        if (!arg.startsWith('??????"
       ]
     },
     {
@@ -5692,7 +5692,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/trigger-render-pipeline.js",
-        "Content skim: 'use strict';\r\n\r\nconst https = require('https');\r\n\r\nfunction makeRequest(hostname, path, method = 'GET', body = null, auth = null) {\r\n    return new Promise((reΓÇª"
+        "Content skim: 'use strict';\r\n\r\nconst https = require('https');\r\n\r\nfunction makeRequest(hostname, path, method = 'GET', body = null, auth = null) {\r\n    return new Promise((re??????"
       ]
     },
     {
@@ -5723,7 +5723,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/verify-deployment.sh",
-        "Content skim: #!/bin/bash\r\n\r\necho \"≡ƒöì SKCS Deployment Verification Script\"\r\necho \"======================================\"\r\n\r\n# Test 1: Backend CORS Preflight\r\necho \"\"\r\necho \"ΓÇª"
+        "Content skim: #!/bin/bash\r\n\r\necho \"????????? SKCS Deployment Verification Script\"\r\necho \"======================================\"\r\n\r\n# Test 1: Backend CORS Preflight\r\necho \"\"\r\necho \"??????"
       ]
     },
     {
@@ -5754,7 +5754,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/verify-predictions.js",
-        "Content skim: require('dotenv').config();\r\nconst { pool } = require('../backend/database');\r\n(async () => {\r\n  const r = await pool.query(\"SELECT tier, type, sport, market_tyΓÇª"
+        "Content skim: require('dotenv').config();\r\nconst { pool } = require('../backend/database');\r\n(async () => {\r\n  const r = await pool.query(\"SELECT tier, type, sport, market_ty??????"
       ]
     },
     {
@@ -5785,7 +5785,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/verify-route-patches.js",
-        "Content skim: 'use strict';\r\n\r\nconst fs = require('fs');\r\nconst path = require('path');\r\n\r\nconst routesDir = path.join(__dirname, '..', 'backend', 'routes');\r\n\r\nconsole.log('ΓÇª"
+        "Content skim: 'use strict';\r\n\r\nconst fs = require('fs');\r\nconst path = require('path');\r\n\r\nconst routesDir = path.join(__dirname, '..', 'backend', 'routes');\r\n\r\nconsole.log('??????"
       ]
     },
     {
@@ -5816,7 +5816,7 @@
       ],
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/wipe-events-data.js",
-        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proceΓÇª"
+        "Content skim: 'use strict';\r\n\r\nrequire('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });\r\nconst { Pool } = require('pg');\r\n\r\nconst connStr = proce??????"
       ]
     },
     {
@@ -5848,7 +5848,7 @@
       ],
       "classification_evidence": [
         "Path under B29: api/pipeline/run-full.js",
-        "First skim: 'use strict';\r\n\r\nfunction normalizeHost(value) {\r\n    if (!value) return null;\r\n    return String(value).trim().replace(/\\/+$/, '');\r\n}\r\n\r\nfunction extractBeare…"
+        "First skim: 'use strict';\r\n\r\nfunction normalizeHost(value) {\r\n    if (!value) return null;\r\n    return String(value).trim().replace(/\\/+$/, '');\r\n}\r\n\r\nfunction extractBeare???"
       ]
     },
     {
@@ -12975,7 +12975,7 @@
       ],
       "classification_evidence": [
         "Path: check-db.js",
-        "Skim: require('dotenv').config({ path: require('path').resolve(__dirname, 'backend', '.env') });\nconst pool = require('./backend/database');\n\nasync function checkPredictions() {\n    try …"
+        "Skim: require('dotenv').config({ path: require('path').resolve(__dirname, 'backend', '.env') });\nconst pool = require('./backend/database');\n\nasync function checkPredictions() {\n    try ???"
       ]
     },
     {
@@ -13006,7 +13006,7 @@
       ],
       "classification_evidence": [
         "Path: check-football-times.js",
-        "Skim: require('dotenv').config({ path: require('path').resolve(__dirname, 'backend', '.env') });\nconst pool = require('./backend/database');\n\nasync function checkTimes() {\n    try {\n    …"
+        "Skim: require('dotenv').config({ path: require('path').resolve(__dirname, 'backend', '.env') });\nconst pool = require('./backend/database');\n\nasync function checkTimes() {\n    try {\n    ???"
       ]
     },
     {
@@ -13037,7 +13037,7 @@
       ],
       "classification_evidence": [
         "Path: check-football.js",
-        "Skim: require('dotenv').config({ path: require('path').resolve(__dirname, 'backend', '.env') });\nconst pool = require('./backend/database');\n\nasync function checkFootballData() {\n    try…"
+        "Skim: require('dotenv').config({ path: require('path').resolve(__dirname, 'backend', '.env') });\nconst pool = require('./backend/database');\n\nasync function checkFootballData() {\n    try???"
       ]
     },
     {
@@ -13068,7 +13068,7 @@
       ],
       "classification_evidence": [
         "Path: check-production-logs.js",
-        "Skim: /**\r\n * Check why production is using templates despite GROQ_KEY being set\r\n */\r\n\r\nconst axios = require('axios');\r\n\r\nconst RENDER_SERVICE_URL = 'https://skcsai.onrender.com'; // Y…"
+        "Skim: /**\r\n * Check why production is using templates despite GROQ_KEY being set\r\n */\r\n\r\nconst axios = require('axios');\r\n\r\nconst RENDER_SERVICE_URL = 'https://skcsai.onrender.com'; // Y???"
       ]
     },
     {
@@ -13099,7 +13099,7 @@
       ],
       "classification_evidence": [
         "Path: check-recent-predictions.js",
-        "Skim: /**\r\n * Check recent predictions to see if any use AI insights\r\n */\r\n\r\nrequire('dotenv').config();\r\nconst { createClient } = require('@supabase/supabase-js');\r\n\r\nconst SUPABASE_URL…"
+        "Skim: /**\r\n * Check recent predictions to see if any use AI insights\r\n */\r\n\r\nrequire('dotenv').config();\r\nconst { createClient } = require('@supabase/supabase-js');\r\n\r\nconst SUPABASE_URL???"
       ]
     },
     {
@@ -13130,7 +13130,7 @@
       ],
       "classification_evidence": [
         "Path: check-sync-timestamps.js",
-        "Skim: require('dotenv').config();\r\nconst { pool } = require('./backend/db');\r\n\r\nasync function checkSyncTimestamps() {\r\n    const today = new Date().toISOString().split('T')[0];\r\n    con…"
+        "Skim: require('dotenv').config();\r\nconst { pool } = require('./backend/db');\r\n\r\nasync function checkSyncTimestamps() {\r\n    const today = new Date().toISOString().split('T')[0];\r\n    con???"
       ]
     },
     {
@@ -13161,7 +13161,7 @@
       ],
       "classification_evidence": [
         "Path: check-table-columns.js",
-        "Skim: const { query } = require('./backend/database');\n\nasync function checkTableColumns() {\n    try {\n        const result = await query(`\n            SELECT column_name, data_type \n   …"
+        "Skim: const { query } = require('./backend/database');\n\nasync function checkTableColumns() {\n    try {\n        const result = await query(`\n            SELECT column_name, data_type \n   ???"
       ]
     },
     {
@@ -13192,7 +13192,7 @@
       ],
       "classification_evidence": [
         "Path: check-tables.js",
-        "Skim: require('dotenv').config({ path: require('path').resolve(__dirname, 'backend', '.env') });\nconst pool = require('./backend/database');\n\nasync function inspectDB() {\n    try {\n     …"
+        "Skim: require('dotenv').config({ path: require('path').resolve(__dirname, 'backend', '.env') });\nconst pool = require('./backend/database');\n\nasync function inspectDB() {\n    try {\n     ???"
       ]
     },
     {
@@ -13223,7 +13223,7 @@
       ],
       "classification_evidence": [
         "Path: competitions.json",
-        "Skim: {\"lastUpdateId\":5657449845,\"requestedUpdateId\":-1,\"ttl\":5,\"sports\":[{\"id\":7,\"name\":\"Baseball\",\"nameForURL\":\"baseball\",\"imageVersion\":1},{\"id\":3,\"name\":\"Tennis\",\"nameForURL\":\"tennis…"
+        "Skim: {\"lastUpdateId\":5657449845,\"requestedUpdateId\":-1,\"ttl\":5,\"sports\":[{\"id\":7,\"name\":\"Baseball\",\"nameForURL\":\"baseball\",\"imageVersion\":1},{\"id\":3,\"name\":\"Tennis\",\"nameForURL\":\"tennis???"
       ]
     },
     {
@@ -14574,7 +14574,7 @@
       ],
       "classification_evidence": [
         "Path under B29: dolphin-server/Dockerfile",
-        "First skim: # Dockerfile for Dolphin 3.0 Llama 3.2 3B Server on Render\r\nFROM ghcr.io/ggml-org/llama.cpp:server\r\n\r\n# Download the Dolphin model (Q4_K_M for faster inference,…"
+        "First skim: # Dockerfile for Dolphin 3.0 Llama 3.2 3B Server on Render\r\nFROM ghcr.io/ggml-org/llama.cpp:server\r\n\r\n# Download the Dolphin model (Q4_K_M for faster inference,???"
       ]
     },
     {
@@ -14606,7 +14606,7 @@
       ],
       "classification_evidence": [
         "Path under B29: dolphin-server/README.md",
-        "First skim: # Dolphin AI Server for SKCS EdgeMind\r\n\r\nThis directory contains the Docker configuration for deploying the Dolphin 3.0 Llama 3.2 3B model on Render as a web se…"
+        "First skim: # Dolphin AI Server for SKCS EdgeMind\r\n\r\nThis directory contains the Docker configuration for deploying the Dolphin 3.0 Llama 3.2 3B model on Render as a web se???"
       ]
     },
     {
@@ -14637,7 +14637,7 @@
       ],
       "classification_evidence": [
         "Path: find-active-files.js",
-        "Skim: const fs = require('fs');\r\nconst path = require('path');\r\n\r\nconst BACKEND_DIR = path.join(__dirname, 'backend');\r\n\r\n// Files we are hunting for\r\nconst targets = ['server.js', 'serv…"
+        "Skim: const fs = require('fs');\r\nconst path = require('path');\r\n\r\nconst BACKEND_DIR = path.join(__dirname, 'backend');\r\n\r\n// Files we are hunting for\r\nconst targets = ['server.js', 'serv???"
       ]
     },
     {
@@ -14702,7 +14702,7 @@
       ],
       "classification_evidence": [
         "Path: force-seed.js",
-        "Skim: require('dotenv').config({ path: require('path').resolve(__dirname, 'backend', '.env') });\nconst { runBootstrap } = require('./backend/dbBootstrap');\n\nasync function forceSeed() {\n…"
+        "Skim: require('dotenv').config({ path: require('path').resolve(__dirname, 'backend', '.env') });\nconst { runBootstrap } = require('./backend/dbBootstrap');\n\nasync function forceSeed() {\n???"
       ]
     },
     {
@@ -14734,7 +14734,7 @@
       ],
       "classification_evidence": [
         "Path under B29: js/config.js",
-        "First skim: // Default to the live Render API, but allow an earlier override for migration tests.\r\nwindow.API_BASE_URL = window.API_BASE_URL || (\r\n    window.location.hostn…"
+        "First skim: // Default to the live Render API, but allow an earlier override for migration tests.\r\nwindow.API_BASE_URL = window.API_BASE_URL || (\r\n    window.location.hostn???"
       ]
     },
     {
@@ -14766,7 +14766,7 @@
       ],
       "classification_evidence": [
         "Path under B29: js/supabase-bundle.js",
-        "First skim: /**\n * First-Party Supabase Bundle\n * Bundled locally to avoid tracking prevention issues with CDN\n */\n\n// Import Supabase client from node_modules (bundled)\n//…"
+        "First skim: /**\n * First-Party Supabase Bundle\n * Bundled locally to avoid tracking prevention issues with CDN\n */\n\n// Import Supabase client from node_modules (bundled)\n//???"
       ]
     },
     {
@@ -14798,7 +14798,7 @@
       ],
       "classification_evidence": [
         "Path under B29: js/supabase-client-src.js",
-        "First skim: import { createClient } from '@supabase/supabase-js';\r\n\r\nconst supabaseUrl = window.SUPABASE_URL || 'https://ghzjntdvaptuxfpvhybb.supabase.co';\r\nconst supabaseA…"
+        "First skim: import { createClient } from '@supabase/supabase-js';\r\n\r\nconst supabaseUrl = window.SUPABASE_URL || 'https://ghzjntdvaptuxfpvhybb.supabase.co';\r\nconst supabaseA???"
       ]
     },
     {
@@ -14830,7 +14830,7 @@
       ],
       "classification_evidence": [
         "Path under B29: js/supabase-init.js",
-        "First skim: // SKCS AI Sports Edge - Supabase Client Initialization\r\n// Load directly from CDN to avoid ITP issues with localStorage\r\n\r\n(function() {\r\n    'use strict';\r\n  …"
+        "First skim: // SKCS AI Sports Edge - Supabase Client Initialization\r\n// Load directly from CDN to avoid ITP issues with localStorage\r\n\r\n(function() {\r\n    'use strict';\r\n  ???"
       ]
     },
     {
@@ -14893,7 +14893,7 @@
       ],
       "classification_evidence": [
         "Path: market-explorer.html",
-        "Skim: <!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n<meta charset=\"UTF-8\">\r\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n<title>Sports Market Hub</title>\r\n<meta n…"
+        "Skim: <!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n<meta charset=\"UTF-8\">\r\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n<title>Sports Market Hub</title>\r\n<meta n???"
       ]
     },
     {
@@ -14926,7 +14926,7 @@
       ],
       "classification_evidence": [
         "Path: monitoring_dashboard_queries.sql",
-        "Skim: -- Production Monitoring Dashboard Queries for SKCS Master Rulebook\r\n-- Comprehensive SQL queries for production monitoring and analytics\r\n\r\n-- ====================================…"
+        "Skim: -- Production Monitoring Dashboard Queries for SKCS Master Rulebook\r\n-- Comprehensive SQL queries for production monitoring and analytics\r\n\r\n-- ====================================???"
       ]
     },
     {
@@ -14957,7 +14957,7 @@
       ],
       "classification_evidence": [
         "Path: overall-project-completion.json",
-        "Skim: {\n  \"project\": \"SKCS Table Consolidation Project\",\n  \"status\": \"ALL PHASES COMPLETED SUCCESSFULLY\",\n  \"timestamp\": \"2026-05-14T18:16:04.650Z\",\n  \"phases\": {\n    \"phase1\": {\n      \"…"
+        "Skim: {\n  \"project\": \"SKCS Table Consolidation Project\",\n  \"status\": \"ALL PHASES COMPLETED SUCCESSFULLY\",\n  \"timestamp\": \"2026-05-14T18:16:04.650Z\",\n  \"phases\": {\n    \"phase1\": {\n      \"???"
       ]
     },
     {
@@ -14988,7 +14988,7 @@
       ],
       "classification_evidence": [
         "Path: package-lock.json",
-        "Skim: {\r\n  \"name\": \"skcsai\",\r\n  \"version\": \"1.0.0\",\r\n  \"lockfileVersion\": 3,\r\n  \"requires\": true,\r\n  \"packages\": {\r\n    \"\": {\r\n      \"name\": \"skcsai\",\r\n      \"version\": \"1.0.0\",\r\n      \"…"
+        "Skim: {\r\n  \"name\": \"skcsai\",\r\n  \"version\": \"1.0.0\",\r\n  \"lockfileVersion\": 3,\r\n  \"requires\": true,\r\n  \"packages\": {\r\n    \"\": {\r\n      \"name\": \"skcsai\",\r\n      \"version\": \"1.0.0\",\r\n      \"???"
       ]
     },
     {
@@ -15019,7 +15019,7 @@
       ],
       "classification_evidence": [
         "Path: package.json",
-        "Skim: {\r\n  \"name\": \"skcsai\",\r\n  \"version\": \"1.0.0\",\r\n  \"description\": \"SKCS AI - Multi-Sport Prediction Platform\",\r\n  \"main\": \"backend/server-express.js\",\r\n  \"scripts\": {\r\n    \"build:sup…"
+        "Skim: {\r\n  \"name\": \"skcsai\",\r\n  \"version\": \"1.0.0\",\r\n  \"description\": \"SKCS AI - Multi-Sport Prediction Platform\",\r\n  \"main\": \"backend/server-express.js\",\r\n  \"scripts\": {\r\n    \"build:sup???"
       ]
     },
     {
@@ -15050,7 +15050,7 @@
       ],
       "classification_evidence": [
         "Path: phase1-final-report.json",
-        "Skim: {\n  \"phase\": \"Phase 1 - Fixtures Consolidation\",\n  \"status\": \"SUCCESSFULLY COMPLETED\",\n  \"timestamp\": \"2026-05-14T18:09:19.757Z\",\n  \"results\": {\n    \"cricketFixturesMigrated\": \"17\"…"
+        "Skim: {\n  \"phase\": \"Phase 1 - Fixtures Consolidation\",\n  \"status\": \"SUCCESSFULLY COMPLETED\",\n  \"timestamp\": \"2026-05-14T18:09:19.757Z\",\n  \"results\": {\n    \"cricketFixturesMigrated\": \"17\"???"
       ]
     },
     {
@@ -15081,7 +15081,7 @@
       ],
       "classification_evidence": [
         "Path: phase2-cleanup.js",
-        "Skim: const fs = require('fs');\r\nconst path = require('path');\r\n\r\nconst ROOT_DIR = __dirname;\r\nconst ARCHIVE_DIR = path.join(ROOT_DIR, '_archive');\r\n\r\n// Define specific archive subdirec…"
+        "Skim: const fs = require('fs');\r\nconst path = require('path');\r\n\r\nconst ROOT_DIR = __dirname;\r\nconst ARCHIVE_DIR = path.join(ROOT_DIR, '_archive');\r\n\r\n// Define specific archive subdirec???"
       ]
     },
     {
@@ -15112,7 +15112,7 @@
       ],
       "classification_evidence": [
         "Path: phase2-conservative-summary.json",
-        "Skim: {\n  \"phase\": \"Phase 2 - Rules Unification (Conservative)\",\n  \"status\": \"COMPLETED\",\n  \"timestamp\": \"2026-05-14T18:11:46.428Z\",\n  \"progress\": {\n    \"backupsCreated\": true,\n    \"unif…"
+        "Skim: {\n  \"phase\": \"Phase 2 - Rules Unification (Conservative)\",\n  \"status\": \"COMPLETED\",\n  \"timestamp\": \"2026-05-14T18:11:46.428Z\",\n  \"progress\": {\n    \"backupsCreated\": true,\n    \"unif???"
       ]
     },
     {
@@ -15143,7 +15143,7 @@
       ],
       "classification_evidence": [
         "Path: phase2-final-summary.json",
-        "Skim: {\n  \"phase\": \"Phase 2 - Rules Unification\",\n  \"status\": \"SUCCESSFULLY COMPLETED\",\n  \"timestamp\": \"2026-05-14T18:12:47.711Z\",\n  \"results\": {\n    \"tierRulesMigrated\": \"2\",\n    \"crick…"
+        "Skim: {\n  \"phase\": \"Phase 2 - Rules Unification\",\n  \"status\": \"SUCCESSFULLY COMPLETED\",\n  \"timestamp\": \"2026-05-14T18:12:47.711Z\",\n  \"results\": {\n    \"tierRulesMigrated\": \"2\",\n    \"crick???"
       ]
     },
     {
@@ -15174,7 +15174,7 @@
       ],
       "classification_evidence": [
         "Path: phase3-comprehensive-summary.json",
-        "Skim: {\n  \"phase\": \"Phase 3 - Predictions Consolidation (Completed)\",\n  \"status\": \"SUCCESSFULLY COMPLETED\",\n  \"timestamp\": \"2026-05-14T18:16:04.646Z\",\n  \"results\": {\n    \"totalUnifiedPre…"
+        "Skim: {\n  \"phase\": \"Phase 3 - Predictions Consolidation (Completed)\",\n  \"status\": \"SUCCESSFULLY COMPLETED\",\n  \"timestamp\": \"2026-05-14T18:16:04.646Z\",\n  \"results\": {\n    \"totalUnifiedPre???"
       ]
     },
     {
@@ -15205,7 +15205,7 @@
       ],
       "classification_evidence": [
         "Path: phase3-migration-summary.json",
-        "Skim: {\n  \"phase\": \"Phase 3 - Predictions Consolidation\",\n  \"status\": \"COMPLETED\",\n  \"timestamp\": \"2026-05-14T18:14:49.896Z\",\n  \"results\": {\n    \"totalUnifiedPredictions\": \"1\",\n    \"stat…"
+        "Skim: {\n  \"phase\": \"Phase 3 - Predictions Consolidation\",\n  \"status\": \"COMPLETED\",\n  \"timestamp\": \"2026-05-14T18:14:49.896Z\",\n  \"results\": {\n    \"totalUnifiedPredictions\": \"1\",\n    \"stat???"
       ]
     },
     {
@@ -15236,7 +15236,7 @@
       ],
       "classification_evidence": [
         "Path: placeholders-and-insights-audit.json",
-        "Skim: {\n  \"placeholders\": [\n    {\n      \"table\": \"ai_predictions_backup_phase3\",\n      \"id\": \"unknown\",\n      \"field\": \"edgemind_feedback\",\n      \"value\": \"Closely matched teams. Home (N…"
+        "Skim: {\n  \"placeholders\": [\n    {\n      \"table\": \"ai_predictions_backup_phase3\",\n      \"id\": \"unknown\",\n      \"field\": \"edgemind_feedback\",\n      \"value\": \"Closely matched teams. Home (N???"
       ]
     },
     {
@@ -17268,7 +17268,7 @@
       ],
       "classification_evidence": [
         "Path: qodana.yaml",
-        "Skim: #-------------------------------------------------------------------------------#\n#               Qodana analysis is configured by qodana.yaml file               #\n#             ht…"
+        "Skim: #-------------------------------------------------------------------------------#\n#               Qodana analysis is configured by qodana.yaml file               #\n#             ht???"
       ]
     },
     {
@@ -17299,7 +17299,7 @@
       ],
       "classification_evidence": [
         "Path: refresh-ai-insights.js",
-        "Skim: const path = require(\"path\");require(\"dotenv\").config({  path: path.resolve(__dirname, \"backend/.env\")});console.log(\"ENV CHECK:\", {  url: process.env.SUPABASE_URL,  anon: process.…"
+        "Skim: const path = require(\"path\");require(\"dotenv\").config({  path: path.resolve(__dirname, \"backend/.env\")});console.log(\"ENV CHECK:\", {  url: process.env.SUPABASE_URL,  anon: process.???"
       ]
     },
     {
@@ -17365,7 +17365,7 @@
       ],
       "classification_evidence": [
         "Path under B29: reports/execution-spine-compliance-map.json",
-        "First skim: {\n  \"generatedAt\": \"2026-06-05T00:44:34.328Z\",\n  \"summary\": {\n    \"filesScanned\": 3738,\n    \"filesWithFindings\": 187,\n    \"wrappedFiles\": 22,\n    \"bypassCandida…"
+        "First skim: {\n  \"generatedAt\": \"2026-06-05T00:44:34.328Z\",\n  \"summary\": {\n    \"filesScanned\": 3738,\n    \"filesWithFindings\": 187,\n    \"wrappedFiles\": 22,\n    \"bypassCandida???"
       ]
     },
     {
@@ -17398,7 +17398,7 @@
       ],
       "classification_evidence": [
         "Path under B29: reports/execution-spine-compliance-map.md",
-        "First skim: # SKCS Execution Spine Compliance Map\n\n## Summary\n- Files scanned: 3738\n- Files with findings: 187\n- Files already using `executeOperation`: 22\n- Bypass candida…"
+        "First skim: # SKCS Execution Spine Compliance Map\n\n## Summary\n- Files scanned: 3738\n- Files with findings: 187\n- Files already using `executeOperation`: 22\n- Bypass candida???"
       ]
     },
     {
@@ -17461,7 +17461,7 @@
       ],
       "classification_evidence": [
         "Path: run-final-test.js",
-        "Skim: require('dotenv').config({ path: require('path').resolve(__dirname, 'backend', '.env') });\nconst pool = require('./backend/database');\n\nasync function runFinalTest() {\n    try {\n  …"
+        "Skim: require('dotenv').config({ path: require('path').resolve(__dirname, 'backend', '.env') });\nconst pool = require('./backend/database');\n\nasync function runFinalTest() {\n    try {\n  ???"
       ]
     },
     {
@@ -17523,7 +17523,7 @@
       ],
       "classification_evidence": [
         "Path: safe-migration-plan.json",
-        "Skim: {\n  \"philosophy\": \"CONSERVATIVE APPROACH - Zero Risk of Data Loss\",\n  \"principles\": [\n    \"NEVER delete original tables until new system is fully validated\",\n    \"Create VIEW layer…"
+        "Skim: {\n  \"philosophy\": \"CONSERVATIVE APPROACH - Zero Risk of Data Loss\",\n  \"principles\": [\n    \"NEVER delete original tables until new system is fully validated\",\n    \"Create VIEW layer???"
       ]
     },
     {
@@ -17621,7 +17621,7 @@
       ],
       "classification_evidence": [
         "Path: scratch_test_pipeline.js",
-        "Skim: const { runPipelineFromConfiguredDataMode } = require('./backend/services/aiPipeline');\n\nasync function test() {\n    try {\n        console.log('[TEST] Running pipeline locally for …"
+        "Skim: const { runPipelineFromConfiguredDataMode } = require('./backend/services/aiPipeline');\n\nasync function test() {\n    try {\n        console.log('[TEST] Running pipeline locally for ???"
       ]
     },
     {
@@ -27011,7 +27011,7 @@
       ],
       "classification_evidence": [
         "Path under B29: src/data/sportsdb-leagues.json",
-        "First skim: {\n  \"sports\": {\n    \"Football (Soccer)\": {\n      \"rawSport\": \"Soccer\",\n      \"leagues\": [\n        {\n          \"id\": \"4753\",\n          \"name\": \"Algerian Ligue 1\"…"
+        "First skim: {\n  \"sports\": {\n    \"Football (Soccer)\": {\n      \"rawSport\": \"Soccer\",\n      \"leagues\": [\n        {\n          \"id\": \"4753\",\n          \"name\": \"Algerian Ligue 1\"???"
       ]
     },
     {
@@ -27042,7 +27042,7 @@
       ],
       "classification_evidence": [
         "Path: supabase-diagnostics-report.json",
-        "Skim: {\n  \"timestamp\": \"2026-05-11T17:44:24.508Z\",\n  \"database_info\": {\n    \"postgresql_version\": \"PostgreSQL 17.6 on aarch64-unknown-linux-gnu, compiled by gcc (GCC) 13.2.0, 64-bit\",\n  …"
+        "Skim: {\n  \"timestamp\": \"2026-05-11T17:44:24.508Z\",\n  \"database_info\": {\n    \"postgresql_version\": \"PostgreSQL 17.6 on aarch64-unknown-linux-gnu, compiled by gcc (GCC) 13.2.0, 64-bit\",\n  ???"
       ]
     },
     {
@@ -27073,7 +27073,7 @@
       ],
       "classification_evidence": [
         "Path: supabase-migration-plan.json",
-        "Skim: {\n  \"phases\": [\n    {\n      \"phase\": 1,\n      \"priority\": \"URGENT\",\n      \"title\": \"Merge cricket_fixtures and fixtures\",\n      \"description\": \"Eliminate exact structural duplicati…"
+        "Skim: {\n  \"phases\": [\n    {\n      \"phase\": 1,\n      \"priority\": \"URGENT\",\n      \"title\": \"Merge cricket_fixtures and fixtures\",\n      \"description\": \"Eliminate exact structural duplicati???"
       ]
     },
     {
@@ -27104,7 +27104,7 @@
       ],
       "classification_evidence": [
         "Path: supabase-table-analysis.json",
-        "Skim: {\n  \"generated_at\": \"2026-05-24T08:24:25.691Z\",\n  \"summary\": {\n    \"total_tables\": 81,\n    \"tables_with_rls\": 1,\n    \"tables_with_policies\": 5,\n    \"tables_with_indexes\": 73,\n    \"…"
+        "Skim: {\n  \"generated_at\": \"2026-05-24T08:24:25.691Z\",\n  \"summary\": {\n    \"total_tables\": 81,\n    \"tables_with_rls\": 1,\n    \"tables_with_policies\": 5,\n    \"tables_with_indexes\": 73,\n    \"???"
       ]
     },
     {
@@ -27135,7 +27135,7 @@
       ],
       "classification_evidence": [
         "Path: supabase-visual-analysis-report.json",
-        "Skim: {\n  \"summary\": {\n    \"totalTables\": 14,\n    \"duplicateGroups\": 1,\n    \"ruleTables\": 3,\n    \"mergeOpportunities\": 3,\n    \"dataDuplication\": 3\n  },\n  \"tables\": {\n    \"cricket_fixture…"
+        "Skim: {\n  \"summary\": {\n    \"totalTables\": 14,\n    \"duplicateGroups\": 1,\n    \"ruleTables\": 3,\n    \"mergeOpportunities\": 3,\n    \"dataDuplication\": 3\n  },\n  \"tables\": {\n    \"cricket_fixture???"
       ]
     },
     {
@@ -27157,7 +27157,7 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this functionΓÇÖs behaviour before relying on it in production flows.",
+      "next_validation": "Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this function??????s behaviour before relying on it in production flows.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
       "purpose_description": "Supabase scheduled Edge Function to sync fixtures and trigger enrichment/AI pipeline via backend.",
       "functional_group": "SCHEDULER_BACKGROUND",
@@ -27190,7 +27190,7 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this functionΓÇÖs behaviour before relying on it in production flows.",
+      "next_validation": "Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this function??????s behaviour before relying on it in production flows.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
       "purpose_description": "Supabase scheduled Edge Function to sync fixtures and trigger enrichment/AI pipeline via backend.",
       "functional_group": "SCHEDULER_BACKGROUND",
@@ -27201,7 +27201,7 @@
       ],
       "classification_evidence": [
         "Fast skim: index.ts is a Supabase scheduled/function asset (path: supabase/edge-functions/scheduledFixtureSync/index.ts); first meaningful line: import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'.",
-        "Fast skim: observed markers: rpc(update_fixture_processing_log,upsert_raw_fixtures_batch) ΓÇó tables(sport_sync,sport_sync,prediction_publish_runs)."
+        "Fast skim: observed markers: rpc(update_fixture_processing_log,upsert_raw_fixtures_batch) ?????? tables(sport_sync,sport_sync,prediction_publish_runs)."
       ]
     },
     {
@@ -27223,7 +27223,7 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this functionΓÇÖs behaviour before relying on it in production flows.",
+      "next_validation": "Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this function??????s behaviour before relying on it in production flows.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
       "purpose_description": "Supabase scheduled function to refresh prediction pipeline on defined time windows.",
       "functional_group": "SCHEDULER_BACKGROUND",
@@ -27234,7 +27234,7 @@
       ],
       "classification_evidence": [
         "Fast skim: index.ts is a Supabase scheduled/function asset (path: supabase/functions/scheduled-prediction-refresh/index.ts); first meaningful line: import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'.",
-        "Fast skim: observed markers: rpc(normalize_fixtures_for_window,generate_stage_1_predictions) ΓÇó tables(subscription_plans,normalized_fixtures)."
+        "Fast skim: observed markers: rpc(normalize_fixtures_for_window,generate_stage_1_predictions) ?????? tables(subscription_plans,normalized_fixtures)."
       ]
     },
     {
@@ -27256,7 +27256,7 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this functionΓÇÖs behaviour before relying on it in production flows.",
+      "next_validation": "Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this function??????s behaviour before relying on it in production flows.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
       "purpose_description": "Supabase function returning semantic drift summary via `get_semantic_violation_summary` RPC.",
       "functional_group": "SCHEDULER_BACKGROUND",
@@ -27289,7 +27289,7 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this functionΓÇÖs behaviour before relying on it in production flows.",
+      "next_validation": "Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this function??????s behaviour before relying on it in production flows.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
       "purpose_description": "Supabase Edge Function that triggers backend full sync pipeline via scheduled call.",
       "functional_group": "SCHEDULER_BACKGROUND",
@@ -29377,7 +29377,7 @@
       ],
       "classification_evidence": [
         "Path: table-dependency-map.json",
-        "Skim: {\n  \"tables\": [\n    \"cricket_fixtures\",\n    \"fixtures\",\n    \"predictions_raw\",\n    \"predictions_filtered\",\n    \"ai_predictions\",\n    \"tier_rules\",\n    \"cricket_market_rules\"\n  ],\n …"
+        "Skim: {\n  \"tables\": [\n    \"cricket_fixtures\",\n    \"fixtures\",\n    \"predictions_raw\",\n    \"predictions_filtered\",\n    \"ai_predictions\",\n    \"tier_rules\",\n    \"cricket_market_rules\"\n  ],\n ???"
       ]
     },
     {
@@ -29409,7 +29409,7 @@
       ],
       "classification_evidence": [
         "Path: tailwind.config.js",
-        "Skim: /** @type {import('tailwindcss').Config} */\nmodule.exports = {\n  content: [\n    \"./public/**/*.html\",\n    \"./public/**/*.js\",\n    \"./public/**/*.jsx\"\n  ],\n  theme: {\n    extend: {}…"
+        "Skim: /** @type {import('tailwindcss').Config} */\nmodule.exports = {\n  content: [\n    \"./public/**/*.html\",\n    \"./public/**/*.js\",\n    \"./public/**/*.jsx\"\n  ],\n  theme: {\n    extend: {}???"
       ]
     },
     {
@@ -29440,7 +29440,7 @@
       ],
       "classification_evidence": [
         "Path: test-ai-insights.js",
-        "Skim: /**\r\n * Diagnostic script to test AI insight generation\r\n * Checks: Groq availability, Dolphin availability, AI generation, recent predictions\r\n */\r\n\r\nrequire('dotenv').config();\r\n…"
+        "Skim: /**\r\n * Diagnostic script to test AI insight generation\r\n * Checks: Groq availability, Dolphin availability, AI generation, recent predictions\r\n */\r\n\r\nrequire('dotenv').config();\r\n???"
       ]
     },
     {
@@ -29471,7 +29471,7 @@
       ],
       "classification_evidence": [
         "Path: test-ai-simulation.js",
-        "Skim: /**\r\n * Simulate production AI insight generation\r\n */\r\n\r\nconst axios = require('axios');\r\n\r\nconst GROQ_KEY = process.env.GROQ_API_KEY || process.env.GROQ_KEY;\r\n\r\nasync function te…"
+        "Skim: /**\r\n * Simulate production AI insight generation\r\n */\r\n\r\nconst axios = require('axios');\r\n\r\nconst GROQ_KEY = process.env.GROQ_API_KEY || process.env.GROQ_KEY;\r\n\r\nasync function te???"
       ]
     },
     {
@@ -29502,7 +29502,7 @@
       ],
       "classification_evidence": [
         "Path: test-bigballs-direct.js",
-        "Skim: 'use strict';\n\nrequire('dotenv').config();\nconst axios = require('axios');\n\nasync function test() {\n    const key = process.env.BIG_BALLS_DATA_API_KEY || process.env.BBS_API_KEY;\n …"
+        "Skim: 'use strict';\n\nrequire('dotenv').config();\nconst axios = require('axios');\n\nasync function test() {\n    const key = process.env.BIG_BALLS_DATA_API_KEY || process.env.BBS_API_KEY;\n ???"
       ]
     },
     {
@@ -29533,7 +29533,7 @@
       ],
       "classification_evidence": [
         "Path: test-espn-direct.js",
-        "Skim: /**\n * Direct ESPN Hidden API test\n * Tests the exact URL patterns used by dataProvider.js\n */\n\nasync function testESPN() {\n    const ESPN_BASE_URL = 'https://site.api.espn.com/api…"
+        "Skim: /**\n * Direct ESPN Hidden API test\n * Tests the exact URL patterns used by dataProvider.js\n */\n\nasync function testESPN() {\n    const ESPN_BASE_URL = 'https://site.api.espn.com/api???"
       ]
     },
     {
@@ -29564,7 +29564,7 @@
       ],
       "classification_evidence": [
         "Path: test-groq-debug.js",
-        "Skim: /**\r\n * Debug Groq API to find the 400 error\r\n */\r\n\r\nrequire('dotenv').config();\r\nconst axios = require('axios');\r\n\r\nconst GROQ_KEY = process.env.GROQ_API_KEY || process.env.GROQ_K…"
+        "Skim: /**\r\n * Debug Groq API to find the 400 error\r\n */\r\n\r\nrequire('dotenv').config();\r\nconst axios = require('axios');\r\n\r\nconst GROQ_KEY = process.env.GROQ_API_KEY || process.env.GROQ_K???"
       ]
     },
     {
@@ -29595,7 +29595,7 @@
       ],
       "classification_evidence": [
         "Path: test-groq-models.js",
-        "Skim: /**\r\n * Test which Groq models are actually available\r\n */\r\n\r\nrequire('dotenv').config();\r\nconst axios = require('axios');\r\n\r\nconst GROQ_KEY = process.env.GROQ_API_KEY || process.e…"
+        "Skim: /**\r\n * Test which Groq models are actually available\r\n */\r\n\r\nrequire('dotenv').config();\r\nconst axios = require('axios');\r\n\r\nconst GROQ_KEY = process.env.GROQ_API_KEY || process.e???"
       ]
     },
     {
@@ -29626,7 +29626,7 @@
       ],
       "classification_evidence": [
         "Path: test-sportsdb.js",
-        "Skim: /**\r\n * Standalone test script to query TheSportsDB API\r\n * \r\n * This script manually queries TheSportsDB for fixtures on \"2026-05-11\"\r\n * and logs the exact request URL, HTTP stat…"
+        "Skim: /**\r\n * Standalone test script to query TheSportsDB API\r\n * \r\n * This script manually queries TheSportsDB for fixtures on \"2026-05-11\"\r\n * and logs the exact request URL, HTTP stat???"
       ]
     },
     {
@@ -29657,7 +29657,7 @@
       ],
       "classification_evidence": [
         "Path: test-wc-id.js",
-        "Skim: const fetch = require('node-fetch');\n\nasync function checkLeague(id) {\n    const url = `https://v3.football.api-sports.io/leagues?id=${id}`;\n    const res = await fetch(url, {\n    …"
+        "Skim: const fetch = require('node-fetch');\n\nasync function checkLeague(id) {\n    const url = `https://v3.football.api-sports.io/leagues?id=${id}`;\n    const res = await fetch(url, {\n    ???"
       ]
     },
     {
@@ -29688,7 +29688,7 @@
       ],
       "classification_evidence": [
         "Path: test_scenarios_master_rulebook.js",
-        "Skim: // Comprehensive Test Scenarios for SKCS Master Rulebook Implementation\r\n// Tests all edge cases and boundary conditions\r\n\r\nconst { selectSecondaryMarkets } = require('./backend/se…"
+        "Skim: // Comprehensive Test Scenarios for SKCS Master Rulebook Implementation\r\n// Tests all edge cases and boundary conditions\r\n\r\nconst { selectSecondaryMarkets } = require('./backend/se???"
       ]
     },
     {
@@ -29710,7 +29710,7 @@
       "goes_somewhere": "UNKNOWN",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Revalidate this test assetΓÇÖs authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change.",
+      "next_validation": "Revalidate this test asset??????s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change.",
       "notes": "EAC-001 classification foundation / manifest / checker / test asset. Registration only; classification pending.",
       "purpose_description": "Contract test asset validating EAC-001 deterministic batch membership, required structured classification fields, and progress-count expectations.",
       "functional_group": "TEST_PROOF",
@@ -29743,7 +29743,7 @@
       "goes_somewhere": "YES",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Revalidate this test assetΓÇÖs authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change.",
+      "next_validation": "Revalidate this test asset??????s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change.",
       "notes": "Control Center foundation asset.",
       "purpose_description": "Governance test asset validating Edge Control Center ledger structure, task dependency rules, and ledger completion evidence contracts.",
       "functional_group": "TEST_PROOF",
@@ -29777,7 +29777,7 @@
       "goes_somewhere": "YES",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Revalidate this test assetΓÇÖs authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change.",
+      "next_validation": "Revalidate this test asset??????s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change.",
       "notes": "Control Center foundation asset.",
       "purpose_description": "Governance test asset validating the Edge Master Project Register schema integrity and that ledger task IDs match registered projects.",
       "functional_group": "TEST_PROOF",
@@ -29810,7 +29810,7 @@
       "goes_somewhere": "YES",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Revalidate this test assetΓÇÖs authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change.",
+      "next_validation": "Revalidate this test asset??????s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change.",
       "notes": "Control Center foundation asset.",
       "purpose_description": "Repository governance/asset-register test asset validating tracked asset register integrity and EAC structured classification field correctness.",
       "functional_group": "TEST_PROOF",
@@ -29844,7 +29844,7 @@
       "goes_somewhere": "YES",
       "known_conflicts": [],
       "validation_status": "REGISTERED",
-      "next_validation": "Revalidate this test assetΓÇÖs authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change.",
+      "next_validation": "Revalidate this test asset??????s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change.",
       "notes": "Contract proof of ESA-001 static discovery/inventory integrity only; no runtime execution.",
       "purpose_description": "Runtime inventory contract test asset validating ESA-001 discovery surfaces are governed and validation rules fail closed on removal or unknown task bindings.",
       "functional_group": "TEST_PROOF",
@@ -29888,7 +29888,7 @@
       ],
       "classification_evidence": [
         "Path under B29: tmp/key-validation-1776365488298.json",
-        "First skim: {\r\n  \"startedAt\": \"2026-04-16T18:47:44.229Z\",\r\n  \"completedAt\": \"2026-04-16T18:51:28.293Z\",\r\n  \"results\": [\r\n    {\r\n      \"name\": \"SUPABASE_URL + SUPABASE_ANON_…"
+        "First skim: {\r\n  \"startedAt\": \"2026-04-16T18:47:44.229Z\",\r\n  \"completedAt\": \"2026-04-16T18:51:28.293Z\",\r\n  \"results\": [\r\n    {\r\n      \"name\": \"SUPABASE_URL + SUPABASE_ANON_???"
       ]
     },
     {
@@ -29920,7 +29920,7 @@
       ],
       "classification_evidence": [
         "Path under B29: tmp/key-validation-1776365827255.json",
-        "First skim: {\r\n  \"startedAt\": \"2026-04-16T18:53:59.271Z\",\r\n  \"completedAt\": \"2026-04-16T18:57:07.254Z\",\r\n  \"results\": [\r\n    {\r\n      \"name\": \"SUPABASE_URL + SUPABASE_ANON_…"
+        "First skim: {\r\n  \"startedAt\": \"2026-04-16T18:53:59.271Z\",\r\n  \"completedAt\": \"2026-04-16T18:57:07.254Z\",\r\n  \"results\": [\r\n    {\r\n      \"name\": \"SUPABASE_URL + SUPABASE_ANON_???"
       ]
     },
     {
@@ -29952,7 +29952,7 @@
       ],
       "classification_evidence": [
         "Path under B29: tmp/key-validation-1776482624434.json",
-        "First skim: {\r\n  \"startedAt\": \"2026-04-18T03:21:47.416Z\",\r\n  \"completedAt\": \"2026-04-18T03:23:44.430Z\",\r\n  \"results\": [\r\n    {\r\n      \"name\": \"SUPABASE_URL + SUPABASE_ANON_…"
+        "First skim: {\r\n  \"startedAt\": \"2026-04-18T03:21:47.416Z\",\r\n  \"completedAt\": \"2026-04-18T03:23:44.430Z\",\r\n  \"results\": [\r\n    {\r\n      \"name\": \"SUPABASE_URL + SUPABASE_ANON_???"
       ]
     },
     {
@@ -29984,7 +29984,7 @@
       ],
       "classification_evidence": [
         "Path under B29: tmp/today-fixture-pull-1776482706164.json",
-        "First skim: {\r\n  \"generated_at\": \"2026-04-18T03:25:06.164Z\",\r\n  \"date\": \"2026-04-18\",\r\n  \"results\": [\r\n    {\r\n      \"sport\": \"football\",\r\n      \"provider\": \"api-sports\",\r\n …"
+        "First skim: {\r\n  \"generated_at\": \"2026-04-18T03:25:06.164Z\",\r\n  \"date\": \"2026-04-18\",\r\n  \"results\": [\r\n    {\r\n      \"sport\": \"football\",\r\n      \"provider\": \"api-sports\",\r\n ???"
       ]
     },
     {
@@ -30015,7 +30015,7 @@
       ],
       "classification_evidence": [
         "Path: trigger_ai.js",
-        "Skim: const axios = require('axios');\r\n\r\nconst API_URL = 'https://skcs-sports-edge-skcsai.onrender.com/api/refresh-predictions';\r\nconst API_KEY = 'SUMMER_SKCSAI_738913'; // Replace with …"
+        "Skim: const axios = require('axios');\r\n\r\nconst API_URL = 'https://skcs-sports-edge-skcsai.onrender.com/api/refresh-predictions';\r\nconst API_KEY = 'SUMMER_SKCSAI_738913'; // Replace with ???"
       ]
     },
     {
