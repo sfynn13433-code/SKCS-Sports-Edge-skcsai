@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 19,
+  "project_count": 20,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -255,6 +255,7 @@
         "ESA-001"
       ],
       "blocks": [
+        "EAC-R1-001",
         "EMG-001"
       ],
       "affected_layers": [
@@ -295,6 +296,56 @@
         "Validated deterministic 29-batch model with fixed ordered first-match precedence, governed-asset coverage, zero unbatched assets, zero duplicate membership, and no batch over 100 assets",
         "Validated EPR/ESA evidence reuse and ESA contradiction reconciliation rules",
         "Validated repository map requirements and fail-closed completion proof targets without final asset-resolution decisions"
+      ]
+    },
+    {
+      "project_id": "EAC-R1-001",
+      "project_name": "EAC-001 B18 Manifest and Repository Map Alignment Repair",
+      "category": "Repository Organization",
+      "description": "Repair the proven EAC-001 closure drift by aligning B18 batch membership with the canonical repository register and repository map without changing unrelated classification decisions.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
+      "current_status": "PROPOSED",
+      "priority": "critical",
+      "blocked_by": [
+        "EAC-001"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "repository",
+        "control-center"
+      ],
+      "related_tasks": [
+        "EAC-R1-001"
+      ],
+      "related_contracts": [],
+      "related_files": [],
+      "related_tables": [],
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "B18 manifest membership includes the governed policy asset, the register remains at 913 governed assets, all 913 assets remain fully classified, classification pending remains 0, the repository map matches the register, the asset classification checker passes, the classification tests pass, and no unrelated classification decisions change.",
+      "proof_required": [
+        "B18 manifest includes the governed policy asset",
+        "Register remains 913 governed assets",
+        "All 913 assets remain fully classified",
+        "Pending remains 0",
+        "Repository map matches the register",
+        "Asset classification checker passes",
+        "Classification tests pass",
+        "No unrelated classification decisions change"
+      ],
+      "risks_if_ignored": [
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
+      ],
+      "recommended_order": 6,
+      "next_action": "Await separate approval and execution of the EAC-R1-001 alignment repair.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
+      "last_updated": "2026-07-09",
+      "governed_by_control_task_id": "EAC-R1-001",
+      "current_evidence": [
+        "Governance registration created from proven EAC-001 closure drift findings",
+        "Repair is intentionally deferred until this governed mini-project is separately executed"
       ]
     },
     {
@@ -339,7 +390,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 6,
+      "recommended_order": 7,
       "next_action": "Wait for Edge inventory and project registration.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -389,7 +440,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 7,
+      "recommended_order": 8,
       "next_action": "Do not implement until EPR-001, ESA-001, and EMG-001 sequence permits inspection.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -440,7 +491,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 8,
+      "recommended_order": 9,
       "next_action": "Register and inventory Supabase storage before approving the FIP bridge.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -493,7 +544,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 9,
+      "recommended_order": 10,
       "next_action": "Wait for Edge inventory.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -542,7 +593,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 10,
+      "recommended_order": 11,
       "next_action": "Wait for Edge inventory.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -593,7 +644,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 11,
+      "recommended_order": 12,
       "next_action": "Remain PARTIAL and blocked until EFI-001 provides a governed Scout input origin.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -641,7 +692,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 12,
+      "recommended_order": 13,
       "next_action": "Wait for system inventory.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -687,7 +738,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 13,
+      "recommended_order": 14,
       "next_action": "Wait for system inventory.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -731,7 +782,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 14,
+      "recommended_order": 15,
       "next_action": "Wait for security and pipeline inventory.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -773,7 +824,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 15,
+      "recommended_order": 16,
       "next_action": "Implement ECU-001 Edge Control Center operator UI v1",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-09",
@@ -818,7 +869,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 16,
+      "recommended_order": 17,
       "next_action": "Wait for system, storage, and security inventory.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -873,7 +924,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 17,
+      "recommended_order": 18,
       "next_action": "Remain BLOCKED until all dependencies are satisfied.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-05",
@@ -912,7 +963,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 18,
+      "recommended_order": 19,
       "next_action": "Proceed to ESA-RR-002 scope refinement and sealing (contract-only).",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-07",
@@ -954,7 +1005,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 19,
+      "recommended_order": 20,
       "next_action": "Resume EAC-001 classification at B02 / file 16.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-07",

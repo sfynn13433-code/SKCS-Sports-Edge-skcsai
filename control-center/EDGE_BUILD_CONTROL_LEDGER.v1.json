@@ -278,6 +278,54 @@
       "last_updated": "2026-07-09"
     },
     {
+      "task_id": "EAC-R1-001",
+      "task_name": "EAC-001 B18 Manifest and Repository Map Alignment Repair",
+      "workstream": "Repository Organization",
+      "description": "Repair the proven EAC-001 closure drift by aligning B18 batch membership with the canonical repository register and repository map without changing unrelated classification decisions.",
+      "status": "PROPOSED",
+      "priority": "critical",
+      "blocked_by": [
+        "EAC-001"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "repository",
+        "control-center"
+      ],
+      "related_contracts": [],
+      "affected_files": [
+        "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
+        "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
+        "control-center/EDGE_ASSET_REPOSITORY_MAP.md",
+        "control-center/check_edge_asset_classification.js",
+        "tests/edge-asset-classification.test.js"
+      ],
+      "affected_tables": [],
+      "completion_definition": "B18 manifest membership includes the governed policy asset, the register remains at 913 governed assets, all 913 assets remain fully classified, classification pending remains 0, the repository map matches the register, the asset classification checker passes, the classification tests pass, and no unrelated classification decisions change.",
+      "proof_required": [
+        "B18 manifest includes the governed policy asset",
+        "Register remains 913 governed assets",
+        "All 913 assets remain fully classified",
+        "Pending remains 0",
+        "Repository map matches the register",
+        "Asset classification checker passes",
+        "Classification tests pass",
+        "No unrelated classification decisions change"
+      ],
+      "current_evidence": [
+        "Governance registration created from proven EAC-001 closure drift findings",
+        "Repair is intentionally deferred until this governed mini-project is separately executed"
+      ],
+      "open_gaps": [
+        "Manifest/register/map alignment remains drifted",
+        "Repair implementation not yet executed"
+      ],
+      "next_action": "Await separate approval and execution of the EAC-R1-001 alignment repair.",
+      "owner_note": "Governance registration only; do not repair drift in this packet.",
+      "last_updated": "2026-07-09"
+    },
+    {
       "task_id": "EMG-001",
       "task_name": "Scout-Edge Marriage Gate Contract",
       "workstream": "Scout Handoff",

@@ -35,7 +35,14 @@ Blocks: EAC-001, EMG-001, EFI-001, EST-001, ESEC-001, EPI-001, EGR-001, EAI-001,
 Status: APPROVED
 Governed by: EAC-001
 Blocked by: EPR-001, ESA-001
-Blocks: EMG-001
+Blocks: EAC-R1-001, EMG-001
+
+## EAC-R1-001 — EAC-001 B18 Manifest and Repository Map Alignment Repair
+
+Status: PROPOSED
+Governed by: EAC-R1-001
+Blocked by: EAC-001
+Blocks: none
 
 ## EMG-001 — Scout-Edge Marriage Gate Contract
 
