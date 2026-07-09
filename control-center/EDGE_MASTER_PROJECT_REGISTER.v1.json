@@ -323,13 +323,14 @@
       "related_tables": [],
       "known_issues": [],
       "required_decisions": [],
-      "completion_definition": "B18 manifest membership includes the governed policy asset, the register remains at 913 governed assets, all 913 assets remain fully classified, classification pending remains 0, the repository map matches the register, the asset classification checker passes, the classification tests pass, and no unrelated classification decisions change.",
+      "completion_definition": "B18 manifest membership includes the governed policy asset, the register remains at 913 governed assets, all 913 assets remain fully classified, classification pending remains 0, the repository map matches the register, the stale 912 expectation in tests/edge-asset-classification.test.js is updated to the governed 913 total, the asset classification checker passes, the classification tests pass, and no unrelated classification decisions change.",
       "proof_required": [
         "B18 manifest includes the governed policy asset",
         "Register remains 913 governed assets",
         "All 913 assets remain fully classified",
         "Pending remains 0",
         "Repository map matches the register",
+        "Stale 912 expectation in tests/edge-asset-classification.test.js is updated to 913",
         "Asset classification checker passes",
         "Classification tests pass",
         "No unrelated classification decisions change"
@@ -345,7 +346,8 @@
       "governed_by_control_task_id": "EAC-R1-001",
       "current_evidence": [
         "Governance registration created from proven EAC-001 closure drift findings",
-        "Repair is intentionally deferred until this governed mini-project is separately executed"
+        "Repair is intentionally deferred until this governed mini-project is separately executed",
+        "Repair scope is limited to B18 membership, repository map alignment, and the stale 912 test expectation"
       ]
     },
     {
