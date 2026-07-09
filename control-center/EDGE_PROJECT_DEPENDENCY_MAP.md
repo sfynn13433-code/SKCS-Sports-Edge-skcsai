@@ -14,7 +14,14 @@ Blocks: EPR-001
 Status: TESTED
 Governed by: EPR-001
 Blocked by: ECC-001
-Blocks: ESA-001, EAC-001
+Blocks: EDGE-GOV-001, ESA-001, EAC-001
+
+## EDGE-GOV-001 — Edge Asset Work Sequence Policy
+
+Status: DONE
+Governed by: EDGE-GOV-001
+Blocked by: EPR-001
+Blocks: none
 
 ## ESA-001 — Edge System and Runtime Inventory
 

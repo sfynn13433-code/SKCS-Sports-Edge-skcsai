@@ -133,7 +133,7 @@
       "task_name": "Edge Asset Work Sequence Policy",
       "workstream": "Control Center",
       "description": "Create and enforce the governed Edge asset work sequence policy so classification, inspection, repair, validation, and close-out remain ordered and separately governed.",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "critical",
       "blocked_by": [
         "EPR-001"
@@ -169,8 +169,8 @@
         "One-active-mini-project law stated"
       ],
       "open_gaps": [],
-      "next_action": "Validate the policy asset registration and checker enforcement, then formally close EDGE-GOV-001 when the focused tests pass.",
-      "owner_note": "Governed sequencing policy for later inspection and repair work.",
+      "next_action": "No further action.",
+      "owner_note": "Closed sequencing policy for later inspection and repair work.",
       "last_updated": "2026-07-09"
     },
     {
