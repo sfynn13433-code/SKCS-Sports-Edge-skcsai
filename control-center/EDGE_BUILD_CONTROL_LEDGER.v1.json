@@ -647,6 +647,44 @@
       "last_updated": "2026-07-05"
     },
     {
+      "task_id": "ECU-001",
+      "task_name": "Edge Control Center Operator UI",
+      "workstream": "UI and Delivery",
+      "description": "Provide a read-only internal operator dashboard that projects existing governed Edge Control Center records into a human-readable visual interface.",
+      "status": "APPROVED",
+      "priority": "high",
+      "blocked_by": [],
+      "blocks": [],
+      "affected_layers": [
+        "UI",
+        "governance",
+        "control-center"
+      ],
+      "related_contracts": [],
+      "affected_files": [
+        "public/control-center.html",
+        "public/css/control-center.css",
+        "public/js/control-center.js",
+        "backend/services/controlCenterReadService.js",
+        "backend/routes/controlCenter.js",
+        "backend/server-express.js"
+      ],
+      "affected_tables": [],
+      "completion_definition": "A usable internal Edge Control Center operator dashboard exists at /control-center.html that is read-only and truthfully projects governed Control Center state. The dashboard is unlocked by admin authentication (x-api-key) and never embeds raw canonical governed JSON. All Control Center data is served exclusively through admin-protected GET-only API routes under /api/control-center, which return purpose-built safe projections. The UI displays canonical counts (assets classified and pending), projects, gates/blockers, and runtime inventory summary from persisted Control Center artifacts and does not claim any PASS/closure readiness state without API-derived evidence. The implementation preserves existing Control Center mutation semantics (no POST/PUT/PATCH/DELETE routes) and does not change runtime code behavior.",
+      "proof_required": [
+        "UI auth lock/unlock flow uses localStorage key skcs_admin_api_key",
+        "All /api/control-center routes enforce requireRole('admin') and are GET-only",
+        "Projections are derived from canonical persisted Control Center artifacts",
+        "No API responses include environment secrets, API keys, database connection strings, or raw file contents",
+        "Frontend HTML does not embed governed register/ledger/runtime JSON payloads"
+      ],
+      "current_evidence": [],
+      "open_gaps": [],
+      "next_action": "Implement ECU-001 Edge Control Center operator UI v1",
+      "owner_note": "Owner-directed: provide a read-only operator dashboard for governed Control Center state without mutating governance.",
+      "last_updated": "2026-07-09"
+    },
+    {
       "task_id": "EOPS-001",
       "task_name": "Deployment and Operations Governance",
       "workstream": "Deployment and Operations",

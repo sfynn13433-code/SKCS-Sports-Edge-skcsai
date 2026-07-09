@@ -19,6 +19,7 @@ A repository file is an asset. It is not automatically a project.
 | EGR-001 | Grading and Accuracy Governance | Prediction Lifecycle | PROPOSED | high | EGR-001 | Wait for system inventory. |
 | EAI-001 | AI Provider and EdgeMind Boundary | AI and Inference | PROPOSED | high | EAI-001 | Wait for system inventory. |
 | EUI-001 | Subscriber UI and Prediction Delivery | UI and Delivery | PROPOSED | high | EUI-001 | Wait for security and pipeline inventory. |
+| ECU-001 | Edge Control Center Operator UI | UI and Delivery | APPROVED | high | ECU-001 | Implement ECU-001 Edge Control Center operator UI v1 |
 | EOPS-001 | Deployment and Operations Governance | Deployment and Operations | PROPOSED | high | EOPS-001 | Wait for system, storage, and security inventory. |
 | E2E-001 | Scout to Edge End-to-End Proof | Scout Handoff | BLOCKED | critical | E2E-001 | Remain BLOCKED until all dependencies are satisfied. |
 | ESA-RR-001 | ESA-RR-001 Runtime Repair Base Contract (Approved) | Governance and Contract Refinement | APPROVED | high | ESA-RR-001 | Proceed to ESA-RR-002 scope refinement and sealing (contract-only). |
