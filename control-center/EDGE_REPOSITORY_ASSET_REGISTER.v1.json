@@ -5,8 +5,8 @@
   "source_command": "git ls-files",
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
-  "tracked_path_count": 907,
-  "registered_asset_count": 906,
+  "tracked_path_count": 913,
+  "registered_asset_count": 912,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -7310,6 +7310,39 @@
       ]
     },
     {
+      "asset_path": "backend/routes/controlCenter.js",
+      "asset_type": "SOURCE_CODE",
+      "asset_role": "APPLICATION_SOURCE",
+      "source_state": "PRE_EXISTING_MODIFIED",
+      "authority_class": "UNKNOWN",
+      "current_state": "UNKNOWN",
+      "owner_project_id": "ECU-001",
+      "governed_by_control_task_id": "ECU-001",
+      "related_assets": [],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "UNKNOWN",
+      "known_conflicts": [],
+      "validation_status": "REGISTERED",
+      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
+      "purpose_description": "Admin-protected Control Center operator router: provides read-only projections for overview/projects/assets/gates/runtime/findings.",
+      "functional_group": "API_ROUTE",
+      "relationship_tags": [
+        "ROUTE",
+        "API",
+        "SECURITY",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Fast skim: enforces requireRole('admin') on GET endpoints under /api/control-center and returns purpose-built safe projections (no writes)."
+      ]
+    },
+    {
       "asset_path": "backend/routes/cricketCache.js",
       "asset_type": "SOURCE_CODE",
       "asset_role": "APPLICATION_SOURCE",
@@ -9794,6 +9827,39 @@
       ],
       "classification_evidence": [
         "Skim: file exports service functions and participates in backend pipelines."
+      ]
+    },
+    {
+      "asset_path": "backend/services/controlCenterReadService.js",
+      "asset_type": "SOURCE_CODE",
+      "asset_role": "APPLICATION_SOURCE",
+      "source_state": "PRE_EXISTING_MODIFIED",
+      "authority_class": "UNKNOWN",
+      "current_state": "UNKNOWN",
+      "owner_project_id": "ECU-001",
+      "governed_by_control_task_id": "ECU-001",
+      "related_assets": [],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "UNKNOWN",
+      "known_conflicts": [],
+      "validation_status": "REGISTERED",
+      "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
+      "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
+      "purpose_description": "Read-only projection service for Edge Control Center operator UI; derives overview/projects/assets/gates/runtime/findings from canonical Control Center JSON artifacts.",
+      "functional_group": "SERVICE",
+      "relationship_tags": [
+        "SERVICE",
+        "GOVERNANCE",
+        "API"
+      ],
+      "classification_evidence": [
+        "Skim: loads canonical ledger/project/asset/runtime JSON and delegates completeness to check_edge_asset_classification.js and check_edge_system_runtime_inventory.js.",
+        "Exports overview(), projectList(), assetList(), gates(), runtime(), and findings() projections without returning raw file contents or secrets."
       ]
     },
     {
@@ -15434,6 +15500,72 @@
       ]
     },
     {
+      "asset_path": "public/control-center.html",
+      "asset_type": "DATA",
+      "asset_role": "DATA_ASSET",
+      "source_state": "PRE_EXISTING_MODIFIED",
+      "authority_class": "UNKNOWN",
+      "current_state": "UNKNOWN",
+      "owner_project_id": "ECU-001",
+      "governed_by_control_task_id": "ECU-001",
+      "related_assets": [],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "UNKNOWN",
+      "known_conflicts": [],
+      "validation_status": "REGISTERED",
+      "next_validation": "Revalidate operator UI sections and admin-key unlock flow whenever ECU-001 API projections or dashboard requirements change.",
+      "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
+      "purpose_description": "Operator UI shell for SKCS EDGE CONTROL CENTER (read-only dashboard) at /control-center.html with admin-key unlock.",
+      "functional_group": "FRONTEND_UI",
+      "relationship_tags": [
+        "UI",
+        "PUBLIC_ASSET",
+        "GOVERNANCE",
+        "SECURITY"
+      ],
+      "classification_evidence": [
+        "Fast skim: locked-by-default HTML with admin API key input, Unlock button, and dashboard sections for Overview/Projects/Assets/Gates/Runtime/Findings.",
+        "Top chunk first line: <!doctype html>"
+      ]
+    },
+    {
+      "asset_path": "public/css/control-center.css",
+      "asset_type": "DATA",
+      "asset_role": "DATA_ASSET",
+      "source_state": "PRE_EXISTING_MODIFIED",
+      "authority_class": "UNKNOWN",
+      "current_state": "UNKNOWN",
+      "owner_project_id": "ECU-001",
+      "governed_by_control_task_id": "ECU-001",
+      "related_assets": [],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "UNKNOWN",
+      "known_conflicts": [],
+      "validation_status": "REGISTERED",
+      "next_validation": "Revalidate operator dashboard styling whenever ECU-001 UI layout or section requirements change.",
+      "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
+      "purpose_description": "Stylesheet for Edge Control Center operator dashboard UI (dark admin theme, lock screen, tables, badges).",
+      "functional_group": "FRONTEND_UI",
+      "relationship_tags": [
+        "UI",
+        "PUBLIC_ASSET"
+      ],
+      "classification_evidence": [
+        "Fast skim: public/css/control-center.css linked from control-center.html for operator dashboard presentation.",
+        "Filename and path indicate browser-delivered CSS for the ECU-001 control center page."
+      ]
+    },
+    {
       "asset_path": "public/css/hero-carousel.css",
       "asset_type": "DATA",
       "asset_role": "DATA_ASSET",
@@ -16459,6 +16591,40 @@
         "Fast skim: public/js/config.js under public/ indicates browser-delivered UI asset.",
         "Filename suggests frontend script/component code delivered to browser.",
         "Top chunk first line: // Default to the live Render API, but allow an earlier override for migration tests."
+      ]
+    },
+    {
+      "asset_path": "public/js/control-center.js",
+      "asset_type": "SOURCE_CODE",
+      "asset_role": "APPLICATION_SOURCE",
+      "source_state": "PRE_EXISTING_MODIFIED",
+      "authority_class": "UNKNOWN",
+      "current_state": "UNKNOWN",
+      "owner_project_id": "ECU-001",
+      "governed_by_control_task_id": "ECU-001",
+      "related_assets": [],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "UNKNOWN",
+      "known_conflicts": [],
+      "validation_status": "REGISTERED",
+      "next_validation": "Revalidate admin-key unlock and /api/control-center fetch behavior whenever ECU-001 API routes or dashboard sections change.",
+      "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
+      "purpose_description": "Client-side logic for Edge Control Center operator dashboard; admin-key unlock via localStorage and authenticated fetches to /api/control-center endpoints.",
+      "functional_group": "FRONTEND_UI",
+      "relationship_tags": [
+        "UI",
+        "API",
+        "SECURITY",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Skim: stores admin key in localStorage key skcs_admin_api_key and sends x-api-key header on fetch to /api/control-center/* routes.",
+        "Renders Overview, Projects, Assets (with filters/pagination), Gates, Runtime, and Findings sections from API projections."
       ]
     },
     {
@@ -29756,6 +29922,40 @@
       "classification_evidence": [
         "File imports `loadLedger`, `validateLedger`, and checks every DONE task has `current_evidence`, while BLOCKED tasks have explicit `blocked_by` dependencies.",
         "It asserts unique `task_id` values and that each blocked dependency resolves to another known ledger task."
+      ]
+    },
+    {
+      "asset_path": "tests/edge-control-center-ui.test.js",
+      "asset_type": "TEST",
+      "asset_role": "TEST_PROOF",
+      "source_state": "PRE_EXISTING_MODIFIED",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "UNKNOWN",
+      "owner_project_id": "ECU-001",
+      "governed_by_control_task_id": "ECU-001",
+      "related_assets": [],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "UNKNOWN",
+      "known_conflicts": [],
+      "validation_status": "REGISTERED",
+      "next_validation": "Revalidate ECU-001 API auth, GET-only routes, projection correctness, and HTML contract whenever control center router or UI changes.",
+      "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
+      "purpose_description": "Governance test asset validating ECU-001 Control Center operator API auth, GET-only routes, canonical projections, assets pagination/filters, and frontend admin-key contract.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "API",
+        "SECURITY"
+      ],
+      "classification_evidence": [
+        "File mounts controlCenterRouter in-memory and asserts 401/403/200 auth behavior on all /api/control-center endpoints.",
+        "Asserts overview counts match canonical EAC/runtime fixtures and that control-center.html uses skcs_admin_api_key without embedding governed JSON."
       ]
     },
     {

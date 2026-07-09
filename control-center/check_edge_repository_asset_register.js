@@ -173,6 +173,19 @@ const EAC_IMPLEMENTATION_PATHS = new Set([
   "tests/edge-asset-classification.test.js",
 ]);
 
+// ECU-001: Edge Control Center Operator UI (read-only projections + admin dashboard)
+// Governed assets are only those owned by this implementation scope.
+const ECU_IMPLEMENTATION_PATHS = new Set([
+  "public/control-center.html",
+  "public/css/control-center.css",
+  "public/js/control-center.js",
+  "backend/services/controlCenterReadService.js",
+  "backend/routes/controlCenter.js",
+  "backend/server-express.js",
+  "tests/edge-control-center-ui.test.js",
+  "package.json",
+]);
+
 const ECC_FOUNDATION_PATHS = new Set([
   "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "control-center/EDGE_CONTROL_CENTER.md",
@@ -431,6 +444,13 @@ function ownershipFor(assetPath, projectIds) {
     return {
       owner_project_id: "EAC-001",
       governed_by_control_task_id: "EAC-001",
+    };
+  }
+
+  if (ECU_IMPLEMENTATION_PATHS.has(assetPath) && projectIds.has("ECU-001")) {
+    return {
+      owner_project_id: "ECU-001",
+      governed_by_control_task_id: "ECU-001",
     };
   }
 

@@ -1,10 +1,10 @@
 # EDGE ASSET REPOSITORY MAP
 EAC_PROJECT_ID: EAC-001
 MANIFEST_SCHEMA_VERSION: 1.0.0
-TOTAL_GOVERNED_ASSETS: 906
-TOTAL_BATCHED_ASSETS: 906
+TOTAL_GOVERNED_ASSETS: 912
+TOTAL_BATCHED_ASSETS: 912
 FULLY_CLASSIFIED_ASSETS: 0
-CLASSIFICATION_PENDING_ASSETS: 906
+CLASSIFICATION_PENDING_ASSETS: 912
 CLOSURE_READY: NO
 
 CURRENT_STATE_COUNTS
@@ -13,31 +13,31 @@ CURRENT_STATE_COUNTS
 - LEGACY: 0
 - HISTORICAL_EVIDENCE: 0
 - STALE_OR_SUPERSEDED: 61
-- UNKNOWN: 833
+- UNKNOWN: 839
 - GENERATED: 0
 
 FUNCTIONAL_GROUP_COUNTS
 - SCRIPT_TOOL: 173
 - PROVIDER_INTEGRATION: 118
 - DOCUMENTATION_KNOWLEDGE: 99
-- TEST_PROOF: 91
+- TEST_PROOF: 92
 - DATABASE_MIGRATION: 84
-- FRONTEND_UI: 55
+- FRONTEND_UI: 58
 - DATABASE: 49
 - DEPLOYMENT_OPERATIONS: 46
 - GENERATED_OUTPUT: 36
 - SCHEDULER_BACKGROUND: 29
 - PREDICTION: 25
 - GOVERNANCE: 23
+- API_ROUTE: 17
 - ACCA: 16
-- API_ROUTE: 16
 - BACKEND_RUNTIME: 10
 - PUBLIC_ASSET: 10
 - AI_EDGEMIND: 7
 - GRADING_ACCURACY: 7
 - UNCATEGORIZED: 6
+- SERVICE: 4
 - SECURITY_SUBSCRIBER: 3
-- SERVICE: 3
 
 RELATIONSHIP_TAG_COUNTS
 - SCRIPT_TOOL: 289
@@ -45,43 +45,43 @@ RELATIONSHIP_TAG_COUNTS
 - SQL: 239
 - DATABASE: 221
 - PROVIDER: 197
-- API: 166
+- API: 170
 - DOCUMENTATION: 134
-- GOVERNANCE: 128
+- GOVERNANCE: 133
 - OBSERVABILITY: 97
 - PREDICTION: 91
-- TEST_PROOF: 89
-- UI: 88
+- UI: 91
+- TEST_PROOF: 90
 - MIGRATION: 87
 - AUDIT: 76
-- ROUTE: 65
+- ROUTE: 66
 - GENERATED: 63
 - DEPLOYMENT: 58
+- SECURITY: 54
 - CONFIGURATION: 50
-- SECURITY: 50
-- SERVICE: 45
+- SERVICE: 46
 - BACKGROUND_JOB: 31
 - SCHEDULER: 31
 - RULEBOOK: 25
 - ACCA: 23
 - AI_EDGEMIND: 18
-- PUBLIC_ASSET: 10
+- PUBLIC_ASSET: 12
 - GRADING: 8
 - SUBSCRIBER: 4
 - CONTROLLER: 2
 
-NEXT_VALIDATION_NON_EMPTY_ASSETS: 906
+NEXT_VALIDATION_NON_EMPTY_ASSETS: 912
 
 BATCH_COMPLETION_SUMMARY
 - B01 | CONTROL_CENTER | ASSET_COUNT=15 | CLASSIFIED=0 | PENDING=15
 - B02 | BACKEND_DIRECT_FILES | ASSET_COUNT=13 | CLASSIFIED=0 | PENDING=13
-- B03 | BACKEND_ROUTES_AND_CONTROLLERS | ASSET_COUNT=27 | CLASSIFIED=0 | PENDING=27
+- B03 | BACKEND_ROUTES_AND_CONTROLLERS | ASSET_COUNT=28 | CLASSIFIED=0 | PENDING=28
 - B04 | BACKEND_UTILS_SEMANTIC_CORE_AND_TEST | ASSET_COUNT=46 | CLASSIFIED=0 | PENDING=46
 - B05 | BACKEND_SCRIPTS | ASSET_COUNT=15 | CLASSIFIED=0 | PENDING=15
 - B06 | BACKEND_PROVIDERS | ASSET_COUNT=10 | CLASSIFIED=0 | PENDING=10
 - B07 | BACKEND_SRC_SERVICES | ASSET_COUNT=9 | CLASSIFIED=0 | PENDING=9
 - B08 | BACKEND_ADAPTERS_AND_CONFIG | ASSET_COUNT=13 | CLASSIFIED=0 | PENDING=13
-- B09 | BACKEND_SERVICES | ASSET_COUNT=85 | CLASSIFIED=0 | PENDING=85
+- B09 | BACKEND_SERVICES | ASSET_COUNT=86 | CLASSIFIED=0 | PENDING=86
 - B10 | SCRIPTS_AUDIT_GOV | ASSET_COUNT=27 | CLASSIFIED=0 | PENDING=27
 - B11 | SCRIPTS_CHECK_VALIDATE_VERIFY | ASSET_COUNT=59 | CLASSIFIED=0 | PENDING=59
 - B12 | SCRIPTS_TEST_DIAG_TRACE | ASSET_COUNT=66 | CLASSIFIED=0 | PENDING=66
@@ -93,10 +93,10 @@ BATCH_COMPLETION_SUMMARY
 - B18 | SKCS_KNOWLEDGE_GOV_AND_AUDIT | ASSET_COUNT=22 | CLASSIFIED=0 | PENDING=22
 - B19 | SKCS_KNOWLEDGE_KNOWLEDGE | ASSET_COUNT=17 | CLASSIFIED=0 | PENDING=17
 - B20 | SKCS_KNOWLEDGE_PROVIDERS | ASSET_COUNT=18 | CLASSIFIED=0 | PENDING=18
-- B21 | PUBLIC_UI | ASSET_COUNT=62 | CLASSIFIED=0 | PENDING=62
+- B21 | PUBLIC_UI | ASSET_COUNT=65 | CLASSIFIED=0 | PENDING=65
 - B22 | SUPABASE_MIGRATIONS | ASSET_COUNT=61 | CLASSIFIED=0 | PENDING=61
 - B23 | DB_SQL_AND_SUPABASE_OTHER | ASSET_COUNT=20 | CLASSIFIED=0 | PENDING=20
-- B24 | TESTS | ASSET_COUNT=5 | CLASSIFIED=0 | PENDING=5
+- B24 | TESTS | ASSET_COUNT=6 | CLASSIFIED=0 | PENDING=6
 - B25 | SCRATCH | ASSET_COUNT=2 | CLASSIFIED=0 | PENDING=2
 - B26 | DEPLOYMENT_CI | ASSET_COUNT=5 | CLASSIFIED=0 | PENDING=5
 - B27 | ARCHIVE | ASSET_COUNT=61 | CLASSIFIED=0 | PENDING=61
@@ -148,6 +148,7 @@ PER_ASSET_BY_BATCH
 | backend/routes/accuracy.js | Accuracy API route: returns aggregated accuracy/availability insights over a requested fixture date and sport, including optional publish_run filtering. | API_ROUTE | UNKNOWN | ["ROUTE","API","DATABASE","RUNTIME"] | ["Defines `router.get('/')` for `/api/accuracy` and queries `predictions_accuracy` plus `direct1x2_prediction_final` aggregates; uses `gradingAccuracyCore` helpers to compute tier/type breakdowns."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/routes/antigravity.js | Antigravity workflow API route: exposes status/workflow listing and allows triggering and toggling Antigravity workflow executions. | AI_EDGEMIND | UNKNOWN | ["AI_EDGEMIND","ROUTE","API","RUNTIME"] | ["Creates an Antigravity `WorkflowEngine` and defines GET `/status`, `/workflows`, `/workflows/:id` plus POST `/workflows/:id/trigger` and PUT `/workflows/:id/toggle` endpoints."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/routes/chat.js | Chat API route: authenticated user entrypoint for EdgeMind bot responses (default chat and /chat subpath) backed by `generateBotResponse`. | API_ROUTE | UNKNOWN | ["ROUTE","API","CONTROLLER","SECURITY"] | ["Defines POST `/` and POST `/chat` handlers guarded by `requireRole('user')` + `requireSupabaseUser`, both calling `generateBotResponse` from `backend/controllers/edgeMindController.js`."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| backend/routes/controlCenter.js | Admin-protected Control Center operator router: provides read-only projections for overview/projects/assets/gates/runtime/findings. | API_ROUTE | UNKNOWN | ["ROUTE","API","SECURITY","GOVERNANCE"] | ["Fast skim: enforces requireRole('admin') on GET endpoints under /api/control-center and returns purpose-built safe projections (no writes)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/routes/cricketCache.js | Cricket cache read API route: returns the current cricket cache snapshot from the `cricApiCacheService` cache layer. | API_ROUTE | UNKNOWN | ["ROUTE","API","RUNTIME","SERVICE"] | ["Defines GET `/` endpoint which calls `readCache()` from `backend/services/cricApiCacheService` and returns cached data or 404 when missing."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/routes/cricketCount.js | Cricket count API route: returns counts of cricket insight rows by status (active/upcoming/complete/all) and direct-market subset. | API_ROUTE | UNKNOWN | ["ROUTE","API","DATABASE","RUNTIME"] | ["Defines GET `/api/cricket-count` handler which queries `cricket_insights_final` via Supabase (`eq('sport','cricket')`) and filters rows using `filterByStatus()` based on `status` query parameter; computes `direct_count` by counting rows where `market_group === 'direct'`."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/routes/cricketCron.js | Cricket cron/control API routes: secure scheduled endpoints to publish Cricbuzz cricket insights and refresh CricAPI caches (daily/live) with control-plane gating. | SCHEDULER_BACKGROUND | UNKNOWN | ["ROUTE","API","SECURITY","BACKGROUND_JOB","RUNTIME","SCHEDULER"] | ["Defines router.get handlers for `/cricket/cricbuzz`, `/cricket/cricapi/daily`, and `/cricket/cricapi/live` that verify cron secret via `verifyCronSecret()` (CRON_SECRET/x-cron-secret), check gating via `getExecutionConstraints()` from `governanceGatekeeper`, and execute background operations through `executeOperation()` calling `publishCricbuzzCricket`, `refreshDailyCache`, and `refreshLiveScores`."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
@@ -312,6 +313,7 @@ PER_ASSET_BY_BATCH
 | backend/services/contextEnrichmentService.js | Scheduled job / background maintenance | SCHEDULER_BACKGROUND | UNKNOWN | ["SCHEDULER","BACKGROUND_JOB","PREDICTION","DATABASE","SQL","PROVIDER","API"] | ["Top-level skim: require('../database') \| require('axios') \| require('../core/verificationController').","Detected external HTTP client usage (axios/fetch).","Detected caching behavior (cache/table/key patterns)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/contextIngestionService.js | Backend service: contextIngestionService | DATABASE | UNKNOWN | ["PREDICTION","DATABASE","PROVIDER","API"] | ["Top-level skim: require('axios').","Detected external HTTP client usage (axios/fetch).","Detected caching behavior (cache/table/key patterns)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/contradictionGovernance.js | Backend service: contradictionGovernance | PROVIDER_INTEGRATION | UNKNOWN | ["PROVIDER"] | ["Skim: file exports service functions and participates in backend pipelines."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| backend/services/controlCenterReadService.js | Read-only projection service for Edge Control Center operator UI; derives overview/projects/assets/gates/runtime/findings from canonical Control Center JSON artifacts. | SERVICE | UNKNOWN | ["SERVICE","GOVERNANCE","API"] | ["Skim: loads canonical ledger/project/asset/runtime JSON and delegates completeness to check_edge_asset_classification.js and check_edge_system_runtime_inventory.js.","Exports overview(), projectList(), assetList(), gates(), runtime(), and findings() projections without returning raw file contents or secrets."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/cricApiCacheService.js | Scheduled job / background maintenance | SCHEDULER_BACKGROUND | UNKNOWN | ["SCHEDULER","BACKGROUND_JOB","DATABASE","SQL","PROVIDER"] | ["Top-level skim: require('fs/promises') \| require('path') \| require('../apiClients').","Detected Supabase usage (createClient/from/SQL-like queries).","Detected caching behavior (cache/table/key patterns)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/cricbuzzService.js | Backend service: cricbuzzService | DATABASE | UNKNOWN | ["DATABASE","PROVIDER"] | ["Top-level skim: require('axios').","Detected Supabase usage (createClient/from/SQL-like queries).","Detected external HTTP client usage (axios/fetch)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/cricketLiveEnrichmentService.js | Backend service: cricketLiveEnrichmentService | PROVIDER_INTEGRATION | UNKNOWN | ["PREDICTION","PROVIDER","API"] | ["Top-level skim: require('axios') \| require('./apiQuotaRouter').","Detected external HTTP client usage (axios/fetch)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
@@ -803,6 +805,8 @@ PER_ASSET_BY_BATCH
 | public/admin-sync.html | Public HTML page apparently delivered for UI routes: admin-sync.html. | FRONTEND_UI | UNKNOWN | ["UI"] | ["Fast skim: public/admin-sync.html under public/ indicates browser-delivered UI asset.","Filename suggests HTML route/page entrypoint for UI delivery.","Top chunk first line: <!DOCTYPE html>"] | Verify actual frontend references and whether admin-sync.html remains current vs superseded. |
 | public/components/HeroCarousel.jsx | Public JavaScript/JSX frontend helper or component: HeroCarousel.jsx. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/components/HeroCarousel.jsx under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: /**"] | Verify actual frontend references and whether HeroCarousel.jsx remains current vs superseded. |
 | public/components/TrendDashboard.jsx | Public JavaScript/JSX frontend helper or component: TrendDashboard.jsx. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/components/TrendDashboard.jsx under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: /**"] | Verify actual frontend references and whether TrendDashboard.jsx remains current vs superseded. |
+| public/control-center.html | Operator UI shell for SKCS EDGE CONTROL CENTER (read-only dashboard) at /control-center.html with admin-key unlock. | FRONTEND_UI | UNKNOWN | ["UI","PUBLIC_ASSET","GOVERNANCE","SECURITY"] | ["Fast skim: locked-by-default HTML with admin API key input, Unlock button, and dashboard sections for Overview/Projects/Assets/Gates/Runtime/Findings.","Top chunk first line: <!doctype html>"] | Revalidate operator UI sections and admin-key unlock flow whenever ECU-001 API projections or dashboard requirements change. |
+| public/css/control-center.css | Stylesheet for Edge Control Center operator dashboard UI (dark admin theme, lock screen, tables, badges). | FRONTEND_UI | UNKNOWN | ["UI","PUBLIC_ASSET"] | ["Fast skim: public/css/control-center.css linked from control-center.html for operator dashboard presentation.","Filename and path indicate browser-delivered CSS for the ECU-001 control center page."] | Revalidate operator dashboard styling whenever ECU-001 UI layout or section requirements change. |
 | public/css/hero-carousel.css | Public CSS stylesheet for frontend UI styling: hero-carousel.css. | FRONTEND_UI | UNKNOWN | ["UI","OBSERVABILITY"] | ["Fast skim: public/css/hero-carousel.css under public/ indicates browser-delivered UI asset.","Filename suggests CSS styling delivered to browser.","Top chunk first line: /**"] | Verify actual frontend references and whether hero-carousel.css remains current vs superseded. |
 | public/css/input.css | Public CSS stylesheet for frontend UI styling: input.css. | FRONTEND_UI | UNKNOWN | ["UI","OBSERVABILITY"] | ["Fast skim: public/css/input.css under public/ indicates browser-delivered UI asset.","Filename suggests CSS styling delivered to browser.","Top chunk first line: @tailwind base;"] | Verify actual frontend references and whether input.css remains current vs superseded. |
 | public/css/output.css | Public CSS stylesheet for frontend UI styling: output.css. | FRONTEND_UI | UNKNOWN | ["UI","OBSERVABILITY"] | ["Fast skim: public/css/output.css under public/ indicates browser-delivered UI asset.","Filename suggests CSS styling delivered to browser."] | Verify actual frontend references and whether output.css remains current vs superseded. |
@@ -835,6 +839,7 @@ PER_ASSET_BY_BATCH
 | public/js/acca-builder.js | Public JavaScript/JSX frontend helper or component: acca-builder.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/acca-builder.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: // Handles building ACCAs via the /api/v1/acca/build endpoint"] | Verify actual frontend references and whether acca-builder.js remains current vs superseded. |
 | public/js/ai-reasoning-display.js | Public JavaScript/JSX frontend helper or component: ai-reasoning-display.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/ai-reasoning-display.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: // Provides AI reasoning tooltips/display logic"] | Verify actual frontend references and whether ai-reasoning-display.js remains current vs superseded. |
 | public/js/config.js | Public JavaScript/JSX frontend helper or component: config.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/config.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: // Default to the live Render API, but allow an earlier override for migration tests."] | Verify actual frontend references and whether config.js remains current vs superseded. |
+| public/js/control-center.js | Client-side logic for Edge Control Center operator dashboard; admin-key unlock via localStorage and authenticated fetches to /api/control-center endpoints. | FRONTEND_UI | UNKNOWN | ["UI","API","SECURITY","GOVERNANCE"] | ["Skim: stores admin key in localStorage key skcs_admin_api_key and sends x-api-key header on fetch to /api/control-center/* routes.","Renders Overview, Projects, Assets (with filters/pagination), Gates, Runtime, and Findings sections from API projections."] | Revalidate admin-key unlock and /api/control-center fetch behavior whenever ECU-001 API routes or dashboard sections change. |
 | public/js/doubleChanceCombos.js | Public JavaScript/JSX frontend helper or component: doubleChanceCombos.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/doubleChanceCombos.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: // FINAL DOUBLE CHANCE COMBOS ALGORITHM (with Consistency Engine)"] | Verify actual frontend references and whether doubleChanceCombos.js remains current vs superseded. |
 | public/js/hero-carousel.js | Public JavaScript/JSX frontend helper or component: hero-carousel.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/hero-carousel.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: /**"] | Verify actual frontend references and whether hero-carousel.js remains current vs superseded. |
 | public/js/semantic-drift-dashboard.js | Public JavaScript/JSX frontend helper or component: semantic-drift-dashboard.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/semantic-drift-dashboard.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: (function () {"] | Verify actual frontend references and whether semantic-drift-dashboard.js remains current vs superseded. |
@@ -954,6 +959,7 @@ PER_ASSET_BY_BATCH
 |---|---|---|---|---|---|---|
 | tests/edge-asset-classification.test.js | Contract test asset validating EAC-001 deterministic batch membership, required structured classification fields, and progress-count expectations. | TEST_PROOF | UNKNOWN | ["TEST_PROOF","GOVERNANCE","AUDIT"] | ["File `tests/edge-asset-classification.test.js` asserts EAC enums (functional_group/relationship_tags) and uses `computeBatchMembership` + first-match semantics against `EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json`.","It validates `fullyClassifiedAssets` / `classificationPendingAssets` baseline expectations and checks repository map synchronization via the checker helpers."] | Revalidate this test asset??????s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change. |
 | tests/edge-control-center-ledger.test.js | Governance test asset validating Edge Control Center ledger structure, task dependency rules, and ledger completion evidence contracts. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","RULEBOOK","AUDIT"] | ["File imports `loadLedger`, `validateLedger`, and checks every DONE task has `current_evidence`, while BLOCKED tasks have explicit `blocked_by` dependencies.","It asserts unique `task_id` values and that each blocked dependency resolves to another known ledger task."] | Revalidate this test asset??????s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change. |
+| tests/edge-control-center-ui.test.js | Governance test asset validating ECU-001 Control Center operator API auth, GET-only routes, canonical projections, assets pagination/filters, and frontend admin-key contract. | TEST_PROOF | UNKNOWN | ["TEST_PROOF","GOVERNANCE","API","SECURITY"] | ["File mounts controlCenterRouter in-memory and asserts 401/403/200 auth behavior on all /api/control-center endpoints.","Asserts overview counts match canonical EAC/runtime fixtures and that control-center.html uses skcs_admin_api_key without embedding governed JSON."] | Revalidate ECU-001 API auth, GET-only routes, projection correctness, and HTML contract whenever control center router or UI changes. |
 | tests/edge-project-register.test.js | Governance test asset validating the Edge Master Project Register schema integrity and that ledger task IDs match registered projects. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","AUDIT"] | ["File uses `check_edge_project_register.js` helpers to assert the register loads, has canonical version `1.0`, and that every required field is present for each project.","It validates that ledger task IDs map exactly onto `register.projects` and that project status/blocked_by mirrors ledger task data."] | Revalidate this test asset??????s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change. |
 | tests/edge-repository-asset-register.test.js | Repository governance/asset-register test asset validating tracked asset register integrity and EAC structured classification field correctness. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","AUDIT","DATABASE"] | ["File asserts the asset register exists/canonical version and iterates required field sets over all assets.","It validates EAC-001 structured classification fields types (`purpose_description`/`functional_group`/`relationship_tags`/`classification_evidence`) and checks enum legality for current_state and other fields."] | Revalidate this test asset??????s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change. |
 | tests/edge-system-runtime-inventory.test.js | Runtime inventory contract test asset validating ESA-001 discovery surfaces are governed and validation rules fail closed on removal or unknown task bindings. | TEST_PROOF | UNKNOWN | ["TEST_PROOF","RUNTIME","OBSERVABILITY","GOVERNANCE"] | ["File imports runtime inventory helpers (`discoverMaterialSurfaces`, `validateInventory`, `renderRuntimeMap`) and validates the canonical runtime inventory passes.","It includes fail-closed tests (e.g., removing a governed surface or altering control-task bindings) and asserts validation errors start with the expected failure markers."] | Revalidate this test asset??????s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change. |

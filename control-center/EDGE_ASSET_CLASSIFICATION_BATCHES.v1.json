@@ -69,12 +69,13 @@
           "backend/controllers/"
         ]
       },
-      "asset_count": 27,
+      "asset_count": 28,
       "asset_paths": [
         "backend/controllers/edgeMindController.js",
         "backend/routes/accuracy.js",
         "backend/routes/antigravity.js",
         "backend/routes/chat.js",
+        "backend/routes/controlCenter.js",
         "backend/routes/cricketCache.js",
         "backend/routes/cricketCount.js",
         "backend/routes/cricketCron.js",
@@ -283,7 +284,7 @@
           "backend/services/"
         ]
       },
-      "asset_count": 85,
+      "asset_count": 86,
       "asset_paths": [
         "backend/services/accaBuilder.js",
         "backend/services/accaMathUtils.js",
@@ -309,6 +310,7 @@
         "backend/services/contextEnrichmentService.js",
         "backend/services/contextIngestionService.js",
         "backend/services/contradictionGovernance.js",
+        "backend/services/controlCenterReadService.js",
         "backend/services/cricApiCacheService.js",
         "backend/services/cricbuzzService.js",
         "backend/services/cricketLiveEnrichmentService.js",
@@ -1018,7 +1020,7 @@
           "public/"
         ]
       },
-      "asset_count": 62,
+      "asset_count": 65,
       "asset_paths": [
         "public/about-bg.jpg",
         "public/about-bg.webp",
@@ -1026,6 +1028,8 @@
         "public/admin-sync.html",
         "public/components/HeroCarousel.jsx",
         "public/components/TrendDashboard.jsx",
+        "public/control-center.html",
+        "public/css/control-center.css",
         "public/css/hero-carousel.css",
         "public/css/input.css",
         "public/css/output.css",
@@ -1058,6 +1062,7 @@
         "public/js/acca-builder.js",
         "public/js/ai-reasoning-display.js",
         "public/js/config.js",
+        "public/js/control-center.js",
         "public/js/doubleChanceCombos.js",
         "public/js/hero-carousel.js",
         "public/js/semantic-drift-dashboard.js",
@@ -1204,10 +1209,11 @@
           "tests/"
         ]
       },
-      "asset_count": 5,
+      "asset_count": 6,
       "asset_paths": [
         "tests/edge-asset-classification.test.js",
         "tests/edge-control-center-ledger.test.js",
+        "tests/edge-control-center-ui.test.js",
         "tests/edge-project-register.test.js",
         "tests/edge-repository-asset-register.test.js",
         "tests/edge-system-runtime-inventory.test.js"

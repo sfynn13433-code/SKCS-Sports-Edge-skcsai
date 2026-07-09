@@ -671,6 +671,43 @@
       }
     },
     {
+      "asset_path": "backend/routes/controlCenter.js",
+      "source_state": "PRE_EXISTING_MODIFIED",
+      "surface_classes": [
+        "ROUTE"
+      ],
+      "reachability_state": "CONFIRMED",
+      "mount_paths": [
+        "/api/control-center"
+      ],
+      "runtime_callers": [],
+      "runtime_consumers": [
+        "backend/server-express.js"
+      ],
+      "runtime_dependencies": [
+        "backend/services/controlCenterReadService.js",
+        "backend/utils/auth.js"
+      ],
+      "external_providers": [],
+      "environment_key_names": [],
+      "database_role": "NONE",
+      "database_objects": [],
+      "schedule_or_trigger": "",
+      "deployment_surface": "",
+      "governance_reachability_type": "NONE",
+      "governed_by_control_task_id": "ESA-001",
+      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
+      "evidence": [
+        "Static package/deployment/import/mount evidence."
+      ],
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "76ef64dd5ccf448cd45084c2f035d50e562218c7e4a77f33bded1c59d656cd56",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
+    },
+    {
       "asset_path": "backend/routes/cricketCache.js",
       "source_state": "COMMITTED_REPOSITORY",
       "surface_classes": [
@@ -1777,6 +1814,7 @@
         "backend/routes/accuracy.js",
         "backend/routes/antigravity.js",
         "backend/routes/chat.js",
+        "backend/routes/controlCenter.js",
         "backend/routes/cricketCache.js",
         "backend/routes/cricketCount.js",
         "backend/routes/cricketCron.js",
@@ -2746,6 +2784,43 @@
       "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
       "relationship_evidence_provenance": {
         "source_content_sha256": "d1cfd1a685e0a358cf3c726ae481a1042d0392b722eb3406c430e886a8282e0a",
+        "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
+    },
+    {
+      "asset_path": "backend/services/controlCenterReadService.js",
+      "source_state": "PRE_EXISTING_MODIFIED",
+      "surface_classes": [
+        "SCOUT_FIP_SURFACE",
+        "SERVICE"
+      ],
+      "reachability_state": "CONFIRMED",
+      "mount_paths": [],
+      "runtime_callers": [],
+      "runtime_consumers": [
+        "backend/routes/controlCenter.js"
+      ],
+      "runtime_dependencies": [
+        "control-center/check_control_center.js",
+        "control-center/check_edge_asset_classification.js",
+        "control-center/check_edge_system_runtime_inventory.js"
+      ],
+      "external_providers": [],
+      "environment_key_names": [],
+      "database_role": "NONE",
+      "database_objects": [],
+      "schedule_or_trigger": "",
+      "deployment_surface": "",
+      "governance_reachability_type": "NONE",
+      "governed_by_control_task_id": "ESA-001",
+      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
+      "evidence": [
+        "Static package/deployment/import/mount evidence."
+      ],
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "bcbac283d746717c882ff5631a53986581c081698f25e136d16802d5fb40b55b",
         "relationship_evidence_sha256": "accd4fc53fb718e971a854e22133cb3308286e84c2d070b03fc1c1b45f4925aa",
         "captured_source_presence_state": "PRESENT_TRACKED"
       }
@@ -4884,6 +4959,42 @@
       }
     },
     {
+      "asset_path": "control-center/check_edge_system_runtime_inventory.js",
+      "source_state": "COMMITTED_REPOSITORY",
+      "surface_classes": [
+        "DATABASE_SURFACE"
+      ],
+      "reachability_state": "CONFIRMED",
+      "mount_paths": [],
+      "runtime_callers": [],
+      "runtime_consumers": [
+        "backend/services/controlCenterReadService.js"
+      ],
+      "runtime_dependencies": [],
+      "external_providers": [],
+      "environment_key_names": [],
+      "database_role": "READ_WRITE",
+      "database_objects": [
+        "Scout",
+        "direct",
+        "keyword"
+      ],
+      "schedule_or_trigger": "",
+      "deployment_surface": "",
+      "governance_reachability_type": "NONE",
+      "governed_by_control_task_id": "ESA-001",
+      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
+      "evidence": [
+        "Static package/deployment/import/mount evidence."
+      ],
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "0e168b790ce735b204a4315a2ba8a599c1057108bd9d6b1f95cf58fb652d0862",
+        "relationship_evidence_sha256": "a43217b667191e9b1171cd2a60683c705d0bb3730d86583e984c8a06282c3687",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
+    },
+    {
       "asset_path": "Dockerfile",
       "source_state": "COMMITTED_REPOSITORY",
       "surface_classes": [
@@ -5092,6 +5203,37 @@
       "relationship_evidence_provenance": {
         "source_content_sha256": "6980ab4ba92cc984b75384f3ebf8e3ec4602bf77829978f816df4395c02ba655",
         "relationship_evidence_sha256": "bfec5297138b7770aaa6d169c0d166b4eedb837d2dfacb4ee10ce67e634c0f01",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
+    },
+    {
+      "asset_path": "public/js/control-center.js",
+      "source_state": "PRE_EXISTING_MODIFIED",
+      "surface_classes": [
+        "DATABASE_SURFACE",
+        "SCOUT_FIP_SURFACE"
+      ],
+      "reachability_state": "CANDIDATE",
+      "mount_paths": [],
+      "runtime_callers": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "external_providers": [],
+      "environment_key_names": [],
+      "database_role": "READ",
+      "database_objects": [],
+      "schedule_or_trigger": "",
+      "deployment_surface": "",
+      "governance_reachability_type": "NONE",
+      "governed_by_control_task_id": "ESA-001",
+      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
+      "evidence": [
+        "Static package/deployment/import/mount evidence."
+      ],
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "4d7d89017909aba506168445d0f7a4ad76174c6a63f4e03b49776af184d9746c",
+        "relationship_evidence_sha256": "b268ca1e551ba86a4fccfad4d84c20838b914d19f781682b6c9efa1aa77f41a7",
         "captured_source_presence_state": "PRESENT_TRACKED"
       }
     },

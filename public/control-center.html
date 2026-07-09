@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SKCS EDGE CONTROL CENTER — Operator View</title>
+    <link rel="stylesheet" href="/css/control-center.css" />
+    <script src="/js/config.js"></script>
+  </head>
+  <body>
+    <div id="lock-screen" class="screen">
+      <div class="card lock-card">
+        <h1 class="title">SKCS EDGE CONTROL CENTER</h1>
+        <div class="subtitle">Operator View</div>
+
+        <div class="section">
+          <div class="badge danger">Admin Access Required</div>
+
+          <label class="label" for="adminApiKeyInput"
+            >Admin API Key</label
+          >
+          <input
+            id="adminApiKeyInput"
+            class="input"
+            type="password"
+            autocomplete="off"
+          />
+
+          <div class="row">
+            <button id="unlockBtn" class="btn primary">Unlock</button>
+            <button id="clearBtn" class="btn">Clear</button>
+          </div>
+
+          <div id="lockStatus" class="status"></div>
+        </div>
+
+        <div class="hint">
+          This page is read-only. Governed Control Center data is served only
+          through admin-protected endpoints.
+        </div>
+      </div>
+    </div>
+
+    <div id="dashboard" class="screen hidden">
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="title-sm">SKCS EDGE CONTROL CENTER</div>
+          <div class="subtitle-sm">Operator View</div>
+        </div>
+        <div class="topbar-right">
+          <div class="chip" id="sessionChip">Admin unlocked</div>
+          <button id="lockBtn" class="btn">Lock</button>
+        </div>
+      </header>
+
+      <nav class="nav">
+        <button class="navbtn" data-target="#overview-section">
+          Overview
+        </button>
+        <button class="navbtn" data-target="#projects-section">
+          Projects
+        </button>
+        <button class="navbtn" data-target="#assets-section">
+          Assets
+        </button>
+        <button class="navbtn" data-target="#gates-section">
+          Gates
+        </button>
+        <button class="navbtn" data-target="#runtime-section">
+          Runtime
+        </button>
+        <button class="navbtn" data-target="#findings-section">
+          Findings
+        </button>
+      </nav>
+
+      <main class="content">
+        <section id="overview-section" class="section">
+          <h2 class="section-title">Overview</h2>
+          <div class="grid cards">
+            <div class="card stat-card">
+              <div class="stat-label">Assets Classified</div>
+              <div class="stat-value" id="cardAssetsClassified">—</div>
+            </div>
+            <div class="card stat-card">
+              <div class="stat-label">Classification Pending</div>
+              <div class="stat-value" id="cardClassificationPending">—</div>
+            </div>
+            <div class="card stat-card">
+              <div class="stat-label">Projects</div>
+              <div class="stat-value" id="cardProjectsCount">—</div>
+            </div>
+            <div class="card stat-card">
+              <div class="stat-label">Current / Startable Work</div>
+              <div class="stat-value" id="cardStartableWork">—</div>
+              <div class="stat-sub" id="cardNextGated">—</div>
+            </div>
+            <div class="card stat-card">
+              <div class="stat-label">Runtime Inventory</div>
+              <div class="stat-value" id="cardRuntimeSurfaces">—</div>
+              <div class="stat-sub" id="cardRuntimeWarnings">—</div>
+            </div>
+            <div class="card stat-card">
+              <div class="stat-label">Scout–Edge Marriage Gate</div>
+              <div class="stat-value" id="cardMarriageGate">—</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="projects-section" class="section">
+          <h2 class="section-title">Projects</h2>
+          <div class="card">
+            <div class="table-wrap">
+              <table class="table" id="projectsTable">
+                <thead>
+                  <tr>
+                    <th>Project ID</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Blocked By</th>
+                    <th>Next Action</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="assets-section" class="section">
+          <h2 class="section-title">Assets</h2>
+          <div class="card">
+            <div class="filters">
+              <input
+                id="assetSearchInput"
+                class="input"
+                placeholder="Search asset path / purpose…"
+              />
+              <select id="stateFilter" class="select">
+                <option value="">All states</option>
+              </select>
+              <input
+                id="groupFilterInput"
+                class="input"
+                placeholder="Functional group…"
+              />
+              <input
+                id="ownerFilterInput"
+                class="input"
+                placeholder="Owner project ID…"
+              />
+              <button id="assetSearchBtn" class="btn primary">Search</button>
+            </div>
+
+            <div class="row between">
+              <div class="muted" id="assetsMeta">—</div>
+              <div class="row">
+                <button id="assetsPrevBtn" class="btn">Prev</button>
+                <div class="muted" id="assetsPageLabel">Page 1</div>
+                <button id="assetsNextBtn" class="btn">Next</button>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="table" id="assetsTable">
+                <thead>
+                  <tr>
+                    <th>Asset Path</th>
+                    <th>Purpose</th>
+                    <th>Functional Group</th>
+                    <th>State</th>
+                    <th>Owner</th>
+                    <th>Next Validation</th>
+                    <th>Tags</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="gates-section" class="section">
+          <h2 class="section-title">Gates</h2>
+          <div class="card">
+            <div class="list" id="gatesList"></div>
+          </div>
+        </section>
+
+        <section id="runtime-section" class="section">
+          <h2 class="section-title">Runtime</h2>
+          <div class="card">
+            <div class="row">
+              <div class="muted">Runtime surfaces:</div>
+              <div class="value" id="runtimeSurfaces">—</div>
+            </div>
+            <div class="row">
+              <div class="muted">Runtime warnings:</div>
+              <div class="value" id="runtimeWarnings">—</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="findings-section" class="section">
+          <h2 class="section-title">Findings</h2>
+          <div class="card">
+            <div id="findingsList" class="list"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/js/control-center.js"></script>
+  </body>
+</html>
+

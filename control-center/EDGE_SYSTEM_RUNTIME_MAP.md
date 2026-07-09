@@ -1,14 +1,14 @@
 # Edge System Runtime Map
 
 Inventory version: 1.0.0
-Inventory SHA-256: 9f33f28716c2f09bc9dd2409dd0afa89b5e25ef9c1a969c55b0cfe5cb32b0ca8
+Inventory SHA-256: 830ddbab9b41f8c30c008b2bb6840e7db1dfdef9ff825be315f6120419d16977
 
 > Synchronized review surface for `EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json`.
 > This map is observational and does not declare future Edge architecture or canonical authority.
 
 ## Summary
 
-- Runtime/system surfaces: 225
+- Runtime/system surfaces: 229
 - Candidate status establishes authority: false
 - Inventory declares future architecture: false
 
@@ -188,6 +188,19 @@ Inventory SHA-256: 9f33f28716c2f09bc9dd2409dd0afa89b5e25ef9c1a969c55b0cfe5cb32b0
 - Surface classes: ROUTE
 - Reachability: CONFIRMED
 - Source state: COMMITTED_REPOSITORY
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: backend/server-express.js
+- Database role: NONE
+- Database objects: None recorded
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
+### backend/routes/controlCenter.js
+
+- Surface classes: ROUTE
+- Reachability: CONFIRMED
+- Source state: PRE_EXISTING_MODIFIED
 - Governed by: ESA-001
 - Runtime callers: None recorded
 - Runtime consumers: backend/server-express.js
@@ -776,6 +789,19 @@ Inventory SHA-256: 9f33f28716c2f09bc9dd2409dd0afa89b5e25ef9c1a969c55b0cfe5cb32b0
 - Governed by: ESA-001
 - Runtime callers: None recorded
 - Runtime consumers: backend/routes/predictions.js, backend/routes/v1/predictions.js
+- Database role: NONE
+- Database objects: None recorded
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
+### backend/services/controlCenterReadService.js
+
+- Surface classes: SCOUT_FIP_SURFACE, SERVICE
+- Reachability: CONFIRMED
+- Source state: PRE_EXISTING_MODIFIED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: backend/routes/controlCenter.js
 - Database role: NONE
 - Database objects: None recorded
 - External providers: None recorded
@@ -1483,6 +1509,19 @@ Inventory SHA-256: 9f33f28716c2f09bc9dd2409dd0afa89b5e25ef9c1a969c55b0cfe5cb32b0
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
+### control-center/check_edge_system_runtime_inventory.js
+
+- Surface classes: DATABASE_SURFACE
+- Reachability: CONFIRMED
+- Source state: COMMITTED_REPOSITORY
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: backend/services/controlCenterReadService.js
+- Database role: READ_WRITE
+- Database objects: Scout, direct, keyword
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
 ### Dockerfile
 
 - Surface classes: DEPLOYMENT_SURFACE
@@ -1570,6 +1609,19 @@ Inventory SHA-256: 9f33f28716c2f09bc9dd2409dd0afa89b5e25ef9c1a969c55b0cfe5cb32b0
 - Runtime callers: None recorded
 - Runtime consumers: None recorded
 - Database role: NONE
+- Database objects: None recorded
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
+### public/js/control-center.js
+
+- Surface classes: DATABASE_SURFACE, SCOUT_FIP_SURFACE
+- Reachability: CANDIDATE
+- Source state: PRE_EXISTING_MODIFIED
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: None recorded
+- Database role: READ
 - Database objects: None recorded
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.

@@ -237,6 +237,7 @@ const metricsRouter     = require('./routes/metrics');
 const semanticDriftRouter = require('./routes/semanticDrift');
 const divanscoreRouter  = require('./routes/divanscore');
 const antigravityRouter = require('./routes/antigravity');
+const controlCenterRouter = require('./routes/controlCenter');
 
 // API v1 Routers (Master Rulebook v2.0)
 const v1PredictionsRouter = require('./routes/v1/predictions');
@@ -747,6 +748,7 @@ app.use('/api/scheduler', schedulerRouter);
 app.use('/api/metrics', metricsRouter);
 app.use('/api/semantic-drift-summary', semanticDriftRouter);
 app.use('/api/feedback', feedbackRouter);
+app.use('/api/control-center', controlCenterRouter);
 app.use('/api', divanscoreRouter);
 app.use('/api/antigravity', antigravityRouter);
 
