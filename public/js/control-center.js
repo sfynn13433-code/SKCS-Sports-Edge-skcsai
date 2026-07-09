@@ -145,6 +145,41 @@ function renderAssets(items) {
   }
 }
 
+function renderGates(gates) {
+  const list = $id('gatesList');
+  if (!list) return;
+  list.innerHTML = '';
+
+  // Dedicated Gates view projects the same canonical ledger gate fields
+  // already used by Overview — no invented rows, no hard-coded status.
+  const rows = [
+    {
+      label: 'Scout–Edge Marriage Gate',
+      status: gates?.scoutEdgeMarriageGate,
+    },
+    {
+      label: 'Supabase Storage Gate',
+      status: gates?.supabaseStorageGate,
+    },
+  ];
+
+  for (const row of rows) {
+    if (row.status == null || row.status === '') continue;
+    renderStatusItem(list, `${row.label} — ${row.status}`);
+  }
+}
+
+async function loadGates() {
+  const gates = await apiGet('/api/control-center/gates');
+  renderGates(gates);
+}
+
+async function loadRuntime() {
+  const runtime = await apiGet('/api/control-center/runtime');
+  setText('runtimeSurfaces', runtime.runtimeSurfacesTotal);
+  setText('runtimeWarnings', runtime.runtimeWarningCount);
+}
+
 async function loadFindings() {
   const data = await apiGet('/api/control-center/findings');
   const counts = data.currentStateCounts || {};
@@ -217,6 +252,8 @@ async function loadAssets() {
 async function initUnlocked() {
   try {
     await loadOverviewAndProjects();
+    await loadGates();
+    await loadRuntime();
     await loadFindings();
 
     // Prime assets filters.

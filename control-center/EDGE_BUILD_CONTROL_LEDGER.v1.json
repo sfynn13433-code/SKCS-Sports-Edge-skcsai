@@ -224,14 +224,13 @@
         "Validated repository map requirements and fail-closed completion proof targets without final asset-resolution decisions"
       ],
       "open_gaps": [
-        "Foundation requires a separate EAC-001 classification-foundation closure inspection to prove strict closure failure is expected (classification-pending remains).",
-        "B01-B29 content classification has not started; purpose/function/relationship evidence remain classification-pending across the governed universe.",
-        "Strict EAC closure is not ready by design until batch content skim + evidence population occurs in a later separate GO.",
-        "Classification-pending assets remain and must stay visibly pending (no keep/align/merge/replace/retire decisions)."
+        "B01-B29 content classification inventory is complete; remaining governed work is EAC-001 full classification closure inspection.",
+        "Strict EAC closure inspection has not yet been separately executed/approved as the next controlled action.",
+        "No KEEP / ALIGN / MERGE / REPLACE / RETIRE / ARCHIVE_EVIDENCE decisions may be made during closure inspection."
       ],
-      "next_action": "Perform a separate EAC-001 classification-foundation closure inspection. Validate schema extension, 29-batch deterministic coverage, manifest/map synchronization, foundation checker pass, and expected strict-closure not-ready state. Do not begin B01 until that inspection returns GO.",
-      "owner_note": "EAC-001 foundation implemented (schema extension + deterministic batch manifest + fail-closed checker + repository map renderer) without starting content skim or final asset-resolution decisions.",
-      "last_updated": "2026-07-06"
+      "next_action": "Perform EAC-001 full classification closure inspection.",
+      "owner_note": "EAC-001 B01-B29 fast-skim inventory campaign is complete with fully classified governed assets and zero classification-pending. Next governed direction is full classification closure inspection only.",
+      "last_updated": "2026-07-09"
     },
     {
       "task_id": "EMG-001",

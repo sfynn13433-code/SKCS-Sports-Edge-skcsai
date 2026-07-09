@@ -314,8 +314,6 @@ function buildBacklog(register) {
     );
   }
 
-  lines.push("");
-
   return `${lines.join("\n")}\n`;
 }
 
@@ -351,6 +349,10 @@ function buildDependencyMap(register) {
       }`
     );
     lines.push("");
+  }
+
+  while (lines.length && lines[lines.length - 1] === "") {
+    lines.pop();
   }
 
   return `${lines.join("\n")}\n`;

@@ -235,9 +235,9 @@
         "Control Center sequencing bypass"
       ],
       "recommended_order": 4,
-      "next_action": "Perform a separate EAC-001 classification-foundation closure inspection. Validate schema extension, 29-batch deterministic coverage, manifest/map synchronization, foundation checker pass, and expected strict-closure not-ready state. Do not begin B01 until that inspection returns GO.",
+      "next_action": "Perform EAC-001 full classification closure inspection.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
-      "last_updated": "2026-07-06",
+      "last_updated": "2026-07-09",
       "governed_by_control_task_id": "EAC-001",
       "current_evidence": [
         "Validated EAC classification contract scope: purpose_description, functional_group, relationship_tags, classification_evidence",

@@ -332,5 +332,93 @@ describe("ECU-001 Control Center Operator UI", () => {
     assert.ok(js.includes("'x-api-key'") || js.includes("x-api-key"));
     assert.equal(js.includes(ADMIN_KEY), false);
   });
+
+  it("dedicated gates projection carries canonical Scout-Edge marriage gate", async () => {
+    const ledger = readJson(
+      path.join(CONTROL_CENTER_DIR, "EDGE_BUILD_CONTROL_LEDGER.v1.json")
+    );
+    const { res, json } = await fetchJson(
+      `${baseUrl}/api/control-center/gates`,
+      { apiKey: ADMIN_KEY }
+    );
+
+    assert.equal(res.status, 200);
+    assert.equal(
+      json.scoutEdgeMarriageGate,
+      ledger.scout_edge_marriage_gate
+    );
+    assert.equal(
+      json.supabaseStorageGate,
+      ledger.supabase_storage_gate
+    );
+    assert.ok(json.scoutEdgeMarriageGate);
+  });
+
+  it("dedicated runtime projection agrees with overview canonical counts", async () => {
+    const overview = await fetchJson(
+      `${baseUrl}/api/control-center/overview`,
+      { apiKey: ADMIN_KEY }
+    );
+    const runtime = await fetchJson(
+      `${baseUrl}/api/control-center/runtime`,
+      { apiKey: ADMIN_KEY }
+    );
+
+    assert.equal(overview.res.status, 200);
+    assert.equal(runtime.res.status, 200);
+    assert.equal(
+      runtime.json.runtimeSurfacesTotal,
+      overview.json.runtime.runtimeSurfacesTotal
+    );
+    assert.equal(
+      runtime.json.runtimeWarningCount,
+      overview.json.runtime.runtimeWarningCount
+    );
+    assert.ok(Number.isFinite(runtime.json.runtimeSurfacesTotal));
+    assert.ok(Number.isFinite(runtime.json.runtimeWarningCount));
+  });
+
+  it("EAC-001 project projection carries governed full-classification closure next_action", async () => {
+    const ledger = readJson(
+      path.join(CONTROL_CENTER_DIR, "EDGE_BUILD_CONTROL_LEDGER.v1.json")
+    );
+    const eacTask = ledger.tasks.find((t) => t.task_id === "EAC-001");
+    assert.ok(eacTask);
+
+    const { res, json } = await fetchJson(
+      `${baseUrl}/api/control-center/projects`,
+      { apiKey: ADMIN_KEY }
+    );
+    assert.equal(res.status, 200);
+
+    const eacProject = (json.projects || []).find(
+      (p) => p.project_id === "EAC-001"
+    );
+    assert.ok(eacProject);
+    assert.equal(eacProject.next_action, eacTask.next_action);
+    assert.match(
+      eacProject.next_action,
+      /Perform EAC-001 full classification closure inspection/
+    );
+    assert.equal(
+      /Do not begin B01/.test(eacProject.next_action),
+      false
+    );
+  });
+
+  it("frontend loads dedicated gates and runtime endpoints", async () => {
+    const jsPath = path.join(
+      __dirname,
+      "../public/js/control-center.js"
+    );
+    const js = readText(jsPath);
+
+    assert.ok(js.includes("/api/control-center/gates"));
+    assert.ok(js.includes("/api/control-center/runtime"));
+    assert.ok(js.includes("runtimeSurfaces"));
+    assert.ok(js.includes("runtimeWarnings"));
+    assert.ok(js.includes("gatesList"));
+    assert.equal(js.includes("BLOCKED"), false);
+  });
 });
 
