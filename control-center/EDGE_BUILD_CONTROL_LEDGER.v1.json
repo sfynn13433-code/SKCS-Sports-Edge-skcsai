@@ -282,7 +282,7 @@
       "task_name": "EAC-001 B18 Manifest and Repository Map Alignment Repair",
       "workstream": "Repository Organization",
       "description": "Repair the proven EAC-001 closure drift by aligning B18 batch membership with the canonical repository register and repository map without changing unrelated classification decisions.",
-      "status": "PROPOSED",
+      "status": "DONE",
       "priority": "critical",
       "blocked_by": [
         "EAC-001"
@@ -314,17 +314,15 @@
         "No unrelated classification decisions change"
       ],
       "current_evidence": [
-        "Governance registration created from proven EAC-001 closure drift findings",
-        "Repair is intentionally deferred until this governed mini-project is separately executed",
-        "Repair scope is limited to B18 membership, repository map alignment, and the stale 912 test expectation"
+        "B18 manifest membership includes the governed policy asset",
+        "Repository map alignment regenerated for 913 governed assets",
+        "Stale 912 expectations in tests/edge-asset-classification.test.js were updated to 913",
+        "Asset classification checker passes",
+        "Classification tests pass"
       ],
-      "open_gaps": [
-        "Manifest/register/map alignment remains drifted",
-        "Stale 912 test expectation remains uncorrected",
-        "Repair implementation not yet executed"
-      ],
-      "next_action": "Await separate approval and execution of the EAC-R1-001 alignment repair.",
-      "owner_note": "Governance registration only; do not repair drift in this packet.",
+      "open_gaps": [],
+      "next_action": "No further action.",
+      "owner_note": "Closed repair alignment task.",
       "last_updated": "2026-07-09"
     },
     {

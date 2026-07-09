@@ -39,7 +39,7 @@ Blocks: EAC-R1-001, EMG-001
 
 ## EAC-R1-001 — EAC-001 B18 Manifest and Repository Map Alignment Repair
 
-Status: PROPOSED
+Status: DONE
 Governed by: EAC-R1-001
 Blocked by: EAC-001
 Blocks: none

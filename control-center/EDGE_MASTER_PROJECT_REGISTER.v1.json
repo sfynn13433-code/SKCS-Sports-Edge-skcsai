@@ -304,7 +304,7 @@
       "category": "Repository Organization",
       "description": "Repair the proven EAC-001 closure drift by aligning B18 batch membership with the canonical repository register and repository map without changing unrelated classification decisions.",
       "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
-      "current_status": "PROPOSED",
+      "current_status": "DONE",
       "priority": "critical",
       "blocked_by": [
         "EAC-001"
@@ -340,14 +340,16 @@
         "Control Center sequencing bypass"
       ],
       "recommended_order": 6,
-      "next_action": "Await separate approval and execution of the EAC-R1-001 alignment repair.",
+      "next_action": "No further action.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-09",
       "governed_by_control_task_id": "EAC-R1-001",
       "current_evidence": [
-        "Governance registration created from proven EAC-001 closure drift findings",
-        "Repair is intentionally deferred until this governed mini-project is separately executed",
-        "Repair scope is limited to B18 membership, repository map alignment, and the stale 912 test expectation"
+        "B18 manifest membership includes the governed policy asset",
+        "Repository map alignment regenerated for 913 governed assets",
+        "Stale 912 expectations in tests/edge-asset-classification.test.js were updated to 913",
+        "Asset classification checker passes",
+        "Classification tests pass"
       ]
     },
     {
