@@ -5,15 +5,58 @@ const assert = require("node:assert/strict");
 
 const {
   ALLOWED_STATUSES,
+  CONTROL_CENTER_PATH,
+  CONTROL_CENTER_GATE_GROUP,
+  createControlCenterGateState,
   LEDGER_PATH,
   MARRIAGE_PREREQUISITES,
+  evaluateControlCenterProposal,
+  loadControlCenterDocument,
   loadLedger,
   validateLedger,
+  validateControlCenterPolicy,
   getMarriageState,
   runCheck,
 } = require(
   "../control-center/check_control_center.js"
 );
+
+function buildGroupProposal(overrides = {}) {
+  return {
+    request_type: "INSPECT_GROUP",
+    mode: "INSPECT",
+    inspection_only: true,
+    preserves_unrelated_changes: true,
+    scope_kind: "EXACT_GROUP",
+    active_asset_group: {
+      group_id: CONTROL_CENTER_GATE_GROUP.group_id,
+      asset_paths: [...CONTROL_CENTER_GATE_GROUP.asset_paths],
+    },
+    ...overrides,
+  };
+}
+
+function buildCloseProposal(overrides = {}) {
+  return {
+    request_type: "CLOSE_GROUP",
+    mode: "CLOSE",
+    preserves_unrelated_changes: true,
+    changed_files: [...CONTROL_CENTER_GATE_GROUP.asset_paths],
+    active_asset_group: {
+      group_id: CONTROL_CENTER_GATE_GROUP.group_id,
+      asset_paths: [...CONTROL_CENTER_GATE_GROUP.asset_paths],
+    },
+    evidence_completion: {
+      contents_and_purpose: true,
+      references_and_consumers: true,
+      runtime_use: true,
+      dependencies: true,
+      overlap_or_duplication: true,
+    },
+    disposition: "USE",
+    ...overrides,
+  };
+}
 
 describe("Edge Control Center Ledger v1", () => {
   it("loads valid Edge ledger JSON", () => {
@@ -26,6 +69,60 @@ describe("Edge Control Center Ledger v1", () => {
     );
     assert.ok(Array.isArray(ledger.tasks));
     assert.ok(ledger.tasks.length >= 14);
+  });
+
+  it("documents the closed investigation state snapshot", () => {
+    const documentText = loadControlCenterDocument();
+    const result = validateControlCenterPolicy(documentText);
+
+    assert.equal(result.errors.length, 0);
+    assert.equal(CONTROL_CENTER_PATH.endsWith("EDGE_CONTROL_CENTER.md"), true);
+    assert.ok(result.state);
+    assert.deepEqual(
+      result.state.required_modes,
+      ["INSPECT", "CLOSE"]
+    );
+    assert.deepEqual(
+      result.state.required_lifecycle,
+      [
+        "PENDING",
+        "INSPECTING",
+        "DISPOSITION_READY",
+        "CLOSURE_READY",
+        "CLOSED",
+      ]
+    );
+    assert.equal(
+      result.state.active_asset_group.group_id,
+      CONTROL_CENTER_GATE_GROUP.group_id
+    );
+    assert.deepEqual(
+      result.state.active_asset_group.asset_paths,
+      CONTROL_CENTER_GATE_GROUP.asset_paths
+    );
+    assert.equal(result.state.lifecycle_state, "CLOSED");
+    assert.equal(result.state.disposition, "USE");
+    assert.equal(result.state.closure_status, "CLOSED");
+    assert.equal(result.state.investigated_assets, 3);
+    assert.equal(result.state.closed_assets, 3);
+    assert.equal(result.state.remaining_assets, 903);
+    assert.deepEqual(
+      result.state.evidence_completion,
+      {
+        contents_and_purpose: true,
+        references_and_consumers: true,
+        runtime_use: true,
+        dependencies: true,
+        overlap_or_duplication: true,
+      }
+    );
+    assert.deepEqual(result.state.inspected_groups, [
+      CONTROL_CENTER_GATE_GROUP.group_id,
+    ]);
+    assert.deepEqual(result.state.closed_groups, [
+      CONTROL_CENTER_GATE_GROUP.group_id,
+    ]);
+    assert.equal(result.state.total_governed_assets, 906);
   });
 
   it("every task has a unique task_id and allowed status", () => {
@@ -121,6 +218,273 @@ describe("Edge Control Center Ledger v1", () => {
     const result = validateLedger(ledger);
 
     assert.deepEqual(result.errors, []);
+  });
+
+  it("runCheck without a proposal defaults the gate to HOLD", () => {
+    const result = runCheck({
+      ledgerPath: LEDGER_PATH,
+      controlCenterPath: CONTROL_CENTER_PATH,
+    });
+
+    assert.equal(result.passed, true);
+    assert.deepEqual(result.policy.errors, []);
+    assert.equal(result.gateDecision.gate, "HOLD");
+    assert.equal(
+      result.gateDecision.reason,
+      "MISSING_INSTRUCTION_OR_STATE"
+    );
+  });
+
+  it("no instruction or state defaults to HOLD", () => {
+    const result = evaluateControlCenterProposal(null, null);
+
+    assert.equal(result.gate, "HOLD");
+    assert.equal(result.reason, "MISSING_INSTRUCTION_OR_STATE");
+  });
+
+  it("exact asset inspection is GREEN", () => {
+    const state = createControlCenterGateState();
+    const result = evaluateControlCenterProposal(
+      buildGroupProposal(),
+      state
+    );
+
+    assert.equal(result.gate, "GREEN");
+    assert.equal(result.mode, "INSPECT");
+    assert.equal(result.reason, "INSPECTION_ACCEPTED");
+    assert.equal(
+      result.activeAssetGroup,
+      CONTROL_CENTER_GATE_GROUP.group_id
+    );
+    assert.equal(result.lifecycleState, "PENDING");
+    assert.equal(result.nextState.lifecycle_state, "INSPECTING");
+  });
+
+  it("broad repository inspection is HOLD", () => {
+    const result = evaluateControlCenterProposal(
+      buildGroupProposal({
+        request_type: "BROAD_REPOSITORY_INSPECTION",
+        scope_kind: "BROAD_REPOSITORY",
+      }),
+      createControlCenterGateState()
+    );
+
+    assert.equal(result.gate, "HOLD");
+    assert.equal(result.reason, "BROAD_REPOSITORY_WORK");
+  });
+
+  it("no explicit inspected group is HOLD", () => {
+    const result = evaluateControlCenterProposal(
+      {
+        request_type: "INSPECT_GROUP",
+        mode: "INSPECT",
+        inspection_only: true,
+        preserves_unrelated_changes: true,
+      },
+      createControlCenterGateState()
+    );
+
+    assert.equal(result.gate, "HOLD");
+    assert.equal(result.reason, "MISSING_ACTIVE_GROUP");
+  });
+
+  it("premature deletion is HOLD", () => {
+    const result = evaluateControlCenterProposal(
+      {
+        request_type: "PREMATURE_DELETE",
+        mode: "CLOSE",
+        active_asset_group: {
+          group_id: CONTROL_CENTER_GATE_GROUP.group_id,
+          asset_paths: [...CONTROL_CENTER_GATE_GROUP.asset_paths],
+        },
+        preserves_unrelated_changes: true,
+      },
+      createControlCenterGateState()
+    );
+
+    assert.equal(result.gate, "HOLD");
+    assert.equal(result.reason, "PREMATURE_DELETE");
+  });
+
+  it("premature merge is HOLD", () => {
+    const result = evaluateControlCenterProposal(
+      {
+        request_type: "PREMATURE_MERGE",
+        mode: "CLOSE",
+        active_asset_group: {
+          group_id: CONTROL_CENTER_GATE_GROUP.group_id,
+          asset_paths: [...CONTROL_CENTER_GATE_GROUP.asset_paths],
+        },
+        preserves_unrelated_changes: true,
+      },
+      createControlCenterGateState()
+    );
+
+    assert.equal(result.gate, "HOLD");
+    assert.equal(result.reason, "PREMATURE_MERGE");
+  });
+
+  it("feature work is HOLD", () => {
+    const result = evaluateControlCenterProposal(
+      {
+        request_type: "FEATURE_WORK",
+        mode: "INSPECT",
+      },
+      createControlCenterGateState()
+    );
+
+    assert.equal(result.gate, "HOLD");
+    assert.equal(result.reason, "FEATURE_WORK");
+  });
+
+  it("inspected group with incomplete evidence CLOSE is HOLD", () => {
+    const state = createControlCenterGateState({
+      lifecycle_state: "CLOSURE_READY",
+      evidence_completion: {
+        contents_and_purpose: true,
+        references_and_consumers: true,
+        runtime_use: true,
+        dependencies: true,
+        overlap_or_duplication: true,
+      },
+      investigated_assets:
+        CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      remaining_assets: 906 - CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+    });
+
+    const result = evaluateControlCenterProposal(
+      buildCloseProposal({
+        evidence_completion: {
+          contents_and_purpose: true,
+          references_and_consumers: false,
+          runtime_use: true,
+          dependencies: true,
+          overlap_or_duplication: true,
+        },
+      }),
+      state
+    );
+
+    assert.equal(result.gate, "HOLD");
+    assert.equal(result.reason, "CLOSURE_EVIDENCE_INCOMPLETE");
+  });
+
+  it("fully investigated group with disposition CLOSE is GREEN", () => {
+    const state = createControlCenterGateState({
+      lifecycle_state: "CLOSURE_READY",
+      evidence_completion: {
+        contents_and_purpose: true,
+        references_and_consumers: true,
+        runtime_use: true,
+        dependencies: true,
+        overlap_or_duplication: true,
+      },
+      investigated_assets:
+        CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      remaining_assets: 906 - CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+    });
+
+    const result = evaluateControlCenterProposal(
+      buildCloseProposal(),
+      state
+    );
+
+    assert.equal(result.gate, "GREEN");
+    assert.equal(result.mode, "CLOSE");
+    assert.equal(result.reason, "CLOSURE_ACCEPTED");
+    assert.equal(result.nextState.lifecycle_state, "CLOSED");
+  });
+
+  it("closure containing unrelated files is HOLD", () => {
+    const state = createControlCenterGateState({
+      lifecycle_state: "CLOSURE_READY",
+      evidence_completion: {
+        contents_and_purpose: true,
+        references_and_consumers: true,
+        runtime_use: true,
+        dependencies: true,
+        overlap_or_duplication: true,
+      },
+      investigated_assets:
+        CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      remaining_assets: 906 - CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+    });
+
+    const result = evaluateControlCenterProposal(
+      buildCloseProposal({
+        changed_files: [
+          ...CONTROL_CENTER_GATE_GROUP.asset_paths,
+          "public/unrelated-file.txt",
+        ],
+      }),
+      state
+    );
+
+    assert.equal(result.gate, "HOLD");
+    assert.equal(result.reason, "CLOSURE_SCOPE_MISMATCH");
+  });
+
+  it("closed group cannot be silently reopened", () => {
+    const state = createControlCenterGateState({
+      lifecycle_state: "CLOSED",
+      closure_status: "CLOSED",
+      evidence_completion: {
+        contents_and_purpose: true,
+        references_and_consumers: true,
+        runtime_use: true,
+        dependencies: true,
+        overlap_or_duplication: true,
+      },
+      disposition: "USE",
+      investigated_assets:
+        CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      closed_assets: CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      remaining_assets: 906 - CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      inspected_groups: [CONTROL_CENTER_GATE_GROUP.group_id],
+      closed_groups: [CONTROL_CENTER_GATE_GROUP.group_id],
+    });
+
+    const result = evaluateControlCenterProposal(
+      buildGroupProposal(),
+      state
+    );
+
+    assert.equal(result.gate, "HOLD");
+    assert.equal(result.reason, "GROUP_ALREADY_CLOSED");
+  });
+
+  it("next asset cannot start before current group closes", () => {
+    const state = createControlCenterGateState({
+      lifecycle_state: "INSPECTING",
+      evidence_completion: {
+        contents_and_purpose: true,
+        references_and_consumers: false,
+        runtime_use: false,
+        dependencies: false,
+        overlap_or_duplication: false,
+      },
+      investigated_assets:
+        CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      remaining_assets: 906 - CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+    });
+
+    const result = evaluateControlCenterProposal(
+      {
+        request_type: "INSPECT_GROUP",
+        mode: "INSPECT",
+        inspection_only: true,
+        preserves_unrelated_changes: true,
+        scope_kind: "EXACT_GROUP",
+        active_asset_group: {
+          group_id: "next-group",
+          asset_paths: ["control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json"],
+        },
+      },
+      state
+    );
+
+    assert.equal(result.gate, "HOLD");
+    assert.equal(result.reason, "ACTIVE_GROUP_MISMATCH");
   });
 
   it("Control Center bootstrap is DONE", () => {

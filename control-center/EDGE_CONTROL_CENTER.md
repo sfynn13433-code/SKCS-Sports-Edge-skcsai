@@ -246,9 +246,11 @@ Before implementation:
 
 ---
 
-## 8. Next task
+<!-- Deprecated sequencing note from the prior gate state.
 
-Next allowed startable task is:
+## 8. Prior sequencing note
+
+Previous allowed startable task snapshot:
 
 EPR-001 closure state:
 
@@ -301,7 +303,112 @@ Do not clear the marriage gate.
 
 Startable tasks: 0
 
-Next gated task:
+Previous gated task snapshot:
 **EAC-001 — Edge Asset Classification and Repository Map [PROPOSED]**
 
 Requires separate approval before start
+-->
+
+## 8. Stateful Control Center gate
+
+All AI instructions are proposals.
+
+ChatGPT, Codex, Cursor, and other AI instructions require Control Center GREEN before execution.
+
+The gate is stateful and uses explicit lifecycle state. It does not use keyword or phrase detection to decide GREEN or HOLD.
+
+Required lifecycle:
+
+- PENDING
+- INSPECTING
+- DISPOSITION_READY
+- CLOSURE_READY
+- CLOSED
+
+Required modes:
+
+- INSPECT
+- CLOSE
+
+Required state snapshot:
+
+<!-- CONTROL_CENTER_STATE_START -->
+```json
+{
+  "required_modes": ["INSPECT", "CLOSE"],
+  "required_lifecycle": ["PENDING", "INSPECTING", "DISPOSITION_READY", "CLOSURE_READY", "CLOSED"],
+  "active_asset_group": {
+    "group_id": "control-center-gate-group",
+    "asset_paths": [
+      "control-center/EDGE_CONTROL_CENTER.md",
+      "control-center/check_control_center.js",
+      "tests/edge-control-center-ledger.test.js"
+    ]
+  },
+  "lifecycle_state": "CLOSED",
+  "evidence_completion": {
+    "contents_and_purpose": true,
+    "references_and_consumers": true,
+    "runtime_use": true,
+    "dependencies": true,
+    "overlap_or_duplication": true
+  },
+  "disposition": "USE",
+  "closure_status": "CLOSED",
+  "total_governed_assets": 906,
+  "investigated_assets": 3,
+  "closed_assets": 3,
+  "remaining_assets": 903,
+  "required_closure_files": [
+    "control-center/EDGE_CONTROL_CENTER.md",
+    "control-center/check_control_center.js",
+    "tests/edge-control-center-ledger.test.js"
+  ],
+  "inspected_groups": ["control-center-gate-group"],
+  "closed_groups": ["control-center-gate-group"]
+}
+```
+<!-- CONTROL_CENTER_STATE_END -->
+
+Investigation evidence:
+
+- contents_and_purpose: the document defines the active Control Center policy and state, the checker enforces it, and the tests verify it.
+- references_and_consumers: `check_control_center.js` loads this document; `tests/edge-control-center-ledger.test.js` and `backend/services/controlCenterReadService.js` consume the checker entrypoint; package scripts expose the control-center checks.
+- runtime_use: `node control-center/check_control_center.js` and `node --test tests/edge-control-center-ledger.test.js` are active runtime verification paths.
+- dependencies: the gate depends on the asset register, the build ledger, Node `fs`, `path`, and `assert`, plus the state JSON embedded above.
+- overlap_or_duplication: the three files are tightly related but not duplicative; they serve distinct policy, gate, and verification roles.
+
+Disposition recorded: USE
+Closure status: CLOSED
+
+INSPECT may receive GREEN only when:
+
+- an exact asset or tightly related group is named
+- the group is recorded as the active investigation scope
+- the instruction is inspection-only
+- no merge, replacement, retirement, deletion, refactor, or unrelated repair is authorized
+
+CLOSE may receive GREEN only when:
+
+- the exact same asset/group was previously inspected
+- contents and purpose evidence exists
+- consumer and reference evidence exists
+- runtime evidence exists
+- dependency evidence exists
+- overlap evidence exists
+- an evidence-backed disposition exists
+- closure scope contains only that inspected group and its required Control Center projection
+- unrelated changes are preserved
+
+No instruction or missing state = HOLD.
+
+Feature work, unrelated cleanup, broad repository work, or premature mutation = HOLD.
+
+The active investigation remains locked until every governed asset has reached CLOSED with an evidence-backed disposition.
+
+Startable tasks are informational only.
+
+Current sequencing remains informational and does not authorize execution:
+
+- EAC-001 — Edge Asset Classification and Repository Map [PROPOSED]
+- ECU-001 — Edge Control Center Operator UI [APPROVED]
