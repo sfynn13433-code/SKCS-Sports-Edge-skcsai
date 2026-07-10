@@ -329,13 +329,15 @@ Required modes:
 
 - INSPECT
 - CLOSE
+- CONTROL
+- ACTIVATE
 
 Required state snapshot:
 
 <!-- CONTROL_CENTER_STATE_START -->
 ```json
 {
-  "required_modes": ["INSPECT", "CLOSE"],
+  "required_modes": ["INSPECT", "CLOSE", "CONTROL", "ACTIVATE"],
   "required_lifecycle": ["PENDING", "INSPECTING", "DISPOSITION_READY", "CLOSURE_READY", "CLOSED"],
   "active_asset_group": {
     "group_id": "control-center-gate-group",
@@ -365,7 +367,12 @@ Required state snapshot:
     "tests/edge-control-center-ledger.test.js"
   ],
   "inspected_groups": ["control-center-gate-group"],
-  "closed_groups": ["control-center-gate-group"]
+  "closed_groups": ["control-center-gate-group"],
+  "closed_asset_paths": [
+    "control-center/EDGE_CONTROL_CENTER.md",
+    "control-center/check_control_center.js",
+    "tests/edge-control-center-ledger.test.js"
+  ]
 }
 ```
 <!-- CONTROL_CENTER_STATE_END -->
@@ -399,6 +406,25 @@ CLOSE may receive GREEN only when:
 - an evidence-backed disposition exists
 - closure scope contains only that inspected group and its required Control Center projection
 - unrelated changes are preserved
+
+CONTROL may receive GREEN only when:
+
+- Stephen explicitly authorizes Control Center maintenance
+- a proven Control Center defect or lifecycle gap is recorded
+- scope is confined to Control Center gate, policy, and focused tests
+- no product asset is changed
+
+ACTIVATE may receive GREEN only when:
+
+- the current group is CLOSED
+- no group remains open
+- the next asset or group is selected from governed asset authority
+- already CLOSED assets are skipped
+- the exact next asset or group is recorded
+- the new lifecycle state becomes PENDING
+- counters remain consistent
+
+Default activation selects the first governed, not-CLOSED asset in deterministic asset-register order.
 
 No instruction or missing state = HOLD.
 

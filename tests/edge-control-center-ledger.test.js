@@ -8,6 +8,7 @@ const {
   CONTROL_CENTER_PATH,
   CONTROL_CENTER_GATE_GROUP,
   createControlCenterGateState,
+  getNextGovernedAssetGroup,
   LEDGER_PATH,
   MARRIAGE_PREREQUISITES,
   evaluateControlCenterProposal,
@@ -58,6 +59,27 @@ function buildCloseProposal(overrides = {}) {
   };
 }
 
+function buildControlProposal(overrides = {}) {
+  return {
+    request_type: "CONTROL_CENTER_MAINTENANCE",
+    mode: "CONTROL",
+    owner_authorized: true,
+    proven_control_center_defect: true,
+    changed_files: [...CONTROL_CENTER_GATE_GROUP.asset_paths],
+    product_asset_paths: [],
+    ...overrides,
+  };
+}
+
+function buildActivateProposal(overrides = {}) {
+  return {
+    request_type: "ACTIVATE_NEXT_GROUP",
+    mode: "ACTIVATE",
+    preserves_unrelated_changes: true,
+    ...overrides,
+  };
+}
+
 describe("Edge Control Center Ledger v1", () => {
   it("loads valid Edge ledger JSON", () => {
     const ledger = loadLedger();
@@ -80,7 +102,7 @@ describe("Edge Control Center Ledger v1", () => {
     assert.ok(result.state);
     assert.deepEqual(
       result.state.required_modes,
-      ["INSPECT", "CLOSE"]
+      ["INSPECT", "CLOSE", "CONTROL", "ACTIVATE"]
     );
     assert.deepEqual(
       result.state.required_lifecycle,
@@ -122,6 +144,10 @@ describe("Edge Control Center Ledger v1", () => {
     assert.deepEqual(result.state.closed_groups, [
       CONTROL_CENTER_GATE_GROUP.group_id,
     ]);
+    assert.deepEqual(
+      result.state.closed_asset_paths,
+      CONTROL_CENTER_GATE_GROUP.asset_paths
+    );
     assert.equal(result.state.total_governed_assets, 906);
   });
 
@@ -485,6 +511,176 @@ describe("Edge Control Center Ledger v1", () => {
 
     assert.equal(result.gate, "HOLD");
     assert.equal(result.reason, "ACTIVE_GROUP_MISMATCH");
+  });
+
+  it("closed group plus ACTIVATE is GREEN", () => {
+    const state = createControlCenterGateState({
+      lifecycle_state: "CLOSED",
+      closure_status: "CLOSED",
+      evidence_completion: {
+        contents_and_purpose: true,
+        references_and_consumers: true,
+        runtime_use: true,
+        dependencies: true,
+        overlap_or_duplication: true,
+      },
+      disposition: "USE",
+      investigated_assets:
+        CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      closed_assets: CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      remaining_assets: 906 - CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      inspected_groups: [CONTROL_CENTER_GATE_GROUP.group_id],
+      closed_groups: [CONTROL_CENTER_GATE_GROUP.group_id],
+      closed_asset_paths: [...CONTROL_CENTER_GATE_GROUP.asset_paths],
+    });
+
+    const result = evaluateControlCenterProposal(
+      buildActivateProposal(),
+      state
+    );
+
+    assert.equal(result.gate, "GREEN");
+    assert.equal(result.mode, "ACTIVATE");
+    assert.equal(result.reason, "NEXT_GROUP_ACTIVATED");
+  });
+
+  it("open group plus ACTIVATE is HOLD", () => {
+    const state = createControlCenterGateState({
+      lifecycle_state: "INSPECTING",
+      closure_status: "OPEN",
+    });
+
+    const result = evaluateControlCenterProposal(
+      buildActivateProposal(),
+      state
+    );
+
+    assert.equal(result.gate, "HOLD");
+    assert.equal(result.reason, "OPEN_GROUP_MUST_CLOSE_FIRST");
+  });
+
+  it("already-closed asset cannot reactivate", () => {
+    const state = createControlCenterGateState({
+      lifecycle_state: "CLOSED",
+      closure_status: "CLOSED",
+      investigated_assets:
+        CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      closed_assets: CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      remaining_assets: 906 - CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      closed_asset_paths: [...CONTROL_CENTER_GATE_GROUP.asset_paths],
+    });
+
+    const result = evaluateControlCenterProposal(
+      buildActivateProposal({
+        next_active_group: {
+          group_id: CONTROL_CENTER_GATE_GROUP.group_id,
+          asset_paths: [...CONTROL_CENTER_GATE_GROUP.asset_paths],
+        },
+      }),
+      state
+    );
+
+    assert.equal(result.gate, "HOLD");
+    assert.equal(result.reason, "NEXT_GROUP_MISMATCH");
+  });
+
+  it("deterministic next governed asset is selected", () => {
+    const state = createControlCenterGateState({
+      lifecycle_state: "CLOSED",
+      closure_status: "CLOSED",
+      investigated_assets:
+        CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      closed_assets: CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      remaining_assets: 906 - CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      closed_asset_paths: [...CONTROL_CENTER_GATE_GROUP.asset_paths],
+    });
+
+    const expectedNextGroup = getNextGovernedAssetGroup(state);
+    const result = evaluateControlCenterProposal(
+      buildActivateProposal(),
+      state
+    );
+
+    assert.deepEqual(result.nextState.active_asset_group, expectedNextGroup);
+    assert.deepEqual(expectedNextGroup, {
+      group_id: ".bat",
+      asset_paths: [".bat"],
+    });
+  });
+
+  it("new group enters PENDING", () => {
+    const state = createControlCenterGateState({
+      lifecycle_state: "CLOSED",
+      closure_status: "CLOSED",
+      investigated_assets:
+        CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      closed_assets: CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      remaining_assets: 906 - CONTROL_CENTER_GATE_GROUP.asset_paths.length,
+      closed_asset_paths: [...CONTROL_CENTER_GATE_GROUP.asset_paths],
+    });
+
+    const result = evaluateControlCenterProposal(
+      buildActivateProposal(),
+      state
+    );
+
+    assert.equal(result.nextState.lifecycle_state, "PENDING");
+    assert.equal(result.nextState.closure_status, "OPEN");
+    assert.equal(result.nextState.disposition, null);
+    assert.deepEqual(result.nextState.evidence_completion, {
+      contents_and_purpose: false,
+      references_and_consumers: false,
+      runtime_use: false,
+      dependencies: false,
+      overlap_or_duplication: false,
+    });
+  });
+
+  it("CONTROL without owner authorization is HOLD", () => {
+    const result = evaluateControlCenterProposal(
+      buildControlProposal({ owner_authorized: false }),
+      createControlCenterGateState()
+    );
+
+    assert.equal(result.gate, "HOLD");
+    assert.equal(result.reason, "OWNER_AUTHORIZATION_REQUIRED");
+  });
+
+  it("CONTROL without proven defect is HOLD", () => {
+    const result = evaluateControlCenterProposal(
+      buildControlProposal({ proven_control_center_defect: false }),
+      createControlCenterGateState()
+    );
+
+    assert.equal(result.gate, "HOLD");
+    assert.equal(result.reason, "PROVEN_CONTROL_CENTER_DEFECT_REQUIRED");
+  });
+
+  it("CONTROL touching product files is HOLD", () => {
+    const result = evaluateControlCenterProposal(
+      buildControlProposal({
+        changed_files: [
+          ...CONTROL_CENTER_GATE_GROUP.asset_paths,
+          "backend/server-express.js",
+        ],
+        product_asset_paths: ["backend/server-express.js"],
+      }),
+      createControlCenterGateState()
+    );
+
+    assert.equal(result.gate, "HOLD");
+    assert.equal(result.reason, "CONTROL_SCOPE_MISMATCH");
+  });
+
+  it("proven owner-authorized Control Center defect is GREEN", () => {
+    const result = evaluateControlCenterProposal(
+      buildControlProposal(),
+      createControlCenterGateState()
+    );
+
+    assert.equal(result.gate, "GREEN");
+    assert.equal(result.mode, "CONTROL");
+    assert.equal(result.reason, "CONTROL_CENTER_MAINTENANCE_ACCEPTED");
   });
 
   it("Control Center bootstrap is DONE", () => {

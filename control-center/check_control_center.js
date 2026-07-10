@@ -39,11 +39,15 @@ const REQUIRED_LIFECYCLE_STATES = Object.freeze([
 const REQUIRED_EXECUTION_MODES = Object.freeze([
   "INSPECT",
   "CLOSE",
+  "CONTROL",
+  "ACTIVATE",
 ]);
 
 const RECOGNIZED_REQUEST_TYPES = Object.freeze([
   "INSPECT_GROUP",
   "CLOSE_GROUP",
+  "CONTROL_CENTER_MAINTENANCE",
+  "ACTIVATE_NEXT_GROUP",
   "FEATURE_WORK",
   "GOVERNANCE_CLEANUP",
   "PREMATURE_DELETE",
@@ -134,6 +138,16 @@ function getTotalGovernedAssets(assetRegister) {
     : 0;
 }
 
+function getGovernedAssetPaths(assetRegister) {
+  if (!Array.isArray(assetRegister?.assets)) {
+    return [];
+  }
+
+  return assetRegister.assets
+    .map((asset) => asset?.asset_path)
+    .filter((assetPath) => typeof assetPath === "string" && assetPath.trim());
+}
+
 function createControlCenterGateState(overrides = {}) {
   const assetRegister = loadAssetRegister();
   const totalGovernedAssets = getTotalGovernedAssets(assetRegister);
@@ -159,6 +173,7 @@ function createControlCenterGateState(overrides = {}) {
     required_closure_files: [...CONTROL_CENTER_GATE_GROUP.asset_paths],
     inspected_groups: [],
     closed_groups: [],
+    closed_asset_paths: [],
   };
 
   return {
@@ -187,6 +202,9 @@ function createControlCenterGateState(overrides = {}) {
       : [],
     closed_groups: Array.isArray(overrides.closed_groups)
       ? [...overrides.closed_groups]
+      : [],
+    closed_asset_paths: Array.isArray(overrides.closed_asset_paths)
+      ? [...overrides.closed_asset_paths]
       : [],
   };
 }
@@ -238,6 +256,53 @@ function listsMatchExactly(left, right) {
   return normalizedLeft.every(
     (value, index) => value === normalizedRight[index]
   );
+}
+
+function isSubsetOfList(items, allowedItems) {
+  const normalizedItems = normalizeFileList(items);
+  const normalizedAllowedItems = normalizeFileList(allowedItems);
+
+  if (!normalizedItems || !normalizedAllowedItems) {
+    return false;
+  }
+
+  const allowed = new Set(normalizedAllowedItems);
+  return normalizedItems.every((item) => allowed.has(item));
+}
+
+function getClosedAssetPaths(state) {
+  const closedAssetPaths = Array.isArray(state?.closed_asset_paths)
+    ? state.closed_asset_paths
+    : [];
+
+  if (
+    state?.lifecycle_state === "CLOSED" &&
+    Array.isArray(state?.active_asset_group?.asset_paths)
+  ) {
+    return normalizeFileList([
+      ...closedAssetPaths,
+      ...state.active_asset_group.asset_paths,
+    ]);
+  }
+
+  return normalizeFileList(closedAssetPaths) || [];
+}
+
+function getNextGovernedAssetGroup(state, assetRegister = loadAssetRegister()) {
+  const governedAssetPaths = getGovernedAssetPaths(assetRegister);
+  const closedAssetPaths = new Set(getClosedAssetPaths(state));
+  const nextAssetPath = governedAssetPaths.find(
+    (assetPath) => !closedAssetPaths.has(assetPath)
+  );
+
+  if (!nextAssetPath) {
+    return null;
+  }
+
+  return {
+    group_id: nextAssetPath,
+    asset_paths: [nextAssetPath],
+  };
 }
 
 function isEvidenceComplete(evidenceCompletion) {
@@ -426,6 +491,7 @@ function validateControlCenterPolicy(documentText) {
   const assetRegister = loadAssetRegister();
   const expectedTotalGovernedAssets =
     getTotalGovernedAssets(assetRegister);
+  const governedAssetPaths = getGovernedAssetPaths(assetRegister);
 
   if (!state) {
     errors.push(
@@ -466,10 +532,9 @@ function validateControlCenterPolicy(documentText) {
     typeof activeGroup !== "object" ||
     typeof activeGroup.group_id !== "string" ||
     activeGroup.group_id.trim() === "" ||
-    !listsMatchExactly(
-      activeGroup.asset_paths,
-      CONTROL_CENTER_GATE_GROUP.asset_paths
-    )
+    !Array.isArray(activeGroup.asset_paths) ||
+    activeGroup.asset_paths.length === 0 ||
+    !isSubsetOfList(activeGroup.asset_paths, governedAssetPaths)
   ) {
     errors.push("Control Center state active_asset_group drift");
   }
@@ -536,7 +601,7 @@ function validateControlCenterPolicy(documentText) {
     !Array.isArray(state.required_closure_files) ||
     !listsMatchExactly(
       state.required_closure_files,
-      CONTROL_CENTER_GATE_GROUP.asset_paths
+      activeGroup?.asset_paths
     )
   ) {
     errors.push("Control Center state required_closure_files drift");
@@ -548,6 +613,13 @@ function validateControlCenterPolicy(documentText) {
 
   if (!Array.isArray(state.closed_groups)) {
     errors.push("Control Center state missing closed_groups");
+  }
+
+  if (
+    !Array.isArray(state.closed_asset_paths) ||
+    !isSubsetOfList(state.closed_asset_paths, governedAssetPaths)
+  ) {
+    errors.push("Control Center state closed_asset_paths drift");
   }
 
   return {
@@ -710,6 +782,206 @@ function evaluateControlCenterProposal(
       lifecycleState: state.lifecycle_state,
       approvedScope: "NONE",
       nextState: state,
+    });
+  }
+
+  if (proposal.mode === "CONTROL") {
+    if (requestType !== "CONTROL_CENTER_MAINTENANCE") {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "CONTROL",
+        reason: "CONTROL_REQUEST_TYPE_REQUIRED",
+        activeAssetGroup: state.active_asset_group.group_id,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    if (proposal.owner_authorized !== true) {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "CONTROL",
+        reason: "OWNER_AUTHORIZATION_REQUIRED",
+        activeAssetGroup: state.active_asset_group.group_id,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    if (proposal.proven_control_center_defect !== true) {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "CONTROL",
+        reason: "PROVEN_CONTROL_CENTER_DEFECT_REQUIRED",
+        activeAssetGroup: state.active_asset_group.group_id,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    if (
+      !listsMatchExactly(
+        proposal.changed_files,
+        CONTROL_CENTER_GATE_GROUP.asset_paths
+      )
+    ) {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "CONTROL",
+        reason: "CONTROL_SCOPE_MISMATCH",
+        activeAssetGroup: state.active_asset_group.group_id,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    if (
+      Array.isArray(proposal.product_asset_paths) &&
+      proposal.product_asset_paths.length > 0
+    ) {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "CONTROL",
+        reason: "PRODUCT_ASSET_CHANGE_BLOCKED",
+        activeAssetGroup: state.active_asset_group.group_id,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    return buildGateResponse({
+      gate: "GREEN",
+      mode: "CONTROL",
+      reason: "CONTROL_CENTER_MAINTENANCE_ACCEPTED",
+      activeAssetGroup: state.active_asset_group.group_id,
+      lifecycleState: state.lifecycle_state,
+      approvedScope:
+        "Maintain only the Control Center gate, policy, and focused tests for the proven lifecycle defect.",
+      nextState: state,
+    });
+  }
+
+  if (proposal.mode === "ACTIVATE") {
+    if (requestType !== "ACTIVATE_NEXT_GROUP") {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "ACTIVATE",
+        reason: "ACTIVATE_REQUEST_TYPE_REQUIRED",
+        activeAssetGroup: state.active_asset_group.group_id,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    if (
+      state.lifecycle_state !== "CLOSED" ||
+      state.closure_status !== "CLOSED"
+    ) {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "ACTIVATE",
+        reason: "OPEN_GROUP_MUST_CLOSE_FIRST",
+        activeAssetGroup: state.active_asset_group.group_id,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    if (!proposal.preserves_unrelated_changes) {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "ACTIVATE",
+        reason: "UNRELATED_CHANGES_NOT_PRESERVED",
+        activeAssetGroup: state.active_asset_group.group_id,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    const closedAssetPaths = getClosedAssetPaths(state);
+    const expectedClosedAssets = closedAssetPaths.length;
+
+    if (Number(state.closed_assets) !== expectedClosedAssets) {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "ACTIVATE",
+        reason: "CLOSED_ASSET_COUNT_DRIFT",
+        activeAssetGroup: state.active_asset_group.group_id,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    const nextGroup = getNextGovernedAssetGroup(state);
+
+    if (!nextGroup) {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "ACTIVATE",
+        reason: "NO_REMAINING_GOVERNED_ASSET",
+        activeAssetGroup: state.active_asset_group.group_id,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    const proposedNextGroup =
+      proposal.next_active_group || proposal.active_asset_group;
+
+    if (
+      proposedNextGroup &&
+      !isExactGroupMatch(proposedNextGroup, nextGroup)
+    ) {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "ACTIVATE",
+        reason: "NEXT_GROUP_MISMATCH",
+        activeAssetGroup: state.active_asset_group.group_id,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    const nextState = {
+      ...state,
+      active_asset_group: nextGroup,
+      lifecycle_state: "PENDING",
+      evidence_completion: {
+        contents_and_purpose: false,
+        references_and_consumers: false,
+        runtime_use: false,
+        dependencies: false,
+        overlap_or_duplication: false,
+      },
+      disposition: null,
+      closure_status: "OPEN",
+      required_closure_files: [...nextGroup.asset_paths],
+      closed_asset_paths: closedAssetPaths,
+      remaining_assets:
+        Number(state.total_governed_assets) -
+        Number(state.investigated_assets),
+    };
+
+    return buildGateResponse({
+      gate: "GREEN",
+      mode: "ACTIVATE",
+      reason: "NEXT_GROUP_ACTIVATED",
+      activeAssetGroup: nextGroup.group_id,
+      lifecycleState: state.lifecycle_state,
+      approvedScope:
+        "Activate the first governed not-closed asset in deterministic asset-register order.",
+      nextState,
     });
   }
 
@@ -1448,10 +1720,14 @@ module.exports = {
   loadControlCenterDocument: readControlCenterDocument,
   readControlCenterDocument,
   getTotalGovernedAssets,
+  getGovernedAssetPaths,
   createControlCenterGateState,
   parseControlCenterStateDocument,
   normalizeFileList,
   listsMatchExactly,
+  isSubsetOfList,
+  getClosedAssetPaths,
+  getNextGovernedAssetGroup,
   isEvidenceComplete,
   normalizeProposal,
   validateLedger,
