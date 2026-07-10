@@ -340,11 +340,9 @@ Required state snapshot:
   "required_modes": ["INSPECT", "CLOSE", "CONTROL", "ACTIVATE"],
   "required_lifecycle": ["PENDING", "INSPECTING", "DISPOSITION_READY", "CLOSURE_READY", "CLOSED"],
   "active_asset_group": {
-    "group_id": "control-center-gate-group",
+    "group_id": ".bat",
     "asset_paths": [
-      "control-center/EDGE_CONTROL_CENTER.md",
-      "control-center/check_control_center.js",
-      "tests/edge-control-center-ledger.test.js"
+      ".bat"
     ]
   },
   "lifecycle_state": "CLOSED",
@@ -355,23 +353,22 @@ Required state snapshot:
     "dependencies": true,
     "overlap_or_duplication": true
   },
-  "disposition": "USE",
+  "disposition": "MERGE",
   "closure_status": "CLOSED",
   "total_governed_assets": 906,
-  "investigated_assets": 3,
-  "closed_assets": 3,
-  "remaining_assets": 903,
+  "investigated_assets": 4,
+  "closed_assets": 4,
+  "remaining_assets": 902,
   "required_closure_files": [
-    "control-center/EDGE_CONTROL_CENTER.md",
-    "control-center/check_control_center.js",
-    "tests/edge-control-center-ledger.test.js"
+    ".bat"
   ],
-  "inspected_groups": ["control-center-gate-group"],
-  "closed_groups": ["control-center-gate-group"],
+  "inspected_groups": ["control-center-gate-group", ".bat"],
+  "closed_groups": ["control-center-gate-group", ".bat"],
   "closed_asset_paths": [
     "control-center/EDGE_CONTROL_CENTER.md",
     "control-center/check_control_center.js",
-    "tests/edge-control-center-ledger.test.js"
+    "tests/edge-control-center-ledger.test.js",
+    ".bat"
   ]
 }
 ```
@@ -386,6 +383,19 @@ Investigation evidence:
 - overlap_or_duplication: the three files are tightly related but not duplicative; they serve distinct policy, gate, and verification roles.
 
 Disposition recorded: USE
+Closure status: CLOSED
+
+Active investigation evidence: .bat
+
+- contents_and_purpose: `.bat` is a Windows batch launcher created to start the local SKCS EdgeMind Dolphin/Llama server on port 8080 and open an ngrok tunnel to that local service.
+- references_and_consumers: repository search found no code path that invokes `.bat`; governed references are the asset register, asset map, classification batches, and the active Control Center state. Runtime code consumes `DOLPHIN_URL` directly instead of invoking this script.
+- runtime_use: no production runtime registration or package script calls `.bat`; if manually executed on the original Windows machine, it opens two command windows for `llama-server.exe` and `ngrok`.
+- reads_and_writes: the script reads no repository files and writes no repository files; it starts external processes and binds local/network ports.
+- dependencies: depends on Windows `cmd`, `timeout`, a machine-specific `C:\Users\skcsa\models\...` llama-server path, a Dolphin model file, and an installed `ngrok` CLI with a hard-coded tunnel URL.
+- overlap_or_duplication: overlaps with `SKCS_START.bat`, which is another root batch launcher for Dolphin and ngrok; backend runtime assets such as `backend/services/aiProvider.js` and `backend/config.js` use `DOLPHIN_URL` rather than either batch file.
+- reuse_value: retain the operational idea of a local Dolphin/ngrok launcher, but merge it with the duplicate launcher pattern into one governed, configurable operator script before relying on it.
+
+Disposition recorded: MERGE
 Closure status: CLOSED
 
 INSPECT may receive GREEN only when:
