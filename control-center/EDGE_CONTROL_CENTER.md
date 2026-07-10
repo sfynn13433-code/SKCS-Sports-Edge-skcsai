@@ -698,3 +698,14 @@ B03 hash re-verification supersession
 - raw_hash_result_count: 28
 - count_match: YES
 - note: this re-verification records the actual local hash output and supersedes the earlier B03 hash report without erasing the audit trail.
+
+Phase 1 batch evidence: B04
+
+- batch_id: B04
+- title: BACKEND_UTILS_SEMANTIC_CORE_AND_TEST
+- hash_method: SHA-256
+- asset_count: 46
+- exact_duplicate_groups: 0
+- batch_outcome: BATCH_COMPLETE
+- next_deterministic_batch: B05
+- note: every B04 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
