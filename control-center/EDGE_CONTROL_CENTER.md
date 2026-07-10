@@ -786,3 +786,14 @@ Phase 1 batch evidence: B11
 - batch_outcome: BATCH_COMPLETE
 - next_deterministic_batch: B12
 - note: every B11 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
+
+Phase 1 batch evidence: B12
+
+- batch_id: B12
+- title: SCRIPTS_TEST_DIAG_TRACE
+- hash_method: SHA-256
+- asset_count: 66
+- exact_duplicate_groups: 0
+- batch_outcome: BATCH_COMPLETE
+- next_deterministic_batch: B13
+- note: every B12 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
