@@ -552,7 +552,7 @@ Required state snapshot:
   "completed_batches": [],
   "remaining_batches": ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10", "B11", "B12", "B13", "B14", "B15", "B16", "B17", "B18", "B19", "B20", "B21", "B22", "B23", "B24", "B25", "B26", "B27", "B28", "B29"],
   "next_deterministic_batch": "B01",
-  "phase_1_duplicate_scan_executed": true,
+  "phase_1_duplicate_scan_executed": false,
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,
