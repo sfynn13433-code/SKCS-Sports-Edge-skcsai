@@ -797,3 +797,14 @@ Phase 1 batch evidence: B12
 - batch_outcome: BATCH_COMPLETE
 - next_deterministic_batch: B13
 - note: every B12 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
+
+Phase 1 batch evidence: B13
+
+- batch_id: B13
+- title: SCRIPTS_RUN_TRIGGER_SCHED
+- hash_method: SHA-256
+- asset_count: 20
+- exact_duplicate_groups: 0
+- batch_outcome: BATCH_COMPLETE
+- next_deterministic_batch: B14
+- note: every B13 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
