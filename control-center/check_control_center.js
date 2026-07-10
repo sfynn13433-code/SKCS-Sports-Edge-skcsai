@@ -19,6 +19,11 @@ const CONTROL_CENTER_DOCUMENT_PATH = path.join(
   "EDGE_CONTROL_CENTER.md"
 );
 
+const BATCH_MANIFEST_PATH = path.join(
+  __dirname,
+  "EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json"
+);
+
 const CONTROL_CENTER_GATE_GROUP = Object.freeze({
   group_id: "control-center-gate-group",
   asset_paths: Object.freeze([
@@ -28,33 +33,79 @@ const CONTROL_CENTER_GATE_GROUP = Object.freeze({
   ]),
 });
 
+const BATCH_MANIFEST_RELATIVE_PATH =
+  "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json";
+
+const CLEANUP_PHASE_ORDER = Object.freeze([
+  "PHASE_0",
+  "PHASE_1",
+  "PHASE_2",
+  "PHASE_3",
+  "PHASE_4",
+  "PHASE_5",
+  "PHASE_6",
+  "PHASE_7",
+  "PHASE_8",
+]);
+
+const PHASE_QUESTIONS = Object.freeze({
+  PHASE_0: "What exact repository state is the cleanup programme starting from?",
+  PHASE_1: "Are any governed files byte-for-byte identical?",
+  PHASE_2: "What does each remaining governed file represent?",
+  PHASE_3: "Is each remaining governed file currently used?",
+  PHASE_4: "Has each applicable file been superseded or left behind by a newer implementation?",
+  PHASE_5: "Are different remaining files doing the same or substantially overlapping job?",
+  PHASE_6: "Which proven unused, replaced, or historical files can safely be removed?",
+  PHASE_7: "Which confirmed overlap groups should become one canonical implementation?",
+  PHASE_8: "Is the cleaned repository internally consistent?",
+});
+
 const REQUIRED_LIFECYCLE_STATES = Object.freeze([
-  "PENDING",
-  "INSPECTING",
-  "DISPOSITION_READY",
-  "CLOSURE_READY",
-  "CLOSED",
+  "PHASE_PENDING",
+  "PHASE_ACTIVE",
+  "BATCH_ACTIVE",
+  "BATCH_COMPLETE",
+  "PHASE_READY_TO_CLOSE",
+  "PHASE_CLOSED",
 ]);
 
 const REQUIRED_EXECUTION_MODES = Object.freeze([
-  "INSPECT",
-  "CLOSE",
+  "PHASE_WORK",
+  "COMPLETE_BATCH",
+  "CLOSE_PHASE",
+  "RECORD_FUTURE_PHASE_NOTE",
   "CONTROL",
-  "ACTIVATE",
 ]);
 
 const RECOGNIZED_REQUEST_TYPES = Object.freeze([
-  "INSPECT_GROUP",
-  "CLOSE_GROUP",
+  "PHASE_WORK",
+  "COMPLETE_BATCH",
+  "CLOSE_PHASE",
+  "RECORD_FUTURE_PHASE_NOTE",
   "CONTROL_CENTER_MAINTENANCE",
-  "ACTIVATE_NEXT_GROUP",
   "FEATURE_WORK",
   "GOVERNANCE_CLEANUP",
   "PREMATURE_DELETE",
   "PREMATURE_MERGE",
   "PREMATURE_REPLACE",
   "BROAD_REPOSITORY_INSPECTION",
+  "CROSS_PHASE_DRIFT",
   "NO_INSTRUCTION",
+  // Historical request types remain recognized only to fail closed.
+  "INSPECT_GROUP",
+  "CLOSE_GROUP",
+  "ACTIVATE_NEXT_GROUP",
+]);
+
+const PHASE_1_FORBIDDEN_WORK = Object.freeze([
+  "PURPOSE_IDENTIFICATION",
+  "LEGACY_IDENTIFICATION",
+  "OVERLAP_IDENTIFICATION",
+  "REPAIR",
+  "REFACTOR",
+  "MERGE_IMPLEMENTATION",
+  "RETIREMENT",
+  "ARCHITECTURE_REDESIGN",
 ]);
 
 const REQUIRED_EVIDENCE_KEYS = Object.freeze([
@@ -73,6 +124,8 @@ const ALLOWED_DISPOSITIONS = Object.freeze([
   "RETIRE",
   "HOLD",
 ]);
+
+const EAC_BATCH_IDS = Object.freeze(["B01","B02","B03","B04","B05","B06","B07","B08","B09","B10","B11","B12","B13","B14","B15","B16","B17","B18","B19","B20","B21","B22","B23","B24","B25","B26","B27","B28","B29"]);
 
 const ALLOWED_STATUSES = [
   "NOT_STARTED",
@@ -148,65 +201,122 @@ function getGovernedAssetPaths(assetRegister) {
     .filter((assetPath) => typeof assetPath === "string" && assetPath.trim());
 }
 
+
+function loadBatchManifest(filePath = BATCH_MANIFEST_PATH) {
+  return loadJson(filePath);
+}
+
+function getEacBatchIds(manifest = loadBatchManifest()) {
+  if (!Array.isArray(manifest?.batches)) {
+    return [...EAC_BATCH_IDS];
+  }
+
+  return manifest.batches
+    .map((batch) => batch?.batch_id)
+    .filter((batchId) => typeof batchId === "string" && batchId.trim());
+}
+
+function getNextIncompleteBatch(state) {
+  const completed = new Set(
+    Array.isArray(state?.completed_batches) ? state.completed_batches : []
+  );
+  const remaining = Array.isArray(state?.remaining_batches)
+    ? state.remaining_batches
+    : getEacBatchIds().filter((batchId) => !completed.has(batchId));
+  return remaining[0] || null;
+}
+
 function createControlCenterGateState(overrides = {}) {
   const assetRegister = loadAssetRegister();
   const totalGovernedAssets = getTotalGovernedAssets(assetRegister);
+  const batchIds = getEacBatchIds();
   const baseState = {
-    active_asset_group: {
-      group_id: CONTROL_CENTER_GATE_GROUP.group_id,
-      asset_paths: [...CONTROL_CENTER_GATE_GROUP.asset_paths],
-    },
-    lifecycle_state: "PENDING",
-    evidence_completion: {
-      contents_and_purpose: false,
-      references_and_consumers: false,
-      runtime_use: false,
-      dependencies: false,
-      overlap_or_duplication: false,
-    },
-    disposition: null,
-    closure_status: "OPEN",
+    governance_model: "REPOSITORY_CLEANUP_PROGRAMME",
+    required_modes: [...REQUIRED_EXECUTION_MODES],
+    required_lifecycle: [...REQUIRED_LIFECYCLE_STATES],
+    cleanup_phase_order: [...CLEANUP_PHASE_ORDER],
+    eac_evidence_reusable: true,
+    eac_batch_manifest: BATCH_MANIFEST_RELATIVE_PATH,
     total_governed_assets: totalGovernedAssets,
-    investigated_assets: 0,
-    closed_assets: 0,
-    remaining_assets: totalGovernedAssets,
-    required_closure_files: [...CONTROL_CENTER_GATE_GROUP.asset_paths],
-    inspected_groups: [],
-    closed_groups: [],
-    closed_asset_paths: [],
+    phase_0: {
+      status: "PHASE_CLOSED",
+      question: PHASE_QUESTIONS.PHASE_0,
+      evidence: {
+        repository_root: path.resolve(__dirname, "..").replace(/\\/g, "/"),
+        active_branch: "main",
+        head_commit: "7d21fc276629bb6aec056299d70e1541b462934f",
+        working_tree_status: "dirty_unrelated_changes_preserved",
+        governed_asset_count: totalGovernedAssets,
+        eac_batch_manifest: BATCH_MANIFEST_RELATIVE_PATH,
+        eac_batch_count: batchIds.length,
+        already_completed_or_removal_work:
+          "Partial external sports provider removal (PARTIAL); EAC-001 B01-B29 classification inventory complete; prior Control Center per-asset investigations preserved as historical evidence",
+        unrelated_local_changes_preserved: true,
+      },
+    },
+    active_phase: "PHASE_1",
+    active_phase_question: PHASE_QUESTIONS.PHASE_1,
+    lifecycle_state: "PHASE_ACTIVE",
+    active_batch: null,
+    completed_batches: [],
+    remaining_batches: [...batchIds],
+    next_deterministic_batch: batchIds[0] || null,
+    phase_1_duplicate_scan_executed: false,
+    future_phase_notes: [],
+    standing_git_authority: true,
+    dangerous_git_actions_approval_gated: true,
+    historical_per_asset_forensic_lifecycle: "PRESERVED_AS_HISTORY_ONLY",
+    historical_closed_asset_paths: [
+      ...CONTROL_CENTER_GATE_GROUP.asset_paths,
+      ".bat",
+      ".dockerignore",
+      ".env.example",
+      ".gitignore",
+      ".gcloudignore",
+    ],
   };
 
-  return {
+  const merged = {
     ...baseState,
     ...overrides,
-    active_asset_group: {
-      ...baseState.active_asset_group,
-      ...(overrides.active_asset_group || {}),
-      asset_paths: Array.isArray(
-        overrides.active_asset_group?.asset_paths
-      )
-        ? [...overrides.active_asset_group.asset_paths]
-        : [...baseState.active_asset_group.asset_paths],
+    phase_0: {
+      ...baseState.phase_0,
+      ...(overrides.phase_0 || {}),
+      evidence: {
+        ...baseState.phase_0.evidence,
+        ...(overrides.phase_0?.evidence || {}),
+      },
     },
-    evidence_completion: {
-      ...baseState.evidence_completion,
-      ...(overrides.evidence_completion || {}),
-    },
-    required_closure_files: Array.isArray(
-      overrides.required_closure_files
+    completed_batches: Array.isArray(overrides.completed_batches)
+      ? [...overrides.completed_batches]
+      : [...baseState.completed_batches],
+    remaining_batches: Array.isArray(overrides.remaining_batches)
+      ? [...overrides.remaining_batches]
+      : [...baseState.remaining_batches],
+    future_phase_notes: Array.isArray(overrides.future_phase_notes)
+      ? [...overrides.future_phase_notes]
+      : [...baseState.future_phase_notes],
+    historical_closed_asset_paths: Array.isArray(
+      overrides.historical_closed_asset_paths
     )
-      ? [...overrides.required_closure_files]
-      : [...baseState.required_closure_files],
-    inspected_groups: Array.isArray(overrides.inspected_groups)
-      ? [...overrides.inspected_groups]
-      : [],
-    closed_groups: Array.isArray(overrides.closed_groups)
-      ? [...overrides.closed_groups]
-      : [],
-    closed_asset_paths: Array.isArray(overrides.closed_asset_paths)
-      ? [...overrides.closed_asset_paths]
-      : [],
+      ? [...overrides.historical_closed_asset_paths]
+      : [...baseState.historical_closed_asset_paths],
+    cleanup_phase_order: Array.isArray(overrides.cleanup_phase_order)
+      ? [...overrides.cleanup_phase_order]
+      : [...baseState.cleanup_phase_order],
+    required_modes: Array.isArray(overrides.required_modes)
+      ? [...overrides.required_modes]
+      : [...baseState.required_modes],
+    required_lifecycle: Array.isArray(overrides.required_lifecycle)
+      ? [...overrides.required_lifecycle]
+      : [...baseState.required_lifecycle],
   };
+
+  if (!merged.next_deterministic_batch) {
+    merged.next_deterministic_batch = getNextIncompleteBatch(merged);
+  }
+
+  return merged;
 }
 
 function parseControlCenterStateDocument(documentText) {
@@ -271,21 +381,7 @@ function isSubsetOfList(items, allowedItems) {
 }
 
 function getClosedAssetPaths(state) {
-  const closedAssetPaths = Array.isArray(state?.closed_asset_paths)
-    ? state.closed_asset_paths
-    : [];
-
-  if (
-    state?.lifecycle_state === "CLOSED" &&
-    Array.isArray(state?.active_asset_group?.asset_paths)
-  ) {
-    return normalizeFileList([
-      ...closedAssetPaths,
-      ...state.active_asset_group.asset_paths,
-    ]);
-  }
-
-  return normalizeFileList(closedAssetPaths) || [];
+  return normalizeFileList(state?.historical_closed_asset_paths) || [];
 }
 
 function getNextGovernedAssetGroup(state, assetRegister = loadAssetRegister()) {
@@ -663,6 +759,198 @@ function buildGateResponse({
   };
 }
 
+
+
+function validateControlCenterPolicy(documentText) {
+  const errors = [];
+  const state = parseControlCenterStateDocument(documentText);
+  const assetRegister = loadAssetRegister();
+  const expectedTotalGovernedAssets = getTotalGovernedAssets(assetRegister);
+  const batchIds = getEacBatchIds();
+
+  if (!state) {
+    errors.push(
+      "EDGE_CONTROL_CENTER.md missing structured control center state"
+    );
+    return { errors, state: null };
+  }
+
+  if (state.governance_model !== "REPOSITORY_CLEANUP_PROGRAMME") {
+    errors.push("Control Center state governance_model drift");
+  }
+
+  if (!Array.isArray(state.required_modes)) {
+    errors.push("Control Center state missing required_modes");
+  } else if (!listsMatchExactly(state.required_modes, REQUIRED_EXECUTION_MODES)) {
+    errors.push("Control Center state required_modes drift");
+  }
+
+  if (!Array.isArray(state.required_lifecycle)) {
+    errors.push("Control Center state missing required_lifecycle");
+  } else if (
+    !listsMatchExactly(state.required_lifecycle, REQUIRED_LIFECYCLE_STATES)
+  ) {
+    errors.push("Control Center state required_lifecycle drift");
+  }
+
+  if (!Array.isArray(state.cleanup_phase_order)) {
+    errors.push("Control Center state missing cleanup_phase_order");
+  } else if (!listsMatchExactly(state.cleanup_phase_order, CLEANUP_PHASE_ORDER)) {
+    errors.push("Control Center state cleanup_phase_order drift");
+  }
+
+  if (state.eac_evidence_reusable !== true) {
+    errors.push("Control Center state must recognize reusable EAC-001 evidence");
+  }
+
+  if (state.eac_batch_manifest !== BATCH_MANIFEST_RELATIVE_PATH) {
+    errors.push("Control Center state eac_batch_manifest drift");
+  }
+
+  if (Number(state.total_governed_assets) !== expectedTotalGovernedAssets) {
+    errors.push("Control Center state total_governed_assets drift");
+  }
+
+  if (!state.phase_0 || state.phase_0.status !== "PHASE_CLOSED") {
+    errors.push("Control Center state phase_0 must be PHASE_CLOSED with evidence");
+  } else {
+    const evidence = state.phase_0.evidence || {};
+    for (const key of [
+      "repository_root",
+      "active_branch",
+      "head_commit",
+      "working_tree_status",
+      "governed_asset_count",
+      "eac_batch_manifest",
+      "eac_batch_count",
+      "already_completed_or_removal_work",
+    ]) {
+      if (
+        evidence[key] == null ||
+        (typeof evidence[key] === "string" && evidence[key].trim() === "")
+      ) {
+        errors.push(`Control Center state phase_0 evidence missing ${key}`);
+      }
+    }
+    if (Number(evidence.governed_asset_count) !== expectedTotalGovernedAssets) {
+      errors.push("Control Center state phase_0 governed_asset_count drift");
+    }
+    if (Number(evidence.eac_batch_count) !== batchIds.length) {
+      errors.push("Control Center state phase_0 eac_batch_count drift");
+    }
+  }
+
+  if (state.active_phase !== "PHASE_1") {
+    errors.push("Control Center state active_phase must be PHASE_1");
+  }
+
+  if (state.active_phase_question !== PHASE_QUESTIONS.PHASE_1) {
+    errors.push("Control Center state active_phase_question drift");
+  }
+
+  if (!REQUIRED_LIFECYCLE_STATES.includes(state.lifecycle_state)) {
+    errors.push("Control Center state lifecycle_state invalid");
+  }
+
+  if (state.lifecycle_state !== "PHASE_ACTIVE") {
+    errors.push("Control Center state lifecycle_state must be PHASE_ACTIVE");
+  }
+
+  if (!Array.isArray(state.completed_batches)) {
+    errors.push("Control Center state missing completed_batches");
+  }
+
+  if (!Array.isArray(state.remaining_batches)) {
+    errors.push("Control Center state missing remaining_batches");
+  } else if (!listsMatchExactly(state.remaining_batches, batchIds.filter((id) => !(state.completed_batches || []).includes(id)))) {
+    // remaining should equal all batches minus completed in order
+    const expectedRemaining = batchIds.filter(
+      (id) => !(state.completed_batches || []).includes(id)
+    );
+    if (!listsMatchExactly(state.remaining_batches, expectedRemaining)) {
+      errors.push("Control Center state remaining_batches drift");
+    }
+  }
+
+  const expectedNext = getNextIncompleteBatch(state);
+  if (state.next_deterministic_batch !== expectedNext) {
+    errors.push("Control Center state next_deterministic_batch drift");
+  }
+
+  if (state.phase_1_duplicate_scan_executed !== false) {
+    errors.push("Control Center state must not claim Phase 1 duplicate scan executed during policy update");
+  }
+
+  if (!Array.isArray(state.future_phase_notes)) {
+    errors.push("Control Center state missing future_phase_notes");
+  }
+
+  if (state.standing_git_authority !== true) {
+    errors.push("Control Center state standing_git_authority missing");
+  }
+
+  if (state.dangerous_git_actions_approval_gated !== true) {
+    errors.push("Control Center state dangerous_git_actions_approval_gated missing");
+  }
+
+  if (
+    state.historical_per_asset_forensic_lifecycle !==
+    "PRESERVED_AS_HISTORY_ONLY"
+  ) {
+    errors.push("Control Center state must preserve historical forensic lifecycle evidence");
+  }
+
+  if (!Array.isArray(state.historical_closed_asset_paths)) {
+    errors.push("Control Center state missing historical_closed_asset_paths");
+  }
+
+  if (!String(documentText).includes("### Historical Control Center evidence")) {
+    errors.push("EDGE_CONTROL_CENTER.md missing historical evidence section");
+  }
+
+  if (
+    String(documentText).includes(
+      "locked until every governed asset has reached CLOSED"
+    )
+  ) {
+    errors.push("EDGE_CONTROL_CENTER.md still contains conflicting per-asset lock law");
+  }
+
+  return { errors, state };
+}
+
+function isExactGroupMatch(proposalGroup, stateGroup) {
+  if (!proposalGroup || !stateGroup) {
+    return false;
+  }
+
+  return (
+    typeof proposalGroup.group_id === "string" &&
+    proposalGroup.group_id === stateGroup.group_id &&
+    listsMatchExactly(proposalGroup.asset_paths, stateGroup.asset_paths)
+  );
+}
+
+function buildGateResponse({
+  gate,
+  mode,
+  reason,
+  activeAssetGroup,
+  lifecycleState,
+  approvedScope,
+  nextState,
+}) {
+  return {
+    gate,
+    mode,
+    reason,
+    activeAssetGroup,
+    lifecycleState,
+    approvedScope,
+    nextState,
+  };
+}
+
 function evaluateControlCenterProposal(
   proposalInput,
   stateInput = createControlCenterGateState()
@@ -670,17 +958,12 @@ function evaluateControlCenterProposal(
   const proposal = normalizeProposal(proposalInput);
   const state = stateInput || createControlCenterGateState();
 
-  if (
-    !proposal ||
-    !state ||
-    !state.active_asset_group ||
-    !state.lifecycle_state
-  ) {
+  if (!proposal || !state || !state.active_phase || !state.lifecycle_state) {
     return buildGateResponse({
       gate: "HOLD",
       mode: proposal?.mode || "NONE",
       reason: "MISSING_INSTRUCTION_OR_STATE",
-      activeAssetGroup: state?.active_asset_group?.group_id || "NONE",
+      activeAssetGroup: state?.active_phase || "NONE",
       lifecycleState: state?.lifecycle_state || "NONE",
       approvedScope: "NONE",
       nextState: state || null,
@@ -688,13 +971,14 @@ function evaluateControlCenterProposal(
   }
 
   const requestType = proposal.request_type || "NO_INSTRUCTION";
+  const activeLabel = `${state.active_phase}:${state.active_batch || state.next_deterministic_batch || "NONE"}`;
 
   if (!RECOGNIZED_REQUEST_TYPES.includes(requestType)) {
     return buildGateResponse({
       gate: "HOLD",
       mode: proposal.mode || "NONE",
       reason: "UNRECOGNIZED_REQUEST_TYPE",
-      activeAssetGroup: state.active_asset_group.group_id,
+      activeAssetGroup: activeLabel,
       lifecycleState: state.lifecycle_state,
       approvedScope: "NONE",
       nextState: state,
@@ -706,7 +990,7 @@ function evaluateControlCenterProposal(
       gate: "HOLD",
       mode: "NONE",
       reason: "NO_INSTRUCTION",
-      activeAssetGroup: state.active_asset_group.group_id,
+      activeAssetGroup: activeLabel,
       lifecycleState: state.lifecycle_state,
       approvedScope: "NONE",
       nextState: state,
@@ -718,7 +1002,7 @@ function evaluateControlCenterProposal(
       gate: "HOLD",
       mode: proposal.mode || "NONE",
       reason: "FEATURE_WORK",
-      activeAssetGroup: state.active_asset_group.group_id,
+      activeAssetGroup: activeLabel,
       lifecycleState: state.lifecycle_state,
       approvedScope: "NONE",
       nextState: state,
@@ -730,7 +1014,7 @@ function evaluateControlCenterProposal(
       gate: "HOLD",
       mode: proposal.mode || "NONE",
       reason: "UNRELATED_GOVERNANCE_CLEANUP",
-      activeAssetGroup: state.active_asset_group.group_id,
+      activeAssetGroup: activeLabel,
       lifecycleState: state.lifecycle_state,
       approvedScope: "NONE",
       nextState: state,
@@ -742,7 +1026,7 @@ function evaluateControlCenterProposal(
       gate: "HOLD",
       mode: proposal.mode || "NONE",
       reason: "PREMATURE_DELETE",
-      activeAssetGroup: state.active_asset_group.group_id,
+      activeAssetGroup: activeLabel,
       lifecycleState: state.lifecycle_state,
       approvedScope: "NONE",
       nextState: state,
@@ -754,7 +1038,7 @@ function evaluateControlCenterProposal(
       gate: "HOLD",
       mode: proposal.mode || "NONE",
       reason: "PREMATURE_MERGE",
-      activeAssetGroup: state.active_asset_group.group_id,
+      activeAssetGroup: activeLabel,
       lifecycleState: state.lifecycle_state,
       approvedScope: "NONE",
       nextState: state,
@@ -766,7 +1050,7 @@ function evaluateControlCenterProposal(
       gate: "HOLD",
       mode: proposal.mode || "NONE",
       reason: "PREMATURE_REPLACE",
-      activeAssetGroup: state.active_asset_group.group_id,
+      activeAssetGroup: activeLabel,
       lifecycleState: state.lifecycle_state,
       approvedScope: "NONE",
       nextState: state,
@@ -778,7 +1062,36 @@ function evaluateControlCenterProposal(
       gate: "HOLD",
       mode: proposal.mode || "NONE",
       reason: "BROAD_REPOSITORY_WORK",
-      activeAssetGroup: state.active_asset_group.group_id,
+      activeAssetGroup: activeLabel,
+      lifecycleState: state.lifecycle_state,
+      approvedScope: "NONE",
+      nextState: state,
+    });
+  }
+
+  if (
+    requestType === "INSPECT_GROUP" ||
+    requestType === "CLOSE_GROUP" ||
+    requestType === "ACTIVATE_NEXT_GROUP" ||
+    ["INSPECT", "CLOSE", "ACTIVATE"].includes(proposal.mode)
+  ) {
+    return buildGateResponse({
+      gate: "HOLD",
+      mode: proposal.mode || "NONE",
+      reason: "LEGACY_PER_ASSET_FORENSIC_LIFECYCLE_RETIRED",
+      activeAssetGroup: activeLabel,
+      lifecycleState: state.lifecycle_state,
+      approvedScope: "NONE",
+      nextState: state,
+    });
+  }
+
+  if (requestType === "CROSS_PHASE_DRIFT" || proposal.cross_phase_work === true) {
+    return buildGateResponse({
+      gate: "HOLD",
+      mode: proposal.mode || "NONE",
+      reason: "CROSS_PHASE_DRIFT",
+      activeAssetGroup: activeLabel,
       lifecycleState: state.lifecycle_state,
       approvedScope: "NONE",
       nextState: state,
@@ -791,7 +1104,7 @@ function evaluateControlCenterProposal(
         gate: "HOLD",
         mode: "CONTROL",
         reason: "CONTROL_REQUEST_TYPE_REQUIRED",
-        activeAssetGroup: state.active_asset_group.group_id,
+        activeAssetGroup: activeLabel,
         lifecycleState: state.lifecycle_state,
         approvedScope: "NONE",
         nextState: state,
@@ -803,7 +1116,7 @@ function evaluateControlCenterProposal(
         gate: "HOLD",
         mode: "CONTROL",
         reason: "OWNER_AUTHORIZATION_REQUIRED",
-        activeAssetGroup: state.active_asset_group.group_id,
+        activeAssetGroup: activeLabel,
         lifecycleState: state.lifecycle_state,
         approvedScope: "NONE",
         nextState: state,
@@ -815,7 +1128,7 @@ function evaluateControlCenterProposal(
         gate: "HOLD",
         mode: "CONTROL",
         reason: "PROVEN_CONTROL_CENTER_DEFECT_REQUIRED",
-        activeAssetGroup: state.active_asset_group.group_id,
+        activeAssetGroup: activeLabel,
         lifecycleState: state.lifecycle_state,
         approvedScope: "NONE",
         nextState: state,
@@ -832,7 +1145,7 @@ function evaluateControlCenterProposal(
         gate: "HOLD",
         mode: "CONTROL",
         reason: "CONTROL_SCOPE_MISMATCH",
-        activeAssetGroup: state.active_asset_group.group_id,
+        activeAssetGroup: activeLabel,
         lifecycleState: state.lifecycle_state,
         approvedScope: "NONE",
         nextState: state,
@@ -847,7 +1160,7 @@ function evaluateControlCenterProposal(
         gate: "HOLD",
         mode: "CONTROL",
         reason: "PRODUCT_ASSET_CHANGE_BLOCKED",
-        activeAssetGroup: state.active_asset_group.group_id,
+        activeAssetGroup: activeLabel,
         lifecycleState: state.lifecycle_state,
         approvedScope: "NONE",
         nextState: state,
@@ -858,95 +1171,53 @@ function evaluateControlCenterProposal(
       gate: "GREEN",
       mode: "CONTROL",
       reason: "CONTROL_CENTER_MAINTENANCE_ACCEPTED",
-      activeAssetGroup: state.active_asset_group.group_id,
+      activeAssetGroup: activeLabel,
       lifecycleState: state.lifecycle_state,
-      approvedScope:
-        "Maintain only the Control Center gate, policy, and focused tests for the proven lifecycle defect.",
+      approvedScope: CONTROL_CENTER_GATE_GROUP.asset_paths.join(","),
       nextState: state,
     });
   }
 
-  if (proposal.mode === "ACTIVATE") {
-    if (requestType !== "ACTIVATE_NEXT_GROUP") {
+  if (proposal.mode === "RECORD_FUTURE_PHASE_NOTE") {
+    if (requestType !== "RECORD_FUTURE_PHASE_NOTE") {
       return buildGateResponse({
         gate: "HOLD",
-        mode: "ACTIVATE",
-        reason: "ACTIVATE_REQUEST_TYPE_REQUIRED",
-        activeAssetGroup: state.active_asset_group.group_id,
+        mode: "RECORD_FUTURE_PHASE_NOTE",
+        reason: "FUTURE_PHASE_NOTE_REQUEST_TYPE_REQUIRED",
+        activeAssetGroup: activeLabel,
         lifecycleState: state.lifecycle_state,
         approvedScope: "NONE",
         nextState: state,
       });
     }
 
+    const note = proposal.future_phase_note;
     if (
-      state.lifecycle_state !== "CLOSED" ||
-      state.closure_status !== "CLOSED"
+      !note ||
+      typeof note !== "object" ||
+      !note.asset_paths ||
+      !Array.isArray(note.asset_paths) ||
+      note.asset_paths.length === 0 ||
+      !note.observed_issue ||
+      !note.likely_future_phase
     ) {
       return buildGateResponse({
         gate: "HOLD",
-        mode: "ACTIVATE",
-        reason: "OPEN_GROUP_MUST_CLOSE_FIRST",
-        activeAssetGroup: state.active_asset_group.group_id,
+        mode: "RECORD_FUTURE_PHASE_NOTE",
+        reason: "FUTURE_PHASE_NOTE_INCOMPLETE",
+        activeAssetGroup: activeLabel,
         lifecycleState: state.lifecycle_state,
         approvedScope: "NONE",
         nextState: state,
       });
     }
 
-    if (!proposal.preserves_unrelated_changes) {
+    if (note.likely_future_phase === state.active_phase) {
       return buildGateResponse({
         gate: "HOLD",
-        mode: "ACTIVATE",
-        reason: "UNRELATED_CHANGES_NOT_PRESERVED",
-        activeAssetGroup: state.active_asset_group.group_id,
-        lifecycleState: state.lifecycle_state,
-        approvedScope: "NONE",
-        nextState: state,
-      });
-    }
-
-    const closedAssetPaths = getClosedAssetPaths(state);
-    const expectedClosedAssets = closedAssetPaths.length;
-
-    if (Number(state.closed_assets) !== expectedClosedAssets) {
-      return buildGateResponse({
-        gate: "HOLD",
-        mode: "ACTIVATE",
-        reason: "CLOSED_ASSET_COUNT_DRIFT",
-        activeAssetGroup: state.active_asset_group.group_id,
-        lifecycleState: state.lifecycle_state,
-        approvedScope: "NONE",
-        nextState: state,
-      });
-    }
-
-    const nextGroup = getNextGovernedAssetGroup(state);
-
-    if (!nextGroup) {
-      return buildGateResponse({
-        gate: "HOLD",
-        mode: "ACTIVATE",
-        reason: "NO_REMAINING_GOVERNED_ASSET",
-        activeAssetGroup: state.active_asset_group.group_id,
-        lifecycleState: state.lifecycle_state,
-        approvedScope: "NONE",
-        nextState: state,
-      });
-    }
-
-    const proposedNextGroup =
-      proposal.next_active_group || proposal.active_asset_group;
-
-    if (
-      proposedNextGroup &&
-      !isExactGroupMatch(proposedNextGroup, nextGroup)
-    ) {
-      return buildGateResponse({
-        gate: "HOLD",
-        mode: "ACTIVATE",
-        reason: "NEXT_GROUP_MISMATCH",
-        activeAssetGroup: state.active_asset_group.group_id,
+        mode: "RECORD_FUTURE_PHASE_NOTE",
+        reason: "FUTURE_PHASE_NOTE_MUST_TARGET_OTHER_PHASE",
+        activeAssetGroup: activeLabel,
         lifecycleState: state.lifecycle_state,
         approvedScope: "NONE",
         nextState: state,
@@ -955,174 +1226,61 @@ function evaluateControlCenterProposal(
 
     const nextState = {
       ...state,
-      active_asset_group: nextGroup,
-      lifecycle_state: "PENDING",
-      evidence_completion: {
-        contents_and_purpose: false,
-        references_and_consumers: false,
-        runtime_use: false,
-        dependencies: false,
-        overlap_or_duplication: false,
-      },
-      disposition: null,
-      closure_status: "OPEN",
-      required_closure_files: [...nextGroup.asset_paths],
-      closed_asset_paths: closedAssetPaths,
-      remaining_assets:
-        Number(state.total_governed_assets) -
-        Number(state.investigated_assets),
-    };
-
-    return buildGateResponse({
-      gate: "GREEN",
-      mode: "ACTIVATE",
-      reason: "NEXT_GROUP_ACTIVATED",
-      activeAssetGroup: nextGroup.group_id,
-      lifecycleState: state.lifecycle_state,
-      approvedScope:
-        "Activate the first governed not-closed asset in deterministic asset-register order.",
-      nextState,
-    });
-  }
-
-  const proposalGroup = proposal.active_asset_group;
-
-  if (
-    !proposalGroup ||
-    typeof proposalGroup !== "object" ||
-    typeof proposalGroup.group_id !== "string" ||
-    proposalGroup.group_id.trim() === "" ||
-    !Array.isArray(proposalGroup.asset_paths)
-  ) {
-    return buildGateResponse({
-      gate: "HOLD",
-      mode: proposal.mode || "NONE",
-      reason: "MISSING_ACTIVE_GROUP",
-      activeAssetGroup: state.active_asset_group.group_id,
-      lifecycleState: state.lifecycle_state,
-      approvedScope: "NONE",
-      nextState: state,
-    });
-  }
-
-  const exactGroupMatch = isExactGroupMatch(
-    proposalGroup,
-    state.active_asset_group
-  );
-
-  if (!exactGroupMatch) {
-    return buildGateResponse({
-      gate: "HOLD",
-      mode: proposal.mode || "NONE",
-      reason: "ACTIVE_GROUP_MISMATCH",
-      activeAssetGroup: state.active_asset_group.group_id,
-      lifecycleState: state.lifecycle_state,
-      approvedScope: "NONE",
-      nextState: state,
-    });
-  }
-
-  if (!proposal.preserves_unrelated_changes) {
-    return buildGateResponse({
-      gate: "HOLD",
-      mode: proposal.mode || "NONE",
-      reason: "UNRELATED_CHANGES_NOT_PRESERVED",
-      activeAssetGroup: state.active_asset_group.group_id,
-      lifecycleState: state.lifecycle_state,
-      approvedScope: "NONE",
-      nextState: state,
-    });
-  }
-
-  if (proposal.mode === "INSPECT") {
-    if (proposal.inspection_only !== true) {
-      return buildGateResponse({
-        gate: "HOLD",
-        mode: "INSPECT",
-        reason: "INSPECTION_ONLY_REQUIRED",
-        activeAssetGroup: state.active_asset_group.group_id,
-        lifecycleState: state.lifecycle_state,
-        approvedScope: "NONE",
-        nextState: state,
-      });
-    }
-
-    if (state.lifecycle_state === "CLOSED") {
-      return buildGateResponse({
-        gate: "HOLD",
-        mode: "INSPECT",
-        reason: "GROUP_ALREADY_CLOSED",
-        activeAssetGroup: state.active_asset_group.group_id,
-        lifecycleState: state.lifecycle_state,
-        approvedScope: "NONE",
-        nextState: state,
-      });
-    }
-
-    if (
-      !["PENDING", "INSPECTING"].includes(state.lifecycle_state)
-    ) {
-      return buildGateResponse({
-        gate: "HOLD",
-        mode: "INSPECT",
-        reason: "INSPECT_MISALIGNED_WITH_LIFECYCLE",
-        activeAssetGroup: state.active_asset_group.group_id,
-        lifecycleState: state.lifecycle_state,
-        approvedScope: "NONE",
-        nextState: state,
-      });
-    }
-
-    const nextState = {
-      ...state,
-      lifecycle_state: "INSPECTING",
-      investigated_assets:
-        Number(state.investigated_assets) +
-        state.active_asset_group.asset_paths.length,
-      remaining_assets:
-        Number(state.total_governed_assets) -
-        (Number(state.investigated_assets) +
-          state.active_asset_group.asset_paths.length),
-      inspected_groups: [
-        ...state.inspected_groups,
-        state.active_asset_group.group_id,
+      future_phase_notes: [
+        ...(state.future_phase_notes || []),
+        {
+          asset_paths: [...note.asset_paths],
+          observed_issue: String(note.observed_issue),
+          likely_future_phase: String(note.likely_future_phase),
+        },
       ],
     };
 
     return buildGateResponse({
       gate: "GREEN",
-      mode: "INSPECT",
-      reason: "INSPECTION_ACCEPTED",
-      activeAssetGroup: state.active_asset_group.group_id,
+      mode: "RECORD_FUTURE_PHASE_NOTE",
+      reason: "FUTURE_PHASE_NOTE_RECORDED",
+      activeAssetGroup: activeLabel,
       lifecycleState: state.lifecycle_state,
-      approvedScope:
-        "Inspect only the exact active asset group and capture contents, purpose, references, consumers, runtime use, dependencies, overlap, and reuse evidence.",
+      approvedScope: "FUTURE_PHASE_NOTE",
       nextState,
     });
   }
 
-  if (proposal.mode === "CLOSE") {
+  if (proposal.mode === "PHASE_WORK") {
+    if (requestType !== "PHASE_WORK") {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "PHASE_WORK",
+        reason: "PHASE_WORK_REQUEST_TYPE_REQUIRED",
+        activeAssetGroup: activeLabel,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    if (proposal.phase !== state.active_phase) {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "PHASE_WORK",
+        reason: "CROSS_PHASE_DRIFT",
+        activeAssetGroup: activeLabel,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
     if (
-      state.lifecycle_state !== "DISPOSITION_READY" &&
-      state.lifecycle_state !== "CLOSURE_READY"
+      state.active_phase === "PHASE_1" &&
+      PHASE_1_FORBIDDEN_WORK.includes(proposal.work_kind)
     ) {
       return buildGateResponse({
         gate: "HOLD",
-        mode: "CLOSE",
-        reason: "CLOSURE_EVIDENCE_INCOMPLETE",
-        activeAssetGroup: state.active_asset_group.group_id,
-        lifecycleState: state.lifecycle_state,
-        approvedScope: "NONE",
-        nextState: state,
-      });
-    }
-
-    if (!isEvidenceComplete(proposal.evidence_completion)) {
-      return buildGateResponse({
-        gate: "HOLD",
-        mode: "CLOSE",
-        reason: "CLOSURE_EVIDENCE_INCOMPLETE",
-        activeAssetGroup: state.active_asset_group.group_id,
+        mode: "PHASE_WORK",
+        reason: "PHASE_1_FORBIDDEN_WORK",
+        activeAssetGroup: activeLabel,
         lifecycleState: state.lifecycle_state,
         approvedScope: "NONE",
         nextState: state,
@@ -1130,14 +1288,141 @@ function evaluateControlCenterProposal(
     }
 
     if (
-      !proposal.disposition ||
-      !ALLOWED_DISPOSITIONS.includes(proposal.disposition)
+      state.active_phase === "PHASE_1" &&
+      proposal.requires_full_forensic_evidence === true
     ) {
       return buildGateResponse({
         gate: "HOLD",
-        mode: "CLOSE",
-        reason: "MISSING_DISPOSITION",
-        activeAssetGroup: state.active_asset_group.group_id,
+        mode: "PHASE_WORK",
+        reason: "PHASE_1_FULL_FORENSIC_EVIDENCE_NOT_REQUIRED",
+        activeAssetGroup: activeLabel,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    const targetBatch =
+      proposal.batch_id || state.active_batch || state.next_deterministic_batch;
+
+    if (
+      ["PHASE_1", "PHASE_2", "PHASE_3", "PHASE_4", "PHASE_5"].includes(
+        state.active_phase
+      )
+    ) {
+      if (!targetBatch || targetBatch !== state.next_deterministic_batch) {
+        if (state.active_batch && targetBatch === state.active_batch) {
+          // continue active batch
+        } else {
+          return buildGateResponse({
+            gate: "HOLD",
+            mode: "PHASE_WORK",
+            reason: "BATCH_ORDER_VIOLATION",
+            activeAssetGroup: activeLabel,
+            lifecycleState: state.lifecycle_state,
+            approvedScope: "NONE",
+            nextState: state,
+          });
+        }
+      }
+    }
+
+    const nextState = {
+      ...state,
+      lifecycle_state: targetBatch ? "BATCH_ACTIVE" : state.lifecycle_state,
+      active_batch: targetBatch || state.active_batch,
+    };
+
+    return buildGateResponse({
+      gate: "GREEN",
+      mode: "PHASE_WORK",
+      reason: "PHASE_WORK_ACCEPTED",
+      activeAssetGroup: `${state.active_phase}:${nextState.active_batch || "NONE"}`,
+      lifecycleState: state.lifecycle_state,
+      approvedScope: `${state.active_phase}/${nextState.active_batch || "PHASE"}`,
+      nextState,
+    });
+  }
+
+  if (proposal.mode === "COMPLETE_BATCH") {
+    if (requestType !== "COMPLETE_BATCH") {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "COMPLETE_BATCH",
+        reason: "COMPLETE_BATCH_REQUEST_TYPE_REQUIRED",
+        activeAssetGroup: activeLabel,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    const batchId = proposal.batch_id || state.active_batch;
+    if (!batchId || batchId !== (state.active_batch || state.next_deterministic_batch)) {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "COMPLETE_BATCH",
+        reason: "BATCH_MISMATCH",
+        activeAssetGroup: activeLabel,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    if (proposal.requires_full_forensic_lifecycle === true) {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "COMPLETE_BATCH",
+        reason: "FULL_FORENSIC_LIFECYCLE_NOT_REQUIRED_FOR_BATCH",
+        activeAssetGroup: activeLabel,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    const completed = [...new Set([...(state.completed_batches || []), batchId])];
+    const remaining = (state.remaining_batches || []).filter((id) => id !== batchId);
+    const nextState = {
+      ...state,
+      completed_batches: completed,
+      remaining_batches: remaining,
+      active_batch: null,
+      next_deterministic_batch: remaining[0] || null,
+      lifecycle_state: remaining.length === 0 ? "PHASE_READY_TO_CLOSE" : "BATCH_COMPLETE",
+    };
+
+    return buildGateResponse({
+      gate: "GREEN",
+      mode: "COMPLETE_BATCH",
+      reason: "BATCH_COMPLETED",
+      activeAssetGroup: `${state.active_phase}:${batchId}`,
+      lifecycleState: state.lifecycle_state,
+      approvedScope: `${state.active_phase}/${batchId}`,
+      nextState,
+    });
+  }
+
+  if (proposal.mode === "CLOSE_PHASE") {
+    if (requestType !== "CLOSE_PHASE") {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "CLOSE_PHASE",
+        reason: "CLOSE_PHASE_REQUEST_TYPE_REQUIRED",
+        activeAssetGroup: activeLabel,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    if (proposal.phase !== state.active_phase) {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "CLOSE_PHASE",
+        reason: "CROSS_PHASE_DRIFT",
+        activeAssetGroup: activeLabel,
         lifecycleState: state.lifecycle_state,
         approvedScope: "NONE",
         nextState: state,
@@ -1145,48 +1430,66 @@ function evaluateControlCenterProposal(
     }
 
     if (
-      !listsMatchExactly(
-        proposal.changed_files,
-        state.required_closure_files
+      state.lifecycle_state !== "PHASE_READY_TO_CLOSE" &&
+      !(
+        Array.isArray(state.remaining_batches) &&
+        state.remaining_batches.length === 0
       )
     ) {
       return buildGateResponse({
         gate: "HOLD",
-        mode: "CLOSE",
-        reason: "CLOSURE_SCOPE_MISMATCH",
-        activeAssetGroup: state.active_asset_group.group_id,
+        mode: "CLOSE_PHASE",
+        reason: "PHASE_NOT_READY_TO_CLOSE",
+        activeAssetGroup: activeLabel,
         lifecycleState: state.lifecycle_state,
         approvedScope: "NONE",
         nextState: state,
       });
     }
 
-    const nextState = {
-      ...state,
-      lifecycle_state: "CLOSED",
-      closure_status: "CLOSED",
-      disposition: proposal.disposition,
-      closed_assets:
-        Number(state.closed_assets) +
-        state.active_asset_group.asset_paths.length,
-      remaining_assets:
-        Number(state.total_governed_assets) -
-        (Number(state.investigated_assets) ||
-          state.active_asset_group.asset_paths.length),
-      closed_groups: [
-        ...state.closed_groups,
-        state.active_asset_group.group_id,
-      ],
-    };
+    const currentIndex = CLEANUP_PHASE_ORDER.indexOf(state.active_phase);
+    const nextPhase =
+      currentIndex >= 0 && currentIndex < CLEANUP_PHASE_ORDER.length - 1
+        ? CLEANUP_PHASE_ORDER[currentIndex + 1]
+        : null;
+
+    if (proposal.activate_phase && proposal.activate_phase !== nextPhase) {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "CLOSE_PHASE",
+        reason: "PHASE_ORDER_VIOLATION",
+        activeAssetGroup: activeLabel,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    const nextState = nextPhase
+      ? {
+          ...state,
+          active_phase: nextPhase,
+          active_phase_question: PHASE_QUESTIONS[nextPhase],
+          lifecycle_state: "PHASE_ACTIVE",
+          active_batch: null,
+          completed_batches: [],
+          remaining_batches: [...getEacBatchIds()],
+          next_deterministic_batch: getEacBatchIds()[0] || null,
+        }
+      : {
+          ...state,
+          lifecycle_state: "PHASE_CLOSED",
+          active_batch: null,
+          next_deterministic_batch: null,
+        };
 
     return buildGateResponse({
       gate: "GREEN",
-      mode: "CLOSE",
-      reason: "CLOSURE_ACCEPTED",
-      activeAssetGroup: state.active_asset_group.group_id,
+      mode: "CLOSE_PHASE",
+      reason: nextPhase ? "PHASE_CLOSED_NEXT_ACTIVATED" : "PROGRAMME_CLOSED",
+      activeAssetGroup: nextPhase || state.active_phase,
       lifecycleState: state.lifecycle_state,
-      approvedScope:
-        "Close only the exact previously inspected group and the required Control Center projection files.",
+      approvedScope: state.active_phase,
       nextState,
     });
   }
@@ -1194,8 +1497,8 @@ function evaluateControlCenterProposal(
   return buildGateResponse({
     gate: "HOLD",
     mode: proposal.mode || "NONE",
-    reason: "UNSUPPORTED_MODE",
-    activeAssetGroup: state.active_asset_group.group_id,
+    reason: "UNHANDLED_PROPOSAL",
+    activeAssetGroup: activeLabel,
     lifecycleState: state.lifecycle_state,
     approvedScope: "NONE",
     nextState: state,
@@ -1464,24 +1767,24 @@ function printReport(result) {
   );
   console.log("");
 
-  console.log("Control Center investigation state:");
+  console.log("Control Center cleanup programme state:");
+  console.log(
+    `  Active phase: ${controlCenterState.active_phase}`
+  );
+  console.log(
+    `  Phase question: ${controlCenterState.active_phase_question}`
+  );
   console.log(
     `  Lifecycle state: ${controlCenterState.lifecycle_state}`
   );
   console.log(
-    `  Active asset/group: ${controlCenterState.active_asset_group.group_id}`
+    `  Next batch: ${controlCenterState.next_deterministic_batch}`
   );
   console.log(
     `  Total governed assets: ${controlCenterState.total_governed_assets}`
   );
   console.log(
-    `  Investigated assets: ${controlCenterState.investigated_assets}`
-  );
-  console.log(
-    `  Closed assets: ${controlCenterState.closed_assets}`
-  );
-  console.log(
-    `  Remaining assets: ${controlCenterState.remaining_assets}`
+    `  Future phase notes: ${(controlCenterState.future_phase_notes || []).length}`
   );
   console.log("");
 
@@ -1489,7 +1792,7 @@ function printReport(result) {
   console.log(`MODE: ${gateDecision.mode}`);
   console.log(`REASON: ${gateDecision.reason}`);
   console.log(
-    `ACTIVE ASSET/GROUP: ${gateDecision.activeAssetGroup}`
+    `ACTIVE PHASE/BATCH: ${gateDecision.activeAssetGroup}`
   );
   console.log(
     `LIFECYCLE STATE: ${gateDecision.lifecycleState}`
@@ -1709,6 +2012,12 @@ module.exports = {
   ASSET_REGISTER_PATH,
   CONTROL_CENTER_DOCUMENT_PATH,
   CONTROL_CENTER_GATE_GROUP,
+  BATCH_MANIFEST_PATH,
+  BATCH_MANIFEST_RELATIVE_PATH,
+  CLEANUP_PHASE_ORDER,
+  PHASE_QUESTIONS,
+  PHASE_1_FORBIDDEN_WORK,
+  EAC_BATCH_IDS,
   REQUIRED_LIFECYCLE_STATES,
   REQUIRED_EXECUTION_MODES,
   RECOGNIZED_REQUEST_TYPES,
@@ -1717,10 +2026,13 @@ module.exports = {
   SATISFIED_STATUSES,
   loadLedger,
   loadAssetRegister,
+  loadBatchManifest,
   loadControlCenterDocument: readControlCenterDocument,
   readControlCenterDocument,
   getTotalGovernedAssets,
   getGovernedAssetPaths,
+  getEacBatchIds,
+  getNextIncompleteBatch,
   createControlCenterGateState,
   parseControlCenterStateDocument,
   normalizeFileList,

@@ -309,73 +309,271 @@ Previous gated task snapshot:
 Requires separate approval before start
 -->
 
-## 8. Stateful Control Center gate
+## 8. Stateful Control Center gate — Repository Cleanup Programme
 
 All AI instructions are proposals.
 
 ChatGPT, Codex, Cursor, and other AI instructions require Control Center GREEN before execution.
 
-The gate is stateful and uses explicit lifecycle state. It does not use keyword or phrase detection to decide GREEN or HOLD.
+The gate is stateful. It does not use keyword or phrase detection to decide GREEN or HOLD.
 
-Required lifecycle:
+### Governing principle
 
-- PENDING
-- INSPECTING
-- DISPOSITION_READY
-- CLOSURE_READY
-- CLOSED
+ONE QUESTION ACROSS THE REPOSITORY AT A TIME.
+
+Complete one approved cleanup phase across all applicable governed assets and all applicable EAC-001 batches.
+
+Close that phase.
+
+Only then activate the next phase.
+
+Do not mix cleanup questions.
+
+Do not drift into another phase because an agent notices a different issue.
+
+Any out-of-phase finding must be recorded as `FUTURE_PHASE_NOTE` and the active phase must continue.
+
+### Existing EAC-001 evidence law
+
+EAC-001 skim/classification is existing repository evidence and must be reused.
+
+The Control Center must not require an implementation agent to rediscover every asset from zero or repeat full initial classification before a later cleanup phase.
+
+A later phase may inspect additional evidence only for the exact question asked by that phase.
+
+### Primary lifecycle (phase and batch oriented)
+
+Required lifecycle states:
+
+- PHASE_PENDING
+- PHASE_ACTIVE
+- BATCH_ACTIVE
+- BATCH_COMPLETE
+- PHASE_READY_TO_CLOSE
+- PHASE_CLOSED
 
 Required modes:
 
-- INSPECT
-- CLOSE
+- PHASE_WORK
+- COMPLETE_BATCH
+- CLOSE_PHASE
+- RECORD_FUTURE_PHASE_NOTE
 - CONTROL
-- ACTIVATE
+
+The old per-asset forensic lifecycle (`PENDING` → `INSPECTING` → `DISPOSITION_READY` → `CLOSURE_READY` → `CLOSED` with five evidence areas for every asset) is historical only.
+
+It is no longer the mandatory primary lifecycle for the repository cleanup mission.
+
+Per-asset evidence may still exist where useful.
+
+It must not force a full forensic lifecycle for every file during Phase 1.
+
+### Ordered cleanup phases
+
+1. PHASE_0 — REPOSITORY BASELINE AND CONTROL
+   Question: What exact repository state is the cleanup programme starting from?
+   No cleanup. No repair. No duplicate removal.
+
+2. PHASE_1 — EXACT DUPLICATE ELIMINATION
+   Question: Are any governed files byte-for-byte identical?
+   Preferred first-pass: local deterministic hashing (for example SHA-256).
+   Exact duplicate means byte-for-byte identical content. Similar code, same purpose, same file name, or generated similarity are not exact duplicates.
+   Phase 1 may remove only proven exact duplicates after a quick path/reference safety check.
+   Phase 1 does not require purpose, runtime-use, dependency, overlap, reuse-value, merge, retirement, or replacement evidence for every unique file.
+
+3. PHASE_2 — FILE PURPOSE IDENTIFICATION
+   Question: What does each remaining governed file represent?
+   Reuse EAC-001. No merge, deletion, retirement, repair, or refactoring.
+
+4. PHASE_3 — ACTIVE USE IDENTIFICATION
+   Question: Is each remaining governed file currently used?
+   Outcomes: ACTIVE, INDIRECTLY_ACTIVE, MANUAL_USE, NO_CURRENT_USE_FOUND, UNKNOWN.
+   NO_CURRENT_USE_FOUND does not authorise deletion.
+
+5. PHASE_4 — LEGACY AND REPLACEMENT IDENTIFICATION
+   Question: Has each applicable file been superseded or left behind by a newer implementation?
+   Outcomes: CURRENT, LEGACY, REPLACED, HISTORICAL, UNCERTAIN.
+
+6. PHASE_5 — FUNCTIONAL OVERLAP IDENTIFICATION
+   Question: Are different remaining files doing the same or substantially overlapping job?
+   Outcomes: NO_OVERLAP, PARTIAL_OVERLAP, MAJOR_OVERLAP, POTENTIAL_MERGE_GROUP.
+   Identifies overlap only. No merge implementation.
+
+7. PHASE_6 — SAFE RETIREMENT
+   Question: Which proven unused, replaced, or historical files can safely be removed?
+   Outcomes: RETIRE, KEEP, BLOCKED. Approved RETIRE may be implemented here.
+
+8. PHASE_7 — MERGE AND CONSOLIDATION
+   Question: Which confirmed overlap groups should become one canonical implementation?
+   Deep investigation phase for proven overlap candidates only.
+
+9. PHASE_8 — FINAL REPOSITORY VALIDATION
+   Question: Is the cleaned repository internally consistent?
+   Do not start a new cleanup hunt.
+
+### Phase order law
+
+Allowed sequence: PHASE_0 → PHASE_1 → PHASE_2 → PHASE_3 → PHASE_4 → PHASE_5 → PHASE_6 → PHASE_7 → PHASE_8.
+
+A later phase must not activate while an earlier phase is incomplete.
+
+### Active phase law
+
+The Control Center must expose exactly one active repository cleanup phase.
+
+An implementation agent must be able to determine:
+
+- active phase
+- active phase question
+- active phase scope
+- active batch where applicable
+- completed batches
+- remaining batches
+- phase status
+- phase Definition of Done
+- future phase notes
+
+The Control Center must fail closed if an agent attempts work belonging to a different cleanup phase.
+
+### Batch law
+
+Reuse the existing deterministic EAC-001 batch manifest (`control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json`, B01–B29).
+
+Do not invent a second arbitrary batch system.
+
+Where a phase is batch-oriented, process deterministic EAC-001 batches in the existing defined order unless the Control Center records an explicit evidence-backed exception.
+
+The next incomplete batch is the next default batch.
+
+### Phase 1 forbidden questions
+
+During PHASE_1 do not investigate as active work:
+
+- What is this file for?
+- Is this file old/legacy/unused/replaced?
+- Can different files be merged?
+- Do different files overlap?
+- Is the code good / should it be refactored?
+- Is there a defect / should it be repaired?
+- Should the architecture be redesigned?
+
+If noticed: record `FUTURE_PHASE_NOTE` with asset path(s), brief issue, and likely future phase. Continue Phase 1. Do not investigate the note during Phase 1.
+
+### No cross-phase drift law
+
+During an active phase: do the active phase only.
+
+An agent noticing another problem must not investigate it deeply, repair it, refactor it, merge it, retire it, or change architecture because of it.
+
+Record a `FUTURE_PHASE_NOTE` and continue the active phase.
+
+### Standing Git authority
+
+Stephen grants standing repository authority for approved Control Center cleanup phases to perform routine Git inspection, scoped staging, verified batch/phase commits, and push of successfully verified committed work without requesting separate approval from Stephen for each routine Git step.
+
+Allowed without asking Stephen again when the work is inside the active approved phase, the batch/unit is complete, required focused verification passed, unrelated changes are preserved, staged changes contain only approved phase work, and scope is confirmed before commit:
+
+- git status / git status --short
+- git diff / git diff --check
+- git log / git show / git rev-parse / git ls-files / git grep
+- git add -- &lt;exact approved phase/batch paths&gt;
+- git commit
+- git push origin main
+
+Git actions still requiring Stephen's explicit approval:
+
+- git reset --hard
+- git clean
+- discarding local work with git checkout / git restore
+- git rebase
+- merging branches
+- force push / git push --force
+- branch deletion
+- history rewriting
+- mass repository rollback
+- any Git action that would knowingly discard unrelated local changes
+
+Repository standing Git authority does not override a mandatory IDE, sandbox, OS, or product security approval prompt.
+
+### Gate mode rules
+
+PHASE_WORK may receive GREEN only when the requested phase equals the active phase, the work matches the active phase question, and (for batch-oriented phases) the batch is the next incomplete deterministic EAC-001 batch or the recorded active batch.
+
+COMPLETE_BATCH may receive GREEN only for the active batch of the active phase and must not require unique files to enter the old full forensic lifecycle.
+
+CLOSE_PHASE may receive GREEN only when the active phase Definition of Done is met and phase status is PHASE_READY_TO_CLOSE.
+
+RECORD_FUTURE_PHASE_NOTE may receive GREEN when it records an out-of-phase finding without changing the active phase.
+
+CONTROL may receive GREEN only when:
+
+- Stephen explicitly authorizes Control Center maintenance
+- a proven Control Center defect or lifecycle gap is recorded
+- scope is confined to Control Center gate, policy, and focused tests
+- no product asset is changed
+
+No instruction or missing state = HOLD.
+
+Feature work, unrelated cleanup, broad repository work, premature mutation, or wrong-phase work = HOLD.
+
+Startable ledger tasks remain informational only and do not authorize cleanup-phase execution by themselves.
 
 Required state snapshot:
 
 <!-- CONTROL_CENTER_STATE_START -->
 ```json
 {
-  "required_modes": ["INSPECT", "CLOSE", "CONTROL", "ACTIVATE"],
-  "required_lifecycle": ["PENDING", "INSPECTING", "DISPOSITION_READY", "CLOSURE_READY", "CLOSED"],
-  "active_asset_group": {
-    "group_id": ".gcloudignore",
-    "asset_paths": [
-      ".gcloudignore"
-    ]
-  },
-  "lifecycle_state": "CLOSURE_READY",
-  "evidence_completion": {
-    "contents_and_purpose": true,
-    "references_and_consumers": true,
-    "runtime_use": true,
-    "dependencies": true,
-    "overlap_or_duplication": true
-  },
-  "disposition": "MERGE",
-  "closure_status": "OPEN",
+  "governance_model": "REPOSITORY_CLEANUP_PROGRAMME",
+  "required_modes": ["PHASE_WORK", "COMPLETE_BATCH", "CLOSE_PHASE", "RECORD_FUTURE_PHASE_NOTE", "CONTROL"],
+  "required_lifecycle": ["PHASE_PENDING", "PHASE_ACTIVE", "BATCH_ACTIVE", "BATCH_COMPLETE", "PHASE_READY_TO_CLOSE", "PHASE_CLOSED"],
+  "cleanup_phase_order": ["PHASE_0", "PHASE_1", "PHASE_2", "PHASE_3", "PHASE_4", "PHASE_5", "PHASE_6", "PHASE_7", "PHASE_8"],
+  "eac_evidence_reusable": true,
+  "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
   "total_governed_assets": 906,
-  "investigated_assets": 8,
-  "closed_assets": 7,
-  "remaining_assets": 898,
-  "required_closure_files": [
-    ".gcloudignore"
-  ],
-  "inspected_groups": ["control-center-gate-group", ".bat", ".dockerignore", ".env.example", ".gitignore", ".gcloudignore"],
-  "closed_groups": ["control-center-gate-group", ".bat", ".dockerignore", ".env.example", ".gitignore"],
-  "closed_asset_paths": [
+  "phase_0": {
+    "status": "PHASE_CLOSED",
+    "question": "What exact repository state is the cleanup programme starting from?",
+    "evidence": {
+      "repository_root": "C:/Users/user/Desktop/Stephen Fynn/SKCS-test",
+      "active_branch": "main",
+      "head_commit": "7d21fc276629bb6aec056299d70e1541b462934f",
+      "working_tree_status": "dirty_unrelated_changes_preserved",
+      "governed_asset_count": 906,
+      "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
+      "eac_batch_count": 29,
+      "already_completed_or_removal_work": "Partial external sports provider removal (PARTIAL); EAC-001 B01-B29 classification inventory complete; prior Control Center per-asset investigations preserved as historical evidence",
+      "unrelated_local_changes_preserved": true
+    }
+  },
+  "active_phase": "PHASE_1",
+  "active_phase_question": "Are any governed files byte-for-byte identical?",
+  "lifecycle_state": "PHASE_ACTIVE",
+  "active_batch": null,
+  "completed_batches": [],
+  "remaining_batches": ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10", "B11", "B12", "B13", "B14", "B15", "B16", "B17", "B18", "B19", "B20", "B21", "B22", "B23", "B24", "B25", "B26", "B27", "B28", "B29"],
+  "next_deterministic_batch": "B01",
+  "phase_1_duplicate_scan_executed": false,
+  "future_phase_notes": [],
+  "standing_git_authority": true,
+  "dangerous_git_actions_approval_gated": true,
+  "historical_per_asset_forensic_lifecycle": "PRESERVED_AS_HISTORY_ONLY",
+  "historical_closed_asset_paths": [
     "control-center/EDGE_CONTROL_CENTER.md",
     "control-center/check_control_center.js",
     "tests/edge-control-center-ledger.test.js",
     ".bat",
     ".dockerignore",
     ".env.example",
-    ".gitignore"
+    ".gitignore",
+    ".gcloudignore"
   ]
 }
 ```
 <!-- CONTROL_CENTER_STATE_END -->
+
+### Historical Control Center evidence (preserved)
+
+The following records are preserved historical evidence from the previous per-asset forensic investigation model. They are not the active cleanup lifecycle.
 
 Investigation evidence:
 
@@ -452,54 +650,3 @@ Active investigation evidence: .gcloudignore
 
 Disposition recorded: MERGE
 Closure status: OPEN
-
-INSPECT may receive GREEN only when:
-
-- an exact asset or tightly related group is named
-- the group is recorded as the active investigation scope
-- the instruction is inspection-only
-- no merge, replacement, retirement, deletion, refactor, or unrelated repair is authorized
-
-CLOSE may receive GREEN only when:
-
-- the exact same asset/group was previously inspected
-- contents and purpose evidence exists
-- consumer and reference evidence exists
-- runtime evidence exists
-- dependency evidence exists
-- overlap evidence exists
-- an evidence-backed disposition exists
-- closure scope contains only that inspected group and its required Control Center projection
-- unrelated changes are preserved
-
-CONTROL may receive GREEN only when:
-
-- Stephen explicitly authorizes Control Center maintenance
-- a proven Control Center defect or lifecycle gap is recorded
-- scope is confined to Control Center gate, policy, and focused tests
-- no product asset is changed
-
-ACTIVATE may receive GREEN only when:
-
-- the current group is CLOSED
-- no group remains open
-- the next asset or group is selected from governed asset authority
-- already CLOSED assets are skipped
-- the exact next asset or group is recorded
-- the new lifecycle state becomes PENDING
-- counters remain consistent
-
-Default activation selects the first governed, not-CLOSED asset in deterministic asset-register order.
-
-No instruction or missing state = HOLD.
-
-Feature work, unrelated cleanup, broad repository work, or premature mutation = HOLD.
-
-The active investigation remains locked until every governed asset has reached CLOSED with an evidence-backed disposition.
-
-Startable tasks are informational only.
-
-Current sequencing remains informational and does not authorize execution:
-
-- EAC-001 — Edge Asset Classification and Repository Map [PROPOSED]
-- ECU-001 — Edge Control Center Operator UI [APPROVED]
