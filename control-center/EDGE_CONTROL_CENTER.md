@@ -830,3 +830,14 @@ Phase 1 batch evidence: B15
 - batch_outcome: BATCH_COMPLETE
 - next_deterministic_batch: B16
 - note: every B15 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
+
+Phase 1 batch evidence: B16
+
+- batch_id: B16
+- title: DOCS_ROOT_MD_TXT
+- hash_method: SHA-256
+- asset_count: 36
+- exact_duplicate_groups: 0
+- batch_outcome: BATCH_COMPLETE
+- next_deterministic_batch: B17
+- note: every B16 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
