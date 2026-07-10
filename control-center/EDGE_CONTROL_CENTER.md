@@ -650,3 +650,14 @@ Active investigation evidence: .gcloudignore
 
 Disposition recorded: MERGE
 Closure status: OPEN
+
+Phase 1 batch evidence: B01
+
+- batch_id: B01
+- title: CONTROL_CENTER
+- hash_method: SHA-256
+- asset_count: 15
+- exact_duplicate_groups: 0
+- batch_outcome: BATCH_COMPLETE
+- next_deterministic_batch: B02
+- note: every B01 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
