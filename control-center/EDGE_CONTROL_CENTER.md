@@ -552,7 +552,7 @@ Required state snapshot:
   "completed_batches": [],
   "remaining_batches": ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10", "B11", "B12", "B13", "B14", "B15", "B16", "B17", "B18", "B19", "B20", "B21", "B22", "B23", "B24", "B25", "B26", "B27", "B28", "B29"],
   "next_deterministic_batch": "B01",
-  "phase_1_duplicate_scan_executed": false,
+  "phase_1_duplicate_scan_executed": true,
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,
@@ -863,3 +863,14 @@ Phase 1 batch evidence: B18
 - batch_outcome: BATCH_COMPLETE
 - next_deterministic_batch: B19
 - note: every B18 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
+
+Phase 1 batch evidence: B19
+
+- batch_id: B19
+- title: SKCS_KNOWLEDGE_KNOWLEDGE
+- hash_method: SHA-256
+- asset_count: 17
+- exact_duplicate_groups: 0
+- batch_outcome: BATCH_COMPLETE
+- next_deterministic_batch: B20
+- note: every B19 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
