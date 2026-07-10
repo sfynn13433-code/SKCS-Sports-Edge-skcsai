@@ -808,3 +808,13 @@ Phase 1 batch evidence: B13
 - batch_outcome: BATCH_COMPLETE
 - next_deterministic_batch: B14
 - note: every B13 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
+
+FUTURE_PHASE_NOTE
+
+- asset_paths:
+  - scripts/enrich-h2h.js
+  - scripts/enrich-importance.js
+  - scripts/enrich-injuries.js
+  - scripts/enrich-travel.js
+- issue: B14 manifest-derived paths are missing from the working tree, so exact local Get-FileHash SHA-256 verification cannot complete for those assets.
+- likely_future_phase: Control Center manifest reconciliation / asset inventory repair
