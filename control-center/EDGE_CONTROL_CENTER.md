@@ -720,3 +720,14 @@ Phase 1 batch evidence: B05
 - batch_outcome: BATCH_COMPLETE
 - next_deterministic_batch: B06
 - note: every B05 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
+
+Phase 1 batch evidence: B06
+
+- batch_id: B06
+- title: BACKEND_PROVIDERS_FOOTBALL
+- hash_method: SHA-256
+- asset_count: 10
+- exact_duplicate_groups: 0
+- batch_outcome: BATCH_COMPLETE
+- next_deterministic_batch: B07
+- note: every B06 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
