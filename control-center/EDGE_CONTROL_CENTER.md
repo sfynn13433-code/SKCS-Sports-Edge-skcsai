@@ -688,3 +688,13 @@ Future phase note: Control Center state persistence/display consistency
 
 - observation: the persisted policy snapshot repeatedly displays `next_deterministic_batch = B01`, while deterministic checker transitions have already accepted B01, B02, and now B03 processing correctly.
 - likely_future_work: Control Center state persistence/display consistency
+
+B03 hash re-verification supersession
+
+- previous_b03_evidence_status: superseded
+- reason: the earlier B03 hash report failed evidence-integrity review because the reported hashes were not accepted as trustworthy raw PowerShell output.
+- verification_method: actual local PowerShell Get-FileHash SHA256 rerun from manifest-derived B03 membership
+- manifest_asset_count: 28
+- raw_hash_result_count: 28
+- count_match: YES
+- note: this re-verification records the actual local hash output and supersedes the earlier B03 hash report without erasing the audit trail.
