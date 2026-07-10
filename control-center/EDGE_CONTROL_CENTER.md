@@ -340,12 +340,12 @@ Required state snapshot:
   "required_modes": ["INSPECT", "CLOSE", "CONTROL", "ACTIVATE"],
   "required_lifecycle": ["PENDING", "INSPECTING", "DISPOSITION_READY", "CLOSURE_READY", "CLOSED"],
   "active_asset_group": {
-    "group_id": ".env.example",
+    "group_id": ".gcloudignore",
     "asset_paths": [
-      ".env.example"
+      ".gcloudignore"
     ]
   },
-  "lifecycle_state": "CLOSED",
+  "lifecycle_state": "CLOSURE_READY",
   "evidence_completion": {
     "contents_and_purpose": true,
     "references_and_consumers": true,
@@ -353,24 +353,25 @@ Required state snapshot:
     "dependencies": true,
     "overlap_or_duplication": true
   },
-  "disposition": "KEEP",
-  "closure_status": "CLOSED",
+  "disposition": "MERGE",
+  "closure_status": "OPEN",
   "total_governed_assets": 906,
-  "investigated_assets": 6,
-  "closed_assets": 6,
-  "remaining_assets": 900,
+  "investigated_assets": 8,
+  "closed_assets": 7,
+  "remaining_assets": 898,
   "required_closure_files": [
-    ".env.example"
+    ".gcloudignore"
   ],
-  "inspected_groups": ["control-center-gate-group", ".bat", ".dockerignore", ".env.example"],
-  "closed_groups": ["control-center-gate-group", ".bat", ".dockerignore", ".env.example"],
+  "inspected_groups": ["control-center-gate-group", ".bat", ".dockerignore", ".env.example", ".gitignore", ".gcloudignore"],
+  "closed_groups": ["control-center-gate-group", ".bat", ".dockerignore", ".env.example", ".gitignore"],
   "closed_asset_paths": [
     "control-center/EDGE_CONTROL_CENTER.md",
     "control-center/check_control_center.js",
     "tests/edge-control-center-ledger.test.js",
     ".bat",
     ".dockerignore",
-    ".env.example"
+    ".env.example",
+    ".gitignore"
   ]
 }
 ```
@@ -425,6 +426,32 @@ Active investigation evidence: .env.example
 
 Disposition recorded: KEEP
 Closure status: CLOSED
+
+Closed investigation evidence: .gitignore
+
+- contents_and_purpose: `.gitignore` excludes local env files, dependency directories, build outputs, IDE/OS files, logs, caches, archive output, and local tool state from source control.
+- references_and_consumers: Git consumes it directly; the repository governance files also reference the root ignore policy as a tracked configuration artifact. No application runtime code imports it.
+- runtime_use: it has no runtime execution role; it only changes what Git tracks.
+- reads_and_writes: the file reads and writes nothing.
+- dependencies: depends on Git ignore semantics and the repo's local/generated paths such as `.env`, `node_modules`, Python caches, `.vercel`, `_archive/`, `backend/cache/*.json`, and log files.
+- overlap_or_duplication: overlaps with `.dockerignore` and `.gcloudignore`, but those files govern different boundaries. The source-control boundary belongs in `.gitignore`.
+- reuse_value: keep it as the canonical Git tracking policy for this repository.
+
+Disposition recorded: KEEP
+Closure status: CLOSED
+
+Active investigation evidence: .gcloudignore
+
+- contents_and_purpose: `.gcloudignore` is the repository-root Google Cloud CLI upload filter, excluding local secrets, dependency/build directories, IDE files, Git metadata, and large local artifacts from any gcloud-managed source upload.
+- references_and_consumers: no application code imports or calls `.gcloudignore`; its direct consumer would be Google Cloud tooling when commands such as deploy or source upload run from the repository root. Current repository references are governance artifacts plus historical documentation traces like `phase2-cleanup.js`, `FULL_WORKSPACE_AUDIT_REPORT.md`, and a comment in `backend/server-express.js` pointing at a now-absent root `docs/google-cloud-soccer-refresh.md`.
+- runtime_use: there is no proven current runtime or build path in package scripts, Vercel config, Render config, or live root docs that invokes Google Cloud deployment from this repository. The only Google Cloud operational trail left in-tree is archived or report-derived material, including `_archive/docs_legacy/google-cloud-soccer-refresh.md`; the current tracked root doc is absent.
+- reads_and_writes: `.gcloudignore` does not read or write repository files; Google Cloud CLI tooling would read it implicitly to omit matching files from upload context.
+- dependencies: depends on Google Cloud CLI ignore semantics and the paths it names, including `.env*`, `node_modules`, Python virtualenv/build outputs, IDE folders, `.git`, `backend/scripts/_vendor`, `backend/scripts/results`, and chaos log files.
+- overlap_or_duplication: overlaps heavily with `.gitignore` and materially with `.dockerignore`; most exclusion patterns are already governed elsewhere, and the remaining Google Cloud-specific value only matters if this repository still uses gcloud source-upload workflows.
+- reuse_value: retain the useful exclusion patterns, but merge or reconcile them into the surviving ignore-policy surfaces unless a current Google Cloud deployment path is re-established and proved active.
+
+Disposition recorded: MERGE
+Closure status: OPEN
 
 INSPECT may receive GREEN only when:
 

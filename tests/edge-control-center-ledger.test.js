@@ -93,7 +93,7 @@ describe("Edge Control Center Ledger v1", () => {
     assert.ok(ledger.tasks.length >= 14);
   });
 
-  it("documents the closed investigation state snapshot", () => {
+  it("documents the active investigation state snapshot", () => {
     const documentText = loadControlCenterDocument();
     const result = validateControlCenterPolicy(documentText);
 
@@ -116,18 +116,18 @@ describe("Edge Control Center Ledger v1", () => {
     );
     assert.equal(
       result.state.active_asset_group.group_id,
-      ".env.example"
+      ".gcloudignore"
     );
     assert.deepEqual(
       result.state.active_asset_group.asset_paths,
-      [".env.example"]
+      [".gcloudignore"]
     );
-    assert.equal(result.state.lifecycle_state, "CLOSED");
-    assert.equal(result.state.disposition, "KEEP");
-    assert.equal(result.state.closure_status, "CLOSED");
-    assert.equal(result.state.investigated_assets, 6);
-    assert.equal(result.state.closed_assets, 6);
-    assert.equal(result.state.remaining_assets, 900);
+    assert.equal(result.state.lifecycle_state, "CLOSURE_READY");
+    assert.equal(result.state.disposition, "MERGE");
+    assert.equal(result.state.closure_status, "OPEN");
+    assert.equal(result.state.investigated_assets, 8);
+    assert.equal(result.state.closed_assets, 7);
+    assert.equal(result.state.remaining_assets, 898);
     assert.deepEqual(
       result.state.evidence_completion,
       {
@@ -143,16 +143,19 @@ describe("Edge Control Center Ledger v1", () => {
       ".bat",
       ".dockerignore",
       ".env.example",
+      ".gitignore",
+      ".gcloudignore",
     ]);
     assert.deepEqual(result.state.closed_groups, [
       CONTROL_CENTER_GATE_GROUP.group_id,
       ".bat",
       ".dockerignore",
       ".env.example",
+      ".gitignore",
     ]);
     assert.deepEqual(
       result.state.closed_asset_paths,
-      [...CONTROL_CENTER_GATE_GROUP.asset_paths, ".bat", ".dockerignore", ".env.example"]
+      [...CONTROL_CENTER_GATE_GROUP.asset_paths, ".bat", ".dockerignore", ".env.example", ".gitignore"]
     );
     assert.equal(result.state.total_governed_assets, 906);
   });
