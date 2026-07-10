@@ -819,3 +819,14 @@ Phase 1 batch evidence: B14
 - batch_outcome: BATCH_COMPLETE
 - next_deterministic_batch: B15
 - note: four stale manifest paths were removed after confirming they were deleted in commit 659e7f710ff578b088a3fc7d2a25d9767190ec78; corrected B14 assets hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
+
+Phase 1 batch evidence: B15
+
+- batch_id: B15
+- title: SCRIPTS_MAINT_FIX_CLEANUP_MIGRATE
+- hash_method: SHA-256
+- asset_count: 52
+- exact_duplicate_groups: 0
+- batch_outcome: BATCH_COMPLETE
+- next_deterministic_batch: B16
+- note: every B15 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
