@@ -742,3 +742,14 @@ Phase 1 batch evidence: B07
 - batch_outcome: BATCH_COMPLETE
 - next_deterministic_batch: B08
 - note: every B07 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
+
+Phase 1 batch evidence: B08
+
+- batch_id: B08
+- title: BACKEND_ADAPTERS_AND_CONFIG
+- hash_method: SHA-256
+- asset_count: 13
+- exact_duplicate_groups: 0
+- batch_outcome: BATCH_COMPLETE
+- next_deterministic_batch: B09
+- note: every B08 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
