@@ -764,3 +764,14 @@ Phase 1 batch evidence: B09
 - batch_outcome: BATCH_COMPLETE
 - next_deterministic_batch: B10
 - note: every B09 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
+
+Phase 1 batch evidence: B10
+
+- batch_id: B10
+- title: SCRIPTS_AUDIT_GOV
+- hash_method: SHA-256
+- asset_count: 27
+- exact_duplicate_groups: 0
+- batch_outcome: BATCH_COMPLETE
+- next_deterministic_batch: B11
+- note: every B10 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
