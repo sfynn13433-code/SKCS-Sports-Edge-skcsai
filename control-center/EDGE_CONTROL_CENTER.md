@@ -672,3 +672,19 @@ Phase 1 batch evidence: B02
 - batch_outcome: BATCH_COMPLETE
 - next_deterministic_batch: B03
 - note: every B02 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
+
+Phase 1 batch evidence: B03
+
+- batch_id: B03
+- title: BACKEND_ROUTES_AND_CONTROLLERS
+- hash_method: SHA-256
+- asset_count: 28
+- exact_duplicate_groups: 0
+- batch_outcome: BATCH_COMPLETE
+- next_deterministic_batch: B04
+- note: every B03 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
+
+Future phase note: Control Center state persistence/display consistency
+
+- observation: the persisted policy snapshot repeatedly displays `next_deterministic_batch = B01`, while deterministic checker transitions have already accepted B01, B02, and now B03 processing correctly.
+- likely_future_work: Control Center state persistence/display consistency
