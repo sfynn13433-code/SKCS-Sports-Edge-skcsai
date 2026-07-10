@@ -852,3 +852,14 @@ Phase 1 batch evidence: B17
 - batch_outcome: BATCH_COMPLETE
 - next_deterministic_batch: B18
 - note: every B17 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
+
+Phase 1 batch evidence: B18
+
+- batch_id: B18
+- title: SKCS_KNOWLEDGE_GOV_AND_AUDIT
+- hash_method: SHA-256
+- asset_count: 23
+- exact_duplicate_groups: 0
+- batch_outcome: BATCH_COMPLETE
+- next_deterministic_batch: B19
+- note: every B18 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
