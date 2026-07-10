@@ -5,8 +5,8 @@
   "source_command": "git ls-files",
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
-  "tracked_path_count": 914,
-  "registered_asset_count": 913,
+  "tracked_path_count": 903,
+  "registered_asset_count": 902,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -363,74 +363,6 @@
       "classification_evidence": [
         "Path under B29: .githooks/pre-commit",
         "First skim: #!/bin/sh\r\n# Local-only Master Rulebook guard. Runs on your machine; no GitHub Actions billing.\r\n\r\nSTAGED_FILES=$(git diff --cached --name-only --diff-filter=AC???"
-      ]
-    },
-    {
-      "asset_path": ".github/workflows/daily-insights.yml",
-      "asset_type": "CONFIG",
-      "asset_role": "CONFIGURATION",
-      "source_state": "COMMITTED_REPOSITORY",
-      "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
-      "owner_project_id": "UNRESOLVED",
-      "governed_by_control_task_id": "EPR-001",
-      "related_assets": [],
-      "related_tables": [],
-      "related_functions": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [],
-      "database_objects": [],
-      "deployment_surface": [],
-      "goes_somewhere": "UNKNOWN",
-      "known_conflicts": [],
-      "validation_status": "REGISTERED",
-      "next_validation": "Verify current GitHub Actions activation and recent execution history for `Daily Insights`, and confirm environment/secrets dependencies (API keys) and scheduler overlap behavior versus other enrichment schedulers in the later deployment comparison phase.",
-      "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "GitHub Actions scheduled automation to generate and commit daily Edge insight enrichment artifacts under `public/data/`.",
-      "functional_group": "SCHEDULER_BACKGROUND",
-      "relationship_tags": [
-        "SCHEDULER",
-        "BACKGROUND_JOB",
-        "DEPLOYMENT",
-        "PROVIDER"
-      ],
-      "classification_evidence": [
-        "Workflow name `Daily Insights` with `on.schedule.cron: '0 5 * * *'` and `workflow_dispatch` trigger.",
-        "CI steps install deps (`npm ci`) and run enrichment commands (`npm run tsdb:day`, `form:enrich`, `h2h:enrich`, `injuries:enrich`, then travel/importance enrich) and commit/push generated JSON outputs; uses secrets like `NEWSAPI_KEY`."
-      ]
-    },
-    {
-      "asset_path": ".github/workflows/lineups-insights.yml",
-      "asset_type": "CONFIG",
-      "asset_role": "CONFIGURATION",
-      "source_state": "COMMITTED_REPOSITORY",
-      "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
-      "owner_project_id": "UNRESOLVED",
-      "governed_by_control_task_id": "EPR-001",
-      "related_assets": [],
-      "related_tables": [],
-      "related_functions": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [],
-      "database_objects": [],
-      "deployment_surface": [],
-      "goes_somewhere": "UNKNOWN",
-      "known_conflicts": [],
-      "validation_status": "REGISTERED",
-      "next_validation": "Verify current GitHub Actions activation and recent execution history for `Lineups Enrichment`, and confirm secrets dependencies and any runtime/scheduler overlap versus Render/Vercel scheduled jobs during the later deployment comparison phase.",
-      "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "GitHub Actions scheduled automation to generate and commit lineups-related enrichment artifacts under `public/data/`.",
-      "functional_group": "SCHEDULER_BACKGROUND",
-      "relationship_tags": [
-        "SCHEDULER",
-        "BACKGROUND_JOB",
-        "DEPLOYMENT",
-        "PROVIDER"
-      ],
-      "classification_evidence": [
-        "Workflow name `Lineups Enrichment` with `on.schedule.cron: '0 11 * * *'` and `workflow_dispatch` trigger.",
-        "CI steps install deps (`npm ci`) and run enrichment commands (`h2h:enrich`, `injuries:enrich`, `lineups:enrich`, then travel enrich), commit/push generated JSON outputs; uses secrets like `APIFOOTBALL_KEY` and `NEWSAPI_KEY`."
       ]
     },
     {
@@ -4012,37 +3944,6 @@
       ]
     },
     {
-      "asset_path": "_archive/root/style.css",
-      "asset_type": "OTHER",
-      "asset_role": "UNCLASSIFIED_ASSET_ROLE",
-      "source_state": "COMMITTED_REPOSITORY",
-      "authority_class": "UNKNOWN",
-      "current_state": "STALE_OR_SUPERSEDED",
-      "owner_project_id": "UNRESOLVED",
-      "governed_by_control_task_id": "EPR-001",
-      "related_assets": [],
-      "related_tables": [],
-      "related_functions": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [],
-      "database_objects": [],
-      "deployment_surface": [],
-      "goes_somewhere": "UNKNOWN",
-      "known_conflicts": [],
-      "validation_status": "REGISTERED",
-      "next_validation": "Later validate retention by comparing with current non-archive artifacts and confirming no runtime activation/usage is required.",
-      "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Archived UI style asset retained under _archive/root (style.css).",
-      "functional_group": "GENERATED_OUTPUT",
-      "relationship_tags": [
-        "GENERATED"
-      ],
-      "classification_evidence": [
-        "Path under _archive/: _archive/root/style.css",
-        "Content skim: body {\r\n    font-family: Arial, sans-serif;\r\n    background-color: #f4f4f4;\r\n    margin: 0;\r\n    padding: 20px;\r\n    display: flex;\r\n    justify-content: center??????"
-      ]
-    },
-    {
       "asset_path": "_archive/scripts/analyze-routes.js",
       "asset_type": "SOURCE_CODE",
       "asset_role": "APPLICATION_SOURCE",
@@ -4102,37 +4003,6 @@
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/analyze-table-usage.js",
         "Content skim: 'use strict';\r\n\r\nconst fs = require('fs');\r\nconst path = require('path');\r\n\r\nconst backendDir = path.join(__dirname, '..', 'backend');\r\n\r\n// All tables from dat??????"
-      ]
-    },
-    {
-      "asset_path": "_archive/scripts/check-api.js",
-      "asset_type": "SOURCE_CODE",
-      "asset_role": "APPLICATION_SOURCE",
-      "source_state": "COMMITTED_REPOSITORY",
-      "authority_class": "UNKNOWN",
-      "current_state": "STALE_OR_SUPERSEDED",
-      "owner_project_id": "UNRESOLVED",
-      "governed_by_control_task_id": "EPR-001",
-      "related_assets": [],
-      "related_tables": [],
-      "related_functions": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [],
-      "database_objects": [],
-      "deployment_surface": [],
-      "goes_somewhere": "UNKNOWN",
-      "known_conflicts": [],
-      "validation_status": "REGISTERED",
-      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
-      "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (check-api.js).",
-      "functional_group": "SCRIPT_TOOL",
-      "relationship_tags": [
-        "SCRIPT_TOOL"
-      ],
-      "classification_evidence": [
-        "Path under _archive/: _archive/scripts/check-api.js",
-        "Content skim: Skim unavailable"
       ]
     },
     {
@@ -5602,37 +5472,6 @@
       "classification_evidence": [
         "Path under _archive/: _archive/scripts/test-scheduler-endpoint.sh",
         "Content skim: #!/bin/bash\r\n\r\n# Test script for SKCS scheduler endpoints\r\n# This script validates the idempotency and conflict resolution features\r\n\r\nset -e\r\n\r\n# Configuration??????"
-      ]
-    },
-    {
-      "asset_path": "_archive/scripts/test_math.js",
-      "asset_type": "SOURCE_CODE",
-      "asset_role": "APPLICATION_SOURCE",
-      "source_state": "COMMITTED_REPOSITORY",
-      "authority_class": "UNKNOWN",
-      "current_state": "STALE_OR_SUPERSEDED",
-      "owner_project_id": "UNRESOLVED",
-      "governed_by_control_task_id": "EPR-001",
-      "related_assets": [],
-      "related_tables": [],
-      "related_functions": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [],
-      "database_objects": [],
-      "deployment_surface": [],
-      "goes_somewhere": "UNKNOWN",
-      "known_conflicts": [],
-      "validation_status": "REGISTERED",
-      "next_validation": "Later compare against current non-archive tooling scripts (outside _archive/) to confirm retention intent; validate expected operational/database assumptions.",
-      "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Archived operational CI/deployment tool script retained under _archive/scripts (test_math.js).",
-      "functional_group": "SCRIPT_TOOL",
-      "relationship_tags": [
-        "SCRIPT_TOOL"
-      ],
-      "classification_evidence": [
-        "Path under _archive/: _archive/scripts/test_math.js",
-        "Content skim: Skim unavailable"
       ]
     },
     {
@@ -16273,38 +16112,6 @@
       ]
     },
     {
-      "asset_path": "public/data/venue-cache.json",
-      "asset_type": "CONFIG",
-      "asset_role": "CONFIGURATION",
-      "source_state": "COMMITTED_REPOSITORY",
-      "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
-      "owner_project_id": "UNRESOLVED",
-      "governed_by_control_task_id": "EPR-001",
-      "related_assets": [],
-      "related_tables": [],
-      "related_functions": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [],
-      "database_objects": [],
-      "deployment_surface": [],
-      "goes_somewhere": "UNKNOWN",
-      "known_conflicts": [],
-      "validation_status": "REGISTERED",
-      "next_validation": "Verify actual frontend references and whether venue-cache.json remains current vs superseded.",
-      "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Static/public frontend asset (venue-cache.json) apparently used for UI presentation or configuration.",
-      "functional_group": "FRONTEND_UI",
-      "relationship_tags": [
-        "UI",
-        "GENERATED"
-      ],
-      "classification_evidence": [
-        "Fast skim: public/data/venue-cache.json under public/ indicates browser-delivered UI asset.",
-        "Top chunk first line: {}"
-      ]
-    },
-    {
       "asset_path": "public/data/vip-stress-saturday.json",
       "asset_type": "CONFIG",
       "asset_role": "CONFIGURATION",
@@ -21527,114 +21334,6 @@
       ]
     },
     {
-      "asset_path": "scripts/enrich-h2h.js",
-      "asset_type": "SOURCE_CODE",
-      "asset_role": "APPLICATION_SOURCE",
-      "source_state": "COMMITTED_REPOSITORY",
-      "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
-      "owner_project_id": "UNRESOLVED",
-      "governed_by_control_task_id": "EPR-001",
-      "related_assets": [],
-      "related_tables": [],
-      "related_functions": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [],
-      "database_objects": [],
-      "deployment_surface": [],
-      "goes_somewhere": "UNKNOWN",
-      "known_conflicts": [],
-      "validation_status": "REGISTERED",
-      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
-      "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: enrich-h2h.js is a PROVIDER_INTEGRATION script for enriching matches with contextual signals.",
-      "functional_group": "PROVIDER_INTEGRATION",
-      "relationship_tags": [
-        "SCRIPT_TOOL",
-        "RUNTIME",
-        "API",
-        "ROUTE",
-        "PROVIDER"
-      ],
-      "classification_evidence": [
-        "Fast skim: enrich-h2h.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
-        "Fast skim: includes HTTP/API interaction points.",
-        "Fast skim: references provider-specific feeds/adapters."
-      ]
-    },
-    {
-      "asset_path": "scripts/enrich-importance.js",
-      "asset_type": "SOURCE_CODE",
-      "asset_role": "APPLICATION_SOURCE",
-      "source_state": "COMMITTED_REPOSITORY",
-      "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
-      "owner_project_id": "UNRESOLVED",
-      "governed_by_control_task_id": "EPR-001",
-      "related_assets": [],
-      "related_tables": [],
-      "related_functions": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [],
-      "database_objects": [],
-      "deployment_surface": [],
-      "goes_somewhere": "UNKNOWN",
-      "known_conflicts": [],
-      "validation_status": "REGISTERED",
-      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
-      "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: enrich-importance.js is a PROVIDER_INTEGRATION script for enriching matches with contextual signals.",
-      "functional_group": "PROVIDER_INTEGRATION",
-      "relationship_tags": [
-        "SCRIPT_TOOL",
-        "RUNTIME",
-        "API",
-        "ROUTE",
-        "PROVIDER"
-      ],
-      "classification_evidence": [
-        "Fast skim: enrich-importance.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
-        "Fast skim: includes HTTP/API interaction points.",
-        "Fast skim: references provider-specific feeds/adapters."
-      ]
-    },
-    {
-      "asset_path": "scripts/enrich-injuries.js",
-      "asset_type": "SOURCE_CODE",
-      "asset_role": "APPLICATION_SOURCE",
-      "source_state": "COMMITTED_REPOSITORY",
-      "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
-      "owner_project_id": "UNRESOLVED",
-      "governed_by_control_task_id": "EPR-001",
-      "related_assets": [],
-      "related_tables": [],
-      "related_functions": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [],
-      "database_objects": [],
-      "deployment_surface": [],
-      "goes_somewhere": "UNKNOWN",
-      "known_conflicts": [],
-      "validation_status": "REGISTERED",
-      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
-      "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: enrich-injuries.js is a PROVIDER_INTEGRATION script for enriching matches with contextual signals.",
-      "functional_group": "PROVIDER_INTEGRATION",
-      "relationship_tags": [
-        "SCRIPT_TOOL",
-        "RUNTIME",
-        "DATABASE",
-        "API",
-        "ROUTE"
-      ],
-      "classification_evidence": [
-        "Fast skim: enrich-injuries.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
-        "Fast skim: uses Supabase client patterns for DB reads/writes.",
-        "Fast skim: includes HTTP/API interaction points."
-      ]
-    },
-    {
       "asset_path": "scripts/enrich-lineups.js",
       "asset_type": "SOURCE_CODE",
       "asset_role": "APPLICATION_SOURCE",
@@ -21702,42 +21401,6 @@
       ],
       "classification_evidence": [
         "Fast skim: enrich-team-form.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
-        "Fast skim: includes HTTP/API interaction points.",
-        "Fast skim: references provider-specific feeds/adapters."
-      ]
-    },
-    {
-      "asset_path": "scripts/enrich-travel.js",
-      "asset_type": "SOURCE_CODE",
-      "asset_role": "APPLICATION_SOURCE",
-      "source_state": "COMMITTED_REPOSITORY",
-      "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
-      "owner_project_id": "UNRESOLVED",
-      "governed_by_control_task_id": "EPR-001",
-      "related_assets": [],
-      "related_tables": [],
-      "related_functions": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [],
-      "database_objects": [],
-      "deployment_surface": [],
-      "goes_somewhere": "UNKNOWN",
-      "known_conflicts": [],
-      "validation_status": "REGISTERED",
-      "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
-      "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: enrich-travel.js is a PROVIDER_INTEGRATION script for enriching matches with contextual signals.",
-      "functional_group": "PROVIDER_INTEGRATION",
-      "relationship_tags": [
-        "SCRIPT_TOOL",
-        "RUNTIME",
-        "API",
-        "ROUTE",
-        "PROVIDER"
-      ],
-      "classification_evidence": [
-        "Fast skim: enrich-travel.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
         "Fast skim: includes HTTP/API interaction points.",
         "Fast skim: references provider-specific feeds/adapters."
       ]
@@ -27470,39 +27133,6 @@
       ]
     },
     {
-      "asset_path": "supabase/functions/sync-sports-data/index.ts",
-      "asset_type": "SOURCE_CODE",
-      "asset_role": "APPLICATION_SOURCE",
-      "source_state": "COMMITTED_REPOSITORY",
-      "authority_class": "UNKNOWN",
-      "current_state": "UNKNOWN",
-      "owner_project_id": "UNRESOLVED",
-      "governed_by_control_task_id": "EPR-001",
-      "related_assets": [],
-      "related_tables": [],
-      "related_functions": [],
-      "runtime_consumers": [],
-      "runtime_dependencies": [],
-      "database_objects": [],
-      "deployment_surface": [],
-      "goes_somewhere": "UNKNOWN",
-      "known_conflicts": [],
-      "validation_status": "REGISTERED",
-      "next_validation": "Verify runtime invocation/scheduling wiring, required Supabase RPC/table dependencies, and that later code supersedes this function??????s behaviour before relying on it in production flows.",
-      "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Supabase Edge Function that triggers backend full sync pipeline via scheduled call.",
-      "functional_group": "SCHEDULER_BACKGROUND",
-      "relationship_tags": [
-        "SCHEDULER",
-        "BACKGROUND_JOB",
-        "RUNTIME"
-      ],
-      "classification_evidence": [
-        "Fast skim: index.ts is a Supabase scheduled/function asset (path: supabase/functions/sync-sports-data/index.ts); first meaningful line: Deno.serve(async (_req) => {.",
-        "Fast skim: observed markers: POST /api/pipeline/run-full."
-      ]
-    },
-    {
       "asset_path": "supabase/migrations/20260415000001_create_insight_usage.sql",
       "asset_type": "DATABASE_MIGRATION",
       "asset_role": "DATABASE_MIGRATION",
@@ -30297,6 +29927,14 @@
     "tracked_path_count_semantics_unchanged": true,
     "underlying_artifact_commit_required": false,
     "candidates": [
+      {
+        "asset_path": ".codex/environments/environment.toml",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
       {
         "asset_path": "all_acca_migrations.txt",
         "source_state": "PRE_EXISTING_UNTRACKED",

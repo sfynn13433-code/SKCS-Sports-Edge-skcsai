@@ -22075,12 +22075,6 @@
       "findings": []
     },
     {
-      "file": "public/data/venue-cache.json",
-      "hasWrapper": false,
-      "bypassCandidate": false,
-      "findings": []
-    },
-    {
       "file": "public/data/vip-stress-saturday.json",
       "hasWrapper": false,
       "bypassCandidate": false,
@@ -79511,12 +79505,6 @@
       "findings": []
     },
     {
-      "file": "_archive/scripts/check-api.js",
-      "hasWrapper": false,
-      "bypassCandidate": false,
-      "findings": []
-    },
-    {
       "file": "_archive/scripts/check-confidence.js",
       "hasWrapper": false,
       "bypassCandidate": false,
@@ -79789,12 +79777,6 @@
     },
     {
       "file": "_archive/scripts/phase3-cleanup.js",
-      "hasWrapper": false,
-      "bypassCandidate": false,
-      "findings": []
-    },
-    {
-      "file": "_archive/scripts/test_math.js",
       "hasWrapper": false,
       "bypassCandidate": false,
       "findings": []

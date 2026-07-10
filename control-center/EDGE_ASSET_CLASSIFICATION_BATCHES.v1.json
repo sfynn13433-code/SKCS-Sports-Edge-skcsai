@@ -1017,7 +1017,7 @@
           "public/"
         ]
       },
-      "asset_count": 65,
+      "asset_count": 64,
       "asset_paths": [
         "public/about-bg.jpg",
         "public/about-bg.webp",
@@ -1048,7 +1048,6 @@
         "public/data/tsdb-coverage-2026-05-18.json",
         "public/data/tsdb-coverage-2026-05-19.json",
         "public/data/tsdb-day-2026-05-17.json",
-        "public/data/venue-cache.json",
         "public/data/vip-stress-saturday.json",
         "public/direct-markets.html",
         "public/experience.html",
@@ -1096,7 +1095,7 @@
           "supabase/migrations/"
         ]
       },
-      "asset_count": 61,
+      "asset_count": 60,
       "asset_paths": [
         "supabase/migrations/20260415000001_create_insight_usage.sql",
         "supabase/migrations/20260418000002_update_predictions_final_risk_level_check.sql",
@@ -1266,14 +1265,12 @@
           "_archive/"
         ]
       },
-      "asset_count": 61,
+      "asset_count": 59,
       "asset_paths": [
         "_archive/root/cli_v1.1.0.exe",
         "_archive/root/render.zip",
-        "_archive/root/style.css",
         "_archive/scripts/analyze-routes.js",
         "_archive/scripts/analyze-table-usage.js",
-        "_archive/scripts/check-api.js",
         "_archive/scripts/check-confidence.js",
         "_archive/scripts/check-connectivity.js",
         "_archive/scripts/check-constraints.js",
@@ -1320,7 +1317,6 @@
         "_archive/scripts/sql/create_event_context_tables.sql",
         "_archive/scripts/sql/create_prediction_publish_runs.sql",
         "_archive/scripts/sql/create_predictions_accuracy.sql",
-        "_archive/scripts/test_math.js",
         "_archive/scripts/test-scheduler-endpoint.sh",
         "_archive/scripts/trigger-grade.js",
         "_archive/scripts/trigger-refresh.js",
