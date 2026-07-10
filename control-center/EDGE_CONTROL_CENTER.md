@@ -340,9 +340,9 @@ Required state snapshot:
   "required_modes": ["INSPECT", "CLOSE", "CONTROL", "ACTIVATE"],
   "required_lifecycle": ["PENDING", "INSPECTING", "DISPOSITION_READY", "CLOSURE_READY", "CLOSED"],
   "active_asset_group": {
-    "group_id": ".dockerignore",
+    "group_id": ".env.example",
     "asset_paths": [
-      ".dockerignore"
+      ".env.example"
     ]
   },
   "lifecycle_state": "CLOSED",
@@ -356,20 +356,21 @@ Required state snapshot:
   "disposition": "KEEP",
   "closure_status": "CLOSED",
   "total_governed_assets": 906,
-  "investigated_assets": 5,
-  "closed_assets": 5,
-  "remaining_assets": 901,
+  "investigated_assets": 6,
+  "closed_assets": 6,
+  "remaining_assets": 900,
   "required_closure_files": [
-    ".dockerignore"
+    ".env.example"
   ],
-  "inspected_groups": ["control-center-gate-group", ".bat", ".dockerignore"],
-  "closed_groups": ["control-center-gate-group", ".bat", ".dockerignore"],
+  "inspected_groups": ["control-center-gate-group", ".bat", ".dockerignore", ".env.example"],
+  "closed_groups": ["control-center-gate-group", ".bat", ".dockerignore", ".env.example"],
   "closed_asset_paths": [
     "control-center/EDGE_CONTROL_CENTER.md",
     "control-center/check_control_center.js",
     "tests/edge-control-center-ledger.test.js",
     ".bat",
-    ".dockerignore"
+    ".dockerignore",
+    ".env.example"
   ]
 }
 ```
@@ -408,6 +409,19 @@ Active investigation evidence: .dockerignore
 - dependencies: depends on Docker build semantics and the root build context; it also relates to local directories/files named in its patterns, including `.env`, `node_modules`, Python cache/build directories, `.git`, IDE folders, `backend/scripts/_vendor`, `backend/scripts/results`, and chaos log files.
 - overlap_or_duplication: overlaps substantially with `.gitignore`, but the boundary is different: `.gitignore` governs source control tracking, while `.dockerignore` governs container build context and secret/artifact exclusion.
 - reuse_value: keep as an active security and build hygiene configuration; its useful patterns should remain aligned with `.gitignore` and Dockerfile build requirements.
+
+Disposition recorded: KEEP
+Closure status: CLOSED
+
+Active investigation evidence: .env.example
+
+- contents_and_purpose: `.env.example` is the repository-root environment template documenting required and optional configuration for application runtime, database access, Supabase, auth, billing, sports providers, AI providers, Render hosts, ingestion limits, pipeline tuning, circuit breakers, and debug flags.
+- references_and_consumers: setup docs instruct copying `.env.example` to `.env`; `.gitignore` explicitly keeps `.env.example` tracked while ignoring real env files; runtime code reads matching variables through `process.env`, `dotenv`, and Python `os.getenv`.
+- runtime_use: the file itself is not loaded as runtime configuration, but its variable names mirror runtime dependencies used by backend services, scripts, cron triggers, Supabase clients, provider adapters, and deployment config.
+- reads_and_writes: `.env.example` reads and writes nothing; developers/operators copy or consult it to create local or deployment environment values.
+- dependencies: depends on the current runtime configuration contract across `backend/config.js`, database modules, middleware, provider clients, scripts, `render.yaml`, and docs. It must stay aligned with actual env-variable consumers.
+- overlap_or_duplication: overlaps with deployment docs, data-ingestion docs, `.gitignore` env-file policy, and generated external-source inventory references, but it is the central tracked template and not replaced by those assets.
+- reuse_value: keep as the canonical non-secret env template; reuse it as the governed source for onboarding and configuration audits, while separately correcting encoding artifacts in a future approved edit if needed.
 
 Disposition recorded: KEEP
 Closure status: CLOSED
