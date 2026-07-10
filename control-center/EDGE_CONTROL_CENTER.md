@@ -661,3 +661,14 @@ Phase 1 batch evidence: B01
 - batch_outcome: BATCH_COMPLETE
 - next_deterministic_batch: B02
 - note: every B01 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
+
+Phase 1 batch evidence: B02
+
+- batch_id: B02
+- title: BACKEND_DIRECT_FILES
+- hash_method: SHA-256
+- asset_count: 13
+- exact_duplicate_groups: 0
+- batch_outcome: BATCH_COMPLETE
+- next_deterministic_batch: B03
+- note: every B02 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
