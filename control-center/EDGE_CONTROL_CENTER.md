@@ -340,9 +340,9 @@ Required state snapshot:
   "required_modes": ["INSPECT", "CLOSE", "CONTROL", "ACTIVATE"],
   "required_lifecycle": ["PENDING", "INSPECTING", "DISPOSITION_READY", "CLOSURE_READY", "CLOSED"],
   "active_asset_group": {
-    "group_id": ".bat",
+    "group_id": ".dockerignore",
     "asset_paths": [
-      ".bat"
+      ".dockerignore"
     ]
   },
   "lifecycle_state": "CLOSED",
@@ -353,22 +353,23 @@ Required state snapshot:
     "dependencies": true,
     "overlap_or_duplication": true
   },
-  "disposition": "MERGE",
+  "disposition": "KEEP",
   "closure_status": "CLOSED",
   "total_governed_assets": 906,
-  "investigated_assets": 4,
-  "closed_assets": 4,
-  "remaining_assets": 902,
+  "investigated_assets": 5,
+  "closed_assets": 5,
+  "remaining_assets": 901,
   "required_closure_files": [
-    ".bat"
+    ".dockerignore"
   ],
-  "inspected_groups": ["control-center-gate-group", ".bat"],
-  "closed_groups": ["control-center-gate-group", ".bat"],
+  "inspected_groups": ["control-center-gate-group", ".bat", ".dockerignore"],
+  "closed_groups": ["control-center-gate-group", ".bat", ".dockerignore"],
   "closed_asset_paths": [
     "control-center/EDGE_CONTROL_CENTER.md",
     "control-center/check_control_center.js",
     "tests/edge-control-center-ledger.test.js",
-    ".bat"
+    ".bat",
+    ".dockerignore"
   ]
 }
 ```
@@ -396,6 +397,19 @@ Active investigation evidence: .bat
 - reuse_value: retain the operational idea of a local Dolphin/ngrok launcher, but merge it with the duplicate launcher pattern into one governed, configurable operator script before relying on it.
 
 Disposition recorded: MERGE
+Closure status: CLOSED
+
+Active investigation evidence: .dockerignore
+
+- contents_and_purpose: `.dockerignore` is the repository-root Docker context exclusion policy, excluding Node artifacts, local secrets, Python caches/build outputs, OS/IDE files, Git metadata, local vendor folders, script result dumps, and chaos logs from container build context.
+- references_and_consumers: Docker tooling consumes `.dockerignore` implicitly when building from the repository root; repository references are the asset register, asset map, classification batches, and current Control Center state.
+- runtime_use: it affects container image build inputs, including the root `Dockerfile`; it is not executed at application runtime and has no server route or package-script caller.
+- reads_and_writes: the file reads and writes nothing; Docker/build tooling reads it to decide which workspace paths to omit from build context transfer.
+- dependencies: depends on Docker build semantics and the root build context; it also relates to local directories/files named in its patterns, including `.env`, `node_modules`, Python cache/build directories, `.git`, IDE folders, `backend/scripts/_vendor`, `backend/scripts/results`, and chaos log files.
+- overlap_or_duplication: overlaps substantially with `.gitignore`, but the boundary is different: `.gitignore` governs source control tracking, while `.dockerignore` governs container build context and secret/artifact exclusion.
+- reuse_value: keep as an active security and build hygiene configuration; its useful patterns should remain aligned with `.gitignore` and Dockerfile build requirements.
+
+Disposition recorded: KEEP
 Closure status: CLOSED
 
 INSPECT may receive GREEN only when:

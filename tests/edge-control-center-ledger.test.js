@@ -116,18 +116,18 @@ describe("Edge Control Center Ledger v1", () => {
     );
     assert.equal(
       result.state.active_asset_group.group_id,
-      ".bat"
+      ".dockerignore"
     );
     assert.deepEqual(
       result.state.active_asset_group.asset_paths,
-      [".bat"]
+      [".dockerignore"]
     );
     assert.equal(result.state.lifecycle_state, "CLOSED");
-    assert.equal(result.state.disposition, "MERGE");
+    assert.equal(result.state.disposition, "KEEP");
     assert.equal(result.state.closure_status, "CLOSED");
-    assert.equal(result.state.investigated_assets, 4);
-    assert.equal(result.state.closed_assets, 4);
-    assert.equal(result.state.remaining_assets, 902);
+    assert.equal(result.state.investigated_assets, 5);
+    assert.equal(result.state.closed_assets, 5);
+    assert.equal(result.state.remaining_assets, 901);
     assert.deepEqual(
       result.state.evidence_completion,
       {
@@ -141,14 +141,16 @@ describe("Edge Control Center Ledger v1", () => {
     assert.deepEqual(result.state.inspected_groups, [
       CONTROL_CENTER_GATE_GROUP.group_id,
       ".bat",
+      ".dockerignore",
     ]);
     assert.deepEqual(result.state.closed_groups, [
       CONTROL_CENTER_GATE_GROUP.group_id,
       ".bat",
+      ".dockerignore",
     ]);
     assert.deepEqual(
       result.state.closed_asset_paths,
-      [...CONTROL_CENTER_GATE_GROUP.asset_paths, ".bat"]
+      [...CONTROL_CENTER_GATE_GROUP.asset_paths, ".bat", ".dockerignore"]
     );
     assert.equal(result.state.total_governed_assets, 906);
   });
