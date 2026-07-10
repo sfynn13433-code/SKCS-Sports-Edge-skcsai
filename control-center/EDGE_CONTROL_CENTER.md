@@ -841,3 +841,14 @@ Phase 1 batch evidence: B16
 - batch_outcome: BATCH_COMPLETE
 - next_deterministic_batch: B17
 - note: every B16 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
+
+Phase 1 batch evidence: B17
+
+- batch_id: B17
+- title: DOCS_DIR
+- hash_method: SHA-256
+- asset_count: 24
+- exact_duplicate_groups: 0
+- batch_outcome: BATCH_COMPLETE
+- next_deterministic_batch: B18
+- note: every B17 asset hashed uniquely; no duplicate removal, reference rewrite, or path-safety escalation was required.
