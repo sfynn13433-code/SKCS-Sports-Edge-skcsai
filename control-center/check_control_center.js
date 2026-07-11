@@ -97,6 +97,16 @@ const RECOGNIZED_REQUEST_TYPES = Object.freeze([
   "ACTIVATE_NEXT_GROUP",
 ]);
 
+const ACTIVE_CLEANUP_PHASE = "PHASE_3";
+
+const PHASE_3_OUTCOMES = Object.freeze([
+  "ACTIVE",
+  "INDIRECTLY_ACTIVE",
+  "MANUAL_USE",
+  "NO_CURRENT_USE_FOUND",
+  "UNKNOWN",
+]);
+
 const PHASE_1_FORBIDDEN_WORK = Object.freeze([
   "PURPOSE_IDENTIFICATION",
   "LEGACY_IDENTIFICATION",
@@ -106,6 +116,10 @@ const PHASE_1_FORBIDDEN_WORK = Object.freeze([
   "MERGE_IMPLEMENTATION",
   "RETIREMENT",
   "ARCHITECTURE_REDESIGN",
+]);
+
+const PHASE_3_ALLOWED_WORK = Object.freeze([
+  "ACTIVE_USE_IDENTIFICATION",
 ]);
 
 const REQUIRED_EVIDENCE_KEYS = Object.freeze([
@@ -254,14 +268,37 @@ function createControlCenterGateState(overrides = {}) {
         unrelated_local_changes_preserved: true,
       },
     },
-    active_phase: "PHASE_1",
-    active_phase_question: PHASE_QUESTIONS.PHASE_1,
+    phase_1: {
+      status: "PHASE_CLOSED",
+      question: PHASE_QUESTIONS.PHASE_1,
+      evidence: {
+        result: "CLOSED",
+        duplicate_scan_executed: true,
+        final_repository_wide_check: "PASS",
+        closure_note:
+          "Phase 1 Exact Duplicate Elimination is closed. Do not reopen without explicit Control Center approval.",
+      },
+    },
+    phase_2: {
+      status: "PHASE_CLOSED",
+      question: PHASE_QUESTIONS.PHASE_2,
+      evidence: {
+        result: "PASS WITH CORRECTIONS",
+        batches_reviewed: "B01-B29",
+        final_manifest_count_check: "PASS",
+        closure_note:
+          "Phase 2 Purpose Classification Review is closed. Do not reopen without explicit Control Center approval.",
+      },
+    },
+    active_phase: ACTIVE_CLEANUP_PHASE,
+    active_phase_question: PHASE_QUESTIONS[ACTIVE_CLEANUP_PHASE],
     lifecycle_state: "PHASE_ACTIVE",
     active_batch: null,
     completed_batches: [],
     remaining_batches: [...batchIds],
     next_deterministic_batch: batchIds[0] || null,
-    phase_1_duplicate_scan_executed: false,
+    phase_3_outcomes: [...PHASE_3_OUTCOMES],
+    phase_3_no_deletion_law: "NO_CURRENT_USE_FOUND does not authorize deletion.",
     future_phase_notes: [],
     standing_git_authority: true,
     dangerous_git_actions_approval_gated: true,
@@ -840,12 +877,31 @@ function validateControlCenterPolicy(documentText) {
     }
   }
 
-  if (state.active_phase !== "PHASE_1") {
-    errors.push("Control Center state active_phase must be PHASE_1");
+  if (!state.phase_1 || state.phase_1.status !== "PHASE_CLOSED") {
+    errors.push("Control Center state phase_1 must be PHASE_CLOSED");
   }
 
-  if (state.active_phase_question !== PHASE_QUESTIONS.PHASE_1) {
+  if (!state.phase_2 || state.phase_2.status !== "PHASE_CLOSED") {
+    errors.push("Control Center state phase_2 must be PHASE_CLOSED");
+  }
+
+  if (state.active_phase !== ACTIVE_CLEANUP_PHASE) {
+    errors.push(`Control Center state active_phase must be ${ACTIVE_CLEANUP_PHASE}`);
+  }
+
+  if (state.active_phase_question !== PHASE_QUESTIONS[ACTIVE_CLEANUP_PHASE]) {
     errors.push("Control Center state active_phase_question drift");
+  }
+
+  if (!listsMatchExactly(state.phase_3_outcomes, PHASE_3_OUTCOMES)) {
+    errors.push("Control Center state phase_3_outcomes drift");
+  }
+
+  if (
+    typeof state.phase_3_no_deletion_law !== "string" ||
+    !state.phase_3_no_deletion_law.includes("NO_CURRENT_USE_FOUND does not authorize deletion")
+  ) {
+    errors.push("Control Center state phase_3_no_deletion_law missing");
   }
 
   if (!REQUIRED_LIFECYCLE_STATES.includes(state.lifecycle_state)) {
@@ -877,9 +933,6 @@ function validateControlCenterPolicy(documentText) {
     errors.push("Control Center state next_deterministic_batch drift");
   }
 
-  if (state.phase_1_duplicate_scan_executed !== false) {
-    errors.push("Control Center state must not claim Phase 1 duplicate scan executed during policy update");
-  }
 
   if (!Array.isArray(state.future_phase_notes)) {
     errors.push("Control Center state missing future_phase_notes");
@@ -1295,6 +1348,21 @@ function evaluateControlCenterProposal(
         gate: "HOLD",
         mode: "PHASE_WORK",
         reason: "PHASE_1_FULL_FORENSIC_EVIDENCE_NOT_REQUIRED",
+        activeAssetGroup: activeLabel,
+        lifecycleState: state.lifecycle_state,
+        approvedScope: "NONE",
+        nextState: state,
+      });
+    }
+
+    if (
+      state.active_phase === "PHASE_3" &&
+      !PHASE_3_ALLOWED_WORK.includes(proposal.work_kind)
+    ) {
+      return buildGateResponse({
+        gate: "HOLD",
+        mode: "PHASE_WORK",
+        reason: "PHASE_3_ACTIVE_USE_WORK_REQUIRED",
         activeAssetGroup: activeLabel,
         lifecycleState: state.lifecycle_state,
         approvedScope: "NONE",

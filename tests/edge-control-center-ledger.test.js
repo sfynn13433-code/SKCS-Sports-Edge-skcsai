@@ -33,9 +33,9 @@ function buildPhaseWorkProposal(overrides = {}) {
   return {
     request_type: "PHASE_WORK",
     mode: "PHASE_WORK",
-    phase: "PHASE_1",
+    phase: "PHASE_3",
     batch_id: "B01",
-    work_kind: "EXACT_DUPLICATE_HASH_CHECK",
+    work_kind: "ACTIVE_USE_IDENTIFICATION",
     requires_full_forensic_evidence: false,
     preserves_unrelated_changes: true,
     ...overrides,
@@ -119,21 +119,30 @@ describe("Edge Control Center Ledger v1", () => {
       "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json"
     );
     assert.equal(result.state.phase_0.status, "PHASE_CLOSED");
-    assert.equal(result.state.active_phase, "PHASE_1");
+    assert.equal(result.state.phase_1.status, "PHASE_CLOSED");
+    assert.equal(result.state.phase_2.status, "PHASE_CLOSED");
+    assert.equal(result.state.active_phase, "PHASE_3");
     assert.equal(
       result.state.active_phase_question,
-      "Are any governed files byte-for-byte identical?"
+      "Is each remaining governed file currently used?"
     );
     assert.equal(result.state.lifecycle_state, "PHASE_ACTIVE");
     assert.equal(result.state.next_deterministic_batch, "B01");
-    assert.equal(result.state.phase_1_duplicate_scan_executed, false);
+    assert.deepEqual(result.state.phase_3_outcomes, [
+      "ACTIVE",
+      "INDIRECTLY_ACTIVE",
+      "MANUAL_USE",
+      "NO_CURRENT_USE_FOUND",
+      "UNKNOWN",
+    ]);
+    assert.match(result.state.phase_3_no_deletion_law, /does not authorize deletion/i);
     assert.equal(result.state.standing_git_authority, true);
     assert.equal(result.state.dangerous_git_actions_approval_gated, true);
     assert.equal(
       result.state.historical_per_asset_forensic_lifecycle,
       "PRESERVED_AS_HISTORY_ONLY"
     );
-    assert.equal(result.state.total_governed_assets, 906);
+    assert.equal(result.state.total_governed_assets, 902);
     assert.ok(documentText.includes("### Historical Control Center evidence"));
     assert.ok(documentText.includes("Standing Git authority"));
     assert.ok(documentText.includes("git reset --hard"));
@@ -154,7 +163,7 @@ describe("Edge Control Center Ledger v1", () => {
 
   it("exposes exactly one active cleanup phase", () => {
     const state = createControlCenterGateState();
-    assert.equal(state.active_phase, "PHASE_1");
+    assert.equal(state.active_phase, "PHASE_3");
     assert.equal(CLEANUP_PHASE_ORDER.filter((p) => p === state.active_phase).length, 1);
   });
 
@@ -180,7 +189,7 @@ describe("Edge Control Center Ledger v1", () => {
     assert.equal(result.reason, "MISSING_INSTRUCTION_OR_STATE");
   });
 
-  it("Phase 1 exact-duplicate hash work is GREEN without full forensic evidence", () => {
+  it("Phase 3 active-use identification work is GREEN", () => {
     const state = createControlCenterGateState();
     const result = evaluateControlCenterProposal(
       buildPhaseWorkProposal(),
@@ -197,8 +206,11 @@ describe("Edge Control Center Ledger v1", () => {
   it("Phase 1 blocks purpose/legacy/overlap/repair as active work", () => {
     for (const work_kind of PHASE_1_FORBIDDEN_WORK) {
       const result = evaluateControlCenterProposal(
-        buildPhaseWorkProposal({ work_kind }),
-        createControlCenterGateState()
+        buildPhaseWorkProposal({ phase: "PHASE_1", work_kind }),
+        createControlCenterGateState({
+          active_phase: "PHASE_1",
+          active_phase_question: PHASE_QUESTIONS.PHASE_1,
+        })
       );
       assert.equal(result.gate, "HOLD");
       assert.equal(result.reason, "PHASE_1_FORBIDDEN_WORK");
@@ -207,8 +219,11 @@ describe("Edge Control Center Ledger v1", () => {
 
   it("Phase 1 rejects requiring full forensic evidence", () => {
     const result = evaluateControlCenterProposal(
-      buildPhaseWorkProposal({ requires_full_forensic_evidence: true }),
-      createControlCenterGateState()
+      buildPhaseWorkProposal({ phase: "PHASE_1", requires_full_forensic_evidence: true }),
+      createControlCenterGateState({
+        active_phase: "PHASE_1",
+        active_phase_question: PHASE_QUESTIONS.PHASE_1,
+      })
     );
     assert.equal(result.gate, "HOLD");
     assert.equal(result.reason, "PHASE_1_FULL_FORENSIC_EVIDENCE_NOT_REQUIRED");
@@ -231,7 +246,7 @@ describe("Edge Control Center Ledger v1", () => {
     );
     assert.equal(result.gate, "GREEN");
     assert.equal(result.reason, "FUTURE_PHASE_NOTE_RECORDED");
-    assert.equal(result.nextState.active_phase, "PHASE_1");
+    assert.equal(result.nextState.active_phase, "PHASE_3");
     assert.equal(result.nextState.lifecycle_state, "PHASE_ACTIVE");
     assert.equal(result.nextState.future_phase_notes.length, 1);
     assert.equal(
@@ -274,6 +289,8 @@ describe("Edge Control Center Ledger v1", () => {
 
   it("later phase cannot activate before active phase closes", () => {
     const state = createControlCenterGateState({
+      active_phase: "PHASE_1",
+      active_phase_question: PHASE_QUESTIONS.PHASE_1,
       lifecycle_state: "PHASE_ACTIVE",
       remaining_batches: [...EAC_BATCH_IDS],
     });
@@ -287,6 +304,8 @@ describe("Edge Control Center Ledger v1", () => {
 
   it("phase order is fail-closed when activating a skipped phase", () => {
     const state = createControlCenterGateState({
+      active_phase: "PHASE_1",
+      active_phase_question: PHASE_QUESTIONS.PHASE_1,
       lifecycle_state: "PHASE_READY_TO_CLOSE",
       remaining_batches: [],
       completed_batches: [...EAC_BATCH_IDS],
@@ -300,15 +319,22 @@ describe("Edge Control Center Ledger v1", () => {
   });
 
   it("closing ready Phase 1 activates Phase 2 in order", () => {
-    const state = createControlCenterGateState({
+    const state = {
+      ...createControlCenterGateState(),
+      active_phase: "PHASE_1",
+      active_phase_question: PHASE_QUESTIONS.PHASE_1,
       lifecycle_state: "PHASE_READY_TO_CLOSE",
+      active_batch: null,
       remaining_batches: [],
       completed_batches: [...EAC_BATCH_IDS],
-    });
+      next_deterministic_batch: null,
+    };
+
     const result = evaluateControlCenterProposal(
       buildClosePhaseProposal(),
       state
     );
+
     assert.equal(result.gate, "GREEN");
     assert.equal(result.reason, "PHASE_CLOSED_NEXT_ACTIVATED");
     assert.equal(result.nextState.active_phase, "PHASE_2");

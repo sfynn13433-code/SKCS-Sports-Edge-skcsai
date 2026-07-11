@@ -524,9 +524,32 @@ Required state snapshot:
 ```json
 {
   "governance_model": "REPOSITORY_CLEANUP_PROGRAMME",
-  "required_modes": ["PHASE_WORK", "COMPLETE_BATCH", "CLOSE_PHASE", "RECORD_FUTURE_PHASE_NOTE", "CONTROL"],
-  "required_lifecycle": ["PHASE_PENDING", "PHASE_ACTIVE", "BATCH_ACTIVE", "BATCH_COMPLETE", "PHASE_READY_TO_CLOSE", "PHASE_CLOSED"],
-  "cleanup_phase_order": ["PHASE_0", "PHASE_1", "PHASE_2", "PHASE_3", "PHASE_4", "PHASE_5", "PHASE_6", "PHASE_7", "PHASE_8"],
+  "required_modes": [
+    "PHASE_WORK",
+    "COMPLETE_BATCH",
+    "CLOSE_PHASE",
+    "RECORD_FUTURE_PHASE_NOTE",
+    "CONTROL"
+  ],
+  "required_lifecycle": [
+    "PHASE_PENDING",
+    "PHASE_ACTIVE",
+    "BATCH_ACTIVE",
+    "BATCH_COMPLETE",
+    "PHASE_READY_TO_CLOSE",
+    "PHASE_CLOSED"
+  ],
+  "cleanup_phase_order": [
+    "PHASE_0",
+    "PHASE_1",
+    "PHASE_2",
+    "PHASE_3",
+    "PHASE_4",
+    "PHASE_5",
+    "PHASE_6",
+    "PHASE_7",
+    "PHASE_8"
+  ],
   "eac_evidence_reusable": true,
   "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
   "total_governed_assets": 902,
@@ -545,14 +568,43 @@ Required state snapshot:
       "unrelated_local_changes_preserved": true
     }
   },
-  "active_phase": "PHASE_1",
-  "active_phase_question": "Are any governed files byte-for-byte identical?",
+  "active_phase": "PHASE_3",
+  "active_phase_question": "Is each remaining governed file currently used?",
   "lifecycle_state": "PHASE_ACTIVE",
   "active_batch": null,
   "completed_batches": [],
-  "remaining_batches": ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10", "B11", "B12", "B13", "B14", "B15", "B16", "B17", "B18", "B19", "B20", "B21", "B22", "B23", "B24", "B25", "B26", "B27", "B28", "B29"],
+  "remaining_batches": [
+    "B01",
+    "B02",
+    "B03",
+    "B04",
+    "B05",
+    "B06",
+    "B07",
+    "B08",
+    "B09",
+    "B10",
+    "B11",
+    "B12",
+    "B13",
+    "B14",
+    "B15",
+    "B16",
+    "B17",
+    "B18",
+    "B19",
+    "B20",
+    "B21",
+    "B22",
+    "B23",
+    "B24",
+    "B25",
+    "B26",
+    "B27",
+    "B28",
+    "B29"
+  ],
   "next_deterministic_batch": "B01",
-  "phase_1_duplicate_scan_executed": false,
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,
@@ -566,7 +618,35 @@ Required state snapshot:
     ".env.example",
     ".gitignore",
     ".gcloudignore"
-  ]
+  ],
+  "phase_1": {
+    "status": "PHASE_CLOSED",
+    "question": "Are any governed files byte-for-byte identical?",
+    "evidence": {
+      "result": "CLOSED",
+      "duplicate_scan_executed": true,
+      "final_repository_wide_check": "PASS",
+      "closure_note": "Phase 1 Exact Duplicate Elimination is closed. Do not reopen without explicit Control Center approval."
+    }
+  },
+  "phase_2": {
+    "status": "PHASE_CLOSED",
+    "question": "What does each remaining governed file represent?",
+    "evidence": {
+      "result": "PASS WITH CORRECTIONS",
+      "batches_reviewed": "B01-B29",
+      "final_manifest_count_check": "PASS",
+      "closure_note": "Phase 2 Purpose Classification Review is closed. Do not reopen without explicit Control Center approval."
+    }
+  },
+  "phase_3_outcomes": [
+    "ACTIVE",
+    "INDIRECTLY_ACTIVE",
+    "MANUAL_USE",
+    "NO_CURRENT_USE_FOUND",
+    "UNKNOWN"
+  ],
+  "phase_3_no_deletion_law": "NO_CURRENT_USE_FOUND does not authorize deletion."
 }
 ```
 <!-- CONTROL_CENTER_STATE_END -->
@@ -1640,3 +1720,22 @@ Final validation:
 - Control Center closure notes exist for late Phase 2 corrections and repairs.
 - No source deletion, merge, retirement, runtime repair, submodule repair, or refactor was performed as part of final closure.
 - Phase 2 is closed; do not reopen without a new explicit Control Center task.
+
+## CONTROL CENTER PHASE-STATE REPAIR - PHASE 3 ACTIVATED
+
+Result: PASS
+
+Scope:
+- Repair target: Control Center cleanup programme machine-readable state and checker alignment.
+- Prior completed phases preserved: PHASE_1 Exact Duplicate Elimination, PHASE_2 Purpose Classification Review.
+- New active phase: PHASE_3 / Active Use Identification.
+
+Phase 3 rule:
+- Active question: Is each remaining governed file currently used?
+- Outcomes: ACTIVE, INDIRECTLY_ACTIVE, MANUAL_USE, NO_CURRENT_USE_FOUND, UNKNOWN.
+- NO_CURRENT_USE_FOUND does not authorize deletion.
+
+Validation boundary:
+- No Phase 3 asset-use review was started.
+- No product/source/runtime files were changed.
+- No deletion, merge, retirement, refactor, Supabase mutation, or classification reopen was performed.
