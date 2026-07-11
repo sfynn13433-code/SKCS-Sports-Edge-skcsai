@@ -1205,3 +1205,21 @@ Phase 2 purpose classification evidence: B16
   - GEMINI.md functional_group changed from PROVIDER_INTEGRATION to DOCUMENTATION_KNOWLEDGE.
   - Purpose descriptions corrected for proven B16 documentation assets based on focused source inspection.
 - evidence: Local PowerShell B16 manifest/register/source inspection confirmed 36/36 source files exist, verified 36/36 register coverage, corrected three proven functional_group mismatches, corrected proven B16 purpose-description mismatches, and kept scope limited to B16 purpose classification.
+
+
+Phase 2 purpose classification evidence: B17
+
+- batch_id: B17
+- title: DOCS_DIR
+- asset_count: 24
+- register_coverage: 24/24
+- result: PASS WITH CORRECTION
+- batch_manifest_modified: NO
+- register_modified: YES
+- corrections:
+  - docs/api_quota_router.md functional_group changed from DEPLOYMENT_OPERATIONS to DOCUMENTATION_KNOWLEDGE.
+  - docs/blueprint-semantic-drift-control-plane.md functional_group changed from DEPLOYMENT_OPERATIONS to DOCUMENTATION_KNOWLEDGE.
+  - docs/README.md functional_group changed from DEPLOYMENT_OPERATIONS to DOCUMENTATION_KNOWLEDGE.
+  - docs/SKCS_ENGINE_V2_PHASE05_INGEST_MAP.md functional_group changed from DEPLOYMENT_OPERATIONS to DOCUMENTATION_KNOWLEDGE.
+  - Purpose descriptions corrected for proven B17 documentation assets based on focused source inspection.
+- evidence: Local PowerShell B17 manifest/register/source inspection confirmed 24/24 source files exist, verified 24/24 register coverage, corrected four proven functional_group mismatches, corrected proven B17 purpose-description mismatches, and kept scope limited to B17 purpose classification.

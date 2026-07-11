@@ -13674,7 +13674,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: DATA_INGESTION.md is a DOCUMENTATION_KNOWLEDGE asset for ingestion pipeline documentation.",
+      "purpose_description": "Reviewed classification: DATA_INGESTION.md documents sports data ingestion requirements, no-key data libraries, dependencies, environment setup, directory structure, constraints, and usage examples.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -13706,7 +13706,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: DEPLOYMENT_GUIDE.md is a DEPLOYMENT_OPERATIONS asset for deployment troubleshooting guide.",
+      "purpose_description": "Reviewed classification: DEPLOYMENT_GUIDE.md documents SKCS deployment strategy across GitHub Pages, Vercel, and Render, including deployment status, features, and auto-deploy behavior.",
       "functional_group": "DEPLOYMENT_OPERATIONS",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -13743,8 +13743,8 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: README.md is a DEPLOYMENT_OPERATIONS asset for deployment troubleshooting guide.",
-      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "purpose_description": "Reviewed classification: README.md is the docs directory index linking deployment, ingestion, platform configuration, provider documentation, and developer quick links.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
         "DEPLOYMENT",
@@ -13780,7 +13780,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: SKCS_ENGINE_V2_ADR.md is a DOCUMENTATION_KNOWLEDGE asset for ingestion pipeline documentation.",
+      "purpose_description": "Reviewed classification: SKCS_ENGINE_V2_ADR.md is the accepted architecture decision record for building SKCS Engine V2 in parallel with V1, including context, identity/scoring decisions, and runtime notes.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -13817,8 +13817,8 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: SKCS_ENGINE_V2_PHASE05_INGEST_MAP.md is a DEPLOYMENT_OPERATIONS asset for ingestion pipeline documentation.",
-      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "purpose_description": "Reviewed classification: SKCS_ENGINE_V2_PHASE05_INGEST_MAP.md is the locked ingestion integrity map and source-shape diagnosis for canonical football event data, runtime wiring, and payload drop points.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
         "DEPLOYMENT",
@@ -13855,7 +13855,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: SKCS_ENGINE_V2_PHASE0B5_REPLAY.md is a DOCUMENTATION_KNOWLEDGE asset for ingestion pipeline documentation.",
+      "purpose_description": "Reviewed classification: SKCS_ENGINE_V2_PHASE0B5_REPLAY.md is the active design contract for the Phase 0b.5 canonical replay engine and historical canonical football truth recovery.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -13889,7 +13889,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: SKCS_ENGINE_V2_PHASE0_DESIGN.md is a DOCUMENTATION_KNOWLEDGE asset for ingestion pipeline documentation.",
+      "purpose_description": "Reviewed classification: SKCS_ENGINE_V2_PHASE0_DESIGN.md is the locked Provider-ID-first V2 design for identity, canonical entities, team mapping, schema, and results spine.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -13925,7 +13925,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: VERCEL_DEPLOY_TROUBLESHOOTING.md is a DEPLOYMENT_OPERATIONS asset for deployment troubleshooting guide.",
+      "purpose_description": "Reviewed classification: VERCEL_DEPLOY_TROUBLESHOOTING.md documents Vercel deployment troubleshooting for marketplace integration provisioning failures, Supabase integration handling, redeploy steps, and status checks.",
       "functional_group": "DEPLOYMENT_OPERATIONS",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -13961,7 +13961,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: acca_rules_v2.1.md is a DOCUMENTATION_KNOWLEDGE asset for governance/ops navigation and runbook documentation.",
+      "purpose_description": "Reviewed classification: acca_rules_v2.1.md defines ACCA Rules v2.1, including fallback ladder and tier diversity rules.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION"
@@ -13992,7 +13992,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: alert-routing-degraded-state.md is a DOCUMENTATION_KNOWLEDGE asset for health checks and diagnostics.",
+      "purpose_description": "Reviewed classification: alert-routing-degraded-state.md documents SKCS alert routing, degraded-state behavior, payload requirements, hard rules, and operator flow.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -14025,8 +14025,8 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: api_quota_router.md is a DEPLOYMENT_OPERATIONS asset for ingestion pipeline documentation.",
-      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "purpose_description": "Reviewed classification: api_quota_router.md documents the governed API quota router data engine, architecture, production defaults, usage, blocked-call observability, and wired entry points.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
         "DEPLOYMENT",
@@ -14061,8 +14061,8 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: blueprint-semantic-drift-control-plane.md is a DEPLOYMENT_OPERATIONS asset for health checks and diagnostics.",
-      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "purpose_description": "Reviewed classification: blueprint-semantic-drift-control-plane.md is an implementation blueprint for semantic drift monitoring, enforcement, summary endpoints, dashboard integration, and control-plane safety.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
         "DEPLOYMENT",
@@ -14098,7 +14098,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: canonical_ingest_firewall.spec.md is a DOCUMENTATION_KNOWLEDGE asset for ingestion pipeline documentation.",
+      "purpose_description": "Reviewed classification: canonical_ingest_firewall.spec.md is the active design contract for the canonical football ingest firewall, truth boundary, runtime enforcement, and required ingest payload shape.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -14133,7 +14133,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: control-plane-operational-pack.md is a DEPLOYMENT_OPERATIONS asset for deployment troubleshooting guide.",
+      "purpose_description": "Reviewed classification: control-plane-operational-pack.md documents the SKCS control-plane operational pack, including health feed inputs/outputs, alert routing, degraded-state response, and operational constraints.",
       "functional_group": "DEPLOYMENT_OPERATIONS",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -14171,7 +14171,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: cricket-providers.md is a DOCUMENTATION_KNOWLEDGE asset for ingestion pipeline documentation.",
+      "purpose_description": "Reviewed classification: cricket-providers.md documents cricket provider roles, including Cricbuzz as primary fixture provider and Livescore6 discovery/enrichment provider observations.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -14203,7 +14203,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: football-leagues-apisports.md is a DOCUMENTATION_KNOWLEDGE asset for API and routing documentation.",
+      "purpose_description": "Reviewed classification: football-leagues-apisports.md is a football league registry for API-Sports V3 IDs, allowlist/sync configuration, API call rules, and league-addition procedure.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -14235,7 +14235,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: pipeline-health-feed.md is a DOCUMENTATION_KNOWLEDGE asset for health checks and diagnostics.",
+      "purpose_description": "Reviewed classification: pipeline-health-feed.md specifies the SKCS pipeline health feed, including purpose, inputs, outputs, hard rule, suggested view shape, and control-plane use.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -14267,7 +14267,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: free-livescore-api.md is a DOCUMENTATION_KNOWLEDGE asset for ingestion pipeline documentation.",
+      "purpose_description": "Reviewed classification: free-livescore-api.md records Free Livescore API provider discovery, confirmed endpoint/response shape, normalized data, classification, and approved resolver/ID-mapping use.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -14299,7 +14299,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: live-football-api-policy.md is a DOCUMENTATION_KNOWLEDGE asset for ingestion pipeline documentation.",
+      "purpose_description": "Reviewed classification: live-football-api-policy.md defines the controlled football enrichment provider policy, quota treatment, approved/disallowed uses, and runtime limits.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -14334,7 +14334,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: runbook_degraded_states.md is a DEPLOYMENT_OPERATIONS asset for deployment troubleshooting guide.",
+      "purpose_description": "Reviewed classification: runbook_degraded_states.md is the SKCS production runbook for incident response, degraded-state recovery, state checks, response by state, rollback notes, and recovery rules.",
       "functional_group": "DEPLOYMENT_OPERATIONS",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -14369,7 +14369,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: skcs_grading_snapshot_v1.spec.md is a DOCUMENTATION_KNOWLEDGE asset for API and routing documentation.",
+      "purpose_description": "Reviewed classification: skcs_grading_snapshot_v1.spec.md specifies the grading snapshot endpoint, query/response contract, data sources, and predictions_accuracy population phase.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -14403,7 +14403,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: sportsdataio-pre-match-directive.md is a DOCUMENTATION_KNOWLEDGE asset for API and routing documentation.",
+      "purpose_description": "Reviewed classification: sportsdataio-pre-match-directive.md is the SportsDataIO pre-match implementation directive defining supported use, code paths to align, quota gating, logging rules, and disallowed live-provider behavior.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -14436,7 +14436,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: supabase-tier-display-requirements.md is a DOCUMENTATION_KNOWLEDGE asset for Supabase/database documentation.",
+      "purpose_description": "Reviewed classification: supabase-tier-display-requirements.md defines Supabase tier display requirements, minimum master pool targets, SQL checks, limitations, and prediction category supply requirements.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -14470,7 +14470,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DEPLOYMENT_OPERATIONS asset is referenced/consumed by governance or runtime tooling and validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: weekly-global-scrape-scheduler.md is a DEPLOYMENT_OPERATIONS asset for scheduler runbook documentation.",
+      "purpose_description": "Reviewed classification: weekly-global-scrape-scheduler.md documents weekly global seven-day rolling scrape scheduling for Linux crontab and Google Cloud Scheduler.",
       "functional_group": "DEPLOYMENT_OPERATIONS",
       "relationship_tags": [
         "DOCUMENTATION",
