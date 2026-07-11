@@ -1516,7 +1516,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: README.md is a DOCUMENTATION_KNOWLEDGE artifact for semantic mapping/violation reference.",
+      "purpose_description": "Reviewed classification: README.md is the SKCS Knowledge Layer v1 index describing the folder purpose, structure, governance/provider sections, and key knowledge-layer documents.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2336,7 +2336,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: api_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for knowledge registry / reference documentation.",
+      "purpose_description": "Reviewed classification: api_registry.md is the SKCS API registry capturing external and internal API surfaces, primary sports/data providers, AI and inference APIs, internal API surfaces, and future provider tracking fields.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION"
@@ -2367,7 +2367,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: architecture_decisions.md is a DOCUMENTATION_KNOWLEDGE artifact for semantic mapping/violation reference.",
+      "purpose_description": "Reviewed classification: architecture_decisions.md records SKCS architecture decisions, compatibility decisions, future decision topics, and safeguards against architectural drift.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2399,7 +2399,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: business_rules.md is a DOCUMENTATION_KNOWLEDGE artifact for formula registry reference.",
+      "purpose_description": "Reviewed classification: business_rules.md captures SKCS business rules for predictions, publication, access, confidence/risk, secondary markets, subscription behavior, football focus, schedules, and documentation discipline.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2432,7 +2432,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: cost_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for knowledge registry / reference documentation.",
+      "purpose_description": "Reviewed classification: cost_registry.md tracks provider quotas, estimated call frequency, budget class, duplication risk, and cost impact across SKCS external provider surfaces.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2465,7 +2465,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: database_schema.md is a DOCUMENTATION_KNOWLEDGE artifact for views/materialized-views reference.",
+      "purpose_description": "Reviewed classification: database_schema.md documents SKCS core prediction, identity, rules, governance, ingestion, cache, ops, AI execution, and telemetry database structures.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2498,7 +2498,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: dependency_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for semantic mapping/violation reference.",
+      "purpose_description": "Reviewed classification: dependency_registry.md maps SKCS scoring, publication, ingestion, provider quota, and runtime dependency chains, including source-of-truth notes for canonical rows versus raw provider responses.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2532,7 +2532,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: edge_functions.md is a DOCUMENTATION_KNOWLEDGE artifact for knowledge registry / reference documentation.",
+      "purpose_description": "Reviewed classification: edge_functions.md records current Supabase Edge Function status, present alternatives, future capture requirements, cost impact, and hidden-infrastructure gap notes.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION"
@@ -2563,7 +2563,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: formula_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for formula registry reference.",
+      "purpose_description": "Reviewed classification: formula_registry.md is the SKCS formula registry covering deterministic scoring formulas, supporting utility formulas, and formula inventory standards for purpose, inputs, outputs, dependencies, and consumers.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2596,7 +2596,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: glossary.md is a DOCUMENTATION_KNOWLEDGE artifact for views/materialized-views reference.",
+      "purpose_description": "Reviewed classification: glossary.md defines SKCS system terminology, including the platform, database/business layer, SQL scoring logic, quota planning, and knowledge-layer concepts.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2629,7 +2629,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: pipeline_metrics_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for semantic mapping/violation reference.",
+      "purpose_description": "Reviewed classification: pipeline_metrics_registry.md defines facts-only measured telemetry for SKCS pipeline health, measured sources, and core metrics used by the control-plane evaluator and verification controller.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2661,7 +2661,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: provider_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for semantic mapping/violation reference.",
+      "purpose_description": "Reviewed classification: provider_registry.md tracks provider behavior, classification types, fallback order, quota implications, provider status, approved uses, blocked uses, adapters, scripts, and governance references.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2696,7 +2696,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: scheduled_jobs.md is a DOCUMENTATION_KNOWLEDGE artifact for views/materialized-views reference.",
+      "purpose_description": "Reviewed classification: scheduled_jobs.md documents known backend schedules, Supabase cron references, required job metadata, and the operational rule that scheduled jobs are production dependencies.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION"
@@ -2727,7 +2727,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: semantic_field_mapping_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for semantic mapping/violation reference.",
+      "purpose_description": "Reviewed classification: semantic_field_mapping_registry.md defines provider field meaning, canonical identity rules, time/status/player/injury mappings, context boundaries, and semantic-drift prevention rules.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2762,7 +2762,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: semantic_violation_log.md is a DOCUMENTATION_KNOWLEDGE artifact for semantic mapping/violation reference.",
+      "purpose_description": "Reviewed classification: semantic_violation_log.md defines the operational meaning of the semantic violation ledger, including logged events, minimum fields, operating rules, and audit signal behavior.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2794,7 +2794,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: system_topology.md is a DOCUMENTATION_KNOWLEDGE artifact for views/materialized-views reference.",
+      "purpose_description": "Reviewed classification: system_topology.md documents SKCS topology, controlled provider inputs, normalization and publish steps, backend layers, database topology, read path, and frontend canonical-read rules.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2826,7 +2826,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE asset is referenced/consumed by later governance validation and ensure its relationship tagging remains consistent.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: views_and_materialized_views.md is a DOCUMENTATION_KNOWLEDGE artifact for views/materialized-views reference.",
+      "purpose_description": "Reviewed classification: views_and_materialized_views.md documents SKCS key views and materialized admin views, plus required view metadata, business-contract impact, and consumer-impact recording rules.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
