@@ -1781,3 +1781,68 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B01 batch state not advanced in this patch.
+
+## PHASE 3 — B02 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 — Active Use Identification
+- Batch: B02 / BACKEND_DIRECT_FILES
+- Question: Is each B02 governed file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+
+Outcome summary:
+- ACTIVE: 8
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 4
+- NO_CURRENT_USE_FOUND: 1
+- UNKNOWN: 0
+
+B02 outcomes:
+1. backend/.gitignore — ACTIVE
+   Evidence: Backend Git operational ignore file excluding backend node_modules, env files, local DB/log/form artifacts, and backend.local-backup.
+
+2. backend/apiClients.js — ACTIVE
+   Evidence: Imported by active backend data-provider service and exports provider clients/helper functions used by backend ingestion/provider flows.
+
+3. backend/checkCanonicalEvents.js — MANUAL_USE
+   Evidence: Standalone Supabase diagnostic script for canonical_events counts, sport distribution, and future event inspection. No active runtime caller found.
+
+4. backend/config.js — ACTIVE
+   Evidence: Runtime configuration module loaded by server, database modules, api clients, and services.
+
+5. backend/database.js — ACTIVE
+   Evidence: Runtime PostgreSQL/Supabase database module used by server startup, routes, subscription/profile helpers, query helpers, and transaction helpers.
+
+6. backend/db.js — ACTIVE
+   Evidence: Runtime DB helper imported by EdgeMind controller path and active backend code.
+
+7. backend/dbBootstrap.js — ACTIVE
+   Evidence: Imported and executed by backend/server-express.js during startup to verify tables, compatibility views, cleanup, and bootstrap state.
+
+8. backend/deploy-trigger-cricket.js — ACTIVE
+   Evidence: Render cricket cron start command points to node backend/deploy-trigger-cricket.js; script exits safely unless cricket ingestion is enabled.
+
+9. backend/deploy-trigger.js — ACTIVE
+   Evidence: Render weekly global scrape cron start command points to node backend/deploy-trigger.js.
+
+10. backend/edgemind_inference.py — MANUAL_USE
+    Evidence: Standalone Python EdgeMind/Antigravity inference bridge with CLI entrypoint requiring python edgemind_inference.py <event_id>. No active Node/server caller found.
+
+11. backend/package-lock.json — NO_CURRENT_USE_FOUND
+    Evidence: Minimal backend lockfile with only empty backend package entry. Root install/build uses root package.json; no backend package script caller found.
+
+12. backend/server-express.js — ACTIVE
+    Evidence: Root package main/start/dev target and Render backend web start command. Mounts backend API routes and server runtime.
+
+13. backend/test-ultra-slim.js — MANUAL_USE
+    Evidence: Standalone local Dolphin inference test script. No active package/runtime caller found.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B02 batch state not advanced in this patch.
