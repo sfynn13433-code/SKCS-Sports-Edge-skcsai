@@ -3535,7 +3535,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this PROVIDER_INTEGRATION provider doc is used by governance checks and validate relationship inference later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: soccerdata_provider_health.md is a PROVIDER_INTEGRATION asset for synthesis notes from prior notebook/workflow.",
+      "purpose_description": "Rough classification: soccerdata_provider_health.md is a PROVIDER_INTEGRATION asset for provider health verification and probe notes.",
       "functional_group": "PROVIDER_INTEGRATION",
       "relationship_tags": [
         "DOCUMENTATION",

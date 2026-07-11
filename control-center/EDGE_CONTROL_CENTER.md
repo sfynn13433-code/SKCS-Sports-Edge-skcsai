@@ -1253,3 +1253,25 @@ Phase 2 purpose classification evidence: B19
   - No functional_group corrections required; all B19 assets remained DOCUMENTATION_KNOWLEDGE.
   - Purpose descriptions corrected for proven B19 knowledge-layer registry/reference assets based on focused source inspection.
 - evidence: Local PowerShell B19 manifest/register/source inspection confirmed 17/17 source files exist, verified 17/17 register coverage, confirmed functional_group alignment, corrected proven B19 purpose-description mismatches, and kept scope limited to B19 purpose classification.
+
+## PHASE 2 — B20 PURPOSE CLASSIFICATION REVIEW — CLOSED
+
+Result: PASS WITH CORRECTION
+
+Scope:
+- Batch: B20
+- Title: SKCS_KNOWLEDGE_PROVIDERS
+- Assets inspected: 18/18
+- Start HEAD: 97b821b2
+
+Read-only inspection findings:
+- All B20 assets exist.
+- All B20 assets are present in the repository asset register.
+- All B20 assets are correctly classified as PROVIDER_INTEGRATION.
+- Source skim confirms B20 assets are provider audits, endpoint catalogs, health reports, semantic mappings, readiness assessments, call restrictions, and synthesis notes.
+
+Correction:
+- SKCS-KNOWLEDGE/providers/soccerdata_provider_health.md purpose_description corrected from NotebookLM/workflow synthesis notes to provider health verification and probe notes.
+
+Out of scope:
+- GitHub vulnerability notices were not inspected or changed.
