@@ -23408,17 +23408,19 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Setup/config utility for database access control (RLS) or fixtures.",
-      "functional_group": "SCRIPT_TOOL",
+      "purpose_description": "Database RLS/policy migration script that enables row-level security on predictions_final and creates tier access policies.",
+      "functional_group": "DATABASE_MIGRATION",
       "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
         "SQL",
-        "RUNTIME",
+        "SECURITY",
         "SCRIPT_TOOL"
       ],
       "classification_evidence": [
-        "Contains SQL-like query execution or query string patterns.",
-        "Emits console output for validation/audit visibility.",
-        "Performs schema/migration/row-level checks visible in content."
+        "Source enables RLS on predictions_final with ALTER TABLE.",
+        "Source drops and creates RLS policies for backend service role and authenticated tier access.",
+        "Source verifies pg_policies and pg_class RLS status before exit."
       ]
     },
     {
@@ -23723,16 +23725,18 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Validation/audit utility script for Edge controlled assets.",
-      "functional_group": "SCRIPT_TOOL",
+      "purpose_description": "Database schema migration script that adds edgemind_report and secondary_insights columns to predictions_final and verifies the columns.",
+      "functional_group": "DATABASE_MIGRATION",
       "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
         "SQL",
         "SCRIPT_TOOL"
       ],
       "classification_evidence": [
-        "Contains SQL-like query execution or query string patterns.",
-        "Emits console output for validation/audit visibility.",
-        "Performs schema/migration/row-level checks visible in content."
+        "Source runs ALTER TABLE public.predictions_final ADD COLUMN IF NOT EXISTS edgemind_report TEXT.",
+        "Source runs ALTER TABLE public.predictions_final ADD COLUMN IF NOT EXISTS secondary_insights JSONB.",
+        "Source verifies the added columns through information_schema.columns."
       ]
     },
     {
@@ -26278,15 +26282,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Verification script for governed data structures and publication readiness.",
-      "functional_group": "SCRIPT_TOOL",
+      "purpose_description": "Browser/DevTools DOM verification script for checking required UI containers, modal structure, and UI update functions.",
+      "functional_group": "FRONTEND_UI",
       "relationship_tags": [
-        "SQL",
-        "SCRIPT_TOOL"
+        "UI",
+        "SCRIPT_TOOL",
+        "TEST_PROOF"
       ],
       "classification_evidence": [
-        "Contains SQL-like query execution or query string patterns.",
-        "Emits console output for validation/audit visibility."
+        "Source checks document.getElementById for required match-detail, AI confidence, terminal, and sport container elements.",
+        "Source verifies modal structure and UI update functions such as showMatchDetailModal and updateModalWithAIData.",
+        "Source is intended to be pasted into browser DevTools for DOM structure verification."
       ]
     },
     {

@@ -1102,3 +1102,18 @@ REGISTER MODIFIED: YES
 BATCH MANIFEST MODIFIED: NO
 CORRECTION: scripts/audit-v2-provider-coverage.js functional_group changed from DATABASE_MIGRATION to SCRIPT_TOOL because its purpose_description and relationship_tags identify it as an audit script, not a migration runner.
 EVIDENCE: Local PowerShell inspection confirmed all B10 assets exist in the register, one purpose classification mismatch was found and corrected, and final review scope remained limited to B10.
+
+
+Phase 2 purpose classification evidence: B11
+
+- batch_id: B11
+- title: SCRIPTS_CHECK_VALIDATE_VERIFY
+- asset_count: 59
+- register_coverage: 59/59
+- result: PASS WITH CORRECTION
+- corrections:
+  - scripts/setup-rls.js functional_group changed from SCRIPT_TOOL to DATABASE_MIGRATION because it enables RLS and creates DB policies through ALTER TABLE / CREATE POLICY SQL, not only generic setup/config.
+  - scripts/task1-schema-update.js functional_group changed from SCRIPT_TOOL to DATABASE_MIGRATION because it runs ALTER TABLE ADD COLUMN statements on predictions_final and verifies resulting columns.
+  - scripts/verify_dom_structure.js functional_group changed from SCRIPT_TOOL to FRONTEND_UI; relationship_tags changed from SQL/SCRIPT_TOOL to UI/SCRIPT_TOOL/TEST_PROOF because it checks browser DOM containers/functions and contains no SQL/database behavior.
+- batch_manifest_modified: NO
+- evidence: Read-only B11 manifest/register/source inspection confirmed B11 membership and the three purpose mismatches above; scope stayed limited to B11 purpose classification.
