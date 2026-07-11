@@ -1739,3 +1739,45 @@ Validation boundary:
 - No Phase 3 asset-use review was started.
 - No product/source/runtime files were changed.
 - No deletion, merge, retirement, refactor, Supabase mutation, or classification reopen was performed.
+
+## PHASE 3 — B01 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 — Active Use Identification
+- Batch: B01 / CONTROL_CENTER
+- Question: Is each B01 governed file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+
+Outcome summary:
+- ACTIVE: 13
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 2
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B01 outcomes:
+1. control-center/check_control_center.js — ACTIVE
+2. control-center/check_edge_asset_classification.js — ACTIVE
+3. control-center/check_edge_project_register.js — ACTIVE
+4. control-center/check_edge_repository_asset_register.js — ACTIVE
+5. control-center/check_edge_system_runtime_inventory.js — ACTIVE
+6. control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json — ACTIVE
+7. control-center/EDGE_ASSET_REPOSITORY_MAP.md — ACTIVE
+8. control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json — ACTIVE
+9. control-center/EDGE_CONTROL_CENTER.md — ACTIVE
+10. control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json — ACTIVE
+11. control-center/EDGE_PROJECT_BACKLOG.md — MANUAL_USE
+12. control-center/EDGE_PROJECT_DEPENDENCY_MAP.md — MANUAL_USE
+13. control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json — ACTIVE
+14. control-center/EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json — ACTIVE
+15. control-center/EDGE_SYSTEM_RUNTIME_MAP.md — ACTIVE
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B01 batch state not advanced in this patch.
