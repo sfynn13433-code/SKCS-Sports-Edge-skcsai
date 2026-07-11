@@ -2303,3 +2303,67 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B07 batch state not advanced in this patch.
+## PHASE 3 — B08 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 — Active Use Identification
+- Batch: B08 / BACKEND_ADAPTERS_AND_CONFIG
+- Question: Is each B08 governed file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+
+Outcome summary:
+- ACTIVE: 9
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 3
+- NO_CURRENT_USE_FOUND: 1
+- UNKNOWN: 0
+
+B08 outcomes:
+1. backend/adapters/f1Adapter.js — NO_CURRENT_USE_FOUND
+   Evidence: File exports a disabled F1 adapter that throws "F1 adapter is disabled in this deployment"; repository search found no current caller beyond governance/manifest references.
+
+2. backend/adapters/footballAdapter.js — ACTIVE
+   Evidence: Imported by backend/adapters/index.js. The Supabase scheduledFixtureSync function imports loadAdapter from backend/adapters/index.js and dynamically loads configured adapters for enabled sport sync records.
+
+3. backend/adapters/index.js — ACTIVE
+   Evidence: Imported by supabase/edge-functions/scheduledFixtureSync/index.ts and used to load configured sport adapters before fixture fetch.
+
+4. backend/adapters/tennisAdapter.js — ACTIVE
+   Evidence: Imported by backend/adapters/index.js, which is consumed by scheduledFixtureSync for configured adapter loading.
+
+5. backend/config/activeSports.js — ACTIVE
+   Evidence: Imported by active backend scheduler, sync service, AI pipeline, ACCA builder, and EdgeMind controller paths to resolve enabled deployment sports.
+
+6. backend/config/apiEndpoints.js — MANUAL_USE
+   Evidence: Imported by backend/utils/apiUsageLimiter.js for API-Sports daily hard-cap constants; current evidence points to utility/script usage rather than a proven active server/runtime path.
+
+7. backend/config/bigBallsLeagueMap.js — ACTIVE
+   Evidence: Imported by backend/services/bigBallsFootballBridge.js, which is imported by backend/services/dataProvider.js in the active data-provider path.
+
+8. backend/config/footballRules.js — ACTIVE
+   Evidence: Imported by backend/services/accaBuilder.js for active ACCA/football rule thresholds and constraints.
+
+9. backend/config/predictionOutcomes.js — ACTIVE
+   Evidence: Imported by backend/services/marketScoringEngine.js and used by scoreMarkets() to resolve the sport market/outcome universe.
+
+10. backend/config/soccerDataLeagueMap.js — MANUAL_USE
+    Evidence: Referenced by backend/providers/football/soccerDataApiProvider.js and SoccerData audit/discovery tooling; no active runtime caller was proven for the SoccerData provider path in this phase.
+
+11. backend/config/sportRules.js — MANUAL_USE
+    Evidence: Imported by scripts/run-stage2-context.js for staged context math, and that stage is invoked by scripts/run-master-pipeline.js; no active server/package runtime caller was proven.
+
+12. backend/config/subscriptionMatrix.js — ACTIVE
+    Evidence: Imported by backend/server-express.js, backend/routes/predictions.js, and backend/controllers/edgeMindController.js for plan capabilities, prediction filtering, daily allocations, and subscription access shaping.
+
+13. backend/config/subscriptionPlans.js — ACTIVE
+    Evidence: Imported by backend/routes/user.js, backend/routes/predictions.js, backend/server-express.js, subscriptionMatrix.js, and EdgeMind controller paths for plan normalization and tier-key resolution.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B08 batch state not advanced in this patch.
