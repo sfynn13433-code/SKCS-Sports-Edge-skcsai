@@ -2973,3 +2973,70 @@ Validation boundary:
 - No active-use outcome authorizes deletion.
 - B15 batch state not advanced in this patch.
 - GitHub vulnerability notice remains future dependency/security work and was not touched.
+
+## PHASE 3 - B16 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 - Active Use Identification
+- Batch: B16 / DOCS_ROOT_MD_TXT
+- Question: Is each B16 governed file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+- Dependency/security/vulnerability notice work performed: NO
+
+Outcome summary:
+- ACTIVE: 0
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 36
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B16 MANUAL_USE assets:
+- AGENTS.md
+- ARCHITECTURE_OVERVIEW.md
+- COMPREHENSIVE_AUDIT_REPORT.md
+- COMPREHENSIVE_FOOTBALL_RULES_REPORT.md
+- CRON_SETUP.md
+- DASHBOARD_QUICK_START.md
+- DASHBOARD_REFACTOR_GUIDE.md
+- DEEPSEEK_SESSION_SKCSTEST.txt
+- DEEPSEEK_STATE.md
+- DEPLOYMENT_STATUS.md
+- DEPLOYMENT_VERIFICATION_GUIDE.md
+- football-ecosystem-report.md
+- FRONTEND_FIXES_SUMMARY.md
+- FRONTEND_INVESTIGATION_REPORT.md
+- FULL_WORKSPACE_AUDIT_REPORT.md
+- GEMINI.md
+- IMPLEMENTATION_GAP_ANALYSIS.md
+- IMPLEMENTATION_SUMMARY.md
+- MASTER_RULEBOOK_IMPLEMENTATION_GUIDE.md
+- MIGRATION_FREEZE.md
+- PRIVACY_POLICY.md
+- README_DASHBOARD_REFACTOR.md
+- README_DATA_INGESTION.md
+- README.md
+- requirements.txt
+- runtime.txt
+- SINGLE_USE_AUDIT_REPORT.md
+- SKCS_MASTER_RULEBOOK.md
+- SMB_WINDSURF_FINAL_IMPLEMENTATION.md
+- SMB_WINDSURF_IMPLEMENTATION_PROMPT.md
+- SPORT_CONSISTENCY_AUDIT_REPORT.md
+- STRICT_RULES.md
+- SUPABASE_DIAGNOSTIC_REPORT.md
+- SUPABASE_TABLE_ANALYSIS.md
+- SUPABASE_TABLES_SUMMARY.md
+- TERMS_OF_SERVICE.md
+
+Evidence:
+- B16 is defined as the DOCS_ROOT_MD_TXT batch with 36 governed root documentation/text assets.
+- B16 manifest rule selects root files with .md and .txt extensions, and the governed B16 asset list also includes root requirements.txt and runtime.txt.
+- package.json starts the application through backend/server-express.js and exposes build/test/control/script commands, not B16 root documentation files.
+- render.yaml starts the web service with node backend/server-express.js.
+- render.yaml uses scripts/requirements.txt for the sports-fixture-population Python cron, not root requirements.txt.
+- Root requirements.txt and runtime.txt exist as repository-level Python environment documents, but no active deployment, runtime, package-script, or process-manager caller was proven for them in this phase.
+- PRIVACY_POLICY.md and TERMS_y notice remains future dependency/security work and was not touched.
