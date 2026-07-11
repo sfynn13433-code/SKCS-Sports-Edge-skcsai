@@ -1483,3 +1483,41 @@ Validation:
 - B27 post-correction purpose classification review result: PASS WITH CORRECTION.
 - No source, register, map, merge, deletion, retirement, or refactor was performed.
 - Scope limited to B27 manifest asset_count correction and purpose classification closure.
+## PHASE 2 - B28 PURPOSE CLASSIFICATION REVIEW - CLOSED
+
+Result: PASS WITH CORRECTION
+
+Scope:
+- Batch: B28 / ROOT_NON_MD_TXT_FILES
+- Manifest asset_count: 55
+- Manifest asset_paths reviewed: 55
+- Map rows reviewed: 55
+- Register/map/tracked/disk coverage: PASS
+
+Correction:
+- Updated kabaddiPy purpose/evidence/next_validation.
+- Updated sportbook purpose/evidence/next_validation.
+- Functional group remains UNCATEGORIZED because current EAC functional_group enums do not include a dedicated SUBMODULE/GITLINK category.
+
+Reason:
+- Local validation confirmed both kabaddiPy and sportbook are Gitlink entries: git ls-tree reports mode 160000 commit.
+- Local validation confirmed .gitmodules is missing.
+- Local validation confirmed git submodule status fails because no submodule mapping exists.
+- Therefore they are orphan Gitlink/submodule pointers, not normal readable folders/files.
+- This phase records purpose only; restoration, deletion, retirement, or replacement belongs to later phases.
+
+Inspection:
+- B28 manifest count/path count/map row count: 55/55/55.
+- B28 coverage: PASS.
+- Functional group counts before correction: DATABASE_MIGRATION 1, DEPLOYMENT_OPERATIONS 8, DOCUMENTATION_KNOWLEDGE 1, GENERATED_OUTPUT 16, PUBLIC_ASSET 1, SCRIPT_TOOL 15, TEST_PROOF 11, UNCATEGORIZED 2.
+- Current state count: UNKNOWN 55.
+
+Changed files:
+- control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json
+- control-center/EDGE_ASSET_REPOSITORY_MAP.md
+- control-center/EDGE_CONTROL_CENTER.md
+
+Validation:
+- B28 purpose classification review result: PASS WITH CORRECTION.
+- No source, manifest, merge, deletion, retirement, submodule repair, or refactor was performed.
+- Scope limited to B28 purpose evidence correction and purpose classification closure.
