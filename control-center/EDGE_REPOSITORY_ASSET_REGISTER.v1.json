@@ -7992,7 +7992,7 @@
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
       "purpose_description": "VIP stress-payload generator endpoint: produces tier-limited UI-ready prediction buckets (direct, secondary, multi, same-match, ACCA) from prediction tables using daily allocations and confidence rules.",
-      "functional_group": "GENERATED_OUTPUT",
+      "functional_group": "PREDICTION",
       "relationship_tags": [
         "ROUTE",
         "API",
