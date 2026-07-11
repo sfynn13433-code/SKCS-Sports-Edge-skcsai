@@ -2555,3 +2555,95 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B10 batch state not advanced in this patch.
+## PHASE 3 — B11 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 — Active Use Identification
+- Batch: B11 / SCRIPTS_CHECK_VALIDATE_VERIFY
+- Question: Is each B11 governed file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+
+Outcome summary:
+- ACTIVE: 0
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 59
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B11 MANUAL_USE assets:
+- scripts/_check-db.js
+- scripts/_check-final-table.js
+- scripts/_check-match-dates.js
+- scripts/_check-plan-visibility.js
+- scripts/_check-team-locks.js
+- scripts/_check-tier.js
+- scripts/check-acca-data.js
+- scripts/check-accuracy-schema.js
+- scripts/check-accuracy-time.js
+- scripts/check-all-fixtures.js
+- scripts/check-cache-schema.js
+- scripts/check-cache.js
+- scripts/check-canonical-events-schema.js
+- scripts/check-cricket-rows.js
+- scripts/check-db-schema.js
+- scripts/check-events-schema.js
+- scripts/check-events-status.js
+- scripts/check-events.js
+- scripts/check-filtered-schema.js
+- scripts/check-final-table-columns.js
+- scripts/check-final-table-schema.js
+- scripts/check-fixtures-structure.js
+- scripts/check-french-league.js
+- scripts/check-graded.js
+- scripts/check-match-details.js
+- scripts/check-match-id-mapping.js
+- scripts/check-match-prediction.js
+- scripts/check-old-events.js
+- scripts/check-predictions.js
+- scripts/check-publication-state.js
+- scripts/check-raw-json.js
+- scripts/check-raw-prediction-structure.js
+- scripts/check-scheduler-schema.js
+- scripts/check-schema.js
+- scripts/check-stages-schema.js
+- scripts/check-supabase-vs-pg-tiers.js
+- scripts/check-tables.js
+- scripts/check-timestamp-cols.js
+- scripts/migration1-plan-visibility.js
+- scripts/schema-introspection.js
+- scripts/setup-rls.js
+- scripts/task1-schema-update.js
+- scripts/validate-backfill-accuracy.js
+- scripts/validate-keys.js
+- scripts/validate-relational-migration.js
+- scripts/verify_dom_structure.js
+- scripts/verify-acca-legs.js
+- scripts/verify-accas.js
+- scripts/verify-bigballs-provider.js
+- scripts/verify-bsd-crosswalk.js
+- scripts/verify-bsd-enrichment.js
+- scripts/verify-bsd-provider.js
+- scripts/verify-db-rule-alignment.js
+- scripts/verify-end-to-end-loop.js
+- scripts/verify-master-rulebook-alignment.js
+- scripts/verify-new-predictions.js
+- scripts/verify-soccerdata-provider.js
+- scripts/verify-sportsdb-coverage.js
+- scripts/verify-vercel-build.js
+
+Evidence:
+- B11 is defined as the SCRIPTS_CHECK_VALIDATE_VERIFY batch.
+- B11 manifest rule selects scripts/check-*, scripts/_check-*, scripts/validate-*, scripts/verify-*, plus exact operator scripts: setup-rls.js, schema-introspection.js, task1-schema-update.js, migration1-plan-visibility.js, and verify_dom_structure.js.
+- package.json exposes several B11 verification scripts as npm operator commands: verify:vercel, verify:bsd, verify:bsd-provider, verify:bsd-crosswalk, verify:bigballs-provider, verify:soccerdata-provider, db:verify:rules, and verify:rulebook.
+- setup-rls.js and schema-introspection.js are database operator tools, not runtime product modules.
+- No B11 file is classified as active runtime/product code in this phase.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B11 batch state not advanced in this patch.
