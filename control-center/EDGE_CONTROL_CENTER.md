@@ -2121,3 +2121,75 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B04 batch state not advanced in this patch.
+
+
+## PHASE 3 — B05 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 — Active Use Identification
+- Batch: B05 / BACKEND_SCRIPTS
+- Question: Is each B05 governed file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+
+Outcome summary:
+- ACTIVE: 1
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 14
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B05 outcomes:
+1. backend/scripts/add-avg-total-log.js — MANUAL_USE
+   Evidence: Standalone repository patch/diagnostic insertion script targeting backend/services/accaBuilder.js. No runtime, package script, or external tooling caller found.
+
+2. backend/scripts/add-diagnostics.js — MANUAL_USE
+   Evidence: Standalone repository patch/diagnostic insertion script targeting backend/services/accaBuilder.js. No runtime, package script, or external tooling caller found.
+
+3. backend/scripts/bridge_frontend.py — MANUAL_USE
+   Evidence: Standalone Python Supabase bridge script with environment loading and direct Supabase client usage. Referenced only by runtime consumer audit documentation and governance/report files.
+
+4. backend/scripts/generate_vip_master.py — MANUAL_USE
+   Evidence: Standalone Python VIP generation script using Supabase and AI provider clients. Referenced only by runtime consumer audit documentation and governance/report files.
+
+5. backend/scripts/ingest_football.py — MANUAL_USE
+   Evidence: Standalone Python football ingestion script using API-Sports and Supabase. Referenced by ingest-map documentation and governance/report files.
+
+6. backend/scripts/patch-acca-builder.js — MANUAL_USE
+   Evidence: Standalone repository patch script targeting backend/services/accaBuilder.js. No runtime, package script, or external tooling caller found.
+
+7. backend/scripts/patch-card-uniqueness.js — MANUAL_USE
+   Evidence: Standalone repository patch script targeting backend/services/accaBuilder.js for card uniqueness/team-lock logic. No runtime, package script, or external tooling caller found.
+
+8. backend/scripts/patch-final-flow.js — MANUAL_USE
+   Evidence: Standalone repository patch script targeting backend/services/accaBuilder.js and insight-engine flow. No runtime, package script, or external tooling caller found.
+
+9. backend/scripts/patch-row-cleanup.js — MANUAL_USE
+   Evidence: Standalone repository patch script targeting backend/services/accaBuilder.js to insert stale-row cleanup logic. No runtime, package script, or external tooling caller found.
+
+10. backend/scripts/patch-skcs-law.js — MANUAL_USE
+    Evidence: Standalone repository patch script targeting ACCA/SKCS law imports and logic. No runtime, package script, or external tooling caller found.
+
+11. backend/scripts/populate_sports_data.py — MANUAL_USE
+    Evidence: Standalone Python data population script with direct provider keys and Supabase client usage; manually referenced from scripts/populate_sports_data.py. No active runtime caller found.
+
+12. backend/scripts/requirements.txt — MANUAL_USE
+    Evidence: Python dependency manifest for backend scripts/tooling; referenced by documentation and tooling contexts. No package/runtime execution caller found.
+
+13. backend/scripts/sync-sportsrc-fixtures.js — ACTIVE
+    Evidence: Referenced from package.json and implemented as a Supabase-backed SportsRC fixture sync script.
+
+14. backend/scripts/test_ai_providers.py — MANUAL_USE
+    Evidence: Standalone Python AI-provider test script with local/OpenAI-style provider configuration. No runtime, package script, or external tooling caller found.
+
+15. backend/scripts/test_ai_real_matches.py — MANUAL_USE
+    Evidence: Standalone Python AI real-match test script using Supabase and provider clients. No runtime, package script, or external tooling caller found.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B05 batch state not advanced in this patch.
