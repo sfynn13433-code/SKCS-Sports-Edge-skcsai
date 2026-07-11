@@ -1551,7 +1551,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: column_dependency_matrix.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "purpose_description": "Reviewed classification: column_dependency_matrix.md is a first-pass column-level dependency matrix for high-value SKCS assets, focusing on runtime behavior, publication, scoring, cleanup, risk, and consumers.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -1586,7 +1586,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: cron_provider_runtime_map.md is a DOCUMENTATION_KNOWLEDGE artifact for runtime consumer/dependency audit.",
+      "purpose_description": "Reviewed classification: cron_provider_runtime_map.md maps cron and interval execution triggers to providers, reads/writes, cost risk, failure impact, and redesign opportunities.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -1618,7 +1618,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: gap_report.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "purpose_description": "Reviewed classification: gap_report.md is a historical SKCS Knowledge Layer gap report covering completed first-pass registries and remaining high-priority documentation, schema, runtime, provider, and formula gaps.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -1654,7 +1654,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: knowledge_layer_completeness_audit.md is a DOCUMENTATION_KNOWLEDGE artifact for audit evidence and review findings.",
+      "purpose_description": "Reviewed classification: knowledge_layer_completeness_audit.md is an active coarse-grained audit assessing whether the SKCS Knowledge Layer covers major database, rules, API, governance, runtime, and risk-mapping structures.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -1690,7 +1690,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: migration_history.md is a DOCUMENTATION_KNOWLEDGE artifact for migration history/trace analysis.",
+      "purpose_description": "Reviewed classification: migration_history.md tracks meaningful schema and migration changes, known drift events, and future migration-history items so later sessions do not rediscover the same issues.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION"
@@ -1721,7 +1721,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: observability_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "purpose_description": "Reviewed classification: observability_registry.md is the source of truth for SKCS degraded-runtime detection, semantic drift, control-plane states, observability signals, thresholds, and runtime detections.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -1756,7 +1756,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: prediction_dependency_audit.md is a DOCUMENTATION_KNOWLEDGE artifact for audit evidence and review findings.",
+      "purpose_description": "Reviewed classification: prediction_dependency_audit.md is an active audit mapping prediction-system dependencies before further RLS rollout on prediction, enrichment, or settlement tables.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -1790,7 +1790,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: runtime_consumer_audit.md is a DOCUMENTATION_KNOWLEDGE artifact for runtime consumer/dependency audit.",
+      "purpose_description": "Reviewed classification: runtime_consumer_audit.md is the first-pass runtime audit for important SKCS assets, focused on actual repository consumers, publication surfaces, compatibility views, and schema-drift impact.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -1825,7 +1825,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: runtime_consumer_audit_v2.md is a DOCUMENTATION_KNOWLEDGE artifact for runtime consumer/dependency audit.",
+      "purpose_description": "Reviewed classification: runtime_consumer_audit_v2.md is a deeper consumer map for key prediction assets, covering read-path consumers, write-path producers, stored fields, and break impact.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -1860,7 +1860,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: schema_drift_log.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "purpose_description": "Reviewed classification: schema_drift_log.md records SKCS schema drift events, why they matter, and future table/view/column migration drift entries.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION"
@@ -1891,7 +1891,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: technical_debt.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "purpose_description": "Reviewed classification: technical_debt.md records known SKCS technical debt themes, why architectural drift matters, and next debt items such as legacy migrations and provider fallback complexity.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -1923,7 +1923,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: undocumented_assets.md is a DOCUMENTATION_KNOWLEDGE artifact for documentation gap analysis.",
+      "purpose_description": "Reviewed classification: undocumented_assets.md tracks known but not yet fully inventoried assets, including provider endpoint catalogs, database view consumer maps, edge-function status, and remaining raw/cache tables.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION"
@@ -1954,7 +1954,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: verification_runtime_audit.md is a DOCUMENTATION_KNOWLEDGE artifact for runtime consumer/dependency audit.",
+      "purpose_description": "Reviewed classification: verification_runtime_audit.md is an active truth audit identifying which Layer 5 verification checks are implemented in runtime code or active policy state versus only defined in specs.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -1989,7 +1989,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: ai_usage_policy.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "purpose_description": "Reviewed classification: ai_usage_policy.md defines SKCS AI tool usage rules, including anti-invention discipline, Supabase/source-of-truth behavior, cost control, and change documentation requirements.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2021,7 +2021,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: bigballs_evaluation_focus.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "purpose_description": "Reviewed classification: bigballs_evaluation_focus.md is a governance directive shifting active provider evaluation to Big Balls Data, with status matrix, restrictions, environment flag, success criteria, and Bzzoiro preservation notes.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2057,7 +2057,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: bsd_governance_hold.md is a DOCUMENTATION_KNOWLEDGE artifact for governance policy guidance.",
+      "purpose_description": "Reviewed classification: bsd_governance_hold.md records the lifted BSD governance hold, completed merge gates, promotion sequence, and remaining runtime constraints for enrichment and verification-only use.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2093,7 +2093,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: bsd_provider_suitability_scorecard.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "purpose_description": "Reviewed classification: bsd_provider_suitability_scorecard.md documents BSD provider suitability, API governance characteristics, coverage depth, historical data, and schema stability assessment.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2128,7 +2128,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: documentation_policy.md is a DOCUMENTATION_KNOWLEDGE artifact for documentation gap analysis.",
+      "purpose_description": "Reviewed classification: documentation_policy.md defines the SKCS documentation policy requiring formulas, rules, tables, views, API integrations, scheduled jobs, and providers to have documentation entries before completion.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2194,7 +2194,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: feature_risk_registry.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "purpose_description": "Reviewed classification: feature_risk_registry.md is a permanent governance artifact defining which provider fields may enter each SKCS lane, including BSD approved endpoint field lanes, scores, and statuses.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2229,7 +2229,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: naming_standards.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "purpose_description": "Reviewed classification: naming_standards.md defines SKCS naming standards for database, documentation, Python, Node, SQL, runtime helpers, provider helpers, and authoritative prediction formulas.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2264,7 +2264,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: provider_scorecard_bsd.md is a DOCUMENTATION_KNOWLEDGE artifact for governance knowledge/audit artifacts.",
+      "purpose_description": "Reviewed classification: provider_scorecard_bsd.md is the BSD provider scorecard recording field audit date, governance verdict, production status, decision summary, weighted scorecard, and governance overlay.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -2300,7 +2300,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE artifact is referenced/used by later governance validation and ensure relationship discovery aligns.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: verification_layer_spec.md is a DOCUMENTATION_KNOWLEDGE artifact for verification-layer instructions.",
+      "purpose_description": "Reviewed classification: verification_layer_spec.md defines Layer 5 as an operational control system, including invariants, controlled transitions, verification inputs, and deterministic checks.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",

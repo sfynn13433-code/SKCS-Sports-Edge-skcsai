@@ -1223,3 +1223,18 @@ Phase 2 purpose classification evidence: B17
   - docs/SKCS_ENGINE_V2_PHASE05_INGEST_MAP.md functional_group changed from DEPLOYMENT_OPERATIONS to DOCUMENTATION_KNOWLEDGE.
   - Purpose descriptions corrected for proven B17 documentation assets based on focused source inspection.
 - evidence: Local PowerShell B17 manifest/register/source inspection confirmed 24/24 source files exist, verified 24/24 register coverage, corrected four proven functional_group mismatches, corrected proven B17 purpose-description mismatches, and kept scope limited to B17 purpose classification.
+
+
+Phase 2 purpose classification evidence: B18
+
+- batch_id: B18
+- title: SKCS_KNOWLEDGE_GOV_AND_AUDIT
+- asset_count: 23
+- register_coverage: 23/23
+- result: PASS WITH CORRECTION
+- batch_manifest_modified: NO
+- register_modified: YES
+- corrections:
+  - No functional_group corrections required; all B18 assets remained DOCUMENTATION_KNOWLEDGE.
+  - Purpose descriptions corrected for proven B18 audit/governance knowledge assets based on focused source inspection.
+- evidence: Local PowerShell B18 manifest/register/source inspection confirmed 23/23 source files exist, verified 23/23 register coverage, confirmed functional_group alignment, corrected proven B18 purpose-description mismatches, and kept scope limited to B18 purpose classification.
