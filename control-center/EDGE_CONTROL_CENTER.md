@@ -3050,3 +3050,65 @@ Validation boundary:
 - No active-use outcome authorizes deletion.
 - B16 batch state not advanced in this patch.
 - GitHub vulnerability notice remains future dependency/security work and was not touched.
+
+## PHASE 3 - B17 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 - Active Use Identification
+- Batch: B17 / DOCS_DIR
+- Question: Is each B17 governed file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+- Dependency/security/vulnerability notice work performed: NO
+
+Outcome summary:
+- ACTIVE: 0
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 24
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B17 MANUAL_USE assets:
+- docs/acca_rules_v2.1.md
+- docs/alert-routing-degraded-state.md
+- docs/api_quota_router.md
+- docs/blueprint-semantic-drift-control-plane.md
+- docs/canonical_ingest_firewall.spec.md
+- docs/control-plane-operational-pack.md
+- docs/cricket-providers.md
+- docs/DATA_INGESTION.md
+- docs/DEPLOYMENT_GUIDE.md
+- docs/football-leagues-apisports.md
+- docs/pipeline-health-feed.md
+- docs/provider-discovery/free-livescore-api.md
+- docs/providers/live-football-api-policy.md
+- docs/README.md
+- docs/runbook_degraded_states.md
+- docs/SKCS_ENGINE_V2_ADR.md
+- docs/SKCS_ENGINE_V2_PHASE0_DESIGN.md
+- docs/SKCS_ENGINE_V2_PHASE05_INGEST_MAP.md
+- docs/SKCS_ENGINE_V2_PHASE0B5_REPLAY.md
+- docs/skcs_grading_snapshot_v1.spec.md
+- docs/sportsdataio-pre-match-directive.md
+- docs/supabase-tier-display-requirements.md
+- docs/VERCEL_DEPLOY_TROUBLESHOOTING.md
+- docs/weekly-global-scrape-scheduler.md
+
+Evidence:
+- B17 is defined as the DOCS_DIR batch with 24 governed assets under docs/.
+- package.json starts the application through backend/server-express.js and exposes build, test, control, audit, sync, trigger, verification, and script commands outside docs/.
+- render.yaml starts the web service through backend/server-express.js and cron services through backend/scripts paths, not docs/.
+- Repository search found docs/ references as documentation, specification, governance, runtime-map, audit, or reference links rather than active runtime process targets.
+- No B17 asset is a deployment entrypoint, package-script target, server import target, cron command, build command, or active runtime dependency proven in this phase.
+- No deletion, merge, retirement, dependency/security, vulnerability, source/runtime/product change is authorized by this evidence.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B17 batch state not advanced in this patch.
+- GitHub vulnerability notice remains future dependency/security work and was not touched.
+
