@@ -1299,3 +1299,24 @@ Validation:
 - B21 manifest count confirmed: 64.
 - B21 post-correction group counts: FRONTEND_UI 38, GENERATED_OUTPUT 18, PUBLIC_ASSET 8.
 - Scope limited to B21 purpose classification correction.
+
+## PHASE 2 - B22 PURPOSE CLASSIFICATION REVIEW - CLOSED
+
+Result: PASS - NO CORRECTION
+
+Scope:
+- Batch: B22 / SUPABASE_MIGRATIONS
+- Assets reviewed: 60
+- Files corrected: 0
+- Changed files:
+  - control-center/EDGE_CONTROL_CENTER.md
+
+Inspection:
+- Confirmed B22 manifest contains 60 assets under supabase/migrations/.
+- Confirmed B22 register entries are classified as DATABASE_MIGRATION.
+- Confirmed purpose evidence aligns with Supabase SQL migration files creating or altering database tables, indexes, functions, triggers, views, RLS policies, and related schema objects.
+
+Validation:
+- B22 post-inspection group counts: DATABASE_MIGRATION 60.
+- No proven B22 purpose classification mismatches found.
+- Scope limited to B22 purpose classification review.
