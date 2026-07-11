@@ -2647,12 +2647,12 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B11 batch state not advanced in this patch.
-## PHASE 3 — B12 ACTIVE USE IDENTIFICATION EVIDENCE
+## PHASE 3 â€” B12 ACTIVE USE IDENTIFICATION EVIDENCE
 
 Result: PASS
 
 Scope:
-- Phase: PHASE_3 — Active Use Identification
+- Phase: PHASE_3 â€” Active Use Identification
 - Batch: B12 / SCRIPTS_TEST_DIAG_TRACE
 - Question: Is each B12 governed file currently used?
 - Deletion/merge/retirement/refactor performed: NO
