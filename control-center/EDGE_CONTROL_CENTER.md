@@ -1,4 +1,4 @@
-﻿# SKCS Edge Control Center
+# SKCS Edge Control Center
 
 **Generated:** 2026-07-05
 **Ledger:** `control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json`
@@ -6,7 +6,7 @@
 
 ---
 
-> **Scout â†” Edge marriage remains BLOCKED. Edge Control Center v1 exists to govern the deferred integration, Supabase storage, security, prediction integrity, and external-provider removal before the two systems are connected.**
+> **Scout ↔ Edge marriage remains BLOCKED. Edge Control Center v1 exists to govern the deferred integration, Supabase storage, security, prediction integrity, and external-provider removal before the two systems are connected.**
 
 ---
 
@@ -18,7 +18,7 @@
 | **Edge/Test** | FIP consumption, prediction analysis, probability/scoring, contextual adjustment, market interpretation, filtering, direct prediction logic, ACCA construction, explanation, publication, users and subscribers |
 | **Scout database** | Neon |
 | **Edge/Test database** | Supabase |
-| **Sports truth direction** | Scout â†’ validated FIP boundary â†’ Edge |
+| **Sports truth direction** | Scout → validated FIP boundary → Edge |
 | **Subscriber/commercial direction** | Remains inside Edge/Supabase |
 | **Raw Scout evidence mirror in Supabase** | Forbidden by default |
 | **Full FIP permanent retention in Supabase** | Gated |
@@ -30,7 +30,7 @@ The integration bridge was deliberately deferred while Scout's governance, build
 
 The current project is not the discovery of a forgotten bridge.
 
-It is the governed resumption of the intentionally deferred Scout â†” Edge integration.
+It is the governed resumption of the intentionally deferred Scout ↔ Edge integration.
 
 ---
 
@@ -41,13 +41,13 @@ It is the governed resumption of the intentionally deferred Scout â†” Edge 
 | **Edge Control Center v1** | DONE |
 | **Edge Master Project Register** | TESTED |
 | **Full Edge system/runtime inventory** | TESTED |
-| **Scout â†” Edge marriage gate** | BLOCKED |
+| **Scout ↔ Edge marriage gate** | BLOCKED |
 | **Supabase storage gate** | BLOCKED |
 | **External sports provider removal** | PARTIAL |
 | **FIP intake handshake** | PROPOSED |
 | **Subscriber/security boundary inventory** | PROPOSED |
 | **Prediction pipeline integrity inventory** | PROPOSED |
-| **Scout â†’ Edge end-to-end proof** | BLOCKED |
+| **Scout → Edge end-to-end proof** | BLOCKED |
 
 ---
 
@@ -80,10 +80,10 @@ However Edge still has reachable direct sports-acquisition origins.
 Known evidence includes:
 
 `backend/services/aiPipeline.js`
-â†’ `getPredictionInputs()`
-â†’ `backend/services/dataProvider.js`
-â†’ `buildLiveData()`
-â†’ external provider acquisition
+→ `getPredictionInputs()`
+→ `backend/services/dataProvider.js`
+→ `buildLiveData()`
+→ external provider acquisition
 
 Additional acquisition surfaces have been identified in:
 
@@ -106,7 +106,7 @@ EFI-001 must first define the governed FIP input origin.
 
 Edge/Test operates under a constrained Supabase storage budget of approximately 0.5 GB.
 
-The Scout â†” Edge bridge must not create a second Scout evidence database inside Supabase.
+The Scout ↔ Edge bridge must not create a second Scout evidence database inside Supabase.
 
 The following distinction is mandatory:
 
@@ -123,10 +123,10 @@ These are separate architecture decisions.
 Preferred direction:
 
 Scout FIP
-â†’ Edge intake validation
-â†’ transient analysis input
-â†’ Edge prediction/scoring/explanation
-â†’ Supabase retains derived Edge state plus canonical FIP reference/provenance/hash
+→ Edge intake validation
+→ transient analysis input
+→ Edge prediction/scoring/explanation
+→ Supabase retains derived Edge state plus canonical FIP reference/provenance/hash
 
 Do not permanently copy Scout raw evidence, historical evidence, source archives, or full intelligence history into Supabase by default.
 
@@ -254,7 +254,7 @@ Previous allowed startable task snapshot:
 
 EPR-001 closure state:
 
-**EPR-001 â€” Edge Master Project Register [TESTED]**
+**EPR-001 — Edge Master Project Register [TESTED]**
 
 Mode:
 
@@ -304,12 +304,12 @@ Do not clear the marriage gate.
 Startable tasks: 0
 
 Previous gated task snapshot:
-**EAC-001 â€” Edge Asset Classification and Repository Map [PROPOSED]**
+**EAC-001 — Edge Asset Classification and Repository Map [PROPOSED]**
 
 Requires separate approval before start
 -->
 
-## 8. Stateful Control Center gate â€” Repository Cleanup Programme
+## 8. Stateful Control Center gate — Repository Cleanup Programme
 
 All AI instructions are proposals.
 
@@ -360,7 +360,7 @@ Required modes:
 - RECORD_FUTURE_PHASE_NOTE
 - CONTROL
 
-The old per-asset forensic lifecycle (`PENDING` â†’ `INSPECTING` â†’ `DISPOSITION_READY` â†’ `CLOSURE_READY` â†’ `CLOSED` with five evidence areas for every asset) is historical only.
+The old per-asset forensic lifecycle (`PENDING` → `INSPECTING` → `DISPOSITION_READY` → `CLOSURE_READY` → `CLOSED` with five evidence areas for every asset) is historical only.
 
 It is no longer the mandatory primary lifecycle for the repository cleanup mission.
 
@@ -370,50 +370,50 @@ It must not force a full forensic lifecycle for every file during Phase 1.
 
 ### Ordered cleanup phases
 
-1. PHASE_0 â€” REPOSITORY BASELINE AND CONTROL
+1. PHASE_0 — REPOSITORY BASELINE AND CONTROL
    Question: What exact repository state is the cleanup programme starting from?
    No cleanup. No repair. No duplicate removal.
 
-2. PHASE_1 â€” EXACT DUPLICATE ELIMINATION
+2. PHASE_1 — EXACT DUPLICATE ELIMINATION
    Question: Are any governed files byte-for-byte identical?
    Preferred first-pass: local deterministic hashing (for example SHA-256).
    Exact duplicate means byte-for-byte identical content. Similar code, same purpose, same file name, or generated similarity are not exact duplicates.
    Phase 1 may remove only proven exact duplicates after a quick path/reference safety check.
    Phase 1 does not require purpose, runtime-use, dependency, overlap, reuse-value, merge, retirement, or replacement evidence for every unique file.
 
-3. PHASE_2 â€” FILE PURPOSE IDENTIFICATION
+3. PHASE_2 — FILE PURPOSE IDENTIFICATION
    Question: What does each remaining governed file represent?
    Reuse EAC-001. No merge, deletion, retirement, repair, or refactoring.
 
-4. PHASE_3 â€” ACTIVE USE IDENTIFICATION
+4. PHASE_3 — ACTIVE USE IDENTIFICATION
    Question: Is each remaining governed file currently used?
    Outcomes: ACTIVE, INDIRECTLY_ACTIVE, MANUAL_USE, NO_CURRENT_USE_FOUND, UNKNOWN.
    NO_CURRENT_USE_FOUND does not authorise deletion.
 
-5. PHASE_4 â€” LEGACY AND REPLACEMENT IDENTIFICATION
+5. PHASE_4 — LEGACY AND REPLACEMENT IDENTIFICATION
    Question: Has each applicable file been superseded or left behind by a newer implementation?
    Outcomes: CURRENT, LEGACY, REPLACED, HISTORICAL, UNCERTAIN.
 
-6. PHASE_5 â€” FUNCTIONAL OVERLAP IDENTIFICATION
+6. PHASE_5 — FUNCTIONAL OVERLAP IDENTIFICATION
    Question: Are different remaining files doing the same or substantially overlapping job?
    Outcomes: NO_OVERLAP, PARTIAL_OVERLAP, MAJOR_OVERLAP, POTENTIAL_MERGE_GROUP.
    Identifies overlap only. No merge implementation.
 
-7. PHASE_6 â€” SAFE RETIREMENT
+7. PHASE_6 — SAFE RETIREMENT
    Question: Which proven unused, replaced, or historical files can safely be removed?
    Outcomes: RETIRE, KEEP, BLOCKED. Approved RETIRE may be implemented here.
 
-8. PHASE_7 â€” MERGE AND CONSOLIDATION
+8. PHASE_7 — MERGE AND CONSOLIDATION
    Question: Which confirmed overlap groups should become one canonical implementation?
    Deep investigation phase for proven overlap candidates only.
 
-9. PHASE_8 â€” FINAL REPOSITORY VALIDATION
+9. PHASE_8 — FINAL REPOSITORY VALIDATION
    Question: Is the cleaned repository internally consistent?
    Do not start a new cleanup hunt.
 
 ### Phase order law
 
-Allowed sequence: PHASE_0 â†’ PHASE_1 â†’ PHASE_2 â†’ PHASE_3 â†’ PHASE_4 â†’ PHASE_5 â†’ PHASE_6 â†’ PHASE_7 â†’ PHASE_8.
+Allowed sequence: PHASE_0 → PHASE_1 → PHASE_2 → PHASE_3 → PHASE_4 → PHASE_5 → PHASE_6 → PHASE_7 → PHASE_8.
 
 A later phase must not activate while an earlier phase is incomplete.
 
@@ -437,7 +437,7 @@ The Control Center must fail closed if an agent attempts work belonging to a dif
 
 ### Batch law
 
-Reuse the existing deterministic EAC-001 batch manifest (`control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json`, B01â€“B29).
+Reuse the existing deterministic EAC-001 batch manifest (`control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json`, B01–B29).
 
 Do not invent a second arbitrary batch system.
 
@@ -1740,12 +1740,12 @@ Validation boundary:
 - No product/source/runtime files were changed.
 - No deletion, merge, retirement, refactor, Supabase mutation, or classification reopen was performed.
 
-## PHASE 3 â€” B01 ACTIVE USE IDENTIFICATION EVIDENCE
+## PHASE 3 — B01 ACTIVE USE IDENTIFICATION EVIDENCE
 
 Result: PASS
 
 Scope:
-- Phase: PHASE_3 â€” Active Use Identification
+- Phase: PHASE_3 — Active Use Identification
 - Batch: B01 / CONTROL_CENTER
 - Question: Is each B01 governed file currently used?
 - Deletion/merge/retirement/refactor performed: NO
@@ -1760,21 +1760,21 @@ Outcome summary:
 - UNKNOWN: 0
 
 B01 outcomes:
-1. control-center/check_control_center.js â€” ACTIVE
-2. control-center/check_edge_asset_classification.js â€” ACTIVE
-3. control-center/check_edge_project_register.js â€” ACTIVE
-4. control-center/check_edge_repository_asset_register.js â€” ACTIVE
-5. control-center/check_edge_system_runtime_inventory.js â€” ACTIVE
-6. control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json â€” ACTIVE
-7. control-center/EDGE_ASSET_REPOSITORY_MAP.md â€” ACTIVE
-8. control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json â€” ACTIVE
-9. control-center/EDGE_CONTROL_CENTER.md â€” ACTIVE
-10. control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json â€” ACTIVE
-11. control-center/EDGE_PROJECT_BACKLOG.md â€” MANUAL_USE
-12. control-center/EDGE_PROJECT_DEPENDENCY_MAP.md â€” MANUAL_USE
-13. control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json â€” ACTIVE
-14. control-center/EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json â€” ACTIVE
-15. control-center/EDGE_SYSTEM_RUNTIME_MAP.md â€” ACTIVE
+1. control-center/check_control_center.js — ACTIVE
+2. control-center/check_edge_asset_classification.js — ACTIVE
+3. control-center/check_edge_project_register.js — ACTIVE
+4. control-center/check_edge_repository_asset_register.js — ACTIVE
+5. control-center/check_edge_system_runtime_inventory.js — ACTIVE
+6. control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json — ACTIVE
+7. control-center/EDGE_ASSET_REPOSITORY_MAP.md — ACTIVE
+8. control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json — ACTIVE
+9. control-center/EDGE_CONTROL_CENTER.md — ACTIVE
+10. control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json — ACTIVE
+11. control-center/EDGE_PROJECT_BACKLOG.md — MANUAL_USE
+12. control-center/EDGE_PROJECT_DEPENDENCY_MAP.md — MANUAL_USE
+13. control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json — ACTIVE
+14. control-center/EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json — ACTIVE
+15. control-center/EDGE_SYSTEM_RUNTIME_MAP.md — ACTIVE
 
 Validation boundary:
 - Evidence only.
@@ -1782,12 +1782,12 @@ Validation boundary:
 - No active-use outcome authorizes deletion.
 - B01 batch state not advanced in this patch.
 
-## PHASE 3 â€” B02 ACTIVE USE IDENTIFICATION EVIDENCE
+## PHASE 3 — B02 ACTIVE USE IDENTIFICATION EVIDENCE
 
 Result: PASS
 
 Scope:
-- Phase: PHASE_3 â€” Active Use Identification
+- Phase: PHASE_3 — Active Use Identification
 - Batch: B02 / BACKEND_DIRECT_FILES
 - Question: Is each B02 governed file currently used?
 - Deletion/merge/retirement/refactor performed: NO
@@ -1802,43 +1802,43 @@ Outcome summary:
 - UNKNOWN: 0
 
 B02 outcomes:
-1. backend/.gitignore â€” ACTIVE
+1. backend/.gitignore — ACTIVE
    Evidence: Backend Git operational ignore file excluding backend node_modules, env files, local DB/log/form artifacts, and backend.local-backup.
 
-2. backend/apiClients.js â€” ACTIVE
+2. backend/apiClients.js — ACTIVE
    Evidence: Imported by active backend data-provider service and exports provider clients/helper functions used by backend ingestion/provider flows.
 
-3. backend/checkCanonicalEvents.js â€” MANUAL_USE
+3. backend/checkCanonicalEvents.js — MANUAL_USE
    Evidence: Standalone Supabase diagnostic script for canonical_events counts, sport distribution, and future event inspection. No active runtime caller found.
 
-4. backend/config.js â€” ACTIVE
+4. backend/config.js — ACTIVE
    Evidence: Runtime configuration module loaded by server, database modules, api clients, and services.
 
-5. backend/database.js â€” ACTIVE
+5. backend/database.js — ACTIVE
    Evidence: Runtime PostgreSQL/Supabase database module used by server startup, routes, subscription/profile helpers, query helpers, and transaction helpers.
 
-6. backend/db.js â€” ACTIVE
+6. backend/db.js — ACTIVE
    Evidence: Runtime DB helper imported by EdgeMind controller path and active backend code.
 
-7. backend/dbBootstrap.js â€” ACTIVE
+7. backend/dbBootstrap.js — ACTIVE
    Evidence: Imported and executed by backend/server-express.js during startup to verify tables, compatibility views, cleanup, and bootstrap state.
 
-8. backend/deploy-trigger-cricket.js â€” ACTIVE
+8. backend/deploy-trigger-cricket.js — ACTIVE
    Evidence: Render cricket cron start command points to node backend/deploy-trigger-cricket.js; script exits safely unless cricket ingestion is enabled.
 
-9. backend/deploy-trigger.js â€” ACTIVE
+9. backend/deploy-trigger.js — ACTIVE
    Evidence: Render weekly global scrape cron start command points to node backend/deploy-trigger.js.
 
-10. backend/edgemind_inference.py â€” MANUAL_USE
+10. backend/edgemind_inference.py — MANUAL_USE
     Evidence: Standalone Python EdgeMind/Antigravity inference bridge with CLI entrypoint requiring python edgemind_inference.py <event_id>. No active Node/server caller found.
 
-11. backend/package-lock.json â€” NO_CURRENT_USE_FOUND
+11. backend/package-lock.json — NO_CURRENT_USE_FOUND
     Evidence: Minimal backend lockfile with only empty backend package entry. Root install/build uses root package.json; no backend package script caller found.
 
-12. backend/server-express.js â€” ACTIVE
+12. backend/server-express.js — ACTIVE
     Evidence: Root package main/start/dev target and Render backend web start command. Mounts backend API routes and server runtime.
 
-13. backend/test-ultra-slim.js â€” MANUAL_USE
+13. backend/test-ultra-slim.js — MANUAL_USE
     Evidence: Standalone local Dolphin inference test script. No active package/runtime caller found.
 
 Validation boundary:
@@ -1958,12 +1958,12 @@ Validation boundary:
 - B03 batch state not advanced in this patch.
 
 
-## PHASE 3 â€” B04 ACTIVE USE IDENTIFICATION EVIDENCE
+## PHASE 3 — B04 ACTIVE USE IDENTIFICATION EVIDENCE
 
 Result: PASS
 
 Scope:
-- Phase: PHASE_3 â€” Active Use Identification
+- Phase: PHASE_3 — Active Use Identification
 - Batch: B04 / BACKEND_UTILS_SEMANTIC_CORE_AND_TEST
 - Question: Is each B04 governed file currently used?
 - Deletion/merge/retirement/refactor performed: NO
@@ -1978,142 +1978,142 @@ Outcome summary:
 - UNKNOWN: 0
 
 B04 outcomes:
-1. backend/audit/system_integrity_audit.md â€” MANUAL_USE
+1. backend/audit/system_integrity_audit.md — MANUAL_USE
    Evidence: System integrity audit document retained as human/governance evidence. No runtime, package script, or tooling caller found.
 
-2. backend/core/executionPipeline.js â€” ACTIVE
+2. backend/core/executionPipeline.js — ACTIVE
    Evidence: Referenced by active backend routes, server runtime, cron jobs, sync services, heartbeat service, and pipeline/direct builder services.
 
-3. backend/core/verificationController.js â€” ACTIVE
+3. backend/core/verificationController.js — ACTIVE
    Evidence: Referenced by backend/server-express.js, active prediction route, semantic-layer controllers, AI/context/pipeline services, sync service, and TheSportsDB pipeline.
 
-4. backend/core/verificationSignalContract.js â€” ACTIVE
+4. backend/core/verificationSignalContract.js — ACTIVE
    Evidence: Imported by backend/core/verificationController.js and used through the active verification controller path.
 
-5. backend/errors/ProviderQuotaExceededError.js â€” ACTIVE
+5. backend/errors/ProviderQuotaExceededError.js — ACTIVE
    Evidence: Imported by backend/apiClients.js and backend/services/dataProvider.js for active provider quota handling.
 
-6. backend/logic/edgeMind_manifest.json â€” NO_CURRENT_USE_FOUND
+6. backend/logic/edgeMind_manifest.json — NO_CURRENT_USE_FOUND
    Evidence: Logic manifest file exists and documents EdgeMind scoring, but no runtime, package script, manual tooling, or documentation consumer was found beyond governance/report registration.
 
-7. backend/middleware/supabaseJwt.js â€” ACTIVE
+7. backend/middleware/supabaseJwt.js — ACTIVE
    Evidence: Imported by active auth-protected backend routes and backend/server-express.js.
 
-8. backend/parsers/base_sport_parser.py â€” NO_CURRENT_USE_FOUND
+8. backend/parsers/base_sport_parser.py — NO_CURRENT_USE_FOUND
    Evidence: Parser module exists, but no current runtime, package script, manual tooling, or documentation consumer was found beyond governance/report registration.
 
-9. backend/semantic-layer/controlPlaneEvaluator.js â€” ACTIVE
+9. backend/semantic-layer/controlPlaneEvaluator.js — ACTIVE
    Evidence: Referenced by active execution pipeline, verification controller, semantic drift summary service, runtime maps, and audit tooling.
 
-10. backend/semantic-layer/decisionFingerprintService.js â€” ACTIVE
+10. backend/semantic-layer/decisionFingerprintService.js — ACTIVE
     Evidence: Referenced by backend/core/executionPipeline.js and execution-spine audit tooling.
 
-11. backend/semantic-layer/enforcementGuard.js â€” ACTIVE
+11. backend/semantic-layer/enforcementGuard.js — ACTIVE
     Evidence: Referenced by active backend/services/aiPipeline.js and semantic control-plane documentation/runtime maps.
 
-12. backend/semantic-layer/errorMemoryLayer.js â€” ACTIVE
+12. backend/semantic-layer/errorMemoryLayer.js — ACTIVE
     Evidence: Referenced by backend/core/executionPipeline.js and execution-spine audit tooling.
 
-13. backend/semantic-layer/gatekeeperAdapter.js â€” ACTIVE
+13. backend/semantic-layer/gatekeeperAdapter.js — ACTIVE
     Evidence: Referenced by backend/core/executionPipeline.js and execution-spine audit tooling.
 
-14. backend/semantic-layer/governanceGatekeeper.js â€” ACTIVE
+14. backend/semantic-layer/governanceGatekeeper.js — ACTIVE
     Evidence: Referenced by active cricket cron route, cron jobs service, gatekeeper adapter, runtime maps, and execution-spine audit tooling.
 
-15. backend/semantic-layer/normalizer.js â€” ACTIVE
+15. backend/semantic-layer/normalizer.js — ACTIVE
     Evidence: Referenced by enforcementGuard.js, provider normalizer paths, AI/sync service context, and boundary audit tooling.
 
-16. backend/semantic-layer/preflightSimulator.js â€” ACTIVE
+16. backend/semantic-layer/preflightSimulator.js — ACTIVE
     Evidence: Referenced by backend/core/executionPipeline.js and execution-spine audit tooling.
 
-17. backend/semantic-layer/registry.js â€” ACTIVE
+17. backend/semantic-layer/registry.js — ACTIVE
     Evidence: Referenced by football provider normalizers, semantic normalizer, sportsdataio contract helpers, and provider mapping documentation.
 
-18. backend/semantic-layer/sportsdataioContractHelpers.js â€” MANUAL_USE
+18. backend/semantic-layer/sportsdataioContractHelpers.js — MANUAL_USE
     Evidence: Referenced by scripts/sync-ucl-context.js and provider mapping documentation. No active runtime caller found.
 
-19. backend/semantic-layer/verificationController.js â€” ACTIVE
+19. backend/semantic-layer/verificationController.js — ACTIVE
     Evidence: Referenced by backend/core/executionPipeline.js, runtime maps, and execution-spine audit tooling.
 
-20. backend/semantic-layer/violationLogger.js â€” ACTIVE
+20. backend/semantic-layer/violationLogger.js — ACTIVE
     Evidence: Referenced by enforcementGuard.js and runtime/compliance maps.
 
-21. backend/test/smoke-test-insight-engine.js â€” MANUAL_USE
+21. backend/test/smoke-test-insight-engine.js — MANUAL_USE
     Evidence: Standalone smoke test file with Node execution instructions and imports from backend/utils/insightEngine.js. No active runtime caller found.
 
-22. backend/test/smoke-test-skcs-law.js â€” MANUAL_USE
+22. backend/test/smoke-test-skcs-law.js — MANUAL_USE
     Evidence: Standalone law-compliance smoke test file with Node execution instructions; referenced by smoke-test-insight-engine.js. No active runtime caller found.
 
-23. backend/utils/accaLogicEngine.js â€” ACTIVE
+23. backend/utils/accaLogicEngine.js — ACTIVE
     Evidence: Referenced by accaBuilder, acca math utilities, market scoring engine, smoke tests, patch scripts, and football-rules audit tooling.
 
-24. backend/utils/apiCache.js â€” ACTIVE
+24. backend/utils/apiCache.js — ACTIVE
     Evidence: Referenced by backend/utils/rapidApiWaterfall.js and cache/provider service paths.
 
-25. backend/utils/apiQueue.js â€” ACTIVE
+25. backend/utils/apiQueue.js — ACTIVE
     Evidence: Referenced by active cron jobs, enhanced match details service, hybrid sports data service, and TheSportsDB pipeline.
 
-26. backend/utils/apiUsageLimiter.js â€” MANUAL_USE
+26. backend/utils/apiUsageLimiter.js — MANUAL_USE
     Evidence: Referenced by scripts/import-today-snapshot-pipeline.js. No active runtime caller found.
 
-27. backend/utils/auth.js â€” ACTIVE
+27. backend/utils/auth.js — ACTIVE
     Evidence: Referenced by active backend routes, backend/server-express.js, runtime inventory, and control-center routes.
 
-28. backend/utils/availability.js â€” ACTIVE
+28. backend/utils/availability.js — ACTIVE
     Evidence: Referenced by active predictions route and live fixture fetch tooling.
 
-29. backend/utils/conflictResolver.js â€” ACTIVE
+29. backend/utils/conflictResolver.js — ACTIVE
     Evidence: Referenced by backend/services/accaBuilder.js and runtime maps.
 
-30. backend/utils/contextInsights.js â€” ACTIVE
+30. backend/utils/contextInsights.js — ACTIVE
     Evidence: Referenced by active predictions and VIP routes.
 
-31. backend/utils/dateNormalization.js â€” ACTIVE
+31. backend/utils/dateNormalization.js — ACTIVE
     Evidence: Referenced by backend/server-express.js and active predictions route.
 
-32. backend/utils/db.js â€” ACTIVE
+32. backend/utils/db.js — ACTIVE
     Evidence: Runtime re-export to backend/db.js; referenced by active backend routes, server runtime, providers, services, semantic-layer modules, scripts, and system runtime inventory.
 
-33. backend/utils/insightEngine.js â€” ACTIVE
+33. backend/utils/insightEngine.js — ACTIVE
     Evidence: Referenced by active predictions route, accaBuilder service, patch scripts, and smoke tests.
 
-34. backend/utils/insightValidationMatrix.js â€” ACTIVE
+34. backend/utils/insightValidationMatrix.js — ACTIVE
     Evidence: Referenced by active VIP route and accaBuilder service.
 
-35. backend/utils/jobLogger.js â€” ACTIVE
+35. backend/utils/jobLogger.js — ACTIVE
     Evidence: Referenced by backend/server-express.js, scheduler/test logger scripts, runtime maps, and AGENTS.md.
 
-36. backend/utils/keyPool.js â€” ACTIVE
+36. backend/utils/keyPool.js — ACTIVE
     Evidence: Referenced by backend/apiClients.js, data provider services, rapidApiWaterfall.js, live fixture fetch tooling, and import snapshot tooling.
 
-37. backend/utils/marketConsistency.js â€” ACTIVE
+37. backend/utils/marketConsistency.js — ACTIVE
     Evidence: Referenced by active predictions route and accaBuilder service.
 
-38. backend/utils/pipelineLogger.js â€” ACTIVE
+38. backend/utils/pipelineLogger.js — ACTIVE
     Evidence: Referenced by active debug/predictions routes, accaBuilder, aiPipeline, market intelligence, sync service, and insight engine paths.
 
-39. backend/utils/providerCircuitBreaker.js â€” ACTIVE
+39. backend/utils/providerCircuitBreaker.js — ACTIVE
     Evidence: Referenced by backend/apiClients.js, api cache service, live fixture fetch tooling, and runtime maps.
 
-40. backend/utils/purgeStaleData.js â€” MANUAL_USE
+40. backend/utils/purgeStaleData.js — MANUAL_USE
     Evidence: One-off CLI utility with explicit usage `node backend/utils/purgeStaleData.js`; no active runtime caller found.
 
-41. backend/utils/rapidApiWaterfall.js â€” ACTIVE
+41. backend/utils/rapidApiWaterfall.js — ACTIVE
     Evidence: Referenced by backend/server-express.js, live fixture fetch tooling, cache test tooling, and runtime maps.
 
-42. backend/utils/secondaryMarketSelector.js â€” ACTIVE
+42. backend/utils/secondaryMarketSelector.js — ACTIVE
     Evidence: Referenced by backend/services/direct1x2Builder.js and football-rules audit tooling.
 
-43. backend/utils/sportsrcNormalizer.js â€” ACTIVE
+43. backend/utils/sportsrcNormalizer.js — ACTIVE
     Evidence: Referenced by backend/services/dataProvider.js.
 
-44. backend/utils/validation.js â€” ACTIVE
+44. backend/utils/validation.js — ACTIVE
     Evidence: Referenced by accaBuilder, aiPipeline, filterEngine, and runtime inventory.
 
-45. backend/utils/weather.js â€” ACTIVE
+45. backend/utils/weather.js — ACTIVE
     Evidence: Referenced by active predictions route and live fixture fetch tooling.
 
-46. backend/workers/now_api_pulse.py â€” NO_CURRENT_USE_FOUND
+46. backend/workers/now_api_pulse.py — NO_CURRENT_USE_FOUND
     Evidence: Background worker module exists, but no current runtime, package script, manual tooling, or documentation consumer was found beyond governance/report registration.
 
 Validation boundary:
@@ -2123,12 +2123,12 @@ Validation boundary:
 - B04 batch state not advanced in this patch.
 
 
-## PHASE 3 â€” B05 ACTIVE USE IDENTIFICATION EVIDENCE
+## PHASE 3 — B05 ACTIVE USE IDENTIFICATION EVIDENCE
 
 Result: PASS
 
 Scope:
-- Phase: PHASE_3 â€” Active Use Identification
+- Phase: PHASE_3 — Active Use Identification
 - Batch: B05 / BACKEND_SCRIPTS
 - Question: Is each B05 governed file currently used?
 - Deletion/merge/retirement/refactor performed: NO
@@ -2143,49 +2143,49 @@ Outcome summary:
 - UNKNOWN: 0
 
 B05 outcomes:
-1. backend/scripts/add-avg-total-log.js â€” MANUAL_USE
+1. backend/scripts/add-avg-total-log.js — MANUAL_USE
    Evidence: Standalone repository patch/diagnostic insertion script targeting backend/services/accaBuilder.js. No runtime, package script, or external tooling caller found.
 
-2. backend/scripts/add-diagnostics.js â€” MANUAL_USE
+2. backend/scripts/add-diagnostics.js — MANUAL_USE
    Evidence: Standalone repository patch/diagnostic insertion script targeting backend/services/accaBuilder.js. No runtime, package script, or external tooling caller found.
 
-3. backend/scripts/bridge_frontend.py â€” MANUAL_USE
+3. backend/scripts/bridge_frontend.py — MANUAL_USE
    Evidence: Standalone Python Supabase bridge script with environment loading and direct Supabase client usage. Referenced only by runtime consumer audit documentation and governance/report files.
 
-4. backend/scripts/generate_vip_master.py â€” MANUAL_USE
+4. backend/scripts/generate_vip_master.py — MANUAL_USE
    Evidence: Standalone Python VIP generation script using Supabase and AI provider clients. Referenced only by runtime consumer audit documentation and governance/report files.
 
-5. backend/scripts/ingest_football.py â€” MANUAL_USE
+5. backend/scripts/ingest_football.py — MANUAL_USE
    Evidence: Standalone Python football ingestion script using API-Sports and Supabase. Referenced by ingest-map documentation and governance/report files.
 
-6. backend/scripts/patch-acca-builder.js â€” MANUAL_USE
+6. backend/scripts/patch-acca-builder.js — MANUAL_USE
    Evidence: Standalone repository patch script targeting backend/services/accaBuilder.js. No runtime, package script, or external tooling caller found.
 
-7. backend/scripts/patch-card-uniqueness.js â€” MANUAL_USE
+7. backend/scripts/patch-card-uniqueness.js — MANUAL_USE
    Evidence: Standalone repository patch script targeting backend/services/accaBuilder.js for card uniqueness/team-lock logic. No runtime, package script, or external tooling caller found.
 
-8. backend/scripts/patch-final-flow.js â€” MANUAL_USE
+8. backend/scripts/patch-final-flow.js — MANUAL_USE
    Evidence: Standalone repository patch script targeting backend/services/accaBuilder.js and insight-engine flow. No runtime, package script, or external tooling caller found.
 
-9. backend/scripts/patch-row-cleanup.js â€” MANUAL_USE
+9. backend/scripts/patch-row-cleanup.js — MANUAL_USE
    Evidence: Standalone repository patch script targeting backend/services/accaBuilder.js to insert stale-row cleanup logic. No runtime, package script, or external tooling caller found.
 
-10. backend/scripts/patch-skcs-law.js â€” MANUAL_USE
+10. backend/scripts/patch-skcs-law.js — MANUAL_USE
     Evidence: Standalone repository patch script targeting ACCA/SKCS law imports and logic. No runtime, package script, or external tooling caller found.
 
-11. backend/scripts/populate_sports_data.py â€” MANUAL_USE
+11. backend/scripts/populate_sports_data.py — MANUAL_USE
     Evidence: Standalone Python data population script with direct provider keys and Supabase client usage; manually referenced from scripts/populate_sports_data.py. No active runtime caller found.
 
-12. backend/scripts/requirements.txt â€” MANUAL_USE
+12. backend/scripts/requirements.txt — MANUAL_USE
     Evidence: Python dependency manifest for backend scripts/tooling; referenced by documentation and tooling contexts. No package/runtime execution caller found.
 
-13. backend/scripts/sync-sportsrc-fixtures.js â€” ACTIVE
+13. backend/scripts/sync-sportsrc-fixtures.js — ACTIVE
     Evidence: Referenced from package.json and implemented as a Supabase-backed SportsRC fixture sync script.
 
-14. backend/scripts/test_ai_providers.py â€” MANUAL_USE
+14. backend/scripts/test_ai_providers.py — MANUAL_USE
     Evidence: Standalone Python AI-provider test script with local/OpenAI-style provider configuration. No runtime, package script, or external tooling caller found.
 
-15. backend/scripts/test_ai_real_matches.py â€” MANUAL_USE
+15. backend/scripts/test_ai_real_matches.py — MANUAL_USE
     Evidence: Standalone Python AI real-match test script using Supabase and provider clients. No runtime, package script, or external tooling caller found.
 
 Validation boundary:
@@ -2195,12 +2195,12 @@ Validation boundary:
 - B05 batch state not advanced in this patch.
 
 
-## PHASE 3 â€” B06 ACTIVE USE IDENTIFICATION EVIDENCE
+## PHASE 3 — B06 ACTIVE USE IDENTIFICATION EVIDENCE
 
 Result: PASS
 
 Scope:
-- Phase: PHASE_3 â€” Active Use Identification
+- Phase: PHASE_3 — Active Use Identification
 - Batch: B06 / BACKEND_PROVIDERS
 - Question: Is each B06 governed file currently used?
 - Deletion/merge/retirement/refactor performed: NO
@@ -2215,34 +2215,34 @@ Outcome summary:
 - UNKNOWN: 0
 
 B06 outcomes:
-1. backend/providers/football/bigBallsDataNormalizer.js â€” MANUAL_USE
+1. backend/providers/football/bigBallsDataNormalizer.js — MANUAL_USE
    Evidence: Referenced by backend/providers/football/bigBallsDataProvider.js and provider documentation. No active runtime or package caller found.
 
-2. backend/providers/football/bigBallsDataProvider.js â€” MANUAL_USE
+2. backend/providers/football/bigBallsDataProvider.js — MANUAL_USE
    Evidence: Referenced by scripts/verify-bigballs-provider.js and provider documentation. No active runtime or package caller found.
 
-3. backend/providers/football/bsdNormalizer.js â€” MANUAL_USE
+3. backend/providers/football/bsdNormalizer.js — MANUAL_USE
    Evidence: Referenced by backend/providers/football/bsdProvider.js and provider documentation. No active runtime or package caller found.
 
-4. backend/providers/football/bsdProvider.js â€” MANUAL_USE
+4. backend/providers/football/bsdProvider.js — MANUAL_USE
    Evidence: Referenced by scripts/verify-bsd-provider.js and provider documentation. No active runtime or package caller found.
 
-5. backend/providers/football/bzzoiroNormalizer.js â€” MANUAL_USE
+5. backend/providers/football/bzzoiroNormalizer.js — MANUAL_USE
    Evidence: Referenced by backend/providers/football/bsdNormalizer.js, backend/providers/football/bzzoiroProvider.js, and provider documentation. No active runtime or package caller found.
 
-6. backend/providers/football/bzzoiroProvider.js â€” MANUAL_USE
+6. backend/providers/football/bzzoiroProvider.js — MANUAL_USE
    Evidence: Referenced by scripts/sync-bsd-enrichment.js, scripts/verify-bsd-enrichment.js, and provider documentation. No active runtime or package caller found.
 
-7. backend/providers/football/soccerDataApiNormalizer.js â€” MANUAL_USE
+7. backend/providers/football/soccerDataApiNormalizer.js — MANUAL_USE
    Evidence: Referenced by backend/providers/football/soccerDataApiProvider.js, SoccerData audit scripts, and provider documentation. No active runtime or package caller found.
 
-8. backend/providers/football/soccerDataApiProvider.js â€” MANUAL_USE
+8. backend/providers/football/soccerDataApiProvider.js — MANUAL_USE
    Evidence: Referenced by scripts/verify-soccerdata-provider.js and provider documentation. No active runtime or package caller found.
 
-9. backend/providers/football/sportsApiProFootballAdapter.js â€” MANUAL_USE
+9. backend/providers/football/sportsApiProFootballAdapter.js — MANUAL_USE
    Evidence: Referenced by scripts/test-sportsapi-pro-football-adapter.js. No active runtime or package caller found.
 
-10. backend/providers/football/sportsApiProFootballNormalizer.js â€” MANUAL_USE
+10. backend/providers/football/sportsApiProFootballNormalizer.js — MANUAL_USE
     Evidence: Referenced by backend/providers/football/sportsApiProFootballAdapter.js. No active runtime or package caller found.
 
 Validation boundary:
@@ -2251,12 +2251,12 @@ Validation boundary:
 - No active-use outcome authorizes deletion.
 - B06 batch state not advanced in this patch.
 
-## PHASE 3 â€” B07 ACTIVE USE IDENTIFICATION EVIDENCE
+## PHASE 3 — B07 ACTIVE USE IDENTIFICATION EVIDENCE
 
 Result: PASS
 
 Scope:
-- Phase: PHASE_3 â€” Active Use Identification
+- Phase: PHASE_3 — Active Use Identification
 - Batch: B07 / BACKEND_SRC_SERVICES
 - Question: Is each B07 governed file currently used?
 - Deletion/merge/retirement/refactor performed: NO
@@ -2271,31 +2271,31 @@ Outcome summary:
 - UNKNOWN: 0
 
 B07 outcomes:
-1. backend/src/services/contextIntelligence/adjustProbability.js â€” ACTIVE
+1. backend/src/services/contextIntelligence/adjustProbability.js — ACTIVE
    Evidence: Imported by backend/services/aiPipeline.js and used by the active prediction pipeline to adjust baseline probabilities and apply market-level context adjustments.
 
-2. backend/src/services/contextIntelligence/aiPipeline_core.js â€” ACTIVE
+2. backend/src/services/contextIntelligence/aiPipeline_core.js — ACTIVE
    Evidence: Imported by backend/src/services/contextIntelligence/aiPipeline.js and used as the core enrichment pipeline for weather, availability, discipline, stability, and extended context signals.
 
-3. backend/src/services/contextIntelligence/aiPipeline.js â€” ACTIVE
+3. backend/src/services/contextIntelligence/aiPipeline.js — ACTIVE
    Evidence: Imported by backend/services/aiPipeline.js; runtime map records it as consumed by backend/services/aiPipeline.js and using fixture_context_cache.
 
-4. backend/src/services/contextIntelligence/availabilitySignal.js â€” ACTIVE
+4. backend/src/services/contextIntelligence/availabilitySignal.js — ACTIVE
    Evidence: Imported by backend/src/services/contextIntelligence/aiPipeline_core.js and used in the active context enrichment path to compute availability_risk.
 
-5. backend/src/services/contextIntelligence/cacheService.js â€” NO_CURRENT_USE_FOUND
+5. backend/src/services/contextIntelligence/cacheService.js — NO_CURRENT_USE_FOUND
    Evidence: Exports context_intelligence_cache helper functions, but no current runtime, package script, or active service caller was found for the exported helper names.
 
-6. backend/src/services/contextIntelligence/disciplineSignal.js â€” ACTIVE
+6. backend/src/services/contextIntelligence/disciplineSignal.js — ACTIVE
    Evidence: Imported by backend/src/services/contextIntelligence/aiPipeline_core.js and used in the active context enrichment path to compute discipline_risk.
 
-7. backend/src/services/contextIntelligence/stabilitySignal.js â€” ACTIVE
+7. backend/src/services/contextIntelligence/stabilitySignal.js — ACTIVE
    Evidence: Imported by backend/src/services/contextIntelligence/aiPipeline_core.js and used in the active context enrichment path to compute stability_risk.
 
-8. backend/src/services/contextIntelligence/weatherSignal.js â€” ACTIVE
+8. backend/src/services/contextIntelligence/weatherSignal.js — ACTIVE
    Evidence: Imported by backend/src/services/contextIntelligence/aiPipeline_core.js; runtime map records it as consumed by that core pipeline and tied to api.weatherapi.com.
 
-9. backend/src/services/marketRouter/waterfall.js â€” NO_CURRENT_USE_FOUND
+9. backend/src/services/marketRouter/waterfall.js — NO_CURRENT_USE_FOUND
    Evidence: Exports resolveDecision for market waterfall selection, but no current runtime, package script, or active service caller was found for resolveDecision or the marketRouter waterfall module.
 
 Validation boundary:
@@ -2303,12 +2303,12 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B07 batch state not advanced in this patch.
-## PHASE 3 â€” B08 ACTIVE USE IDENTIFICATION EVIDENCE
+## PHASE 3 — B08 ACTIVE USE IDENTIFICATION EVIDENCE
 
 Result: PASS
 
 Scope:
-- Phase: PHASE_3 â€” Active Use Identification
+- Phase: PHASE_3 — Active Use Identification
 - Batch: B08 / BACKEND_ADAPTERS_AND_CONFIG
 - Question: Is each B08 governed file currently used?
 - Deletion/merge/retirement/refactor performed: NO
@@ -2323,43 +2323,43 @@ Outcome summary:
 - UNKNOWN: 0
 
 B08 outcomes:
-1. backend/adapters/f1Adapter.js â€” NO_CURRENT_USE_FOUND
+1. backend/adapters/f1Adapter.js — NO_CURRENT_USE_FOUND
    Evidence: File exports a disabled F1 adapter that throws "F1 adapter is disabled in this deployment"; repository search found no current caller beyond governance/manifest references.
 
-2. backend/adapters/footballAdapter.js â€” ACTIVE
+2. backend/adapters/footballAdapter.js — ACTIVE
    Evidence: Imported by backend/adapters/index.js. The Supabase scheduledFixtureSync function imports loadAdapter from backend/adapters/index.js and dynamically loads configured adapters for enabled sport sync records.
 
-3. backend/adapters/index.js â€” ACTIVE
+3. backend/adapters/index.js — ACTIVE
    Evidence: Imported by supabase/edge-functions/scheduledFixtureSync/index.ts and used to load configured sport adapters before fixture fetch.
 
-4. backend/adapters/tennisAdapter.js â€” ACTIVE
+4. backend/adapters/tennisAdapter.js — ACTIVE
    Evidence: Imported by backend/adapters/index.js, which is consumed by scheduledFixtureSync for configured adapter loading.
 
-5. backend/config/activeSports.js â€” ACTIVE
+5. backend/config/activeSports.js — ACTIVE
    Evidence: Imported by active backend scheduler, sync service, AI pipeline, ACCA builder, and EdgeMind controller paths to resolve enabled deployment sports.
 
-6. backend/config/apiEndpoints.js â€” MANUAL_USE
+6. backend/config/apiEndpoints.js — MANUAL_USE
    Evidence: Imported by backend/utils/apiUsageLimiter.js for API-Sports daily hard-cap constants; current evidence points to utility/script usage rather than a proven active server/runtime path.
 
-7. backend/config/bigBallsLeagueMap.js â€” ACTIVE
+7. backend/config/bigBallsLeagueMap.js — ACTIVE
    Evidence: Imported by backend/services/bigBallsFootballBridge.js, which is imported by backend/services/dataProvider.js in the active data-provider path.
 
-8. backend/config/footballRules.js â€” ACTIVE
+8. backend/config/footballRules.js — ACTIVE
    Evidence: Imported by backend/services/accaBuilder.js for active ACCA/football rule thresholds and constraints.
 
-9. backend/config/predictionOutcomes.js â€” ACTIVE
+9. backend/config/predictionOutcomes.js — ACTIVE
    Evidence: Imported by backend/services/marketScoringEngine.js and used by scoreMarkets() to resolve the sport market/outcome universe.
 
-10. backend/config/soccerDataLeagueMap.js â€” MANUAL_USE
+10. backend/config/soccerDataLeagueMap.js — MANUAL_USE
     Evidence: Referenced by backend/providers/football/soccerDataApiProvider.js and SoccerData audit/discovery tooling; no active runtime caller was proven for the SoccerData provider path in this phase.
 
-11. backend/config/sportRules.js â€” MANUAL_USE
+11. backend/config/sportRules.js — MANUAL_USE
     Evidence: Imported by scripts/run-stage2-context.js for staged context math, and that stage is invoked by scripts/run-master-pipeline.js; no active server/package runtime caller was proven.
 
-12. backend/config/subscriptionMatrix.js â€” ACTIVE
+12. backend/config/subscriptionMatrix.js — ACTIVE
     Evidence: Imported by backend/server-express.js, backend/routes/predictions.js, and backend/controllers/edgeMindController.js for plan capabilities, prediction filtering, daily allocations, and subscription access shaping.
 
-13. backend/config/subscriptionPlans.js â€” ACTIVE
+13. backend/config/subscriptionPlans.js — ACTIVE
     Evidence: Imported by backend/routes/user.js, backend/routes/predictions.js, backend/server-express.js, subscriptionMatrix.js, and EdgeMind controller paths for plan normalization and tier-key resolution.
 
 Validation boundary:
@@ -2367,12 +2367,12 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B08 batch state not advanced in this patch.
-## PHASE 3 â€” B09 ACTIVE USE IDENTIFICATION EVIDENCE
+## PHASE 3 — B09 ACTIVE USE IDENTIFICATION EVIDENCE
 
 Result: PASS
 
 Scope:
-- Phase: PHASE_3 â€” Active Use Identification
+- Phase: PHASE_3 — Active Use Identification
 - Batch: B09 / BACKEND_SERVICES
 - Question: Is each B09 governed file currently used?
 - Deletion/merge/retirement/refactor performed: NO
@@ -2495,12 +2495,12 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B09 batch state not advanced in this patch.
-## PHASE 3 â€” B10 ACTIVE USE IDENTIFICATION EVIDENCE
+## PHASE 3 — B10 ACTIVE USE IDENTIFICATION EVIDENCE
 
 Result: PASS
 
 Scope:
-- Phase: PHASE_3 â€” Active Use Identification
+- Phase: PHASE_3 — Active Use Identification
 - Batch: B10 / SCRIPTS_AUDIT_GOV
 - Question: Is each B10 governed file currently used?
 - Deletion/merge/retirement/refactor performed: NO
@@ -2555,12 +2555,12 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B10 batch state not advanced in this patch.
-## PHASE 3 â€” B11 ACTIVE USE IDENTIFICATION EVIDENCE
+## PHASE 3 — B11 ACTIVE USE IDENTIFICATION EVIDENCE
 
 Result: PASS
 
 Scope:
-- Phase: PHASE_3 â€” Active Use Identification
+- Phase: PHASE_3 — Active Use Identification
 - Batch: B11 / SCRIPTS_CHECK_VALIDATE_VERIFY
 - Question: Is each B11 governed file currently used?
 - Deletion/merge/retirement/refactor performed: NO
@@ -2647,12 +2647,12 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B11 batch state not advanced in this patch.
-## PHASE 3 â€” B12 ACTIVE USE IDENTIFICATION EVIDENCE
+## PHASE 3 — B12 ACTIVE USE IDENTIFICATION EVIDENCE
 
 Result: PASS
 
 Scope:
-- Phase: PHASE_3 â€” Active Use Identification
+- Phase: PHASE_3 — Active Use Identification
 - Batch: B12 / SCRIPTS_TEST_DIAG_TRACE
 - Question: Is each B12 governed file currently used?
 - Deletion/merge/retirement/refactor performed: NO
@@ -2976,13 +2976,12 @@ Validation boundary:
 
 ## PHASE 3 - B16 ACTIVE USE IDENTIFICATION EVIDENCE
 
-Result: PASS WITH EVIDENCE TEXT REPAIR
+Result: PASS
 
 Scope:
 - Phase: PHASE_3 - Active Use Identification
 - Batch: B16 / DOCS_ROOT_MD_TXT
 - Question: Is each B16 governed file currently used?
-- Repair type: Evidence text repair only
 - Deletion/merge/retirement/refactor performed: NO
 - Phase 1 reopened: NO
 - Phase 2 reopened: NO
@@ -3040,6 +3039,14 @@ Evidence:
 - render.yaml starts the web service with node backend/server-express.js.
 - render.yaml uses scripts/requirements.txt for the sports-fixture-population Python cron, not root requirements.txt.
 - Root requirements.txt and runtime.txt exist as repository-level Python environment documents, but no active deployment, runtime, package-script, or process-manager caller was proven for them in this phase.
-- PRIVACYdvanced in this patch.
-- GitHub vulnerability notice remains future dependency/security work and was not touched.
+- PRIVACY_POLICY.md and TERMS_OF_SERVICE.md are root policy documents; public delivery uses separate public HTML surfaces, so the root markdown documents are manual/reference assets in this phase.
+- AGENTS.md, GEMINI.md, DEEPSEEK_STATE.md, DEEPSEEK_SESSION_SKCSTEST.txt, SMB_WINDSURF_FINAL_IMPLEMENTATION.md, and SMB_WINDSURF_IMPLEMENTATION_PROMPT.md are operator/AI-assistant guidance or session/reference documents, not proven runtime assets.
+- Remaining B16 references found by tracked scan are governance, report, documentation, audit, repository-index, or operator references.
+- No deletion, merge, retirement, dependency/security, vulnerability, source/runtime/product change is authorized by this evidence.
 
+Validation boundary:
+- Evidence text and UTF-8 preservation repair only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B16 batch state not advanced in this patch.
+- GitHub vulnerability notice remains future dependency/security work and was not touched.
