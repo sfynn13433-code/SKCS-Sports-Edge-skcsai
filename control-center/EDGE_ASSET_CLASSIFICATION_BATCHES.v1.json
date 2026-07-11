@@ -672,7 +672,7 @@
           "py_verify_thesportsdb_coverage.py"
         ]
       },
-      "asset_count": 35,
+      "asset_count": 31,
       "asset_paths": [
         "scripts/backfill-direct1x2-final-fields.js",
         "scripts/backfill-fixture-ids.js",

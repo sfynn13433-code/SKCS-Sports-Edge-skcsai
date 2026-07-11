@@ -18930,12 +18930,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: backfill-direct1x2-final-fields.js is a SCRIPT_TOOL script for backfilling governed database fields.",
-      "functional_group": "SCRIPT_TOOL",
+      "purpose_description": "Reviewed classification: backfill-direct1x2-final-fields.js repairs fields in direct1x2_prediction_final and links final predictions to publish runs; primary purpose is generated prediction-output data repair.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
+        "GENERATED",
+        "DATABASE",
+        "SQL",
+        "PREDICTION",
         "SCRIPT_TOOL",
-        "RUNTIME",
-        "SQL"
+        "RUNTIME"
       ],
       "classification_evidence": [
         "Fast skim: backfill-direct1x2-final-fields.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
@@ -18964,12 +18967,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: backfill-fixture-ids.js is a SCRIPT_TOOL script for backfilling governed database fields.",
-      "functional_group": "SCRIPT_TOOL",
+      "purpose_description": "Reviewed classification: backfill-fixture-ids.js repairs fixture identifiers and team/date fields in direct1x2_prediction_final by matching final predictions to events; primary purpose is generated prediction-output data repair.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
+        "GENERATED",
+        "DATABASE",
+        "SQL",
+        "PREDICTION",
         "SCRIPT_TOOL",
-        "RUNTIME",
-        "SQL"
+        "RUNTIME"
       ],
       "classification_evidence": [
         "Fast skim: backfill-fixture-ids.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
@@ -19107,12 +19113,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: backfill-provider-event-id.js is a SCRIPT_TOOL script for backfilling governed database fields.",
-      "functional_group": "SCRIPT_TOOL",
+      "purpose_description": "Reviewed classification: backfill-provider-event-id.js derives provider_event_id values for canonical_events from raw provider payloads; primary purpose is provider/canonical event integration repair.",
+      "functional_group": "PROVIDER_INTEGRATION",
       "relationship_tags": [
+        "PROVIDER",
+        "DATABASE",
+        "SQL",
         "SCRIPT_TOOL",
-        "RUNTIME",
-        "SQL"
+        "RUNTIME"
       ],
       "classification_evidence": [
         "Fast skim: backfill-provider-event-id.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
@@ -20717,9 +20725,11 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: compose-context-pack.js is a SCRIPT_TOOL script for building context packs.",
-      "functional_group": "SCRIPT_TOOL",
+      "purpose_description": "Reviewed classification: compose-context-pack.js merges public data inputs into a dated public/data context-pack JSON artifact; primary purpose is generated output assembly.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
+        "GENERATED",
+        "DATA",
         "SCRIPT_TOOL",
         "RUNTIME"
       ],
@@ -20818,12 +20828,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: cricapi-cache-refresh.js is a SCRIPT_TOOL script for fetching/syncing external fixtures/events.",
-      "functional_group": "SCRIPT_TOOL",
+      "purpose_description": "Reviewed classification: cricapi-cache-refresh.js calls CricAPI cache services to refresh daily and live cricket provider data; primary purpose is provider integration maintenance.",
+      "functional_group": "PROVIDER_INTEGRATION",
       "relationship_tags": [
+        "PROVIDER",
+        "API",
+        "CACHE",
         "SCRIPT_TOOL",
-        "RUNTIME",
-        "PROVIDER"
+        "RUNTIME"
       ],
       "classification_evidence": [
         "Fast skim: cricapi-cache-refresh.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
@@ -21866,13 +21878,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: force-enrich-match.js is a SCRIPT_TOOL script for controlled inventory processing.",
-      "functional_group": "SCRIPT_TOOL",
+      "purpose_description": "Reviewed classification: force-enrich-match.js forces match context enrichment and EdgeMind insight generation for a selected event; primary purpose is AI/EdgeMind enrichment and prediction generation.",
+      "functional_group": "AI_EDGEMIND",
       "relationship_tags": [
+        "AI_EDGEMIND",
+        "PREDICTION",
+        "DATABASE",
+        "PROVIDER",
         "SCRIPT_TOOL",
-        "RUNTIME",
-        "SQL",
-        "PROVIDER"
+        "RUNTIME"
       ],
       "classification_evidence": [
         "Fast skim: force-enrich-match.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",
@@ -22760,13 +22774,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database write effects for batch-level relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: rebuild-canonical-from-api-sports.js is a SCRIPT_TOOL script for rebuilding canonical fixture/event tables.",
-      "functional_group": "SCRIPT_TOOL",
+      "purpose_description": "Reviewed classification: rebuild-canonical-from-api-sports.js replays API-Sports football fixtures through the canonical ingest firewall and writes canonical events; primary purpose is provider integration and canonical event rebuild.",
+      "functional_group": "PROVIDER_INTEGRATION",
       "relationship_tags": [
-        "SCRIPT_TOOL",
-        "RUNTIME",
+        "PROVIDER",
+        "API",
         "DATABASE",
-        "PROVIDER"
+        "CANONICAL_EVENTS",
+        "SCRIPT_TOOL",
+        "RUNTIME"
       ],
       "classification_evidence": [
         "Fast skim: rebuild-canonical-from-api-sports.js filename indicates controlled backfill/ingest/enrich/bridge/publish processing.",

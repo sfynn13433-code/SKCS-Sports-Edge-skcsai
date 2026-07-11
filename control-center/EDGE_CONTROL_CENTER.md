@@ -1143,3 +1143,24 @@ Phase 2 purpose classification evidence: B13
 - register_modified: NO
 - evidence: Local PowerShell read-only B13 manifest/register/source inspection confirmed all 20 B13 assets exist, all 20 are present in the register, and focused review of _trigger-sync.js, run-master-pipeline.js, run-test.js, and trigger-publication.js confirmed their current purpose classifications are acceptable. Scope stayed limited to B13 purpose classification.
 
+
+Phase 2 purpose classification evidence: B14
+
+- batch_id: B14
+- title: SCRIPTS_INGEST_ENRICH_SYNC_IMPORT
+- asset_count: 31
+- register_coverage: 31/31
+- result: PASS WITH CORRECTION
+- batch_manifest_modified: YES
+  - asset_count corrected from 35 to 31 because B14 contained 31 listed asset_paths, all 31 source files exist, all 31 are present in the register, and no missing B14-like tracked scripts were found.
+- register_modified: YES
+- corrections:
+  - scripts/backfill-direct1x2-final-fields.js functional_group changed from SCRIPT_TOOL to GENERATED_OUTPUT.
+  - scripts/backfill-fixture-ids.js functional_group changed from SCRIPT_TOOL to GENERATED_OUTPUT.
+  - scripts/backfill-provider-event-id.js functional_group changed from SCRIPT_TOOL to PROVIDER_INTEGRATION.
+  - scripts/compose-context-pack.js functional_group changed from SCRIPT_TOOL to GENERATED_OUTPUT.
+  - scripts/cricapi-cache-refresh.js functional_group changed from SCRIPT_TOOL to PROVIDER_INTEGRATION.
+  - scripts/force-enrich-match.js functional_group changed from SCRIPT_TOOL to AI_EDGEMIND.
+  - scripts/rebuild-canonical-from-api-sports.js functional_group changed from SCRIPT_TOOL to PROVIDER_INTEGRATION.
+- evidence: Local PowerShell B14 manifest/register/source inspection confirmed B14 membership, repaired stale B14 asset_count metadata, and corrected seven proven purpose mismatches based on focused source review. Scope stayed limited to B14 purpose classification.
+
