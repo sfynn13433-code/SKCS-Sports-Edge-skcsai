@@ -1377,3 +1377,34 @@ Validation:
 - No proven B24 purpose classification mismatches found.
 - No register, map, source, manifest, merge, deletion, repair, or refactor was performed.
 - Scope limited to B24 purpose classification review.
+
+
+## PHASE 2 - B25 PURPOSE CLASSIFICATION REVIEW - CLOSED
+
+Result: PASS WITH CORRECTION
+
+Scope:
+- Batch: B25 / SCRATCH
+- Manifest declared asset_count: 2
+- Actual asset paths reviewed: 2
+- Register coverage found: 2/2
+
+Correction:
+- scratch/db_normalize.js functional_group changed from DATABASE_MIGRATION to DATABASE.
+- scratch/db_normalize.js relationship_tags changed from ["DATABASE","MIGRATION","SQL","SCRIPT_TOOL"] to ["DATABASE","SQL","SCRIPT_TOOL"].
+
+Reason:
+- Source inspection confirmed scratch/db_normalize.js runs UPDATE statements to normalize sport labels in existing predictions_raw, leagues, and optional match_context_data rows.
+- It does not create, alter, drop, index, trigger, function, or policy schema objects.
+- Therefore it is database data-maintenance/normalization work, not a database migration.
+- scratch/db_sync.js remains DATABASE because it only runs SELECT DISTINCT diagnostics against predictions_raw and leagues.
+
+Changed files:
+- control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json
+- control-center/EDGE_ASSET_REPOSITORY_MAP.md
+- control-center/EDGE_CONTROL_CENTER.md
+
+Validation:
+- B25 post-correction group counts: DATABASE 2.
+- No source, manifest, merge, deletion, retirement, or refactor was performed.
+- Scope limited to B25 purpose classification correction.

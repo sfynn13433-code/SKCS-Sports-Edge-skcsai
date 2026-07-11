@@ -17590,16 +17590,16 @@
       "next_validation": "Confirm required database tables/columns exist (`predictions_raw`, `leagues`, and optional `match_context_data`) and validate the sport remap affects only intended rows; inspect runtime/DB wiring via `query()`.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
       "purpose_description": "Normalize sport labels in existing raw prediction and league records so downstream identifiers align (e.g., `nba` -> `basketball`, `american_football` -> `nfl`, `soccer_*` -> `football`).",
-      "functional_group": "DATABASE_MIGRATION",
+      "functional_group": "DATABASE",
       "relationship_tags": [
         "DATABASE",
-        "MIGRATION",
         "SQL",
         "SCRIPT_TOOL"
       ],
       "classification_evidence": [
         "Contains SQL `UPDATE` statements against `predictions_raw` to remap `sport` values (nba/american_football/soccer_% -> canonical sports).",
-        "Also updates `leagues`, and attempts an optional `match_context_data` update; uses `query` from `../backend/database` in a standalone `normalizeDb()` script."
+        "Also updates `leagues`, and attempts an optional `match_context_data` update; uses `query` from `../backend/database` in a standalone `normalizeDb()` script.",
+        "Phase 2 B25 correction: source runs data-normalization UPDATE statements against existing predictions_raw, leagues, and optional match_context_data rows; it does not create, alter, drop, index, trigger, function, or policy schema objects, so functional_group is DATABASE rather than DATABASE_MIGRATION."
       ]
     },
     {
