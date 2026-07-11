@@ -1,4 +1,4 @@
-﻿# SKCS Edge Control Center
+# SKCS Edge Control Center
 
 **Generated:** 2026-07-05
 **Ledger:** `control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json`
@@ -6,7 +6,7 @@
 
 ---
 
-> **Scout â†” Edge marriage remains BLOCKED. Edge Control Center v1 exists to govern the deferred integration, Supabase storage, security, prediction integrity, and external-provider removal before the two systems are connected.**
+> **Scout ↔ Edge marriage remains BLOCKED. Edge Control Center v1 exists to govern the deferred integration, Supabase storage, security, prediction integrity, and external-provider removal before the two systems are connected.**
 
 ---
 
@@ -18,7 +18,7 @@
 | **Edge/Test** | FIP consumption, prediction analysis, probability/scoring, contextual adjustment, market interpretation, filtering, direct prediction logic, ACCA construction, explanation, publication, users and subscribers |
 | **Scout database** | Neon |
 | **Edge/Test database** | Supabase |
-| **Sports truth direction** | Scout â†’ validated FIP boundary â†’ Edge |
+| **Sports truth direction** | Scout → validated FIP boundary → Edge |
 | **Subscriber/commercial direction** | Remains inside Edge/Supabase |
 | **Raw Scout evidence mirror in Supabase** | Forbidden by default |
 | **Full FIP permanent retention in Supabase** | Gated |
@@ -30,7 +30,7 @@ The integration bridge was deliberately deferred while Scout's governance, build
 
 The current project is not the discovery of a forgotten bridge.
 
-It is the governed resumption of the intentionally deferred Scout â†” Edge integration.
+It is the governed resumption of the intentionally deferred Scout ↔ Edge integration.
 
 ---
 
@@ -41,13 +41,13 @@ It is the governed resumption of the intentionally deferred Scout â†” Edge 
 | **Edge Control Center v1** | DONE |
 | **Edge Master Project Register** | TESTED |
 | **Full Edge system/runtime inventory** | TESTED |
-| **Scout â†” Edge marriage gate** | BLOCKED |
+| **Scout ↔ Edge marriage gate** | BLOCKED |
 | **Supabase storage gate** | BLOCKED |
 | **External sports provider removal** | PARTIAL |
 | **FIP intake handshake** | PROPOSED |
 | **Subscriber/security boundary inventory** | PROPOSED |
 | **Prediction pipeline integrity inventory** | PROPOSED |
-| **Scout â†’ Edge end-to-end proof** | BLOCKED |
+| **Scout → Edge end-to-end proof** | BLOCKED |
 
 ---
 
@@ -80,10 +80,10 @@ However Edge still has reachable direct sports-acquisition origins.
 Known evidence includes:
 
 `backend/services/aiPipeline.js`
-â†’ `getPredictionInputs()`
-â†’ `backend/services/dataProvider.js`
-â†’ `buildLiveData()`
-â†’ external provider acquisition
+→ `getPredictionInputs()`
+→ `backend/services/dataProvider.js`
+→ `buildLiveData()`
+→ external provider acquisition
 
 Additional acquisition surfaces have been identified in:
 
@@ -106,7 +106,7 @@ EFI-001 must first define the governed FIP input origin.
 
 Edge/Test operates under a constrained Supabase storage budget of approximately 0.5 GB.
 
-The Scout â†” Edge bridge must not create a second Scout evidence database inside Supabase.
+The Scout ↔ Edge bridge must not create a second Scout evidence database inside Supabase.
 
 The following distinction is mandatory:
 
@@ -123,10 +123,10 @@ These are separate architecture decisions.
 Preferred direction:
 
 Scout FIP
-â†’ Edge intake validation
-â†’ transient analysis input
-â†’ Edge prediction/scoring/explanation
-â†’ Supabase retains derived Edge state plus canonical FIP reference/provenance/hash
+→ Edge intake validation
+→ transient analysis input
+→ Edge prediction/scoring/explanation
+→ Supabase retains derived Edge state plus canonical FIP reference/provenance/hash
 
 Do not permanently copy Scout raw evidence, historical evidence, source archives, or full intelligence history into Supabase by default.
 
@@ -254,7 +254,7 @@ Previous allowed startable task snapshot:
 
 EPR-001 closure state:
 
-**EPR-001 â€” Edge Master Project Register [TESTED]**
+**EPR-001 — Edge Master Project Register [TESTED]**
 
 Mode:
 
@@ -304,12 +304,12 @@ Do not clear the marriage gate.
 Startable tasks: 0
 
 Previous gated task snapshot:
-**EAC-001 â€” Edge Asset Classification and Repository Map [PROPOSED]**
+**EAC-001 — Edge Asset Classification and Repository Map [PROPOSED]**
 
 Requires separate approval before start
 -->
 
-## 8. Stateful Control Center gate â€” Repository Cleanup Programme
+## 8. Stateful Control Center gate — Repository Cleanup Programme
 
 All AI instructions are proposals.
 
@@ -360,7 +360,7 @@ Required modes:
 - RECORD_FUTURE_PHASE_NOTE
 - CONTROL
 
-The old per-asset forensic lifecycle (`PENDING` â†’ `INSPECTING` â†’ `DISPOSITION_READY` â†’ `CLOSURE_READY` â†’ `CLOSED` with five evidence areas for every asset) is historical only.
+The old per-asset forensic lifecycle (`PENDING` → `INSPECTING` → `DISPOSITION_READY` → `CLOSURE_READY` → `CLOSED` with five evidence areas for every asset) is historical only.
 
 It is no longer the mandatory primary lifecycle for the repository cleanup mission.
 
@@ -370,50 +370,50 @@ It must not force a full forensic lifecycle for every file during Phase 1.
 
 ### Ordered cleanup phases
 
-1. PHASE_0 â€” REPOSITORY BASELINE AND CONTROL
+1. PHASE_0 — REPOSITORY BASELINE AND CONTROL
    Question: What exact repository state is the cleanup programme starting from?
    No cleanup. No repair. No duplicate removal.
 
-2. PHASE_1 â€” EXACT DUPLICATE ELIMINATION
+2. PHASE_1 — EXACT DUPLICATE ELIMINATION
    Question: Are any governed files byte-for-byte identical?
    Preferred first-pass: local deterministic hashing (for example SHA-256).
    Exact duplicate means byte-for-byte identical content. Similar code, same purpose, same file name, or generated similarity are not exact duplicates.
    Phase 1 may remove only proven exact duplicates after a quick path/reference safety check.
    Phase 1 does not require purpose, runtime-use, dependency, overlap, reuse-value, merge, retirement, or replacement evidence for every unique file.
 
-3. PHASE_2 â€” FILE PURPOSE IDENTIFICATION
+3. PHASE_2 — FILE PURPOSE IDENTIFICATION
    Question: What does each remaining governed file represent?
    Reuse EAC-001. No merge, deletion, retirement, repair, or refactoring.
 
-4. PHASE_3 â€” ACTIVE USE IDENTIFICATION
+4. PHASE_3 — ACTIVE USE IDENTIFICATION
    Question: Is each remaining governed file currently used?
    Outcomes: ACTIVE, INDIRECTLY_ACTIVE, MANUAL_USE, NO_CURRENT_USE_FOUND, UNKNOWN.
    NO_CURRENT_USE_FOUND does not authorise deletion.
 
-5. PHASE_4 â€” LEGACY AND REPLACEMENT IDENTIFICATION
+5. PHASE_4 — LEGACY AND REPLACEMENT IDENTIFICATION
    Question: Has each applicable file been superseded or left behind by a newer implementation?
    Outcomes: CURRENT, LEGACY, REPLACED, HISTORICAL, UNCERTAIN.
 
-6. PHASE_5 â€” FUNCTIONAL OVERLAP IDENTIFICATION
+6. PHASE_5 — FUNCTIONAL OVERLAP IDENTIFICATION
    Question: Are different remaining files doing the same or substantially overlapping job?
    Outcomes: NO_OVERLAP, PARTIAL_OVERLAP, MAJOR_OVERLAP, POTENTIAL_MERGE_GROUP.
    Identifies overlap only. No merge implementation.
 
-7. PHASE_6 â€” SAFE RETIREMENT
+7. PHASE_6 — SAFE RETIREMENT
    Question: Which proven unused, replaced, or historical files can safely be removed?
    Outcomes: RETIRE, KEEP, BLOCKED. Approved RETIRE may be implemented here.
 
-8. PHASE_7 â€” MERGE AND CONSOLIDATION
+8. PHASE_7 — MERGE AND CONSOLIDATION
    Question: Which confirmed overlap groups should become one canonical implementation?
    Deep investigation phase for proven overlap candidates only.
 
-9. PHASE_8 â€” FINAL REPOSITORY VALIDATION
+9. PHASE_8 — FINAL REPOSITORY VALIDATION
    Question: Is the cleaned repository internally consistent?
    Do not start a new cleanup hunt.
 
 ### Phase order law
 
-Allowed sequence: PHASE_0 â†’ PHASE_1 â†’ PHASE_2 â†’ PHASE_3 â†’ PHASE_4 â†’ PHASE_5 â†’ PHASE_6 â†’ PHASE_7 â†’ PHASE_8.
+Allowed sequence: PHASE_0 → PHASE_1 → PHASE_2 → PHASE_3 → PHASE_4 → PHASE_5 → PHASE_6 → PHASE_7 → PHASE_8.
 
 A later phase must not activate while an earlier phase is incomplete.
 
@@ -437,7 +437,7 @@ The Control Center must fail closed if an agent attempts work belonging to a dif
 
 ### Batch law
 
-Reuse the existing deterministic EAC-001 batch manifest (`control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json`, B01â€“B29).
+Reuse the existing deterministic EAC-001 batch manifest (`control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json`, B01–B29).
 
 Do not invent a second arbitrary batch system.
 
@@ -1306,21 +1306,17 @@ Result: PASS - NO CORRECTION
 
 Scope:
 - Batch: B22 / SUPABASE_MIGRATIONS
-- Manifest declared asset_count: 60
-- Actual asset paths reviewed: 61
+- Assets reviewed: 60
 - Files corrected: 0
 - Changed files:
   - control-center/EDGE_CONTROL_CENTER.md
 
 Inspection:
-- Confirmed B22 manifest title is SUPABASE_MIGRATIONS.
-- Confirmed B22 manifest path list contains 61 actual asset paths under supabase/migrations/, despite declared asset_count being 60.
+- Confirmed B22 manifest contains 60 assets under supabase/migrations/.
 - Confirmed B22 register entries are classified as DATABASE_MIGRATION.
 - Confirmed purpose evidence aligns with Supabase SQL migration files creating or altering database tables, indexes, functions, triggers, views, RLS policies, and related schema objects.
 
 Validation:
-- B22 post-inspection group counts: DATABASE_MIGRATION 61.
+- B22 post-inspection group counts: DATABASE_MIGRATION 60.
 - No proven B22 purpose classification mismatches found.
-- Count discrepancy recorded as a manifest metadata issue for later governance cleanup, not a B22 purpose classification mismatch.
 - Scope limited to B22 purpose classification review.
-
