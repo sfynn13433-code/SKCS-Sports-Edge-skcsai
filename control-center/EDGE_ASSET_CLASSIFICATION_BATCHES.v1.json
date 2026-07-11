@@ -1246,10 +1246,8 @@
           ".github/"
         ]
       },
-      "asset_count": 5,
+      "asset_count": 3,
       "asset_paths": [
-        ".github/workflows/daily-insights.yml",
-        ".github/workflows/lineups-insights.yml",
         "Dockerfile",
         "render.yaml",
         "vercel.json"

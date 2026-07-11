@@ -1408,3 +1408,42 @@ Validation:
 - B25 post-correction group counts: DATABASE 2.
 - No source, manifest, merge, deletion, retirement, or refactor was performed.
 - Scope limited to B25 purpose classification correction.
+
+## PHASE 2 - B26 PURPOSE CLASSIFICATION REVIEW - CLOSED
+
+Result: PASS WITH CORRECTION
+
+Scope:
+- Batch: B26 / DEPLOYMENT_CI
+- Manifest declared asset_count before correction: 5
+- Actual tracked/on-disk asset paths reviewed: 3
+- Register coverage found: 3/3
+- Map coverage found: 3/3
+
+Correction:
+- Removed stale B26 manifest asset_paths:
+  - .github/workflows/daily-insights.yml
+  - .github/workflows/lineups-insights.yml
+- Corrected B26 manifest asset_count from 5 to 3.
+
+Reason:
+- Local evidence confirmed both workflow files are not tracked by git.
+- Local evidence confirmed both workflow files are missing on disk.
+- Local evidence confirmed both workflow files are absent from EDGE_REPOSITORY_ASSET_REGISTER.v1.json.
+- Local evidence confirmed both workflow files are absent from EDGE_ASSET_REPOSITORY_MAP.md.
+- Therefore B26 manifest membership was stale; this was not missing purpose-classification work.
+
+Inspection:
+- Dockerfile remains DEPLOYMENT_OPERATIONS: container build recipe for backend Express server deployment.
+- render.yaml remains DEPLOYMENT_OPERATIONS: Render web service and cron/scheduler configuration.
+- vercel.json remains DEPLOYMENT_OPERATIONS: Vercel build, function, cron, header, and rewrite configuration.
+
+Changed files:
+- control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json
+- control-center/EDGE_CONTROL_CENTER.md
+
+Validation:
+- B26 post-correction manifest asset_count: 3.
+- B26 post-correction group counts: DEPLOYMENT_OPERATIONS 3.
+- No source, register, map, merge, deletion, retirement, or refactor was performed.
+- Scope limited to B26 manifest stale-entry correction and purpose classification closure.
