@@ -1130,3 +1130,16 @@ Phase 2 purpose classification evidence: B12
 - register_modified: NO
 - evidence: Local PowerShell read-only B12 manifest/register/source inspection confirmed all 66 B12 assets exist, all 66 are present in the register, all current functional_group values are TEST_PROOF, and focused review of the five heuristic candidates confirmed they are test/diagnostic proof scripts rather than production migrations, runtime services, or frontend assets. Scope stayed limited to B12 purpose classification.
 
+
+Phase 2 purpose classification evidence: B13
+
+- batch_id: B13
+- title: SCRIPTS_RUN_TRIGGER_SCHED
+- asset_count: 20
+- register_coverage: 20/20
+- result: PASS WITH NO CORRECTION
+- corrections: NONE
+- batch_manifest_modified: NO
+- register_modified: NO
+- evidence: Local PowerShell read-only B13 manifest/register/source inspection confirmed all 20 B13 assets exist, all 20 are present in the register, and focused review of _trigger-sync.js, run-master-pipeline.js, run-test.js, and trigger-publication.js confirmed their current purpose classifications are acceptable. Scope stayed limited to B13 purpose classification.
+
