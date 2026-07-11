@@ -1956,3 +1956,168 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B03 batch state not advanced in this patch.
+
+
+## PHASE 3 — B04 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 — Active Use Identification
+- Batch: B04 / BACKEND_UTILS_SEMANTIC_CORE_AND_TEST
+- Question: Is each B04 governed file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+
+Outcome summary:
+- ACTIVE: 37
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 6
+- NO_CURRENT_USE_FOUND: 3
+- UNKNOWN: 0
+
+B04 outcomes:
+1. backend/audit/system_integrity_audit.md — MANUAL_USE
+   Evidence: System integrity audit document retained as human/governance evidence. No runtime, package script, or tooling caller found.
+
+2. backend/core/executionPipeline.js — ACTIVE
+   Evidence: Referenced by active backend routes, server runtime, cron jobs, sync services, heartbeat service, and pipeline/direct builder services.
+
+3. backend/core/verificationController.js — ACTIVE
+   Evidence: Referenced by backend/server-express.js, active prediction route, semantic-layer controllers, AI/context/pipeline services, sync service, and TheSportsDB pipeline.
+
+4. backend/core/verificationSignalContract.js — ACTIVE
+   Evidence: Imported by backend/core/verificationController.js and used through the active verification controller path.
+
+5. backend/errors/ProviderQuotaExceededError.js — ACTIVE
+   Evidence: Imported by backend/apiClients.js and backend/services/dataProvider.js for active provider quota handling.
+
+6. backend/logic/edgeMind_manifest.json — NO_CURRENT_USE_FOUND
+   Evidence: Logic manifest file exists and documents EdgeMind scoring, but no runtime, package script, manual tooling, or documentation consumer was found beyond governance/report registration.
+
+7. backend/middleware/supabaseJwt.js — ACTIVE
+   Evidence: Imported by active auth-protected backend routes and backend/server-express.js.
+
+8. backend/parsers/base_sport_parser.py — NO_CURRENT_USE_FOUND
+   Evidence: Parser module exists, but no current runtime, package script, manual tooling, or documentation consumer was found beyond governance/report registration.
+
+9. backend/semantic-layer/controlPlaneEvaluator.js — ACTIVE
+   Evidence: Referenced by active execution pipeline, verification controller, semantic drift summary service, runtime maps, and audit tooling.
+
+10. backend/semantic-layer/decisionFingerprintService.js — ACTIVE
+    Evidence: Referenced by backend/core/executionPipeline.js and execution-spine audit tooling.
+
+11. backend/semantic-layer/enforcementGuard.js — ACTIVE
+    Evidence: Referenced by active backend/services/aiPipeline.js and semantic control-plane documentation/runtime maps.
+
+12. backend/semantic-layer/errorMemoryLayer.js — ACTIVE
+    Evidence: Referenced by backend/core/executionPipeline.js and execution-spine audit tooling.
+
+13. backend/semantic-layer/gatekeeperAdapter.js — ACTIVE
+    Evidence: Referenced by backend/core/executionPipeline.js and execution-spine audit tooling.
+
+14. backend/semantic-layer/governanceGatekeeper.js — ACTIVE
+    Evidence: Referenced by active cricket cron route, cron jobs service, gatekeeper adapter, runtime maps, and execution-spine audit tooling.
+
+15. backend/semantic-layer/normalizer.js — ACTIVE
+    Evidence: Referenced by enforcementGuard.js, provider normalizer paths, AI/sync service context, and boundary audit tooling.
+
+16. backend/semantic-layer/preflightSimulator.js — ACTIVE
+    Evidence: Referenced by backend/core/executionPipeline.js and execution-spine audit tooling.
+
+17. backend/semantic-layer/registry.js — ACTIVE
+    Evidence: Referenced by football provider normalizers, semantic normalizer, sportsdataio contract helpers, and provider mapping documentation.
+
+18. backend/semantic-layer/sportsdataioContractHelpers.js — MANUAL_USE
+    Evidence: Referenced by scripts/sync-ucl-context.js and provider mapping documentation. No active runtime caller found.
+
+19. backend/semantic-layer/verificationController.js — ACTIVE
+    Evidence: Referenced by backend/core/executionPipeline.js, runtime maps, and execution-spine audit tooling.
+
+20. backend/semantic-layer/violationLogger.js — ACTIVE
+    Evidence: Referenced by enforcementGuard.js and runtime/compliance maps.
+
+21. backend/test/smoke-test-insight-engine.js — MANUAL_USE
+    Evidence: Standalone smoke test file with Node execution instructions and imports from backend/utils/insightEngine.js. No active runtime caller found.
+
+22. backend/test/smoke-test-skcs-law.js — MANUAL_USE
+    Evidence: Standalone law-compliance smoke test file with Node execution instructions; referenced by smoke-test-insight-engine.js. No active runtime caller found.
+
+23. backend/utils/accaLogicEngine.js — ACTIVE
+    Evidence: Referenced by accaBuilder, acca math utilities, market scoring engine, smoke tests, patch scripts, and football-rules audit tooling.
+
+24. backend/utils/apiCache.js — ACTIVE
+    Evidence: Referenced by backend/utils/rapidApiWaterfall.js and cache/provider service paths.
+
+25. backend/utils/apiQueue.js — ACTIVE
+    Evidence: Referenced by active cron jobs, enhanced match details service, hybrid sports data service, and TheSportsDB pipeline.
+
+26. backend/utils/apiUsageLimiter.js — MANUAL_USE
+    Evidence: Referenced by scripts/import-today-snapshot-pipeline.js. No active runtime caller found.
+
+27. backend/utils/auth.js — ACTIVE
+    Evidence: Referenced by active backend routes, backend/server-express.js, runtime inventory, and control-center routes.
+
+28. backend/utils/availability.js — ACTIVE
+    Evidence: Referenced by active predictions route and live fixture fetch tooling.
+
+29. backend/utils/conflictResolver.js — ACTIVE
+    Evidence: Referenced by backend/services/accaBuilder.js and runtime maps.
+
+30. backend/utils/contextInsights.js — ACTIVE
+    Evidence: Referenced by active predictions and VIP routes.
+
+31. backend/utils/dateNormalization.js — ACTIVE
+    Evidence: Referenced by backend/server-express.js and active predictions route.
+
+32. backend/utils/db.js — ACTIVE
+    Evidence: Runtime re-export to backend/db.js; referenced by active backend routes, server runtime, providers, services, semantic-layer modules, scripts, and system runtime inventory.
+
+33. backend/utils/insightEngine.js — ACTIVE
+    Evidence: Referenced by active predictions route, accaBuilder service, patch scripts, and smoke tests.
+
+34. backend/utils/insightValidationMatrix.js — ACTIVE
+    Evidence: Referenced by active VIP route and accaBuilder service.
+
+35. backend/utils/jobLogger.js — ACTIVE
+    Evidence: Referenced by backend/server-express.js, scheduler/test logger scripts, runtime maps, and AGENTS.md.
+
+36. backend/utils/keyPool.js — ACTIVE
+    Evidence: Referenced by backend/apiClients.js, data provider services, rapidApiWaterfall.js, live fixture fetch tooling, and import snapshot tooling.
+
+37. backend/utils/marketConsistency.js — ACTIVE
+    Evidence: Referenced by active predictions route and accaBuilder service.
+
+38. backend/utils/pipelineLogger.js — ACTIVE
+    Evidence: Referenced by active debug/predictions routes, accaBuilder, aiPipeline, market intelligence, sync service, and insight engine paths.
+
+39. backend/utils/providerCircuitBreaker.js — ACTIVE
+    Evidence: Referenced by backend/apiClients.js, api cache service, live fixture fetch tooling, and runtime maps.
+
+40. backend/utils/purgeStaleData.js — MANUAL_USE
+    Evidence: One-off CLI utility with explicit usage `node backend/utils/purgeStaleData.js`; no active runtime caller found.
+
+41. backend/utils/rapidApiWaterfall.js — ACTIVE
+    Evidence: Referenced by backend/server-express.js, live fixture fetch tooling, cache test tooling, and runtime maps.
+
+42. backend/utils/secondaryMarketSelector.js — ACTIVE
+    Evidence: Referenced by backend/services/direct1x2Builder.js and football-rules audit tooling.
+
+43. backend/utils/sportsrcNormalizer.js — ACTIVE
+    Evidence: Referenced by backend/services/dataProvider.js.
+
+44. backend/utils/validation.js — ACTIVE
+    Evidence: Referenced by accaBuilder, aiPipeline, filterEngine, and runtime inventory.
+
+45. backend/utils/weather.js — ACTIVE
+    Evidence: Referenced by active predictions route and live fixture fetch tooling.
+
+46. backend/workers/now_api_pulse.py — NO_CURRENT_USE_FOUND
+    Evidence: Background worker module exists, but no current runtime, package script, manual tooling, or documentation consumer was found beyond governance/report registration.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B04 batch state not advanced in this patch.
