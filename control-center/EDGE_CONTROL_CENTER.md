@@ -2647,3 +2647,104 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B11 batch state not advanced in this patch.
+## PHASE 3 — B12 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 — Active Use Identification
+- Batch: B12 / SCRIPTS_TEST_DIAG_TRACE
+- Question: Is each B12 governed file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+
+Outcome summary:
+- ACTIVE: 0
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 66
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B12 MANUAL_USE assets:
+- scripts/browser_console_test.js
+- scripts/debug-cricket-ai-predictions.js
+- scripts/debug-cricket-insights-schema.js
+- scripts/debug-cricket-simple.js
+- scripts/debug-key.js
+- scripts/debug-matches-content.js
+- scripts/debug-matches-json.js
+- scripts/diagnose-filtering.js
+- scripts/diagnostic-espn-fixed.js
+- scripts/diagnostic-espn.js
+- scripts/diagnostic-thesportsdb.js
+- scripts/examine-prediction-76412.js
+- scripts/examine-tier-rules.js
+- scripts/simulate-filtering.js
+- scripts/smoke-test.js
+- scripts/test_full_fallback_flow.js
+- scripts/test-ai-predictions-542703.js
+- scripts/test-ai-predictions-endpoint.js
+- scripts/test-all-rapid-hosts.js
+- scripts/test-antigravity.js
+- scripts/test-api.js
+- scripts/test-api2.js
+- scripts/test-cache.js
+- scripts/test-corrected-endpoint.js
+- scripts/test-cricbuzz.js
+- scripts/test-cricket-live-line-advance-provider.js
+- scripts/test-cricket-live-line-provider.js
+- scripts/test-cron.js
+- scripts/test-divanscore-rankings-fallback.js
+- scripts/test-fetch.js
+- scripts/test-final-endpoint.js
+- scripts/test-fixed-ai-predictions.js
+- scripts/test-fixed-endpoint.js
+- scripts/test-fixed-pipeline.js
+- scripts/test-football-h2h-pipeline-integration.js
+- scripts/test-football-highlights-h2h.js
+- scripts/test-football-risk-tier-mapper.js
+- scripts/test-football536-endpoints.js
+- scripts/test-football536-fixtures-normalizer.js
+- scripts/test-free-livescore-fixtures.js
+- scripts/test-free-livescore-search.js
+- scripts/test-live-football-api-priority.js
+- scripts/test-livescore6-cricket-provider.js
+- scripts/test-logger.js
+- scripts/test-metrx-factory-top-metrics.js
+- scripts/test-metrx-top-metrics.js
+- scripts/test-network.js
+- scripts/test-odds-integration.js
+- scripts/test-optimized-endpoints.js
+- scripts/test-pipeline-integration.js
+- scripts/test-pro-football-api.js
+- scripts/test-rank-calibration.js
+- scripts/test-rank-injection.js
+- scripts/test-sports-live-rankings.js
+- scripts/test-sportsapi-pro-football-adapter.js
+- scripts/test-sportsapi-pro-football-joinability.js
+- scripts/test-sportsapi-pro-football.js
+- scripts/test-sportsrc-fixtures.js
+- scripts/test-sportsrc-health.js
+- scripts/test-sportsrc-odds.js
+- scripts/test-telemetry-integration.js
+- scripts/test-thesportsdb-endpoints.js
+- scripts/test-weather-pipeline.js
+- scripts/trace-data-flow.js
+- scripts/trace-filtering-rules.js
+- scripts/trace-filtering-timestamp.js
+
+Evidence:
+- B12 is defined as the SCRIPTS_TEST_DIAG_TRACE batch with 66 governed assets.
+- B12 manifest rule selects scripts whose basename starts with test-, debug-, diagnose-, diagnostic-, examine-, or trace-, plus exact files: simulate-filtering.js, browser_console_test.js, smoke-test.js, and test_full_fallback_flow.js.
+- Tracked-reference scan found package.json command exposure for scripts/smoke-test.js through npm test / test:smoke and scripts/test-antigravity.js through antigravity:test.
+- AGENTS.md documents smoke/API testing as operator workflows, including scripts/smoke-test.js and scripts/test-api.js.
+- Other B12 references found by tracked scan are governance/report/dependency-map references, not runtime/product imports.
+- No B12 file is classified as active runtime/product code in this phase.
+- B12 files are test, debug, diagnostic, examination, simulation, smoke, or trace operator assets; current-use outcome is MANUAL_USE.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B12 batch state not advanced in this patch.
