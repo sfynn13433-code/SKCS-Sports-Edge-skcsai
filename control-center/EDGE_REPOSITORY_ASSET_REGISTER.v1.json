@@ -13407,7 +13407,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Validate with the governing Control Center project proof.",
       "notes": "Control Center foundation asset.",
-      "purpose_description": "Repository Asset Register enumerating all tracked repository paths (906 assets) and storing the EAC-001 classification contract fields per asset for governance-controlled review.",
+      "purpose_description": "Repository Asset Register enumerating all tracked repository paths (902 assets) and storing the EAC-001 classification contract fields per asset for governance-controlled review.",
       "functional_group": "GOVERNANCE",
       "relationship_tags": [
         "CONFIGURATION",
@@ -13641,7 +13641,7 @@
       "next_validation": "Revalidate static discovery completeness and fail-closed runtime inventory integrity during ESA-001 closure.",
       "notes": "Control Center runtime inventory integrity checker. Current-state evidence only; does not declare future Edge architecture. Does not activate Scout/FIP or establish provider/database retention.",
       "purpose_description": "Statically checks `control-center/EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json` reachability/inventory completeness and synchronizes the observational runtime map in `control-center/EDGE_SYSTEM_RUNTIME_MAP.md` without executing providers.",
-      "functional_group": "BACKEND_RUNTIME",
+      "functional_group": "TEST_PROOF",
       "relationship_tags": [
         "RUNTIME",
         "DATABASE",
