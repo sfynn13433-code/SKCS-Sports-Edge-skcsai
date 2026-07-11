@@ -2367,3 +2367,131 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B08 batch state not advanced in this patch.
+## PHASE 3 — B09 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 — Active Use Identification
+- Batch: B09 / BACKEND_SERVICES
+- Question: Is each B09 governed file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+
+Outcome summary:
+- ACTIVE: 63
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 6
+- NO_CURRENT_USE_FOUND: 17
+- UNKNOWN: 0
+
+B09 ACTIVE assets:
+- backend/services/accaBuilder.js
+- backend/services/aiPipeline.js
+- backend/services/aiPipelineOrchestrator.js
+- backend/services/aiProvider.js
+- backend/services/aiScoring.js
+- backend/services/aiTelemetryService.js
+- backend/services/antigravity/WorkflowEngine.js
+- backend/services/apiCacheService.js
+- backend/services/apiQuotaRouter.js
+- backend/services/apiQuotaRouterProviders.js
+- backend/services/bigBallsDataApiClient.js
+- backend/services/bigBallsFootballBridge.js
+- backend/services/blockedApiCallsLog.js
+- backend/services/canonicalEvents.js
+- backend/services/canonicalIngestFirewall.js
+- backend/services/conflictEngine.js
+- backend/services/contextEnrichmentService.js
+- backend/services/contextIngestionService.js
+- backend/services/contradictionGovernance.js
+- backend/services/controlCenterReadService.js
+- backend/services/cricApiCacheService.js
+- backend/services/cricbuzzService.js
+- backend/services/cricketLiveEnrichmentService.js
+- backend/services/cricketLiveMatchResolver.js
+- backend/services/cricketRulesEngine.js
+- backend/services/cronJobs.js
+- backend/services/dataProvider.js
+- backend/services/dataProviders.js
+- backend/services/direct1x2Builder.js
+- backend/services/direct1x2Engine.js
+- backend/services/divanscoreService.js
+- backend/services/enhancedMatchDetailsService.js
+- backend/services/espnHiddenApiService.js
+- backend/services/filterEngine.js
+- backend/services/footballH2HExtractor.js
+- backend/services/footballHighlightsService.js
+- backend/services/footballRankExtractor.js
+- backend/services/freeLivescoreApiService.js
+- backend/services/gradingAccuracyCore.js
+- backend/services/gradingSnapshotService.js
+- backend/services/hybridSportsDataService.js
+- backend/services/marketIntelligence.js
+- backend/services/marketScoringEngine.js
+- backend/services/masterRulebookRiskClassification.js
+- backend/services/metrxFactoryService.js
+- backend/services/normalizerService.js
+- backend/services/oddsBudgetService.js
+- backend/services/pipelineMetricsService.js
+- backend/services/proFootballDataService.js
+- backend/services/providerQuotaService.js
+- backend/services/quotaPlanner.js
+- backend/services/safeHavenSelector.js
+- backend/services/saveContextData.js
+- backend/services/saveDirectInsights.js
+- backend/services/semanticDriftSummaryService.js
+- backend/services/skcsHeartbeat.js
+- backend/services/sportsrcHealthService.js
+- backend/services/subscriptionTiming.js
+- backend/services/syncService.js
+- backend/services/systemTruthLogger.js
+- backend/services/thesportsdbPipeline.js
+- backend/services/tier1BootstrapService.js
+- backend/services/tier1SchemaProfile.js
+
+Evidence for ACTIVE group:
+Runtime map records confirmed reachability and active consumers through backend routes, server startup, active pipeline services, metrics routes, scheduler routes, cricket routes, control-center routes, semantic drift routes, and service-to-service runtime chains.
+
+B09 MANUAL_USE assets:
+- backend/services/bzzoiroApiClient.js
+  Evidence: Referenced through the sandboxed Bzzoiro football provider path. That provider path was previously classified as manual/provider-evaluation use, not active runtime use.
+- backend/services/bzzoiroCrosswalk.js
+  Evidence: Supports Bzzoiro/API-Sports crosswalk and verification-lane logic; no active runtime caller was proven in B09.
+- backend/services/freeLivescoreApiExtractor.js
+  Evidence: Referenced by test/discovery tooling for Free Livescore payload extraction; no active runtime caller was proven.
+- backend/services/soccerDataApiClient.js
+  Evidence: Referenced by SoccerData provider/evaluation tooling; no active runtime caller was proven for the SoccerData provider path.
+- backend/services/sportsApiProFootballExtractor.js
+  Evidence: Supports SportsAPI Pro football provider/evaluation tooling; no active runtime caller was proven.
+- backend/services/sportsApiProFootballService.js
+  Evidence: Supports SportsAPI Pro football provider/evaluation tooling; no active runtime caller was proven.
+
+B09 NO_CURRENT_USE_FOUND assets:
+- backend/services/accaMathUtils.js
+- backend/services/aiProvider_odds_update.js
+- backend/services/comboEngine.js
+- backend/services/football536Extractor.js
+- backend/services/football536Service.js
+- backend/services/footballRiskTierMapper.js
+- backend/services/liveFootballApiExtractor.js
+- backend/services/liveFootballApiService.js
+- backend/services/metrxFactoryExtractor.js
+- backend/services/oddsApiPipeline.js
+- backend/services/rateLimitsAnalysis.js
+- backend/services/reEvaluationEngine.js
+- backend/services/sportsLiveScoresExtractor.js
+- backend/services/sportsLiveScoresService.js
+- backend/services/unifiedFixturesService.js
+- backend/services/unifiedPredictionsService.js
+- backend/services/unifiedRulesService.js
+
+Evidence for NO_CURRENT_USE_FOUND group:
+Repository search and runtime-map inspection did not prove current backend route, server startup, service-to-service, package script, or active manual-tool consumers for these files during B09 inspection.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B09 batch state not advanced in this patch.
