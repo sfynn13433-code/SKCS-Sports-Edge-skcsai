@@ -1323,3 +1323,34 @@ Validation:
 - No proven B22 purpose classification mismatches found.
 - Count discrepancy recorded as a manifest metadata issue for later governance cleanup, not a B22 purpose classification mismatch.
 - Scope limited to B22 purpose classification review.
+
+## PHASE 2 - B23 PURPOSE CLASSIFICATION REVIEW - CLOSED
+
+Result: PASS WITH CORRECTION
+
+Scope:
+- Batch: B23 / DB_SQL_AND_SUPABASE_OTHER
+- Manifest declared asset_count: 20
+- Actual asset paths reviewed: 20
+- Existing source files found: 19
+- Register coverage found: 19/20
+
+Corrections:
+- 11 SQL/schema assets changed from DATABASE to DATABASE_MIGRATION after source inspection confirmed schema-changing SQL behaviour.
+- supabase/functions/semantic-drift-summary/index.ts changed from SCHEDULER_BACKGROUND to API_ROUTE because it serves HTTP requests, reads URL parameters, invokes get_semantic_violation_summary RPC, and returns JSON.
+- control-center/EDGE_ASSET_REPOSITORY_MAP.md regenerated after register correction.
+
+Governance/path drift recorded only:
+- supabase/functions/sync-sports-data/index.ts is listed in B23 but is absent from the working tree and absent from the repository asset register.
+- No deletion, manifest repair, or path removal was performed in B23.
+
+Changed files:
+- control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json
+- control-center/EDGE_ASSET_REPOSITORY_MAP.md
+- control-center/EDGE_CONTROL_CENTER.md
+
+Validation:
+- B23 focused validation PASS.
+- B23 post-correction counts: DATABASE_MIGRATION 11, DATABASE 4, SCHEDULER_BACKGROUND 3, API_ROUTE 1, REGISTER_MISSING 1.
+- Full npm run control:classification remains blocked by pre-existing non-B23 issues: B22 manifest asset_count drift plus invalid relationship tags from earlier B21/B15 corrections.
+- Scope limited to B23 purpose classification corrections.
