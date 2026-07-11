@@ -5745,7 +5745,7 @@
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
       "purpose_description": "Git ignore rules for backend-local and generated artifacts (e.g., deps, secrets, sqlite/cache files).",
-      "functional_group": "UNCATEGORIZED",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
       "relationship_tags": [
         "CONFIGURATION"
       ],
@@ -6725,7 +6725,7 @@
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
       "purpose_description": "npm lockfile that pins backend dependency versions (package-lock metadata and resolved package graph).",
-      "functional_group": "UNCATEGORIZED",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
       "relationship_tags": [
         "CONFIGURATION",
         "GENERATED"
