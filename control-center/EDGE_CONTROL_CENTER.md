@@ -1550,3 +1550,40 @@ Validation:
 - Register orphan Gitlink/submodule next_validation count: 2.
 - No source, manifest, map, merge, deletion, retirement, submodule repair, or refactor was performed.
 - B29 was not started before this repair.
+## PHASE 2 - B29 PURPOSE CLASSIFICATION REVIEW - CLOSED
+
+Result: PASS WITH CORRECTION
+
+Scope:
+- Batch: B29 / DOT_TOOL_DIRS_AND_SMALL_DIRS
+- Manifest asset_count: 26
+- Manifest asset_paths reviewed: 26
+- Map rows reviewed: 26
+- Register/map/tracked/disk coverage: PASS
+
+Correction:
+- Updated .qwen/settings.json from UNCATEGORIZED to DOCUMENTATION_KNOWLEDGE.
+- Updated .qwen/settings.json.orig from UNCATEGORIZED to DOCUMENTATION_KNOWLEDGE.
+- Updated both Qwen purpose descriptions to identify them as local AI-assistant command-permission settings.
+
+Reason:
+- Local validation confirmed both files are readable JSON configuration files.
+- Their content defines Qwen allowed Bash command permissions.
+- They are not source runtime files, generated outputs, deployments, tests, or executable scripts.
+- Therefore DOCUMENTATION_KNOWLEDGE is the closest valid current EAC functional group.
+
+Inspection:
+- B29 manifest count/path count/map row count: 26/26/26.
+- B29 coverage: PASS.
+- Functional group counts before correction: API_ROUTE 1, BACKEND_RUNTIME 2, DEPLOYMENT_OPERATIONS 1, DOCUMENTATION_KNOWLEDGE 9, GENERATED_OUTPUT 8, PROVIDER_INTEGRATION 1, PUBLIC_ASSET 1, SCRIPT_TOOL 1, UNCATEGORIZED 2.
+- Current state count: UNKNOWN 26.
+
+Changed files:
+- control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json
+- control-center/EDGE_ASSET_REPOSITORY_MAP.md
+- control-center/EDGE_CONTROL_CENTER.md
+
+Validation:
+- B29 purpose classification review result: PASS WITH CORRECTION.
+- No source, manifest, merge, deletion, retirement, runtime repair, or refactor was performed.
+- Scope limited to B29 Qwen purpose classification correction and closure.

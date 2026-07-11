@@ -450,8 +450,8 @@
       "validation_status": "REGISTERED",
       "next_validation": "Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Local Qwen tool settings configuration retained for reference.",
-      "functional_group": "UNCATEGORIZED",
+      "purpose_description": "Local Qwen AI-assistant settings configuration defining allowed command permissions for development-tool operation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "CONFIGURATION",
         "GOVERNANCE"
@@ -482,8 +482,8 @@
       "validation_status": "REGISTERED",
       "next_validation": "Later compare this B29 tool/config asset against current non-B29 runtime wiring (route/provider/service activation) to validate retention and overlap; confirm classification evidence accuracy.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Local Qwen tool settings configuration retained for reference.",
-      "functional_group": "UNCATEGORIZED",
+      "purpose_description": "Local Qwen AI-assistant settings configuration defining allowed command permissions for development-tool operation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "CONFIGURATION",
         "GOVERNANCE"
