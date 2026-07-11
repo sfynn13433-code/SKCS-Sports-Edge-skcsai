@@ -1254,7 +1254,7 @@ Phase 2 purpose classification evidence: B19
   - Purpose descriptions corrected for proven B19 knowledge-layer registry/reference assets based on focused source inspection.
 - evidence: Local PowerShell B19 manifest/register/source inspection confirmed 17/17 source files exist, verified 17/17 register coverage, confirmed functional_group alignment, corrected proven B19 purpose-description mismatches, and kept scope limited to B19 purpose classification.
 
-## PHASE 2 — B20 PURPOSE CLASSIFICATION REVIEW — CLOSED
+## PHASE 2 - B20 PURPOSE CLASSIFICATION REVIEW - CLOSED
 
 Result: PASS WITH CORRECTION
 
