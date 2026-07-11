@@ -1164,3 +1164,28 @@ Phase 2 purpose classification evidence: B14
   - scripts/rebuild-canonical-from-api-sports.js functional_group changed from SCRIPT_TOOL to PROVIDER_INTEGRATION.
 - evidence: Local PowerShell B14 manifest/register/source inspection confirmed B14 membership, repaired stale B14 asset_count metadata, and corrected seven proven purpose mismatches based on focused source review. Scope stayed limited to B14 purpose classification.
 
+
+Phase 2 purpose classification evidence: B15
+
+- batch_id: B15
+- title: SCRIPTS_MAINT_FIX_CLEANUP_MIGRATE
+- asset_count: 52
+- register_coverage: 52/52
+- result: PASS WITH CORRECTION
+- batch_manifest_modified: NO
+- register_modified: YES
+- corrections:
+  - scripts/_bsd_league_inventory.json functional_group changed from SCRIPT_TOOL to GENERATED_OUTPUT.
+  - scripts/_local-rebuild.js functional_group changed from SCRIPT_TOOL to PREDICTION.
+  - scripts/add-event-columns.js functional_group changed from SCRIPT_TOOL to DATABASE_MIGRATION.
+  - scripts/build-sportsdb-config.js functional_group changed from SCRIPT_TOOL to PROVIDER_INTEGRATION.
+  - scripts/cleanup-predictions.js functional_group changed from DEPLOYMENT_OPERATIONS to DATABASE.
+  - scripts/cleanup-unknown-teams.js functional_group changed from DEPLOYMENT_OPERATIONS to DATABASE.
+  - scripts/cleanup.js functional_group changed from DEPLOYMENT_OPERATIONS to DATABASE.
+  - scripts/fix-json-simple.js functional_group changed from DEPLOYMENT_OPERATIONS to GENERATED_OUTPUT.
+  - scripts/fix-remaining-json-issues.js functional_group changed from DEPLOYMENT_OPERATIONS to GENERATED_OUTPUT.
+  - scripts/fix-sport-data.js functional_group changed from DEPLOYMENT_OPERATIONS to GENERATED_OUTPUT.
+  - scripts/gulf_in_class_simulation.js functional_group changed from SCRIPT_TOOL to ACCA.
+  - scripts/render-api-deploy.js functional_group changed from SCRIPT_TOOL to DEPLOYMENT_OPERATIONS.
+- evidence: Local PowerShell B15 manifest/register/source inspection confirmed B15 membership, verified all 52 source files exist, verified 52/52 register coverage, and corrected twelve proven purpose mismatches based on focused source review. Scope stayed limited to B15 purpose classification.
+

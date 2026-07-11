@@ -17651,9 +17651,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database/schema effects for this SCRIPT_TOOL classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: _bsd_league_inventory.json is a SCRIPT_TOOL asset used for inventory/ops utility.",
-      "functional_group": "SCRIPT_TOOL",
+      "purpose_description": "Reviewed classification: _bsd_league_inventory.json is a generated BSD/SKCS league coverage inventory artifact; primary purpose is generated provider inventory output.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
+        "GENERATED",
+        "PROVIDER",
+        "INVENTORY",
         "SCRIPT_TOOL"
       ],
       "classification_evidence": [
@@ -17879,10 +17882,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database/schema effects for this SCRIPT_TOOL classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: _local-rebuild.js is a SCRIPT_TOOL asset used for inventory/ops utility.",
-      "functional_group": "SCRIPT_TOOL",
+      "purpose_description": "Reviewed classification: _local-rebuild.js invokes aiPipeline rebuildFinalOutputs against the database; primary purpose is prediction/final-output rebuild.",
+      "functional_group": "PREDICTION",
       "relationship_tags": [
-        "SCRIPT_TOOL"
+        "PREDICTION",
+        "PIPELINE",
+        "DATABASE",
+        "SCRIPT_TOOL",
+        "RUNTIME"
       ],
       "classification_evidence": [
         "Fast skim: _local-rebuild.js indicates controlled SCRIPT_TOOL maintenance/processing utility."
@@ -17979,10 +17986,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database/schema effects for this SCRIPT_TOOL classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: add-event-columns.js is a SCRIPT_TOOL asset used for inventory/ops utility.",
-      "functional_group": "SCRIPT_TOOL",
+      "purpose_description": "Reviewed classification: add-event-columns.js applies ALTER TABLE changes to the events table; primary purpose is database schema migration.",
+      "functional_group": "DATABASE_MIGRATION",
       "relationship_tags": [
-        "SCRIPT_TOOL"
+        "DATABASE",
+        "MIGRATION",
+        "SQL",
+        "SCRIPT_TOOL",
+        "RUNTIME"
       ],
       "classification_evidence": [
         "Fast skim: add-event-columns.js indicates controlled SCRIPT_TOOL maintenance/processing utility."
@@ -19320,12 +19331,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database/schema effects for this SCRIPT_TOOL classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: build-sportsdb-config.js is a SCRIPT_TOOL asset used for inventory/ops utility.",
-      "functional_group": "SCRIPT_TOOL",
+      "purpose_description": "Reviewed classification: build-sportsdb-config.js calls TheSportsDB API and writes sports/league provider configuration artifacts; primary purpose is provider integration config generation.",
+      "functional_group": "PROVIDER_INTEGRATION",
       "relationship_tags": [
-        "SCRIPT_TOOL",
+        "PROVIDER",
         "API",
-        "ROUTE"
+        "CONFIG",
+        "GENERATED",
+        "SCRIPT_TOOL",
+        "RUNTIME"
       ],
       "classification_evidence": [
         "Fast skim: build-sportsdb-config.js indicates controlled SCRIPT_TOOL maintenance/processing utility.",
@@ -20526,11 +20540,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database/schema effects for this DEPLOYMENT_OPERATIONS classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: cleanup-predictions.js is a DEPLOYMENT_OPERATIONS asset used for inventory/ops utility.",
-      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "purpose_description": "Reviewed classification: cleanup-predictions.js deletes recent rows from direct1x2_prediction_final; primary purpose is database cleanup.",
+      "functional_group": "DATABASE",
       "relationship_tags": [
+        "DATABASE",
+        "SQL",
+        "CLEANUP",
         "SCRIPT_TOOL",
-        "SQL"
+        "RUNTIME"
       ],
       "classification_evidence": [
         "Fast skim: cleanup-predictions.js indicates controlled DEPLOYMENT_OPERATIONS maintenance/processing utility.",
@@ -20558,11 +20575,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database/schema effects for this DEPLOYMENT_OPERATIONS classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: cleanup-unknown-teams.js is a DEPLOYMENT_OPERATIONS asset used for inventory/ops utility.",
-      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "purpose_description": "Reviewed classification: cleanup-unknown-teams.js deletes direct1x2_prediction_final rows with Unknown Home/Away teams; primary purpose is database cleanup.",
+      "functional_group": "DATABASE",
       "relationship_tags": [
+        "DATABASE",
+        "SQL",
+        "CLEANUP",
         "SCRIPT_TOOL",
-        "SQL"
+        "RUNTIME"
       ],
       "classification_evidence": [
         "Fast skim: cleanup-unknown-teams.js indicates controlled DEPLOYMENT_OPERATIONS maintenance/processing utility.",
@@ -20590,11 +20610,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database/schema effects for this DEPLOYMENT_OPERATIONS classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: cleanup.js is a DEPLOYMENT_OPERATIONS asset used for inventory/ops utility.",
-      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "purpose_description": "Reviewed classification: cleanup.js deletes invalid direct1x2_prediction_final rows and drops an obsolete tier_rules constraint; primary purpose is database cleanup/repair.",
+      "functional_group": "DATABASE",
       "relationship_tags": [
+        "DATABASE",
+        "SQL",
+        "CLEANUP",
+        "MIGRATION",
         "SCRIPT_TOOL",
-        "SQL"
+        "RUNTIME"
       ],
       "classification_evidence": [
         "Fast skim: cleanup.js indicates controlled DEPLOYMENT_OPERATIONS maintenance/processing utility.",
@@ -21683,11 +21707,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database/schema effects for this DEPLOYMENT_OPERATIONS classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: fix-json-simple.js is a DEPLOYMENT_OPERATIONS asset used for inventory/ops utility.",
-      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "purpose_description": "Reviewed classification: fix-json-simple.js repairs JSON output fields in direct1x2_prediction_final and predictions_unified; primary purpose is generated prediction-output data repair.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
+        "GENERATED",
+        "DATABASE",
+        "SQL",
+        "PREDICTION",
         "SCRIPT_TOOL",
-        "SQL"
+        "RUNTIME"
       ],
       "classification_evidence": [
         "Fast skim: fix-json-simple.js indicates controlled DEPLOYMENT_OPERATIONS maintenance/processing utility.",
@@ -21814,11 +21842,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database/schema effects for this DEPLOYMENT_OPERATIONS classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: fix-remaining-json-issues.js is a DEPLOYMENT_OPERATIONS asset used for inventory/ops utility.",
-      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "purpose_description": "Reviewed classification: fix-remaining-json-issues.js repairs remaining JSON and placeholder issues in prediction output tables; primary purpose is generated prediction-output data repair.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
+        "GENERATED",
+        "DATABASE",
+        "SQL",
+        "PREDICTION",
         "SCRIPT_TOOL",
-        "SQL"
+        "RUNTIME"
       ],
       "classification_evidence": [
         "Fast skim: fix-remaining-json-issues.js indicates controlled DEPLOYMENT_OPERATIONS maintenance/processing utility.",
@@ -21846,11 +21878,15 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database/schema effects for this DEPLOYMENT_OPERATIONS classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: fix-sport-data.js is a DEPLOYMENT_OPERATIONS asset used for inventory/ops utility.",
-      "functional_group": "DEPLOYMENT_OPERATIONS",
+      "purpose_description": "Reviewed classification: fix-sport-data.js repairs tier/sport-related fields in direct1x2_prediction_final rows; primary purpose is generated prediction-output data repair.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
+        "GENERATED",
+        "DATABASE",
+        "SQL",
+        "PREDICTION",
         "SCRIPT_TOOL",
-        "SQL"
+        "RUNTIME"
       ],
       "classification_evidence": [
         "Fast skim: fix-sport-data.js indicates controlled DEPLOYMENT_OPERATIONS maintenance/processing utility.",
@@ -21951,9 +21987,12 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database/schema effects for this SCRIPT_TOOL classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: gulf_in_class_simulation.js is a SCRIPT_TOOL asset used for inventory/ops utility.",
-      "functional_group": "SCRIPT_TOOL",
+      "purpose_description": "Reviewed classification: gulf_in_class_simulation.js tests Gulf in Class SMB/ACCA leg-unlock and contradiction logic; primary purpose is ACCA/SMB rule simulation.",
+      "functional_group": "ACCA",
       "relationship_tags": [
+        "ACCA",
+        "SIMULATION",
+        "PREDICTION",
         "SCRIPT_TOOL"
       ],
       "classification_evidence": [
@@ -22811,12 +22850,14 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect runtime wiring and database/schema effects for this SCRIPT_TOOL classification asset, plus validate relationship discovery.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: render-api-deploy.js is a SCRIPT_TOOL asset used for inventory/ops utility.",
-      "functional_group": "SCRIPT_TOOL",
+      "purpose_description": "Reviewed classification: render-api-deploy.js triggers Render deployments through Render's REST API; primary purpose is deployment operations.",
+      "functional_group": "DEPLOYMENT_OPERATIONS",
       "relationship_tags": [
-        "SCRIPT_TOOL",
+        "DEPLOYMENT",
         "API",
-        "DEPLOYMENT"
+        "RENDER",
+        "SCRIPT_TOOL",
+        "RUNTIME"
       ],
       "classification_evidence": [
         "Fast skim: render-api-deploy.js indicates controlled SCRIPT_TOOL maintenance/processing utility.",
