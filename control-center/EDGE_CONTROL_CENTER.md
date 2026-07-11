@@ -1521,3 +1521,32 @@ Validation:
 - B28 purpose classification review result: PASS WITH CORRECTION.
 - No source, manifest, merge, deletion, retirement, submodule repair, or refactor was performed.
 - Scope limited to B28 purpose evidence correction and purpose classification closure.
+## PHASE 2 - B28 REGISTER SCOPE REPAIR - CLOSED
+
+Result: PASS
+
+Scope:
+- Batch: B28 / ROOT_NON_MD_TXT_FILES
+- Repair target: EDGE_REPOSITORY_ASSET_REGISTER.v1.json over-broad text replacement from prior B28 closure commit.
+- Intended B28 target assets: kabaddiPy and sportbook only.
+
+Correction:
+- Reverted over-broad orphan Gitlink/submodule next_validation, purpose, and evidence text from non-target B28 register entries.
+- Preserved the orphan Gitlink/submodule purpose/evidence/next_validation correction only for kabaddiPy and sportbook.
+- No map correction was required; the map already had only the two intended B28 row corrections.
+
+Reason:
+- Post-push verification showed the B28 register replacement was broader than intended.
+- The correct B28 purpose correction applies only to kabaddiPy and sportbook.
+- This repair restores Phase 2 scope discipline before B29 starts.
+
+Changed files:
+- control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json
+- control-center/EDGE_CONTROL_CENTER.md
+
+Validation:
+- Register orphan Gitlink/submodule purpose count: 2.
+- Register orphan Gitlink/submodule evidence count: 2.
+- Register orphan Gitlink/submodule next_validation count: 2.
+- No source, manifest, map, merge, deletion, retirement, submodule repair, or refactor was performed.
+- B29 was not started before this repair.
