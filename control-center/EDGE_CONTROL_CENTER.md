@@ -1088,3 +1088,17 @@ JSON PATCHED: NO
 REGISTER MODIFIED: NO
 BATCH MANIFEST MODIFIED: NO
 EVIDENCE: Local read-only PowerShell inspection confirmed all B09 assets exist in the register, all have functional groups and purpose descriptions, review flags returned no rows, and final git status was clean.
+
+### PHASE 2 - B10 PURPOSE CLASSIFICATION REVIEW
+
+STATUS: CLOSED
+RESULT: PASS WITH CORRECTION
+BATCH: B10 - SCRIPTS_AUDIT_GOV
+ASSET COUNT: 27
+REGISTER COVERAGE: 27/27
+PURPOSE CLASSIFICATION CORRECTIONS REQUIRED: 1
+JSON PATCHED: YES
+REGISTER MODIFIED: YES
+BATCH MANIFEST MODIFIED: NO
+CORRECTION: scripts/audit-v2-provider-coverage.js functional_group changed from DATABASE_MIGRATION to SCRIPT_TOOL because its purpose_description and relationship_tags identify it as an audit script, not a migration runner.
+EVIDENCE: Local PowerShell inspection confirmed all B10 assets exist in the register, one purpose classification mismatch was found and corrected, and final review scope remained limited to B10.

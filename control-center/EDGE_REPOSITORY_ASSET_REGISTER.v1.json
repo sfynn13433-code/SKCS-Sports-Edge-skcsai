@@ -18898,7 +18898,7 @@
       "next_validation": "Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
       "purpose_description": "Audit script for provider/rules/tables alignment and consistency.",
-      "functional_group": "DATABASE_MIGRATION",
+      "functional_group": "SCRIPT_TOOL",
       "relationship_tags": [
         "SCRIPT_TOOL",
         "SQL",
