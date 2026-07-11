@@ -2879,3 +2879,97 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B14 batch state not advanced in this patch.
+
+## PHASE 3 - B15 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 - Active Use Identification
+- Batch: B15 / SCRIPTS_MAINT_FIX_CLEANUP_MIGRATE
+- Question: Is each B15 governed file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+- Dependency/security/vulnerability notice work performed: NO
+
+Outcome summary:
+- ACTIVE: 1
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 51
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B15 ACTIVE assets:
+- scripts/requirements.txt
+
+B15 MANUAL_USE assets:
+- scripts/_bsd_league_inventory.json
+- scripts/_local-rebuild.js
+- scripts/add-cricket-rls-policies.sql
+- scripts/add-event-columns.js
+- scripts/analyze-postgres-tables.js
+- scripts/analyze-supabase-tables-full.js
+- scripts/analyze-supabase-tables.js
+- scripts/analyze-supabase-visual.js
+- scripts/build-acca.js
+- scripts/build-sportsdb-config.js
+- scripts/cleanup-competition-allowlists.js
+- scripts/cleanup-duplicate-fallbacks.js
+- scripts/cleanup-live-direct-duplicates.js
+- scripts/cleanup-predictions.js
+- scripts/cleanup-unknown-teams.js
+- scripts/cleanup.js
+- scripts/complete-phase1-testing.js
+- scripts/complete-phase2-rules.js
+- scripts/complete-phase3-predictions.js
+- scripts/create-indexes.js
+- scripts/create-migration-plan.js
+- scripts/db-cleanup.js
+- scripts/deployment_verification.js
+- scripts/deployment-status.md
+- scripts/fix-ai-predictions-endpoint.js
+- scripts/fix-frontend-placeholders.js
+- scripts/fix-json-simple.js
+- scripts/fix-matches-structure.js
+- scripts/fix-placeholders-and-insights.js
+- scripts/fix-prediction-76412.js
+- scripts/fix-remaining-json-issues.js
+- scripts/fix-sport-data.js
+- scripts/gulf_in_class_simulation.js
+- scripts/hotfix-acca-rules.js
+- scripts/implement-phase1-fixtures-corrected.js
+- scripts/implement-phase1-fixtures.js
+- scripts/implement-phase2-rules-conservative.js
+- scripts/implement-phase2-rules.js
+- scripts/implement-phase3-predictions.js
+- scripts/install-local-git-hooks.js
+- scripts/manual-grade.js
+- scripts/map-table-dependencies.js
+- scripts/purge-fallback-data.js
+- scripts/quarantine-database.js
+- scripts/render-api-deploy.js
+- scripts/repair-unknown-team-names.js
+- scripts/resolve-results.js
+- scripts/safe-migration-plan.js
+- scripts/supabase_health_check.js
+- scripts/supabase-diagnostics.js
+- scripts/track-prediction-accuracy.js
+
+Evidence:
+- B15 is defined as the SCRIPTS_MAINT_FIX_CLEANUP_MIGRATE batch with 52 governed assets.
+- B15 manifest rule selects maintenance/fix/migration script basenames beginning with cleanup-, purge-, quarantine-, repair-, fix-, hotfix-, implement-, complete-phase, and add-, plus selected exact maintenance assets.
+- Tracked deployment configuration in render.yaml uses scripts/requirements.txt through `pip install -r scripts/requirements.txt`; therefore scripts/requirements.txt is currently active through deployment/build configuration.
+- package.json exposes scripts/build-sportsdb-config.js, scripts/track-prediction-accuracy.js, and scripts/install-local-git-hooks.js as npm operator commands.
+- scripts/track-prediction-accuracy.js is an executable grading/accuracy utility with `require.main === module` entrypoint and exported functions, but no active runtime caller was proven in this phase.
+- scripts/build-sportsdb-config.js is an executable configuration-generation utility that writes generated sports configuration output, but no active runtime caller was proven in this phase.
+- scripts/install-local-git-hooks.js is explicitly local-machine setup tooling and says it is run once per clone through npm run install:hooks.
+- Remaining B15 references found by tracked scan are governance, report, dependency-map, archived-comparison, or operator/maintenance references.
+- No deletion, merge, retirement, dependency/security, vulnerability, source/runtime/product change is authorized by this evidence.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B15 batch state not advanced in this patch.
+- GitHub vulnerability notice remains future dependency/security work and was not touched.
