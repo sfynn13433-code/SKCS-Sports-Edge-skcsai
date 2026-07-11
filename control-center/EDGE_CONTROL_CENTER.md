@@ -2250,3 +2250,56 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B06 batch state not advanced in this patch.
+
+## PHASE 3 — B07 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 — Active Use Identification
+- Batch: B07 / BACKEND_SRC_SERVICES
+- Question: Is each B07 governed file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+
+Outcome summary:
+- ACTIVE: 7
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 0
+- NO_CURRENT_USE_FOUND: 2
+- UNKNOWN: 0
+
+B07 outcomes:
+1. backend/src/services/contextIntelligence/adjustProbability.js — ACTIVE
+   Evidence: Imported by backend/services/aiPipeline.js and used by the active prediction pipeline to adjust baseline probabilities and apply market-level context adjustments.
+
+2. backend/src/services/contextIntelligence/aiPipeline_core.js — ACTIVE
+   Evidence: Imported by backend/src/services/contextIntelligence/aiPipeline.js and used as the core enrichment pipeline for weather, availability, discipline, stability, and extended context signals.
+
+3. backend/src/services/contextIntelligence/aiPipeline.js — ACTIVE
+   Evidence: Imported by backend/services/aiPipeline.js; runtime map records it as consumed by backend/services/aiPipeline.js and using fixture_context_cache.
+
+4. backend/src/services/contextIntelligence/availabilitySignal.js — ACTIVE
+   Evidence: Imported by backend/src/services/contextIntelligence/aiPipeline_core.js and used in the active context enrichment path to compute availability_risk.
+
+5. backend/src/services/contextIntelligence/cacheService.js — NO_CURRENT_USE_FOUND
+   Evidence: Exports context_intelligence_cache helper functions, but no current runtime, package script, or active service caller was found for the exported helper names.
+
+6. backend/src/services/contextIntelligence/disciplineSignal.js — ACTIVE
+   Evidence: Imported by backend/src/services/contextIntelligence/aiPipeline_core.js and used in the active context enrichment path to compute discipline_risk.
+
+7. backend/src/services/contextIntelligence/stabilitySignal.js — ACTIVE
+   Evidence: Imported by backend/src/services/contextIntelligence/aiPipeline_core.js and used in the active context enrichment path to compute stability_risk.
+
+8. backend/src/services/contextIntelligence/weatherSignal.js — ACTIVE
+   Evidence: Imported by backend/src/services/contextIntelligence/aiPipeline_core.js; runtime map records it as consumed by that core pipeline and tied to api.weatherapi.com.
+
+9. backend/src/services/marketRouter/waterfall.js — NO_CURRENT_USE_FOUND
+   Evidence: Exports resolveDecision for market waterfall selection, but no current runtime, package script, or active service caller was found for resolveDecision or the marketRouter waterfall module.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B07 batch state not advanced in this patch.
