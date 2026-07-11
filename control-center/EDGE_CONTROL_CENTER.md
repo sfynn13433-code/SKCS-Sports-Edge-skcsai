@@ -2193,3 +2193,60 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B05 batch state not advanced in this patch.
+
+
+## PHASE 3 — B06 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 — Active Use Identification
+- Batch: B06 / BACKEND_PROVIDERS
+- Question: Is each B06 governed file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+
+Outcome summary:
+- ACTIVE: 0
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 10
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B06 outcomes:
+1. backend/providers/football/bigBallsDataNormalizer.js — MANUAL_USE
+   Evidence: Referenced by backend/providers/football/bigBallsDataProvider.js and provider documentation. No active runtime or package caller found.
+
+2. backend/providers/football/bigBallsDataProvider.js — MANUAL_USE
+   Evidence: Referenced by scripts/verify-bigballs-provider.js and provider documentation. No active runtime or package caller found.
+
+3. backend/providers/football/bsdNormalizer.js — MANUAL_USE
+   Evidence: Referenced by backend/providers/football/bsdProvider.js and provider documentation. No active runtime or package caller found.
+
+4. backend/providers/football/bsdProvider.js — MANUAL_USE
+   Evidence: Referenced by scripts/verify-bsd-provider.js and provider documentation. No active runtime or package caller found.
+
+5. backend/providers/football/bzzoiroNormalizer.js — MANUAL_USE
+   Evidence: Referenced by backend/providers/football/bsdNormalizer.js, backend/providers/football/bzzoiroProvider.js, and provider documentation. No active runtime or package caller found.
+
+6. backend/providers/football/bzzoiroProvider.js — MANUAL_USE
+   Evidence: Referenced by scripts/sync-bsd-enrichment.js, scripts/verify-bsd-enrichment.js, and provider documentation. No active runtime or package caller found.
+
+7. backend/providers/football/soccerDataApiNormalizer.js — MANUAL_USE
+   Evidence: Referenced by backend/providers/football/soccerDataApiProvider.js, SoccerData audit scripts, and provider documentation. No active runtime or package caller found.
+
+8. backend/providers/football/soccerDataApiProvider.js — MANUAL_USE
+   Evidence: Referenced by scripts/verify-soccerdata-provider.js and provider documentation. No active runtime or package caller found.
+
+9. backend/providers/football/sportsApiProFootballAdapter.js — MANUAL_USE
+   Evidence: Referenced by scripts/test-sportsapi-pro-football-adapter.js. No active runtime or package caller found.
+
+10. backend/providers/football/sportsApiProFootballNormalizer.js — MANUAL_USE
+    Evidence: Referenced by backend/providers/football/sportsApiProFootballAdapter.js. No active runtime or package caller found.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B06 batch state not advanced in this patch.
