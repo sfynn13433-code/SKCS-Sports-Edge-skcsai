@@ -1846,3 +1846,113 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B02 batch state not advanced in this patch.
+
+## PHASE 3 - B03 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE 3 - Active Use Identification
+- Batch: B03 / BACKEND_ROUTES_AND_CONTROLLERS
+- Question: Is each B03 governed file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+
+Outcome summary:
+- ACTIVE: 28
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 0
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B03 outcomes:
+1. backend/controllers/edgeMindController.js - ACTIVE
+   Evidence: backend/routes/chat.js imports generateBotResponse from this controller, and backend/server-express.js mounts the chat router at /api/chat and /api/edgemind.
+
+2. backend/routes/accuracy.js - ACTIVE
+   Evidence: Imported by backend/server-express.js and mounted at /api/accuracy.
+
+3. backend/routes/antigravity.js - ACTIVE
+   Evidence: Imported by backend/server-express.js and mounted at /api/antigravity.
+
+4. backend/routes/chat.js - ACTIVE
+   Evidence: Imported by backend/server-express.js and mounted at /api/chat and /api/edgemind.
+
+5. backend/routes/controlCenter.js - ACTIVE
+   Evidence: Imported by backend/server-express.js and mounted at /api/control-center.
+
+6. backend/routes/cricketCache.js - ACTIVE
+   Evidence: Imported by backend/server-express.js and mounted at /api/cricket/cache.
+
+7. backend/routes/cricketCount.js - ACTIVE
+   Evidence: Imported by backend/server-express.js and mounted at /api/cricket/count.
+
+8. backend/routes/cricketCron.js - ACTIVE
+   Evidence: Imported by backend/server-express.js and mounted at /api/cron.
+
+9. backend/routes/cricketInsights.js - ACTIVE
+   Evidence: Imported by backend/server-express.js and mounted at /api/cricket/insights.
+
+10. backend/routes/debug.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted at /api/debug.
+
+11. backend/routes/direct1x2.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted at /api/direct-1x2.
+
+12. backend/routes/divanscore.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted at /api.
+
+13. backend/routes/feedback.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted at /api/feedback.
+
+14. backend/routes/metrics.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted at /api/metrics.
+
+15. backend/routes/pipeline.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted at /api/pipeline.
+
+16. backend/routes/predictions.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted at /api/predictions.
+
+17. backend/routes/refresh-ai.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted at /api/admin.
+
+18. backend/routes/scheduler.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted at /api/scheduler.
+
+19. backend/routes/semanticDrift.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted at /api/semantic-drift-summary.
+
+20. backend/routes/skcsGrading.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted at /api/skcs.
+
+21. backend/routes/sportsEdge.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted at /.
+
+22. backend/routes/tier1.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted at /api/tier1.
+
+23. backend/routes/user.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted at /api/user.
+
+24. backend/routes/v1/acca.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted under /api/v1.
+
+25. backend/routes/v1/predictions.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted under /api/v1.
+
+26. backend/routes/v1/sameMatchBuilder.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted at /api/v1/smb.
+
+27. backend/routes/v1/secondaryMarkets.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted at /api/v1/markets/secondary.
+
+28. backend/routes/vip.js - ACTIVE
+    Evidence: Imported by backend/server-express.js and mounted at /api/vip.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B03 batch state not advanced in this patch.
