@@ -1447,3 +1447,39 @@ Validation:
 - B26 post-correction group counts: DEPLOYMENT_OPERATIONS 3.
 - No source, register, map, merge, deletion, retirement, or refactor was performed.
 - Scope limited to B26 manifest stale-entry correction and purpose classification closure.
+## PHASE 2 - B27 PURPOSE CLASSIFICATION REVIEW - CLOSED
+
+Result: PASS WITH CORRECTION
+
+Scope:
+- Batch: B27 / ARCHIVE
+- Manifest declared asset_count before correction: 59
+- Actual manifest asset_paths reviewed: 58
+- Map rows reviewed: 58
+- Register/map/tracked/disk coverage: PASS
+
+Correction:
+- Corrected B27 manifest asset_count from 59 to 58.
+
+Reason:
+- Local validation confirmed B27 manifest asset_paths count is 58.
+- Local validation confirmed B27 map row count is 58.
+- Local validation confirmed all B27 manifest paths are tracked, on disk, in the register, and in the map.
+- Therefore the B27 asset_count value was stale; this was not missing archive purpose-classification work.
+
+Inspection:
+- All B27 reviewed assets are under _archive/.
+- Current state count: STALE_OR_SUPERSEDED 58.
+- Functional group counts: DATABASE_MIGRATION 6, GENERATED_OUTPUT 3, SCRIPT_TOOL 49.
+- No non-archive rows found.
+- No non-stale rows found.
+
+Changed files:
+- control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json
+- control-center/EDGE_CONTROL_CENTER.md
+
+Validation:
+- B27 post-correction manifest asset_count: 58.
+- B27 post-correction purpose classification review result: PASS WITH CORRECTION.
+- No source, register, map, merge, deletion, retirement, or refactor was performed.
+- Scope limited to B27 manifest asset_count correction and purpose classification closure.
