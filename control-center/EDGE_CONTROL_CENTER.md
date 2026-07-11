@@ -2748,3 +2748,64 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B12 batch state not advanced in this patch.
+
+## PHASE 3 - B13 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 - Active Use Identification
+- Batch: B13 / SCRIPTS_RUN_TRIGGER_SCHED
+- Question: Is each B13 governed file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+
+Outcome summary:
+- ACTIVE: 1
+- INDIRECTLY_ACTIVE: 4
+- MANUAL_USE: 15
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B13 ACTIVE assets:
+- scripts/run-master-pipeline.js
+
+B13 INDIRECTLY_ACTIVE assets:
+- scripts/run-edgemind-judge.js
+- scripts/run-stage1-math.js
+- scripts/run-stage2-context.js
+- scripts/run-stage3-volatility.js
+
+B13 MANUAL_USE assets:
+- scripts/_trigger-sync.js
+- scripts/external-scheduler.js
+- scripts/run-migration.js
+- scripts/run-pipeline-from-context-pack.js
+- scripts/run-pipeline.js
+- scripts/run-scheduled-sync.js
+- scripts/run-test.js
+- scripts/scheduler.js
+- scripts/start-rapidapi-cricket-mcp.js
+- scripts/trigger-grade.js
+- scripts/trigger-pipeline-sync.js
+- scripts/trigger-publication.js
+- scripts/trigger-refresh.js
+- scripts/trigger-settlement.js
+- scripts/wake-and-sync.js
+
+Evidence:
+- B13 is defined as the SCRIPTS_RUN_TRIGGER_SCHED batch with 20 governed assets.
+- B13 manifest rule selects scripts whose basename starts with run- or trigger-, plus exact files: _trigger-sync.js, scheduler.js, external-scheduler.js, wake-and-sync.js, and start-rapidapi-cricket-mcp.js.
+- Tracked-reference scan found backend/server-express.js references scripts/run-master-pipeline.js; therefore run-master-pipeline.js is currently active through backend runtime.
+- scripts/run-master-pipeline.js invokes scripts/run-stage1-math.js, scripts/run-stage2-context.js, scripts/run-stage3-volatility.js, and scripts/run-edgemind-judge.js; therefore those four scripts are indirectly active through the active pipeline orchestrator.
+- package.json exposes scripts/run-migration.js, scripts/run-pipeline-from-context-pack.js, scripts/trigger-grade.js, scripts/trigger-refresh.js, and scripts/trigger-settlement.js as npm operator commands.
+- SKCS-KNOWLEDGE scheduled jobs documentation references scripts/external-scheduler.js and scripts/scheduler.js, but no active runtime/process-manager caller was proven in this phase.
+- Remaining B13 references found by tracked scan are governance, report, dependency-map, archived-comparison, or operator documentation references.
+- No deletion, merge, retirement, dependency/security, or source/runtime/product change is authorized by this evidence.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B13 batch state not advanced in this patch.
