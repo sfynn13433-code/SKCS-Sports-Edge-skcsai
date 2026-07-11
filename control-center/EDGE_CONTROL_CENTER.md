@@ -2809,3 +2809,73 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B13 batch state not advanced in this patch.
+
+## PHASE 3 - B14 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 - Active Use Identification
+- Batch: B14 / SCRIPTS_INGEST_ENRICH_SYNC_IMPORT
+- Question: Is each B14 governed file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+
+Outcome summary:
+- ACTIVE: 2
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 29
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B14 ACTIVE assets:
+- scripts/fetch-live-fixtures.js
+- scripts/populate_sports_data.py
+
+B14 MANUAL_USE assets:
+- scripts/backfill-direct1x2-final-fields.js
+- scripts/backfill-fixture-ids.js
+- scripts/backfill-football-context.js
+- scripts/backfill-prediction-grading.js
+- scripts/backfill-predictions-accuracy.js
+- scripts/backfill-provider-event-id.js
+- scripts/bridge-raw-predictions-for-grading.js
+- scripts/bridge-to-final.sql
+- scripts/brute-force-ingest.js
+- scripts/compose-context-pack.js
+- scripts/cricapi-cache-refresh.js
+- scripts/discover-free-livescore-endpoints.js
+- scripts/enrich-lineups.js
+- scripts/enrich-team-form.js
+- scripts/fetch-thesportsdb-day.js
+- scripts/force-enrich-match.js
+- scripts/import-f1-formula1db.js
+- scripts/import-today-snapshot-pipeline.js
+- scripts/investigate-football536-current-fixtures.js
+- scripts/normalize-frontend-sports.js
+- scripts/normalize-sport-values.js
+- scripts/publish-cricbuzz-cricket.js
+- scripts/publish-cricbuzz-direct-fixtures.js
+- scripts/publish-prediction-76412.js
+- scripts/py_verify_thesportsdb_coverage.py
+- scripts/rebuild-canonical-from-api-sports.js
+- scripts/simple-sync.js
+- scripts/sync-bsd-enrichment.js
+- scripts/sync-ucl-context.js
+
+Evidence:
+- B14 is defined as the SCRIPTS_INGEST_ENRICH_SYNC_IMPORT batch with 31 governed assets.
+- B14 manifest rule selects scripts whose basename starts with backfill-, bridge-, brute-force, compose-, cricapi-, discover-, enrich-, fetch-, force-enrich-, import-, investigate-, normalize-, publish-, rebuild-, simple-sync, sync-, plus selected exact provider/verification assets.
+- Tracked-reference scan found backend/server-express.js references scripts/fetch-live-fixtures.js for full pipeline sync; therefore scripts/fetch-live-fixtures.js is currently active through backend runtime.
+- Tracked-reference scan found render.yaml startCommand uses python scripts/populate_sports_data.py; therefore scripts/populate_sports_data.py is currently active through deployment/process configuration.
+- package.json exposes operator commands for scripts/backfill-football-context.js, scripts/backfill-prediction-grading.js, scripts/bridge-raw-predictions-for-grading.js, scripts/compose-context-pack.js, scripts/cricapi-cache-refresh.js, scripts/enrich-lineups.js, scripts/enrich-team-form.js, scripts/fetch-thesportsdb-day.js, scripts/sync-bsd-enrichment.js, and scripts/sync-ucl-context.js.
+- scripts/backfill-prediction-grading.js invokes scripts/bridge-raw-predictions-for-grading.js, but the parent script is package/operator-driven rather than proven active runtime in this phase.
+- Remaining B14 references found by tracked scan are governance, report, dependency-map, audit, documentation, archived-comparison, or operator references.
+- No deletion, merge, retirement, dependency/security, or source/runtime/product change is authorized by this evidence.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B14 batch state not advanced in this patch.
