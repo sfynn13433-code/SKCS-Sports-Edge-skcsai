@@ -1306,17 +1306,20 @@ Result: PASS - NO CORRECTION
 
 Scope:
 - Batch: B22 / SUPABASE_MIGRATIONS
-- Assets reviewed: 60
+- Manifest declared asset_count: 60
+- Actual asset paths reviewed: 61
 - Files corrected: 0
 - Changed files:
   - control-center/EDGE_CONTROL_CENTER.md
 
 Inspection:
-- Confirmed B22 manifest contains 60 assets under supabase/migrations/.
+- Confirmed B22 manifest title is SUPABASE_MIGRATIONS.
+- Confirmed B22 manifest path list contains 61 actual asset paths under supabase/migrations/, despite declared asset_count being 60.
 - Confirmed B22 register entries are classified as DATABASE_MIGRATION.
 - Confirmed purpose evidence aligns with Supabase SQL migration files creating or altering database tables, indexes, functions, triggers, views, RLS policies, and related schema objects.
 
 Validation:
-- B22 post-inspection group counts: DATABASE_MIGRATION 60.
+- B22 post-inspection group counts: DATABASE_MIGRATION 61.
 - No proven B22 purpose classification mismatches found.
+- Count discrepancy recorded as a manifest metadata issue for later governance cleanup, not a B22 purpose classification mismatch.
 - Scope limited to B22 purpose classification review.
