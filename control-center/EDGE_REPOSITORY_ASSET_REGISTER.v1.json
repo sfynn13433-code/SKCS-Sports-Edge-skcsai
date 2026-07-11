@@ -15589,15 +15589,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Verify actual frontend references and whether all_leagues_raw.json remains current vs superseded.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Static/public frontend asset (all_leagues_raw.json) apparently used for UI presentation or configuration.",
-      "functional_group": "FRONTEND_UI",
+      "purpose_description": "Generated/static public data output (all_leagues_raw.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "UI",
-        "GENERATED"
+        "GENERATED",
+        "PUBLIC_DATA"
       ],
       "classification_evidence": [
         "Fast skim: public/data/all_leagues_raw.json under public/ indicates browser-delivered UI asset.",
-        "Top chunk first line: {"
+        "Top chunk first line: {",
+        "Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."
       ]
     },
     {
@@ -15621,15 +15623,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Verify actual frontend references and whether all_sports_raw.json remains current vs superseded.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Static/public frontend asset (all_sports_raw.json) apparently used for UI presentation or configuration.",
-      "functional_group": "FRONTEND_UI",
+      "purpose_description": "Generated/static public data output (all_sports_raw.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "UI",
-        "GENERATED"
+        "GENERATED",
+        "PUBLIC_DATA"
       ],
       "classification_evidence": [
         "Fast skim: public/data/all_sports_raw.json under public/ indicates browser-delivered UI asset.",
-        "Top chunk first line: ["
+        "Top chunk first line: [",
+        "Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."
       ]
     },
     {
@@ -15653,15 +15657,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Verify actual frontend references and whether context-pack-2026-05-17.json remains current vs superseded.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Public context pack JSON for pipeline consumption: context-pack-2026-05-17.json.",
-      "functional_group": "FRONTEND_UI",
+      "purpose_description": "Generated/static public data output (context-pack-2026-05-17.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "UI",
-        "GENERATED"
+        "GENERATED",
+        "PUBLIC_DATA"
       ],
       "classification_evidence": [
         "Fast skim: public/data/context-pack-2026-05-17.json under public/ indicates browser-delivered UI asset.",
-        "Top chunk first line: {"
+        "Top chunk first line: {",
+        "Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."
       ]
     },
     {
@@ -15685,15 +15691,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Verify actual frontend references and whether event-details-cache.json remains current vs superseded.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Static/public frontend asset (event-details-cache.json) apparently used for UI presentation or configuration.",
-      "functional_group": "FRONTEND_UI",
+      "purpose_description": "Generated/static public data output (event-details-cache.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "UI",
-        "GENERATED"
+        "GENERATED",
+        "PUBLIC_DATA"
       ],
       "classification_evidence": [
         "Fast skim: public/data/event-details-cache.json under public/ indicates browser-delivered UI asset.",
-        "Top chunk first line: {"
+        "Top chunk first line: {",
+        "Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."
       ]
     },
     {
@@ -15717,15 +15725,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Verify actual frontend references and whether h2h-2026-05-17.json remains current vs superseded.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Static/public frontend asset (h2h-2026-05-17.json) apparently used for UI presentation or configuration.",
-      "functional_group": "FRONTEND_UI",
+      "purpose_description": "Generated/static public data output (h2h-2026-05-17.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "UI",
-        "GENERATED"
+        "GENERATED",
+        "PUBLIC_DATA"
       ],
       "classification_evidence": [
         "Fast skim: public/data/h2h-2026-05-17.json under public/ indicates browser-delivered UI asset.",
-        "Top chunk first line: {"
+        "Top chunk first line: {",
+        "Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."
       ]
     },
     {
@@ -15749,15 +15759,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Verify actual frontend references and whether importance-2026-05-17.json remains current vs superseded.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Static/public frontend asset (importance-2026-05-17.json) apparently used for UI presentation or configuration.",
-      "functional_group": "FRONTEND_UI",
+      "purpose_description": "Generated/static public data output (importance-2026-05-17.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "UI",
-        "GENERATED"
+        "GENERATED",
+        "PUBLIC_DATA"
       ],
       "classification_evidence": [
         "Fast skim: public/data/importance-2026-05-17.json under public/ indicates browser-delivered UI asset.",
-        "Top chunk first line: {"
+        "Top chunk first line: {",
+        "Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."
       ]
     },
     {
@@ -15781,15 +15793,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Verify actual frontend references and whether injuries-2026-05-17.json remains current vs superseded.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Static/public frontend asset (injuries-2026-05-17.json) apparently used for UI presentation or configuration.",
-      "functional_group": "FRONTEND_UI",
+      "purpose_description": "Generated/static public data output (injuries-2026-05-17.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "UI",
-        "GENERATED"
+        "GENERATED",
+        "PUBLIC_DATA"
       ],
       "classification_evidence": [
         "Fast skim: public/data/injuries-2026-05-17.json under public/ indicates browser-delivered UI asset.",
-        "Top chunk first line: {"
+        "Top chunk first line: {",
+        "Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."
       ]
     },
     {
@@ -15813,15 +15827,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Verify actual frontend references and whether news-injury-cache.json remains current vs superseded.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Static/public frontend asset (news-injury-cache.json) apparently used for UI presentation or configuration.",
-      "functional_group": "FRONTEND_UI",
+      "purpose_description": "Generated/static public data output (news-injury-cache.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "UI",
-        "GENERATED"
+        "GENERATED",
+        "PUBLIC_DATA"
       ],
       "classification_evidence": [
         "Fast skim: public/data/news-injury-cache.json under public/ indicates browser-delivered UI asset.",
-        "Top chunk first line: {"
+        "Top chunk first line: {",
+        "Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."
       ]
     },
     {
@@ -15845,15 +15861,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Verify actual frontend references and whether pipeline-dry-2026-05-17.json remains current vs superseded.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Static/public frontend asset (pipeline-dry-2026-05-17.json) apparently used for UI presentation or configuration.",
-      "functional_group": "FRONTEND_UI",
+      "purpose_description": "Generated/static public data output (pipeline-dry-2026-05-17.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "UI",
-        "GENERATED"
+        "GENERATED",
+        "PUBLIC_DATA"
       ],
       "classification_evidence": [
         "Fast skim: public/data/pipeline-dry-2026-05-17.json under public/ indicates browser-delivered UI asset.",
-        "Top chunk first line: {"
+        "Top chunk first line: {",
+        "Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."
       ]
     },
     {
@@ -15877,15 +15895,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Verify actual frontend references and whether standings-cache.json remains current vs superseded.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Static/public frontend asset (standings-cache.json) apparently used for UI presentation or configuration.",
-      "functional_group": "FRONTEND_UI",
+      "purpose_description": "Generated/static public data output (standings-cache.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "UI",
-        "GENERATED"
+        "GENERATED",
+        "PUBLIC_DATA"
       ],
       "classification_evidence": [
         "Fast skim: public/data/standings-cache.json under public/ indicates browser-delivered UI asset.",
-        "Top chunk first line: {}"
+        "Top chunk first line: {}",
+        "Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."
       ]
     },
     {
@@ -15909,15 +15929,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Verify actual frontend references and whether team-form-2026-05-17.json remains current vs superseded.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Static/public frontend asset (team-form-2026-05-17.json) apparently used for UI presentation or configuration.",
-      "functional_group": "FRONTEND_UI",
+      "purpose_description": "Generated/static public data output (team-form-2026-05-17.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "UI",
-        "GENERATED"
+        "GENERATED",
+        "PUBLIC_DATA"
       ],
       "classification_evidence": [
         "Fast skim: public/data/team-form-2026-05-17.json under public/ indicates browser-delivered UI asset.",
-        "Top chunk first line: {"
+        "Top chunk first line: {",
+        "Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."
       ]
     },
     {
@@ -15941,15 +15963,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Verify actual frontend references and whether team-form-cache.json remains current vs superseded.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Static/public frontend asset (team-form-cache.json) apparently used for UI presentation or configuration.",
-      "functional_group": "FRONTEND_UI",
+      "purpose_description": "Generated/static public data output (team-form-cache.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "UI",
-        "GENERATED"
+        "GENERATED",
+        "PUBLIC_DATA"
       ],
       "classification_evidence": [
         "Fast skim: public/data/team-form-cache.json under public/ indicates browser-delivered UI asset.",
-        "Top chunk first line: {"
+        "Top chunk first line: {",
+        "Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."
       ]
     },
     {
@@ -15973,15 +15997,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Verify actual frontend references and whether travel-2026-05-17.json remains current vs superseded.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Static/public frontend asset (travel-2026-05-17.json) apparently used for UI presentation or configuration.",
-      "functional_group": "FRONTEND_UI",
+      "purpose_description": "Generated/static public data output (travel-2026-05-17.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "UI",
-        "GENERATED"
+        "GENERATED",
+        "PUBLIC_DATA"
       ],
       "classification_evidence": [
         "Fast skim: public/data/travel-2026-05-17.json under public/ indicates browser-delivered UI asset.",
-        "Top chunk first line: {"
+        "Top chunk first line: {",
+        "Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."
       ]
     },
     {
@@ -16005,15 +16031,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Verify actual frontend references and whether tsdb-coverage-2026-05-17.json remains current vs superseded.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Static/public frontend asset (tsdb-coverage-2026-05-17.json) apparently used for UI presentation or configuration.",
-      "functional_group": "FRONTEND_UI",
+      "purpose_description": "Generated/static public data output (tsdb-coverage-2026-05-17.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "UI",
-        "GENERATED"
+        "GENERATED",
+        "PUBLIC_DATA"
       ],
       "classification_evidence": [
         "Fast skim: public/data/tsdb-coverage-2026-05-17.json under public/ indicates browser-delivered UI asset.",
-        "Top chunk first line: {"
+        "Top chunk first line: {",
+        "Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."
       ]
     },
     {
@@ -16037,15 +16065,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Verify actual frontend references and whether tsdb-coverage-2026-05-18.json remains current vs superseded.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Static/public frontend asset (tsdb-coverage-2026-05-18.json) apparently used for UI presentation or configuration.",
-      "functional_group": "FRONTEND_UI",
+      "purpose_description": "Generated/static public data output (tsdb-coverage-2026-05-18.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "UI",
-        "GENERATED"
+        "GENERATED",
+        "PUBLIC_DATA"
       ],
       "classification_evidence": [
         "Fast skim: public/data/tsdb-coverage-2026-05-18.json under public/ indicates browser-delivered UI asset.",
-        "Top chunk first line: {"
+        "Top chunk first line: {",
+        "Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."
       ]
     },
     {
@@ -16069,15 +16099,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Verify actual frontend references and whether tsdb-coverage-2026-05-19.json remains current vs superseded.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Static/public frontend asset (tsdb-coverage-2026-05-19.json) apparently used for UI presentation or configuration.",
-      "functional_group": "FRONTEND_UI",
+      "purpose_description": "Generated/static public data output (tsdb-coverage-2026-05-19.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "UI",
-        "GENERATED"
+        "GENERATED",
+        "PUBLIC_DATA"
       ],
       "classification_evidence": [
         "Fast skim: public/data/tsdb-coverage-2026-05-19.json under public/ indicates browser-delivered UI asset.",
-        "Top chunk first line: {"
+        "Top chunk first line: {",
+        "Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."
       ]
     },
     {
@@ -16101,14 +16133,16 @@
       "validation_status": "REGISTERED",
       "next_validation": "Verify actual frontend references and whether tsdb-day-2026-05-17.json remains current vs superseded.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Static/public frontend asset (tsdb-day-2026-05-17.json) apparently used for UI presentation or configuration.",
-      "functional_group": "FRONTEND_UI",
+      "purpose_description": "Generated/static public data output (tsdb-day-2026-05-17.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "UI",
-        "GENERATED"
+        "GENERATED",
+        "PUBLIC_DATA"
       ],
       "classification_evidence": [
-        "Fast skim: public/data/tsdb-day-2026-05-17.json under public/ indicates browser-delivered UI asset."
+        "Fast skim: public/data/tsdb-day-2026-05-17.json under public/ indicates browser-delivered UI asset.",
+        "Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."
       ]
     },
     {
@@ -16132,15 +16166,17 @@
       "validation_status": "REGISTERED",
       "next_validation": "Verify actual frontend references and whether vip-stress-saturday.json remains current vs superseded.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Static/public frontend asset (vip-stress-saturday.json) apparently used for UI presentation or configuration.",
-      "functional_group": "FRONTEND_UI",
+      "purpose_description": "Generated/static public data output (vip-stress-saturday.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component.",
+      "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "UI",
-        "GENERATED"
+        "GENERATED",
+        "PUBLIC_DATA"
       ],
       "classification_evidence": [
         "Fast skim: public/data/vip-stress-saturday.json under public/ indicates browser-delivered UI asset.",
-        "Top chunk first line: {"
+        "Top chunk first line: {",
+        "Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."
       ]
     },
     {

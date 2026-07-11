@@ -1275,3 +1275,27 @@ Correction:
 
 Out of scope:
 - GitHub vulnerability notices were not inspected or changed.
+
+## PHASE 2 - B21 PURPOSE CLASSIFICATION REVIEW - CLOSED
+
+Result: PASS WITH CORRECTION
+
+Scope:
+- Batch: B21 / PUBLIC_UI
+- Assets reviewed: 64
+- Files corrected: 18
+- Changed files:
+  - control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json
+
+Correction:
+- public/data/*.json functional_group changed from FRONTEND_UI to GENERATED_OUTPUT.
+
+Reason:
+- Source inspection confirmed the public/data JSON files are generated/static sports data and cache outputs, including league data, sports data, event details, team form, injury/news, coverage, and VIP stress data.
+- Reference inspection confirmed these files are consumed as data/cache outputs from frontend fetch paths and scripts, not maintained as UI pages/components/styles.
+- Existing taxonomy supports GENERATED_OUTPUT for generated JSON/data/report artifacts.
+
+Validation:
+- B21 manifest count confirmed: 64.
+- B21 post-correction group counts: FRONTEND_UI 38, GENERATED_OUTPUT 18, PUBLIC_ASSET 8.
+- Scope limited to B21 purpose classification correction.
