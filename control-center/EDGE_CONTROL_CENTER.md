@@ -1587,3 +1587,30 @@ Validation:
 - B29 purpose classification review result: PASS WITH CORRECTION.
 - No source, manifest, merge, deletion, retirement, runtime repair, or refactor was performed.
 - Scope limited to B29 Qwen purpose classification correction and closure.
+## PHASE 2 - B22 MANIFEST COUNT REPAIR - CLOSED
+
+Result: PASS
+
+Scope:
+- Batch: B22 / SUPABASE_MIGRATIONS
+- Repair target: EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json stale asset_count only.
+
+Correction:
+- Corrected B22 manifest asset_count from 60 to 61.
+
+Reason:
+- Phase 2 final closure control found B22 asset_count 60 but asset_paths.Count 61.
+- Read-only B22 inspection confirmed B22 map row count is 61.
+- The first and last manifest paths matched the B22 migration range.
+- This was a stale manifest count, not missing purpose-classification work.
+
+Changed files:
+- control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json
+- control-center/EDGE_CONTROL_CENTER.md
+
+Validation:
+- B22 post-repair asset_count: 61.
+- B22 post-repair asset_paths.Count: 61.
+- Repository-wide manifest count check: PASS.
+- No source, register, map, merge, deletion, retirement, runtime repair, or refactor was performed.
+- Scope limited to B22 manifest count correction before Phase 2 closure.
