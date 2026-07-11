@@ -1189,3 +1189,19 @@ Phase 2 purpose classification evidence: B15
   - scripts/render-api-deploy.js functional_group changed from SCRIPT_TOOL to DEPLOYMENT_OPERATIONS.
 - evidence: Local PowerShell B15 manifest/register/source inspection confirmed B15 membership, verified all 52 source files exist, verified 52/52 register coverage, and corrected twelve proven purpose mismatches based on focused source review. Scope stayed limited to B15 purpose classification.
 
+
+Phase 2 purpose classification evidence: B16
+
+- batch_id: B16
+- title: DOCS_ROOT_MD_TXT
+- asset_count: 36
+- register_coverage: 36/36
+- result: PASS WITH CORRECTION
+- batch_manifest_modified: NO
+- register_modified: YES
+- corrections:
+  - AGENTS.md functional_group changed from PROVIDER_INTEGRATION to DOCUMENTATION_KNOWLEDGE.
+  - DEEPSEEK_STATE.md functional_group changed from PROVIDER_INTEGRATION to DOCUMENTATION_KNOWLEDGE.
+  - GEMINI.md functional_group changed from PROVIDER_INTEGRATION to DOCUMENTATION_KNOWLEDGE.
+  - Purpose descriptions corrected for proven B16 documentation assets based on focused source inspection.
+- evidence: Local PowerShell B16 manifest/register/source inspection confirmed 36/36 source files exist, verified 36/36 register coverage, corrected three proven functional_group mismatches, corrected proven B16 purpose-description mismatches, and kept scope limited to B16 purpose classification.

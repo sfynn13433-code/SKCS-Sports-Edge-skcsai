@@ -610,8 +610,8 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this PROVIDER_INTEGRATION doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: AGENTS.md is a PROVIDER_INTEGRATION asset for AI provider session/usage notes.",
-      "functional_group": "PROVIDER_INTEGRATION",
+      "purpose_description": "Reviewed classification: AGENTS.md is a project operator and agent guide covering SKCS AI Sports Edge architecture, backend services, database, authentication, providers, deployment, and operating context.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "PROVIDER",
         "RUNTIME",
@@ -652,7 +652,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: ARCHITECTURE_OVERVIEW.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "purpose_description": "Reviewed classification: ARCHITECTURE_OVERVIEW.md documents dashboard architecture, centralized state, component hierarchy, routing, events, and DOM update flow.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -722,7 +722,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: COMPREHENSIVE_FOOTBALL_RULES_REPORT.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "purpose_description": "Reviewed classification: COMPREHENSIVE_FOOTBALL_RULES_REPORT.md is a comprehensive football rules ecosystem report covering rule frameworks, algorithms, constraints, and governance mechanisms.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -755,7 +755,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: CRON_SETUP.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "purpose_description": "Reviewed classification: CRON_SETUP.md documents cricket cron-job.org setup for Render cron execution, including URL, schedule, timezone, method, timeout, and expected response.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -892,8 +892,8 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this PROVIDER_INTEGRATION doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: DEEPSEEK_STATE.md is a PROVIDER_INTEGRATION asset for repository governance/inventory documentation.",
-      "functional_group": "PROVIDER_INTEGRATION",
+      "purpose_description": "Reviewed classification: DEEPSEEK_STATE.md records SKCS-INFRA-001 Supabase decomposition and migration programme state, freeze rules, phase plan, and extensions to retire.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "PROVIDER",
         "RUNTIME",
@@ -924,7 +924,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: DEPLOYMENT_STATUS.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide.",
+      "purpose_description": "Reviewed classification: DEPLOYMENT_STATUS.md records SKCS Master Rulebook v2.0 deployment progress, committed files, pending SQL migration steps, and rollout status.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -1030,7 +1030,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: FRONTEND_FIXES_SUMMARY.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide.",
+      "purpose_description": "Reviewed classification: FRONTEND_FIXES_SUMMARY.md summarizes completed frontend fixes for Master Rulebook alignment, including risk thresholds, Safe Haven logic, secondary markets, and EdgeMind messaging.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -1067,7 +1067,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: FRONTEND_INVESTIGATION_REPORT.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide.",
+      "purpose_description": "Reviewed classification: FRONTEND_INVESTIGATION_REPORT.md is a historical frontend investigation report covering the 58 percent ghost confidence issue, risk label mapping, and frontend root causes.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -1141,8 +1141,8 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this PROVIDER_INTEGRATION doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: GEMINI.md is a PROVIDER_INTEGRATION asset for AI provider session/usage notes.",
-      "functional_group": "PROVIDER_INTEGRATION",
+      "purpose_description": "Reviewed classification: GEMINI.md documents the SKCS AI Sports Edge project stack and architecture, including backend, Supabase, ingestion, AI providers, prediction engine, ACCA builder, and deployment architecture.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "PROVIDER",
         "RUNTIME",
@@ -1178,7 +1178,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: IMPLEMENTATION_GAP_ANALYSIS.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide.",
+      "purpose_description": "Reviewed classification: IMPLEMENTATION_GAP_ANALYSIS.md is a historical Master Rulebook implementation gap analysis comparing rulebook specifications against implementation status.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -1215,7 +1215,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: IMPLEMENTATION_SUMMARY.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "purpose_description": "Reviewed classification: IMPLEMENTATION_SUMMARY.md summarizes the completed dashboard refactor, including centralized state management, isolated components, routing, and delivered UI changes.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -1318,7 +1318,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: MIGRATION_FREEZE.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "purpose_description": "Reviewed classification: MIGRATION_FREEZE.md is a SKCS-INFRA-001 migration freeze directive suspending feature development, schemas, migrations, and new endpoints until Phase 1 completion.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION"
@@ -1348,7 +1348,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: PRIVACY_POLICY.md is a DOCUMENTATION_KNOWLEDGE asset for audit report and review findings.",
+      "purpose_description": "Reviewed classification: PRIVACY_POLICY.md is the SKCS AI Sports Edge privacy and data protection policy covering POPIA/GDPR, data collection, lawful basis, sharing, transfers, and retention.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -1451,7 +1451,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: README_DATA_INGESTION.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "purpose_description": "Reviewed classification: README_DATA_INGESTION.md documents sports data ingestion requirements, public data libraries, install commands, and source notes for supported sports.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION"
@@ -1481,7 +1481,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: SINGLE_USE_AUDIT_REPORT.md is a DOCUMENTATION_KNOWLEDGE asset for audit report and review findings.",
+      "purpose_description": "Reviewed classification: SINGLE_USE_AUDIT_REPORT.md is an audit report for deprecated global single-use restriction logic, affected files, correct ACCA-only restrictions, and required policy corrections.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -3575,7 +3575,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: SKCS_MASTER_RULEBOOK.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide.",
+      "purpose_description": "Reviewed classification: SKCS_MASTER_RULEBOOK.md is the SKCS AI Sports Edge Master Rulebook v2.0 defining risk/confidence framework, publication rules, market governance, and ACCA/SMB rules.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -3640,7 +3640,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: SMB_WINDSURF_FINAL_IMPLEMENTATION.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "purpose_description": "Reviewed classification: SMB_WINDSURF_FINAL_IMPLEMENTATION.md is the locked SMB v2.0 final implementation specification for Windsurf, covering model architecture, Gulf in Class gate, tier thresholds, and correlation rules.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -3671,7 +3671,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: SMB_WINDSURF_IMPLEMENTATION_PROMPT.md is a DOCUMENTATION_KNOWLEDGE asset for master rulebook implementation guide.",
+      "purpose_description": "Reviewed classification: SMB_WINDSURF_IMPLEMENTATION_PROMPT.md is the SMB v2.0 implementation prompt for Windsurf, listing target files, required functions, leg generation, confidence calculation, and correlation handling.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -3744,7 +3744,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: STRICT_RULES.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "purpose_description": "Reviewed classification: STRICT_RULES.md is an AI coding assistant safety directive defining pre-flight verification, no-deletion policy, scope containment, traceability, and code modification rules.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -3777,7 +3777,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: SUPABASE_DIAGNOSTIC_REPORT.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "purpose_description": "Reviewed classification: SUPABASE_DIAGNOSTIC_REPORT.md is a read-only Supabase diagnostic report covering schema analysis, constraints, rules, duplicate detection, and merge potential.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION"
@@ -3807,7 +3807,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: SUPABASE_TABLES_SUMMARY.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "purpose_description": "Reviewed classification: SUPABASE_TABLES_SUMMARY.md is a Supabase table summary catalogue listing tables by function across prediction, fixture, match, and supporting data groups.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION"
@@ -3837,7 +3837,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: SUPABASE_TABLE_ANALYSIS.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "purpose_description": "Reviewed classification: SUPABASE_TABLE_ANALYSIS.md is a Supabase table analysis report covering table counts, RLS, indexes, constraints, triggers, columns, and per-table statistics.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
@@ -14599,7 +14599,7 @@
       "validation_status": "REGISTERED",
       "next_validation": "Inspect how this DOCUMENTATION_KNOWLEDGE doc/log is consumed by the system and validate any governance/rule dependencies later.",
       "notes": "Bootstrap registration only. Registration does not assert correctness, currency, approval, permanence, runtime use, or compatibility with Scout/FIP.",
-      "purpose_description": "Rough classification: football-ecosystem-report.md is a DOCUMENTATION_KNOWLEDGE asset for repository governance/inventory documentation.",
+      "purpose_description": "Reviewed classification: football-ecosystem-report.md is a football ecosystem report covering database structures, APIs, adapters, prediction logic, frontend components, and deployment configuration.",
       "functional_group": "DOCUMENTATION_KNOWLEDGE",
       "relationship_tags": [
         "DOCUMENTATION",
