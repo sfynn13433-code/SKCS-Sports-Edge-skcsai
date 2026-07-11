@@ -2495,3 +2495,63 @@ Validation boundary:
 - No source/runtime/product files changed.
 - No active-use outcome authorizes deletion.
 - B09 batch state not advanced in this patch.
+## PHASE 3 — B10 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 — Active Use Identification
+- Batch: B10 / SCRIPTS_AUDIT_GOV
+- Question: Is each B10 governed file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+
+Outcome summary:
+- ACTIVE: 0
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 27
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B10 MANUAL_USE assets:
+- scripts/apply-db-governance.js
+- scripts/apply-migrations.js
+- scripts/audit-api-call-map.js
+- scripts/audit-api-sports-usage.js
+- scripts/audit-bigballs-discovery.js
+- scripts/audit-bsd-discovery.js
+- scripts/audit-bsd-league-inventory.js
+- scripts/audit-cricket-final-tables.js
+- scripts/audit-cricket-rules.js
+- scripts/audit-cricket-storage.js
+- scripts/audit-cricket-tables.js
+- scripts/audit-database.js
+- scripts/audit-execution-spine.js
+- scripts/audit-football-rules-alignment.js
+- scripts/audit-grading-pipeline.js
+- scripts/audit-placeholders-and-insights.js
+- scripts/audit-soccerdata-discovery.js
+- scripts/audit-soccerdata-summer-coverage.js
+- scripts/audit-sport-values.js
+- scripts/audit-sportsdataio-boundary.ps1
+- scripts/audit-table-usage.js
+- scripts/audit-v2-foundation.js
+- scripts/audit-v2-identity-deep.js
+- scripts/audit-v2-provider-coverage.js
+- scripts/gatekeeper-pipeline.js
+- scripts/master-qa.js
+- scripts/secondary-market-gatekeeper.js
+
+Evidence:
+- B10 is defined as the SCRIPTS_AUDIT_GOV batch.
+- B10 manifest rule selects scripts/audit-* plus exact governance script names: apply-db-governance.js, apply-migrations.js, master-qa.js, gatekeeper-pipeline.js, and secondary-market-gatekeeper.js.
+- package.json exposes several B10 scripts as npm operator commands: accuracy:audit, audit:api, audit:execution-spine, audit:bsd-discovery, audit:bsd-league-inventory, audit:bigballs-discovery, audit:soccerdata-discovery, and audit:soccerdata-summer.
+- The exact governance scripts are manual/operator tools: database governance application, migration application, master QA, and gatekeeper/secondary-market governance.
+- No B10 file is classified as active runtime/product code in this phase.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B10 batch state not advanced in this patch.
