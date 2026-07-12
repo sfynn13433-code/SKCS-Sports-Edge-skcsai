@@ -596,16 +596,16 @@ Required state snapshot:
   "completed_batches": [
     "B01-B03",
     "B04-B06",
-    "B07-B10"
+    "B07-B10",
+    "B11-B14"
   ],
   "remaining_batches": [
-    "B11-B14",
     "B15-B18",
     "B19-B22",
     "B23-B26",
     "B27-B29"
   ],
-  "next_deterministic_batch": "B11-B14",
+  "next_deterministic_batch": "B15-B18",
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,
@@ -8744,10 +8744,313 @@ Explicit scope confirmation:
 - B11-B29 not inspected for implementation in this packet.
 - No runtime/source files changed.
 
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized by this packet.
+
+## PHASE 7 - B11-B14 MERGE AND CONSOLIDATION EVIDENCE
+
+Result: PASS WITH NO_ACTION AND RUNTIME-PROOF HOLDS
+
+Scope:
+- Phase: PHASE_7 - Merge and Consolidation
+- Grouped review unit: B11-B14
+- Start HEAD: 65882245
+- Inspection scope: B11, B12, B13, B14 only
+- B15-B29 touched: NO
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Authority sources reviewed:
+- control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json B11, B12, B13, and B14 membership
+- PHASE 4 - B11-B14 LEGACY AND REPLACEMENT IDENTIFICATION EVIDENCE
+- PHASE 5 - B11-B14 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+- PHASE 6 - B11-B14 CANONICAL AUTHORITY SELECTION EVIDENCE
+
+B11 assets inspected (59):
+1. scripts/_check-db.js
+2. scripts/_check-final-table.js
+3. scripts/_check-match-dates.js
+4. scripts/_check-plan-visibility.js
+5. scripts/_check-team-locks.js
+6. scripts/_check-tier.js
+7. scripts/check-acca-data.js
+8. scripts/check-accuracy-schema.js
+9. scripts/check-accuracy-time.js
+10. scripts/check-all-fixtures.js
+11. scripts/check-cache-schema.js
+12. scripts/check-cache.js
+13. scripts/check-canonical-events-schema.js
+14. scripts/check-cricket-rows.js
+15. scripts/check-db-schema.js
+16. scripts/check-events-schema.js
+17. scripts/check-events-status.js
+18. scripts/check-events.js
+19. scripts/check-filtered-schema.js
+20. scripts/check-final-table-columns.js
+21. scripts/check-final-table-schema.js
+22. scripts/check-fixtures-structure.js
+23. scripts/check-french-league.js
+24. scripts/check-graded.js
+25. scripts/check-match-details.js
+26. scripts/check-match-id-mapping.js
+27. scripts/check-match-prediction.js
+28. scripts/check-old-events.js
+29. scripts/check-predictions.js
+30. scripts/check-publication-state.js
+31. scripts/check-raw-json.js
+32. scripts/check-raw-prediction-structure.js
+33. scripts/check-scheduler-schema.js
+34. scripts/check-schema.js
+35. scripts/check-stages-schema.js
+36. scripts/check-supabase-vs-pg-tiers.js
+37. scripts/check-tables.js
+38. scripts/check-timestamp-cols.js
+39. scripts/migration1-plan-visibility.js
+40. scripts/schema-introspection.js
+41. scripts/setup-rls.js
+42. scripts/task1-schema-update.js
+43. scripts/validate-backfill-accuracy.js
+44. scripts/validate-keys.js
+45. scripts/validate-relational-migration.js
+46. scripts/verify_dom_structure.js
+47. scripts/verify-acca-legs.js
+48. scripts/verify-accas.js
+49. scripts/verify-bigballs-provider.js
+50. scripts/verify-bsd-crosswalk.js
+51. scripts/verify-bsd-enrichment.js
+52. scripts/verify-bsd-provider.js
+53. scripts/verify-db-rule-alignment.js
+54. scripts/verify-end-to-end-loop.js
+55. scripts/verify-master-rulebook-alignment.js
+56. scripts/verify-new-predictions.js
+57. scripts/verify-soccerdata-provider.js
+58. scripts/verify-sportsdb-coverage.js
+59. scripts/verify-vercel-build.js
+
+B12 assets inspected (66):
+1. scripts/browser_console_test.js
+2. scripts/debug-cricket-ai-predictions.js
+3. scripts/debug-cricket-insights-schema.js
+4. scripts/debug-cricket-simple.js
+5. scripts/debug-key.js
+6. scripts/debug-matches-content.js
+7. scripts/debug-matches-json.js
+8. scripts/diagnose-filtering.js
+9. scripts/diagnostic-espn-fixed.js
+10. scripts/diagnostic-espn.js
+11. scripts/diagnostic-thesportsdb.js
+12. scripts/examine-prediction-76412.js
+13. scripts/examine-tier-rules.js
+14. scripts/simulate-filtering.js
+15. scripts/smoke-test.js
+16. scripts/test_full_fallback_flow.js
+17. scripts/test-ai-predictions-542703.js
+18. scripts/test-ai-predictions-endpoint.js
+19. scripts/test-all-rapid-hosts.js
+20. scripts/test-antigravity.js
+21. scripts/test-api.js
+22. scripts/test-api2.js
+23. scripts/test-cache.js
+24. scripts/test-corrected-endpoint.js
+25. scripts/test-cricbuzz.js
+26. scripts/test-cricket-live-line-advance-provider.js
+27. scripts/test-cricket-live-line-provider.js
+28. scripts/test-cron.js
+29. scripts/test-divanscore-rankings-fallback.js
+30. scripts/test-fetch.js
+31. scripts/test-final-endpoint.js
+32. scripts/test-fixed-ai-predictions.js
+33. scripts/test-fixed-endpoint.js
+34. scripts/test-fixed-pipeline.js
+35. scripts/test-football-h2h-pipeline-integration.js
+36. scripts/test-football-highlights-h2h.js
+37. scripts/test-football-risk-tier-mapper.js
+38. scripts/test-football536-endpoints.js
+39. scripts/test-football536-fixtures-normalizer.js
+40. scripts/test-free-livescore-fixtures.js
+41. scripts/test-free-livescore-search.js
+42. scripts/test-live-football-api-priority.js
+43. scripts/test-livescore6-cricket-provider.js
+44. scripts/test-logger.js
+45. scripts/test-metrx-factory-top-metrics.js
+46. scripts/test-metrx-top-metrics.js
+47. scripts/test-network.js
+48. scripts/test-odds-integration.js
+49. scripts/test-optimized-endpoints.js
+50. scripts/test-pipeline-integration.js
+51. scripts/test-pro-football-api.js
+52. scripts/test-rank-calibration.js
+53. scripts/test-rank-injection.js
+54. scripts/test-sports-live-rankings.js
+55. scripts/test-sportsapi-pro-football-adapter.js
+56. scripts/test-sportsapi-pro-football-joinability.js
+57. scripts/test-sportsapi-pro-football.js
+58. scripts/test-sportsrc-fixtures.js
+59. scripts/test-sportsrc-health.js
+60. scripts/test-sportsrc-odds.js
+61. scripts/test-telemetry-integration.js
+62. scripts/test-thesportsdb-endpoints.js
+63. scripts/test-weather-pipeline.js
+64. scripts/trace-data-flow.js
+65. scripts/trace-filtering-rules.js
+66. scripts/trace-filtering-timestamp.js
+
+B13 assets inspected (20):
+1. scripts/_trigger-sync.js
+2. scripts/external-scheduler.js
+3. scripts/run-edgemind-judge.js
+4. scripts/run-master-pipeline.js
+5. scripts/run-migration.js
+6. scripts/run-pipeline-from-context-pack.js
+7. scripts/run-pipeline.js
+8. scripts/run-scheduled-sync.js
+9. scripts/run-stage1-math.js
+10. scripts/run-stage2-context.js
+11. scripts/run-stage3-volatility.js
+12. scripts/run-test.js
+13. scripts/scheduler.js
+14. scripts/start-rapidapi-cricket-mcp.js
+15. scripts/trigger-grade.js
+16. scripts/trigger-pipeline-sync.js
+17. scripts/trigger-publication.js
+18. scripts/trigger-refresh.js
+19. scripts/trigger-settlement.js
+20. scripts/wake-and-sync.js
+
+B14 assets inspected (31):
+1. scripts/backfill-direct1x2-final-fields.js
+2. scripts/backfill-fixture-ids.js
+3. scripts/backfill-football-context.js
+4. scripts/backfill-prediction-grading.js
+5. scripts/backfill-predictions-accuracy.js
+6. scripts/backfill-provider-event-id.js
+7. scripts/bridge-raw-predictions-for-grading.js
+8. scripts/bridge-to-final.sql
+9. scripts/brute-force-ingest.js
+10. scripts/compose-context-pack.js
+11. scripts/cricapi-cache-refresh.js
+12. scripts/discover-free-livescore-endpoints.js
+13. scripts/enrich-lineups.js
+14. scripts/enrich-team-form.js
+15. scripts/fetch-live-fixtures.js
+16. scripts/fetch-thesportsdb-day.js
+17. scripts/force-enrich-match.js
+18. scripts/import-f1-formula1db.js
+19. scripts/import-today-snapshot-pipeline.js
+20. scripts/investigate-football536-current-fixtures.js
+21. scripts/normalize-frontend-sports.js
+22. scripts/normalize-sport-values.js
+23. scripts/populate_sports_data.py
+24. scripts/publish-cricbuzz-cricket.js
+25. scripts/publish-cricbuzz-direct-fixtures.js
+26. scripts/publish-prediction-76412.js
+27. scripts/py_verify_thesportsdb_coverage.py
+28. scripts/rebuild-canonical-from-api-sports.js
+29. scripts/simple-sync.js
+30. scripts/sync-bsd-enrichment.js
+31. scripts/sync-ucl-context.js
+
+B11-B14 Phase 7 decision summary:
+- IMPLEMENT_CONSOLIDATION: 0 assets
+- NO_ACTION: 112 assets
+- HOLD_NEEDS_RUNTIME_PROOF: 64 assets
+
+HOLD_NEEDS_RUNTIME_PROOF assets:
+1. scripts/_trigger-sync.js
+2. scripts/backfill-direct1x2-final-fields.js
+3. scripts/backfill-fixture-ids.js
+4. scripts/backfill-football-context.js
+5. scripts/backfill-prediction-grading.js
+6. scripts/backfill-predictions-accuracy.js
+7. scripts/backfill-provider-event-id.js
+8. scripts/bridge-raw-predictions-for-grading.js
+9. scripts/bridge-to-final.sql
+10. scripts/brute-force-ingest.js
+11. scripts/compose-context-pack.js
+12. scripts/cricapi-cache-refresh.js
+13. scripts/discover-free-livescore-endpoints.js
+14. scripts/enrich-lineups.js
+15. scripts/enrich-team-form.js
+16. scripts/external-scheduler.js
+17. scripts/run-master-pipeline.js
+18. scripts/run-migration.js
+19. scripts/run-pipeline-from-context-pack.js
+20. scripts/run-pipeline.js
+21. scripts/run-scheduled-sync.js
+22. scripts/run-stage1-math.js
+23. scripts/run-stage2-context.js
+24. scripts/run-stage3-volatility.js
+25. scripts/run-test.js
+26. scripts/scheduler.js
+27. scripts/start-rapidapi-cricket-mcp.js
+28. scripts/sync-bsd-enrichment.js
+29. scripts/sync-ucl-context.js
+30. scripts/test-fetch.js
+31. scripts/test-final-endpoint.js
+32. scripts/test-fixed-ai-predictions.js
+33. scripts/test-fixed-endpoint.js
+34. scripts/test-fixed-pipeline.js
+35. scripts/test-football536-endpoints.js
+36. scripts/test-football536-fixtures-normalizer.js
+37. scripts/test-free-livescore-fixtures.js
+38. scripts/test-free-livescore-search.js
+39. scripts/test-live-football-api-priority.js
+40. scripts/test-livescore6-cricket-provider.js
+41. scripts/test-metrx-factory-top-metrics.js
+42. scripts/test-metrx-top-metrics.js
+43. scripts/test-network.js
+44. scripts/test-optimized-endpoints.js
+45. scripts/test-pipeline-integration.js
+46. scripts/test-pro-football-api.js
+47. scripts/test-sports-live-rankings.js
+48. scripts/test-sportsapi-pro-football-adapter.js
+49. scripts/test-sportsapi-pro-football-joinability.js
+50. scripts/test-sportsapi-pro-football.js
+51. scripts/test-sportsrc-fixtures.js
+52. scripts/test-sportsrc-health.js
+53. scripts/test-sportsrc-odds.js
+54. scripts/test-thesportsdb-endpoints.js
+55. scripts/test-weather-pipeline.js
+56. scripts/trace-data-flow.js
+57. scripts/trace-filtering-rules.js
+58. scripts/trace-filtering-timestamp.js
+59. scripts/trigger-grade.js
+60. scripts/trigger-pipeline-sync.js
+61. scripts/trigger-publication.js
+62. scripts/trigger-refresh.js
+63. scripts/trigger-settlement.js
+64. scripts/wake-and-sync.js
+
+NO_ACTION basis:
+- Phase 4 classified all B11-B14 assets as CURRENT manual verification, diagnostic, trigger, scheduler, ingest, enrichment, sync, import, and backfill tools.
+- Phase 5 found overlap candidates across tests, traces, provider discovery, pipeline runners, grading/publication, database/backfill/bridge, cricket, and context/enrichment scripts, but did not authorize merge, deletion, retirement, refactor, SQL, execution, or database mutation.
+- Phase 6 placed script-heavy overlap candidates behind NEEDS_RUNTIME_PROOF and did not replace earlier canonical runtime/service authorities with scripts.
+- B11-B14 manifest assets not explicitly named in the Phase 6 B11-B14 NEEDS_RUNTIME_PROOF list remain NO_ACTION because no safe consolidation path is proven for those current check/validate/verify surfaces.
+- Phase 6 entries for scripts/apply-db-governance.js and scripts/apply-migrations.js are out of B11-B14 manifest scope (B10) and are not carried into this grouped unit.
+
+Implementation actions performed:
+- None.
+
+Why no B11-B14 consolidation was authorized:
+- These are script-heavy manual/operator and diagnostic surfaces.
+- Many scripts may execute endpoint calls, database reads/writes, migrations, sync, import, enrichment, trigger, or backfill behavior.
+- Phase 6 explicitly holds named script candidates behind NEEDS_RUNTIME_PROOF.
+- Implementing consolidation now would risk breaking manual workflows, database state, provider diagnostics, pipeline triggers, migration/backfill paths, or operator evidence without proof.
+
+Explicit scope confirmation:
+- B11-B14 only.
+- B15-B29 not inspected for implementation in this packet.
+- No runtime/source files changed.
+
 Batch decision:
-- B07-B10 merge/consolidation gate is evidence-complete with NO_ACTION for canonical/current assets and HOLD_NEEDS_RUNTIME_PROOF for held/legacy/superseded/script surfaces.
-- Grouped unit B07-B10 is closed.
-- Next deterministic group: B11-B14
+- B11-B14 merge/consolidation gate is evidence-complete with NO_ACTION for non-held current/manual assets and HOLD_NEEDS_RUNTIME_PROOF for script-heavy overlap candidates.
+- Grouped unit B11-B14 is closed.
+- Next deterministic group: B15-B18
 
 Validation boundary:
 - Evidence only.
