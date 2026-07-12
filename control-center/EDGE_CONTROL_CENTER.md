@@ -581,11 +581,12 @@ Required state snapshot:
   },
   "active_phase": "PHASE_6",
   "active_phase_question": "Which Phase 5 overlap candidate families should have canonical authority selected?",
-  "lifecycle_state": "PHASE_ACTIVE",
+  "lifecycle_state": "BATCH_COMPLETE",
   "active_batch": null,
-  "completed_batches": [],
+  "completed_batches": [
+    "B02-B03"
+  ],
   "remaining_batches": [
-    "B02-B03",
     "B04-B06",
     "B07-B10",
     "B11-B14",
@@ -594,7 +595,7 @@ Required state snapshot:
     "B23-B26",
     "B27-B29"
   ],
-  "next_deterministic_batch": "B02-B03",
+  "next_deterministic_batch": "B04-B06",
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,

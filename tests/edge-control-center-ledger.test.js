@@ -34,7 +34,7 @@ function buildPhaseWorkProposal(overrides = {}) {
     request_type: "PHASE_WORK",
     mode: "PHASE_WORK",
     phase: "PHASE_6",
-    batch_id: "B02-B03",
+    batch_id: "B04-B06",
     work_kind: "CANONICAL_AUTHORITY_SELECTION",
     requires_full_forensic_evidence: false,
     preserves_unrelated_changes: true,
@@ -127,8 +127,10 @@ describe("Edge Control Center Ledger v1", () => {
       result.state.active_phase_question,
       "Which Phase 5 overlap candidate families should have canonical authority selected?"
     );
-    assert.equal(result.state.lifecycle_state, "PHASE_ACTIVE");
-    assert.equal(result.state.next_deterministic_batch, "B02-B03");
+    assert.equal(result.state.lifecycle_state, "BATCH_COMPLETE");
+    assert.deepEqual(result.state.completed_batches, ["B02-B03"]);
+    assert.equal(result.state.remaining_batches[0], "B04-B06");
+    assert.equal(result.state.next_deterministic_batch, "B04-B06");
     assert.deepEqual(result.state.phase_3_outcomes, [
       "ACTIVE",
       "INDIRECTLY_ACTIVE",
@@ -157,8 +159,8 @@ describe("Edge Control Center Ledger v1", () => {
     const state = createControlCenterGateState();
     assert.equal(state.eac_evidence_reusable, true);
     assert.deepEqual(getEacBatchIds(), [...EAC_BATCH_IDS]);
-    assert.equal(getNextIncompleteBatch(state), "B02-B03");
-    assert.equal(state.next_deterministic_batch, "B02-B03");
+    assert.equal(getNextIncompleteBatch(state), "B04-B06");
+    assert.equal(state.next_deterministic_batch, "B04-B06");
     assert.equal(EAC_BATCH_IDS.length, 29);
   });
 
@@ -201,7 +203,7 @@ describe("Edge Control Center Ledger v1", () => {
     assert.equal(result.mode, "PHASE_WORK");
     assert.equal(result.reason, "PHASE_WORK_ACCEPTED");
     assert.equal(result.nextState.lifecycle_state, "BATCH_ACTIVE");
-    assert.equal(result.nextState.active_batch, "B02-B03");
+    assert.equal(result.nextState.active_batch, "B04-B06");
   });
 
   it("Phase 1 blocks purpose/legacy/overlap/repair as active work", () => {
@@ -248,7 +250,7 @@ describe("Edge Control Center Ledger v1", () => {
     assert.equal(result.gate, "GREEN");
     assert.equal(result.reason, "FUTURE_PHASE_NOTE_RECORDED");
     assert.equal(result.nextState.active_phase, "PHASE_6");
-    assert.equal(result.nextState.lifecycle_state, "PHASE_ACTIVE");
+    assert.equal(result.nextState.lifecycle_state, "BATCH_COMPLETE");
     assert.equal(result.nextState.future_phase_notes.length, 1);
     assert.equal(
       result.nextState.future_phase_notes[0].likely_future_phase,
@@ -267,8 +269,8 @@ describe("Edge Control Center Ledger v1", () => {
     );
     assert.equal(result.gate, "GREEN");
     assert.equal(result.reason, "BATCH_COMPLETED");
-    assert.deepEqual(result.nextState.completed_batches, ["B01"]);
-    assert.equal(result.nextState.next_deterministic_batch, "B02-B03");
+    assert.deepEqual(result.nextState.completed_batches, ["B02-B03", "B01"]);
+    assert.equal(result.nextState.next_deterministic_batch, "B04-B06");
     assert.equal(result.nextState.lifecycle_state, "BATCH_COMPLETE");
   });
 
