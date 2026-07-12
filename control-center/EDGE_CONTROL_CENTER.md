@@ -4616,3 +4616,95 @@ Validation boundary:
 - No file removal, merge, retirement, refactor, source change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
 - B19-B22 Phase 4 evidence is closed.
 - Next batch: B23.
+
+## Phase 4 B23-B26 Legacy and Replacement Identification Closure
+
+Starting HEAD:
+- 4521f78e
+
+Batch group:
+- B23 DB_SQL_AND_SUPABASE_OTHER
+- B24 TESTS
+- B25 SCRATCH
+- B26 DEPLOYMENT_CI
+
+Scope:
+- Phase 4 evidence-only legacy and replacement identification.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation was authorized or performed.
+
+Membership:
+- B23 declared asset count: 20; actual path count: 20; missing files: 1.
+- B24 declared asset count: 6; actual path count: 6; missing files: 0.
+- B25 declared asset count: 2; actual path count: 2; missing files: 0.
+- B26 declared asset count: 3; actual path count: 3; missing files: 0.
+
+Attention-only scan:
+- B23 strong legacy/replacement markers: 0; missing path: 1.
+- B24 strong legacy/replacement markers: 1.
+- B25 strong legacy/replacement markers: 0.
+- B26 strong legacy/replacement markers: 0.
+
+B23 missing path disposition:
+- supabase/functions/sync-sports-data/index.ts is absent from the working tree.
+- Git history shows it was deleted in commit d869061e, subject "Retire unused Supabase pipeline trigger".
+- Deletion evidence: delete mode 100644 supabase/functions/sync-sports-data/index.ts.
+- Existing Control Center notes already record that the B23 manifest still lists the path while current tracked source does not, and that this remains future governance cleanup only.
+- Phase 4 therefore treats this absent path as HISTORICAL_EVIDENCE / already-retired evidence, not CURRENT and not UNKNOWN.
+- No deletion or governance cleanup is authorized by Phase 4.
+
+B24 strong marker disposition:
+- tests/edge-control-center-ledger.test.js remains CURRENT.
+- The "retired" marker appears inside an assertion that legacy per-asset forensic modes are retired.
+- The marker does not describe the test file itself as retired.
+- The file is actively referenced by package.json test:control-center and governance/control-center references.
+
+B23 outcome summary:
+- CURRENT: 19
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 1
+- UNKNOWN: 0
+
+B24 outcome summary:
+- CURRENT: 6
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+B25 outcome summary:
+- CURRENT: 2
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+B26 outcome summary:
+- CURRENT: 3
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+Decision:
+- B23 closes with 19 CURRENT assets and 1 HISTORICAL_EVIDENCE absent retired path.
+- B24 closes with 6 CURRENT assets.
+- B25 closes with 2 CURRENT assets.
+- B26 closes with 3 CURRENT assets.
+- UNKNOWN is 0 for B23-B26.
+- No cleanup action is authorized by these outcomes.
+- Future governance cleanup remains: remove or reconcile the stale B23 manifest/report reference for supabase/functions/sync-sports-data/index.ts in a later approved phase.
+
+Validation boundary:
+- Evidence only.
+- No file removal, merge, retirement, refactor, source change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+- B23-B26 Phase 4 evidence is closed.
+- Next batch: B27.
