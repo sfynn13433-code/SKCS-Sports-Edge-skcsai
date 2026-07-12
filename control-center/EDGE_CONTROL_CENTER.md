@@ -4708,3 +4708,85 @@ Validation boundary:
 - No file removal, merge, retirement, refactor, source change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
 - B23-B26 Phase 4 evidence is closed.
 - Next batch: B27.
+
+## Phase 4 B27-B29 Legacy and Replacement Identification Closure
+
+Starting HEAD:
+- 3386d139
+
+Batch group:
+- B27 ARCHIVE
+- B28 ROOT_NON_MD_TXT_FILES
+- B29 DOT_TOOL_DIRS_AND_SMALL_DIRS
+
+Scope:
+- Phase 4 evidence-only legacy and replacement identification.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation was authorized or performed.
+
+Membership:
+- B27 declared asset count: 58; actual path count: 58; missing files: 0.
+- B28 declared asset count: 55; actual path count: 55; missing files: 0.
+- B29 declared asset count: 26; actual path count: 26; missing files: 0.
+
+Attention-only scan:
+- B27 strong legacy/replacement markers: 1.
+- B28 strong legacy/replacement markers: 1.
+- B29 strong legacy/replacement markers: 0.
+
+B27 archive disposition:
+- B27 is explicitly titled ARCHIVE.
+- B27 manifest authority uses prefix rule _archive/.
+- All B27 assets are under _archive/ and are retained as historical/archive evidence, not current operational source.
+- _archive/scripts/analyze-table-usage.js contains a "DEPRECATED (no code, no data)" category inside the script output logic; this describes table classification inside the script, not an additional file-level replacement marker.
+- Phase 4 therefore treats B27 as HISTORICAL_EVIDENCE.
+- No deletion or cleanup action is authorized by this outcome.
+
+B28 strong marker disposition:
+- package-lock.json remains CURRENT.
+- The "deprecated" marker appears inside the dependency graph for node_modules/prebuild-install, not as a marker that package-lock.json itself is deprecated.
+- Root package.json is active and package-lock.json remains the root dependency lockfile for the active root package authority.
+- The previously identified backend/package-lock.json supersession does not apply to the root package-lock.json.
+
+B29 disposition:
+- B29 has no strong legacy/replacement markers.
+- Dot-tool, hook, JS config/source, small data, and local tool directory assets remain CURRENT for Phase 4 purposes unless later phases prove cleanup, merge, retirement, or deletion.
+
+B27 outcome summary:
+- CURRENT: 0
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 58
+- UNKNOWN: 0
+
+B28 outcome summary:
+- CURRENT: 55
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+B29 outcome summary:
+- CURRENT: 26
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+Decision:
+- B27 closes with 58 HISTORICAL_EVIDENCE archived assets.
+- B28 closes with 55 CURRENT assets.
+- B29 closes with 26 CURRENT assets.
+- UNKNOWN is 0 for B27-B29.
+- No cleanup action is authorized by these outcomes.
+
+Validation boundary:
+- Evidence only.
+- No file removal, merge, retirement, refactor, source change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+- B27-B29 Phase 4 evidence is closed.
+- Phase 4 batch review is complete through B29.
