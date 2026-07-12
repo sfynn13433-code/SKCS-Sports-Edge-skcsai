@@ -414,9 +414,28 @@ function createControlCenterGateState(overrides = {}) {
           "Phase 7 Merge and Consolidation is closed. PHASE_8 activation does not authorize a new cleanup hunt or individual EAC batch re-sequencing.",
       },
     },
+    phase_8: {
+      status: "PHASE_READY_TO_CLOSE",
+      question: PHASE_QUESTIONS.PHASE_8,
+      evidence: {
+        result: "PASS",
+        validation_start_commit: "900650e4",
+        lifecycle_before_validation: "PHASE_ACTIVE",
+        phase_7_grouped_review_units_preserved:
+          "B01-B03,B04-B06,B07-B10,B11-B14,B15-B18,B19-B22,B23-B26,B27-B29",
+        review_order_model: "NO_BATCH_MODEL",
+        classification_repair_commit: "26acdedc",
+        runtime_inventory_repair_commit: "900650e4",
+        control_verify: "PASS",
+        deferred_holds:
+          "HOLD_NEEDS_RUNTIME_PROOF and HOLD_ABSENT_PATH remain deferred future work, not Phase 8 defects",
+        validation_note:
+          "Phase 8 final repository validation evidence is complete. Phase 8 is ready for a separate closure summary/control packet.",
+      },
+    },
     active_phase: ACTIVE_CLEANUP_PHASE,
     active_phase_question: PHASE_QUESTIONS[ACTIVE_CLEANUP_PHASE],
-    lifecycle_state: "PHASE_ACTIVE",
+    lifecycle_state: "PHASE_READY_TO_CLOSE",
     active_batch: null,
     completed_batches: [],
     remaining_batches: [],
@@ -1018,6 +1037,33 @@ function validateControlCenterPolicy(documentText) {
     errors.push("Control Center state phase_7 must be PHASE_CLOSED");
   }
 
+  if (!state.phase_8 || state.phase_8.status !== "PHASE_READY_TO_CLOSE") {
+    errors.push(
+      "Control Center state phase_8 must be PHASE_READY_TO_CLOSE with evidence"
+    );
+  } else {
+    const evidence = state.phase_8.evidence || {};
+    for (const key of [
+      "result",
+      "validation_start_commit",
+      "lifecycle_before_validation",
+      "phase_7_grouped_review_units_preserved",
+      "review_order_model",
+      "classification_repair_commit",
+      "runtime_inventory_repair_commit",
+      "control_verify",
+      "deferred_holds",
+      "validation_note",
+    ]) {
+      if (
+        evidence[key] == null ||
+        (typeof evidence[key] === "string" && evidence[key].trim() === "")
+      ) {
+        errors.push(`Control Center state phase_8 evidence missing ${key}`);
+      }
+    }
+  }
+
   if (state.active_phase !== ACTIVE_CLEANUP_PHASE) {
     errors.push(`Control Center state active_phase must be ${ACTIVE_CLEANUP_PHASE}`);
   }
@@ -1118,6 +1164,16 @@ function validateControlCenterPolicy(documentText) {
     )
   ) {
     errors.push("EDGE_CONTROL_CENTER.md missing PHASE_8 activation warning");
+  }
+
+  if (
+    !String(documentText).includes(
+      "## PHASE 8 FINAL REPOSITORY VALIDATION EVIDENCE"
+    )
+  ) {
+    errors.push(
+      "EDGE_CONTROL_CENTER.md missing PHASE 8 final repository validation evidence"
+    );
   }
 
   if (

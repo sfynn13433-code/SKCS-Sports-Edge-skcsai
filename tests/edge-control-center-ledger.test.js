@@ -129,7 +129,10 @@ describe("Edge Control Center Ledger v1", () => {
       result.state.active_phase_question,
       "Is the cleaned repository internally consistent?"
     );
-    assert.equal(result.state.lifecycle_state, "PHASE_ACTIVE");
+    assert.equal(result.state.lifecycle_state, "PHASE_READY_TO_CLOSE");
+    assert.equal(result.state.phase_8.status, "PHASE_READY_TO_CLOSE");
+    assert.equal(result.state.phase_8.evidence.result, "PASS");
+    assert.equal(result.state.phase_8.evidence.validation_start_commit, "900650e4");
     assert.equal(result.state.active_batch, null);
     assert.deepEqual(result.state.completed_batches, []);
     assert.deepEqual(result.state.remaining_batches, []);
@@ -150,6 +153,9 @@ describe("Edge Control Center Ledger v1", () => {
     );
     assert.equal(result.state.total_governed_assets, 902);
     assert.ok(documentText.includes("### Historical Control Center evidence"));
+    assert.ok(
+      documentText.includes("## PHASE 8 FINAL REPOSITORY VALIDATION EVIDENCE")
+    );
     assert.ok(documentText.includes("Standing Git authority"));
     assert.ok(documentText.includes("git reset --hard"));
     assert.equal(
