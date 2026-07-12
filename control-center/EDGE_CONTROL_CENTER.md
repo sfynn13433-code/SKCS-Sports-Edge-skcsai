@@ -3393,3 +3393,110 @@ Validation boundary:
 - No active-use outcome authorizes deletion.
 - B21 batch state not advanced in this patch.
 - GitHub vulnerability and Dependabot notices remain future dependency/security work and were not touched.
+
+## PHASE 3 - B22 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 - Active Use Identification
+- Batch: B22 / SUPABASE_MIGRATIONS
+- Question: Is each B22 governed Supabase migration file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Schema change performed: NO
+- Migration execution performed: NO
+- Supabase mutation performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+- Dependency/security/vulnerability notice work performed: NO
+
+Outcome summary:
+- ACTIVE: 0
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 61
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B22 MANUAL_USE assets:
+- supabase/migrations/20260415000001_create_insight_usage.sql
+- supabase/migrations/20260418000002_update_predictions_final_risk_level_check.sql
+- supabase/migrations/20260501_skcs_comprehensive_engine.sql
+- supabase/migrations/20260512000001_create_canonical_bookmakers.sql
+- supabase/migrations/20260512000002_add_odds_to_match_context.sql
+- supabase/migrations/20260512000003_create_sport_sync_table.sql
+- supabase/migrations/20260512000004_create_upsert_raw_fixture_rpc.sql
+- supabase/migrations/20260512000005_create_context_enrichment_trigger.sql
+- supabase/migrations/20260512000006_create_fixture_processing_log.sql
+- supabase/migrations/20260512000007_create_admin_views.sql
+- supabase/migrations/20260512000008_create_event_odds_snapshots.sql
+- supabase/migrations/20260512000009_create_get_prediction_rpc.sql
+- supabase/migrations/20260512000010_populate_sport_sync.sql
+- supabase/migrations/20260512000012_create_get_prediction_function.sql
+- supabase/migrations/20260512000013_disable_rls_match_context.sql
+- supabase/migrations/20260522000001_add_watchlist_column.sql
+- supabase/migrations/20260522000002_add_sport_to_tier_rules.sql
+- supabase/migrations/20260523000001_drop_insight_usage.sql
+- supabase/migrations/20260524000001_remove_dev_rls_policies.sql
+- supabase/migrations/20260524000002_create_upsert_canonical_event_rpc.sql
+- supabase/migrations/20260531000001_skcs_engine_v2_phase0_identity.sql
+- supabase/migrations/20260531000002_skcs_engine_v2_phase0b_match_results.sql
+- supabase/migrations/20260617_add_market_tier.sql
+- supabase/migrations/20260619000001_rename_predictions_final_to_direct1x2.sql
+- supabase/migrations/20260619000002_align_direct1x2_columns.sql
+- supabase/migrations/20260619000003_direct1x2_risk_tier_and_secondary_markets.sql
+- supabase/migrations/20260621000001_enforce_league_country_on_direct_matches.sql
+- supabase/migrations/20260701000001_normalize_sport_names.sql
+- supabase/migrations/20260717000001_create_f1_schema.sql
+- supabase/migrations/20260718000001_db_rule_alignment_75_55_30.sql
+- supabase/migrations/20260820000001_rename_risk_tiers_and_safe_haven.sql
+- supabase/migrations/20260820000002_fix_secondary_governance_80_75.sql
+- supabase/migrations/20260822000001_add_partitioning.sql
+- supabase/migrations/20260822000002_create_relational_odds_tables.sql
+- supabase/migrations/20260822000002a_create_relational_tables.sql
+- supabase/migrations/20260822000002b_create_relational_indexes.sql
+- supabase/migrations/20260822000002c_create_relational_functions_triggers.sql
+- supabase/migrations/20260822000002d_create_relational_views.sql
+- supabase/migrations/20260822000003_normalize_prediction_tables.sql
+- supabase/migrations/20260822000003a_create_prediction_tables.sql
+- supabase/migrations/20260822000003b_create_prediction_indexes.sql
+- supabase/migrations/20260822000003c_create_prediction_functions_triggers.sql
+- supabase/migrations/20260822000003d_create_prediction_views.sql
+- supabase/migrations/20260822000004_create_materialized_admin_views.sql
+- supabase/migrations/20260822000005_skcs_engine_v2_engine_core.sql
+- supabase/migrations/20260822000006_ai_governance_telemetry.sql
+- supabase/migrations/20260822000007_ai_governance_rls_policies.sql
+- supabase/migrations/20260822000008_service_role_rls_policies.sql
+- supabase/migrations/20260822000009_public_read_config_rls_policies.sql
+- supabase/migrations/20260822000010_public_read_reference_rls.sql
+- supabase/migrations/20260822000011_system_health_state.sql
+- supabase/migrations/20260822000012_semantic_violations.sql
+- supabase/migrations/20260822000013_semantic_violation_summary.sql
+- supabase/migrations/20260822000014_system_health_state_contract.sql
+- supabase/migrations/20260902000000_pipeline_health_feed.sql
+- supabase/migrations/20261001000000_runtime_truth_mirror.sql
+- supabase/migrations/20261005000000_runtime_truth_mirror_alignment.sql
+- supabase/migrations/20261005000001_fix_calculate_team_strength_ambiguity.sql
+- supabase/migrations/20261006000000_sportsdataio_contract_alignment.sql
+- supabase/migrations/20261006000001_canonical_events.sql
+- supabase/migrations/20261007000000_user_experience_feedback.sql
+
+Evidence:
+- B22 is defined as the SUPABASE_MIGRATIONS batch with 61 governed SQL migration assets under supabase/migrations/.
+- The active application start path is package.json start -> node backend/server-express.js.
+- Render web deployment starts node backend/server-express.js and does not execute B22 migrations as part of the web start command.
+- Render cron commands in render.yaml do not execute B22 migration files.
+- scripts/run-migration.js is a manual migration runner that reads SQL files from supabase/migrations by filename; it also has default migration names from B22.
+- package.json exposes db:migrate:rules as a manual command for one B22 migration: 20260820000002_fix_secondary_governance_80_75.sql.
+- scripts/apply-migrations.js is a manual migration application script that reads supabase/migrations and filters 20260822 migration files.
+- SKCS-KNOWLEDGE/knowledge/database_schema.md treats supabase/migrations/ as schema inventory evidence.
+- .githooks/pre-commit includes supabase/migrations/* in the local Master Rulebook guard scope.
+- B22 migration files are database schema/change-history assets, not server runtime entrypoints, browser assets, active cron entrypoints, or deployed product code entrypoints.
+- This phase does not determine whether any migration has already been applied, should be reapplied, is superseded, is safe to retire, or matches the live Supabase database. Those are future database/schema governance questions.
+- No deletion, merge, retirement, dependency/security, vulnerability, source/runtime/product change, schema change, migration execution, or Supabase mutation is authorized by this evidence.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B22 batch state not advanced in this patch.
+- GitHub vulnerability and Dependabot notices remain future dependency/security work and were not touched.
