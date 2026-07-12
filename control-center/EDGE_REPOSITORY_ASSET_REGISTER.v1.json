@@ -15594,7 +15594,7 @@
       "relationship_tags": [
         "UI",
         "GENERATED",
-        "PUBLIC_DATA"
+        "PUBLIC_ASSET"
       ],
       "classification_evidence": [
         "Fast skim: public/data/all_leagues_raw.json under public/ indicates browser-delivered UI asset.",
@@ -15628,7 +15628,7 @@
       "relationship_tags": [
         "UI",
         "GENERATED",
-        "PUBLIC_DATA"
+        "PUBLIC_ASSET"
       ],
       "classification_evidence": [
         "Fast skim: public/data/all_sports_raw.json under public/ indicates browser-delivered UI asset.",
@@ -15662,7 +15662,7 @@
       "relationship_tags": [
         "UI",
         "GENERATED",
-        "PUBLIC_DATA"
+        "PUBLIC_ASSET"
       ],
       "classification_evidence": [
         "Fast skim: public/data/context-pack-2026-05-17.json under public/ indicates browser-delivered UI asset.",
@@ -15696,7 +15696,7 @@
       "relationship_tags": [
         "UI",
         "GENERATED",
-        "PUBLIC_DATA"
+        "PUBLIC_ASSET"
       ],
       "classification_evidence": [
         "Fast skim: public/data/event-details-cache.json under public/ indicates browser-delivered UI asset.",
@@ -15730,7 +15730,7 @@
       "relationship_tags": [
         "UI",
         "GENERATED",
-        "PUBLIC_DATA"
+        "PUBLIC_ASSET"
       ],
       "classification_evidence": [
         "Fast skim: public/data/h2h-2026-05-17.json under public/ indicates browser-delivered UI asset.",
@@ -15764,7 +15764,7 @@
       "relationship_tags": [
         "UI",
         "GENERATED",
-        "PUBLIC_DATA"
+        "PUBLIC_ASSET"
       ],
       "classification_evidence": [
         "Fast skim: public/data/importance-2026-05-17.json under public/ indicates browser-delivered UI asset.",
@@ -15798,7 +15798,7 @@
       "relationship_tags": [
         "UI",
         "GENERATED",
-        "PUBLIC_DATA"
+        "PUBLIC_ASSET"
       ],
       "classification_evidence": [
         "Fast skim: public/data/injuries-2026-05-17.json under public/ indicates browser-delivered UI asset.",
@@ -15832,7 +15832,7 @@
       "relationship_tags": [
         "UI",
         "GENERATED",
-        "PUBLIC_DATA"
+        "PUBLIC_ASSET"
       ],
       "classification_evidence": [
         "Fast skim: public/data/news-injury-cache.json under public/ indicates browser-delivered UI asset.",
@@ -15866,7 +15866,7 @@
       "relationship_tags": [
         "UI",
         "GENERATED",
-        "PUBLIC_DATA"
+        "PUBLIC_ASSET"
       ],
       "classification_evidence": [
         "Fast skim: public/data/pipeline-dry-2026-05-17.json under public/ indicates browser-delivered UI asset.",
@@ -15900,7 +15900,7 @@
       "relationship_tags": [
         "UI",
         "GENERATED",
-        "PUBLIC_DATA"
+        "PUBLIC_ASSET"
       ],
       "classification_evidence": [
         "Fast skim: public/data/standings-cache.json under public/ indicates browser-delivered UI asset.",
@@ -15934,7 +15934,7 @@
       "relationship_tags": [
         "UI",
         "GENERATED",
-        "PUBLIC_DATA"
+        "PUBLIC_ASSET"
       ],
       "classification_evidence": [
         "Fast skim: public/data/team-form-2026-05-17.json under public/ indicates browser-delivered UI asset.",
@@ -15968,7 +15968,7 @@
       "relationship_tags": [
         "UI",
         "GENERATED",
-        "PUBLIC_DATA"
+        "PUBLIC_ASSET"
       ],
       "classification_evidence": [
         "Fast skim: public/data/team-form-cache.json under public/ indicates browser-delivered UI asset.",
@@ -16002,7 +16002,7 @@
       "relationship_tags": [
         "UI",
         "GENERATED",
-        "PUBLIC_DATA"
+        "PUBLIC_ASSET"
       ],
       "classification_evidence": [
         "Fast skim: public/data/travel-2026-05-17.json under public/ indicates browser-delivered UI asset.",
@@ -16036,7 +16036,7 @@
       "relationship_tags": [
         "UI",
         "GENERATED",
-        "PUBLIC_DATA"
+        "PUBLIC_ASSET"
       ],
       "classification_evidence": [
         "Fast skim: public/data/tsdb-coverage-2026-05-17.json under public/ indicates browser-delivered UI asset.",
@@ -16070,7 +16070,7 @@
       "relationship_tags": [
         "UI",
         "GENERATED",
-        "PUBLIC_DATA"
+        "PUBLIC_ASSET"
       ],
       "classification_evidence": [
         "Fast skim: public/data/tsdb-coverage-2026-05-18.json under public/ indicates browser-delivered UI asset.",
@@ -16104,7 +16104,7 @@
       "relationship_tags": [
         "UI",
         "GENERATED",
-        "PUBLIC_DATA"
+        "PUBLIC_ASSET"
       ],
       "classification_evidence": [
         "Fast skim: public/data/tsdb-coverage-2026-05-19.json under public/ indicates browser-delivered UI asset.",
@@ -16138,7 +16138,7 @@
       "relationship_tags": [
         "UI",
         "GENERATED",
-        "PUBLIC_DATA"
+        "PUBLIC_ASSET"
       ],
       "classification_evidence": [
         "Fast skim: public/data/tsdb-day-2026-05-17.json under public/ indicates browser-delivered UI asset.",
@@ -16171,7 +16171,7 @@
       "relationship_tags": [
         "UI",
         "GENERATED",
-        "PUBLIC_DATA"
+        "PUBLIC_ASSET"
       ],
       "classification_evidence": [
         "Fast skim: public/data/vip-stress-saturday.json under public/ indicates browser-delivered UI asset.",
@@ -17692,7 +17692,7 @@
       "relationship_tags": [
         "GENERATED",
         "PROVIDER",
-        "INVENTORY",
+        "AUDIT",
         "SCRIPT_TOOL"
       ],
       "classification_evidence": [
@@ -17922,7 +17922,7 @@
       "functional_group": "PREDICTION",
       "relationship_tags": [
         "PREDICTION",
-        "PIPELINE",
+        "BACKGROUND_JOB",
         "DATABASE",
         "SCRIPT_TOOL",
         "RUNTIME"
@@ -19372,7 +19372,7 @@
       "relationship_tags": [
         "PROVIDER",
         "API",
-        "CONFIG",
+        "CONFIGURATION",
         "GENERATED",
         "SCRIPT_TOOL",
         "RUNTIME"
@@ -20581,7 +20581,7 @@
       "relationship_tags": [
         "DATABASE",
         "SQL",
-        "CLEANUP",
+        "AUDIT",
         "SCRIPT_TOOL",
         "RUNTIME"
       ],
@@ -20616,7 +20616,7 @@
       "relationship_tags": [
         "DATABASE",
         "SQL",
-        "CLEANUP",
+        "AUDIT",
         "SCRIPT_TOOL",
         "RUNTIME"
       ],
@@ -20651,7 +20651,7 @@
       "relationship_tags": [
         "DATABASE",
         "SQL",
-        "CLEANUP",
+        "AUDIT",
         "MIGRATION",
         "SCRIPT_TOOL",
         "RUNTIME"
@@ -20789,7 +20789,6 @@
       "functional_group": "GENERATED_OUTPUT",
       "relationship_tags": [
         "GENERATED",
-        "DATA",
         "SCRIPT_TOOL",
         "RUNTIME"
       ],
@@ -20893,7 +20892,7 @@
       "relationship_tags": [
         "PROVIDER",
         "API",
-        "CACHE",
+        "OBSERVABILITY",
         "SCRIPT_TOOL",
         "RUNTIME"
       ],
@@ -22027,7 +22026,7 @@
       "functional_group": "ACCA",
       "relationship_tags": [
         "ACCA",
-        "SIMULATION",
+        "TEST_PROOF",
         "PREDICTION",
         "SCRIPT_TOOL"
       ],
@@ -22855,7 +22854,7 @@
         "PROVIDER",
         "API",
         "DATABASE",
-        "CANONICAL_EVENTS",
+        "PREDICTION",
         "SCRIPT_TOOL",
         "RUNTIME"
       ],
@@ -22891,7 +22890,7 @@
       "relationship_tags": [
         "DEPLOYMENT",
         "API",
-        "RENDER",
+        "CONFIGURATION",
         "SCRIPT_TOOL",
         "RUNTIME"
       ],

@@ -1171,7 +1171,7 @@
                                                     "supabase/"
                                                 ]
                                  },
-                        "asset_count":  20,
+                        "asset_count":  19,
                         "asset_paths":  [
                                             "sql/acca_rules.sql",
                                             "sql/day_zero_subscription.sql",
@@ -1191,7 +1191,6 @@
                                             "supabase/edge-functions/scheduledFixtureSync/index.ts",
                                             "supabase/functions/scheduled-prediction-refresh/index.ts",
                                             "supabase/functions/semantic-drift-summary/index.ts",
-                                            "supabase/functions/sync-sports-data/index.ts",
                                             "supabase/schema/ai_pipeline_schema.sql"
                                         ]
                     },
