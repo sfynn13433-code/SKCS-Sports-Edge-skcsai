@@ -4527,3 +4527,92 @@ Validation boundary:
 - No file removal, merge, retirement, refactor, source change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
 - B15-B18 Phase 4 evidence is closed.
 - Next batch: B19.
+
+## Phase 4 B19-B22 Legacy and Replacement Identification Closure
+
+Starting HEAD:
+- f89f1d8f
+
+Batch group:
+- B19 SKCS_KNOWLEDGE_KNOWLEDGE
+- B20 SKCS_KNOWLEDGE_PROVIDERS
+- B21 PUBLIC_UI
+- B22 SUPABASE_MIGRATIONS
+
+Scope:
+- Phase 4 evidence-only legacy and replacement identification.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation was authorized or performed.
+
+Membership:
+- B19 declared asset count: 17; actual path count: 17; missing files: 0.
+- B20 declared asset count: 18; actual path count: 18; missing files: 0.
+- B21 declared asset count: 64; actual path count: 64; missing files: 0.
+- B22 declared asset count: 61; actual path count: 61; missing files: 0.
+
+Attention-only scan:
+- B19 strong legacy/replacement markers: 2.
+- B20 strong legacy/replacement markers: 0.
+- B21 strong legacy/replacement markers: 2.
+- B22 strong legacy/replacement markers: 2.
+
+B19 strong marker disposition:
+- SKCS-KNOWLEDGE/knowledge/provider_registry.md remains CURRENT. The "superseded by" marker refers to Bzzoiro provider evaluation being superseded by BBD focus, not replacement of the provider registry file.
+- SKCS-KNOWLEDGE/knowledge/semantic_field_mapping_registry.md remains CURRENT. The "do not use" markers are anti-pattern and truth-layer boundary rules inside the registry, not instructions that the registry file is unused or replaced.
+
+B21 strong marker disposition:
+- public/js/supabase-bundle.js remains CURRENT. The "deprecated" markers are inside bundled Supabase library comments and warnings for specific API options/methods, not evidence that the bundle asset itself is replaced.
+- public/terms.html remains CURRENT. The "do not use" marker is user-facing legal Terms wording, not an instruction that the file is unused or replaced.
+
+B22 strong marker disposition:
+- supabase/migrations/20260531000002_skcs_engine_v2_phase0b_match_results.sql remains CURRENT as a migration record. The "deprecated" marker refers to one SQL function path inside the migration, while the migration also defines the match_results spine and canonical ingest path.
+- supabase/migrations/20261006000000_sportsdataio_contract_alignment.sql remains CURRENT as a migration record. The "deprecated" and "retired" markers are allowed values inside a data_contracts status CHECK constraint, not evidence that the migration file is deprecated or retired.
+
+B19 outcome summary:
+- CURRENT: 17
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+B20 outcome summary:
+- CURRENT: 18
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+B21 outcome summary:
+- CURRENT: 64
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+B22 outcome summary:
+- CURRENT: 61
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+Decision:
+- B19 closes with 17 CURRENT assets.
+- B20 closes with 18 CURRENT assets.
+- B21 closes with 64 CURRENT assets.
+- B22 closes with 61 CURRENT assets.
+- UNKNOWN is 0 for B19-B22.
+- No cleanup action is authorized by these outcomes.
+
+Validation boundary:
+- Evidence only.
+- No file removal, merge, retirement, refactor, source change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+- B19-B22 Phase 4 evidence is closed.
+- Next batch: B23.
