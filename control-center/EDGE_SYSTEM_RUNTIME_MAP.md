@@ -1,14 +1,14 @@
 # Edge System Runtime Map
 
 Inventory version: 1.0.0
-Inventory SHA-256: 830ddbab9b41f8c30c008b2bb6840e7db1dfdef9ff825be315f6120419d16977
+Inventory SHA-256: b8b2531b742323235eaabb297549e70dc41cf8ba6527bde8ae66cc4556551f3b
 
 > Synchronized review surface for `EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json`.
 > This map is observational and does not declare future Edge architecture or canonical authority.
 
 ## Summary
 
-- Runtime/system surfaces: 229
+- Runtime/system surfaces: 230
 - Candidate status establishes authority: false
 - Inventory declares future architecture: false
 
@@ -1952,6 +1952,19 @@ Inventory SHA-256: 830ddbab9b41f8c30c008b2bb6840e7db1dfdef9ff825be315f6120419d16
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
 ### SKCS-KNOWLEDGE/governance/documentation_policy.md
+
+- Surface classes: GOVERNANCE_ENFORCEMENT
+- Reachability: CANDIDATE
+- Source state: COMMITTED_REPOSITORY
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: None recorded
+- Database role: NONE
+- Database objects: None recorded
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
+### SKCS-KNOWLEDGE/governance/edge_asset_work_sequence_policy.md
 
 - Surface classes: GOVERNANCE_ENFORCEMENT
 - Reachability: CANDIDATE

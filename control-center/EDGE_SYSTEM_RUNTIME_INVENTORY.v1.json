@@ -1925,7 +1925,7 @@
       ],
       "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
       "relationship_evidence_provenance": {
-        "source_content_sha256": "e0e8fb065ec3fc332fef7267049efdd55d10eae5630236877083e24bc75dc14e",
+        "source_content_sha256": "af4f411af2c0b8dd1f3572afea142cd114923f88f1f4b0db786a37346f15cf1b",
         "relationship_evidence_sha256": "a20e081592d59e638906ae9643942e8ce984729136bcc7aafa0fe304a1ada3eb",
         "captured_source_presence_state": "PRESENT_TRACKED"
       }
@@ -5201,7 +5201,7 @@
       ],
       "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
       "relationship_evidence_provenance": {
-        "source_content_sha256": "6980ab4ba92cc984b75384f3ebf8e3ec4602bf77829978f816df4395c02ba655",
+        "source_content_sha256": "b7d6682e460596afa9f7c08de4c156b6f037cfc3d8c6d67ebfc8153ddbd1e270",
         "relationship_evidence_sha256": "bfec5297138b7770aaa6d169c0d166b4eedb837d2dfacb4ee10ce67e634c0f01",
         "captured_source_presence_state": "PRESENT_TRACKED"
       }
@@ -5232,7 +5232,7 @@
       ],
       "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
       "relationship_evidence_provenance": {
-        "source_content_sha256": "4d7d89017909aba506168445d0f7a4ad76174c6a63f4e03b49776af184d9746c",
+        "source_content_sha256": "e1bc15ddaaadbed1347f7c13116f8847c29553ae7111941534781b9e00782dac",
         "relationship_evidence_sha256": "b268ca1e551ba86a4fccfad4d84c20838b914d19f781682b6c9efa1aa77f41a7",
         "captured_source_presence_state": "PRESENT_TRACKED"
       }
@@ -6168,6 +6168,36 @@
       "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
       "relationship_evidence_provenance": {
         "source_content_sha256": "97da126b42ec5ffd7a7f87192a1cf8031c4416bf7be4fd5e1f62b559fc6f1182",
+        "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
+    },
+    {
+      "asset_path": "SKCS-KNOWLEDGE/governance/edge_asset_work_sequence_policy.md",
+      "source_state": "COMMITTED_REPOSITORY",
+      "surface_classes": [
+        "GOVERNANCE_ENFORCEMENT"
+      ],
+      "reachability_state": "CANDIDATE",
+      "mount_paths": [],
+      "runtime_callers": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "external_providers": [],
+      "environment_key_names": [],
+      "database_role": "NONE",
+      "database_objects": [],
+      "schedule_or_trigger": "",
+      "deployment_surface": "",
+      "governance_reachability_type": "DOCUMENT_ONLY",
+      "governed_by_control_task_id": "ESA-001",
+      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
+      "evidence": [
+        "Static package/deployment/import/mount evidence."
+      ],
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "c90c22a7f505386801b467166d64ee45249eb56460ff6aafa94084de071137c2",
         "relationship_evidence_sha256": "5bde8c82061260a90a0f0dec2e291ca569fd34c96d9f2a36454a67d2eb2ea6c6",
         "captured_source_presence_state": "PRESENT_TRACKED"
       }
