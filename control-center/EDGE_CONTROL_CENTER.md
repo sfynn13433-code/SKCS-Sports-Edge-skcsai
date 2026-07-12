@@ -584,10 +584,10 @@ Required state snapshot:
   "lifecycle_state": "BATCH_COMPLETE",
   "active_batch": null,
   "completed_batches": [
-    "B02-B03"
+    "B02-B03",
+    "B04-B06"
   ],
   "remaining_batches": [
-    "B04-B06",
     "B07-B10",
     "B11-B14",
     "B15-B18",
@@ -595,7 +595,7 @@ Required state snapshot:
     "B23-B26",
     "B27-B29"
   ],
-  "next_deterministic_batch": "B04-B06",
+  "next_deterministic_batch": "B07-B10",
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,
@@ -7135,6 +7135,247 @@ B02-B03 Phase 6 decision summary:
 
 Next batch group:
 - B04-B06
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized by this packet.
+
+## PHASE 6 - B04-B06 CANONICAL AUTHORITY SELECTION EVIDENCE
+
+Result: PASS WITH CANONICAL AUTHORITY DECISIONS AND RUNTIME-PROOF HOLDS
+
+Scope:
+- Phase: PHASE_6 - Canonical Authority Selection
+- Batches: B04 - BACKEND_UTILS_SEMANTIC_CORE_AND_TEST; B05 - BACKEND_SCRIPTS; B06 - BACKEND_PROVIDERS
+- Source evidence: PHASE 5 - B04-B06 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+- Start HEAD: 1e6bb1ba
+- Evidence type: canonical authority decision only
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Decision vocabulary used:
+- CANONICAL_KEEP
+- NEEDS_RUNTIME_PROOF
+
+Candidate group 1: verification controller boundary
+
+Assets:
+- backend/core/verificationController.js
+- backend/semantic-layer/verificationController.js
+- backend/core/verificationSignalContract.js
+- backend/core/executionPipeline.js
+
+Phase 6 decisions:
+- backend/core/verificationController.js: CANONICAL_KEEP - core verification controller authority.
+- backend/semantic-layer/verificationController.js: CANONICAL_KEEP - semantic-layer verification adapter authority.
+- backend/core/verificationSignalContract.js: CANONICAL_KEEP - canonical verification signal contract.
+- backend/core/executionPipeline.js: NEEDS_RUNTIME_PROOF - orchestration bridge needs live caller proof before any replacement.
+
+Control decision:
+- Keep the verification controller, semantic adapter, and signal contract as canonical authorities.
+- Hold executionPipeline behind NEEDS_RUNTIME_PROOF before any replacement or retirement.
+
+Candidate group 2: semantic governance and control-plane pipeline
+
+Assets:
+- backend/semantic-layer/controlPlaneEvaluator.js
+- backend/semantic-layer/decisionFingerprintService.js
+- backend/semantic-layer/enforcementGuard.js
+- backend/semantic-layer/errorMemoryLayer.js
+- backend/semantic-layer/gatekeeperAdapter.js
+- backend/semantic-layer/governanceGatekeeper.js
+- backend/semantic-layer/normalizer.js
+- backend/semantic-layer/preflightSimulator.js
+- backend/semantic-layer/registry.js
+- backend/semantic-layer/sportsdataioContractHelpers.js
+- backend/semantic-layer/violationLogger.js
+
+Phase 6 decisions:
+- backend/semantic-layer/controlPlaneEvaluator.js: CANONICAL_KEEP - semantic control-plane evaluator authority.
+- backend/semantic-layer/decisionFingerprintService.js: CANONICAL_KEEP - decision fingerprint authority.
+- backend/semantic-layer/enforcementGuard.js: CANONICAL_KEEP - enforcement boundary authority.
+- backend/semantic-layer/errorMemoryLayer.js: CANONICAL_KEEP - error-memory authority.
+- backend/semantic-layer/gatekeeperAdapter.js: CANONICAL_KEEP - gatekeeper adapter authority.
+- backend/semantic-layer/governanceGatekeeper.js: CANONICAL_KEEP - governance gatekeeper authority.
+- backend/semantic-layer/normalizer.js: CANONICAL_KEEP - semantic normalization authority.
+- backend/semantic-layer/preflightSimulator.js: CANONICAL_KEEP - preflight simulation authority.
+- backend/semantic-layer/registry.js: CANONICAL_KEEP - semantic registry authority.
+- backend/semantic-layer/sportsdataioContractHelpers.js: CANONICAL_KEEP - SportsDataIO contract helper authority.
+- backend/semantic-layer/violationLogger.js: CANONICAL_KEEP - semantic violation logging authority.
+
+Control decision:
+- Keep each semantic-layer file as the canonical authority for its own control-plane boundary.
+- No consolidation is authorized.
+
+Candidate group 3: ACCA, market consistency, and insight-rule surfaces
+
+Assets:
+- backend/utils/accaLogicEngine.js
+- backend/utils/insightEngine.js
+- backend/utils/insightValidationMatrix.js
+- backend/utils/marketConsistency.js
+- backend/utils/conflictResolver.js
+- backend/utils/secondaryMarketSelector.js
+- backend/utils/validation.js
+- backend/test/smoke-test-insight-engine.js
+- backend/test/smoke-test-skcs-law.js
+- backend/scripts/add-avg-total-log.js
+- backend/scripts/add-diagnostics.js
+- backend/scripts/patch-acca-builder.js
+- backend/scripts/patch-card-uniqueness.js
+- backend/scripts/patch-final-flow.js
+- backend/scripts/patch-row-cleanup.js
+- backend/scripts/patch-skcs-law.js
+
+Phase 6 decisions:
+- backend/utils/accaLogicEngine.js: CANONICAL_KEEP - ACCA math and leg-selection authority.
+- backend/utils/insightEngine.js: CANONICAL_KEEP - ACCA core law authority.
+- backend/utils/insightValidationMatrix.js: CANONICAL_KEEP - insight-leg validation authority.
+- backend/utils/marketConsistency.js: CANONICAL_KEEP - market consistency authority.
+- backend/utils/conflictResolver.js: CANONICAL_KEEP - market conflict resolution authority.
+- backend/utils/secondaryMarketSelector.js: CANONICAL_KEEP - secondary-market selection authority.
+- backend/utils/validation.js: CANONICAL_KEEP - rule validation authority.
+- backend/test/smoke-test-insight-engine.js: NEEDS_RUNTIME_PROOF - proof artifact, not authority.
+- backend/test/smoke-test-skcs-law.js: NEEDS_RUNTIME_PROOF - proof artifact, not authority.
+- backend/scripts/add-avg-total-log.js: NEEDS_RUNTIME_PROOF - manual patch helper, not canonical runtime authority.
+- backend/scripts/add-diagnostics.js: NEEDS_RUNTIME_PROOF - manual patch helper, not canonical runtime authority.
+- backend/scripts/patch-acca-builder.js: NEEDS_RUNTIME_PROOF - patch helper, not canonical runtime authority.
+- backend/scripts/patch-card-uniqueness.js: NEEDS_RUNTIME_PROOF - patch helper, not canonical runtime authority.
+- backend/scripts/patch-final-flow.js: NEEDS_RUNTIME_PROOF - patch helper, not canonical runtime authority.
+- backend/scripts/patch-row-cleanup.js: NEEDS_RUNTIME_PROOF - patch helper, not canonical runtime authority.
+- backend/scripts/patch-skcs-law.js: NEEDS_RUNTIME_PROOF - patch helper, not canonical runtime authority.
+
+Control decision:
+- Keep runtime utility files as canonical authorities.
+- Hold tests and patch helpers behind NEEDS_RUNTIME_PROOF.
+
+Candidate group 4: database/cache/job utility surfaces
+
+Assets:
+- backend/utils/db.js
+- backend/utils/apiCache.js
+- backend/utils/jobLogger.js
+- backend/utils/purgeStaleData.js
+
+Phase 6 decisions:
+- backend/utils/db.js: CANONICAL_KEEP - general database helper authority.
+- backend/utils/apiCache.js: CANONICAL_KEEP - API cache authority.
+- backend/utils/jobLogger.js: CANONICAL_KEEP - job logging authority.
+- backend/utils/purgeStaleData.js: NEEDS_RUNTIME_PROOF - stale-data purge helper is not the canonical database authority.
+
+Control decision:
+- Keep the helper, cache, and job logger surfaces.
+- Hold purgeStaleData.js behind NEEDS_RUNTIME_PROOF.
+
+Candidate group 5: external provider access, quota, key, cache, and circuit-breaker utilities
+
+Assets:
+- backend/errors/ProviderQuotaExceededError.js
+- backend/utils/apiQueue.js
+- backend/utils/apiUsageLimiter.js
+- backend/utils/keyPool.js
+- backend/utils/providerCircuitBreaker.js
+- backend/utils/rapidApiWaterfall.js
+- backend/utils/availability.js
+- backend/utils/weather.js
+- backend/providers/football/bigBallsDataProvider.js
+- backend/providers/football/bsdProvider.js
+- backend/providers/football/bzzoiroProvider.js
+- backend/providers/football/soccerDataApiProvider.js
+- backend/providers/football/sportsApiProFootballAdapter.js
+
+Phase 6 decisions:
+- backend/errors/ProviderQuotaExceededError.js: CANONICAL_KEEP - provider quota error authority.
+- backend/utils/apiQueue.js: CANONICAL_KEEP - provider request queue authority.
+- backend/utils/apiUsageLimiter.js: CANONICAL_KEEP - usage limiter authority.
+- backend/utils/keyPool.js: CANONICAL_KEEP - provider key pool authority.
+- backend/utils/providerCircuitBreaker.js: CANONICAL_KEEP - provider circuit-breaker authority.
+- backend/utils/rapidApiWaterfall.js: CANONICAL_KEEP - RapidAPI fallback/access authority.
+- backend/utils/availability.js: CANONICAL_KEEP - provider availability authority.
+- backend/utils/weather.js: CANONICAL_KEEP - weather enrichment authority.
+- backend/providers/football/bigBallsDataProvider.js: CANONICAL_KEEP - external football provider authority.
+- backend/providers/football/bsdProvider.js: CANONICAL_KEEP - external football provider authority.
+- backend/providers/football/bzzoiroProvider.js: CANONICAL_KEEP - external football provider authority.
+- backend/providers/football/soccerDataApiProvider.js: CANONICAL_KEEP - external football provider authority.
+- backend/providers/football/sportsApiProFootballAdapter.js: NEEDS_RUNTIME_PROOF - adapter boundary needs live caller proof before any replacement.
+
+Control decision:
+- Keep the provider-access utilities and provider implementations as canonical authorities.
+- Hold the adapter boundary behind NEEDS_RUNTIME_PROOF.
+
+Candidate group 6: football provider and normalizer families
+
+Assets:
+- backend/providers/football/bigBallsDataProvider.js
+- backend/providers/football/bigBallsDataNormalizer.js
+- backend/providers/football/bsdProvider.js
+- backend/providers/football/bsdNormalizer.js
+- backend/providers/football/bzzoiroProvider.js
+- backend/providers/football/bzzoiroNormalizer.js
+- backend/providers/football/soccerDataApiProvider.js
+- backend/providers/football/soccerDataApiNormalizer.js
+- backend/providers/football/sportsApiProFootballAdapter.js
+- backend/providers/football/sportsApiProFootballNormalizer.js
+
+Phase 6 decisions:
+- backend/providers/football/bigBallsDataProvider.js: CANONICAL_KEEP - BigBalls provider authority.
+- backend/providers/football/bigBallsDataNormalizer.js: CANONICAL_KEEP - BigBalls normalizer authority.
+- backend/providers/football/bsdProvider.js: CANONICAL_KEEP - BSD provider authority.
+- backend/providers/football/bsdNormalizer.js: CANONICAL_KEEP - BSD normalizer authority.
+- backend/providers/football/bzzoiroProvider.js: CANONICAL_KEEP - Bzzoiro provider authority.
+- backend/providers/football/bzzoiroNormalizer.js: CANONICAL_KEEP - Bzzoiro normalizer authority.
+- backend/providers/football/soccerDataApiProvider.js: CANONICAL_KEEP - SoccerDataAPI provider authority.
+- backend/providers/football/soccerDataApiNormalizer.js: CANONICAL_KEEP - SoccerDataAPI normalizer authority.
+- backend/providers/football/sportsApiProFootballAdapter.js: NEEDS_RUNTIME_PROOF - shared adapter boundary.
+- backend/providers/football/sportsApiProFootballNormalizer.js: CANONICAL_KEEP - SportsApiPro normalizer authority.
+
+Control decision:
+- Keep each provider/normalizer pair as canonical for its source.
+- Hold the shared adapter behind NEEDS_RUNTIME_PROOF.
+
+Candidate group 7: sports normalization and ingestion scripts
+
+Assets:
+- backend/parsers/base_sport_parser.py
+- backend/workers/now_api_pulse.py
+- backend/scripts/bridge_frontend.py
+- backend/scripts/generate_vip_master.py
+- backend/scripts/ingest_football.py
+- backend/scripts/populate_sports_data.py
+- backend/scripts/sync-sportsrc-fixtures.js
+- backend/scripts/requirements.txt
+- backend/utils/sportsrcNormalizer.js
+- backend/audit/system_integrity_audit.md
+
+Phase 6 decisions:
+- backend/parsers/base_sport_parser.py: NEEDS_RUNTIME_PROOF - parser support surface, not canonical runtime authority.
+- backend/workers/now_api_pulse.py: NEEDS_RUNTIME_PROOF - worker support surface, not canonical runtime authority.
+- backend/scripts/bridge_frontend.py: NEEDS_RUNTIME_PROOF - script bridge, not canonical runtime authority.
+- backend/scripts/generate_vip_master.py: NEEDS_RUNTIME_PROOF - script support surface, not canonical runtime authority.
+- backend/scripts/ingest_football.py: NEEDS_RUNTIME_PROOF - ingestion script, not canonical runtime authority.
+- backend/scripts/populate_sports_data.py: NEEDS_RUNTIME_PROOF - ingestion script, not canonical runtime authority.
+- backend/scripts/sync-sportsrc-fixtures.js: NEEDS_RUNTIME_PROOF - sync script, not canonical runtime authority.
+- backend/scripts/requirements.txt: NEEDS_RUNTIME_PROOF - script environment support, not canonical runtime authority.
+- backend/utils/sportsrcNormalizer.js: CANONICAL_KEEP - SportsRC normalization authority.
+- backend/audit/system_integrity_audit.md: NEEDS_RUNTIME_PROOF - audit evidence, not canonical runtime authority.
+
+Control decision:
+- Keep sportsrcNormalizer.js as canonical authority.
+- Hold script and audit surfaces behind NEEDS_RUNTIME_PROOF.
+
+B04-B06 Phase 6 decision summary:
+- Candidate groups reviewed: 7
+- CANONICAL_KEEP decisions recorded: YES
+- NEEDS_RUNTIME_PROOF holds recorded: YES
+- Merge, deletion, retirement, refactor, SQL, deployment, provider, dependency, security, or runtime action authorized: NO
+- B04-B06 Phase 6 canonical authority selection is evidence-complete.
+
+Next batch group:
+- B07-B10
 
 Validation boundary:
 - Evidence only.

@@ -325,9 +325,11 @@ function createControlCenterGateState(overrides = {}) {
     active_phase_question: PHASE_QUESTIONS[ACTIVE_CLEANUP_PHASE],
     lifecycle_state: "BATCH_COMPLETE",
     active_batch: null,
-    completed_batches: ["B02-B03"],
-    remaining_batches: reviewUnits.filter((unit) => unit !== "B02-B03"),
-    next_deterministic_batch: "B04-B06",
+    completed_batches: ["B02-B03", "B04-B06"],
+    remaining_batches: reviewUnits.filter(
+      (unit) => unit !== "B02-B03" && unit !== "B04-B06"
+    ),
+    next_deterministic_batch: "B07-B10",
     phase_3_outcomes: [...PHASE_3_OUTCOMES],
     phase_3_no_deletion_law: "NO_CURRENT_USE_FOUND does not authorize deletion.",
     future_phase_notes: [],
