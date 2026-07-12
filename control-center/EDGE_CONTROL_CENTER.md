@@ -4975,3 +4975,182 @@ Batch decision:
 Validation boundary:
 - Evidence only.
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+
+## PHASE 5 - B02-B03 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+
+Result: PASS WITH OVERLAP CANDIDATES
+
+Scope:
+- Phase: PHASE_5 - Functional Overlap Identification
+- Batches: B02 - BACKEND_DIRECT_FILES; B03 - BACKEND_ROUTES_AND_CONTROLLERS
+- Evidence type: functional-overlap identification only
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Batch manifest evidence:
+- B02 asset_count: 13
+- B03 asset_count: 28
+- Combined reviewed assets: 41
+- Start HEAD: a5999ceb
+- Compact overlap scan inspected B02-B03 membership, route mounting, database exports, prediction route endpoints, and cricket route endpoints.
+
+Outcome vocabulary used:
+- NO_OVERLAP
+- PARTIAL_OVERLAP
+- MAJOR_OVERLAP
+- POTENTIAL_MERGE_GROUP
+
+Candidate group 1: database access authority
+
+Assets:
+- backend/database.js
+- backend/db.js
+- backend/dbBootstrap.js
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- backend/database.js creates a PostgreSQL pool, auto-converts Supabase direct URLs to pooler URLs, exposes query/transaction helpers, initializes tables, and exports broad database functions including getPredictionsByTier and getProfileById.
+- backend/db.js also creates a PostgreSQL pool, auto-converts Supabase direct URLs to pooler URLs, and exports pool/query/withTransaction.
+- backend/dbBootstrap.js also performs database compatibility/bootstrap work for prediction final tables and views.
+- Multiple B03 routes consume either ../db or ../database, proving more than one database access surface remains active.
+
+Decision:
+- Functional overlap is proven.
+- No canonical database access authority is selected in Phase 5.
+- No merge, deletion, or refactor is authorized.
+- Carry forward as a potential future merge/canonicalization group.
+
+Candidate group 2: server inline endpoint versus route-module boundary
+
+Assets:
+- backend/server-express.js
+- backend/routes/pipeline.js
+- backend/routes/predictions.js
+- backend/routes/debug.js
+- backend/routes/scheduler.js
+- backend/routes/cricketCron.js
+- backend/routes/cricketInsights.js
+- backend/routes/cricketCount.js
+- backend/routes/sportsEdge.js
+- backend/routes/v1/predictions.js
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- backend/server-express.js imports and mounts B03 route modules including predictions, pipeline, debug, user, chat, accuracy, vip, direct1x2, cricketInsights, cricketCount, cricketCron, scheduler, metrics, semanticDrift, divanscore, antigravity, controlCenter, and v1 routes.
+- The same server file also still contains inline endpoint definitions for pipeline trigger, refresh-predictions scheduler paths, debug sync/test paths, cricket daily fixtures cron, master pipeline cron, AI predictions lookup, and cricket table health checks.
+- This proves overlap between the main server bootstrap file and modular route files, especially for pipeline, prediction, scheduler, debug, and cricket responsibilities.
+
+Decision:
+- Functional overlap is proven.
+- The current file arrangement may be intentional or legacy-mixed; Phase 5 does not decide replacement.
+- No endpoint move, router extraction, deletion, or refactor is authorized.
+- Carry forward as a future route-boundary/canonicalization candidate.
+
+Candidate group 3: prediction delivery and prediction API surfaces
+
+Assets:
+- backend/routes/predictions.js
+- backend/routes/v1/predictions.js
+- backend/routes/user.js
+- backend/routes/vip.js
+- backend/routes/direct1x2.js
+- backend/routes/v1/acca.js
+- backend/routes/v1/sameMatchBuilder.js
+- backend/routes/v1/secondaryMarkets.js
+- backend/server-express.js
+
+Outcome:
+- MAJOR_OVERLAP
+
+Evidence:
+- backend/routes/predictions.js exposes the main predictions API and reads direct1x2_prediction_final.
+- backend/routes/v1/predictions.js exposes v1 match prediction, batch, and history endpoints and also reads direct1x2_prediction_final and secondary_market_predictions.
+- backend/routes/user.js exposes subscription-gated user prediction access.
+- backend/routes/vip.js exposes VIP/stress prediction payload access and reads direct1x2_prediction_final.
+- backend/routes/direct1x2.js, v1/acca.js, v1/sameMatchBuilder.js, and v1/secondaryMarkets.js are related prediction/market/ACCA API surfaces.
+- backend/server-express.js also contains an inline /api/ai-predictions/:matchId endpoint that falls back through prediction tables.
+
+Decision:
+- Major functional overlap is proven across prediction delivery surfaces.
+- Different audiences and API contracts may justify separation, so a merge group is not selected yet.
+- No route removal, API consolidation, refactor, or behavior change is authorized.
+- Carry forward as a future API-boundary review candidate.
+
+Candidate group 4: cricket count, cache, cron, and insight surfaces
+
+Assets:
+- backend/routes/cricketCache.js
+- backend/routes/cricketCount.js
+- backend/routes/cricketCron.js
+- backend/routes/cricketInsights.js
+- backend/deploy-trigger-cricket.js
+- backend/server-express.js
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- backend/routes/cricketCache.js reads CricAPI cache.
+- backend/routes/cricketCron.js builds/refreshes Cricbuzz and CricAPI cricket data through cron routes.
+- backend/deploy-trigger-cricket.js triggers a cricket cron URL.
+- backend/routes/cricketCount.js exposes a cricket count endpoint from cricket_insights_final.
+- backend/routes/cricketInsights.js also defines a lightweight /count endpoint and an insights endpoint that counts and groups cricket insight rows.
+- backend/server-express.js separately contains an inline cricket daily fixtures cron endpoint and an inline cricket table health/debug endpoint.
+
+Decision:
+- Functional overlap is proven, especially between cricketCount.js and cricketInsights.js count behavior, and between cricketCron.js and server-express.js inline cricket cron behavior.
+- No consolidation or removal is authorized.
+- Carry forward as a future cricket route-boundary/canonicalization candidate.
+
+Candidate group 5: deploy trigger files and called route endpoints
+
+Assets:
+- backend/deploy-trigger.js
+- backend/routes/pipeline.js
+- backend/deploy-trigger-cricket.js
+- backend/routes/cricketCron.js
+- backend/server-express.js
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- backend/deploy-trigger.js calls /api/pipeline/run-full.
+- backend/routes/pipeline.js owns pipeline route behavior.
+- backend/deploy-trigger-cricket.js calls /api/cron/cricket-daily-fixtures.
+- backend/routes/cricketCron.js owns cricket cron route behavior, while backend/server-express.js also contains an inline cricket daily fixtures endpoint.
+- Trigger files and route files touch the same workflows but have different roles: caller/launcher versus HTTP route owner.
+
+Decision:
+- Partial functional overlap is proven.
+- Keep separate for now.
+- No deletion, merge, or refactor is authorized.
+
+Distinct-role findings:
+- backend/.gitignore: backend source-control ignore boundary; no B02-B03 functional overlap proven.
+- backend/apiClients.js: provider/client and quota/circuit-breaker access surface; no same-job route/controller file proven in this batch.
+- backend/checkCanonicalEvents.js: manual Supabase canonical_events audit script; no same-job B02-B03 asset proven.
+- backend/config.js: environment/config authority; no same-job B02-B03 asset proven.
+- backend/edgemind_inference.py and backend/test-ultra-slim.js: EdgeMind/manual inference bridge and test harness; related to EdgeMind work but no same-job B02-B03 merge group proven.
+- backend/controllers/edgeMindController.js and backend/routes/chat.js: controller/route relationship; dependency relationship does not itself prove functional overlap.
+- backend/routes/accuracy.js and backend/routes/skcsGrading.js: both relate to grading/accuracy reporting but current evidence proves related reporting surfaces, not a merge group.
+- backend/routes/antigravity.js, controlCenter.js, divanscore.js, feedback.js, metrics.js, refresh-ai.js, semanticDrift.js, sportsEdge.js, and tier1.js: no same-job B02-B03 merge group proven by this scan.
+
+Batch decision:
+- B02-B03 contains proven functional overlap candidates.
+- Potential future merge/canonicalization candidates are recorded for database access, server route boundary, cricket route boundary, and prediction API boundary.
+- No cleanup action is authorized by this outcome.
+- B02-B03 Phase 5 evidence is closed.
+- Next batch group: B04-B06.
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
