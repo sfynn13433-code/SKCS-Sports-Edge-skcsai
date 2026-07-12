@@ -598,14 +598,14 @@ Required state snapshot:
     "B04-B06",
     "B07-B10",
     "B11-B14",
-    "B15-B18"
+    "B15-B18",
+    "B19-B22",
+    "B23-B26"
   ],
   "remaining_batches": [
-    "B19-B22",
-    "B23-B26",
     "B27-B29"
   ],
-  "next_deterministic_batch": "B19-B22",
+  "next_deterministic_batch": "B27-B29",
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,
@@ -9474,3 +9474,105 @@ Batch decision:
 Validation boundary:
 - Evidence only.
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, vulnerability remediation, legal text change, subscription behavior change, prediction-content change, user-data change, UI behavior change, route change, generated-output change, or public asset change is authorized by this packet.
+
+## PHASE 7 - B23-B26 MERGE AND CONSOLIDATION EVIDENCE
+
+Result: PASS WITH NO_ACTION, RUNTIME-PROOF HOLDS, AND ABSENT-PATH HOLD
+
+Scope:
+- Phase: PHASE_7 - Merge and Consolidation
+- Grouped review unit: B23-B26
+- Start HEAD: 3aa6b581
+- Inspection scope: B23, B24, B25, B26 only
+- B27-B29 touched: NO
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Supabase function restore/deploy/repair performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Authority sources reviewed:
+- control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json B23, B24, B25, and B26 membership
+- control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json B23, B24, B25, and B26 register coverage
+- PHASE 4 - B23-B26 LEGACY AND REPLACEMENT IDENTIFICATION EVIDENCE
+- PHASE 5 - B23-B26 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+- PHASE 6 - B23-B26 CANONICAL AUTHORITY SELECTION EVIDENCE
+
+Corrected membership/register audit:
+- B23 DB_SQL_AND_SUPABASE_OTHER: declared 20, actual paths 20, matched register rows 19, on-disk missing 1, register missing 1, functional groups: API_ROUTE 1; DATABASE 4; DATABASE_MIGRATION 11; SCHEDULER_BACKGROUND 3. Missing on disk: supabase/functions/sync-sports-data/index.ts. Missing in register: supabase/functions/sync-sports-data/index.ts.
+- B24 TESTS: declared 6, actual paths 6, matched register rows 6, on-disk missing 0, register missing 0, functional groups: TEST_PROOF 6.
+- B25 SCRATCH: declared 2, actual paths 2, matched register rows 2, on-disk missing 0, register missing 0, functional groups: DATABASE 2.
+- B26 DEPLOYMENT_CI: declared 3, actual paths 3, matched register rows 3, on-disk missing 0, register missing 0, functional groups: DEPLOYMENT_OPERATIONS 3.
+
+B23 assets inspected (20):
+1. sql/acca_rules.sql
+2. sql/day_zero_subscription.sql
+3. sql/extreme_smb_data.sql
+4. sql/fix_rls_policies.sql
+5. sql/market_correlations_schema.sql
+6. sql/master_rulebook_triggers.sql
+7. sql/monitoring_tables.sql
+8. sql/performance_optimizations.sql
+9. sql/rapidapi_cache.sql
+10. sql/schema_refactor.sql
+11. sql/supabase_test_user_reset_and_seed.sql
+12. sql/supabase_test_user_seed_access.sql
+13. sql/tables.sql
+14. sql/tier_rules.sql
+15. supabase/edge-functions/scheduled-fixture-sync/index.ts
+16. supabase/edge-functions/scheduledFixtureSync/index.ts
+17. supabase/functions/scheduled-prediction-refresh/index.ts
+18. supabase/functions/semantic-drift-summary/index.ts
+19. supabase/functions/sync-sports-data/index.ts [MISSING_ON_DISK]
+20. supabase/schema/ai_pipeline_schema.sql
+
+B24 assets inspected (6):
+1. tests/edge-asset-classification.test.js
+2. tests/edge-control-center-ledger.test.js
+3. tests/edge-control-center-ui.test.js
+4. tests/edge-project-register.test.js
+5. tests/edge-repository-asset-register.test.js
+6. tests/edge-system-runtime-inventory.test.js
+
+B25 assets inspected (2):
+1. scratch/db_normalize.js
+2. scratch/db_sync.js
+
+B26 assets inspected (3):
+1. Dockerfile
+2. render.yaml
+3. vercel.json
+
+Evidence summary:
+- Phase 4 B23-B26 closed with UNKNOWN 0 and authorized no cleanup action.
+- Phase 4 recorded supabase/functions/sync-sports-data/index.ts as a future governance cleanup item, not a Phase 7 implementation target.
+- Phase 5 B23-B26 proved functional overlap candidates across SQL rulebook/schema assets, Supabase access/test-user scripts, operational SQL, Supabase scheduled/function surfaces, governance tests, scratch database scripts, and deployment configuration boundaries, but authorized no deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation.
+- Phase 6 B23-B26 held SQL, Supabase function, and scratch database script assets behind NEEDS_RUNTIME_PROOF before execution, replacement, consolidation, rewrite, deletion, or retirement.
+- Phase 6 B23-B26 kept governance tests as separate CANONICAL_KEEP authorities for distinct Control Center contracts.
+- Phase 6 B23-B26 kept Dockerfile, render.yaml, and vercel.json as separate CANONICAL_KEEP authorities for distinct hosting surfaces.
+- Phase 6 B23-B26 recorded supabase/functions/sync-sports-data/index.ts as manifest-listed but absent from the working tree, with no restore, delete, deploy, or repair authorized.
+- No Phase 6 decision directly authorizes implementation-level merge/consolidation for B23-B26.
+
+Merge/consolidation decision:
+- B23 SQL and Supabase other assets: HOLD_NEEDS_RUNTIME_PROOF; no SQL, RLS, policy, RPC, trigger, schema, table, index, Supabase function, Edge Function, deployment, restore, repair, replacement, consolidation, deletion, or retirement is authorized.
+- B23 absent supabase/functions/sync-sports-data/index.ts path: HOLD_ABSENT_PATH; record only as stale manifest/future governance evidence in this packet.
+- B24 governance test assets: NO_ACTION; tests remain separate canonical authorities for distinct governance contracts, with no test merge, refactor, deletion, or rewrite authorized.
+- B25 scratch database scripts: HOLD_NEEDS_RUNTIME_PROOF; mutation-capable scratch scripts must not be executed, replaced, consolidated, rewritten, deleted, or retired in this phase.
+- B26 deployment and hosting configuration assets: NO_ACTION; Dockerfile, render.yaml, and vercel.json remain separate hosting authorities, with no deployment config, route, build command, cron, autoDeploy, or environment behavior changed.
+
+Implementation boundary:
+- B23-B26 only.
+- B27-B29 not inspected for implementation in this packet.
+- No runtime/source files changed.
+- No Supabase, database, SQL, RLS, RPC, policy, trigger, schema, table, index, Edge Function, Supabase Function, deployment, dependency, security, test behavior, scratch script, hosting, route, cron, build, or environment behavior changed.
+
+Batch decision:
+- B23-B26 merge/consolidation gate is evidence-complete with NO_ACTION for proven governance-test and deployment/hosting authorities, HOLD_NEEDS_RUNTIME_PROOF for SQL, Supabase function, and scratch/database candidates, and HOLD_ABSENT_PATH for the stale manifest-listed sync-sports-data path.
+- Grouped unit B23-B26 is closed.
+- Next deterministic group: B27-B29
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, vulnerability remediation, Supabase function restore, Supabase function deploy, Supabase function repair, test refactor, deployment-config change, route change, cron change, build change, environment change, scratch-script execution, or stale manifest repair is authorized by this packet.

@@ -352,16 +352,26 @@ function createControlCenterGateState(overrides = {}) {
     active_phase_question: PHASE_QUESTIONS[ACTIVE_CLEANUP_PHASE],
     lifecycle_state: "BATCH_COMPLETE",
     active_batch: null,
-    completed_batches: ["B01-B03", "B04-B06", "B07-B10", "B11-B14", "B15-B18"],
+    completed_batches: [
+      "B01-B03",
+      "B04-B06",
+      "B07-B10",
+      "B11-B14",
+      "B15-B18",
+      "B19-B22",
+      "B23-B26",
+    ],
     remaining_batches: PHASE_7_MERGE_CONSOLIDATION_REVIEW_ORDER.filter(
       (unit) =>
         unit !== "B01-B03" &&
         unit !== "B04-B06" &&
         unit !== "B07-B10" &&
         unit !== "B11-B14" &&
-        unit !== "B15-B18"
+        unit !== "B15-B18" &&
+        unit !== "B19-B22" &&
+        unit !== "B23-B26"
     ),
-    next_deterministic_batch: "B19-B22",
+    next_deterministic_batch: "B27-B29",
     phase_3_outcomes: [...PHASE_3_OUTCOMES],
     phase_3_no_deletion_law: "NO_CURRENT_USE_FOUND does not authorize deletion.",
     future_phase_notes: [],
@@ -1088,6 +1098,22 @@ function validateControlCenterPolicy(documentText) {
     )
   ) {
     errors.push("EDGE_CONTROL_CENTER.md missing PHASE 7 B15-B18 evidence");
+  }
+
+  if (
+    !String(documentText).includes(
+      "## PHASE 7 - B19-B22 MERGE AND CONSOLIDATION EVIDENCE"
+    )
+  ) {
+    errors.push("EDGE_CONTROL_CENTER.md missing PHASE 7 B19-B22 evidence");
+  }
+
+  if (
+    !String(documentText).includes(
+      "## PHASE 7 - B23-B26 MERGE AND CONSOLIDATION EVIDENCE"
+    )
+  ) {
+    errors.push("EDGE_CONTROL_CENTER.md missing PHASE 7 B23-B26 evidence");
   }
 
   if (
