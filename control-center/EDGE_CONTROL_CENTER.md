@@ -3569,3 +3569,50 @@ Validation boundary:
 - No active-use outcome authorizes deletion.
 - B23 batch state not advanced in this patch.
 - GitHub vulnerability and Dependabot notices remain future dependency/security work and were not touched.
+
+## PHASE 3 - B24 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 - Active Use Identification
+- Batch: B24 / TESTS
+- Question: Is each B24 governed test file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Test rewrite performed: NO
+- Runtime/product change performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+- Dependency/security/vulnerability notice work performed: NO
+
+Outcome summary:
+- ACTIVE: 0
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 6
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B24 MANUAL_USE assets:
+- tests/edge-asset-classification.test.js
+- tests/edge-control-center-ledger.test.js
+- tests/edge-control-center-ui.test.js
+- tests/edge-project-register.test.js
+- tests/edge-repository-asset-register.test.js
+- tests/edge-system-runtime-inventory.test.js
+
+Evidence:
+- B24 is defined as the TESTS batch with 6 governed test files under tests/.
+- package.json exposes test:asset-classification for tests/edge-asset-classification.test.js.
+- package.json exposes test:control-center for tests/edge-control-center-ledger.test.js, tests/edge-project-register.test.js, and tests/edge-repository-asset-register.test.js.
+- package.json exposes test:control-center-ui for tests/edge-control-center-ui.test.js.
+- tests/edge-system-runtime-inventory.test.js is a manual Node test file using node:test and importing control-center/check_edge_system_runtime_inventory.js.
+- package.json control:verify runs the control-center validation suite, but does not make these test files runtime entrypoints for the deployed product.
+- B24 files are validation/test assets, not active server startup files, browser-delivered assets, Render start commands, cron commands, schema execution files, or Supabase mutation files.
+- No deletion, merge, retirement, dependency/security, vulnerability, test rewrite, source/runtime/product change, or test-suite restructuring is authorized by this evidence.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B24 batch state not advanced in this patch.
+- GitHub vulnerability and Dependabot notices remain future dependency/security work and were not touched.
