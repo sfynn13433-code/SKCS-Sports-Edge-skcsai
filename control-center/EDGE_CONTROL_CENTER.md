@@ -4230,3 +4230,124 @@ Validation boundary:
 - B03-B06 Phase 4 evidence is closed.
 - Next batch: B07 - BACKEND_SRC_SERVICES.
 
+
+## PHASE 4 - B07-B10 LEGACY AND REPLACEMENT IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_4 - Legacy and Replacement Identification
+- Batches: B07, B08, B09, B10
+- Evidence type: Current/legacy/replacement identification only
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Batch manifest evidence:
+- B07 title: BACKEND_SRC_SERVICES; asset_count: 9
+- B08 title: BACKEND_ADAPTERS_AND_CONFIG; asset_count: 13
+- B09 title: BACKEND_SERVICES; asset_count: 86
+- B10 title: SCRIPTS_AUDIT_GOV; asset_count: 27
+- All B07-B10 asset paths exist locally.
+- All B07-B10 asset paths are tracked by Git.
+- Zero missing assets.
+- Zero untracked assets.
+
+B07 outcome summary:
+- CURRENT: 7
+- LEGACY: 2
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+B08 outcome summary:
+- CURRENT: 12
+- LEGACY: 1
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+B09 outcome summary:
+- CURRENT: 80
+- LEGACY: 3
+- SUPERSEDED: 2
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 1
+- UNKNOWN: 0
+
+B10 outcome summary:
+- CURRENT: 27
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+B07 LEGACY assets:
+1. backend/src/services/contextIntelligence/cacheService.js
+2. backend/src/services/marketRouter/waterfall.js
+
+B07 CURRENT assets:
+- All remaining 7 B07 assets are CURRENT.
+- Evidence: B07 attention scan found the two listed files had no direct consumers and previous NO_CURRENT_USE_FOUND status. Remaining B07 assets retained active/manual current evidence from the compact scan.
+
+B08 LEGACY assets:
+1. backend/adapters/f1Adapter.js
+
+B08 CURRENT assets:
+- All remaining 12 B08 assets are CURRENT.
+- Evidence: backend/adapters/f1Adapter.js explicitly throws "F1 adapter is disabled in this deployment" and had no direct consumers.
+- backend/config/subscriptionMatrix.js is CURRENT because it is referenced by AGENTS.md, backend/controllers/edgeMindController.js, backend/routes/debug.js, backend/routes/predictions.js, backend/routes/vip.js, backend/server-express.js, and migration planning scripts.
+
+B09 LEGACY assets:
+1. backend/services/comboEngine.js
+2. backend/services/rateLimitsAnalysis.js
+3. backend/services/reEvaluationEngine.js
+
+B09 SUPERSEDED assets:
+1. backend/services/accaMathUtils.js
+2. backend/services/aiProvider_odds_update.js
+
+B09 HISTORICAL_EVIDENCE assets:
+1. backend/services/aiProvider_odds_update.js
+
+B09 CURRENT assets:
+- All remaining 80 B09 assets are CURRENT.
+- Evidence: backend/services/accaBuilder.js is used by backend/routes/v1/acca.js and active ACCA/service paths.
+- backend/services/aiPipeline.js is documented in AGENTS.md and consumed by backend/routes/pipeline.js, backend/routes/predictions.js, backend/routes/scheduler.js, and active service paths.
+- backend/services/antigravity/WorkflowEngine.js is consumed by backend/routes/antigravity.js.
+- backend/services/contextIngestionService.js is documented in AGENTS.md and consumed by backend/services/aiPipeline.js.
+- backend/services/dataProvider.js is consumed by backend/routes/scheduler.js, backend/services/accaBuilder.js, backend/services/aiPipeline.js, and provider paths.
+- backend/services/skcsHeartbeat.js is consumed by backend/server-express.js.
+- backend/services/syncService.js is documented in AGENTS.md and consumed by backend/routes/pipeline.js and backend/server-express.js.
+- backend/services/accaMathUtils.js only re-exports backend/utils/accaLogicEngine.js and no direct consumers were proven; active ACCA logic consumption points to backend/utils/accaLogicEngine.js.
+- backend/services/aiProvider_odds_update.js is an odds-update replacement snippet instructing a function replacement inside aiProvider.js, with no direct current consumer proven.
+
+B10 CURRENT assets:
+- All 27 B10 audit/governance script assets are CURRENT manual audit/governance tools.
+- Evidence: attention-only check inspected audit/migration/governance scripts, all existed, all were tracked, and no replacement or superseding audit script was proven.
+- Scripts that execute database reads or migration logic remain evidence-only/manual assets in this phase; this phase did not run them and does not authorize SQL execution.
+
+Decision:
+- B07 closes with 7 CURRENT and 2 LEGACY assets.
+- B08 closes with 12 CURRENT and 1 LEGACY asset.
+- B09 closes with 80 CURRENT, 3 LEGACY, 2 SUPERSEDED, and 1 HISTORICAL_EVIDENCE asset.
+- B10 closes with 27 CURRENT assets.
+- UNKNOWN is 0 for B07-B10.
+- No cleanup action is authorized by these outcomes.
+
+Validation boundary:
+- Evidence only.
+- No file removal, merge, retirement, refactor, source change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+- B07-B10 Phase 4 evidence is closed.
+- Next batch: B11 - SCRIPTS_VERIFICATION_AND_MIGRATION.
+
