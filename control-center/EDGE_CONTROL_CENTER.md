@@ -3500,3 +3500,72 @@ Validation boundary:
 - No active-use outcome authorizes deletion.
 - B22 batch state not advanced in this patch.
 - GitHub vulnerability and Dependabot notices remain future dependency/security work and were not touched.
+
+## PHASE 3 - B23 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS WITH ABSENT-PATH NOTE
+
+Scope:
+- Phase: PHASE_3 - Active Use Identification
+- Batch: B23 / DB_SQL_AND_SUPABASE_OTHER
+- Question: Is each B23 governed SQL / Supabase non-migration asset currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Schema execution performed: NO
+- Supabase mutation performed: NO
+- Function deployment performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+- Dependency/security/vulnerability notice work performed: NO
+
+Outcome summary:
+- ACTIVE: 0
+- INDIRECTLY_ACTIVE: 1
+- MANUAL_USE: 18
+- NO_CURRENT_USE_FOUND: 1
+- UNKNOWN: 0
+
+B23 INDIRECTLY_ACTIVE assets:
+- supabase/edge-functions/scheduledFixtureSync/index.ts
+
+B23 MANUAL_USE assets:
+- sql/acca_rules.sql
+- sql/day_zero_subscription.sql
+- sql/extreme_smb_data.sql
+- sql/fix_rls_policies.sql
+- sql/market_correlations_schema.sql
+- sql/master_rulebook_triggers.sql
+- sql/monitoring_tables.sql
+- sql/performance_optimizations.sql
+- sql/rapidapi_cache.sql
+- sql/schema_refactor.sql
+- sql/supabase_test_user_reset_and_seed.sql
+- sql/supabase_test_user_seed_access.sql
+- sql/tables.sql
+- sql/tier_rules.sql
+- supabase/edge-functions/scheduled-fixture-sync/index.ts
+- supabase/functions/scheduled-prediction-refresh/index.ts
+- supabase/functions/semantic-drift-summary/index.ts
+- supabase/schema/ai_pipeline_schema.sql
+
+B23 NO_CURRENT_USE_FOUND assets:
+- supabase/functions/sync-sports-data/index.ts
+
+Evidence:
+- B23 is defined as DB_SQL_AND_SUPABASE_OTHER with 20 governed SQL / Supabase non-migration assets.
+- The 14 sql/*.sql files are manual database/schema/admin SQL assets, not active Node runtime imports, browser-delivered assets, Render start commands, or active cron entrypoints.
+- sql/tier_rules.sql also has manual audit-tool evidence through scripts/audit-football-rules-alignment.js, which reads sql/tier_rules.sql for drift comparison.
+- supabase/edge-functions/scheduledFixtureSync/index.ts is indirectly active because backend/routes/scheduler.js calls ${SUPABASE_URL}/functions/v1/scheduledFixtureSync, and backend/server-express.js mounts schedulerRouter at /api/scheduler.
+- supabase/edge-functions/scheduled-fixture-sync/index.ts is manual/external-scheduler related: scripts/run-scheduled-sync.js builds a scheduled-fixture-sync function URL, but no active package start, Render start command, or mounted backend route was found executing that script during app startup.
+- supabase/functions/scheduled-prediction-refresh/index.ts is a standalone Supabase function source describing scheduled prediction refresh behavior; no active package start, Render start command, or mounted backend route was found executing it during app startup.
+- supabase/functions/semantic-drift-summary/index.ts is a standalone Supabase function source. The active backend semantic drift path is backend/routes/semanticDrift.js -> backend/services/semanticDriftSummaryService.js, mounted by backend/server-express.js at /api/semantic-drift-summary; that active path uses the backend service and database RPC rather than invoking the Supabase function file.
+- supabase/functions/sync-sports-data/index.ts is still listed in the B23 manifest but is absent from GitHub main / current tracked source, so no current use can be found for that path in this phase.
+- supabase/schema/ai_pipeline_schema.sql is manual schema reference material, not an active runtime entrypoint.
+- No deletion, merge, retirement, dependency/security, vulnerability, source/runtime/product change, schema execution, Supabase mutation, or function deployment is authorized by this evidence.
+- The absent sync-sports-data manifest/register condition is a future governance cleanup item only; it is not repaired during Phase 3 B23.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B23 batch state not advanced in this patch.
+- GitHub vulnerability and Dependabot notices remain future dependency/security work and were not touched.
