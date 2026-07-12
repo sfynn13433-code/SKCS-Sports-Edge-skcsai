@@ -6626,3 +6626,261 @@ Batch decision:
 Validation boundary:
 - Evidence only.
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+
+## PHASE 5 - B27-B29 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+
+Result: PASS WITH OVERLAP CANDIDATES
+
+Scope:
+- Phase: PHASE_5 - Functional Overlap Identification
+- Batches: B27-B29
+- Evidence type: functional-overlap identification only
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Batch manifest evidence:
+- Batch group: B27-B29
+- Start HEAD: 6ede2b52
+- Compact overlap scan inspected final archive/root/config/report/script/data/workflow/temp assets.
+- The scan included root scripts, package/build config, phase reports, Supabase/report JSON, Master Rulebook test scripts, AI/provider test scripts, agent workflow config, API pipeline config, JavaScript Supabase bundle/config files, execution-spine reports, provider/data dump files, and tmp validation JSON files.
+
+Outcome vocabulary used:
+- NO_OVERLAP
+- PARTIAL_OVERLAP
+- MAJOR_OVERLAP
+- POTENTIAL_MERGE_GROUP
+
+Candidate group 1: root manual scripts, AI diagnostics, provider tests, and pipeline utilities
+
+Assets:
+- find-active-files.js
+- force-seed.js
+- refresh-ai-insights.js
+- run-final-test.js
+- scratch_test_pipeline.js
+- trigger_ai.js
+- test_scenarios_master_rulebook.js
+- test-ai-insights.js
+- test-ai-simulation.js
+- test-bigballs-direct.js
+- test-espn-direct.js
+- test-groq-debug.js
+- test-groq-models.js
+- test-sportsdb.js
+- test-wc-id.js
+
+Outcome:
+- MAJOR_OVERLAP
+
+Evidence:
+- Multiple root scripts test or trigger AI insight generation, provider access, rulebook scenarios, sports data access, and pipeline behavior.
+- Several scripts overlap with earlier B11-B14 script-heavy test/trigger/trace evidence.
+- force-seed.js uses backend dbBootstrap behavior.
+- find-active-files.js inspects active file/startup behavior.
+- AI/provider test scripts overlap around manual diagnostics rather than production runtime authority.
+
+Decision:
+- Major manual-script/test overlap is proven.
+- No script is selected as canonical in Phase 5.
+- No script is executed, deleted, merged, or refactored.
+- Carry forward as a future root-script/test canonicalization or retirement candidate.
+
+Candidate group 2: package, build, dependency, and frontend build config surfaces
+
+Assets:
+- package.json
+- package-lock.json
+- tailwind.config.js
+- qodana.yaml
+- LICENSE
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- package.json defines scripts for Supabase bundling, CSS build, build orchestration, live sync, smoke tests, coverage verification, and refresh triggers.
+- package-lock.json locks dependency graph including Supabase, cache, cron, sqlite, and trace-mapping packages.
+- tailwind.config.js scans public HTML/JS/JSX files for frontend build output.
+- qodana.yaml is static-analysis configuration.
+- LICENSE is a distinct legal/license artifact.
+
+Decision:
+- Partial config/build/dependency overlap is proven.
+- Keep separate.
+- No dependency, package, build, license, static-analysis, or frontend build config change is authorized.
+- Carry forward as package/build/config boundary evidence only.
+
+Candidate group 3: phase reports, Supabase reports, migration plans, and dependency maps
+
+Assets:
+- phase1-final-report.json
+- phase2-conservative-summary.json
+- phase2-final-summary.json
+- phase3-comprehensive-summary.json
+- phase3-migration-summary.json
+- overall-project-completion.json
+- placeholders-and-insights-audit.json
+- safe-migration-plan.json
+- supabase-diagnostics-report.json
+- supabase-migration-plan.json
+- supabase-table-analysis.json
+- supabase-visual-analysis-report.json
+- table-dependency-map.json
+- reports/execution-spine-compliance-map.json
+- reports/execution-spine-compliance-map.md
+
+Outcome:
+- MAJOR_OVERLAP
+
+Evidence:
+- Multiple JSON and markdown report artifacts describe project phases, migration progress, Supabase diagnostics, table analysis, visual database analysis, table dependencies, placeholders/insights, and execution-spine compliance.
+- Several assets overlap with earlier B15-B18 documentation/report and B23-B26 SQL/database evidence.
+- reports/execution-spine-compliance-map.json and reports/execution-spine-compliance-map.md are projection-style paired artifacts.
+
+Decision:
+- Major report/audit/map overlap is proven.
+- No report is selected as canonical in Phase 5.
+- No report, JSON map, or markdown projection is deleted, merged, regenerated, or edited.
+- Carry forward as a future report/documentation authority candidate.
+
+Candidate group 4: root/public frontend and Supabase client bundle surfaces
+
+Assets:
+- market-explorer.html
+- js/config.js
+- js/supabase-bundle.js
+- js/supabase-client-src.js
+- js/supabase-init.js
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- market-explorer.html overlaps with public market-explorer and Sports Market Hub frontend concepts already recorded in B19-B22.
+- js/config.js defines frontend/API config behavior outside the public/js tree.
+- js/supabase-client-src.js and js/supabase-bundle.js represent source/bundled Supabase client surfaces.
+- js/supabase-init.js overlaps with earlier public Supabase initialization surfaces.
+
+Decision:
+- Functional frontend/Supabase-client overlap is proven.
+- No frontend source/bundle authority is selected in Phase 5.
+- No bundle, config, HTML, or Supabase client change is authorized.
+- Carry forward as a future frontend/Supabase bundle boundary candidate.
+
+Candidate group 5: local launch, model/runtime, and auxiliary project surfaces
+
+Assets:
+- SKCS_START.bat
+- dolphin-server/Dockerfile
+- dolphin-server/README.md
+- sportbook
+- kabaddiPy
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- SKCS_START.bat is a local/manual launch surface.
+- dolphin-server Dockerfile and README represent local model/runtime support documentation and container setup.
+- sportbook and kabaddiPy appear as auxiliary or provider/domain project surfaces in the scan.
+- These overlap conceptually with runtime/provider/model support but are not proven same-job replacements.
+
+Decision:
+- Partial runtime/auxiliary overlap is proven.
+- No local launcher, Dockerfile, README, or auxiliary project asset is changed.
+- Carry forward as runtime/auxiliary boundary evidence only.
+
+Candidate group 6: agent workflow, local tool config, and hook surfaces
+
+Assets:
+- .gemini/antigravity/README.md
+- .gemini/antigravity/workflows/automated-data-sync.toml
+- .gemini/antigravity/workflows/intelligent-alert-system.toml
+- .gemini/antigravity/workflows/intelligent-pipeline-optimizer.toml
+- .gemini/antigravity/workflows/smart-prediction-engine.toml
+- .gemini/commands.toml
+- .qwen/settings.json
+- .qwen/settings.json.orig
+- .windsurf/workflows/env.md
+- .githooks/pre-commit
+- .stakpak/data/local.db
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- Multiple agent/tool workflow files describe automation, alerting, pipeline optimization, prediction engine workflows, commands, Qwen settings, Windsurf environment notes, Git hook behavior, and local tool database state.
+- These files overlap around developer-agent/tooling orchestration rather than SKCS product runtime.
+- .githooks/pre-commit overlaps with validation/guard behavior but remains a distinct Git hook surface.
+
+Decision:
+- Functional tool/workflow overlap is proven.
+- No agent workflow, hook, local DB, or tool config is changed.
+- Carry forward as a future developer-tooling/workflow canonicalization candidate.
+
+Candidate group 7: API pipeline route and execution-spine projections
+
+Assets:
+- api/pipeline/run-full.js
+- reports/execution-spine-compliance-map.json
+- reports/execution-spine-compliance-map.md
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- api/pipeline/run-full.js is an API pipeline execution surface.
+- Execution-spine report artifacts describe or project compliance/execution-spine state.
+- These overlap with earlier pipeline orchestration and execution-spine evidence, but runtime route and report projection have different roles.
+
+Decision:
+- Partial pipeline/report overlap is proven.
+- No API route, report, or execution-spine projection is changed.
+- Carry forward as pipeline/report boundary evidence only.
+
+Candidate group 8: provider data dumps, sports catalog data, placeholder data, and temporary validation artifacts
+
+Assets:
+- src/data/placeholder.txt
+- src/data/sportsdb-leagues.json
+- tmp/key-validation-1776365488298.json
+- tmp/key-validation-1776365827255.json
+- tmp/key-validation-1776482624434.json
+- tmp/today-fixture-pull-1776482706164.json
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- src/data/sportsdb-leagues.json contains large sports/league catalog-style provider data.
+- tmp key-validation and fixture-pull JSON files are temporary validation/pull artifacts.
+- src/data/placeholder.txt is placeholder data.
+- These files overlap around provider-data snapshots, validation output, and temporary diagnostic artifacts.
+
+Decision:
+- Functional data-artifact overlap is proven.
+- No data file is deleted, moved, regenerated, or edited in Phase 5.
+- Carry forward as a future temp/provider-data retention review candidate.
+
+Distinct-role findings:
+- B27-B29 includes mixed final-surface assets: root scripts, package/config, reports, frontend bundle/config, agent workflow config, local runtime support, API route, data snapshots, and temporary validation files.
+- Repeated testing, reporting, and provider-data patterns alone do not authorize deletion.
+- Temp-looking assets are recorded as retention-review evidence only.
+- Binary/local-tool/runtime-support assets are not modified.
+- No cleanup action is authorized by this evidence pass.
+
+Batch decision:
+- B27-B29 contains proven functional overlap candidates.
+- Potential future canonicalization candidates are recorded for root scripts/tests, package/build config, phase reports/audit maps, frontend Supabase bundle/config, local runtime/model support, developer-agent workflows, pipeline/report projections, and provider/temp data artifacts.
+- No cleanup action is authorized by this outcome.
+- B27-B29 Phase 5 evidence is closed.
+- PHASE_5 batch-level functional overlap identification is complete across B01-B29.
+- Next action after commit: perform a Phase 5 closure summary/control packet.
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
