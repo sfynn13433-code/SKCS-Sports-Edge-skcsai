@@ -3987,3 +3987,72 @@ Validation boundary:
 - No Phase 4 batch inspection is started by this activation.
 - Stop after activation commit and report exact start point for B01 before beginning inspection.
 
+
+## PHASE 4 - B01 LEGACY AND REPLACEMENT IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_4 - Legacy and Replacement Identification
+- Batch: B01 - CONTROL_CENTER
+- Evidence type: Current/legacy/replacement identification only
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+B01 manifest evidence:
+- B01 batch_id: B01
+- B01 title: CONTROL_CENTER
+- B01 asset_count: 15
+- All 15 B01 asset paths exist locally.
+- All 15 B01 asset paths are tracked by Git.
+
+B01 outcome summary:
+- CURRENT: 15
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+B01 CURRENT assets:
+1. control-center/check_control_center.js
+2. control-center/check_edge_asset_classification.js
+3. control-center/check_edge_project_register.js
+4. control-center/check_edge_repository_asset_register.js
+5. control-center/check_edge_system_runtime_inventory.js
+6. control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json
+7. control-center/EDGE_ASSET_REPOSITORY_MAP.md
+8. control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json
+9. control-center/EDGE_CONTROL_CENTER.md
+10. control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json
+11. control-center/EDGE_PROJECT_BACKLOG.md
+12. control-center/EDGE_PROJECT_DEPENDENCY_MAP.md
+13. control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json
+14. control-center/EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json
+15. control-center/EDGE_SYSTEM_RUNTIME_MAP.md
+
+Evidence:
+- package.json exposes active Control Center scripts for control:center, control:projects, control:assets, control:classification, control:classification:closure, and control:runtime.
+- tests reference the B01 Control Center checkers and canonical governance artifacts.
+- EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json declares B01 membership and governed asset source.
+- EDGE_ASSET_REPOSITORY_MAP.md and EDGE_REPOSITORY_ASSET_REGISTER.v1.json describe the B01 assets as governance, checker, generated output, documentation, runtime inventory, and repository asset authority surfaces.
+- EDGE_PROJECT_BACKLOG.md and EDGE_PROJECT_DEPENDENCY_MAP.md are generated from EDGE_MASTER_PROJECT_REGISTER.v1.json but remain current governed documentation outputs.
+- EDGE_SYSTEM_RUNTIME_MAP.md is synchronized from EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json but remains a current governed runtime review output.
+- Search terms found legacy/replacement vocabulary inside checker logic and governance policy text, but did not prove any B01 asset itself has been replaced, superseded, deprecated, obsolete, or archived.
+
+Decision:
+- All 15 B01 Control Center assets remain CURRENT for Phase 4.
+- Generated or derived status does not make a B01 asset legacy when the source/checker relationship remains current and governed.
+- No B01 replacement, supersession, parallel successor, or historical-only status is proven.
+
+Validation boundary:
+- Evidence only.
+- No cleanup action is authorized by this B01 outcome.
+- B01 Phase 4 evidence is closed.
+- Next batch: B02 - BACKEND_DIRECT_FILES.
+
