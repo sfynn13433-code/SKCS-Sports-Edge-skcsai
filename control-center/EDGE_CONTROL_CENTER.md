@@ -581,7 +581,7 @@ Required state snapshot:
   },
   "active_phase": "PHASE_6",
   "active_phase_question": "Which Phase 5 overlap candidate families should have canonical authority selected?",
-  "lifecycle_state": "BATCH_COMPLETE",
+  "lifecycle_state": "PHASE_READY_TO_CLOSE",
   "active_batch": null,
   "completed_batches": [
     "B02-B03",
@@ -590,12 +590,11 @@ Required state snapshot:
     "B11-B14",
     "B15-B18",
     "B19-B22",
-    "B23-B26"
-  ],
-  "remaining_batches": [
+    "B23-B26",
     "B27-B29"
   ],
-  "next_deterministic_batch": "B27-B29",
+  "remaining_batches": [],
+  "next_deterministic_batch": null,
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,
@@ -7906,6 +7905,149 @@ B23-B26 Phase 6 decision summary:
 
 Next batch group:
 - B27-B29
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized by this packet.
+
+## PHASE 6 - B27-B29 CANONICAL AUTHORITY SELECTION EVIDENCE
+
+Decision vocabulary used:
+- CANONICAL_KEEP
+- NEEDS_RUNTIME_PROOF
+
+Existing runtime/service, frontend, deployment, and governance authorities from earlier B04-B06, B07-B10, B11-B14, B15-B18, B19-B22, and B23-B26 decisions remain CANONICAL_KEEP where already recorded.
+This packet records the B27-B29 Phase 5 overlap candidate families only and does not replace earlier authorities with root scripts, reports, duplicate frontend surfaces, agent workflows, or temporary data artifacts.
+
+Candidate group 1: root manual scripts, AI diagnostics, provider tests, and pipeline utilities
+
+Phase 6 decisions:
+- find-active-files.js: NEEDS_RUNTIME_PROOF - manual inspection script, not canonical runtime authority.
+- force-seed.js: NEEDS_RUNTIME_PROOF - manual seed script, not canonical runtime authority.
+- refresh-ai-insights.js: NEEDS_RUNTIME_PROOF - AI refresh script, not canonical runtime authority.
+- run-final-test.js: NEEDS_RUNTIME_PROOF - manual test script, not canonical runtime authority.
+- scratch_test_pipeline.js: NEEDS_RUNTIME_PROOF - pipeline test script, not canonical runtime authority.
+- trigger_ai.js: NEEDS_RUNTIME_PROOF - AI trigger script, not canonical runtime authority.
+- test_scenarios_master_rulebook.js: NEEDS_RUNTIME_PROOF - rulebook test script, not canonical runtime authority.
+- test-ai-insights.js: NEEDS_RUNTIME_PROOF - AI diagnostic script, not canonical runtime authority.
+- test-ai-simulation.js: NEEDS_RUNTIME_PROOF - AI simulation script, not canonical runtime authority.
+- test-bigballs-direct.js: NEEDS_RUNTIME_PROOF - provider test script, not canonical runtime authority.
+- test-espn-direct.js: NEEDS_RUNTIME_PROOF - provider test script, not canonical runtime authority.
+- test-groq-debug.js: NEEDS_RUNTIME_PROOF - provider diagnostic script, not canonical runtime authority.
+- test-groq-models.js: NEEDS_RUNTIME_PROOF - provider diagnostic script, not canonical runtime authority.
+- test-sportsdb.js: NEEDS_RUNTIME_PROOF - provider test script, not canonical runtime authority.
+- test-wc-id.js: NEEDS_RUNTIME_PROOF - provider test script, not canonical runtime authority.
+
+No root manual script, AI diagnostic, provider test, or pipeline utility is selected as canonical authority.
+These assets remain held behind NEEDS_RUNTIME_PROOF before execution, replacement, consolidation, rewrite, deletion, or retirement.
+
+Candidate group 2: package, build, dependency, and frontend build config surfaces
+
+Phase 6 decisions:
+- package.json: CANONICAL_KEEP - distinct npm/build orchestration authority.
+- package-lock.json: CANONICAL_KEEP - distinct dependency lock authority.
+- tailwind.config.js: CANONICAL_KEEP - distinct frontend build config authority.
+- qodana.yaml: NEEDS_RUNTIME_PROOF - static-analysis configuration, not canonical runtime authority.
+- LICENSE: CANONICAL_KEEP - distinct legal/license artifact.
+
+Package and build configuration surfaces remain separate canonical authorities for their distinct configuration roles.
+Static-analysis configuration remains held behind NEEDS_RUNTIME_PROOF.
+
+Candidate group 3: phase reports, Supabase reports, migration plans, and dependency maps
+
+Phase 6 decisions:
+- phase1-final-report.json: NEEDS_RUNTIME_PROOF - historical phase report artifact, not canonical runtime authority.
+- phase2-conservative-summary.json: NEEDS_RUNTIME_PROOF - historical phase report artifact, not canonical runtime authority.
+- phase2-final-summary.json: NEEDS_RUNTIME_PROOF - historical phase report artifact, not canonical runtime authority.
+- phase3-comprehensive-summary.json: NEEDS_RUNTIME_PROOF - historical phase report artifact, not canonical runtime authority.
+- phase3-migration-summary.json: NEEDS_RUNTIME_PROOF - historical phase report artifact, not canonical runtime authority.
+- overall-project-completion.json: NEEDS_RUNTIME_PROOF - historical project report artifact, not canonical runtime authority.
+- placeholders-and-insights-audit.json: NEEDS_RUNTIME_PROOF - historical audit report artifact, not canonical runtime authority.
+- safe-migration-plan.json: NEEDS_RUNTIME_PROOF - historical migration-plan artifact, not canonical runtime authority.
+- supabase-diagnostics-report.json: NEEDS_RUNTIME_PROOF - historical Supabase diagnostic artifact, not canonical runtime authority.
+- supabase-migration-plan.json: NEEDS_RUNTIME_PROOF - historical migration-plan artifact, not canonical runtime authority.
+- supabase-table-analysis.json: NEEDS_RUNTIME_PROOF - historical table-analysis artifact, not canonical runtime authority.
+- supabase-visual-analysis-report.json: NEEDS_RUNTIME_PROOF - historical visual-analysis artifact, not canonical runtime authority.
+- table-dependency-map.json: NEEDS_RUNTIME_PROOF - historical dependency-map artifact, not canonical runtime authority.
+- reports/execution-spine-compliance-map.json: NEEDS_RUNTIME_PROOF - execution-spine projection artifact, not canonical runtime authority.
+- reports/execution-spine-compliance-map.md: NEEDS_RUNTIME_PROOF - execution-spine projection artifact, not canonical runtime authority.
+
+No report, audit map, or markdown projection is selected as canonical authority.
+These assets remain preserved historical evidence held behind NEEDS_RUNTIME_PROOF before execution, replacement, consolidation, rewrite, deletion, or retirement.
+
+Candidate group 4: root/public frontend and Supabase client bundle surfaces
+
+Phase 6 decisions:
+- market-explorer.html: NEEDS_RUNTIME_PROOF - root duplicate frontend surface; public/market-explorer.html remains the recorded public delivery authority from B19-B22.
+- js/config.js: NEEDS_RUNTIME_PROOF - root duplicate config surface; public/js/config.js remains the recorded public config authority from B19-B22.
+- js/supabase-bundle.js: NEEDS_RUNTIME_PROOF - root duplicate bundle surface; public/js/supabase-bundle.js remains the recorded public bundle authority from B19-B22.
+- js/supabase-client-src.js: CANONICAL_KEEP - distinct Supabase client source/build-input authority referenced by package.json build:supabase.
+- js/supabase-init.js: NEEDS_RUNTIME_PROOF - root duplicate init surface; public/js/supabase-init.js remains the recorded public init authority from B19-B22.
+
+No root duplicate frontend or bundle surface replaces the earlier public frontend authorities.
+The Supabase client source/build-input remains a separate canonical build authority.
+
+Candidate group 5: local launch, model/runtime, and auxiliary project surfaces
+
+Phase 6 decisions:
+- SKCS_START.bat: NEEDS_RUNTIME_PROOF - local/manual launch surface, not canonical runtime authority.
+- dolphin-server/Dockerfile: NEEDS_RUNTIME_PROOF - local model/runtime container surface, not canonical product runtime authority.
+- dolphin-server/README.md: NEEDS_RUNTIME_PROOF - local model/runtime documentation, not canonical product runtime authority.
+- sportbook: NEEDS_RUNTIME_PROOF - auxiliary project surface, not canonical runtime authority.
+- kabaddiPy: NEEDS_RUNTIME_PROOF - auxiliary project surface, not canonical runtime authority.
+
+No local launcher, Dockerfile, README, or auxiliary project asset is selected as canonical authority.
+These assets remain held behind NEEDS_RUNTIME_PROOF before execution, replacement, consolidation, rewrite, deletion, or retirement.
+
+Candidate group 6: agent workflow, local tool config, and hook surfaces
+
+Phase 6 decisions:
+- .gemini/antigravity/README.md: NEEDS_RUNTIME_PROOF - agent workflow documentation, not canonical product authority.
+- .gemini/antigravity/workflows/automated-data-sync.toml: NEEDS_RUNTIME_PROOF - agent workflow config, not canonical product authority.
+- .gemini/antigravity/workflows/intelligent-alert-system.toml: NEEDS_RUNTIME_PROOF - agent workflow config, not canonical product authority.
+- .gemini/antigravity/workflows/intelligent-pipeline-optimizer.toml: NEEDS_RUNTIME_PROOF - agent workflow config, not canonical product authority.
+- .gemini/antigravity/workflows/smart-prediction-engine.toml: NEEDS_RUNTIME_PROOF - agent workflow config, not canonical product authority.
+- .gemini/commands.toml: NEEDS_RUNTIME_PROOF - agent command config, not canonical product authority.
+- .qwen/settings.json: NEEDS_RUNTIME_PROOF - local tool settings, not canonical product authority.
+- .qwen/settings.json.orig: NEEDS_RUNTIME_PROOF - local tool settings backup, not canonical product authority.
+- .windsurf/workflows/env.md: NEEDS_RUNTIME_PROOF - local tool workflow note, not canonical product authority.
+- .githooks/pre-commit: NEEDS_RUNTIME_PROOF - local Git hook surface, not canonical runtime authority.
+- .stakpak/data/local.db: NEEDS_RUNTIME_PROOF - local tool database artifact, not canonical runtime authority.
+
+No agent workflow, hook, local DB, or tool config is selected as canonical authority.
+These assets remain held behind NEEDS_RUNTIME_PROOF before execution, replacement, consolidation, rewrite, deletion, or retirement.
+
+Candidate group 7: API pipeline route and execution-spine projections
+
+Phase 6 decisions:
+- api/pipeline/run-full.js: NEEDS_RUNTIME_PROOF - Vercel API pipeline route surface overlapping backend/routes/pipeline.js; not canonical authority until runtime proof resolves the route boundary.
+- reports/execution-spine-compliance-map.json: NEEDS_RUNTIME_PROOF - execution-spine projection artifact, not canonical runtime authority.
+- reports/execution-spine-compliance-map.md: NEEDS_RUNTIME_PROOF - execution-spine projection artifact, not canonical runtime authority.
+
+No API route or execution-spine projection is selected as canonical authority over the existing backend pipeline route authority.
+These assets remain held behind NEEDS_RUNTIME_PROOF before execution, replacement, consolidation, rewrite, deletion, or retirement.
+
+Candidate group 8: provider data dumps, sports catalog data, placeholder data, and temporary validation artifacts
+
+Phase 6 decisions:
+- src/data/placeholder.txt: NEEDS_RUNTIME_PROOF - placeholder data artifact, not canonical runtime authority.
+- src/data/sportsdb-leagues.json: NEEDS_RUNTIME_PROOF - provider catalog snapshot, not canonical runtime authority.
+- tmp/key-validation-1776365488298.json: NEEDS_RUNTIME_PROOF - temporary validation artifact, not canonical runtime authority.
+- tmp/key-validation-1776365827255.json: NEEDS_RUNTIME_PROOF - temporary validation artifact, not canonical runtime authority.
+- tmp/key-validation-1776482624434.json: NEEDS_RUNTIME_PROOF - temporary validation artifact, not canonical runtime authority.
+- tmp/today-fixture-pull-1776482706164.json: NEEDS_RUNTIME_PROOF - temporary fixture-pull artifact, not canonical runtime authority.
+
+No provider-data snapshot, placeholder file, or temporary validation artifact is selected as canonical authority.
+These assets remain held behind NEEDS_RUNTIME_PROOF before execution, replacement, consolidation, rewrite, deletion, or retirement.
+
+B27-B29 Phase 6 decision summary:
+- Candidate groups reviewed: 8
+- CANONICAL_KEEP decisions recorded: YES
+- NEEDS_RUNTIME_PROOF holds recorded: YES
+- Merge, deletion, retirement, refactor, SQL execution, Supabase mutation, deployment change, dependency, security, or runtime action authorized: NO
+- B27-B29 Phase 6 canonical authority selection is evidence-complete.
+- PHASE_6 canonical authority selection is complete across B02-B03 through B27-B29.
+- Next action: close PHASE_6 and activate PHASE_7 when separately authorized.
 
 Validation boundary:
 - Evidence only.

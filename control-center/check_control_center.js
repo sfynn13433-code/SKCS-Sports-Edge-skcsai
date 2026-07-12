@@ -323,7 +323,7 @@ function createControlCenterGateState(overrides = {}) {
     },
     active_phase: ACTIVE_CLEANUP_PHASE,
     active_phase_question: PHASE_QUESTIONS[ACTIVE_CLEANUP_PHASE],
-    lifecycle_state: "BATCH_COMPLETE",
+    lifecycle_state: "PHASE_READY_TO_CLOSE",
     active_batch: null,
     completed_batches: [
       "B02-B03",
@@ -333,18 +333,10 @@ function createControlCenterGateState(overrides = {}) {
       "B15-B18",
       "B19-B22",
       "B23-B26",
+      "B27-B29",
     ],
-    remaining_batches: reviewUnits.filter(
-      (unit) =>
-        unit !== "B02-B03" &&
-        unit !== "B04-B06" &&
-      unit !== "B07-B10" &&
-      unit !== "B11-B14" &&
-      unit !== "B15-B18" &&
-      unit !== "B19-B22" &&
-      unit !== "B23-B26"
-    ),
-    next_deterministic_batch: "B27-B29",
+    remaining_batches: [],
+    next_deterministic_batch: null,
     phase_3_outcomes: [...PHASE_3_OUTCOMES],
     phase_3_no_deletion_law: "NO_CURRENT_USE_FOUND does not authorize deletion.",
     future_phase_notes: [],
@@ -957,8 +949,8 @@ function validateControlCenterPolicy(documentText) {
     errors.push("Control Center state lifecycle_state invalid");
   }
 
-  if (state.lifecycle_state !== "BATCH_COMPLETE") {
-    errors.push("Control Center state lifecycle_state must be BATCH_COMPLETE");
+  if (state.lifecycle_state !== "PHASE_READY_TO_CLOSE") {
+    errors.push("Control Center state lifecycle_state must be PHASE_READY_TO_CLOSE");
   }
 
   if (!Array.isArray(state.completed_batches)) {
