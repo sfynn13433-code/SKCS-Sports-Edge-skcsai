@@ -6945,3 +6945,196 @@ Next recommended control action:
 Validation boundary:
 - Evidence only.
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+
+## PHASE 6 - B02-B03 CANONICAL AUTHORITY SELECTION EVIDENCE
+
+Result: PASS WITH CANONICAL AUTHORITY DECISIONS AND RUNTIME-PROOF HOLDS
+
+Scope:
+- Phase: PHASE_6 - Canonical Authority Selection
+- Batches: B02 - BACKEND_DIRECT_FILES; B03 - BACKEND_ROUTES_AND_CONTROLLERS
+- Source evidence: PHASE 5 - B02-B03 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+- Start HEAD: d71adbe9
+- Evidence type: canonical authority decision only
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Decision vocabulary used:
+- CANONICAL_KEEP
+- NEEDS_RUNTIME_PROOF
+
+Candidate group 1: database access authority
+
+Assets:
+- backend/database.js
+- backend/db.js
+- backend/dbBootstrap.js
+
+Phase 6 decisions:
+- backend/db.js: CANONICAL_KEEP - general database access helper.
+- backend/database.js: NEEDS_RUNTIME_PROOF - broad legacy/compatibility database surface.
+- backend/dbBootstrap.js: CANONICAL_KEEP - database bootstrap/schema/seed authority only.
+
+Evidence:
+- backend/db.js is the focused database helper and exports pool, query, and withTransaction.
+- backend/db.js has broad active use across controllers, routes, services, semantic-layer code, and backend/utils/db.js.
+- backend/database.js is also active and is used by server-express.js, middleware, routes, utilities, and services.
+- backend/database.js exports broader helper functions beyond basic database access, including prediction, profile, subscription, and accuracy helpers.
+- backend/dbBootstrap.js imports query from backend/database.js and exports bootstrap.
+- backend/dbBootstrap.js is used by server-express.js and force-seed.js as bootstrap/schema/seed authority, not as general database access authority.
+
+Control decision:
+- Keep backend/db.js as canonical general database helper.
+- Keep backend/dbBootstrap.js as canonical bootstrap/schema/seed authority.
+- Hold backend/database.js behind NEEDS_RUNTIME_PROOF before any replacement, merge, or retirement.
+
+Candidate group 2: server inline endpoint versus route-module boundary
+
+Assets:
+- backend/server-express.js
+- backend/routes/pipeline.js
+- backend/routes/predictions.js
+- backend/routes/debug.js
+- backend/routes/scheduler.js
+- backend/routes/cricketCron.js
+- backend/routes/cricketInsights.js
+- backend/routes/cricketCount.js
+- backend/routes/sportsEdge.js
+- backend/routes/v1/predictions.js
+
+Phase 6 decisions:
+- backend/server-express.js: CANONICAL_KEEP - server bootstrap, middleware, router mounting, and legacy inline endpoint host.
+- backend/routes/pipeline.js: CANONICAL_KEEP - modular pipeline route authority.
+- backend/routes/predictions.js: CANONICAL_KEEP - modular predictions route authority.
+- backend/routes/debug.js: CANONICAL_KEEP - modular debug route authority.
+- backend/routes/scheduler.js: CANONICAL_KEEP - modular scheduler route authority.
+- backend/routes/cricketCron.js: CANONICAL_KEEP - modular cricket cron route authority.
+- backend/routes/cricketInsights.js: CANONICAL_KEEP - modular cricket insights route authority.
+- backend/routes/cricketCount.js: CANONICAL_KEEP - modular cricket count route authority pending caller proof.
+- backend/routes/sportsEdge.js: CANONICAL_KEEP - modular sports edge public API route authority.
+- backend/routes/v1/predictions.js: CANONICAL_KEEP - modular v1 predictions route authority.
+- Inline server endpoints: NEEDS_RUNTIME_PROOF before any move, deletion, or replacement.
+
+Evidence:
+- server-express.js imports and mounts modular route files.
+- server-express.js also still defines inline endpoints for pipeline trigger, refresh-predictions, debug sync-test, cron routes, cricket daily fixtures, master pipeline, AI predictions, and cricket table debug behavior.
+- Candidate route modules all exist, define router endpoints, and export routers.
+- Route-module overlap is therefore controlled but not safe to consolidate without live caller and route-contract proof.
+
+Control decision:
+- Keep server-express.js as bootstrap/mounting/legacy inline endpoint authority.
+- Keep modular route files as canonical authorities for their mounted route domains.
+- No inline endpoint may be moved, deleted, or replaced until frontend callers, scheduler URLs, deployment references, cron references, and route contracts are proven.
+
+Candidate group 3: prediction delivery and prediction API surfaces
+
+Assets:
+- backend/routes/predictions.js
+- backend/routes/v1/predictions.js
+- backend/routes/user.js
+- backend/routes/vip.js
+- backend/routes/direct1x2.js
+- backend/routes/v1/acca.js
+- backend/routes/v1/sameMatchBuilder.js
+- backend/routes/v1/secondaryMarkets.js
+- backend/server-express.js
+
+Phase 6 decisions:
+- backend/routes/predictions.js: CANONICAL_KEEP - primary subscriber-facing prediction delivery route.
+- backend/routes/v1/predictions.js: CANONICAL_KEEP - v1 contract prediction API route.
+- backend/routes/user.js: CANONICAL_KEEP - user/subscription account prediction access route.
+- backend/routes/vip.js: CANONICAL_KEEP - VIP/stress payload prediction route.
+- backend/routes/direct1x2.js: CANONICAL_KEEP - direct 1X2 market route authority.
+- backend/routes/v1/acca.js: CANONICAL_KEEP - v1 ACCA builder/history route authority.
+- backend/routes/v1/sameMatchBuilder.js: CANONICAL_KEEP - v1 same match builder route authority.
+- backend/routes/v1/secondaryMarkets.js: CANONICAL_KEEP - v1 secondary markets route authority.
+- backend/server-express.js /api/ai-predictions/:matchId: NEEDS_RUNTIME_PROOF - inline legacy/public prediction endpoint.
+
+Evidence:
+- backend/routes/predictions.js is mounted at /api/predictions and handles subscription/auth-controlled prediction delivery, plan allocation, ACCA/mega-ACCA logic, and admin rebuild/clear operations.
+- backend/routes/v1/predictions.js is mounted under /api/v1 and exposes match, batch, and history prediction endpoints.
+- backend/routes/user.js owns user/subscription-specific prediction access and insight consumption routes.
+- backend/routes/vip.js owns VIP/stress prediction payload delivery.
+- backend/routes/direct1x2.js and v1 market routes expose specialized market, ACCA, same-match-builder, and secondary-market contracts.
+- server-express.js still owns an inline /api/ai-predictions/:matchId endpoint with fallback prediction-table logic.
+
+Control decision:
+- Keep separate prediction API authorities by audience and API contract.
+- Hold the inline /api/ai-predictions/:matchId endpoint behind NEEDS_RUNTIME_PROOF before any replacement or retirement.
+
+Candidate group 4: cricket count, cache, cron, and insight surfaces
+
+Assets:
+- backend/routes/cricketCache.js
+- backend/routes/cricketCount.js
+- backend/routes/cricketCron.js
+- backend/routes/cricketInsights.js
+- backend/deploy-trigger-cricket.js
+- backend/server-express.js
+
+Phase 6 decisions:
+- backend/routes/cricketCache.js: CANONICAL_KEEP - cricket cache read route.
+- backend/routes/cricketCron.js: CANONICAL_KEEP - modular cricket cron/cache refresh route.
+- backend/routes/cricketInsights.js: CANONICAL_KEEP - main cricket insights delivery route.
+- backend/routes/cricketCount.js: NEEDS_RUNTIME_PROOF - dedicated compatibility count endpoint.
+- backend/deploy-trigger-cricket.js: CANONICAL_KEEP - external trigger caller, not route authority.
+- backend/server-express.js inline cricket endpoints: NEEDS_RUNTIME_PROOF - legacy inline cricket cron/debug host.
+
+Evidence:
+- backend/routes/cricketCache.js owns the cricket cache read route and reads CricAPI cache through cricApiCacheService.
+- backend/routes/cricketCron.js owns mounted modular cricket cron/cache endpoints for Cricbuzz and CricAPI.
+- backend/routes/cricketInsights.js owns cricket insights delivery and also exposes a lightweight /count endpoint.
+- backend/routes/cricketCount.js duplicates count-like behavior but is separately mounted at /api/cricket/count.
+- backend/deploy-trigger-cricket.js calls /api/cron/cricket-daily-fixtures and is a launcher/caller, not route implementation authority.
+- server-express.js still owns inline /api/cron/cricket-daily-fixtures and /api/debug/cricket-tables endpoints.
+
+Control decision:
+- Keep modular cricket route authorities separate.
+- Hold cricketCount.js and server-express.js inline cricket endpoints behind NEEDS_RUNTIME_PROOF before any consolidation or retirement.
+
+Candidate group 5: deploy trigger files and called route endpoints
+
+Assets:
+- backend/deploy-trigger.js
+- backend/routes/pipeline.js
+- backend/deploy-trigger-cricket.js
+- backend/routes/cricketCron.js
+- backend/server-express.js
+
+Phase 6 decisions:
+- backend/deploy-trigger.js: CANONICAL_KEEP - external pipeline trigger caller, not route authority.
+- backend/routes/pipeline.js: CANONICAL_KEEP - /api/pipeline/run-full route authority.
+- backend/deploy-trigger-cricket.js: CANONICAL_KEEP - external cricket trigger caller, not route authority.
+- backend/routes/cricketCron.js: CANONICAL_KEEP - modular cricket cron/cache route authority.
+- backend/server-express.js /api/cron/cricket-daily-fixtures: NEEDS_RUNTIME_PROOF - inline cricket-daily-fixtures route host.
+
+Evidence:
+- backend/deploy-trigger.js calls /api/pipeline/run-full.
+- backend/routes/pipeline.js defines GET and POST /run-full and is mounted at /api/pipeline.
+- backend/deploy-trigger-cricket.js calls /api/cron/cricket-daily-fixtures.
+- backend/routes/cricketCron.js defines modular /cricket/cricbuzz, /cricket/cricapi/daily, and /cricket/cricapi/live endpoints under /api/cron.
+- server-express.js still owns the inline /api/cron/cricket-daily-fixtures endpoint and mounts both /api/pipeline and /api/cron route modules.
+
+Control decision:
+- Keep trigger files as external callers.
+- Keep route files as route authorities for their mounted route domains.
+- Hold server-express.js inline cricket-daily-fixtures behind NEEDS_RUNTIME_PROOF before any route replacement or retirement.
+
+B02-B03 Phase 6 decision summary:
+- Candidate groups reviewed: 5
+- CANONICAL_KEEP decisions recorded: YES
+- NEEDS_RUNTIME_PROOF holds recorded: YES
+- DEFER decisions recorded: NO
+- Merge, deletion, retirement, refactor, SQL, deployment, provider, dependency, security, or runtime action authorized: NO
+- B02-B03 Phase 6 canonical authority selection is evidence-complete.
+
+Next batch group:
+- B04-B06
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized by this packet.
