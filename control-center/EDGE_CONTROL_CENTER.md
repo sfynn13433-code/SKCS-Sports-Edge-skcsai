@@ -3710,3 +3710,106 @@ Validation boundary:
 - No active-use outcome authorizes deletion.
 - B26 batch state not advanced in this patch.
 - GitHub vulnerability and Dependabot notices remain future dependency/security work and were not touched.
+
+## PHASE 3 - B27 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 - Active Use Identification
+- Batch: B27 / ARCHIVE
+- Question: Is each B27 governed archived asset currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Restore performed: NO
+- Archived script execution performed: NO
+- Database mutation performed: NO
+- Deployment change performed: NO
+- Runtime/product change performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+- Dependency/security/vulnerability notice work performed: NO
+
+Outcome summary:
+- ACTIVE: 0
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 58
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B27 MANUAL_USE assets:
+- _archive/root/cli_v1.1.0.exe
+- _archive/root/render.zip
+- _archive/scripts/analyze-routes.js
+- _archive/scripts/analyze-table-usage.js
+- _archive/scripts/check-confidence.js
+- _archive/scripts/check-connectivity.js
+- _archive/scripts/check-constraints.js
+- _archive/scripts/check-deployment.js
+- _archive/scripts/check-direct-predictions.js
+- _archive/scripts/check-endpoints.js
+- _archive/scripts/check-final-schema.js
+- _archive/scripts/check-final-sports.js
+- _archive/scripts/check-matches.js
+- _archive/scripts/check-metadata-times.js
+- _archive/scripts/check-risk-constraint.js
+- _archive/scripts/check-schema.js
+- _archive/scripts/check-stage-schemas.js
+- _archive/scripts/check-supabase-tables.js
+- _archive/scripts/check-team-names.js
+- _archive/scripts/cors-test.sh
+- _archive/scripts/debug-events.js
+- _archive/scripts/debug-sport-filter.js
+- _archive/scripts/deep-table-analysis.js
+- _archive/scripts/definitive-cors-diagnosis.sh
+- _archive/scripts/deploy-cloud-scheduler.sh
+- _archive/scripts/deploy-render.sh
+- _archive/scripts/file-walker.js
+- _archive/scripts/files-report.json
+- _archive/scripts/final-status.js
+- _archive/scripts/final-verification.js
+- _archive/scripts/fix-matches-timestamps.sql
+- _archive/scripts/fix-sport-filter.js
+- _archive/scripts/fix-tier-rules.js
+- _archive/scripts/fix-view.js
+- _archive/scripts/fix-view.sql
+- _archive/scripts/full-nuke.js
+- _archive/scripts/migration2-fix.js
+- _archive/scripts/migration2-normalized-fixtures.js
+- _archive/scripts/migration2-v2.js
+- _archive/scripts/migration2-v3.js
+- _archive/scripts/normalize-sports.sql
+- _archive/scripts/patch-other-routes.js
+- _archive/scripts/patch-predictions-visibility.js
+- _archive/scripts/phase1-immediate-patch.js
+- _archive/scripts/phase1-patch.js
+- _archive/scripts/phase2-schema-refactor.js
+- _archive/scripts/phase3-cleanup.js
+- _archive/scripts/sql/create_event_context_tables.sql
+- _archive/scripts/sql/create_prediction_publish_runs.sql
+- _archive/scripts/sql/create_predictions_accuracy.sql
+- _archive/scripts/test-scheduler-endpoint.sh
+- _archive/scripts/trigger-grade.js
+- _archive/scripts/trigger-refresh.js
+- _archive/scripts/trigger-render-pipeline.js
+- _archive/scripts/verify-deployment.sh
+- _archive/scripts/verify-predictions.js
+- _archive/scripts/verify-route-patches.js
+- _archive/scripts/wipe-events-data.js
+
+Evidence:
+- B27 is defined as the ARCHIVE batch with 58 governed paths under _archive/.
+- B27 assets include archived root artifacts, archived JavaScript utilities, archived shell scripts, archived SQL files, archived reports, and old trigger/verification utilities.
+- package.json active app startup is node backend/server-express.js; B27 archive files are not package startup entrypoints.
+- render.yaml active web startup is node backend/server-express.js; B27 archive files are not Render web start commands.
+- Repository search evidence found _archive/ references in governance/audit files rather than active startup surfaces.
+- B27 assets are treated as manual archive / historical reference material in this phase, not active runtime assets.
+- Some B27 files appear to be old patch, migration, cleanup, wipe, deployment, and verification utilities. This phase does not execute any archived script or SQL file.
+- No deletion, merge, retirement, dependency/security, vulnerability, restore, source/runtime/product change, database mutation, deployment change, archive cleanup, or historical-evidence cleanup is authorized by this evidence.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No archived file executed.
+- No active-use outcome authorizes deletion.
+- B27 batch state not advanced in this patch.
+- GitHub vulnerability and Dependabot notices remain future dependency/security work and were not touched.
