@@ -585,17 +585,17 @@ Required state snapshot:
   "active_batch": null,
   "completed_batches": [
     "B02-B03",
-    "B04-B06"
+    "B04-B06",
+    "B07-B10"
   ],
   "remaining_batches": [
-    "B07-B10",
     "B11-B14",
     "B15-B18",
     "B19-B22",
     "B23-B26",
     "B27-B29"
   ],
-  "next_deterministic_batch": "B07-B10",
+  "next_deterministic_batch": "B11-B14",
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,
@@ -5399,6 +5399,137 @@ Validation boundary:
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
 
 ## PHASE 5 - B07-B10 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+
+## PHASE 6 - B07-B10 CANONICAL AUTHORITY SELECTION EVIDENCE
+
+Decision vocabulary used:
+- CANONICAL_KEEP
+- NEEDS_RUNTIME_PROOF
+
+Candidate group 1: pipeline, sync, scheduler, and execution orchestration
+
+Phase 6 decisions:
+- backend/services/syncService.js: CANONICAL_KEEP - distinct orchestration authority.
+- backend/services/cronJobs.js: CANONICAL_KEEP - distinct scheduler authority.
+- backend/services/thesportsdbPipeline.js: CANONICAL_KEEP - distinct pipeline authority.
+- backend/services/pipelineMetricsService.js: CANONICAL_KEEP - distinct pipeline health authority.
+- backend/services/systemTruthLogger.js: CANONICAL_KEEP - distinct execution truth/logging authority.
+- scripts/gatekeeper-pipeline.js: NEEDS_RUNTIME_PROOF - audit/gatekeeper script, not canonical runtime authority.
+- scripts/audit-execution-spine.js: NEEDS_RUNTIME_PROOF - audit script, not canonical runtime authority.
+
+Candidate group 2: provider access, provider quota, RapidAPI, and cache boundaries
+
+Phase 6 decisions:
+- backend/services/dataProvider.js: CANONICAL_KEEP - provider acquisition boundary.
+- backend/services/dataProviders.js: CANONICAL_KEEP - provider acquisition/cache boundary.
+- backend/services/providerQuotaService.js: CANONICAL_KEEP - provider quota boundary.
+- backend/services/quotaPlanner.js: CANONICAL_KEEP - quota planning boundary.
+- backend/services/oddsBudgetService.js: CANONICAL_KEEP - provider budget boundary.
+- backend/services/divanscoreService.js: CANONICAL_KEEP - provider-specific service authority.
+- backend/services/metrxFactoryService.js: CANONICAL_KEEP - provider-specific service authority.
+- backend/services/football536Service.js: CANONICAL_KEEP - provider-specific service authority.
+- backend/services/freeLivescoreApiService.js: CANONICAL_KEEP - provider-specific service authority.
+- backend/services/liveFootballApiService.js: CANONICAL_KEEP - provider-specific service authority.
+- backend/services/sportsApiProFootballService.js: CANONICAL_KEEP - provider-specific service authority.
+- backend/services/proFootballDataService.js: CANONICAL_KEEP - provider-specific service authority.
+- backend/services/soccerDataApiClient.js: CANONICAL_KEEP - provider-boundary client authority.
+- backend/services/sportsrcHealthService.js: CANONICAL_KEEP - provider health boundary.
+- scripts/audit-api-call-map.js: NEEDS_RUNTIME_PROOF - audit/discovery script, not canonical authority.
+- scripts/audit-api-sports-usage.js: NEEDS_RUNTIME_PROOF - audit/discovery script, not canonical authority.
+- scripts/audit-bigballs-discovery.js: NEEDS_RUNTIME_PROOF - discovery script, not canonical authority.
+- scripts/audit-bsd-discovery.js: NEEDS_RUNTIME_PROOF - discovery script, not canonical authority.
+- scripts/audit-bsd-league-inventory.js: NEEDS_RUNTIME_PROOF - discovery script, not canonical authority.
+- scripts/audit-soccerdata-discovery.js: NEEDS_RUNTIME_PROOF - discovery script, not canonical authority.
+
+Direct-provider retirement remains blocked for later provider-boundary work.
+
+Candidate group 3: cricket service boundary
+
+Phase 6 decisions:
+- backend/services/cricApiCacheService.js: CANONICAL_KEEP - cricket cache authority.
+- backend/services/cricbuzzService.js: CANONICAL_KEEP - cricket feed authority.
+- backend/services/cricketLiveEnrichmentService.js: CANONICAL_KEEP - cricket live-enrichment authority.
+- backend/services/cricketLiveMatchResolver.js: CANONICAL_KEEP - cricket live resolver authority.
+- backend/services/cricketRulesEngine.js: CANONICAL_KEEP - cricket rules authority.
+- scripts/audit-cricket-final-tables.js: NEEDS_RUNTIME_PROOF - cricket audit script, not canonical authority.
+- scripts/audit-cricket-rules.js: NEEDS_RUNTIME_PROOF - cricket audit script, not canonical authority.
+- scripts/audit-cricket-storage.js: NEEDS_RUNTIME_PROOF - cricket audit script, not canonical authority.
+- scripts/audit-cricket-tables.js: NEEDS_RUNTIME_PROOF - cricket audit script, not canonical authority.
+
+Candidate group 4: football provider, extractor, ranking, and enrichment surfaces
+
+Phase 6 decisions:
+- backend/services/football536Extractor.js: CANONICAL_KEEP - football extractor authority.
+- backend/services/football536Service.js: CANONICAL_KEEP - football provider service authority.
+- backend/services/footballH2HExtractor.js: CANONICAL_KEEP - football extractor authority.
+- backend/services/footballHighlightsService.js: CANONICAL_KEEP - football enrichment authority.
+- backend/services/footballRankExtractor.js: CANONICAL_KEEP - football ranking authority.
+- backend/services/footballRiskTierMapper.js: CANONICAL_KEEP - football ranking/risk authority.
+- backend/services/freeLivescoreApiExtractor.js: CANONICAL_KEEP - football extractor authority.
+- backend/services/freeLivescoreApiService.js: CANONICAL_KEEP - football provider service authority.
+- backend/services/liveFootballApiExtractor.js: CANONICAL_KEEP - football extractor authority.
+- backend/services/liveFootballApiService.js: CANONICAL_KEEP - football provider service authority.
+- backend/services/sportsApiProFootballExtractor.js: CANONICAL_KEEP - football extractor authority.
+- backend/services/sportsApiProFootballService.js: CANONICAL_KEEP - football provider service authority.
+- backend/services/sportsLiveScoresExtractor.js: CANONICAL_KEEP - football extractor authority.
+- backend/services/sportsLiveScoresService.js: CANONICAL_KEEP - football provider service authority.
+- scripts/audit-bigballs-discovery.js: NEEDS_RUNTIME_PROOF - football discovery script, not canonical authority.
+- scripts/audit-bsd-discovery.js: NEEDS_RUNTIME_PROOF - football discovery script, not canonical authority.
+- scripts/audit-bsd-league-inventory.js: NEEDS_RUNTIME_PROOF - football discovery script, not canonical authority.
+- scripts/audit-soccerdata-discovery.js: NEEDS_RUNTIME_PROOF - football discovery script, not canonical authority.
+
+Candidate group 5: prediction, market, ACCA, rulebook, and scoring surfaces
+
+Phase 6 decisions:
+- backend/services/direct1x2Builder.js: CANONICAL_KEEP - direct prediction builder authority.
+- backend/services/direct1x2Engine.js: CANONICAL_KEEP - direct prediction engine authority.
+- backend/services/filterEngine.js: CANONICAL_KEEP - market filtering authority.
+- backend/services/marketIntelligence.js: CANONICAL_KEEP - market intelligence authority.
+- backend/services/marketScoringEngine.js: CANONICAL_KEEP - market scoring authority.
+- backend/services/masterRulebookRiskClassification.js: CANONICAL_KEEP - rulebook risk authority.
+- backend/services/reEvaluationEngine.js: CANONICAL_KEEP - re-evaluation authority.
+- backend/services/safeHavenSelector.js: CANONICAL_KEEP - safe-haven selection authority.
+- backend/services/saveDirectInsights.js: CANONICAL_KEEP - insight persistence authority.
+- backend/services/unifiedPredictionsService.js: CANONICAL_KEEP - unified prediction access authority.
+- backend/services/unifiedRulesService.js: CANONICAL_KEEP - unified rules access authority.
+- scripts/audit-football-rules-alignment.js: NEEDS_RUNTIME_PROOF - rule audit script, not canonical authority.
+- scripts/audit-sport-values.js: NEEDS_RUNTIME_PROOF - rule audit script, not canonical authority.
+- scripts/secondary-market-gatekeeper.js: NEEDS_RUNTIME_PROOF - secondary-market gatekeeper script, not canonical authority.
+
+Candidate group 6: grading, accuracy, semantic drift, and operational health
+
+Phase 6 decisions:
+- backend/services/gradingAccuracyCore.js: CANONICAL_KEEP - grading authority.
+- backend/services/gradingSnapshotService.js: CANONICAL_KEEP - grading snapshot authority.
+- backend/services/semanticDriftSummaryService.js: CANONICAL_KEEP - semantic drift authority.
+- backend/services/pipelineMetricsService.js: CANONICAL_KEEP - operational health authority.
+- backend/services/systemTruthLogger.js: CANONICAL_KEEP - execution truth logging authority.
+- scripts/audit-grading-pipeline.js: NEEDS_RUNTIME_PROOF - grading audit script, not canonical authority.
+- scripts/audit-placeholders-and-insights.js: NEEDS_RUNTIME_PROOF - QA audit script, not canonical authority.
+- scripts/master-qa.js: NEEDS_RUNTIME_PROOF - QA script, not canonical authority.
+
+Candidate group 7: unified data access surfaces
+
+Phase 6 decisions:
+- backend/services/unifiedFixturesService.js: CANONICAL_KEEP - unified fixture access authority.
+- backend/services/unifiedPredictionsService.js: CANONICAL_KEEP - unified prediction access authority.
+- backend/services/unifiedRulesService.js: CANONICAL_KEEP - unified rules access authority.
+- backend/services/normalizerService.js: CANONICAL_KEEP - normalization authority.
+- backend/services/saveContextData.js: CANONICAL_KEEP - context persistence authority.
+- backend/services/saveDirectInsights.js: CANONICAL_KEEP - insight persistence authority.
+
+Candidate group 8: Control Center read service bridge
+
+Phase 6 decisions:
+- backend/services/controlCenterReadService.js: CANONICAL_KEEP - backend read bridge authority.
+- control-center/check_control_center.js: CANONICAL_KEEP - governance checker authority.
+- control-center/check_edge_asset_classification.js: CANONICAL_KEEP - governance checker authority.
+- control-center/check_edge_system_runtime_inventory.js: CANONICAL_KEEP - governance checker authority.
+
+Operational holds:
+- scripts/apply-db-governance.js: NEEDS_RUNTIME_PROOF - database mutation-capable script, not canonical authority.
+- scripts/apply-migrations.js: NEEDS_RUNTIME_PROOF - database mutation-capable script, not canonical authority.
+- These scripts must not be executed in this phase.
 
 Result: PASS WITH OVERLAP CANDIDATES
 
