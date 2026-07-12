@@ -591,7 +591,7 @@ Required state snapshot:
   },
   "active_phase": "PHASE_7",
   "active_phase_question": "Which confirmed canonical authority decisions should be implemented through merge and consolidation?",
-  "lifecycle_state": "BATCH_COMPLETE",
+  "lifecycle_state": "PHASE_READY_TO_CLOSE",
   "active_batch": null,
   "completed_batches": [
     "B01-B03",
@@ -600,12 +600,11 @@ Required state snapshot:
     "B11-B14",
     "B15-B18",
     "B19-B22",
-    "B23-B26"
-  ],
-  "remaining_batches": [
+    "B23-B26",
     "B27-B29"
   ],
-  "next_deterministic_batch": "B27-B29",
+  "remaining_batches": [],
+  "next_deterministic_batch": null,
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,
@@ -9576,3 +9575,206 @@ Batch decision:
 Validation boundary:
 - Evidence only.
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, vulnerability remediation, Supabase function restore, Supabase function deploy, Supabase function repair, test refactor, deployment-config change, route change, cron change, build change, environment change, scratch-script execution, or stale manifest repair is authorized by this packet.
+
+## PHASE 7 - B27-B29 MERGE AND CONSOLIDATION EVIDENCE
+
+Result: PASS WITH NO_ACTION AND RUNTIME-PROOF HOLDS
+
+Scope:
+- Phase: PHASE_7 - Merge and Consolidation
+- Grouped review unit: B27-B29
+- Start HEAD: e398a200
+- Inspection scope: B27, B28, B29 only
+- Post-B29 phase state: PHASE_READY_TO_CLOSE
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Authority sources reviewed:
+- control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json B27, B28, and B29 membership
+- control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json B27, B28, and B29 register coverage
+- PHASE 4 - B27-B29 LEGACY AND REPLACEMENT IDENTIFICATION EVIDENCE
+- PHASE 5 - B27-B29 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+- PHASE 6 - B27-B29 CANONICAL AUTHORITY SELECTION EVIDENCE
+
+Corrected membership/register audit:
+- B27 ARCHIVE: declared 58, actual paths 58, matched register rows 58, on-disk missing 0, register missing 0, functional groups: DATABASE_MIGRATION 6; GENERATED_OUTPUT 3; SCRIPT_TOOL 49.
+- B28 ROOT_NON_MD_TXT_FILES: declared 55, actual paths 55, matched register rows 55, on-disk missing 0, register missing 0, functional groups: DATABASE_MIGRATION 1; DEPLOYMENT_OPERATIONS 8; DOCUMENTATION_KNOWLEDGE 1; GENERATED_OUTPUT 16; PUBLIC_ASSET 1; SCRIPT_TOOL 15; TEST_PROOF 11; UNCATEGORIZED 2.
+- B29 DOT_TOOL_DIRS_AND_SMALL_DIRS: declared 26, actual paths 26, matched register rows 26, on-disk missing 0, register missing 0, functional groups: API_ROUTE 1; BACKEND_RUNTIME 2; DEPLOYMENT_OPERATIONS 1; DOCUMENTATION_KNOWLEDGE 11; GENERATED_OUTPUT 8; PROVIDER_INTEGRATION 1; PUBLIC_ASSET 1; SCRIPT_TOOL 1.
+
+B27 assets inspected (58):
+1. _archive/root/cli_v1.1.0.exe
+2. _archive/root/render.zip
+3. _archive/scripts/analyze-routes.js
+4. _archive/scripts/analyze-table-usage.js
+5. _archive/scripts/check-confidence.js
+6. _archive/scripts/check-connectivity.js
+7. _archive/scripts/check-constraints.js
+8. _archive/scripts/check-deployment.js
+9. _archive/scripts/check-direct-predictions.js
+10. _archive/scripts/check-endpoints.js
+11. _archive/scripts/check-final-schema.js
+12. _archive/scripts/check-final-sports.js
+13. _archive/scripts/check-matches.js
+14. _archive/scripts/check-metadata-times.js
+15. _archive/scripts/check-risk-constraint.js
+16. _archive/scripts/check-schema.js
+17. _archive/scripts/check-stage-schemas.js
+18. _archive/scripts/check-supabase-tables.js
+19. _archive/scripts/check-team-names.js
+20. _archive/scripts/cors-test.sh
+21. _archive/scripts/debug-events.js
+22. _archive/scripts/debug-sport-filter.js
+23. _archive/scripts/deep-table-analysis.js
+24. _archive/scripts/definitive-cors-diagnosis.sh
+25. _archive/scripts/deploy-cloud-scheduler.sh
+26. _archive/scripts/deploy-render.sh
+27. _archive/scripts/file-walker.js
+28. _archive/scripts/files-report.json
+29. _archive/scripts/final-status.js
+30. _archive/scripts/final-verification.js
+31. _archive/scripts/fix-matches-timestamps.sql
+32. _archive/scripts/fix-sport-filter.js
+33. _archive/scripts/fix-tier-rules.js
+34. _archive/scripts/fix-view.js
+35. _archive/scripts/fix-view.sql
+36. _archive/scripts/full-nuke.js
+37. _archive/scripts/migration2-fix.js
+38. _archive/scripts/migration2-normalized-fixtures.js
+39. _archive/scripts/migration2-v2.js
+40. _archive/scripts/migration2-v3.js
+41. _archive/scripts/normalize-sports.sql
+42. _archive/scripts/patch-other-routes.js
+43. _archive/scripts/patch-predictions-visibility.js
+44. _archive/scripts/phase1-immediate-patch.js
+45. _archive/scripts/phase1-patch.js
+46. _archive/scripts/phase2-schema-refactor.js
+47. _archive/scripts/phase3-cleanup.js
+48. _archive/scripts/sql/create_event_context_tables.sql
+49. _archive/scripts/sql/create_prediction_publish_runs.sql
+50. _archive/scripts/sql/create_predictions_accuracy.sql
+51. _archive/scripts/test-scheduler-endpoint.sh
+52. _archive/scripts/trigger-grade.js
+53. _archive/scripts/trigger-refresh.js
+54. _archive/scripts/trigger-render-pipeline.js
+55. _archive/scripts/verify-deployment.sh
+56. _archive/scripts/verify-predictions.js
+57. _archive/scripts/verify-route-patches.js
+58. _archive/scripts/wipe-events-data.js
+
+B28 assets inspected (55):
+1. .bat
+2. .dockerignore
+3. .env.example
+4. .gcloudignore
+5. .gitignore
+6. .gitmsg
+7. .vercelignore
+8. check-db.js
+9. check-football-times.js
+10. check-football.js
+11. check-production-logs.js
+12. check-recent-predictions.js
+13. check-sync-timestamps.js
+14. check-table-columns.js
+15. check-tables.js
+16. competitions.json
+17. find-active-files.js
+18. force-seed.js
+19. kabaddiPy
+20. LICENSE
+21. market-explorer.html
+22. monitoring_dashboard_queries.sql
+23. overall-project-completion.json
+24. package-lock.json
+25. package.json
+26. phase1-final-report.json
+27. phase2-cleanup.js
+28. phase2-conservative-summary.json
+29. phase2-final-summary.json
+30. phase3-comprehensive-summary.json
+31. phase3-migration-summary.json
+32. placeholders-and-insights-audit.json
+33. qodana.yaml
+34. refresh-ai-insights.js
+35. run-final-test.js
+36. safe-migration-plan.json
+37. scratch_test_pipeline.js
+38. SKCS_START.bat
+39. sportbook
+40. supabase-diagnostics-report.json
+41. supabase-migration-plan.json
+42. supabase-table-analysis.json
+43. supabase-visual-analysis-report.json
+44. table-dependency-map.json
+45. tailwind.config.js
+46. test_scenarios_master_rulebook.js
+47. test-ai-insights.js
+48. test-ai-simulation.js
+49. test-bigballs-direct.js
+50. test-espn-direct.js
+51. test-groq-debug.js
+52. test-groq-models.js
+53. test-sportsdb.js
+54. test-wc-id.js
+55. trigger_ai.js
+
+B29 assets inspected (26):
+1. .gemini/antigravity/README.md
+2. .gemini/antigravity/workflows/automated-data-sync.toml
+3. .gemini/antigravity/workflows/intelligent-alert-system.toml
+4. .gemini/antigravity/workflows/intelligent-pipeline-optimizer.toml
+5. .gemini/antigravity/workflows/smart-prediction-engine.toml
+6. .gemini/commands.toml
+7. .githooks/pre-commit
+8. .qwen/settings.json
+9. .qwen/settings.json.orig
+10. .stakpak/data/local.db
+11. .windsurf/workflows/env.md
+12. api/pipeline/run-full.js
+13. dolphin-server/Dockerfile
+14. dolphin-server/README.md
+15. js/config.js
+16. js/supabase-bundle.js
+17. js/supabase-client-src.js
+18. js/supabase-init.js
+19. reports/execution-spine-compliance-map.json
+20. reports/execution-spine-compliance-map.md
+21. src/data/placeholder.txt
+22. src/data/sportsdb-leagues.json
+23. tmp/key-validation-1776365488298.json
+24. tmp/key-validation-1776365827255.json
+25. tmp/key-validation-1776482624434.json
+26. tmp/today-fixture-pull-1776482706164.json
+
+Evidence summary:
+- Phase 4 B27-B29 closed B27 as 58 HISTORICAL_EVIDENCE archived assets, B28 as 55 CURRENT assets, and B29 as 26 CURRENT assets, with UNKNOWN 0 and no cleanup action authorized.
+- Phase 5 B27-B29 proved functional overlap candidates across root scripts/tests, package/build config, phase reports/audit maps, frontend Supabase bundle/config, local runtime/model support, developer-agent workflows, pipeline/report projections, and provider/temp data artifacts, but authorized no cleanup action.
+- Phase 6 B27-B29 kept package.json, package-lock.json, tailwind.config.js, LICENSE, and js/supabase-client-src.js as CANONICAL_KEEP where recorded.
+- Phase 6 B27-B29 held root manual scripts, AI diagnostics, provider tests, historical reports, duplicate root frontend/bundle surfaces, local launch/model/runtime support, agent workflow config, hooks, local tool data, API pipeline/report projections, provider catalog data, placeholder data, and temporary validation artifacts behind NEEDS_RUNTIME_PROOF before execution, replacement, consolidation, rewrite, deletion, or retirement.
+- No Phase 6 decision directly authorizes implementation-level merge/consolidation for B27-B29.
+
+Merge/consolidation decision:
+- B27 archive assets: NO_ACTION for preserved historical evidence; no archive deletion, merge, rewrite, or retirement is authorized in this phase.
+- B28 root non-md/txt assets: NO_ACTION where CANONICAL_KEEP authority is already proven; HOLD_NEEDS_RUNTIME_PROOF for root scripts, historical reports, duplicate frontend surfaces, local runtime support, and temporary/provider-data candidates.
+- B29 dot tool directories and small-directory assets: NO_ACTION where distinct support role is preserved; HOLD_NEEDS_RUNTIME_PROOF for agent workflow, local tool config, hook, auxiliary project, local DB, provider, API, generated-output, and temporary-data candidates.
+- No HOLD_ABSENT_PATH candidate exists in this grouped unit.
+
+Implementation boundary:
+- B27-B29 only.
+- No further Phase 7 grouped batch remains after this packet.
+- No runtime/source files changed.
+- No Supabase, database, SQL, deployment, dependency, security, UI, route, provider, data snapshot, temporary artifact, local tool, hook, package, build, license, or workflow behavior changed.
+
+Batch decision:
+- B27-B29 merge/consolidation gate is evidence-complete with NO_ACTION for proven current, historical, package/build/license, and distinct support authorities, and HOLD_NEEDS_RUNTIME_PROOF for overlap, duplicate, manual-script, report, tooling, local-runtime, provider-data, and temporary-artifact candidates.
+- Grouped unit B27-B29 is closed.
+- PHASE_7 merge and consolidation grouped-batch review is complete across B01-B03 through B27-B29.
+- Phase 7 is ready for a separate closure summary/control packet.
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, vulnerability remediation, package change, build change, license change, UI behavior change, route change, provider change, temporary-file cleanup, local-tool cleanup, hook change, workflow change, or stale artifact cleanup is authorized by this packet.
