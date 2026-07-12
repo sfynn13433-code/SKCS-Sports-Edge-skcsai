@@ -3616,3 +3616,47 @@ Validation boundary:
 - No active-use outcome authorizes deletion.
 - B24 batch state not advanced in this patch.
 - GitHub vulnerability and Dependabot notices remain future dependency/security work and were not touched.
+
+## PHASE 3 - B25 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 - Active Use Identification
+- Batch: B25 / SCRATCH
+- Question: Is each B25 governed scratch file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Script execution performed: NO
+- Database mutation performed: NO
+- Runtime/product change performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+- Dependency/security/vulnerability notice work performed: NO
+
+Outcome summary:
+- ACTIVE: 0
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 2
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B25 MANUAL_USE assets:
+- scratch/db_normalize.js
+- scratch/db_sync.js
+
+Evidence:
+- B25 is defined as the SCRATCH batch with 2 governed scratch files: scratch/db_normalize.js and scratch/db_sync.js.
+- scratch/db_normalize.js is a manual database normalization utility. It imports backend/database and performs UPDATE statements against predictions_raw, leagues, and match_context_data.
+- scratch/db_sync.js is a manual database inspection utility. It imports backend/database and reads distinct sport values from predictions_raw and leagues.
+- package.json active app startup is node backend/server-express.js; B25 scratch files are not active startup entrypoints.
+- No package.json npm script was found that runs scratch/db_normalize.js or scratch/db_sync.js.
+- B25 files are manual/admin scratch utilities, not deployed product runtime entrypoints, browser-delivered assets, Render start commands, cron commands, schema migration files, or Supabase function deployment files.
+- Because scratch/db_normalize.js can mutate database rows, this phase does not execute either B25 file.
+- No deletion, merge, retirement, dependency/security, vulnerability, source/runtime/product change, database mutation, or scratch cleanup is authorized by this evidence.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B25 batch state not advanced in this patch.
+- GitHub vulnerability and Dependabot notices remain future dependency/security work and were not touched.
