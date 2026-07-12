@@ -3286,3 +3286,110 @@ Validation boundary:
 - No active-use outcome authorizes deletion.
 - B20 batch state not advanced in this patch.
 - GitHub vulnerability and Dependabot notices remain future dependency/security work and were not touched.
+
+## PHASE 3 - B21 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 - Active Use Identification
+- Batch: B21 / PUBLIC_UI
+- Question: Is each B21 governed file currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+- UI repair performed: NO
+- Dependency/security/vulnerability notice work performed: NO
+
+Outcome summary:
+- ACTIVE: 64
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 0
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B21 ACTIVE assets:
+- public/about-bg.jpg
+- public/about-bg.webp
+- public/accuracy.html
+- public/admin-sync.html
+- public/components/HeroCarousel.jsx
+- public/components/TrendDashboard.jsx
+- public/control-center.html
+- public/css/control-center.css
+- public/css/hero-carousel.css
+- public/css/input.css
+- public/css/output.css
+- public/css/react-components.css
+- public/data/all_leagues_raw.json
+- public/data/all_sports_raw.json
+- public/data/context-pack-2026-05-17.json
+- public/data/event-details-cache.json
+- public/data/h2h-2026-05-17.json
+- public/data/importance-2026-05-17.json
+- public/data/injuries-2026-05-17.json
+- public/data/news-injury-cache.json
+- public/data/pipeline-dry-2026-05-17.json
+- public/data/standings-cache.json
+- public/data/team-form-2026-05-17.json
+- public/data/team-form-cache.json
+- public/data/travel-2026-05-17.json
+- public/data/tsdb-coverage-2026-05-17.json
+- public/data/tsdb-coverage-2026-05-18.json
+- public/data/tsdb-coverage-2026-05-19.json
+- public/data/tsdb-day-2026-05-17.json
+- public/data/vip-stress-saturday.json
+- public/direct-markets.html
+- public/experience.html
+- public/favicon.ico
+- public/hero-page.jpg
+- public/hero-page.webp
+- public/index.html
+- public/js/acca-builder.js
+- public/js/ai-reasoning-display.js
+- public/js/config.js
+- public/js/control-center.js
+- public/js/doubleChanceCombos.js
+- public/js/hero-carousel.js
+- public/js/semantic-drift-dashboard.js
+- public/js/smh-hub-master-rulebook.js
+- public/js/smh-hub.js
+- public/js/supabase-bundle.js
+- public/js/supabase-init.js
+- public/js/system-health-banner.js
+- public/js/user-experience-feedback.js
+- public/js/vip-stress-dashboard.js
+- public/language-switch.html
+- public/language.jpg
+- public/login.html
+- public/login.jpg
+- public/market-explorer.html
+- public/payment.html
+- public/privacy.html
+- public/robots.txt
+- public/style.css
+- public/subscribe/index.html
+- public/subscription.html
+- public/terms.html
+- public/vip-stress-dashboard.html
+- public/windrawwin.jpg
+
+Evidence:
+- B21 is defined as the PUBLIC_UI batch with 64 governed public UI, static asset, generated public data, frontend script, CSS, image, and route/page files under public/.
+- All 64 B21 assets exist in the current working tree.
+- backend/server-express.js defines PUBLIC_DIR as the repository public directory and serves it through express.static(PUBLIC_DIR).
+- package.json starts the application through node backend/server-express.js.
+- render.yaml starts the web service through node backend/server-express.js.
+- package.json also builds public/js/supabase-bundle.js and public/css/output.css from tracked frontend sources.
+- B21 includes HTML page entrypoints, browser-delivered JavaScript, CSS, images, generated public JSON/data cache files, robots.txt, and subscription/public route files.
+- Repository reference inspection found direct UI/runtime/build/governance references across server static delivery, package scripts, render service startup, frontend links/scripts/fetches, Control Center governance files, execution-spine reports, and historical audit records.
+- Static public serving proves these files are currently browser-deliverable from the active web service boundary.
+- This phase does not determine whether any public route is desirable, current product UX, legacy, duplicated, or safe to retire; those are future phase questions.
+- No deletion, merge, retirement, dependency/security, vulnerability, source/runtime/product change is authorized by this evidence.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No active-use outcome authorizes deletion.
+- B21 batch state not advanced in this patch.
+- GitHub vulnerability and Dependabot notices remain future dependency/security work and were not touched.
