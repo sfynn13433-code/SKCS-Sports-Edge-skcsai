@@ -5,8 +5,8 @@
   "source_command": "git ls-files",
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
-  "tracked_path_count": 911,
-  "registered_asset_count": 910,
+  "tracked_path_count": 913,
+  "registered_asset_count": 912,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -10849,6 +10849,58 @@
         "Exports receiveValidatedFip plus hash/idempotency helpers for EFI-001 validation.",
         "Rejects unsupported schema, non-VALIDATED status, hash mismatch, missing required fields, forbidden origins, and production intake while the marriage gate remains blocked.",
         "Maps accepted payloads to match_info, sharp_odds, contextual_intelligence, and SCOUT_FIP metadata without external provider or database calls."
+      ]
+    },
+    {
+      "asset_path": "backend/services/fipStoragePolicyService.js",
+      "asset_type": "SOURCE_CODE",
+      "asset_role": "APPLICATION_SOURCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "CURRENT_AUTHORITY",
+      "current_state": "CURRENT",
+      "owner_project_id": "EST-001",
+      "governed_by_control_task_id": "EST-001",
+      "related_assets": [
+        "control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md",
+        "backend/services/fipIntakeService.js",
+        "tests/fip-storage-policy-service.test.js"
+      ],
+      "related_tables": [],
+      "related_functions": [
+        "buildEstStorageRecords",
+        "createR1ProvenanceReference",
+        "createR2AuditEvent",
+        "evaluateSupabaseBudget",
+        "detectForbiddenFullFipBody"
+      ],
+      "runtime_consumers": [
+        "tests/fip-storage-policy-service.test.js"
+      ],
+      "runtime_dependencies": [
+        "node:crypto",
+        "backend/services/fipIntakeService.js"
+      ],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "REGISTERED",
+      "next_validation": "EST-001-I1: run node --test tests/fip-storage-policy-service.test.js after any storage policy change; do not persist full FIP bodies.",
+      "notes": "Pure policy service only. It prepares minimal records but does not write to Supabase.",
+      "purpose_description": "Pure EST-001 Supabase storage-policy enforcement layer that builds minimal R1 provenance and R2 audit records from EFI intake results while forbidding full FIP body, Scout mirror, and provider payload persistence.",
+      "functional_group": "SCOUT_FIP",
+      "relationship_tags": [
+        "SERVICE",
+        "SCOUT",
+        "FIP",
+        "DATABASE",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Exports buildEstStorageRecords for transforming EFI intake results into EST-001 R1/R2 storage-ready evidence.",
+        "Rejects full FIP body, Scout mirror, provider payload, and Supabase replay candidate payloads.",
+        "Evaluates Supabase budget thresholds at 80%, 95%, and 100% without performing database or Supabase calls.",
+        "Does not create migrations, run SQL, call Supabase, wire routes, run E2E proof, or clear gates."
       ]
     },
     {
@@ -30152,6 +30204,55 @@
       "classification_evidence": [
         "Builds a valid FIP-001 v1 fixture with the service hash algorithm and verifies accepted envelope output.",
         "Covers rejection for unsupported schema version, non-VALIDATED status, tampered hash, missing required fields, forbidden origins, and AUTHORIZED_PRODUCTION while the marriage gate remains blocked."
+      ]
+    },
+    {
+      "asset_path": "tests/fip-storage-policy-service.test.js",
+      "asset_type": "TEST",
+      "asset_role": "TEST_PROOF",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "EST-001",
+      "governed_by_control_task_id": "EST-001",
+      "related_assets": [
+        "backend/services/fipStoragePolicyService.js",
+        "backend/services/fipIntakeService.js",
+        "control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md"
+      ],
+      "related_tables": [],
+      "related_functions": [
+        "buildEstStorageRecords",
+        "evaluateSupabaseBudget",
+        "detectForbiddenFullFipBody"
+      ],
+      "runtime_consumers": [],
+      "runtime_dependencies": [
+        "node:test",
+        "node:assert/strict",
+        "backend/services/fipStoragePolicyService.js",
+        "backend/services/fipIntakeService.js"
+      ],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "REGISTERED",
+      "next_validation": "EST-001-I1: run node --test tests/fip-storage-policy-service.test.js after any EST storage policy change.",
+      "notes": "Focused EST-001-I1 proof test. It does not run SQL, call Supabase, create migrations, or run E2E proof.",
+      "purpose_description": "Focused Node test coverage for EST-001 Supabase storage-policy enforcement, including R1/R2 minimal records, full FIP body blocking, audit-only rejection handling, and storage budget thresholds.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "SCOUT",
+        "FIP",
+        "DATABASE",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Verifies accepted EFI intake produces minimal R1 provenance and R2 audit records only.",
+        "Verifies full FIP body, Scout mirror, provider payload, markets, context, and fixture body data are not persisted in EST records.",
+        "Verifies rejected EFI intake creates audit-only records and Supabase hard block prevents new EST records."
       ]
     },
     {

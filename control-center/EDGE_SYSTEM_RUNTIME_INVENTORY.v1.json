@@ -3460,6 +3460,38 @@
       }
     },
     {
+      "asset_path": "backend/services/fipStoragePolicyService.js",
+      "source_state": "COMMITTED_REPOSITORY",
+      "surface_classes": [
+        "DATABASE_SURFACE",
+        "SCOUT_FIP_SURFACE",
+        "SERVICE"
+      ],
+      "reachability_state": "CANDIDATE",
+      "mount_paths": [],
+      "runtime_callers": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "external_providers": [],
+      "environment_key_names": [],
+      "database_role": "WRITE",
+      "database_objects": [],
+      "schedule_or_trigger": "",
+      "deployment_surface": "",
+      "governance_reachability_type": "NONE",
+      "governed_by_control_task_id": "ESA-001",
+      "next_validation": "Revalidate runtime reachability and relationships during the next governed Edge architecture review.",
+      "evidence": [
+        "Static package/deployment/import/mount evidence."
+      ],
+      "notes": "Current-state inventory evidence only; this record does not declare future Edge architecture.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "35f4e2240bc68d367b11fd7938c3ed292fc9048f555ac38489f83c1d7e1234f7",
+        "relationship_evidence_sha256": "cbc02f1fc69215905bd8a76fac5069d28ce66acb1e94f306e811dc6b62b1991e",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
+    },
+    {
       "asset_path": "backend/services/footballH2HExtractor.js",
       "source_state": "COMMITTED_REPOSITORY",
       "surface_classes": [

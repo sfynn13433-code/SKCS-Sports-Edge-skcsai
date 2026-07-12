@@ -553,7 +553,7 @@ Required state snapshot:
   ],
   "eac_evidence_reusable": true,
   "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
-  "total_governed_assets": 910,
+  "total_governed_assets": 912,
   "phase_0": {
     "status": "PHASE_CLOSED",
     "question": "What exact repository state is the cleanup programme starting from?",
@@ -562,7 +562,7 @@ Required state snapshot:
       "active_branch": "main",
       "head_commit": "7d21fc276629bb6aec056299d70e1541b462934f",
       "working_tree_status": "dirty_unrelated_changes_preserved",
-      "governed_asset_count": 910,
+      "governed_asset_count": 912,
       "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
       "eac_batch_count": 29,
       "already_completed_or_removal_work": "Partial external sports provider removal (PARTIAL); EAC-001 B01-B29 classification inventory complete; prior Control Center per-asset investigations preserved as historical evidence",
@@ -10304,3 +10304,49 @@ Gate state:
 Next recommended control action:
 - Continue only with separately authorized EST-001-I1, EPI/EPRV blocker work, or E2E-001-X1 sequencing.
 - Do not clear the marriage gate from EFI-001-I1.
+
+
+## EST-001-I1 SUPABASE STORAGE POLICY ENFORCEMENT EVIDENCE
+
+Result: TESTED
+
+Scope:
+- Mini-project: EST-001-I1 - Supabase Storage Enforcement
+- Runtime code added: YES, limited to backend/services/fipStoragePolicyService.js
+- Focused test added: YES, tests/fip-storage-policy-service.test.js
+- Supabase table creation performed: NO
+- Supabase/database mutation performed: NO
+- SQL execution performed: NO
+- Migration creation performed: NO
+- Route/API wiring performed: NO
+- Prediction pipeline call performed: NO
+- E2E proof execution performed: NO
+- External provider removal performed: NO
+- Dependency/security remediation performed: NO
+- Cleanup programme reopened: NO
+
+Implementation evidence:
+- buildEstStorageRecords() creates storage-ready EST records from EFI intake results without writing to Supabase.
+- Accepted EFI intake produces R1 minimal provenance reference and R2 bounded intake audit event only.
+- Rejected EFI intake produces R2 audit-only evidence.
+- Full FIP body, Scout mirror, provider payload, and Supabase body replay persistence are forbidden.
+- Replay source remains Scout by fip_id + validation hash, not Supabase FIP body replay.
+- Supabase budget thresholds are enforced as OK, WARNING at 80%, CRITICAL at 95%, and HARD_BLOCK at 100%.
+- HARD_BLOCK prevents all new EST records.
+- No full FIP body is persisted in any EST record.
+
+Focused proof:
+- node --test tests/fip-intake-service.test.js: PASS
+- node --test tests/fip-storage-policy-service.test.js: PASS
+
+Gate state:
+- scout_edge_marriage_gate: BLOCKED
+- supabase_storage_gate: BLOCKED
+- E2E-001: BLOCKED
+- Physical Supabase persistence: NOT IMPLEMENTED
+- Supabase migrations: NOT CREATED
+- SQL execution: NOT PERFORMED
+
+Next recommended control action:
+- Continue only with separately authorized EPI/EPRV blocker work, a physical Supabase persistence packet if required, or E2E-001-X1 sequencing.
+- Do not clear the marriage gate or storage gate from EST-001-I1.

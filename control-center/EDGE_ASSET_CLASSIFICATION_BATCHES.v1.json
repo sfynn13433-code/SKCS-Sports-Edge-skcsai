@@ -290,7 +290,7 @@
           "backend/services/"
         ]
       },
-      "asset_count": 87,
+      "asset_count": 88,
       "asset_paths": [
         "backend/services/accaBuilder.js",
         "backend/services/accaMathUtils.js",
@@ -351,6 +351,7 @@
         "backend/services/metrxFactoryService.js",
         "backend/services/normalizerService.js",
         "backend/services/fipIntakeService.js",
+        "backend/services/fipStoragePolicyService.js",
         "backend/services/oddsApiPipeline.js",
         "backend/services/oddsBudgetService.js",
         "backend/services/pipelineMetricsService.js",
@@ -1211,7 +1212,7 @@
           "tests/"
         ]
       },
-      "asset_count": 7,
+      "asset_count": 8,
       "asset_paths": [
         "tests/edge-asset-classification.test.js",
         "tests/edge-control-center-ledger.test.js",
@@ -1219,7 +1220,8 @@
         "tests/edge-project-register.test.js",
         "tests/edge-repository-asset-register.test.js",
         "tests/edge-system-runtime-inventory.test.js",
-        "tests/fip-intake-service.test.js"
+        "tests/fip-intake-service.test.js",
+        "tests/fip-storage-policy-service.test.js"
       ]
     },
     {

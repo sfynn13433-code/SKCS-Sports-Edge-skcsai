@@ -1,14 +1,14 @@
 # Edge System Runtime Map
 
 Inventory version: 1.0.0
-Inventory SHA-256: 147b712c95dbe512a81275d8c960dc49c316a63ede091380ff9f6dffafb6077d
+Inventory SHA-256: 62720ca9424d0f138f5fe4c56238309fc426103119cec8831d126f99a90dbac4
 
 > Synchronized review surface for `EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json`.
 > This map is observational and does not declare future Edge architecture or canonical authority.
 
 ## Summary
 
-- Runtime/system surfaces: 220
+- Runtime/system surfaces: 221
 - Candidate status establishes authority: false
 - Inventory declares future architecture: false
 
@@ -990,6 +990,19 @@ Inventory SHA-256: 147b712c95dbe512a81275d8c960dc49c316a63ede091380ff9f6dffafb60
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
 
 ### backend/services/fipIntakeService.js
+
+- Surface classes: DATABASE_SURFACE, SCOUT_FIP_SURFACE, SERVICE
+- Reachability: CANDIDATE
+- Source state: COMMITTED_REPOSITORY
+- Governed by: ESA-001
+- Runtime callers: None recorded
+- Runtime consumers: None recorded
+- Database role: WRITE
+- Database objects: None recorded
+- External providers: None recorded
+- Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
+### backend/services/fipStoragePolicyService.js
 
 - Surface classes: DATABASE_SURFACE, SCOUT_FIP_SURFACE, SERVICE
 - Reachability: CANDIDATE

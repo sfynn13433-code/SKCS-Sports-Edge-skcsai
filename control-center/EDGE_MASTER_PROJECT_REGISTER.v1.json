@@ -487,7 +487,7 @@
       "category": "Data and Storage",
       "description": "Define what Edge may retain from Scout/FIP while respecting the 0.5 GB Supabase capacity constraint and avoiding duplication of Scout's Neon evidence store.",
       "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
-      "current_status": "APPROVED",
+      "current_status": "TESTED",
       "priority": "critical",
       "blocked_by": [
         "ESA-001",
@@ -510,7 +510,15 @@
         "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
         "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1"
       ],
-      "related_files": [],
+      "related_files": [
+        "backend/services/fipStoragePolicyService.js",
+        "tests/fip-storage-policy-service.test.js",
+        "backend/services/fipIntakeService.js",
+        "control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md",
+        "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
+        "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
+        "control-center/EDGE_ASSET_REPOSITORY_MAP.md"
+      ],
       "related_tables": [],
       "known_issues": [],
       "required_decisions": [],
@@ -527,14 +535,28 @@
         "Control Center sequencing bypass"
       ],
       "recommended_order": 9,
-      "next_action": "Contract sealed (EST-001-C1). Proceed to E2E-001 proof planning when separately authorized. Storage implementation remains forbidden.",
+      "next_action": "EST-001-I1 tested. Continue only with separately authorized EPI/EPRV/E2E sequencing or a separately approved physical Supabase persistence packet; do not persist full FIP bodies or clear gates from this packet.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-12",
       "governed_by_control_task_id": "EST-001",
       "current_evidence": [
-        "EST-001-C1 sealed control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md",
-        "Canonical source of truth, data classes T0/R1/R2/D1/F1, retention periods, replay/audit, and ~0.5 GB budget thresholds defined",
-        "supabase_storage_gate remains BLOCKED; full FIP body and Scout mirror storage forbidden"
+        "EST-001-C1 sealed control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md.",
+        "EFI-001-I1 sealed backend/services/fipIntakeService.js as the fail-closed FIP intake boundary.",
+        "EST-001-I1 implemented backend/services/fipStoragePolicyService.js as a pure Supabase storage-policy enforcement layer.",
+        "Policy permits only R1 minimal provenance reference and R2 bounded intake audit records from EFI intake results.",
+        "Policy forbids full FIP body persistence, Scout mirrors, provider payload persistence, and Supabase FIP replay sources.",
+        "Policy keeps replay source as Scout by fip_id + validation hash, not Supabase body replay.",
+        "Policy enforces Supabase budget levels: OK, WARNING at 80%, CRITICAL at 95%, HARD_BLOCK at 100%.",
+        "Focused proof: node --test tests/fip-storage-policy-service.test.js passes.",
+        "No SQL, migration, Supabase mutation, route wiring, E2E proof, provider removal, or gate clearance performed."
+      ],
+      "open_gaps": [
+        "No physical Supabase table or migration implementation performed in EST-001-I1.",
+        "No route/API receive surface wired to storage enforcement.",
+        "No E2E proof executed; E2E-001 remains BLOCKED.",
+        "No marriage gate clearance; scout_edge_marriage_gate remains BLOCKED.",
+        "No supabase_storage_gate clearance; supabase_storage_gate remains BLOCKED.",
+        "No external provider removal or buildLiveData replacement performed."
       ]
     },
     {
