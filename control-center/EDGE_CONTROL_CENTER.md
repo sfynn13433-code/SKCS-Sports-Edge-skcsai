@@ -586,16 +586,16 @@ Required state snapshot:
   "completed_batches": [
     "B02-B03",
     "B04-B06",
-    "B07-B10"
+    "B07-B10",
+    "B11-B14"
   ],
   "remaining_batches": [
-    "B11-B14",
     "B15-B18",
     "B19-B22",
     "B23-B26",
     "B27-B29"
   ],
-  "next_deterministic_batch": "B11-B14",
+  "next_deterministic_batch": "B15-B18",
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,
@@ -5530,6 +5530,114 @@ Operational holds:
 - scripts/apply-db-governance.js: NEEDS_RUNTIME_PROOF - database mutation-capable script, not canonical authority.
 - scripts/apply-migrations.js: NEEDS_RUNTIME_PROOF - database mutation-capable script, not canonical authority.
 - These scripts must not be executed in this phase.
+
+## PHASE 6 - B11-B14 CANONICAL AUTHORITY SELECTION EVIDENCE
+
+Decision vocabulary used:
+- CANONICAL_KEEP
+- NEEDS_RUNTIME_PROOF
+
+Existing runtime/service authorities from earlier B04-B06 and B07-B10 decisions remain CANONICAL_KEEP where already recorded.
+This packet records the script-heavy B11-B14 overlap candidates only and does not replace earlier authorities with scripts.
+
+Candidate group 1: AI prediction endpoint tests and traces
+
+Phase 6 decisions:
+- scripts/test-final-endpoint.js: NEEDS_RUNTIME_PROOF - diagnostic test surface, not canonical runtime authority.
+- scripts/test-fixed-ai-predictions.js: NEEDS_RUNTIME_PROOF - diagnostic test surface, not canonical runtime authority.
+- scripts/test-fixed-endpoint.js: NEEDS_RUNTIME_PROOF - diagnostic test surface, not canonical runtime authority.
+- scripts/trace-data-flow.js: NEEDS_RUNTIME_PROOF - trace surface, not canonical runtime authority.
+- scripts/trace-filtering-rules.js: NEEDS_RUNTIME_PROOF - trace surface, not canonical runtime authority.
+- scripts/trace-filtering-timestamp.js: NEEDS_RUNTIME_PROOF - trace surface, not canonical runtime authority.
+
+Candidate group 2: provider endpoint tests and discovery scripts
+
+Phase 6 decisions:
+- scripts/test-fetch.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/test-network.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/test-football536-endpoints.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/test-football536-fixtures-normalizer.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/test-free-livescore-fixtures.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/test-free-livescore-search.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/test-live-football-api-priority.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/test-metrx-factory-top-metrics.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/test-metrx-top-metrics.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/test-pro-football-api.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/test-optimized-endpoints.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/test-sportsapi-pro-football.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/test-sportsapi-pro-football-adapter.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/test-sportsapi-pro-football-joinability.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/test-sports-live-rankings.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/test-sportsrc-fixtures.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/test-sportsrc-health.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/test-sportsrc-odds.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/test-thesportsdb-endpoints.js: NEEDS_RUNTIME_PROOF - provider test surface, not canonical runtime authority.
+- scripts/discover-free-livescore-endpoints.js: NEEDS_RUNTIME_PROOF - discovery script, not canonical runtime authority.
+
+Candidate group 3: pipeline run, trigger, scheduler, and stage scripts
+
+Phase 6 decisions:
+- scripts/test-fixed-pipeline.js: NEEDS_RUNTIME_PROOF - pipeline test surface, not canonical runtime authority.
+- scripts/test-pipeline-integration.js: NEEDS_RUNTIME_PROOF - pipeline test surface, not canonical runtime authority.
+- scripts/test-weather-pipeline.js: NEEDS_RUNTIME_PROOF - pipeline test surface, not canonical runtime authority.
+- scripts/run-pipeline.js: NEEDS_RUNTIME_PROOF - pipeline runner, not canonical runtime authority.
+- scripts/run-master-pipeline.js: NEEDS_RUNTIME_PROOF - pipeline runner, not canonical runtime authority.
+- scripts/run-pipeline-from-context-pack.js: NEEDS_RUNTIME_PROOF - pipeline runner, not canonical runtime authority.
+- scripts/run-stage1-math.js: NEEDS_RUNTIME_PROOF - stage script, not canonical runtime authority.
+- scripts/run-stage2-context.js: NEEDS_RUNTIME_PROOF - stage script, not canonical runtime authority.
+- scripts/run-stage3-volatility.js: NEEDS_RUNTIME_PROOF - stage script, not canonical runtime authority.
+- scripts/run-test.js: NEEDS_RUNTIME_PROOF - test runner, not canonical runtime authority.
+- scripts/run-scheduled-sync.js: NEEDS_RUNTIME_PROOF - scheduler script, not canonical runtime authority.
+- scripts/scheduler.js: NEEDS_RUNTIME_PROOF - scheduler script, not canonical runtime authority.
+- scripts/external-scheduler.js: NEEDS_RUNTIME_PROOF - scheduler script, not canonical runtime authority.
+- scripts/_trigger-sync.js: NEEDS_RUNTIME_PROOF - trigger script, not canonical runtime authority.
+- scripts/trigger-pipeline-sync.js: NEEDS_RUNTIME_PROOF - trigger script, not canonical runtime authority.
+- scripts/trigger-refresh.js: NEEDS_RUNTIME_PROOF - trigger script, not canonical runtime authority.
+- scripts/wake-and-sync.js: NEEDS_RUNTIME_PROOF - trigger script, not canonical runtime authority.
+
+Candidate group 4: grading, settlement, accuracy, and publication scripts
+
+Phase 6 decisions:
+- scripts/trigger-grade.js: NEEDS_RUNTIME_PROOF - grading trigger script, not canonical runtime authority.
+- scripts/trigger-settlement.js: NEEDS_RUNTIME_PROOF - settlement trigger script, not canonical runtime authority.
+- scripts/trigger-publication.js: NEEDS_RUNTIME_PROOF - publication trigger script, not canonical runtime authority.
+- scripts/backfill-prediction-grading.js: NEEDS_RUNTIME_PROOF - accuracy backfill script, not canonical runtime authority.
+- scripts/backfill-predictions-accuracy.js: NEEDS_RUNTIME_PROOF - accuracy backfill script, not canonical runtime authority.
+- scripts/bridge-raw-predictions-for-grading.js: NEEDS_RUNTIME_PROOF - grading bridge script, not canonical runtime authority.
+- scripts/test-final-endpoint.js: NEEDS_RUNTIME_PROOF - publication/endpoint validation script, not canonical runtime authority.
+- scripts/test-fixed-endpoint.js: NEEDS_RUNTIME_PROOF - publication/endpoint validation script, not canonical runtime authority.
+
+Candidate group 5: database migration, backfill, bridge, and governance scripts
+
+Phase 6 decisions:
+- scripts/apply-db-governance.js: NEEDS_RUNTIME_PROOF - mutation-capable script, not canonical runtime authority.
+- scripts/apply-migrations.js: NEEDS_RUNTIME_PROOF - mutation-capable script, not canonical runtime authority.
+- scripts/run-migration.js: NEEDS_RUNTIME_PROOF - migration runner, not canonical runtime authority.
+- scripts/backfill-direct1x2-final-fields.js: NEEDS_RUNTIME_PROOF - backfill script, not canonical runtime authority.
+- scripts/backfill-fixture-ids.js: NEEDS_RUNTIME_PROOF - backfill script, not canonical runtime authority.
+- scripts/backfill-football-context.js: NEEDS_RUNTIME_PROOF - backfill script, not canonical runtime authority.
+- scripts/backfill-provider-event-id.js: NEEDS_RUNTIME_PROOF - backfill script, not canonical runtime authority.
+- scripts/bridge-to-final.sql: NEEDS_RUNTIME_PROOF - bridge SQL, not canonical runtime authority.
+- scripts/brute-force-ingest.js: NEEDS_RUNTIME_PROOF - brute-force ingest script, not canonical runtime authority.
+
+Candidate group 6: cricket and RapidAPI cricket scripts
+
+Phase 6 decisions:
+- scripts/cricapi-cache-refresh.js: NEEDS_RUNTIME_PROOF - cricket script, not canonical runtime authority.
+- scripts/test-livescore6-cricket-provider.js: NEEDS_RUNTIME_PROOF - cricket provider test script, not canonical runtime authority.
+- scripts/start-rapidapi-cricket-mcp.js: NEEDS_RUNTIME_PROOF - RapidAPI cricket launcher script, not canonical runtime authority.
+
+Candidate group 7: context-pack, enrichment, and football context scripts
+
+Phase 6 decisions:
+- scripts/compose-context-pack.js: NEEDS_RUNTIME_PROOF - context-pack script, not canonical runtime authority.
+- scripts/run-pipeline-from-context-pack.js: NEEDS_RUNTIME_PROOF - context-pack runner, not canonical runtime authority.
+- scripts/enrich-lineups.js: NEEDS_RUNTIME_PROOF - enrichment script, not canonical runtime authority.
+- scripts/enrich-team-form.js: NEEDS_RUNTIME_PROOF - enrichment script, not canonical runtime authority.
+- scripts/sync-ucl-context.js: NEEDS_RUNTIME_PROOF - football-context sync script, not canonical runtime authority.
+- scripts/sync-bsd-enrichment.js: NEEDS_RUNTIME_PROOF - football-context sync/persistence script, not canonical runtime authority.
+
+B11-B14 outcome: script-heavy overlap recorded; all script candidates are held behind NEEDS_RUNTIME_PROOF unless already proven as a non-script governance helper in prior packets.
 
 Result: PASS WITH OVERLAP CANDIDATES
 
