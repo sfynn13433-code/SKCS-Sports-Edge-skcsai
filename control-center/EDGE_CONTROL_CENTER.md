@@ -601,11 +601,12 @@ Required state snapshot:
     }
   },
   "phase_8": {
-    "status": "PHASE_READY_TO_CLOSE",
+    "status": "PHASE_CLOSED",
     "question": "Is the cleaned repository internally consistent?",
     "evidence": {
       "result": "PASS",
       "validation_start_commit": "900650e4",
+      "validation_evidence_commit": "685018ed",
       "lifecycle_before_validation": "PHASE_ACTIVE",
       "phase_7_grouped_review_units_preserved": "B01-B03,B04-B06,B07-B10,B11-B14,B15-B18,B19-B22,B23-B26,B27-B29",
       "review_order_model": "NO_BATCH_MODEL",
@@ -613,12 +614,14 @@ Required state snapshot:
       "runtime_inventory_repair_commit": "900650e4",
       "control_verify": "PASS",
       "deferred_holds": "HOLD_NEEDS_RUNTIME_PROOF and HOLD_ABSENT_PATH remain deferred future work, not Phase 8 defects",
-      "validation_note": "Phase 8 final repository validation evidence is complete. Phase 8 is ready for a separate closure summary/control packet."
+      "validation_note": "Phase 8 final repository validation evidence is complete.",
+      "closure_note": "Phase 8 Final Repository Validation is closed. The repository cleanup programme is complete."
     }
   },
+  "cleanup_programme_status": "PROGRAMME_CLOSED",
   "active_phase": "PHASE_8",
   "active_phase_question": "Is the cleaned repository internally consistent?",
-  "lifecycle_state": "PHASE_READY_TO_CLOSE",
+  "lifecycle_state": "PHASE_CLOSED",
   "active_batch": null,
   "completed_batches": [],
   "remaining_batches": [],
@@ -9935,4 +9938,85 @@ Next recommended control action:
 
 Validation boundary:
 - Control Center evidence recording and lifecycle transition only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+
+## PHASE 8 CLOSURE SUMMARY
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_8 - Final Repository Validation
+- Phase question: Is the cleaned repository internally consistent?
+- Pre-closure HEAD: 685018ed
+- Pre-closure lifecycle state: PHASE_READY_TO_CLOSE
+- Validation evidence commit: 685018ed
+- Review order model: NO_BATCH_MODEL
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Phase 7 closure preservation:
+- PHASE_7 is closed.
+- Grouped review units preserved: B01-B03, B04-B06, B07-B10, B11-B14, B15-B18, B19-B22, B23-B26, B27-B29.
+- No Phase 7 grouped batch review was reopened.
+
+Phase 8 batch model:
+- Phase 8 had no batch model.
+- remaining_batches: []
+- next_deterministic_batch: null
+- completed_batches: []
+- No individual B01-B29 sequencing was introduced.
+
+Governance drift repairs before validation:
+- Classification governance drift repaired at 26acdedc.
+- Runtime inventory governance drift repaired at 900650e4.
+
+Full governance verification:
+- npm run control:center: PASS
+- npm run control:classification: PASS
+- npm run control:runtime: PASS
+- npm run control:verify: PASS end-to-end
+- npm run verify:rulebook: PASS
+- npm run test:control-center: PASS
+
+Deferred holds roll-up:
+- HOLD_NEEDS_RUNTIME_PROOF holds from Phases 6 and 7 remain deferred future work, not cleanup defects.
+- HOLD_ABSENT_PATH holds from Phases 6 and 7 remain deferred future work, not cleanup defects.
+- Scout-Edge marriage prerequisites remain BLOCKED future work, not cleanup defects.
+- External provider removal remains PARTIAL future work, not a cleanup defect.
+- Supabase storage and FIP retention decisions remain BLOCKED future work, not cleanup defects.
+- GitHub Dependabot vulnerability notices were not remediated in this closure packet.
+
+Important non-actions:
+- No file was deleted.
+- No file was merged.
+- No file was retired.
+- No runtime code was changed.
+- No UI behavior was changed.
+- No SQL was executed.
+- No Supabase/database state was changed.
+- No deployment or hosting config was changed.
+- No dependency/security/vulnerability remediation was performed.
+
+Phase 8 closure decision:
+- PHASE_8 final repository validation is complete.
+- PHASE_8 is now closed.
+- The repository cleanup programme is complete across PHASE_0 through PHASE_8.
+- cleanup_programme_status: PROGRAMME_CLOSED
+
+Programme outcome summary:
+- All eight grouped Phase 7 review units completed with NO_ACTION, HOLD_NEEDS_RUNTIME_PROOF, and HOLD_ABSENT_PATH only.
+- Phase 8 proved repository governance consistency without a new cleanup hunt or individual EAC batch re-sequencing.
+- Deferred holds and marriage/provider/storage blockers remain recorded as separately authorized future work.
+
+Next recommended control action:
+- Do not reopen the repository cleanup programme without explicit Control Center approval.
+- Do not begin post-cleanup implementation from this closure packet.
+- Future work belongs to separately authorized non-cleanup programmes only.
+
+Validation boundary:
+- Control Center closure summary and programme state transition only.
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.

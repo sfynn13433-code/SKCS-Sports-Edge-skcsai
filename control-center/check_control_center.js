@@ -415,11 +415,12 @@ function createControlCenterGateState(overrides = {}) {
       },
     },
     phase_8: {
-      status: "PHASE_READY_TO_CLOSE",
+      status: "PHASE_CLOSED",
       question: PHASE_QUESTIONS.PHASE_8,
       evidence: {
         result: "PASS",
         validation_start_commit: "900650e4",
+        validation_evidence_commit: "685018ed",
         lifecycle_before_validation: "PHASE_ACTIVE",
         phase_7_grouped_review_units_preserved:
           "B01-B03,B04-B06,B07-B10,B11-B14,B15-B18,B19-B22,B23-B26,B27-B29",
@@ -430,12 +431,15 @@ function createControlCenterGateState(overrides = {}) {
         deferred_holds:
           "HOLD_NEEDS_RUNTIME_PROOF and HOLD_ABSENT_PATH remain deferred future work, not Phase 8 defects",
         validation_note:
-          "Phase 8 final repository validation evidence is complete. Phase 8 is ready for a separate closure summary/control packet.",
+          "Phase 8 final repository validation evidence is complete.",
+        closure_note:
+          "Phase 8 Final Repository Validation is closed. The repository cleanup programme is complete.",
       },
     },
+    cleanup_programme_status: "PROGRAMME_CLOSED",
     active_phase: ACTIVE_CLEANUP_PHASE,
     active_phase_question: PHASE_QUESTIONS[ACTIVE_CLEANUP_PHASE],
-    lifecycle_state: "PHASE_READY_TO_CLOSE",
+    lifecycle_state: "PHASE_CLOSED",
     active_batch: null,
     completed_batches: [],
     remaining_batches: [],
@@ -1037,11 +1041,9 @@ function validateControlCenterPolicy(documentText) {
     errors.push("Control Center state phase_7 must be PHASE_CLOSED");
   }
 
-  if (!state.phase_8 || state.phase_8.status !== "PHASE_READY_TO_CLOSE") {
-    errors.push(
-      "Control Center state phase_8 must be PHASE_READY_TO_CLOSE with evidence"
-    );
-  } else {
+  if (!state.phase_8) {
+    errors.push("Control Center state phase_8 must be present with evidence");
+  } else if (state.phase_8.status === "PHASE_READY_TO_CLOSE") {
     const evidence = state.phase_8.evidence || {};
     for (const key of [
       "result",
@@ -1061,6 +1063,47 @@ function validateControlCenterPolicy(documentText) {
       ) {
         errors.push(`Control Center state phase_8 evidence missing ${key}`);
       }
+    }
+  } else if (state.phase_8.status === "PHASE_CLOSED") {
+    const evidence = state.phase_8.evidence || {};
+    for (const key of [
+      "result",
+      "validation_start_commit",
+      "validation_evidence_commit",
+      "lifecycle_before_validation",
+      "phase_7_grouped_review_units_preserved",
+      "review_order_model",
+      "classification_repair_commit",
+      "runtime_inventory_repair_commit",
+      "control_verify",
+      "deferred_holds",
+      "validation_note",
+      "closure_note",
+    ]) {
+      if (
+        evidence[key] == null ||
+        (typeof evidence[key] === "string" && evidence[key].trim() === "")
+      ) {
+        errors.push(`Control Center state phase_8 evidence missing ${key}`);
+      }
+    }
+  } else {
+    errors.push(
+      "Control Center state phase_8 must be PHASE_READY_TO_CLOSE or PHASE_CLOSED with evidence"
+    );
+  }
+
+  if (state.lifecycle_state === "PHASE_CLOSED") {
+    if (state.cleanup_programme_status !== "PROGRAMME_CLOSED") {
+      errors.push(
+        "Control Center state cleanup_programme_status must be PROGRAMME_CLOSED when lifecycle_state is PHASE_CLOSED"
+      );
+    }
+
+    if (!state.phase_8 || state.phase_8.status !== "PHASE_CLOSED") {
+      errors.push(
+        "Control Center state phase_8 must be PHASE_CLOSED when lifecycle_state is PHASE_CLOSED"
+      );
     }
   }
 
@@ -1174,6 +1217,10 @@ function validateControlCenterPolicy(documentText) {
     errors.push(
       "EDGE_CONTROL_CENTER.md missing PHASE 8 final repository validation evidence"
     );
+  }
+
+  if (!String(documentText).includes("## PHASE 8 CLOSURE SUMMARY")) {
+    errors.push("EDGE_CONTROL_CENTER.md missing PHASE 8 closure summary");
   }
 
   if (
@@ -1856,6 +1903,7 @@ function evaluateControlCenterProposal(
                 },
               }
             : {}),
+          cleanup_programme_status: "PROGRAMME_CLOSED",
           lifecycle_state: "PHASE_CLOSED",
           active_batch: null,
           next_deterministic_batch: null,
@@ -2146,6 +2194,9 @@ function printReport(result) {
   console.log("");
 
   console.log("Control Center cleanup programme state:");
+  console.log(
+    `  Programme status: ${controlCenterState.cleanup_programme_status || "ACTIVE"}`
+  );
   console.log(
     `  Active phase: ${controlCenterState.active_phase}`
   );

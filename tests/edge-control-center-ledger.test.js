@@ -129,10 +129,11 @@ describe("Edge Control Center Ledger v1", () => {
       result.state.active_phase_question,
       "Is the cleaned repository internally consistent?"
     );
-    assert.equal(result.state.lifecycle_state, "PHASE_READY_TO_CLOSE");
-    assert.equal(result.state.phase_8.status, "PHASE_READY_TO_CLOSE");
+    assert.equal(result.state.lifecycle_state, "PHASE_CLOSED");
+    assert.equal(result.state.cleanup_programme_status, "PROGRAMME_CLOSED");
+    assert.equal(result.state.phase_8.status, "PHASE_CLOSED");
     assert.equal(result.state.phase_8.evidence.result, "PASS");
-    assert.equal(result.state.phase_8.evidence.validation_start_commit, "900650e4");
+    assert.equal(result.state.phase_8.evidence.validation_evidence_commit, "685018ed");
     assert.equal(result.state.active_batch, null);
     assert.deepEqual(result.state.completed_batches, []);
     assert.deepEqual(result.state.remaining_batches, []);
@@ -156,6 +157,7 @@ describe("Edge Control Center Ledger v1", () => {
     assert.ok(
       documentText.includes("## PHASE 8 FINAL REPOSITORY VALIDATION EVIDENCE")
     );
+    assert.ok(documentText.includes("## PHASE 8 CLOSURE SUMMARY"));
     assert.ok(documentText.includes("Standing Git authority"));
     assert.ok(documentText.includes("git reset --hard"));
     assert.equal(
@@ -736,6 +738,50 @@ describe("Edge Control Center Ledger v1", () => {
     assert.deepEqual(result.nextState.remaining_batches, []);
     assert.equal(result.nextState.next_deterministic_batch, null);
     assert.equal(result.nextState.phase_7.status, "PHASE_CLOSED");
+  });
+
+  it("closing ready Phase 8 closes the cleanup programme", () => {
+    const state = {
+      ...createControlCenterGateState({
+        active_phase: "PHASE_8",
+        active_phase_question: PHASE_QUESTIONS.PHASE_8,
+        lifecycle_state: "PHASE_READY_TO_CLOSE",
+        completed_batches: [],
+        remaining_batches: [],
+        next_deterministic_batch: null,
+      }),
+      phase_8: {
+        status: "PHASE_READY_TO_CLOSE",
+        question: PHASE_QUESTIONS.PHASE_8,
+        evidence: {
+          result: "PASS",
+          validation_start_commit: "900650e4",
+          lifecycle_before_validation: "PHASE_ACTIVE",
+          review_order_model: "NO_BATCH_MODEL",
+          control_verify: "PASS",
+          validation_note:
+            "Phase 8 final repository validation evidence is complete.",
+        },
+      },
+    };
+
+    const result = evaluateControlCenterProposal(
+      buildClosePhaseProposal({
+        phase: "PHASE_8",
+        activate_phase: null,
+      }),
+      state
+    );
+
+    assert.equal(result.gate, "GREEN");
+    assert.equal(result.reason, "PROGRAMME_CLOSED");
+    assert.equal(result.nextState.active_phase, "PHASE_8");
+    assert.equal(result.nextState.lifecycle_state, "PHASE_CLOSED");
+    assert.equal(result.nextState.cleanup_programme_status, "PROGRAMME_CLOSED");
+    assert.equal(result.nextState.phase_8.status, "PHASE_CLOSED");
+    assert.deepEqual(result.nextState.completed_batches, []);
+    assert.deepEqual(result.nextState.remaining_batches, []);
+    assert.equal(result.nextState.next_deterministic_batch, null);
   });
 
   it("closing ready Phase 1 activates Phase 2 in order", () => {
