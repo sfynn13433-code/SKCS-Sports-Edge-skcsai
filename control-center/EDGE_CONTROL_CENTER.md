@@ -568,8 +568,8 @@ Required state snapshot:
       "unrelated_local_changes_preserved": true
     }
   },
-  "active_phase": "PHASE_3",
-  "active_phase_question": "Is each remaining governed file currently used?",
+  "active_phase": "PHASE_5",
+  "active_phase_question": "Are different remaining files doing the same or substantially overlapping job?",
   "lifecycle_state": "PHASE_ACTIVE",
   "active_batch": null,
   "completed_batches": [],
