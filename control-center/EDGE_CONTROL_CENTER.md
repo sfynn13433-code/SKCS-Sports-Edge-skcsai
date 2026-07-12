@@ -4128,3 +4128,105 @@ Validation boundary:
 - B02 Phase 4 evidence is closed.
 - Next batch: B03 - BACKEND_ROUTES_AND_CONTROLLERS.
 
+
+## PHASE 4 - B03-B06 LEGACY AND REPLACEMENT IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_4 - Legacy and Replacement Identification
+- Batches: B03, B04, B05, B06
+- Evidence type: Current/legacy/replacement identification only
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Batch manifest evidence:
+- B03 title: BACKEND_ROUTES_AND_CONTROLLERS; asset_count: 28
+- B04 title: BACKEND_UTILS_SEMANTIC_CORE_AND_TEST; asset_count: 46
+- B05 title: BACKEND_SCRIPTS; asset_count: 15
+- B06 title: BACKEND_PROVIDERS; asset_count: 10
+- All B03-B06 asset paths exist locally.
+- All B03-B06 asset paths are tracked by Git.
+- Zero missing assets.
+- Zero untracked assets.
+- Zero zero-reference assets in compact reference scan.
+
+B03 outcome summary:
+- CURRENT: 28
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+B04 outcome summary:
+- CURRENT: 43
+- LEGACY: 3
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+B05 outcome summary:
+- CURRENT: 15
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+B06 outcome summary:
+- CURRENT: 10
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+B03 CURRENT assets:
+- All 28 B03 backend route/controller assets are CURRENT.
+- Evidence: backend/server-express.js imports and mounts the B03 route assets, and backend/routes/chat.js imports backend/controllers/edgeMindController.js.
+- Previous Phase 3 active-use evidence also marked all B03 assets ACTIVE.
+
+B04 LEGACY assets:
+1. backend/logic/edgeMind_manifest.json
+2. backend/parsers/base_sport_parser.py
+3. backend/workers/now_api_pulse.py
+
+B04 CURRENT assets:
+- All remaining 43 B04 assets are CURRENT.
+- Evidence: active B04 core, middleware, semantic-layer, utility, and test assets have direct runtime, service, route, script, or manual-use evidence.
+- Manual-use B04 assets remain CURRENT manual/governance/test/operator assets unless replacement, supersession, or historical-only status is proven.
+
+B05 CURRENT assets:
+- All 15 B05 backend script assets are CURRENT.
+- Evidence: backend/scripts/sync-sportsrc-fixtures.js is exposed by package.json as sync:sportsrc.
+- Remaining B05 scripts retain manual-use status from previous active-use evidence, and no replacement or superseding script was proven in this phase.
+
+B06 CURRENT assets:
+- All 10 B06 backend provider assets are CURRENT manual provider/tooling assets for Phase 4.
+- Evidence: provider and normalizer files are referenced by provider files and verification/audit scripts.
+- No B06 replacement, supersession, parallel successor, or historical-only status was proven in this phase.
+
+Decision:
+- B03 closes with all assets CURRENT.
+- B04 closes with 43 CURRENT and 3 LEGACY assets.
+- B05 closes with all assets CURRENT.
+- B06 closes with all assets CURRENT.
+- UNKNOWN is 0 for B03-B06.
+- No cleanup action is authorized by these outcomes.
+
+Validation boundary:
+- Evidence only.
+- No file removal, merge, retirement, refactor, source change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+- B03-B06 Phase 4 evidence is closed.
+- Next batch: B07 - BACKEND_SRC_SERVICES.
+
