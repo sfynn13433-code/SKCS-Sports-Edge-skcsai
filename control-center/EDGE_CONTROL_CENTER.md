@@ -6132,3 +6132,278 @@ Batch decision:
 Validation boundary:
 - Evidence only.
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+
+## PHASE 5 - B19-B22 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+
+Result: PASS WITH OVERLAP CANDIDATES
+
+Scope:
+- Phase: PHASE_5 - Functional Overlap Identification
+- Batches: B19-B22
+- Evidence type: functional-overlap identification only
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Batch manifest evidence:
+- Batch group: B19-B22
+- Start HEAD: 1fa6aecd
+- Compact overlap scan inspected public frontend pages, public JavaScript assets, static media, public legal/subscription pages, semantic/control-center widgets, and Supabase migration assets.
+
+Outcome vocabulary used:
+- NO_OVERLAP
+- PARTIAL_OVERLAP
+- MAJOR_OVERLAP
+- POTENTIAL_MERGE_GROUP
+
+Candidate group 1: public prediction, dashboard, market, and ACCA frontend surfaces
+
+Assets:
+- public/index.html
+- public/experience.html
+- public/market-explorer.html
+- public/direct-markets.html
+- public/vip-stress-dashboard.html
+- public/js/vip-stress-dashboard.js
+- public/js/smh-hub.js
+- public/js/smh-hub-master-rulebook.js
+- public/js/acca-builder.js
+- public/js/doubleChanceCombos.js
+- public/js/ai-reasoning-display.js
+
+Outcome:
+- MAJOR_OVERLAP
+
+Evidence:
+- Multiple public pages and JavaScript files expose prediction, market, ACCA, direct market, VIP stress-dashboard, and Sports Market Hub behavior.
+- public/js/acca-builder.js calls the ACCA builder endpoint.
+- public/js/doubleChanceCombos.js handles Double Chance combo logic and contradiction-governance concepts.
+- public/js/smh-hub-master-rulebook.js defines Master Rulebook secondary market category mapping.
+- public/js/smh-hub.js wires Sports Market Hub market and ACCA selectors.
+- public/js/vip-stress-dashboard.js manages portal, market, ACCA view state, prediction card registry, API base, and tier/dashboard behavior.
+
+Decision:
+- Major frontend market/prediction/ACCA overlap is proven.
+- No frontend authority is selected in Phase 5.
+- No UI, route, behavior, or JavaScript change is authorized.
+- Carry forward as a future frontend market-dashboard canonicalization candidate.
+
+Candidate group 2: public auth, subscription, payment, and account access surfaces
+
+Assets:
+- public/login.html
+- public/payment.html
+- public/subscription.html
+- public/subscribe/index.html
+- public/experience.html
+- public/js/supabase-init.js
+- public/js/supabase-bundle.js
+- public/js/config.js
+- public/js/user-experience-feedback.js
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- Several public pages initialize or depend on Supabase auth and subscription/payment state.
+- public/login.html, payment.html, subscription.html, and subscribe/index.html all interact with authentication, session, payment, or subscription flow concepts.
+- public/js/supabase-init.js initializes the Supabase client.
+- public/js/config.js defines API base routing and public user key behavior.
+- public/js/user-experience-feedback.js uses API base, user API key, and Supabase session headers for feedback surfaces.
+- public/experience.html links upgrade, subscription, logout, dashboard exploration, and live prediction preview.
+
+Decision:
+- Functional overlap is proven across public auth/subscription/account surfaces.
+- No auth, payment, subscription, or Supabase client behavior is changed.
+- Carry forward as a future auth/subscription frontend boundary candidate.
+
+Candidate group 3: public operator/control-plane and health dashboard surfaces
+
+Assets:
+- public/js/control-center.js
+- public/js/semantic-drift-dashboard.js
+- public/js/system-health-banner.js
+- public/js/config.js
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- public/js/control-center.js manages Control Center API reads and admin key handling.
+- public/js/semantic-drift-dashboard.js reads semantic drift summary endpoint data.
+- public/js/system-health-banner.js reads system health and control-plane reasons.
+- public/js/config.js contributes API routing used by these frontend widgets.
+- These files overlap around operator visibility and runtime health display, but each UI component has a distinct display role.
+
+Decision:
+- Partial overlap is proven.
+- Keep separate for now.
+- No UI refactor, merge, or behavior change is authorized.
+- Carry forward as frontend operator-dashboard boundary evidence.
+
+Candidate group 4: public legal/product pages versus root legal documents
+
+Assets:
+- public/privacy.html
+- public/terms.html
+- public/subscription.html
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- public/privacy.html mirrors public-facing privacy policy language.
+- public/terms.html mirrors public-facing terms/service and prediction-content boundary language.
+- public/subscription.html includes subscription, plan-access, accumulator, pro-rata, and no-refund product language.
+- These overlap with prior root legal/product documents recorded in B15-B18.
+
+Decision:
+- Keep separate.
+- No legal, subscription, refund, or product-policy text is changed.
+- Carry forward only as public/legal documentation boundary evidence.
+
+Candidate group 5: static media, styling, and presentation assets
+
+Assets:
+- public/favicon.ico
+- public/hero-page.jpg
+- public/hero-page.webp
+- public/language.jpg
+- public/login.jpg
+- public/windrawwin.jpg
+- public/style.css
+- public/robots.txt
+- public/language-switch.html
+- public/js/hero-carousel.js
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- Several public image assets and styling files support website presentation.
+- hero-page.jpg and hero-page.webp appear to be alternate formats for hero imagery.
+- public/js/hero-carousel.js implements carousel display behavior and local carousel caching.
+- public/style.css provides global public styling.
+
+Decision:
+- Presentation/static-asset relationship is proven, but no same-job cleanup is authorized.
+- No image, CSS, SEO, or frontend presentation file is changed.
+- Carry forward as static/frontend presentation boundary evidence only.
+
+Candidate group 6: Supabase prediction, market, rulebook, and direct1x2 migrations
+
+Assets:
+- supabase/migrations/20260415000001_create_insight_usage.sql
+- supabase/migrations/20260418000002_update_predictions_final_risk_level_check.sql
+- supabase/migrations/20260501_skcs_comprehensive_engine.sql
+- supabase/migrations/20260522000001_add_watchlist_column.sql
+- supabase/migrations/20260522000002_add_sport_to_tier_rules.sql
+- supabase/migrations/20260523000001_drop_insight_usage.sql
+- supabase/migrations/20260617_add_market_tier.sql
+- supabase/migrations/20260619000001_rename_predictions_final_to_direct1x2.sql
+- supabase/migrations/20260619000002_align_direct1x2_columns.sql
+- supabase/migrations/20260619000003_direct1x2_risk_tier_and_secondary_markets.sql
+- supabase/migrations/20260621000001_enforce_league_country_on_direct_matches.sql
+- supabase/migrations/20260701000001_normalize_sport_names.sql
+- supabase/migrations/20260718000001_db_rule_alignment_75_55_30.sql
+
+Outcome:
+- MAJOR_OVERLAP
+
+Evidence:
+- Multiple migrations modify prediction, market, risk, sport, tier, direct1x2, secondary-market, and rulebook-alignment structures.
+- Some migrations create insight usage restrictions, later drop insight usage, and then rely on ACCA-specific restrictions elsewhere.
+- Several migrations rename predictions_final to direct1x2_prediction_final, align direct1x2 columns, add risk tier/secondary markets, enforce league/country fields, normalize sport names, and align DB rule thresholds.
+
+Decision:
+- Major database migration overlap is proven.
+- No SQL is executed.
+- No database structure, trigger, rule, or migration is changed.
+- Carry forward as a future Supabase migration canonicalization/safety candidate.
+
+Candidate group 7: Supabase fixture, ingest, context, odds, admin, and telemetry migrations
+
+Assets:
+- supabase/migrations/20260512000002_add_odds_to_match_context.sql
+- supabase/migrations/20260512000003_create_sport_sync_table.sql
+- supabase/migrations/20260512000004_create_upsert_raw_fixture_rpc.sql
+- supabase/migrations/20260512000005_create_context_enrichment_trigger.sql
+- supabase/migrations/20260512000006_create_fixture_processing_log.sql
+- supabase/migrations/20260512000007_create_admin_views.sql
+- supabase/migrations/20260512000008_create_event_odds_snapshots.sql
+- supabase/migrations/20260512000010_populate_sport_sync.sql
+- supabase/migrations/20260524000002_create_upsert_canonical_event_rpc.sql
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- Multiple migrations define or support fixture ingest, sport sync, raw fixture upsert, context enrichment, fixture processing logs, admin pipeline health views, odds snapshots, and canonical event upsert.
+- These assets overlap around ingest, telemetry, odds, context, and canonical event database boundaries.
+
+Decision:
+- Functional overlap is proven.
+- No database ingest authority is selected in Phase 5.
+- No SQL, migration, trigger, RPC, or table change is authorized.
+- Carry forward as a future Supabase ingest/telemetry migration boundary candidate.
+
+Candidate group 8: Supabase prediction lookup RPC and compatibility migrations
+
+Assets:
+- supabase/migrations/20260512000009_create_get_prediction_rpc.sql
+- supabase/migrations/20260512000012_create_get_prediction_function.sql
+- supabase/migrations/20260512000013_disable_rls_match_context.sql
+- supabase/migrations/20260524000001_remove_dev_rls_policies.sql
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- Two migrations define prediction lookup functions for match IDs across direct1x2_prediction_final and ai_predictions.
+- RLS-related migrations change access policy posture for match_context and development/public reads.
+- These overlap with the prediction API and Supabase security/access surfaces already recorded in previous Phase 5 packets.
+
+Decision:
+- Functional overlap is proven.
+- No RPC, RLS, policy, security, or access change is authorized.
+- Carry forward as a future Supabase access/RPC boundary candidate.
+
+Candidate group 9: Engine V2 and sport-expansion migrations
+
+Assets:
+- supabase/migrations/20260531000001_skcs_engine_v2_phase0_identity.sql
+- supabase/migrations/20260531000002_skcs_engine_v2_phase0b_match_results.sql
+- supabase/migrations/20260717000001_create_f1_schema.sql
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- Engine V2 identity and match-results migrations create football/team identity and result structures.
+- F1 schema migration creates F1 teams, tracks, persons, races, rosters, and results.
+- These relate to broader sport expansion and engine evolution rather than the current Direct 1X2 runtime only.
+
+Decision:
+- Partial overlap is proven around future engine/sport expansion database structures.
+- No sport expansion or V2 migration action is authorized.
+- Carry forward as database future-phase boundary evidence only.
+
+Distinct-role findings:
+- public/robots.txt is a public SEO/static control file; no same-job merge group is selected.
+- Binary/static media assets are recorded as presentation assets only; no image processing or cleanup is authorized.
+- Supabase migrations are historical/ordered database-change artifacts; overlap does not authorize merging, deleting, or rewriting migration history.
+- Migration overlap is recorded as evidence only and no SQL was executed.
+
+Batch decision:
+- B19-B22 contains proven functional overlap candidates.
+- Potential future canonicalization candidates are recorded for public frontend market/dashboard surfaces, auth/subscription frontend surfaces, operator health UI, legal public pages, static presentation assets, Supabase prediction/rule migrations, Supabase ingest/telemetry migrations, Supabase RPC/RLS migrations, and Engine V2/sport-expansion migrations.
+- No cleanup action is authorized by this outcome.
+- B19-B22 Phase 5 evidence is closed.
+- Next batch group: B23-B26.
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
