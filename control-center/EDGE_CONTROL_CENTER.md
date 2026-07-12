@@ -4056,3 +4056,75 @@ Validation boundary:
 - B01 Phase 4 evidence is closed.
 - Next batch: B02 - BACKEND_DIRECT_FILES.
 
+
+## PHASE 4 - B02 LEGACY AND REPLACEMENT IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_4 - Legacy and Replacement Identification
+- Batch: B02 - BACKEND_DIRECT_FILES
+- Evidence type: Current/legacy/replacement identification only
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+B02 manifest evidence:
+- B02 batch_id: B02
+- B02 title: BACKEND_DIRECT_FILES
+- B02 asset_count: 13
+- All 13 B02 asset paths exist locally.
+- All 13 B02 asset paths are tracked by Git.
+
+B02 outcome summary:
+- CURRENT: 12
+- LEGACY: 0
+- SUPERSEDED: 1
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+B02 CURRENT assets:
+1. backend/.gitignore
+2. backend/apiClients.js
+3. backend/checkCanonicalEvents.js
+4. backend/config.js
+5. backend/database.js
+6. backend/db.js
+7. backend/dbBootstrap.js
+8. backend/deploy-trigger-cricket.js
+9. backend/deploy-trigger.js
+10. backend/edgemind_inference.py
+11. backend/server-express.js
+12. backend/test-ultra-slim.js
+
+B02 SUPERSEDED assets:
+1. backend/package-lock.json
+
+Evidence:
+- package.json starts the application through node backend/server-express.js.
+- render.yaml starts backend/server-express.js, backend/deploy-trigger.js, and backend/deploy-trigger-cricket.js.
+- AGENTS.md identifies backend/apiClients.js, backend/dbBootstrap.js, backend/db.js, backend/config.js, and backend/server-express.js as current backend architecture/runtime assets.
+- backend/checkCanonicalEvents.js is a tracked manual Supabase canonical_events audit script. No replacement or superseding audit script was proven in this phase.
+- backend/edgemind_inference.py is a tracked standalone EdgeMind/Antigravity inference bridge with a CLI entrypoint. No active Node/server caller was proven, but no replacement or superseding bridge was proven either.
+- backend/test-ultra-slim.js is a tracked manual EdgeMind/Dolphin ultra-slim inference test harness. No replacement or superseding test harness was proven in this phase.
+- backend/package-lock.json is a minimal backend lockfile with only an empty backend package entry.
+- backend/package.json does not exist.
+- root package.json exists and governs active start/build scripts.
+- Therefore backend/package-lock.json is superseded as a backend dependency authority, but this Phase 4 outcome does not authorize deletion.
+
+Decision:
+- Twelve B02 backend direct files remain CURRENT for Phase 4.
+- backend/package-lock.json is SUPERSEDED because its paired backend/package.json is absent and active dependency/startup authority is at the repository root.
+- No B02 deletion, merge, retirement, refactor, source change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+
+Validation boundary:
+- Evidence only.
+- No cleanup action is authorized by this B02 outcome.
+- B02 Phase 4 evidence is closed.
+- Next batch: B03 - BACKEND_ROUTES_AND_CONTROLLERS.
+
