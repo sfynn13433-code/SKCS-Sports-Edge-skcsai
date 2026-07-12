@@ -597,15 +597,15 @@ Required state snapshot:
     "B01-B03",
     "B04-B06",
     "B07-B10",
-    "B11-B14"
+    "B11-B14",
+    "B15-B18"
   ],
   "remaining_batches": [
-    "B15-B18",
     "B19-B22",
     "B23-B26",
     "B27-B29"
   ],
-  "next_deterministic_batch": "B15-B18",
+  "next_deterministic_batch": "B19-B22",
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,
@@ -9051,6 +9051,199 @@ Batch decision:
 - B11-B14 merge/consolidation gate is evidence-complete with NO_ACTION for non-held current/manual assets and HOLD_NEEDS_RUNTIME_PROOF for script-heavy overlap candidates.
 - Grouped unit B11-B14 is closed.
 - Next deterministic group: B15-B18
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized by this packet.
+
+## PHASE 7 - B15-B18 MERGE AND CONSOLIDATION EVIDENCE
+
+Result: PASS WITH NO_ACTION AND RUNTIME-PROOF HOLDS
+
+Scope:
+- Phase: PHASE_7 - Merge and Consolidation
+- Grouped review unit: B15-B18
+- Start HEAD: 86a508b1
+- Inspection scope: B15, B16, B17, B18 only
+- B19-B29 touched: NO
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Authority sources reviewed:
+- control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json B15, B16, B17, and B18 membership
+- PHASE 4 - B15-B18 LEGACY AND REPLACEMENT IDENTIFICATION EVIDENCE
+- PHASE 5 - B15-B18 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+- PHASE 6 - B15-B18 CANONICAL AUTHORITY SELECTION EVIDENCE
+
+B15 assets inspected (52):
+1. scripts/_bsd_league_inventory.json
+2. scripts/_local-rebuild.js
+3. scripts/add-cricket-rls-policies.sql
+4. scripts/add-event-columns.js
+5. scripts/analyze-postgres-tables.js
+6. scripts/analyze-supabase-tables-full.js
+7. scripts/analyze-supabase-tables.js
+8. scripts/analyze-supabase-visual.js
+9. scripts/build-acca.js
+10. scripts/build-sportsdb-config.js
+11. scripts/cleanup-competition-allowlists.js
+12. scripts/cleanup-duplicate-fallbacks.js
+13. scripts/cleanup-live-direct-duplicates.js
+14. scripts/cleanup-predictions.js
+15. scripts/cleanup-unknown-teams.js
+16. scripts/cleanup.js
+17. scripts/complete-phase1-testing.js
+18. scripts/complete-phase2-rules.js
+19. scripts/complete-phase3-predictions.js
+20. scripts/create-indexes.js
+21. scripts/create-migration-plan.js
+22. scripts/db-cleanup.js
+23. scripts/deployment_verification.js
+24. scripts/deployment-status.md
+25. scripts/fix-ai-predictions-endpoint.js
+26. scripts/fix-frontend-placeholders.js
+27. scripts/fix-json-simple.js
+28. scripts/fix-matches-structure.js
+29. scripts/fix-placeholders-and-insights.js
+30. scripts/fix-prediction-76412.js
+31. scripts/fix-remaining-json-issues.js
+32. scripts/fix-sport-data.js
+33. scripts/gulf_in_class_simulation.js
+34. scripts/hotfix-acca-rules.js
+35. scripts/implement-phase1-fixtures-corrected.js
+36. scripts/implement-phase1-fixtures.js
+37. scripts/implement-phase2-rules-conservative.js
+38. scripts/implement-phase2-rules.js
+39. scripts/implement-phase3-predictions.js
+40. scripts/install-local-git-hooks.js
+41. scripts/manual-grade.js
+42. scripts/map-table-dependencies.js
+43. scripts/purge-fallback-data.js
+44. scripts/quarantine-database.js
+45. scripts/render-api-deploy.js
+46. scripts/repair-unknown-team-names.js
+47. scripts/requirements.txt
+48. scripts/resolve-results.js
+49. scripts/safe-migration-plan.js
+50. scripts/supabase_health_check.js
+51. scripts/supabase-diagnostics.js
+52. scripts/track-prediction-accuracy.js
+
+B16 assets inspected (36):
+1. AGENTS.md
+2. ARCHITECTURE_OVERVIEW.md
+3. COMPREHENSIVE_AUDIT_REPORT.md
+4. COMPREHENSIVE_FOOTBALL_RULES_REPORT.md
+5. CRON_SETUP.md
+6. DASHBOARD_QUICK_START.md
+7. DASHBOARD_REFACTOR_GUIDE.md
+8. DEEPSEEK_SESSION_SKCSTEST.txt
+9. DEEPSEEK_STATE.md
+10. DEPLOYMENT_STATUS.md
+11. DEPLOYMENT_VERIFICATION_GUIDE.md
+12. football-ecosystem-report.md
+13. FRONTEND_FIXES_SUMMARY.md
+14. FRONTEND_INVESTIGATION_REPORT.md
+15. FULL_WORKSPACE_AUDIT_REPORT.md
+16. GEMINI.md
+17. IMPLEMENTATION_GAP_ANALYSIS.md
+18. IMPLEMENTATION_SUMMARY.md
+19. MASTER_RULEBOOK_IMPLEMENTATION_GUIDE.md
+20. MIGRATION_FREEZE.md
+21. PRIVACY_POLICY.md
+22. README_DASHBOARD_REFACTOR.md
+23. README_DATA_INGESTION.md
+24. README.md
+25. requirements.txt
+26. runtime.txt
+27. SINGLE_USE_AUDIT_REPORT.md
+28. SKCS_MASTER_RULEBOOK.md
+29. SMB_WINDSURF_FINAL_IMPLEMENTATION.md
+30. SMB_WINDSURF_IMPLEMENTATION_PROMPT.md
+31. SPORT_CONSISTENCY_AUDIT_REPORT.md
+32. STRICT_RULES.md
+33. SUPABASE_DIAGNOSTIC_REPORT.md
+34. SUPABASE_TABLE_ANALYSIS.md
+35. SUPABASE_TABLES_SUMMARY.md
+36. TERMS_OF_SERVICE.md
+
+B17 assets inspected (24):
+1. docs/acca_rules_v2.1.md
+2. docs/alert-routing-degraded-state.md
+3. docs/api_quota_router.md
+4. docs/blueprint-semantic-drift-control-plane.md
+5. docs/canonical_ingest_firewall.spec.md
+6. docs/control-plane-operational-pack.md
+7. docs/cricket-providers.md
+8. docs/DATA_INGESTION.md
+9. docs/DEPLOYMENT_GUIDE.md
+10. docs/football-leagues-apisports.md
+11. docs/pipeline-health-feed.md
+12. docs/provider-discovery/free-livescore-api.md
+13. docs/providers/live-football-api-policy.md
+14. docs/README.md
+15. docs/runbook_degraded_states.md
+16. docs/SKCS_ENGINE_V2_ADR.md
+17. docs/SKCS_ENGINE_V2_PHASE0_DESIGN.md
+18. docs/SKCS_ENGINE_V2_PHASE05_INGEST_MAP.md
+19. docs/SKCS_ENGINE_V2_PHASE0B5_REPLAY.md
+20. docs/skcs_grading_snapshot_v1.spec.md
+21. docs/sportsdataio-pre-match-directive.md
+22. docs/supabase-tier-display-requirements.md
+23. docs/VERCEL_DEPLOY_TROUBLESHOOTING.md
+24. docs/weekly-global-scrape-scheduler.md
+
+B18 assets inspected (23):
+1. SKCS-KNOWLEDGE/audit/column_dependency_matrix.md
+2. SKCS-KNOWLEDGE/audit/cron_provider_runtime_map.md
+3. SKCS-KNOWLEDGE/audit/gap_report.md
+4. SKCS-KNOWLEDGE/audit/knowledge_layer_completeness_audit.md
+5. SKCS-KNOWLEDGE/audit/migration_history.md
+6. SKCS-KNOWLEDGE/audit/observability_registry.md
+7. SKCS-KNOWLEDGE/audit/prediction_dependency_audit.md
+8. SKCS-KNOWLEDGE/audit/runtime_consumer_audit_v2.md
+9. SKCS-KNOWLEDGE/audit/runtime_consumer_audit.md
+10. SKCS-KNOWLEDGE/audit/schema_drift_log.md
+11. SKCS-KNOWLEDGE/audit/technical_debt.md
+12. SKCS-KNOWLEDGE/audit/undocumented_assets.md
+13. SKCS-KNOWLEDGE/audit/verification_runtime_audit.md
+14. SKCS-KNOWLEDGE/governance/ai_usage_policy.md
+15. SKCS-KNOWLEDGE/governance/bigballs_evaluation_focus.md
+16. SKCS-KNOWLEDGE/governance/bsd_governance_hold.md
+17. SKCS-KNOWLEDGE/governance/bsd_provider_suitability_scorecard.md
+18. SKCS-KNOWLEDGE/governance/documentation_policy.md
+19. SKCS-KNOWLEDGE/governance/feature_risk_registry.md
+20. SKCS-KNOWLEDGE/governance/naming_standards.md
+21. SKCS-KNOWLEDGE/governance/edge_asset_work_sequence_policy.md
+22. SKCS-KNOWLEDGE/governance/provider_scorecard_bsd.md
+23. SKCS-KNOWLEDGE/governance/verification_layer_spec.md
+
+Evidence summary:
+- Phase 4 B15-B18 closed all 135 assets as CURRENT with UNKNOWN 0 and authorized no cleanup action.
+- Phase 5 B15-B18 proved functional overlap candidates but authorized no deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation.
+- Phase 6 B15-B18 selected limited CANONICAL_KEEP reference authorities and held diagnostic, report, provider, ingestion, dashboard, deployment, configuration, and older design candidates behind NEEDS_RUNTIME_PROOF.
+- No Phase 6 decision directly authorizes implementation-level merge/consolidation for B15-B18.
+
+Merge/consolidation decision:
+- B15 scripts and SQL-capable maintenance assets: HOLD_NEEDS_RUNTIME_PROOF.
+- B16 root documentation/configuration assets: NO_ACTION where canonical/reference role is already proven; otherwise HOLD_NEEDS_RUNTIME_PROOF.
+- B17 docs directory assets: NO_ACTION where canonical/reference role is already proven; otherwise HOLD_NEEDS_RUNTIME_PROOF.
+- B18 SKCS-KNOWLEDGE audit/governance assets: HOLD_NEEDS_RUNTIME_PROOF unless a later phase proves a direct canonical merge target.
+
+Implementation boundary:
+- B15-B18 only.
+- B19-B29 not inspected for implementation in this packet.
+- No runtime/source files changed.
+- No Supabase, database, deployment, dependency, security, legal, subscription, prediction-content, or user-data behavior changed.
+
+Batch decision:
+- B15-B18 merge/consolidation gate is evidence-complete with NO_ACTION for proven current reference assets and HOLD_NEEDS_RUNTIME_PROOF for overlap, diagnostic, report, migration, provider, ingestion, dashboard, deployment, configuration, and older design candidates.
+- Grouped unit B15-B18 is closed.
+- Next deterministic group: B19-B22
 
 Validation boundary:
 - Evidence only.

@@ -34,7 +34,7 @@ function buildPhaseWorkProposal(overrides = {}) {
     request_type: "PHASE_WORK",
     mode: "PHASE_WORK",
     phase: "PHASE_7",
-    batch_id: "B15-B18",
+    batch_id: "B19-B22",
     work_kind: "MERGE_CONSOLIDATION",
     requires_full_forensic_evidence: false,
     preserves_unrelated_changes: true,
@@ -135,14 +135,14 @@ describe("Edge Control Center Ledger v1", () => {
       "B04-B06",
       "B07-B10",
       "B11-B14",
+      "B15-B18",
     ]);
     assert.deepEqual(result.state.remaining_batches, [
-      "B15-B18",
       "B19-B22",
       "B23-B26",
       "B27-B29",
     ]);
-    assert.equal(result.state.next_deterministic_batch, "B15-B18");
+    assert.equal(result.state.next_deterministic_batch, "B19-B22");
     assert.deepEqual(result.state.phase_3_outcomes, [
       "ACTIVE",
       "INDIRECTLY_ACTIVE",
@@ -171,8 +171,8 @@ describe("Edge Control Center Ledger v1", () => {
     const state = createControlCenterGateState();
     assert.equal(state.eac_evidence_reusable, true);
     assert.deepEqual(getEacBatchIds(), [...EAC_BATCH_IDS]);
-    assert.equal(getNextIncompleteBatch(state), "B15-B18");
-    assert.equal(state.next_deterministic_batch, "B15-B18");
+    assert.equal(getNextIncompleteBatch(state), "B19-B22");
+    assert.equal(state.next_deterministic_batch, "B19-B22");
     assert.equal(EAC_BATCH_IDS.length, 29);
   });
 
@@ -215,7 +215,7 @@ describe("Edge Control Center Ledger v1", () => {
     assert.equal(result.mode, "PHASE_WORK");
     assert.equal(result.reason, "PHASE_WORK_ACCEPTED");
     assert.equal(result.nextState.lifecycle_state, "BATCH_ACTIVE");
-    assert.equal(result.nextState.active_batch, "B15-B18");
+    assert.equal(result.nextState.active_batch, "B19-B22");
   });
 
   it("B11-B14 grouped batch completion advances Phase 7 to B15-B18", () => {
