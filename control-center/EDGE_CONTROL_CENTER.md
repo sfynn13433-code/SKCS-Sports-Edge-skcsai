@@ -3914,3 +3914,76 @@ Validation boundary:
 - No active-use outcome authorizes deletion, merge, retirement, refactor, source change, runtime change, product change, SQL execution, deployment change, database mutation, Supabase mutation, dependency update, or vulnerability remediation.
 - Phase 3 is closed.
 - Do not begin Phase 4 without explicit Control Center activation.
+
+## PHASE 4 - LEGACY AND REPLACEMENT IDENTIFICATION - ACTIVATED
+
+Result: ACTIVE
+
+Activation scope:
+- Phase: PHASE_4 - Legacy and Replacement Identification
+- Activation HEAD: e11785f9
+- Previous phase: PHASE_3 - Active Use Identification
+- Previous phase status: CLOSED
+- Activation type: Control Center activation only
+- Batch inspection begun by this activation: NO
+- Deletion/merge/retirement/refactor authorized by this activation: NO
+- Source/runtime/product change authorized by this activation: NO
+- SQL execution authorized by this activation: NO
+- Deployment change authorized by this activation: NO
+- Database/Supabase mutation authorized by this activation: NO
+- Dependency/security/vulnerability remediation authorized by this activation: NO
+
+Objective:
+Identify which governed assets are current, legacy, superseded, replaced, parallel, historical evidence, or unknown based on repository evidence only.
+
+Allowed work:
+- Inspect governed asset evidence.
+- Record Phase 4 legacy/replacement findings in the Control Center.
+- Run approved local guards/checks.
+- Commit/push scoped governance evidence only.
+
+Forbidden work:
+- No deletion.
+- No merge.
+- No retirement.
+- No refactor.
+- No source file repair.
+- No runtime behavior change.
+- No product behavior change.
+- No SQL execution.
+- No deployment change.
+- No database mutation.
+- No Supabase mutation.
+- No dependency update.
+- No vulnerability remediation.
+
+Phase 4 outcome vocabulary:
+- CURRENT
+- LEGACY
+- SUPERSEDED
+- REPLACED_BY
+- PARALLEL
+- HISTORICAL_EVIDENCE
+- UNKNOWN
+
+Batch plan:
+- B01-B29 will be inspected in deterministic order.
+- B01 is the next batch.
+- Each batch must record evidence before outcome.
+- UNKNOWN must be zero at closure or explicitly justified.
+
+Definition of Done:
+- B01-B29 have Phase 4 evidence recorded.
+- Every governed batch entry has a legacy/replacement outcome.
+- UNKNOWN is zero or explicitly justified.
+- Final Phase 4 roll-up is recorded.
+- Rulebook guard passes.
+- Working tree is clean.
+- Scoped commit is created and pushed.
+- No cleanup/remediation work is performed.
+
+Validation boundary:
+- This activation creates the Phase 4 governance boundary only.
+- No Phase 4 batch inspection is started by this activation.
+- Stop after activation commit and report exact start point for B01 before beginning inspection.
+
