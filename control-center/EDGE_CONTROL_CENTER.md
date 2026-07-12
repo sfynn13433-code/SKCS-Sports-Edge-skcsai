@@ -5687,3 +5687,240 @@ Batch decision:
 Validation boundary:
 - Evidence only.
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+
+## PHASE 5 - B11-B14 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+
+Result: PASS WITH OVERLAP CANDIDATES
+
+Scope:
+- Phase: PHASE_5 - Functional Overlap Identification
+- Batches: B11-B14
+- Evidence type: functional-overlap identification only
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Batch manifest evidence:
+- Batch group: B11-B14
+- Start HEAD: 6b4677d2
+- Compact overlap scan inspected script-heavy check, validate, verify, test, diagnostic, trace, run, trigger, scheduler, sync, ingest, enrichment, and backfill assets.
+
+Outcome vocabulary used:
+- NO_OVERLAP
+- PARTIAL_OVERLAP
+- MAJOR_OVERLAP
+- POTENTIAL_MERGE_GROUP
+
+Candidate group 1: AI prediction endpoint tests and traces
+
+Assets:
+- scripts/test-final-endpoint.js
+- scripts/test-fixed-ai-predictions.js
+- scripts/test-fixed-endpoint.js
+- scripts/trace-data-flow.js
+- scripts/trace-filtering-rules.js
+- scripts/trace-filtering-timestamp.js
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- Multiple scripts test or trace AI prediction endpoint behavior.
+- Several scripts query ai_predictions, direct1x2_prediction_final, predictions_raw, and predictions_filtered.
+- The scripts overlap around endpoint validation, prediction-table lookup, fallback behavior, and data-flow diagnosis.
+
+Decision:
+- Functional overlap is proven.
+- No test script is selected as canonical in Phase 5.
+- No deletion, merge, or refactor is authorized.
+- Carry forward as a future test/trace consolidation candidate.
+
+Candidate group 2: provider endpoint tests and discovery scripts
+
+Assets:
+- scripts/test-fetch.js
+- scripts/test-network.js
+- scripts/test-football536-endpoints.js
+- scripts/test-football536-fixtures-normalizer.js
+- scripts/test-free-livescore-fixtures.js
+- scripts/test-free-livescore-search.js
+- scripts/test-live-football-api-priority.js
+- scripts/test-metrx-factory-top-metrics.js
+- scripts/test-metrx-top-metrics.js
+- scripts/test-pro-football-api.js
+- scripts/test-optimized-endpoints.js
+- scripts/test-sportsapi-pro-football.js
+- scripts/test-sportsapi-pro-football-adapter.js
+- scripts/test-sportsapi-pro-football-joinability.js
+- scripts/test-sports-live-rankings.js
+- scripts/test-sportsrc-fixtures.js
+- scripts/test-sportsrc-health.js
+- scripts/test-sportsrc-odds.js
+- scripts/test-thesportsdb-endpoints.js
+- scripts/discover-free-livescore-endpoints.js
+
+Outcome:
+- MAJOR_OVERLAP
+
+Evidence:
+- These scripts test, discover, or verify external provider endpoints and provider-specific extractors/adapters.
+- Providers include API-Sports, Football536, Free Livescore, Live Football API, Metrx Factory, Pro Football, SportsAPI Pro Football, Sports Live Scores, SportSRC, and TheSportsDB.
+- Several scripts load provider services/extractors and test fixture, ranking, odds, prediction, health, or search endpoint behavior.
+
+Decision:
+- Major provider-test overlap is proven.
+- No provider test script is selected as canonical in Phase 5.
+- No provider retirement, endpoint change, dependency update, or security work is authorized.
+- Carry forward as a future provider-test/discovery consolidation candidate.
+
+Candidate group 3: pipeline run, trigger, scheduler, and stage scripts
+
+Assets:
+- scripts/test-fixed-pipeline.js
+- scripts/test-pipeline-integration.js
+- scripts/test-weather-pipeline.js
+- scripts/run-pipeline.js
+- scripts/run-master-pipeline.js
+- scripts/run-pipeline-from-context-pack.js
+- scripts/run-stage1-math.js
+- scripts/run-stage2-context.js
+- scripts/run-stage3-volatility.js
+- scripts/run-test.js
+- scripts/run-scheduled-sync.js
+- scripts/scheduler.js
+- scripts/external-scheduler.js
+- scripts/_trigger-sync.js
+- scripts/trigger-pipeline-sync.js
+- scripts/trigger-refresh.js
+- scripts/wake-and-sync.js
+
+Outcome:
+- MAJOR_OVERLAP
+
+Evidence:
+- Multiple scripts trigger, schedule, test, or run SKCS pipeline flows.
+- Several scripts call pipeline sync/status endpoints, run staged pipeline logic, or schedule recurring sync/build/resolve operations.
+- Several scripts overlap with earlier pipeline orchestration candidates recorded in B07-B10.
+
+Decision:
+- Major pipeline runner/trigger overlap is proven.
+- No canonical runner or scheduler is selected in Phase 5.
+- No script is executed.
+- No deletion, merge, refactor, deployment, or runtime behavior change is authorized.
+- Carry forward as a future pipeline-runner canonicalization candidate.
+
+Candidate group 4: grading, settlement, accuracy, and publication scripts
+
+Assets:
+- scripts/trigger-grade.js
+- scripts/trigger-settlement.js
+- scripts/trigger-publication.js
+- scripts/backfill-prediction-grading.js
+- scripts/backfill-predictions-accuracy.js
+- scripts/bridge-raw-predictions-for-grading.js
+- scripts/test-final-endpoint.js
+- scripts/test-fixed-endpoint.js
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- Several scripts trigger grading, settlement, publication, or backfill prediction accuracy data.
+- These scripts overlap around direct1x2_prediction_final, predictions_accuracy, grading endpoints, and publication process validation.
+- Some scripts are active trigger utilities while others are one-off backfill or validation helpers.
+
+Decision:
+- Functional overlap is proven.
+- No grading/publication script is selected as canonical in Phase 5.
+- No SQL or database mutation is authorized.
+- Carry forward as a future grading/publication script-boundary candidate.
+
+Candidate group 5: database migration, backfill, bridge, and governance scripts
+
+Assets:
+- scripts/apply-db-governance.js
+- scripts/apply-migrations.js
+- scripts/run-migration.js
+- scripts/backfill-direct1x2-final-fields.js
+- scripts/backfill-fixture-ids.js
+- scripts/backfill-football-context.js
+- scripts/backfill-provider-event-id.js
+- scripts/bridge-to-final.sql
+- scripts/brute-force-ingest.js
+
+Outcome:
+- MAJOR_OVERLAP
+
+Evidence:
+- Multiple scripts are database mutation-capable or bridge/backfill data between prediction tables.
+- Several scripts use pg Pool, backend/database, backend/db, or Supabase service keys.
+- bridge-to-final.sql directly describes predictions_filtered to predictions_final bridging.
+- brute-force-ingest.js contains a warning that it should not be used for clean football-only data.
+
+Decision:
+- Major database/backfill/bridge overlap is proven.
+- No database script is executed.
+- No SQL, migration, data repair, merge, deletion, or refactor is authorized.
+- Carry forward as a future database-script safety/canonicalization candidate.
+
+Candidate group 6: cricket and RapidAPI cricket scripts
+
+Assets:
+- scripts/cricapi-cache-refresh.js
+- scripts/test-livescore6-cricket-provider.js
+- scripts/start-rapidapi-cricket-mcp.js
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- These scripts overlap around cricket provider access, CricAPI cache refresh, RapidAPI cricket keys/hosts, and cricket provider testing.
+- The overlap relates to the cricket-service boundary already recorded in B07-B10.
+
+Decision:
+- Partial cricket-provider script overlap is proven.
+- No script execution, provider change, or credential/key work is authorized.
+- Carry forward as cricket script-boundary evidence.
+
+Candidate group 7: context-pack, enrichment, and football context scripts
+
+Assets:
+- scripts/compose-context-pack.js
+- scripts/run-pipeline-from-context-pack.js
+- scripts/enrich-lineups.js
+- scripts/enrich-team-form.js
+- scripts/sync-ucl-context.js
+- scripts/sync-bsd-enrichment.js
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- These scripts compose or consume context packs, enrich football lineups/team form, sync UCL context, or persist BSD enrichment bundles.
+- Several scripts overlap around provider context, football enrichment, match context, and cache/persistence boundaries.
+
+Decision:
+- Functional overlap is proven.
+- No enrichment path is selected as canonical in Phase 5.
+- No sync, ingest, or enrichment script is executed.
+- Carry forward as a future context/enrichment script-boundary candidate.
+
+Distinct-role findings:
+- Scripts in this packet are mostly manual test, trigger, trace, sync, backfill, and diagnostic tools.
+- Repeated provider/test/trigger patterns alone do not authorize deletion.
+- Mutation-capable scripts are recorded as overlap/risk evidence only.
+- No production behavior is changed by this Phase 5 evidence.
+
+Batch decision:
+- B11-B14 contains proven functional overlap candidates.
+- Potential future canonicalization candidates are recorded for AI endpoint tests, provider endpoint tests, pipeline runners/triggers, grading/publication scripts, database backfill/bridge scripts, cricket provider scripts, and context/enrichment scripts.
+- No cleanup action is authorized by this outcome.
+- B11-B14 Phase 5 evidence is closed.
+- Next batch group: B15-B18.
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
