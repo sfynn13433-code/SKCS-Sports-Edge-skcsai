@@ -55,8 +55,8 @@ const PHASE_QUESTIONS = Object.freeze({
   PHASE_3: "Is each remaining governed file currently used?",
   PHASE_4: "Has each applicable file been superseded or left behind by a newer implementation?",
   PHASE_5: "Are different remaining files doing the same or substantially overlapping job?",
-  PHASE_6: "Which proven unused, replaced, or historical files can safely be removed?",
-  PHASE_7: "Which confirmed overlap groups should become one canonical implementation?",
+  PHASE_6: "Which Phase 5 overlap candidate families should have canonical authority selected?",
+  PHASE_7: "Which confirmed canonical authority decisions should be implemented through merge and consolidation?",
   PHASE_8: "Is the cleaned repository internally consistent?",
 });
 
@@ -97,7 +97,18 @@ const RECOGNIZED_REQUEST_TYPES = Object.freeze([
   "ACTIVATE_NEXT_GROUP",
 ]);
 
-const ACTIVE_CLEANUP_PHASE = "PHASE_5";
+const ACTIVE_CLEANUP_PHASE = "PHASE_6";
+
+const PHASE_6_CANONICAL_AUTHORITY_REVIEW_ORDER = Object.freeze([
+  "B02-B03",
+  "B04-B06",
+  "B07-B10",
+  "B11-B14",
+  "B15-B18",
+  "B19-B22",
+  "B23-B26",
+  "B27-B29",
+]);
 
 const PHASE_3_OUTCOMES = Object.freeze([
   "ACTIVE",
@@ -240,10 +251,19 @@ function getNextIncompleteBatch(state) {
   return remaining[0] || null;
 }
 
+function getCleanupReviewUnitsForPhase(phase) {
+  if (phase === "PHASE_6") {
+    return [...PHASE_6_CANONICAL_AUTHORITY_REVIEW_ORDER];
+  }
+
+  return getEacBatchIds();
+}
+
 function createControlCenterGateState(overrides = {}) {
   const assetRegister = loadAssetRegister();
   const totalGovernedAssets = getTotalGovernedAssets(assetRegister);
   const batchIds = getEacBatchIds();
+  const reviewUnits = getCleanupReviewUnitsForPhase(ACTIVE_CLEANUP_PHASE);
   const baseState = {
     governance_model: "REPOSITORY_CLEANUP_PROGRAMME",
     required_modes: [...REQUIRED_EXECUTION_MODES],
@@ -290,13 +310,24 @@ function createControlCenterGateState(overrides = {}) {
           "Phase 2 Purpose Classification Review is closed. Do not reopen without explicit Control Center approval.",
       },
     },
+    phase_5: {
+      status: "PHASE_CLOSED",
+      question: PHASE_QUESTIONS.PHASE_5,
+      evidence: {
+        result: "PASS WITH OVERLAP CANDIDATES",
+        batches_reviewed: "B01-B29",
+        closure_commit: "b71b411d",
+        closure_note:
+          "Phase 5 Functional Overlap Identification is evidence-complete. No canonical authority was selected during Phase 5.",
+      },
+    },
     active_phase: ACTIVE_CLEANUP_PHASE,
     active_phase_question: PHASE_QUESTIONS[ACTIVE_CLEANUP_PHASE],
     lifecycle_state: "PHASE_ACTIVE",
     active_batch: null,
     completed_batches: [],
-    remaining_batches: [...batchIds],
-    next_deterministic_batch: batchIds[0] || null,
+    remaining_batches: [...reviewUnits],
+    next_deterministic_batch: reviewUnits[0] || null,
     phase_3_outcomes: [...PHASE_3_OUTCOMES],
     phase_3_no_deletion_law: "NO_CURRENT_USE_FOUND does not authorize deletion.",
     future_phase_notes: [],
@@ -804,6 +835,7 @@ function validateControlCenterPolicy(documentText) {
   const assetRegister = loadAssetRegister();
   const expectedTotalGovernedAssets = getTotalGovernedAssets(assetRegister);
   const batchIds = getEacBatchIds();
+  const reviewUnits = getCleanupReviewUnitsForPhase(ACTIVE_CLEANUP_PHASE);
 
   if (!state) {
     errors.push(
@@ -918,10 +950,9 @@ function validateControlCenterPolicy(documentText) {
 
   if (!Array.isArray(state.remaining_batches)) {
     errors.push("Control Center state missing remaining_batches");
-  } else if (!listsMatchExactly(state.remaining_batches, batchIds.filter((id) => !(state.completed_batches || []).includes(id)))) {
-    // remaining should equal all batches minus completed in order
-    const expectedRemaining = batchIds.filter(
-      (id) => !(state.completed_batches || []).includes(id)
+  } else {
+    const expectedRemaining = reviewUnits.filter(
+      (unit) => !(state.completed_batches || []).includes(unit)
     );
     if (!listsMatchExactly(state.remaining_batches, expectedRemaining)) {
       errors.push("Control Center state remaining_batches drift");

@@ -33,9 +33,9 @@ function buildPhaseWorkProposal(overrides = {}) {
   return {
     request_type: "PHASE_WORK",
     mode: "PHASE_WORK",
-    phase: "PHASE_3",
-    batch_id: "B01",
-    work_kind: "ACTIVE_USE_IDENTIFICATION",
+    phase: "PHASE_6",
+    batch_id: "B02-B03",
+    work_kind: "CANONICAL_AUTHORITY_SELECTION",
     requires_full_forensic_evidence: false,
     preserves_unrelated_changes: true,
     ...overrides,
@@ -121,13 +121,14 @@ describe("Edge Control Center Ledger v1", () => {
     assert.equal(result.state.phase_0.status, "PHASE_CLOSED");
     assert.equal(result.state.phase_1.status, "PHASE_CLOSED");
     assert.equal(result.state.phase_2.status, "PHASE_CLOSED");
-    assert.equal(result.state.active_phase, "PHASE_3");
+    assert.equal(result.state.phase_5.status, "PHASE_CLOSED");
+    assert.equal(result.state.active_phase, "PHASE_6");
     assert.equal(
       result.state.active_phase_question,
-      "Is each remaining governed file currently used?"
+      "Which Phase 5 overlap candidate families should have canonical authority selected?"
     );
     assert.equal(result.state.lifecycle_state, "PHASE_ACTIVE");
-    assert.equal(result.state.next_deterministic_batch, "B01");
+    assert.equal(result.state.next_deterministic_batch, "B02-B03");
     assert.deepEqual(result.state.phase_3_outcomes, [
       "ACTIVE",
       "INDIRECTLY_ACTIVE",
@@ -156,14 +157,14 @@ describe("Edge Control Center Ledger v1", () => {
     const state = createControlCenterGateState();
     assert.equal(state.eac_evidence_reusable, true);
     assert.deepEqual(getEacBatchIds(), [...EAC_BATCH_IDS]);
-    assert.equal(getNextIncompleteBatch(state), "B01");
-    assert.equal(state.next_deterministic_batch, "B01");
+    assert.equal(getNextIncompleteBatch(state), "B02-B03");
+    assert.equal(state.next_deterministic_batch, "B02-B03");
     assert.equal(EAC_BATCH_IDS.length, 29);
   });
 
   it("exposes exactly one active cleanup phase", () => {
     const state = createControlCenterGateState();
-    assert.equal(state.active_phase, "PHASE_3");
+    assert.equal(state.active_phase, "PHASE_6");
     assert.equal(CLEANUP_PHASE_ORDER.filter((p) => p === state.active_phase).length, 1);
   });
 
@@ -189,7 +190,7 @@ describe("Edge Control Center Ledger v1", () => {
     assert.equal(result.reason, "MISSING_INSTRUCTION_OR_STATE");
   });
 
-  it("Phase 3 active-use identification work is GREEN", () => {
+  it("Phase 6 canonical authority selection work is GREEN", () => {
     const state = createControlCenterGateState();
     const result = evaluateControlCenterProposal(
       buildPhaseWorkProposal(),
@@ -200,7 +201,7 @@ describe("Edge Control Center Ledger v1", () => {
     assert.equal(result.mode, "PHASE_WORK");
     assert.equal(result.reason, "PHASE_WORK_ACCEPTED");
     assert.equal(result.nextState.lifecycle_state, "BATCH_ACTIVE");
-    assert.equal(result.nextState.active_batch, "B01");
+    assert.equal(result.nextState.active_batch, "B02-B03");
   });
 
   it("Phase 1 blocks purpose/legacy/overlap/repair as active work", () => {
@@ -246,7 +247,7 @@ describe("Edge Control Center Ledger v1", () => {
     );
     assert.equal(result.gate, "GREEN");
     assert.equal(result.reason, "FUTURE_PHASE_NOTE_RECORDED");
-    assert.equal(result.nextState.active_phase, "PHASE_3");
+    assert.equal(result.nextState.active_phase, "PHASE_6");
     assert.equal(result.nextState.lifecycle_state, "PHASE_ACTIVE");
     assert.equal(result.nextState.future_phase_notes.length, 1);
     assert.equal(
@@ -267,7 +268,7 @@ describe("Edge Control Center Ledger v1", () => {
     assert.equal(result.gate, "GREEN");
     assert.equal(result.reason, "BATCH_COMPLETED");
     assert.deepEqual(result.nextState.completed_batches, ["B01"]);
-    assert.equal(result.nextState.next_deterministic_batch, "B02");
+    assert.equal(result.nextState.next_deterministic_batch, "B02-B03");
     assert.equal(result.nextState.lifecycle_state, "BATCH_COMPLETE");
   });
 

@@ -399,13 +399,14 @@ It must not force a full forensic lifecycle for every file during Phase 1.
    Outcomes: NO_OVERLAP, PARTIAL_OVERLAP, MAJOR_OVERLAP, POTENTIAL_MERGE_GROUP.
    Identifies overlap only. No merge implementation.
 
-7. PHASE_6 — SAFE RETIREMENT
-   Question: Which proven unused, replaced, or historical files can safely be removed?
-   Outcomes: RETIRE, KEEP, BLOCKED. Approved RETIRE may be implemented here.
+7. PHASE_6 — CANONICAL AUTHORITY SELECTION
+   Question: Which Phase 5 overlap candidate families should have canonical authority selected?
+   Outcomes: CANONICAL_AUTHORITY_SELECTED, KEEP_SEPARATE, BLOCKED.
+   Selects canonical authority only. No merge, deletion, retirement, refactor, or implementation.
 
 8. PHASE_7 — MERGE AND CONSOLIDATION
-   Question: Which confirmed overlap groups should become one canonical implementation?
-   Deep investigation phase for proven overlap candidates only.
+   Question: Which confirmed canonical authority decisions should be implemented through merge and consolidation?
+   Implementation phase for approved Phase 6 canonical authority decisions only.
 
 9. PHASE_8 — FINAL REPOSITORY VALIDATION
    Question: Is the cleaned repository internally consistent?
@@ -568,43 +569,32 @@ Required state snapshot:
       "unrelated_local_changes_preserved": true
     }
   },
-  "active_phase": "PHASE_5",
-  "active_phase_question": "Are different remaining files doing the same or substantially overlapping job?",
+  "phase_5": {
+    "status": "PHASE_CLOSED",
+    "question": "Are different remaining files doing the same or substantially overlapping job?",
+    "evidence": {
+      "result": "PASS WITH OVERLAP CANDIDATES",
+      "batches_reviewed": "B01-B29",
+      "closure_commit": "b71b411d",
+      "closure_note": "Phase 5 Functional Overlap Identification is evidence-complete. No canonical authority was selected during Phase 5."
+    }
+  },
+  "active_phase": "PHASE_6",
+  "active_phase_question": "Which Phase 5 overlap candidate families should have canonical authority selected?",
   "lifecycle_state": "PHASE_ACTIVE",
   "active_batch": null,
   "completed_batches": [],
   "remaining_batches": [
-    "B01",
-    "B02",
-    "B03",
-    "B04",
-    "B05",
-    "B06",
-    "B07",
-    "B08",
-    "B09",
-    "B10",
-    "B11",
-    "B12",
-    "B13",
-    "B14",
-    "B15",
-    "B16",
-    "B17",
-    "B18",
-    "B19",
-    "B20",
-    "B21",
-    "B22",
-    "B23",
-    "B24",
-    "B25",
-    "B26",
-    "B27",
-    "B28",
-    "B29"
+    "B02-B03",
+    "B04-B06",
+    "B07-B10",
+    "B11-B14",
+    "B15-B18",
+    "B19-B22",
+    "B23-B26",
+    "B27-B29"
   ],
-  "next_deterministic_batch": "B01",
+  "next_deterministic_batch": "B02-B03",
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,
