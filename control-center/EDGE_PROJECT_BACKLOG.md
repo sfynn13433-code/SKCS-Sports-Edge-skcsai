@@ -13,7 +13,7 @@ A repository file is an asset. It is not automatically a project.
 | EAC-001 | Edge Asset Classification and Repository Map | Repository Organization | APPROVED | critical | EAC-001 | Perform EAC-001 full classification closure inspection. |
 | EAC-R1-001 | EAC-001 B18 Manifest and Repository Map Alignment Repair | Repository Organization | DONE | critical | EAC-R1-001 | No further action. |
 | EMG-001 | Scout-Edge Marriage Gate Contract | Scout Handoff | APPROVED | critical | EMG-001 | Contract sealed (EMG-001-C1). Proceed to EFI-001 contract inspection when separately authorized. Gate remains BLOCKED. |
-| EFI-001 | FIP Intake Handshake | Scout Handoff | PROPOSED | critical | EFI-001 | Do not implement until EPR-001, ESA-001, and EMG-001 sequence permits inspection. |
+| EFI-001 | FIP Intake Handshake | Scout Handoff | APPROVED | critical | EFI-001 | Contract sealed (EFI-001-C1). Proceed to EST-001 contract inspection when separately authorized. Implementation remains forbidden. |
 | EST-001 | Supabase Storage and FIP Retention Contract | Data and Storage | PROPOSED | critical | EST-001 | Register and inventory Supabase storage before approving the FIP bridge. |
 | ESEC-001 | Subscriber and Security Boundary | Security and Commercial Boundary | PROPOSED | critical | ESEC-001 | Wait for Edge inventory. |
 | EPI-001 | Prediction Pipeline Integrity | Prediction Pipeline | PROPOSED | critical | EPI-001 | Wait for Edge inventory. |

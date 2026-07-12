@@ -412,7 +412,7 @@
       "category": "Scout Handoff",
       "description": "Define and implement the smallest governed Edge intake boundary for the canonical validated Scout Fixture Intelligence Package.",
       "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
-      "current_status": "PROPOSED",
+      "current_status": "APPROVED",
       "priority": "critical",
       "blocked_by": [
         "ESA-001",
@@ -431,7 +431,9 @@
         "EFI-001"
       ],
       "related_contracts": [
-        "FIP-001"
+        "FIP-001",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
+        "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1"
       ],
       "related_files": [],
       "related_tables": [],
@@ -450,13 +452,15 @@
         "Control Center sequencing bypass"
       ],
       "recommended_order": 8,
-      "next_action": "Do not implement until EPR-001, ESA-001, and EMG-001 sequence permits inspection.",
+      "next_action": "Contract sealed (EFI-001-C1). Proceed to EST-001 contract inspection when separately authorized. Implementation remains forbidden.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
-      "last_updated": "2026-07-05",
+      "last_updated": "2026-07-12",
       "governed_by_control_task_id": "EFI-001",
       "current_evidence": [
+        "EFI-001-C1 sealed control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md",
+        "Accepted FIP source, payload minimum, crosswalk, validation, idempotency, and evidence laws defined",
         "Current configured pipeline input still originates from dataProvider.getPredictionInputs()",
-        "No committed Edge FIP intake boundary has been found"
+        "No committed runtime FIP intake boundary exists"
       ]
     },
     {

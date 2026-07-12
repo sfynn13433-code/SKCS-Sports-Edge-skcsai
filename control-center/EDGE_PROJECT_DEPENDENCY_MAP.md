@@ -53,7 +53,7 @@ Blocks: EFI-001, EST-001, ESEC-001
 
 ## EFI-001 — FIP Intake Handshake
 
-Status: PROPOSED
+Status: APPROVED
 Governed by: EFI-001
 Blocked by: ESA-001, EMG-001
 Blocks: EPRV-001, E2E-001

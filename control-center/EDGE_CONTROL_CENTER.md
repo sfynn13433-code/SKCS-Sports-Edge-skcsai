@@ -58,7 +58,7 @@ The following technical prerequisites must be satisfied:
 | ID | Prerequisite | Current state |
 |---|---|---|
 | EMG-001 | Scout-Edge Marriage Gate Contract | APPROVED (contract sealed; gate remains BLOCKED) |
-| EFI-001 | FIP Intake Handshake | PROPOSED |
+| EFI-001 | FIP Intake Handshake | APPROVED (contract sealed; implementation forbidden) |
 | EST-001 | Supabase Storage and FIP Retention Contract | PROPOSED |
 | ESEC-001 | Subscriber and Security Boundary | PROPOSED |
 | EPI-001 | Prediction Pipeline Integrity | PROPOSED |
@@ -553,7 +553,7 @@ Required state snapshot:
   ],
   "eac_evidence_reusable": true,
   "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
-  "total_governed_assets": 904,
+  "total_governed_assets": 905,
   "phase_0": {
     "status": "PHASE_CLOSED",
     "question": "What exact repository state is the cleanup programme starting from?",
@@ -562,7 +562,7 @@ Required state snapshot:
       "active_branch": "main",
       "head_commit": "7d21fc276629bb6aec056299d70e1541b462934f",
       "working_tree_status": "dirty_unrelated_changes_preserved",
-      "governed_asset_count": 904,
+      "governed_asset_count": 905,
       "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
       "eac_batch_count": 29,
       "already_completed_or_removal_work": "Partial external sports provider removal (PARTIAL); EAC-001 B01-B29 classification inventory complete; prior Control Center per-asset investigations preserved as historical evidence",
@@ -10099,3 +10099,42 @@ Important non-actions:
 
 Validation boundary:
 - EMG-001-C1 contract recording only. Does not authorize EFI-001 implementation or marriage-gate clearance.
+
+## EFI-001-C1 — FIP INTAKE HANDSHAKE CONTRACT
+
+Result: **APPROVED (contract sealed; implementation forbidden; gate remains BLOCKED)**
+
+Scope:
+- Mini-project: EFI-001-C1 — FIP Intake Handshake Contract (contract-only)
+- Start commit: 62bdb504e4c47dc460e040ca149ccde1ba453388
+- Mode: contract-only; no intake implementation
+- Cleanup programme: PROGRAMME_CLOSED (not reopened)
+- Prior contracts: EMG-001-C1, SEE-001
+
+Start-point verification:
+- git status --short: clean at start
+- git rev-parse HEAD == 62bdb504 at start
+- npm run control:center: PASS (required before commit)
+- npm run control:verify: PASS (required before commit)
+- npm run verify:rulebook: PASS (required before commit)
+
+Contract decision:
+- EFI-001 intake handshake contract sealed at control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md
+- EFI-001 task status: APPROVED (runtime implementation forbidden)
+- scout_edge_marriage_gate: BLOCKED (unchanged)
+- Accepted source: validated canonical Scout FIP via future EFI-001 boundary only
+- Intake boundary: upstream of buildRawPredictionFromProviderItem(); not POST /api/pipeline/run { matches }
+- Fail-closed validation, idempotency, provenance, and evidence recording laws defined
+- FIP-001 committed authority artifact still pending; EST-001 retention law still pending
+
+Evidence artifacts:
+- control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md
+
+Next recommended mini-project:
+- EST-001-C1 — Supabase Storage and FIP Retention Contract (contract-only), when separately authorized
+
+Important non-actions:
+- No intake implementation, runtime/API/pipeline/UI change, SQL, Supabase mutation, deployment, provider removal, dependency/security remediation, or gate clearance
+
+Validation boundary:
+- EFI-001-C1 contract recording only. Does not authorize runtime intake implementation or marriage-gate clearance.

@@ -379,7 +379,7 @@
       "task_name": "FIP Intake Handshake",
       "workstream": "Scout Handoff",
       "description": "Define and implement the smallest governed Edge intake boundary for the canonical validated Scout Fixture Intelligence Package.",
-      "status": "PROPOSED",
+      "status": "APPROVED",
       "priority": "critical",
       "blocked_by": [
         "ESA-001",
@@ -395,9 +395,12 @@
         "runtime"
       ],
       "related_contracts": [
-        "FIP-001"
+        "FIP-001",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
+        "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1"
       ],
       "affected_files": [
+        "control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md",
         "backend/services/aiPipeline.js",
         "backend/services/dataProvider.js"
       ],
@@ -411,16 +414,20 @@
         "Provenance preservation proof"
       ],
       "current_evidence": [
+        "EFI-001-C1 sealed control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md",
+        "Accepted FIP source, payload minimum, crosswalk, validation, idempotency, and evidence laws defined",
         "Current configured pipeline input still originates from dataProvider.getPredictionInputs()",
-        "No committed Edge FIP intake boundary has been found"
+        "No committed runtime FIP intake boundary exists"
       ],
       "open_gaps": [
-        "FIP materialization mechanism must be proven",
-        "Transport and retention decisions remain open"
+        "FIP-001 committed authority artifact still pending",
+        "Runtime intake service/route not implemented",
+        "EST-001 transport and retention law not defined",
+        "Input validation, idempotency, and provenance runtime proofs not implemented"
       ],
-      "next_action": "Do not implement until EPR-001, ESA-001, and EMG-001 sequence permits inspection.",
-      "owner_note": "This resumes the intentionally deferred Scout-to-Edge bridge.",
-      "last_updated": "2026-07-05"
+      "next_action": "Contract sealed (EFI-001-C1). Proceed to EST-001 contract inspection when separately authorized. Implementation remains forbidden.",
+      "owner_note": "This resumes the intentionally deferred Scout-to-Edge bridge at contract layer only.",
+      "last_updated": "2026-07-12"
     },
     {
       "task_id": "EST-001",
