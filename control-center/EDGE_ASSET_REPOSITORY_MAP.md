@@ -1,14 +1,14 @@
 # EDGE ASSET REPOSITORY MAP
 EAC_PROJECT_ID: EAC-001
 MANIFEST_SCHEMA_VERSION: 1.0.0
-TOTAL_GOVERNED_ASSETS: 906
-TOTAL_BATCHED_ASSETS: 906
+TOTAL_GOVERNED_ASSETS: 907
+TOTAL_BATCHED_ASSETS: 907
 FULLY_CLASSIFIED_ASSETS: 0
-CLASSIFICATION_PENDING_ASSETS: 906
+CLASSIFICATION_PENDING_ASSETS: 907
 CLOSURE_READY: NO
 
 CURRENT_STATE_COUNTS
-- CURRENT: 16
+- CURRENT: 17
 - PARALLEL: 0
 - LEGACY: 0
 - HISTORICAL_EVIDENCE: 0
@@ -19,7 +19,7 @@ CURRENT_STATE_COUNTS
 FUNCTIONAL_GROUP_COUNTS
 - SCRIPT_TOOL: 156
 - PROVIDER_INTEGRATION: 115
-- DOCUMENTATION_KNOWLEDGE: 113
+- DOCUMENTATION_KNOWLEDGE: 114
 - DATABASE_MIGRATION: 96
 - TEST_PROOF: 93
 - GENERATED_OUTPUT: 59
@@ -46,14 +46,14 @@ RELATIONSHIP_TAG_COUNTS
 - DATABASE: 235
 - PROVIDER: 195
 - API: 169
-- DOCUMENTATION: 139
-- GOVERNANCE: 138
+- DOCUMENTATION: 140
+- GOVERNANCE: 139
 - MIGRATION: 101
 - PREDICTION: 100
 - OBSERVABILITY: 99
 - TEST_PROOF: 92
 - UI: 91
-- AUDIT: 82
+- AUDIT: 83
 - GENERATED: 69
 - ROUTE: 61
 - DEPLOYMENT: 56
@@ -71,10 +71,10 @@ RELATIONSHIP_TAG_COUNTS
 - CONTROLLER: 2
 - RPC: 1
 
-NEXT_VALIDATION_NON_EMPTY_ASSETS: 906
+NEXT_VALIDATION_NON_EMPTY_ASSETS: 907
 
 BATCH_COMPLETION_SUMMARY
-- B01 | CONTROL_CENTER | ASSET_COUNT=19 | CLASSIFIED=0 | PENDING=19
+- B01 | CONTROL_CENTER | ASSET_COUNT=20 | CLASSIFIED=0 | PENDING=20
 - B02 | BACKEND_DIRECT_FILES | ASSET_COUNT=13 | CLASSIFIED=0 | PENDING=13
 - B03 | BACKEND_ROUTES_AND_CONTROLLERS | ASSET_COUNT=28 | CLASSIFIED=0 | PENDING=28
 - B04 | BACKEND_UTILS_SEMANTIC_CORE_AND_TEST | ASSET_COUNT=46 | CLASSIFIED=0 | PENDING=46
@@ -114,6 +114,7 @@ PER_ASSET_BY_BATCH
 | control-center/check_edge_project_register.js | Checks and derives the Edge Master Project Register from `control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json`, verifying required project fields and synchronizing backlog/dependency-map documentation assets. | TEST_PROOF | CURRENT | ["RULEBOOK","DOCUMENTATION","GENERATED","AUDIT","GOVERNANCE"] | ["check_edge_project_register.js sets LEDGER_PATH, REGISTER_PATH, BACKLOG_PATH, and DEPENDENCY_MAP_PATH, then validates ledger-driven project register structure and required backlog/dependency-map files."] | Validate with the governing Control Center project proof. |
 | control-center/check_edge_repository_asset_register.js | Builds and validates `control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json` by discovering tracked repository paths and enforcing governed-by and relationship-graph integrity rules for the asset universe. | TEST_PROOF | CURRENT | ["RULEBOOK","GENERATED","AUDIT","GOVERNANCE"] | ["check_edge_repository_asset_register.js discovers tracked paths using git ls-files and writes/validates `EDGE_REPOSITORY_ASSET_REGISTER.v1.json` via ASSET_REGISTER_PATH and writeJson(), including EAC/ECC/EPR governed asset path bindings."] | Validate with the governing Control Center project proof. |
 | control-center/check_edge_system_runtime_inventory.js | Statically checks `control-center/EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json` reachability/inventory completeness and synchronizes the observational runtime map in `control-center/EDGE_SYSTEM_RUNTIME_MAP.md` without executing providers. | TEST_PROOF | UNKNOWN | ["RUNTIME","DATABASE","GENERATED","AUDIT","GOVERNANCE"] | ["check_edge_system_runtime_inventory.js reads `EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json` (INVENTORY_PATH) and writes/updates `EDGE_SYSTEM_RUNTIME_MAP.md` (MAP_PATH), validating required inventory array fields including runtime dependencies, database_objects, and evidence."] | Revalidate static discovery completeness and fail-closed runtime inventory integrity during ESA-001 closure. |
+| control-center/E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1.md | Defines the first safe Scout-Edge E2E proof plan: proof route, FIP sample requirements, EFI-001 intake behavior, EST-001 audit/retention behavior, EMG-001 pass/fail mapping, evidence capture, and remaining blockers. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","AUDIT"] | ["E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1.md maps sealed EMG/EFI/EST contracts into a blocked proof execution plan for E2E-001."] | Validate against E2E-001 proof execution when separately authorized. |
 | control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json | Defines the ordered first-match EAC-001 batch manifest (B01..B29) mapping asset-path rules to classification batches, including the B01 Control Center `control-center/` paths. | GOVERNANCE | UNKNOWN | ["CONFIGURATION","RULEBOOK","GOVERNANCE"] | ["The manifest file declares schema_version/project_id and an ordered batches[] array; B01 uses rule.type=prefix_any with values ['control-center/'] and lists asset_paths with asset_count=15."] | Classify this EAC implementation asset during its assigned EAC-001 shallow-skim batch using the approved classification contract. |
 | control-center/EDGE_ASSET_REPOSITORY_MAP.md | Generated markdown repository map that lists each governed asset by batch and exposes the EAC-001 structured classification fields for per-asset review. | GENERATED_OUTPUT | UNKNOWN | ["DOCUMENTATION","GENERATED","AUDIT","GOVERNANCE"] | ["check_edge_asset_classification.js uses MAP_PATH to render a repository map via renderRepositoryMap() and compares/writes `EDGE_ASSET_REPOSITORY_MAP.md`, with per-batch per-asset rows for purpose_description/functional_group/relationship_tags/classification_evidence."] | Classify this EAC implementation asset during its assigned EAC-001 shallow-skim batch using the approved classification contract. |
 | control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json | Control Center ledger defining task IDs, statuses, gating blocks, and proof_required/evidence sections for governed Edge workstreams including ECC-001/EPR-001/ESA-001. | GOVERNANCE | CURRENT | ["RULEBOOK","GENERATED","GOVERNANCE"] | ["EDGE_BUILD_CONTROL_LEDGER.v1.json contains a tasks[] array with task_id fields, status values, completion_definition text, and proof_required/evidence arrays that are validated by check_control_center.js."] | Validate with the governing Control Center project proof. |

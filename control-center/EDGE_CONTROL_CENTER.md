@@ -553,7 +553,7 @@ Required state snapshot:
   ],
   "eac_evidence_reusable": true,
   "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
-  "total_governed_assets": 906,
+  "total_governed_assets": 907,
   "phase_0": {
     "status": "PHASE_CLOSED",
     "question": "What exact repository state is the cleanup programme starting from?",
@@ -562,7 +562,7 @@ Required state snapshot:
       "active_branch": "main",
       "head_commit": "7d21fc276629bb6aec056299d70e1541b462934f",
       "working_tree_status": "dirty_unrelated_changes_preserved",
-      "governed_asset_count": 906,
+      "governed_asset_count": 907,
       "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
       "eac_batch_count": 29,
       "already_completed_or_removal_work": "Partial external sports provider removal (PARTIAL); EAC-001 B01-B29 classification inventory complete; prior Control Center per-asset investigations preserved as historical evidence",
@@ -10177,3 +10177,46 @@ Important non-actions:
 
 Validation boundary:
 - EST-001-C1 contract recording only. Does not authorize storage implementation or gate clearance.
+
+## E2E-001-C1 — SCOUT TO EDGE END-TO-END PROOF PLANNING PACKET
+
+Result: **PLANNING COMPLETE — EXECUTION BLOCKED**
+
+Scope:
+- Mini-project: E2E-001-C1 — Scout to Edge End-to-End Proof Planning Packet (planning-only)
+- Start commit: 43aad4f2edc60542622889580d2980387f3e5b52
+- Mode: read-only / contract planning only; no proof execution
+- Cleanup programme: PROGRAMME_CLOSED (not reopened)
+- Sealed contracts: EMG-001-C1, EFI-001-C1, EST-001-C1, SEE-001
+
+Start-point verification:
+- git status --short: clean at start
+- git rev-parse HEAD == 43aad4f2 at start
+- npm run control:center: PASS (required before commit)
+- npm run control:verify: PASS (required before commit)
+- npm run verify:rulebook: PASS (required before commit)
+
+Planning decision:
+- E2E proof planning packet sealed at control-center/E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1.md
+- E2E-001 task status: BLOCKED (unchanged)
+- scout_edge_marriage_gate: BLOCKED (unchanged)
+- supabase_storage_gate: BLOCKED (unchanged)
+- Proof route: Scout validated FIP → future EFI-001 boundary → buildRawPredictionFromProviderItem → D1 outputs + R1/R2 evidence
+- Forbidden routes: buildLiveData(), POST /api/pipeline/run { matches }, public/data snapshots
+- Single Football PROOF_FIXTURE sample defined; execution requires separate authorization
+- E2E proof pass ≠ marriage gate clearance
+
+Evidence artifacts:
+- control-center/E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1.md
+
+Next recommended mini-projects (sequenced):
+- FIP-001-C1 — Register committed Scout FIP authority
+- EFI-001-I1 — Smallest fail-closed intake implementation
+- EST-001-I1 — Schema + retention enforcement implementation
+- E2E-001-X1 — Controlled proof execution (when separately authorized)
+
+Important non-actions:
+- No proof execution, intake implementation, runtime/API/pipeline/UI change, SQL, Supabase mutation, deployment, provider removal, dependency/security remediation, or gate clearance
+
+Validation boundary:
+- E2E-001-C1 planning recording only. Does not authorize proof execution or gate clearance.

@@ -23,6 +23,6 @@ A repository file is an asset. It is not automatically a project.
 | EUI-001 | Subscriber UI and Prediction Delivery | UI and Delivery | PROPOSED | high | EUI-001 | Wait for security and pipeline inventory. |
 | ECU-001 | Edge Control Center Operator UI | UI and Delivery | APPROVED | high | ECU-001 | Implement ECU-001 Edge Control Center operator UI v1 |
 | EOPS-001 | Deployment and Operations Governance | Deployment and Operations | PROPOSED | high | EOPS-001 | Wait for system, storage, and security inventory. |
-| E2E-001 | Scout to Edge End-to-End Proof | Scout Handoff | BLOCKED | critical | E2E-001 | Remain BLOCKED until all dependencies are satisfied. |
+| E2E-001 | Scout to Edge End-to-End Proof | Scout Handoff | BLOCKED | critical | E2E-001 | Planning complete (E2E-001-C1). Remain BLOCKED until implementation prerequisites satisfied and separate proof execution authorization. |
 | ESA-RR-001 | ESA-RR-001 Runtime Repair Base Contract (Approved) | Governance and Contract Refinement | APPROVED | high | ESA-RR-001 | Proceed to ESA-RR-002 scope refinement and sealing (contract-only). |
 | ESA-RR-002 | ESA-RR-002 Implementation Law Seal (Hold) | Governance and Contract Refinement | TESTED | critical | ESA-RR-002 | Resume EAC-001 classification at B02 / file 16. |

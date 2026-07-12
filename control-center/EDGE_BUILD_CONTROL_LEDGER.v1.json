@@ -863,9 +863,15 @@
         "end-to-end"
       ],
       "related_contracts": [
-        "FIP-001"
+        "FIP-001",
+        "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
+        "E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1"
       ],
-      "affected_files": [],
+      "affected_files": [
+        "control-center/E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1.md"
+      ],
       "affected_tables": [],
       "completion_definition": "A controlled end-to-end proof demonstrates Scout-to-Edge FIP intake, validation, idempotency, analysis, provenance linkage, minimal retention, and zero reachable direct external sports acquisition.",
       "proof_required": [
@@ -877,17 +883,24 @@
         "Supabase retention proof",
         "Provider reachability proof"
       ],
-      "current_evidence": [],
-      "open_gaps": [
-        "FIP intake not implemented",
-        "Storage retention law not defined",
-        "Security boundary not proven",
-        "Prediction pipeline protection not registered",
-        "Provider removal incomplete"
+      "current_evidence": [
+        "E2E-001-C1 sealed control-center/E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1.md",
+        "Proof route, FIP sample requirements, EFI-001 intake behavior, EST-001 audit/retention behavior, and EMG-001 pass/fail mapping defined",
+        "Execution remains BLOCKED; no actual E2E proof run performed"
       ],
-      "next_action": "Remain BLOCKED until all dependencies are satisfied.",
-      "owner_note": "This is the final technical proof before the Scout-Edge marriage gate can be separately approved.",
-      "last_updated": "2026-07-05"
+      "open_gaps": [
+        "FIP-001 committed authority artifact pending",
+        "EFI-001 runtime intake boundary not implemented",
+        "EST-001 schema and storage enforcement not implemented",
+        "ESEC-001 security boundary not proven",
+        "EPI-001 pipeline integrity not proven",
+        "EPRV-001 provider removal incomplete (PARTIAL)",
+        "Controlled Scout FIP proof sample not yet authorized for execution",
+        "Marriage and storage gates remain BLOCKED"
+      ],
+      "next_action": "Planning complete (E2E-001-C1). Remain BLOCKED until implementation prerequisites satisfied and separate proof execution authorization.",
+      "owner_note": "This is the final technical proof before the Scout-Edge marriage gate can be separately approved. Planning does not clear the gate.",
+      "last_updated": "2026-07-12"
     },
     {
       "task_id": "ESA-RR-001",
