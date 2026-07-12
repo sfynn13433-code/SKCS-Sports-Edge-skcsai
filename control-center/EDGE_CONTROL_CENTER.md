@@ -3660,3 +3660,53 @@ Validation boundary:
 - No active-use outcome authorizes deletion.
 - B25 batch state not advanced in this patch.
 - GitHub vulnerability and Dependabot notices remain future dependency/security work and were not touched.
+
+## PHASE 3 - B26 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 - Active Use Identification
+- Batch: B26 / DEPLOYMENT_CI
+- Question: Is each B26 governed deployment/CI asset currently used?
+- Deletion/merge/retirement/refactor performed: NO
+- Deployment config change performed: NO
+- Render change performed: NO
+- Vercel change performed: NO
+- Docker build performed: NO
+- Runtime/product change performed: NO
+- Phase 1 reopened: NO
+- Phase 2 reopened: NO
+- Dependency/security/vulnerability notice work performed: NO
+
+Outcome summary:
+- ACTIVE: 2
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 1
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B26 ACTIVE assets:
+- render.yaml
+- vercel.json
+
+B26 MANUAL_USE assets:
+- Dockerfile
+
+Evidence:
+- B26 is defined as DEPLOYMENT_CI with 3 governed assets: Dockerfile, render.yaml, and vercel.json.
+- render.yaml is active deployment configuration evidence. It defines the Render web service, Node environment, buildCommand, startCommand, healthCheckPath, autoDeploy setting, environment variables, and cron services.
+- render.yaml starts the active web app with node backend/server-express.js and defines Render cron start commands for deploy-trigger jobs and fixture population.
+- vercel.json is active deployment configuration evidence. It defines Vercel version/framework behavior, installCommand, buildCommand, outputDirectory, function duration config, headers, cron path, and rewrites.
+- Dockerfile is container deployment material. It defines a Node 20 Alpine image, installs production dependencies, exposes PORT 8080, and starts node backend/server-express.js.
+- Current repo deployment evidence does not show Render using Dockerfile: render.yaml declares env: node and startCommand: node backend/server-express.js.
+- Dockerfile is therefore treated as MANUAL_USE / deployment-capable material in this phase, not as an active deployment entrypoint.
+- No deletion, merge, retirement, dependency/security, vulnerability, deployment config change, Render change, Vercel change, Docker build, source/runtime/product change, or deployment cleanup is authorized by this evidence.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed.
+- No deployment configuration files changed.
+- No active-use outcome authorizes deletion.
+- B26 batch state not advanced in this patch.
+- GitHub vulnerability and Dependabot notices remain future dependency/security work and were not touched.
