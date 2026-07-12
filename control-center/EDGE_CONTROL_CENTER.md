@@ -589,20 +589,22 @@ Required state snapshot:
       "closure_note": "Phase 6 Canonical Authority Selection is closed. PHASE_7 activation does not authorize merge/consolidation implementation until a separate Phase 7 batch mini-project is approved."
     }
   },
-  "active_phase": "PHASE_7",
-  "active_phase_question": "Which confirmed canonical authority decisions should be implemented through merge and consolidation?",
-  "lifecycle_state": "PHASE_READY_TO_CLOSE",
+  "phase_7": {
+    "status": "PHASE_CLOSED",
+    "question": "Which confirmed canonical authority decisions should be implemented through merge and consolidation?",
+    "evidence": {
+      "result": "PASS WITH NO_ACTION AND RUNTIME-PROOF HOLDS",
+      "batches_reviewed": "B01-B03,B04-B06,B07-B10,B11-B14,B15-B18,B19-B22,B23-B26,B27-B29",
+      "review_order_model": "GROUPED_REVIEW_UNITS",
+      "closure_commit": "746a2231",
+      "closure_note": "Phase 7 Merge and Consolidation is closed. PHASE_8 activation does not authorize a new cleanup hunt or individual EAC batch re-sequencing."
+    }
+  },
+  "active_phase": "PHASE_8",
+  "active_phase_question": "Is the cleaned repository internally consistent?",
+  "lifecycle_state": "PHASE_ACTIVE",
   "active_batch": null,
-  "completed_batches": [
-    "B01-B03",
-    "B04-B06",
-    "B07-B10",
-    "B11-B14",
-    "B15-B18",
-    "B19-B22",
-    "B23-B26",
-    "B27-B29"
-  ],
+  "completed_batches": [],
   "remaining_batches": [],
   "next_deterministic_batch": null,
   "future_phase_notes": [],
@@ -9778,3 +9780,67 @@ Batch decision:
 Validation boundary:
 - Evidence only.
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, vulnerability remediation, package change, build change, license change, UI behavior change, route change, provider change, temporary-file cleanup, local-tool cleanup, hook change, workflow change, or stale artifact cleanup is authorized by this packet.
+
+## PHASE 7 CLOSURE SUMMARY
+
+Result: PASS WITH NO_ACTION AND RUNTIME-PROOF HOLDS
+
+Scope:
+- Phase: PHASE_7 - Merge and Consolidation
+- Phase question: Which confirmed canonical authority decisions should be implemented through merge and consolidation?
+- Review order model: GROUPED_REVIEW_UNITS only (B01-B03, B04-B06, B07-B10, B11-B14, B15-B18, B19-B22, B23-B26, B27-B29)
+- Pre-closure HEAD: 746a2231
+- Pre-closure lifecycle state: PHASE_READY_TO_CLOSE
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Closed Phase 7 grouped review packets:
+- B01-B03 complete
+- B04-B06 complete
+- B07-B10 complete
+- B11-B14 complete
+- B15-B18 complete
+- B19-B22 complete
+- B23-B26 complete
+- B27-B29 complete
+
+Phase 7 outcome summary:
+- Merge and consolidation gates were completed across all eight grouped Phase 7 review units using NO_ACTION, HOLD_NEEDS_RUNTIME_PROOF, and HOLD_ABSENT_PATH only.
+- No IMPLEMENT_CONSOLIDATION decision was authorized across the grouped Phase 7 programme.
+- Phase 6 canonical authority decisions were reviewed without merge execution, deletion, retirement, refactor, SQL execution, deployment change, or runtime action.
+- HOLD_NEEDS_RUNTIME_PROOF and HOLD_ABSENT_PATH holds remain in force until separately resolved through approved future work.
+- Grouped batch sequencing was preserved; Phase 7 was not converted back to individual B01-B29 progression.
+
+Important non-actions:
+- No file was deleted.
+- No file was merged.
+- No file was retired.
+- No runtime code was changed.
+- No UI behavior was changed.
+- No SQL was executed.
+- No Supabase/database state was changed.
+- No deployment or hosting config was changed.
+- No dependency/security/vulnerability remediation was performed.
+- No GitHub vulnerability notice remediation was performed in this phase.
+
+Phase 7 closure decision:
+- PHASE_7 merge and consolidation is complete across B01-B03 through B27-B29 grouped review units.
+- PHASE_7 is now closed.
+- PHASE_8 is activated as the next cleanup phase.
+
+PHASE_8 activation warning:
+- PHASE_8 activation does not authorize a new cleanup hunt.
+- PHASE_8 activation does not re-seed individual EAC batch sequencing from B01.
+- Activating PHASE_8 establishes final repository validation scope only; it does not authorize deletion, merge execution, retirement, refactor, SQL, Supabase mutation, deployment change, dependency update, or vulnerability remediation.
+
+Next recommended control action:
+- Open the approved PHASE_8 final repository validation mini-project when separately authorized.
+- Do not reopen Phase 7 grouped batch review without explicit Control Center approval.
+
+Validation boundary:
+- Control Center state transition only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.

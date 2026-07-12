@@ -97,7 +97,7 @@ const RECOGNIZED_REQUEST_TYPES = Object.freeze([
   "ACTIVATE_NEXT_GROUP",
 ]);
 
-const ACTIVE_CLEANUP_PHASE = "PHASE_7";
+const ACTIVE_CLEANUP_PHASE = "PHASE_8";
 
 const PHASE_6_CANONICAL_AUTHORITY_REVIEW_ORDER = Object.freeze([
   "B02-B03",
@@ -271,7 +271,60 @@ function getCleanupReviewUnitsForPhase(phase) {
     return [...PHASE_7_MERGE_CONSOLIDATION_REVIEW_ORDER];
   }
 
+  if (phase === "PHASE_8") {
+    return [];
+  }
+
   return getEacBatchIds();
+}
+
+function getPhaseActivationBatchState(nextPhase) {
+  if (nextPhase === "PHASE_7") {
+    return {
+      completed_batches: [],
+      remaining_batches: [...PHASE_7_MERGE_CONSOLIDATION_REVIEW_ORDER],
+      next_deterministic_batch: PHASE_7_MERGE_CONSOLIDATION_REVIEW_ORDER[0] || null,
+    };
+  }
+
+  if (nextPhase === "PHASE_8") {
+    return {
+      completed_batches: [],
+      remaining_batches: [],
+      next_deterministic_batch: null,
+    };
+  }
+
+  const batchIds = getEacBatchIds();
+  return {
+    completed_batches: [],
+    remaining_batches: [...batchIds],
+    next_deterministic_batch: batchIds[0] || null,
+  };
+}
+
+function getExpectedLifecycleState(state) {
+  const reviewUnits = getCleanupReviewUnitsForPhase(state.active_phase);
+
+  if (reviewUnits.length === 0) {
+    if (
+      state.lifecycle_state === "PHASE_READY_TO_CLOSE" ||
+      state.lifecycle_state === "PHASE_CLOSED"
+    ) {
+      return state.lifecycle_state;
+    }
+
+    return "PHASE_ACTIVE";
+  }
+
+  if (
+    Array.isArray(state.remaining_batches) &&
+    state.remaining_batches.length === 0
+  ) {
+    return "PHASE_READY_TO_CLOSE";
+  }
+
+  return "BATCH_COMPLETE";
 }
 
 function createControlCenterGateState(overrides = {}) {
@@ -348,20 +401,24 @@ function createControlCenterGateState(overrides = {}) {
           "Phase 6 Canonical Authority Selection is closed. PHASE_7 activation does not authorize merge/consolidation implementation until a separate Phase 7 batch mini-project is approved.",
       },
     },
+    phase_7: {
+      status: "PHASE_CLOSED",
+      question: PHASE_QUESTIONS.PHASE_7,
+      evidence: {
+        result: "PASS WITH NO_ACTION AND RUNTIME-PROOF HOLDS",
+        batches_reviewed:
+          "B01-B03,B04-B06,B07-B10,B11-B14,B15-B18,B19-B22,B23-B26,B27-B29",
+        review_order_model: "GROUPED_REVIEW_UNITS",
+        closure_commit: "746a2231",
+        closure_note:
+          "Phase 7 Merge and Consolidation is closed. PHASE_8 activation does not authorize a new cleanup hunt or individual EAC batch re-sequencing.",
+      },
+    },
     active_phase: ACTIVE_CLEANUP_PHASE,
     active_phase_question: PHASE_QUESTIONS[ACTIVE_CLEANUP_PHASE],
-    lifecycle_state: "PHASE_READY_TO_CLOSE",
+    lifecycle_state: "PHASE_ACTIVE",
     active_batch: null,
-    completed_batches: [
-      "B01-B03",
-      "B04-B06",
-      "B07-B10",
-      "B11-B14",
-      "B15-B18",
-      "B19-B22",
-      "B23-B26",
-      "B27-B29",
-    ],
+    completed_batches: [],
     remaining_batches: [],
     next_deterministic_batch: null,
     phase_3_outcomes: [...PHASE_3_OUTCOMES],
@@ -957,6 +1014,10 @@ function validateControlCenterPolicy(documentText) {
     errors.push("Control Center state phase_6 must be PHASE_CLOSED");
   }
 
+  if (!state.phase_7 || state.phase_7.status !== "PHASE_CLOSED") {
+    errors.push("Control Center state phase_7 must be PHASE_CLOSED");
+  }
+
   if (state.active_phase !== ACTIVE_CLEANUP_PHASE) {
     errors.push(`Control Center state active_phase must be ${ACTIVE_CLEANUP_PHASE}`);
   }
@@ -980,10 +1041,7 @@ function validateControlCenterPolicy(documentText) {
     errors.push("Control Center state lifecycle_state invalid");
   }
 
-  const expectedLifecycleState =
-    Array.isArray(state.remaining_batches) && state.remaining_batches.length === 0
-      ? "PHASE_READY_TO_CLOSE"
-      : "BATCH_COMPLETE";
+  const expectedLifecycleState = getExpectedLifecycleState(state);
   if (state.lifecycle_state !== expectedLifecycleState) {
     errors.push(
       `Control Center state lifecycle_state must be ${expectedLifecycleState}`
@@ -1042,12 +1100,24 @@ function validateControlCenterPolicy(documentText) {
     errors.push("EDGE_CONTROL_CENTER.md missing PHASE 6 closure summary");
   }
 
+  if (!String(documentText).includes("## PHASE 7 CLOSURE SUMMARY")) {
+    errors.push("EDGE_CONTROL_CENTER.md missing PHASE 7 closure summary");
+  }
+
   if (
     !String(documentText).includes(
       "PHASE_7 activation does not authorize implementation"
     )
   ) {
     errors.push("EDGE_CONTROL_CENTER.md missing PHASE_7 activation warning");
+  }
+
+  if (
+    !String(documentText).includes(
+      "PHASE_8 activation does not authorize a new cleanup hunt"
+    )
+  ) {
+    errors.push("EDGE_CONTROL_CENTER.md missing PHASE_8 activation warning");
   }
 
   if (
@@ -1694,19 +1764,42 @@ function evaluateControlCenterProposal(
       });
     }
 
+    const activationBatchState = nextPhase
+      ? getPhaseActivationBatchState(nextPhase)
+      : {
+          completed_batches: [],
+          remaining_batches: [],
+          next_deterministic_batch: null,
+        };
+    const closedPhaseKey = `phase_${String(state.active_phase || "").replace("PHASE_", "")}`;
+
     const nextState = nextPhase
       ? {
           ...state,
+          ...(Object.prototype.hasOwnProperty.call(state, closedPhaseKey)
+            ? {
+                [closedPhaseKey]: {
+                  ...state[closedPhaseKey],
+                  status: "PHASE_CLOSED",
+                },
+              }
+            : {}),
           active_phase: nextPhase,
           active_phase_question: PHASE_QUESTIONS[nextPhase],
           lifecycle_state: "PHASE_ACTIVE",
           active_batch: null,
-          completed_batches: [],
-          remaining_batches: [...getEacBatchIds()],
-          next_deterministic_batch: getEacBatchIds()[0] || null,
+          ...activationBatchState,
         }
       : {
           ...state,
+          ...(Object.prototype.hasOwnProperty.call(state, closedPhaseKey)
+            ? {
+                [closedPhaseKey]: {
+                  ...state[closedPhaseKey],
+                  status: "PHASE_CLOSED",
+                },
+              }
+            : {}),
           lifecycle_state: "PHASE_CLOSED",
           active_batch: null,
           next_deterministic_batch: null,
