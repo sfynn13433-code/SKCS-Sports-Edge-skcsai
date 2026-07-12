@@ -10020,3 +10020,42 @@ Next recommended control action:
 Validation boundary:
 - Control Center closure summary and programme state transition only.
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+
+## SEE-001 — SCOUT–EDGE READ-ONLY E2E MARRIAGE PROOF
+
+Result: **NEEDS IMPLEMENTATION**
+
+Scope:
+- Mini-project: SEE-001 — Scout–Edge Read-Only E2E Marriage Proof
+- Start commit: 6a8dc811da3e50dfa14653250991c9467f54a7cb
+- Inspection HEAD: 6a8dc811da3e50dfa14653250991c9467f54a7cb
+- Mode: read-only inspection + evidence packet only
+- Cleanup programme: PROGRAMME_CLOSED (not reopened)
+
+Start-point verification:
+- git status --short: clean
+- git rev-parse HEAD == git rev-parse origin/main == 6a8dc811
+- npm run control:center: PASS
+- npm run control:verify: PASS
+- npm run verify:rulebook: PASS
+
+Inspection conclusion:
+- Edge’s committed sports-truth origin is still external-provider acquisition via dataProvider.getPredictionInputs() → buildLiveData().
+- No committed governed FIP intake boundary exists (EFI-001 remains PROPOSED).
+- FIP-001 is referenced in ledger/register only; no canonical FIP contract artifact is committed in this repository.
+- Scout-adjacent candidates backend/services/scoutSignalSync.js and docs/intel_read_contract_v1.md are preserved workspace candidates only (not committed).
+- Nearest analysis hook: aiPipeline.buildRawPredictionFromProviderItem() after normalization to match_info / sharp_odds / contextual_intelligence.
+- Nearest non-governed injection hook: POST /api/pipeline/run with { matches } — insufficient for marriage proof without EMG-001 + EFI-001 + EST-001.
+- scout_edge_marriage_gate remains BLOCKED; E2E-001 remains BLOCKED.
+
+Evidence artifact:
+- control-center/SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md
+
+Next recommended mini-project:
+- EMG-001-C1 — Scout–Edge Marriage Gate Contract (contract-only), then EFI-001 intake handshake before any E2E proof attempt.
+
+Important non-actions:
+- No cleanup reopening, deletion, merge, retirement, refactor, runtime/UI change, SQL, Supabase mutation, deployment change, dependency update, security remediation, or Scout–Edge bridge implementation.
+
+Validation boundary:
+- SEE-001 evidence recording only. Does not authorize marriage-gate clearance or implementation.
