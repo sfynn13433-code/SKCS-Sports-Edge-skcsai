@@ -379,7 +379,7 @@
       "task_name": "FIP Intake Handshake",
       "workstream": "Scout Handoff",
       "description": "Define and implement the smallest governed Edge intake boundary for the canonical validated Scout Fixture Intelligence Package.",
-      "status": "APPROVED",
+      "status": "TESTED",
       "priority": "critical",
       "blocked_by": [
         "ESA-001",
@@ -402,7 +402,12 @@
       "affected_files": [
         "control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md",
         "backend/services/aiPipeline.js",
-        "backend/services/dataProvider.js"
+        "backend/services/dataProvider.js",
+        "backend/services/fipIntakeService.js",
+        "tests/fip-intake-service.test.js",
+        "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
+        "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
+        "control-center/EDGE_ASSET_REPOSITORY_MAP.md"
       ],
       "affected_tables": [],
       "completion_definition": "Edge can receive or read an unmodified validated canonical FIP through one governed fail-closed intake boundary.",
@@ -414,17 +419,22 @@
         "Provenance preservation proof"
       ],
       "current_evidence": [
-        "EFI-001-C1 sealed control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md",
-        "Accepted FIP source, payload minimum, crosswalk, validation, idempotency, and evidence laws defined",
-        "Current configured pipeline input still originates from dataProvider.getPredictionInputs()",
-        "No committed runtime FIP intake boundary exists"
+        "EFI-001-C1 sealed control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md.",
+        "FIP-001-C1 sealed control-center/FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md.",
+        "EFI-001-I1 implemented backend/services/fipIntakeService.js as the single fail-closed Scout FIP intake boundary.",
+        "Boundary accepts only FIP schema version 1.0.0, validation.status VALIDATED, validation.algorithm scout-fip-sha256-v1, and verified canonical hash.",
+        "Boundary rejects missing required wrapper/fixture/market/context/hash fields, forbidden manual/provider/workspace/Supabase replay origins, and AUTHORIZED_PRODUCTION while scout_edge_marriage_gate remains BLOCKED.",
+        "Accepted proof payload maps to Edge analysis envelope fields: match_info, sharp_odds, contextual_intelligence, and metadata.sports_truth_origin = SCOUT_FIP.",
+        "Focused proof: node --test tests/fip-intake-service.test.js passes."
       ],
       "open_gaps": [
-        "Runtime intake service/route not implemented",
-        "Input validation, idempotency, and provenance runtime proofs not implemented",
-        "EFI-001 §5 to FIP-001 crosswalk drift test not yet automated"
+        "No route/API receive surface implemented in EFI-001-I1.",
+        "No Supabase persistence, SQL, migration, or EST-001 storage implementation performed.",
+        "No E2E proof executed; E2E-001 remains BLOCKED.",
+        "No marriage gate clearance; scout_edge_marriage_gate remains BLOCKED.",
+        "No external provider removal or buildLiveData replacement performed."
       ],
-      "next_action": "FIP-001 authority registered (FIP-001-C1). Proceed to EFI-001-I1 intake implementation when separately authorized.",
+      "next_action": "EFI-001-I1 tested. Continue only with separately authorized EST-001-I1/EPI/EPRV/E2E sequencing; do not clear the marriage gate or run E2E proof from this packet.",
       "owner_note": "This resumes the intentionally deferred Scout-to-Edge bridge at contract layer only.",
       "last_updated": "2026-07-12"
     },

@@ -1,14 +1,14 @@
 # EDGE ASSET REPOSITORY MAP
 EAC_PROJECT_ID: EAC-001
 MANIFEST_SCHEMA_VERSION: 1.0.0
-TOTAL_GOVERNED_ASSETS: 908
-TOTAL_BATCHED_ASSETS: 908
+TOTAL_GOVERNED_ASSETS: 910
+TOTAL_BATCHED_ASSETS: 910
 FULLY_CLASSIFIED_ASSETS: 0
-CLASSIFICATION_PENDING_ASSETS: 908
+CLASSIFICATION_PENDING_ASSETS: 910
 CLOSURE_READY: NO
 
 CURRENT_STATE_COUNTS
-- CURRENT: 18
+- CURRENT: 20
 - PARALLEL: 0
 - LEGACY: 0
 - HISTORICAL_EVIDENCE: 0
@@ -21,7 +21,7 @@ FUNCTIONAL_GROUP_COUNTS
 - DOCUMENTATION_KNOWLEDGE: 115
 - PROVIDER_INTEGRATION: 115
 - DATABASE_MIGRATION: 96
-- TEST_PROOF: 93
+- TEST_PROOF: 94
 - GENERATED_OUTPUT: 59
 - DATABASE: 42
 - FRONTEND_UI: 40
@@ -38,20 +38,21 @@ FUNCTIONAL_GROUP_COUNTS
 - SERVICE: 4
 - SECURITY_SUBSCRIBER: 3
 - UNCATEGORIZED: 2
+- SCOUT_FIP: 1
 
 RELATIONSHIP_TAG_COUNTS
-- RUNTIME: 291
+- RUNTIME: 293
 - SCRIPT_TOOL: 283
 - SQL: 238
 - DATABASE: 235
 - PROVIDER: 195
 - API: 169
+- GOVERNANCE: 142
 - DOCUMENTATION: 141
-- GOVERNANCE: 140
 - MIGRATION: 101
 - PREDICTION: 100
 - OBSERVABILITY: 99
-- TEST_PROOF: 92
+- TEST_PROOF: 93
 - UI: 91
 - AUDIT: 83
 - GENERATED: 69
@@ -59,7 +60,7 @@ RELATIONSHIP_TAG_COUNTS
 - DEPLOYMENT: 56
 - SECURITY: 55
 - CONFIGURATION: 52
-- SERVICE: 46
+- SERVICE: 47
 - PUBLIC_ASSET: 30
 - BACKGROUND_JOB: 28
 - SCHEDULER: 27
@@ -69,9 +70,11 @@ RELATIONSHIP_TAG_COUNTS
 - GRADING: 8
 - SUBSCRIBER: 4
 - CONTROLLER: 2
+- FIP: 2
+- SCOUT: 2
 - RPC: 1
 
-NEXT_VALIDATION_NON_EMPTY_ASSETS: 908
+NEXT_VALIDATION_NON_EMPTY_ASSETS: 910
 
 BATCH_COMPLETION_SUMMARY
 - B01 | CONTROL_CENTER | ASSET_COUNT=21 | CLASSIFIED=0 | PENDING=21
@@ -82,7 +85,7 @@ BATCH_COMPLETION_SUMMARY
 - B06 | BACKEND_PROVIDERS | ASSET_COUNT=10 | CLASSIFIED=0 | PENDING=10
 - B07 | BACKEND_SRC_SERVICES | ASSET_COUNT=9 | CLASSIFIED=0 | PENDING=9
 - B08 | BACKEND_ADAPTERS_AND_CONFIG | ASSET_COUNT=13 | CLASSIFIED=0 | PENDING=13
-- B09 | BACKEND_SERVICES | ASSET_COUNT=86 | CLASSIFIED=0 | PENDING=86
+- B09 | BACKEND_SERVICES | ASSET_COUNT=87 | CLASSIFIED=0 | PENDING=87
 - B10 | SCRIPTS_AUDIT_GOV | ASSET_COUNT=27 | CLASSIFIED=0 | PENDING=27
 - B11 | SCRIPTS_CHECK_VALIDATE_VERIFY | ASSET_COUNT=59 | CLASSIFIED=0 | PENDING=59
 - B12 | SCRIPTS_TEST_DIAG_TRACE | ASSET_COUNT=66 | CLASSIFIED=0 | PENDING=66
@@ -97,7 +100,7 @@ BATCH_COMPLETION_SUMMARY
 - B21 | PUBLIC_UI | ASSET_COUNT=64 | CLASSIFIED=0 | PENDING=64
 - B22 | SUPABASE_MIGRATIONS | ASSET_COUNT=61 | CLASSIFIED=0 | PENDING=61
 - B23 | DB_SQL_AND_SUPABASE_OTHER | ASSET_COUNT=19 | CLASSIFIED=0 | PENDING=19
-- B24 | TESTS | ASSET_COUNT=6 | CLASSIFIED=0 | PENDING=6
+- B24 | TESTS | ASSET_COUNT=7 | CLASSIFIED=0 | PENDING=7
 - B25 | SCRATCH | ASSET_COUNT=2 | CLASSIFIED=0 | PENDING=2
 - B26 | DEPLOYMENT_CI | ASSET_COUNT=3 | CLASSIFIED=0 | PENDING=3
 - B27 | ARCHIVE | ASSET_COUNT=58 | CLASSIFIED=0 | PENDING=58
@@ -335,6 +338,7 @@ PER_ASSET_BY_BATCH
 | backend/services/enhancedMatchDetailsService.js | Backend service: enhancedMatchDetailsService | PROVIDER_INTEGRATION | UNKNOWN | ["AI_EDGEMIND","PROVIDER","API"] | ["Top-level skim: require('./espnHiddenApiService') \| require('../utils/apiQueue') \| require('../db') \| require('../config').","Detected external HTTP client usage (axios/fetch)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/espnHiddenApiService.js | Backend service: espnHiddenApiService | PROVIDER_INTEGRATION | UNKNOWN | ["PROVIDER","API"] | ["Top-level skim: require('node-fetch').","Detected external HTTP client usage (axios/fetch)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/filterEngine.js | Backend service: filterEngine | DATABASE | UNKNOWN | ["DATABASE","SQL","PROVIDER"] | ["Top-level skim: require('../db') \| require('../utils/validation') \| require('@supabase/supabase-js') \| require('../config').","Detected Supabase usage (createClient/from/SQL-like queries)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| backend/services/fipIntakeService.js | Single fail-closed EFI-001 runtime boundary for accepting validated Scout FIP-001 v1 payloads, verifying hash/provenance/required fields/forbidden origins, and mapping to the Edge analysis envelope. | SCOUT_FIP | CURRENT | ["SERVICE","SCOUT","FIP","RUNTIME","GOVERNANCE"] | ["Exports receiveValidatedFip plus hash/idempotency helpers for EFI-001 validation.","Rejects unsupported schema, non-VALIDATED status, hash mismatch, missing required fields, forbidden origins, and production intake while the marriage gate remains blocked.","Maps accepted payloads to match_info, sharp_odds, contextual_intelligence, and SCOUT_FIP metadata without external provider or database calls."] | EFI-001-I1: keep this as the single fail-closed FIP intake boundary; revalidate schema, hash, forbidden-origin, gate-block, and envelope tests before any route, storage, or E2E proof wiring. |
 | backend/services/football536Extractor.js | Backend service: football536Extractor | DATABASE | UNKNOWN | ["DATABASE","PROVIDER"] | ["Detected Supabase usage (createClient/from/SQL-like queries)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/football536Service.js | Backend service: football536Service | PROVIDER_INTEGRATION | UNKNOWN | ["PROVIDER","API"] | ["Top-level skim: require('axios').","Detected external HTTP client usage (axios/fetch)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/footballH2HExtractor.js | Backend service: footballH2HExtractor | PROVIDER_INTEGRATION | UNKNOWN | ["PROVIDER"] | ["Skim: file exports service functions and participates in backend pipelines."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
@@ -965,6 +969,7 @@ PER_ASSET_BY_BATCH
 | tests/edge-project-register.test.js | Governance test asset validating the Edge Master Project Register schema integrity and that ledger task IDs match registered projects. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","AUDIT"] | ["File uses `check_edge_project_register.js` helpers to assert the register loads, has canonical version `1.0`, and that every required field is present for each project.","It validates that ledger task IDs map exactly onto `register.projects` and that project status/blocked_by mirrors ledger task data."] | Revalidate this test asset??????s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change. |
 | tests/edge-repository-asset-register.test.js | Repository governance/asset-register test asset validating tracked asset register integrity and EAC structured classification field correctness. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","AUDIT","DATABASE"] | ["File asserts the asset register exists/canonical version and iterates required field sets over all assets.","It validates EAC-001 structured classification fields types (`purpose_description`/`functional_group`/`relationship_tags`/`classification_evidence`) and checks enum legality for current_state and other fields."] | Revalidate this test asset??????s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change. |
 | tests/edge-system-runtime-inventory.test.js | Runtime inventory contract test asset validating ESA-001 discovery surfaces are governed and validation rules fail closed on removal or unknown task bindings. | TEST_PROOF | UNKNOWN | ["TEST_PROOF","RUNTIME","OBSERVABILITY","GOVERNANCE"] | ["File imports runtime inventory helpers (`discoverMaterialSurfaces`, `validateInventory`, `renderRuntimeMap`) and validates the canonical runtime inventory passes.","It includes fail-closed tests (e.g., removing a governed surface or altering control-task bindings) and asserts validation errors start with the expected failure markers."] | Revalidate this test asset??????s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change. |
+| tests/fip-intake-service.test.js | Focused Node test coverage for the EFI-001 fail-closed FIP intake boundary accept/reject behavior and Edge envelope mapping. | TEST_PROOF | CURRENT | ["TEST_PROOF","SCOUT","FIP","RUNTIME","GOVERNANCE"] | ["Builds a valid FIP-001 v1 fixture with the service hash algorithm and verifies accepted envelope output.","Covers rejection for unsupported schema version, non-VALIDATED status, tampered hash, missing required fields, forbidden origins, and AUTHORIZED_PRODUCTION while the marriage gate remains blocked."] | EFI-001-I1: run node --test tests/fip-intake-service.test.js after any FIP intake boundary change. |
 
 ## B25 SCRATCH
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |

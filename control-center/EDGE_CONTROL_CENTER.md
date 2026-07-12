@@ -553,7 +553,7 @@ Required state snapshot:
   ],
   "eac_evidence_reusable": true,
   "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
-  "total_governed_assets": 908,
+  "total_governed_assets": 910,
   "phase_0": {
     "status": "PHASE_CLOSED",
     "question": "What exact repository state is the cleanup programme starting from?",
@@ -562,7 +562,7 @@ Required state snapshot:
       "active_branch": "main",
       "head_commit": "7d21fc276629bb6aec056299d70e1541b462934f",
       "working_tree_status": "dirty_unrelated_changes_preserved",
-      "governed_asset_count": 908,
+      "governed_asset_count": 910,
       "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
       "eac_batch_count": 29,
       "already_completed_or_removal_work": "Partial external sports provider removal (PARTIAL); EAC-001 B01-B29 classification inventory complete; prior Control Center per-asset investigations preserved as historical evidence",
@@ -10263,3 +10263,44 @@ Important non-actions:
 
 Validation boundary:
 - FIP-001-C1 authority registration only. Does not authorize intake implementation or proof execution.
+
+
+## EFI-001-I1 FAIL-CLOSED FIP INTAKE IMPLEMENTATION EVIDENCE
+
+Result: TESTED
+
+Scope:
+- Mini-project: EFI-001-I1 - Smallest Fail-Closed FIP Intake Implementation
+- Runtime code added: YES, limited to backend/services/fipIntakeService.js
+- Focused test added: YES, tests/fip-intake-service.test.js
+- Route/API wiring performed: NO
+- Prediction pipeline call performed: NO
+- Supabase/database mutation performed: NO
+- SQL execution performed: NO
+- E2E proof execution performed: NO
+- External provider removal performed: NO
+- Dependency/security remediation performed: NO
+- Cleanup programme reopened: NO
+
+Implementation evidence:
+- receiveValidatedFip() accepts only committed Scout FIP-001 schema version 1.0.0.
+- validation.status must be VALIDATED.
+- validation.algorithm must be scout-fip-sha256-v1.
+- validation.hash is verified against canonical sorted JSON with validation.hash blanked.
+- Forbidden manual/provider/workspace/Supabase replay origins are rejected.
+- AUTHORIZED_PRODUCTION intake remains blocked unless scout_edge_marriage_gate is separately cleared.
+- Accepted proof payload maps to Edge analysis envelope: match_info, sharp_odds, contextual_intelligence, metadata.sports_truth_origin = SCOUT_FIP.
+
+Focused proof:
+- node --test tests/fip-intake-service.test.js: PASS
+
+Gate state:
+- scout_edge_marriage_gate: BLOCKED
+- supabase_storage_gate: BLOCKED
+- E2E-001: BLOCKED
+- EFI route/API receive surface: NOT IMPLEMENTED
+- EST storage enforcement: NOT IMPLEMENTED
+
+Next recommended control action:
+- Continue only with separately authorized EST-001-I1, EPI/EPRV blocker work, or E2E-001-X1 sequencing.
+- Do not clear the marriage gate from EFI-001-I1.

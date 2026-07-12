@@ -5,8 +5,8 @@
   "source_command": "git ls-files",
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
-  "tracked_path_count": 909,
-  "registered_asset_count": 908,
+  "tracked_path_count": 911,
+  "registered_asset_count": 910,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -10800,6 +10800,55 @@
       ],
       "classification_evidence": [
         "Skim: file exports service functions and participates in backend pipelines."
+      ]
+    },
+    {
+      "asset_path": "backend/services/fipIntakeService.js",
+      "asset_type": "SOURCE_CODE",
+      "asset_role": "APPLICATION_SOURCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "CURRENT_AUTHORITY",
+      "current_state": "CURRENT",
+      "owner_project_id": "EFI-001",
+      "governed_by_control_task_id": "EFI-001",
+      "related_assets": [
+        "control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md",
+        "control-center/FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md",
+        "control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md",
+        "tests/fip-intake-service.test.js"
+      ],
+      "related_tables": [],
+      "related_functions": [
+        "receiveValidatedFip",
+        "computeFipHash",
+        "computeIdempotencyKey"
+      ],
+      "runtime_consumers": [
+        "tests/fip-intake-service.test.js"
+      ],
+      "runtime_dependencies": [
+        "node:crypto"
+      ],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "REGISTERED",
+      "next_validation": "EFI-001-I1: keep this as the single fail-closed FIP intake boundary; revalidate schema, hash, forbidden-origin, gate-block, and envelope tests before any route, storage, or E2E proof wiring.",
+      "notes": "Pure EFI-001 intake validator and EdgeAnalysisEnvelope mapper. Does not call external providers, Supabase, routes, or prediction pipeline.",
+      "purpose_description": "Single fail-closed EFI-001 runtime boundary for accepting validated Scout FIP-001 v1 payloads, verifying hash/provenance/required fields/forbidden origins, and mapping to the Edge analysis envelope.",
+      "functional_group": "SCOUT_FIP",
+      "relationship_tags": [
+        "SERVICE",
+        "SCOUT",
+        "FIP",
+        "RUNTIME",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Exports receiveValidatedFip plus hash/idempotency helpers for EFI-001 validation.",
+        "Rejects unsupported schema, non-VALIDATED status, hash mismatch, missing required fields, forbidden origins, and production intake while the marriage gate remains blocked.",
+        "Maps accepted payloads to match_info, sharp_odds, contextual_intelligence, and SCOUT_FIP metadata without external provider or database calls."
       ]
     },
     {
@@ -30056,6 +30105,53 @@
       "classification_evidence": [
         "File imports runtime inventory helpers (`discoverMaterialSurfaces`, `validateInventory`, `renderRuntimeMap`) and validates the canonical runtime inventory passes.",
         "It includes fail-closed tests (e.g., removing a governed surface or altering control-task bindings) and asserts validation errors start with the expected failure markers."
+      ]
+    },
+    {
+      "asset_path": "tests/fip-intake-service.test.js",
+      "asset_type": "TEST",
+      "asset_role": "TEST_PROOF",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "EFI-001",
+      "governed_by_control_task_id": "EFI-001",
+      "related_assets": [
+        "backend/services/fipIntakeService.js",
+        "control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md",
+        "control-center/FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md"
+      ],
+      "related_tables": [],
+      "related_functions": [
+        "receiveValidatedFip",
+        "computeFipHash",
+        "computeIdempotencyKey"
+      ],
+      "runtime_consumers": [],
+      "runtime_dependencies": [
+        "node:test",
+        "node:assert/strict",
+        "backend/services/fipIntakeService.js"
+      ],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "REGISTERED",
+      "next_validation": "EFI-001-I1: run node --test tests/fip-intake-service.test.js after any FIP intake boundary change.",
+      "notes": "Focused EFI-001-I1 proof test. It does not run E2E proof, mutate Supabase, or call external providers.",
+      "purpose_description": "Focused Node test coverage for the EFI-001 fail-closed FIP intake boundary accept/reject behavior and Edge envelope mapping.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "SCOUT",
+        "FIP",
+        "RUNTIME",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Builds a valid FIP-001 v1 fixture with the service hash algorithm and verifies accepted envelope output.",
+        "Covers rejection for unsupported schema version, non-VALIDATED status, tampered hash, missing required fields, forbidden origins, and AUTHORIZED_PRODUCTION while the marriage gate remains blocked."
       ]
     },
     {
