@@ -3857,3 +3857,19 @@ Validation boundary:
 - No source/runtime/product files changed except this Control Center evidence append.
 - B28 batch state not advanced in this patch.
 - GitHub vulnerability and Dependabot notices remain future dependency/security work and were not touched.
+
+## PHASE 3 - B29 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope: PHASE_3 / B29 / DOT_TOOL_DIRS_AND_SMALL_DIRS. Evidence only. No deletion, merge, refactor, script execution, SQL, deployment, database, runtime/product, dependency/security, or vulnerability work performed.
+
+Outcome summary: ACTIVE 3; INDIRECTLY_ACTIVE 0; MANUAL_USE 23; NO_CURRENT_USE_FOUND 0; UNKNOWN 0.
+
+B29 ACTIVE assets: .githooks/pre-commit; api/pipeline/run-full.js; js/supabase-client-src.js.
+
+B29 MANUAL_USE summary: Remaining 23 assets are tool config, assistant/workflow config, local database/session material, Dolphin reference material, governance reports, placeholder/data files, temp snapshots, or non-startup JS/reference material.
+
+Evidence: B29 manifest validation confirmed 26 governed assets. .githooks/pre-commit is active local commit-guard material. api/pipeline/run-full.js is active API route material. js/supabase-client-src.js is active build input for package.json build:supabase. No B29 cleanup or execution is authorized by this evidence.
+
+Validation boundary: Evidence only. No active-use outcome authorizes deletion. B29 batch state not advanced. GitHub vulnerability and Dependabot notices remain future dependency/security work.
