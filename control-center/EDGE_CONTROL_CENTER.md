@@ -587,15 +587,15 @@ Required state snapshot:
     "B02-B03",
     "B04-B06",
     "B07-B10",
-    "B11-B14"
+    "B11-B14",
+    "B15-B18"
   ],
   "remaining_batches": [
-    "B15-B18",
     "B19-B22",
     "B23-B26",
     "B27-B29"
   ],
-  "next_deterministic_batch": "B15-B18",
+  "next_deterministic_batch": "B19-B22",
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,
@@ -6154,6 +6154,98 @@ Batch decision:
 Validation boundary:
 - Evidence only.
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+
+## PHASE 6 - B15-B18 CANONICAL AUTHORITY SELECTION EVIDENCE
+
+Decision vocabulary used:
+- CANONICAL_KEEP
+- NEEDS_RUNTIME_PROOF
+
+Existing runtime/service authorities from earlier B04-B06 and B07-B10 decisions remain CANONICAL_KEEP where already recorded.
+This packet records the B15-B18 documentation and diagnostic candidates only and does not replace earlier authorities with scripts.
+
+Candidate group 1: Supabase, database, migration, and accuracy diagnostic surfaces
+
+Phase 6 decisions:
+- scripts/safe-migration-plan.js: NEEDS_RUNTIME_PROOF - migration planning diagnostic, not canonical authority.
+- scripts/supabase_health_check.js: NEEDS_RUNTIME_PROOF - Supabase health check, not canonical authority.
+- scripts/supabase-diagnostics.js: NEEDS_RUNTIME_PROOF - database diagnostic script, not canonical authority.
+- scripts/track-prediction-accuracy.js: NEEDS_RUNTIME_PROOF - accuracy diagnostic script, not canonical authority.
+- SUPABASE_DIAGNOSTIC_REPORT.md: NEEDS_RUNTIME_PROOF - database/Supabase report evidence, not canonical database authority.
+- SUPABASE_TABLE_ANALYSIS.md: NEEDS_RUNTIME_PROOF - database/Supabase report evidence, not canonical database authority.
+- SUPABASE_TABLES_SUMMARY.md: NEEDS_RUNTIME_PROOF - database/Supabase report evidence, not canonical database authority.
+- COMPREHENSIVE_AUDIT_REPORT.md: NEEDS_RUNTIME_PROOF - database/Supabase report evidence, not canonical database authority.
+
+No canonical database report is selected.
+
+Candidate group 2: Master Rulebook, football rules, ACCA, SMB, and market governance documents
+
+Phase 6 decisions:
+- SKCS_MASTER_RULEBOOK.md: CANONICAL_KEEP - current Master Rulebook reference authority.
+- STRICT_RULES.md: NEEDS_RUNTIME_PROOF - rules implementation/report document, not canonical authority.
+- COMPREHENSIVE_FOOTBALL_RULES_REPORT.md: NEEDS_RUNTIME_PROOF - rules report document, not canonical authority.
+- MASTER_RULEBOOK_IMPLEMENTATION_GUIDE.md: NEEDS_RUNTIME_PROOF - implementation guide, not canonical authority.
+- docs/acca_rules_v2.1.md: NEEDS_RUNTIME_PROOF - ACCA rules document, not canonical authority.
+- docs/skcs_grading_snapshot_v1.spec.md: NEEDS_RUNTIME_PROOF - grading snapshot spec, not canonical authority.
+- Related implementation and report documents remain NEEDS_RUNTIME_PROOF before replacement, consolidation, or retirement.
+
+Candidate group 3: Architecture, agent, README, dashboard, and workspace overview documents
+
+Phase 6 decisions:
+- README.md: CANONICAL_KEEP - root repository overview.
+- AGENTS.md: CANONICAL_KEEP - agent/developer orientation surface.
+- GEMINI.md: CANONICAL_KEEP - agent/developer orientation surface.
+- ARCHITECTURE_OVERVIEW.md: CANONICAL_KEEP - architecture overview evidence.
+- DASHBOARD_QUICK_START.md: NEEDS_RUNTIME_PROOF - dashboard guidance document, not canonical authority.
+- DASHBOARD_REFACTOR_GUIDE.md: NEEDS_RUNTIME_PROOF - dashboard refactor document, not canonical authority.
+- README_DASHBOARD_REFACTOR.md: NEEDS_RUNTIME_PROOF - dashboard refactor document, not canonical authority.
+- IMPLEMENTATION_SUMMARY.md: NEEDS_RUNTIME_PROOF - implementation summary document, not canonical authority.
+- FULL_WORKSPACE_AUDIT_REPORT.md: NEEDS_RUNTIME_PROOF - workspace overview report, not canonical authority.
+- DEEPSEEK_SESSION_SKCSTEST.txt: NEEDS_RUNTIME_PROOF - DeepSeek session record, not canonical authority.
+- DEEPSEEK_STATE.md: NEEDS_RUNTIME_PROOF - DeepSeek state document, not canonical authority.
+
+Candidate group 4: Provider, ingestion, API quota, and sports data documentation
+
+Phase 6 decisions:
+- docs/canonical_ingest_firewall.spec.md: CANONICAL_KEEP - canonical ingest/firewall specification evidence.
+- docs/api_quota_router.md: NEEDS_RUNTIME_PROOF - API quota routing document, not canonical authority.
+- docs/cricket-providers.md: NEEDS_RUNTIME_PROOF - provider documentation, not canonical authority.
+- docs/football-leagues-apisports.md: NEEDS_RUNTIME_PROOF - sports data documentation, not canonical authority.
+- docs/provider-discovery/free-livescore-api.md: NEEDS_RUNTIME_PROOF - provider discovery document, not canonical authority.
+- docs/providers/live-football-api-policy.md: NEEDS_RUNTIME_PROOF - provider policy document, not canonical authority.
+- docs/sportsdataio-pre-match-directive.md: NEEDS_RUNTIME_PROOF - sports data directive, not canonical authority.
+- docs/SKCS_ENGINE_V2_PHASE05_INGEST_MAP.md: NEEDS_RUNTIME_PROOF - Engine V2 ingest map, not canonical authority.
+- docs/SKCS_ENGINE_V2_PHASE0B5_REPLAY.md: NEEDS_RUNTIME_PROOF - Engine V2 replay document, not canonical authority.
+- README_DATA_INGESTION.md: NEEDS_RUNTIME_PROOF - ingestion overview document, not canonical authority.
+- docs/DATA_INGESTION.md: NEEDS_RUNTIME_PROOF - ingestion documentation, not canonical authority.
+- docs/README.md: NEEDS_RUNTIME_PROOF - docs index/reference surface, not canonical authority.
+
+Candidate group 5: Semantic drift, control plane, runtime health, and degraded-state documentation
+
+Phase 6 decisions:
+- docs/alert-routing-degraded-state.md: CANONICAL_KEEP - degraded-state reference document.
+- docs/blueprint-semantic-drift-control-plane.md: CANONICAL_KEEP - semantic/control-plane reference document.
+- docs/control-plane-operational-pack.md: CANONICAL_KEEP - control-plane operational reference document.
+- docs/pipeline-health-feed.md: CANONICAL_KEEP - runtime health reference document.
+- docs/runbook_degraded_states.md: CANONICAL_KEEP - degraded-state runbook reference document.
+- docs/SKCS_ENGINE_V2_ADR.md: NEEDS_RUNTIME_PROOF - older V2 ADR, not canonical authority.
+- docs/SKCS_ENGINE_V2_PHASE0_DESIGN.md: NEEDS_RUNTIME_PROOF - older V2 design doc, not canonical authority.
+
+Candidate group 6: Legal/product policy and public-facing subscription documents
+
+Phase 6 decisions:
+- PRIVACY_POLICY.md: CANONICAL_KEEP - root legal/product policy document.
+- TERMS_OF_SERVICE.md: CANONICAL_KEEP - root legal/product policy document.
+- No legal, subscription, prediction-content, user-data, analytics, refund, or service-boundary text is changed.
+
+Distinct policy/config/deployment artifacts:
+- MIGRATION_FREEZE.md: NEEDS_RUNTIME_PROOF - distinct policy artifact, not selected for cleanup.
+- requirements.txt: NEEDS_RUNTIME_PROOF - distinct configuration artifact, not selected for cleanup.
+- runtime.txt: NEEDS_RUNTIME_PROOF - distinct configuration artifact, not selected for cleanup.
+- CRON_SETUP.md: NEEDS_RUNTIME_PROOF - distinct deployment setup artifact, not selected for cleanup.
+- docs/DEPLOYMENT_GUIDE.md: NEEDS_RUNTIME_PROOF - distinct deployment guide artifact, not selected for cleanup.
+
+B15-B18 outcome: documentation overlap recorded; these evidence assets are held behind NEEDS_RUNTIME_PROOF unless already proven as a current reference authority.
 
 ## PHASE 5 - B15-B18 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
 
