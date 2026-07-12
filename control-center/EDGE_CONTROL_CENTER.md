@@ -4857,3 +4857,121 @@ Validation boundary:
 - This activation creates the Phase 5 governance boundary only.
 - No Phase 5 batch inspection is started by this activation.
 - Stop after activation commit and report exact start point for B01 before beginning inspection.
+
+## PHASE 5 - B01 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_5 - Functional Overlap Identification
+- Batch: B01 - CONTROL_CENTER
+- Evidence type: functional-overlap identification only
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+B01 manifest evidence:
+- B01 batch_id: B01
+- B01 title: CONTROL_CENTER
+- B01 asset_count: 15
+- Start HEAD: 82f32e2f
+- All 15 B01 asset paths were inspected by compact reference scan.
+
+B01 outcome summary:
+- NO_OVERLAP: 0
+- PARTIAL_OVERLAP: 15
+- MAJOR_OVERLAP: 0
+- POTENTIAL_MERGE_GROUP: 0
+
+Functional-overlap groups:
+
+1. Core Control Center governance group:
+- control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json
+- control-center/EDGE_CONTROL_CENTER.md
+- control-center/check_control_center.js
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- EDGE_BUILD_CONTROL_LEDGER.v1.json is the machine ledger for tasks, statuses, proof requirements, gates, and sequencing.
+- EDGE_CONTROL_CENTER.md is the operator-facing governance document and structured state surface.
+- check_control_center.js validates the ledger and Control Center state.
+- These files intentionally overlap on Control Center governance concepts but do not perform the same job.
+
+Decision:
+- Keep separate.
+- No merge group is proven.
+
+2. Asset classification and repository asset authority group:
+- control-center/check_edge_asset_classification.js
+- control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json
+- control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json
+- control-center/EDGE_ASSET_REPOSITORY_MAP.md
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json defines deterministic B01-B29 batch membership.
+- EDGE_REPOSITORY_ASSET_REGISTER.v1.json is the governed asset register.
+- check_edge_asset_classification.js validates classification and can render EDGE_ASSET_REPOSITORY_MAP.md.
+- EDGE_ASSET_REPOSITORY_MAP.md is the human-readable generated repository map.
+- These files overlap because they describe the same governed asset universe from different control surfaces.
+
+Decision:
+- Keep separate.
+- Generated-map overlap is expected and does not prove a merge candidate.
+
+3. Project register projection group:
+- control-center/check_edge_project_register.js
+- control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json
+- control-center/EDGE_PROJECT_BACKLOG.md
+- control-center/EDGE_PROJECT_DEPENDENCY_MAP.md
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- EDGE_MASTER_PROJECT_REGISTER.v1.json is the project register authority derived from the ledger.
+- EDGE_PROJECT_BACKLOG.md is generated from EDGE_MASTER_PROJECT_REGISTER.v1.json.
+- EDGE_PROJECT_DEPENDENCY_MAP.md is generated from EDGE_MASTER_PROJECT_REGISTER.v1.json.
+- check_edge_project_register.js validates and synchronizes the project register projections.
+- These files overlap because backlog and dependency documentation are projections of the master register.
+
+Decision:
+- Keep separate.
+- Projection overlap is expected and does not prove a merge candidate.
+
+4. Runtime inventory projection group:
+- control-center/check_edge_system_runtime_inventory.js
+- control-center/EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json
+- control-center/EDGE_SYSTEM_RUNTIME_MAP.md
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json is the machine-readable runtime inventory.
+- EDGE_SYSTEM_RUNTIME_MAP.md is the synchronized human-readable runtime review surface.
+- check_edge_system_runtime_inventory.js validates the runtime inventory and synchronizes the runtime map.
+- These files overlap because the runtime map reflects the runtime inventory.
+
+Decision:
+- Keep separate.
+- Runtime inventory projection overlap is expected and does not prove a merge candidate.
+
+Batch decision:
+- B01 has controlled PARTIAL_OVERLAP across governance source/checker/projection surfaces.
+- No MAJOR_OVERLAP is proven.
+- No POTENTIAL_MERGE_GROUP is proven.
+- No cleanup action is authorized by this outcome.
+- B01 Phase 5 evidence is closed.
+- Next batch: B02 - BACKEND_DIRECT_FILES.
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
