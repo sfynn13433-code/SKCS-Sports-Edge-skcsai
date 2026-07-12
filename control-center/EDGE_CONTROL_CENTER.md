@@ -5924,3 +5924,211 @@ Batch decision:
 Validation boundary:
 - Evidence only.
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+
+## PHASE 5 - B15-B18 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+
+Result: PASS WITH OVERLAP CANDIDATES
+
+Scope:
+- Phase: PHASE_5 - Functional Overlap Identification
+- Batches: B15-B18
+- Evidence type: functional-overlap identification only
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Batch manifest evidence:
+- Batch group: B15-B18
+- Start HEAD: af595644
+- Compact overlap scan inspected migration/diagnostic scripts, Supabase scripts, prediction accuracy scripts, root documentation, deployment reports, rulebook reports, frontend reports, provider docs, semantic/control-plane docs, and Supabase/database reports.
+
+Outcome vocabulary used:
+- NO_OVERLAP
+- PARTIAL_OVERLAP
+- MAJOR_OVERLAP
+- POTENTIAL_MERGE_GROUP
+
+Candidate group 1: Supabase, database, migration, and accuracy diagnostic surfaces
+
+Assets:
+- scripts/safe-migration-plan.js
+- scripts/supabase_health_check.js
+- scripts/supabase-diagnostics.js
+- scripts/track-prediction-accuracy.js
+- SUPABASE_DIAGNOSTIC_REPORT.md
+- SUPABASE_TABLE_ANALYSIS.md
+- SUPABASE_TABLES_SUMMARY.md
+- COMPREHENSIVE_AUDIT_REPORT.md
+
+Outcome:
+- MAJOR_OVERLAP
+
+Evidence:
+- Multiple scripts and reports inspect or describe Supabase/database structure, constraints, prediction tables, migration plans, and prediction accuracy.
+- scripts/safe-migration-plan.js includes unified fixture migration planning.
+- scripts/supabase-diagnostics.js performs full database diagnostics.
+- scripts/track-prediction-accuracy.js uses PostgreSQL and tracks football prediction accuracy.
+- Supabase reports describe overlapping table, trigger, rule, prediction, and duplicate-risk information.
+
+Decision:
+- Major database/Supabase diagnostic overlap is proven.
+- No SQL, migration, table update, or database script execution is authorized.
+- No canonical database report is selected in Phase 5.
+- Carry forward as a future database-report/script canonicalization candidate.
+
+Candidate group 2: Master Rulebook, football rules, ACCA, SMB, and market governance documents
+
+Assets:
+- SKCS_MASTER_RULEBOOK.md
+- STRICT_RULES.md
+- COMPREHENSIVE_FOOTBALL_RULES_REPORT.md
+- MASTER_RULEBOOK_IMPLEMENTATION_GUIDE.md
+- DEPLOYMENT_STATUS.md
+- DEPLOYMENT_VERIFICATION_GUIDE.md
+- FRONTEND_FIXES_SUMMARY.md
+- FRONTEND_INVESTIGATION_REPORT.md
+- IMPLEMENTATION_GAP_ANALYSIS.md
+- SINGLE_USE_AUDIT_REPORT.md
+- SPORT_CONSISTENCY_AUDIT_REPORT.md
+- SMB_WINDSURF_FINAL_IMPLEMENTATION.md
+- SMB_WINDSURF_IMPLEMENTATION_PROMPT.md
+- docs/acca_rules_v2.1.md
+- docs/skcs_grading_snapshot_v1.spec.md
+
+Outcome:
+- MAJOR_OVERLAP
+
+Evidence:
+- Multiple documents describe Master Rulebook thresholds, direct 1X2 rules, secondary market governance, ACCA rules, SMB behavior, grading, deployment, frontend alignment, and historical rule gaps.
+- Some documents explicitly mark older content as historical while others describe current rule authority.
+- The documents overlap heavily around rulebook implementation, market governance, ACCA behavior, and frontend/backend rule alignment.
+
+Decision:
+- Major rulebook/documentation overlap is proven.
+- No documentation is deleted, merged, or rewritten in Phase 5.
+- No rule threshold or product behavior is changed.
+- Carry forward as a future rulebook-document authority/canonicalization candidate.
+
+Candidate group 3: Architecture, agent, README, dashboard, and workspace overview documents
+
+Assets:
+- AGENTS.md
+- GEMINI.md
+- README.md
+- README_DATA_INGESTION.md
+- ARCHITECTURE_OVERVIEW.md
+- FULL_WORKSPACE_AUDIT_REPORT.md
+- DASHBOARD_QUICK_START.md
+- DASHBOARD_REFACTOR_GUIDE.md
+- README_DASHBOARD_REFACTOR.md
+- IMPLEMENTATION_SUMMARY.md
+- DEEPSEEK_SESSION_SKCSTEST.txt
+- DEEPSEEK_STATE.md
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- Several root documents describe the same system at different abstraction levels: backend, Supabase, AI pipeline, dashboard, provider ingestion, control rules, and project state.
+- AGENTS.md and GEMINI.md both provide agent/developer orientation.
+- Dashboard quick-start/refactor docs and implementation summary overlap around portal, market, ACCA, controls, and state-update behavior.
+- DeepSeek state/session files overlap with historical project-state memory.
+
+Decision:
+- Functional documentation overlap is proven.
+- No canonical project overview document is selected in Phase 5.
+- No documentation cleanup is authorized.
+- Carry forward as a future documentation-index/canonicalization candidate.
+
+Candidate group 4: Provider, ingestion, API quota, and sports data documentation
+
+Assets:
+- README_DATA_INGESTION.md
+- docs/DATA_INGESTION.md
+- docs/README.md
+- docs/api_quota_router.md
+- docs/cricket-providers.md
+- docs/football-leagues-apisports.md
+- docs/provider-discovery/free-livescore-api.md
+- docs/providers/live-football-api-policy.md
+- docs/sportsdataio-pre-match-directive.md
+- docs/canonical_ingest_firewall.spec.md
+- docs/SKCS_ENGINE_V2_PHASE05_INGEST_MAP.md
+- docs/SKCS_ENGINE_V2_PHASE0B5_REPLAY.md
+
+Outcome:
+- MAJOR_OVERLAP
+
+Evidence:
+- Multiple docs describe provider roles, ingestion rules, quota routing, football leagues, cricket providers, SportsDataIO boundaries, API-Sports boundaries, and canonical ingest firewall rules.
+- Some docs describe canonical truth boundaries while others describe pre-match enrichment or provider discovery.
+- This overlaps with B07-B10 and B11-B14 provider/access candidates.
+
+Decision:
+- Major provider/ingestion documentation overlap is proven.
+- No provider policy is changed.
+- No provider retirement, source change, or dependency update is authorized.
+- Carry forward as a future provider/ingestion documentation authority candidate.
+
+Candidate group 5: Semantic drift, control plane, runtime health, and degraded-state documentation
+
+Assets:
+- docs/alert-routing-degraded-state.md
+- docs/blueprint-semantic-drift-control-plane.md
+- docs/control-plane-operational-pack.md
+- docs/pipeline-health-feed.md
+- docs/runbook_degraded_states.md
+- docs/SKCS_ENGINE_V2_ADR.md
+- docs/SKCS_ENGINE_V2_PHASE0_DESIGN.md
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- Several docs describe semantic drift, control-plane state, health feed, degraded/fail states, execution traces, and V2 design context.
+- The docs repeatedly state control-plane authority and runtime-health separation.
+- These overlap with the B04-B10 semantic/control-plane service candidates.
+
+Decision:
+- Functional documentation overlap is proven.
+- No semantic/control-plane documentation is changed in Phase 5.
+- No runtime health behavior is changed.
+- Carry forward as a future control-plane documentation canonicalization candidate.
+
+Candidate group 6: Legal/product policy and public-facing subscription documents
+
+Assets:
+- PRIVACY_POLICY.md
+- TERMS_OF_SERVICE.md
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- These documents overlap with subscription, payment, prediction-content, user-data, analytics, and service-boundary language.
+- They are legal/product-facing documents rather than engineering implementation files.
+
+Decision:
+- Keep separate.
+- No legal text is changed in Phase 5.
+- Carry forward only as product/legal documentation boundary evidence.
+
+Distinct-role findings:
+- MIGRATION_FREEZE.md, requirements.txt, and runtime.txt are distinct configuration/policy artifacts; no same-job merge group is selected by this scan.
+- CRON_SETUP.md and docs/DEPLOYMENT_GUIDE.md overlap with scheduler/deployment setup but are not selected as a merge group in this packet.
+- Documentation overlap is recorded as evidence only; it does not authorize cleanup.
+- Mutation-capable scripts are recorded as overlap/risk evidence only and were not executed.
+
+Batch decision:
+- B15-B18 contains proven functional overlap candidates.
+- Potential future canonicalization candidates are recorded for Supabase/database diagnostics, Master Rulebook/rule documents, root architecture docs, provider/ingestion docs, control-plane docs, and legal/product policy boundaries.
+- No cleanup action is authorized by this outcome.
+- B15-B18 Phase 5 evidence is closed.
+- Next batch group: B19-B22.
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
