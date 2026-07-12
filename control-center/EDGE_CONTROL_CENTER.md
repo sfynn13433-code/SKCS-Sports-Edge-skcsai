@@ -4437,3 +4437,93 @@ Validation boundary:
 - B11-B14 Phase 4 evidence is closed.
 - Next batch: B15.
 
+
+## Phase 4 B15-B18 Legacy and Replacement Identification Closure
+
+Starting HEAD:
+- a1b1b98f
+
+Batch group:
+- B15 SCRIPTS_MAINT_FIX_CLEANUP_MIGRATE
+- B16 DOCS_ROOT_MD_TXT
+- B17 DOCS_DIR
+- B18 SKCS_KNOWLEDGE_GOV_AND_AUDIT
+
+Scope:
+- Phase 4 evidence-only legacy and replacement identification.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation was authorized or performed.
+
+Membership:
+- B15 declared asset count: 52; actual path count: 52; missing files: 0.
+- B16 declared asset count: 36; actual path count: 36; missing files: 0.
+- B17 declared asset count: 24; actual path count: 24; missing files: 0.
+- B18 declared asset count: 23; actual path count: 23; missing files: 0.
+
+Attention-only scan:
+- B15 strong legacy/replacement markers: 0.
+- B16 strong legacy/replacement markers: 5.
+- B17 strong legacy/replacement markers: 4.
+- B18 strong legacy/replacement markers: 0.
+
+B16 strong marker disposition:
+- DEEPSEEK_SESSION_SKCSTEST.txt remains CURRENT. The "replaced by" marker refers to pg_cron / pg_net replacement by Render cron / Node HTTP, not replacement of the document itself.
+- DEEPSEEK_STATE.md remains CURRENT. The "replaced by" marker refers to pg_cron / pg_net replacement by Render cron / Node HTTP, not replacement of the document itself.
+- SINGLE_USE_AUDIT_REPORT.md remains CURRENT. The "deprecated" marker refers to deprecated global single-use restriction logic being audited, not depreciation of the audit report itself.
+- SKCS_MASTER_RULEBOOK.md remains CURRENT. The "replaced by" marker refers to an old secondary market allowlist replaced by Safe Haven list/categories, not replacement of the rulebook itself.
+- TERMS_OF_SERVICE.md remains CURRENT. The "do not use" marker is user-facing legal wording inside the Terms, not an instruction that the file is unused or replaced.
+
+B17 strong marker disposition:
+- docs/provider-discovery/free-livescore-api.md remains CURRENT. The "do not use" marker limits provider use for final prediction logic; the document remains current provider discovery / resolver-use evidence.
+- docs/providers/live-football-api-policy.md remains CURRENT. The "do not use" markers define provider usage restrictions; the policy document itself remains current.
+- docs/SKCS_ENGINE_V2_PHASE05_INGEST_MAP.md remains CURRENT. The "do not use" marker limits fuzzy team matching as a schema-drift workaround; the ingest map itself remains current.
+- docs/SKCS_ENGINE_V2_PHASE0B5_REPLAY.md remains CURRENT. The "do not use" marker limits TheSportsDB IDs in replay; the replay document itself remains current.
+
+B15 outcome summary:
+- CURRENT: 52
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+B16 outcome summary:
+- CURRENT: 36
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+B17 outcome summary:
+- CURRENT: 24
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+B18 outcome summary:
+- CURRENT: 23
+- LEGACY: 0
+- SUPERSEDED: 0
+- REPLACED_BY: 0
+- PARALLEL: 0
+- HISTORICAL_EVIDENCE: 0
+- UNKNOWN: 0
+
+Decision:
+- B15 closes with 52 CURRENT assets.
+- B16 closes with 36 CURRENT assets.
+- B17 closes with 24 CURRENT assets.
+- B18 closes with 23 CURRENT assets.
+- UNKNOWN is 0 for B15-B18.
+- No cleanup action is authorized by these outcomes.
+
+Validation boundary:
+- Evidence only.
+- No file removal, merge, retirement, refactor, source change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+- B15-B18 Phase 4 evidence is closed.
+- Next batch: B19.
