@@ -588,14 +588,14 @@ Required state snapshot:
     "B04-B06",
     "B07-B10",
     "B11-B14",
-    "B15-B18"
+    "B15-B18",
+    "B19-B22"
   ],
   "remaining_batches": [
-    "B19-B22",
     "B23-B26",
     "B27-B29"
   ],
-  "next_deterministic_batch": "B19-B22",
+  "next_deterministic_batch": "B23-B26",
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,
@@ -6246,6 +6246,102 @@ Distinct policy/config/deployment artifacts:
 - docs/DEPLOYMENT_GUIDE.md: NEEDS_RUNTIME_PROOF - distinct deployment guide artifact, not selected for cleanup.
 
 B15-B18 outcome: documentation overlap recorded; these evidence assets are held behind NEEDS_RUNTIME_PROOF unless already proven as a current reference authority.
+
+## PHASE 6 - B19-B22 CANONICAL AUTHORITY SELECTION EVIDENCE
+
+Decision vocabulary used:
+- CANONICAL_KEEP
+- NEEDS_RUNTIME_PROOF
+
+Existing runtime/service authorities from earlier B04-B06, B07-B10, and B15-B18 decisions remain CANONICAL_KEEP where already recorded.
+This packet records the B19-B22 documentation and migration candidates only and does not replace earlier authorities with scripts.
+
+Candidate group 1: Public prediction, dashboard, market, and ACCA frontend surfaces
+
+Phase 6 decisions:
+- public/index.html: CANONICAL_KEEP - current public frontend delivery role.
+- public/experience.html: CANONICAL_KEEP - current public frontend delivery role.
+- public/market-explorer.html: CANONICAL_KEEP - current public frontend delivery role.
+- public/direct-markets.html: CANONICAL_KEEP - current public frontend delivery role.
+- public/vip-stress-dashboard.html: CANONICAL_KEEP - current public frontend delivery role.
+- public/js/vip-stress-dashboard.js: CANONICAL_KEEP - current public frontend delivery role.
+- public/js/smh-hub.js: CANONICAL_KEEP - current public frontend delivery role.
+- public/js/smh-hub-master-rulebook.js: CANONICAL_KEEP - current public frontend delivery role.
+- public/js/acca-builder.js: CANONICAL_KEEP - current public frontend delivery role.
+- public/js/doubleChanceCombos.js: CANONICAL_KEEP - current public frontend delivery role.
+- public/js/ai-reasoning-display.js: CANONICAL_KEEP - current public frontend delivery role.
+- No frontend market, prediction, ACCA, Sports Market Hub, or dashboard authority is merged or replaced in this phase.
+
+Candidate group 2: Public auth, subscription, payment, and account access surfaces
+
+Phase 6 decisions:
+- public/login.html: CANONICAL_KEEP - current public auth/subscription/account access role.
+- public/payment.html: CANONICAL_KEEP - current public auth/subscription/account access role.
+- public/subscription.html: CANONICAL_KEEP - current public auth/subscription/account access role.
+- public/subscribe/index.html: CANONICAL_KEEP - current public auth/subscription/account access role.
+- public/js/supabase-init.js: CANONICAL_KEEP - current public auth/subscription/account access role.
+- public/js/supabase-bundle.js: CANONICAL_KEEP - current public auth/subscription/account access role.
+- public/js/config.js: CANONICAL_KEEP - current public auth/subscription/account access role.
+- public/js/user-experience-feedback.js: CANONICAL_KEEP - current public auth/subscription/account access role.
+- No auth, payment, subscription, Supabase client, API routing, or account-access behavior is changed.
+
+Candidate group 3: Public operator/control-plane and health dashboard surfaces
+
+Phase 6 decisions:
+- public/js/control-center.js: CANONICAL_KEEP - current public operator/control-plane/health display role.
+- public/js/semantic-drift-dashboard.js: CANONICAL_KEEP - current public operator/control-plane/health display role.
+- public/js/system-health-banner.js: CANONICAL_KEEP - current public operator/control-plane/health display role.
+
+Candidate group 4: Public legal/product pages versus root legal documents
+
+Phase 6 decisions:
+- public/privacy.html: CANONICAL_KEEP - public legal delivery page.
+- public/terms.html: CANONICAL_KEEP - public legal delivery page.
+- Root legal policy authority from B15-B18 remains preserved.
+
+Candidate group 5: Static media, styling, and presentation assets
+
+Phase 6 decisions:
+- public/favicon.ico: CANONICAL_KEEP - static/presentation asset.
+- public/hero-page.jpg: CANONICAL_KEEP - static/presentation asset.
+- public/hero-page.webp: CANONICAL_KEEP - static/presentation asset.
+- public/language.jpg: CANONICAL_KEEP - static/presentation asset.
+- public/login.jpg: CANONICAL_KEEP - static/presentation asset.
+- public/windrawwin.jpg: CANONICAL_KEEP - static/presentation asset.
+- public/style.css: CANONICAL_KEEP - static/presentation asset.
+- public/robots.txt: CANONICAL_KEEP - static/presentation asset.
+- public/language-switch.html: CANONICAL_KEEP - static/presentation asset.
+- public/js/hero-carousel.js: CANONICAL_KEEP - static/presentation asset.
+
+Candidate group 6: Supabase prediction, market, rulebook, and direct1x2 migrations
+
+Phase 6 decisions:
+- Supabase migration files in this packet are NEEDS_RUNTIME_PROOF before execution, replacement, consolidation, rewrite, deletion, or retirement.
+- Prediction, market, rulebook, and direct1x2 migrations remain historical/ordered database-change artifacts.
+- No SQL, RPC, RLS, policy, migration, trigger, schema, table, index, sport-expansion, or database access change is authorized.
+
+Candidate group 7: Supabase fixture, ingest, context, odds, admin, and telemetry migrations
+
+Phase 6 decisions:
+- Supabase migration files in this packet are NEEDS_RUNTIME_PROOF before execution, replacement, consolidation, rewrite, deletion, or retirement.
+- Fixture, ingest, context, odds, admin, and telemetry migrations remain historical/ordered database-change artifacts.
+- No SQL, RPC, RLS, policy, migration, trigger, schema, table, index, sport-expansion, or database access change is authorized.
+
+Candidate group 8: Supabase prediction lookup RPC and compatibility migrations
+
+Phase 6 decisions:
+- Supabase migration files in this packet are NEEDS_RUNTIME_PROOF before execution, replacement, consolidation, rewrite, deletion, or retirement.
+- Prediction lookup RPC and compatibility migrations remain historical/ordered database-change artifacts.
+- No SQL, RPC, RLS, policy, migration, trigger, schema, table, index, sport-expansion, or database access change is authorized.
+
+Candidate group 9: Engine V2 and sport-expansion migrations
+
+Phase 6 decisions:
+- Supabase migration files in this packet are NEEDS_RUNTIME_PROOF before execution, replacement, consolidation, rewrite, deletion, or retirement.
+- Engine V2 and sport-expansion migrations remain historical/ordered database-change artifacts.
+- No SQL, RPC, RLS, policy, migration, trigger, schema, table, index, sport-expansion, or database access change is authorized.
+
+No legal, subscription, prediction-content, or user-data text is changed.
 
 ## PHASE 5 - B15-B18 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
 

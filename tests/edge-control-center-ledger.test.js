@@ -135,9 +135,10 @@ describe("Edge Control Center Ledger v1", () => {
       "B07-B10",
       "B11-B14",
       "B15-B18",
+      "B19-B22",
     ]);
-    assert.equal(result.state.remaining_batches[0], "B19-B22");
-    assert.equal(result.state.next_deterministic_batch, "B19-B22");
+    assert.equal(result.state.remaining_batches[0], "B23-B26");
+    assert.equal(result.state.next_deterministic_batch, "B23-B26");
     assert.deepEqual(result.state.phase_3_outcomes, [
       "ACTIVE",
       "INDIRECTLY_ACTIVE",
@@ -166,8 +167,8 @@ describe("Edge Control Center Ledger v1", () => {
     const state = createControlCenterGateState();
     assert.equal(state.eac_evidence_reusable, true);
     assert.deepEqual(getEacBatchIds(), [...EAC_BATCH_IDS]);
-    assert.equal(getNextIncompleteBatch(state), "B19-B22");
-    assert.equal(state.next_deterministic_batch, "B19-B22");
+    assert.equal(getNextIncompleteBatch(state), "B23-B26");
+    assert.equal(state.next_deterministic_batch, "B23-B26");
     assert.equal(EAC_BATCH_IDS.length, 29);
   });
 
@@ -282,9 +283,10 @@ describe("Edge Control Center Ledger v1", () => {
       "B07-B10",
       "B11-B14",
       "B15-B18",
+      "B19-B22",
       "B01",
     ]);
-    assert.equal(result.nextState.next_deterministic_batch, "B19-B22");
+    assert.equal(result.nextState.next_deterministic_batch, "B23-B26");
     assert.equal(result.nextState.lifecycle_state, "BATCH_COMPLETE");
   });
 
