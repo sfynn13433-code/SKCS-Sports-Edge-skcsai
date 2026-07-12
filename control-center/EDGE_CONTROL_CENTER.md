@@ -6884,3 +6884,74 @@ Batch decision:
 Validation boundary:
 - Evidence only.
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+
+## PHASE 5 - FUNCTIONAL OVERLAP IDENTIFICATION CLOSURE SUMMARY
+
+Result: PASS WITH OVERLAP CANDIDATES
+
+Scope:
+- Phase: PHASE_5 - Functional Overlap Identification
+- Phase question: Are different remaining files doing the same or substantially overlapping job?
+- Batch coverage: B01-B29
+- Evidence type: repository-wide functional-overlap identification by deterministic batch group
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Closed Phase 5 batch packets:
+- B01 closed at a5999ceb
+- B02-B03 closed at cb368c49
+- B04-B06 closed at 427ccfce
+- B07-B10 closed at 6b4677d2
+- B11-B14 closed at af595644
+- B15-B18 closed at 1fa6aecd
+- B19-B22 closed at 88ce49ae
+- B23-B26 closed at 6ede2b52
+- B27-B29 closed at 3c87a5e4
+
+Phase 5 outcome summary:
+- Functional overlap candidates were found across backend routes, backend services, provider surfaces, pipeline runners, schedulers, scripts, SQL/database assets, Supabase functions, public frontend surfaces, documentation/report assets, deployment config, root scripts, agent workflow files, and provider/temp data artifacts.
+- Findings are evidence-only.
+- No canonical replacement authority was selected during Phase 5.
+- No cleanup action was authorized during Phase 5.
+
+Major carry-forward candidate families:
+- Database access authority and Supabase schema/script boundaries.
+- Pipeline orchestration, scheduler, sync, trigger, and execution-spine boundaries.
+- Provider access, quota, cache, discovery, and provider-specific test boundaries.
+- Cricket service/provider/script boundaries.
+- Football provider, extractor, enrichment, ranking, and fixture-context boundaries.
+- Prediction, market, ACCA, Master Rulebook, grading, settlement, and publication boundaries.
+- Frontend market/dashboard/auth/subscription/operator-health boundaries.
+- Rulebook, provider, ingestion, semantic drift, control-plane, and project-state documentation boundaries.
+- Supabase migration, RPC, RLS, scheduled function, Edge Function, and missing-function review boundaries.
+- Governance test boundaries.
+- Deployment/hosting config boundaries.
+- Root manual script, AI diagnostic, provider test, agent workflow, local runtime, and temporary data artifact boundaries.
+
+Important non-actions:
+- No file was deleted.
+- No file was merged.
+- No file was retired.
+- No runtime code was changed.
+- No UI behavior was changed.
+- No SQL was executed.
+- No Supabase/database state was changed.
+- No deployment or hosting config was changed.
+- No dependency/security/vulnerability remediation was performed.
+
+Phase 5 closure decision:
+- PHASE_5 batch-level functional overlap identification is complete across all deterministic batches B01-B29.
+- Phase 5 should now be treated as evidence-complete.
+- Future cleanup must be opened as a separate approved phase or mini-project before any merge, deletion, retirement, refactor, SQL, deployment, provider, dependency, or security action occurs.
+
+Next recommended control action:
+- Open the next approved cleanup phase only after explicit scope selection.
+- Do not act on Phase 5 overlap candidates directly without a new phase-specific decision gate.
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
