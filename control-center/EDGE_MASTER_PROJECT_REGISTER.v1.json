@@ -469,7 +469,7 @@
       "category": "Data and Storage",
       "description": "Define what Edge may retain from Scout/FIP while respecting the 0.5 GB Supabase capacity constraint and avoiding duplication of Scout's Neon evidence store.",
       "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
-      "current_status": "PROPOSED",
+      "current_status": "APPROVED",
       "priority": "critical",
       "blocked_by": [
         "ESA-001",
@@ -487,7 +487,11 @@
       "related_tasks": [
         "EST-001"
       ],
-      "related_contracts": [],
+      "related_contracts": [
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
+        "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1"
+      ],
       "related_files": [],
       "related_tables": [],
       "known_issues": [],
@@ -505,13 +509,14 @@
         "Control Center sequencing bypass"
       ],
       "recommended_order": 9,
-      "next_action": "Register and inventory Supabase storage before approving the FIP bridge.",
+      "next_action": "Contract sealed (EST-001-C1). Proceed to E2E-001 proof planning when separately authorized. Storage implementation remains forbidden.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
-      "last_updated": "2026-07-05",
+      "last_updated": "2026-07-12",
       "governed_by_control_task_id": "EST-001",
       "current_evidence": [
-        "Supabase free-tier storage capacity is constrained to approximately 0.5 GB",
-        "Scout already owns governed sports evidence in Neon and Drive"
+        "EST-001-C1 sealed control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md",
+        "Canonical source of truth, data classes T0/R1/R2/D1/F1, retention periods, replay/audit, and budget thresholds defined",
+        "supabase_storage_gate remains BLOCKED; full FIP body and Scout mirror storage forbidden"
       ]
     },
     {

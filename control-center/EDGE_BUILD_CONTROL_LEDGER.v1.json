@@ -434,7 +434,7 @@
       "task_name": "Supabase Storage and FIP Retention Contract",
       "workstream": "Data and Storage",
       "description": "Define what Edge may retain from Scout/FIP while respecting the 0.5 GB Supabase capacity constraint and avoiding duplication of Scout's Neon evidence store.",
-      "status": "PROPOSED",
+      "status": "APPROVED",
       "priority": "critical",
       "blocked_by": [
         "ESA-001",
@@ -449,8 +449,13 @@
         "storage",
         "Scout handoff"
       ],
-      "related_contracts": [],
+      "related_contracts": [
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
+        "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1"
+      ],
       "affected_files": [
+        "control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md",
         "supabase/",
         "sql/"
       ],
@@ -464,16 +469,17 @@
         "Tests or checks proving forbidden Scout evidence mirroring is not introduced"
       ],
       "current_evidence": [
-        "Supabase free-tier storage capacity is constrained to approximately 0.5 GB",
-        "Scout already owns governed sports evidence in Neon and Drive"
+        "EST-001-C1 sealed control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md",
+        "Canonical source of truth, data classes T0/R1/R2/D1/F1, retention periods, replay/audit, and ~0.5 GB budget thresholds defined",
+        "supabase_storage_gate remains BLOCKED; full FIP body and Scout mirror storage forbidden"
       ],
       "open_gaps": [
         "Current Supabase table-size inventory not yet integrated into Edge governance",
-        "No canonical FIP retention law exists"
+        "Runtime storage enforcement, schema creation, and purge jobs not implemented"
       ],
-      "next_action": "Register and inventory Supabase storage before approving the FIP bridge.",
+      "next_action": "Contract sealed (EST-001-C1). Proceed to E2E-001 proof planning when separately authorized. Storage implementation remains forbidden.",
       "owner_note": "Transporting a FIP does not mean permanently storing the whole FIP in Supabase.",
-      "last_updated": "2026-07-05"
+      "last_updated": "2026-07-12"
     },
     {
       "task_id": "ESEC-001",

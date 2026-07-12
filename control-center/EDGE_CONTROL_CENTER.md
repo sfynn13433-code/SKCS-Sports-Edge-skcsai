@@ -59,7 +59,7 @@ The following technical prerequisites must be satisfied:
 |---|---|---|
 | EMG-001 | Scout-Edge Marriage Gate Contract | APPROVED (contract sealed; gate remains BLOCKED) |
 | EFI-001 | FIP Intake Handshake | APPROVED (contract sealed; implementation forbidden) |
-| EST-001 | Supabase Storage and FIP Retention Contract | PROPOSED |
+| EST-001 | Supabase Storage and FIP Retention Contract | APPROVED (contract sealed; storage gate remains BLOCKED) |
 | ESEC-001 | Subscriber and Security Boundary | PROPOSED |
 | EPI-001 | Prediction Pipeline Integrity | PROPOSED |
 | EPRV-001 | External Sports Provider Removal | PARTIAL |
@@ -553,7 +553,7 @@ Required state snapshot:
   ],
   "eac_evidence_reusable": true,
   "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
-  "total_governed_assets": 905,
+  "total_governed_assets": 906,
   "phase_0": {
     "status": "PHASE_CLOSED",
     "question": "What exact repository state is the cleanup programme starting from?",
@@ -562,7 +562,7 @@ Required state snapshot:
       "active_branch": "main",
       "head_commit": "7d21fc276629bb6aec056299d70e1541b462934f",
       "working_tree_status": "dirty_unrelated_changes_preserved",
-      "governed_asset_count": 905,
+      "governed_asset_count": 906,
       "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
       "eac_batch_count": 29,
       "already_completed_or_removal_work": "Partial external sports provider removal (PARTIAL); EAC-001 B01-B29 classification inventory complete; prior Control Center per-asset investigations preserved as historical evidence",
@@ -10138,3 +10138,42 @@ Important non-actions:
 
 Validation boundary:
 - EFI-001-C1 contract recording only. Does not authorize runtime intake implementation or marriage-gate clearance.
+
+## EST-001-C1 — SUPABASE STORAGE AND FIP RETENTION CONTRACT
+
+Result: **APPROVED (contract sealed; storage gate remains BLOCKED; marriage gate remains BLOCKED)**
+
+Scope:
+- Mini-project: EST-001-C1 — Supabase Storage and FIP Retention Contract (contract-only)
+- Start commit: afc47d38a0f9dd24fb3a91bde89ad68306583d26
+- Mode: contract-only; no SQL/schema/runtime storage implementation
+- Cleanup programme: PROGRAMME_CLOSED (not reopened)
+- Prior contracts: EFI-001-C1, EMG-001-C1, SEE-001
+
+Start-point verification:
+- git status --short: clean at start
+- git rev-parse HEAD == afc47d38 at start
+- npm run control:center: PASS (required before commit)
+- npm run control:verify: PASS (required before commit)
+- npm run verify:rulebook: PASS (required before commit)
+
+Contract decision:
+- EST-001 storage/retention contract sealed at control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md
+- EST-001 task status: APPROVED (runtime storage implementation forbidden)
+- scout_edge_marriage_gate: BLOCKED (unchanged)
+- supabase_storage_gate: BLOCKED (unchanged)
+- Canonical sports truth remains in Scout (Neon); Edge stores derived state + minimal provenance/audit only
+- Full FIP body and Scout evidence mirror forbidden in Supabase
+- Data classes T0/R1/R2/D1/F1, retention periods, budget thresholds, replay/audit, and fail-closed persistence rules defined
+
+Evidence artifacts:
+- control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md
+
+Next recommended mini-project:
+- E2E-001-C1 — Scout to Edge End-to-End Proof planning packet (contract/read-only), when separately authorized
+
+Important non-actions:
+- No SQL, schema creation, Supabase mutation, runtime/API/pipeline/UI change, intake implementation, provider removal, dependency/security remediation, or gate clearance
+
+Validation boundary:
+- EST-001-C1 contract recording only. Does not authorize storage implementation or gate clearance.

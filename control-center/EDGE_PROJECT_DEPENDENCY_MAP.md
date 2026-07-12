@@ -60,7 +60,7 @@ Blocks: EPRV-001, E2E-001
 
 ## EST-001 — Supabase Storage and FIP Retention Contract
 
-Status: PROPOSED
+Status: APPROVED
 Governed by: EST-001
 Blocked by: ESA-001, EMG-001
 Blocks: EOPS-001, E2E-001
