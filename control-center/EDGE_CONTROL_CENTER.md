@@ -9248,3 +9248,229 @@ Batch decision:
 Validation boundary:
 - Evidence only.
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized by this packet.
+
+## PHASE 7 - B19-B22 MERGE AND CONSOLIDATION EVIDENCE
+
+Result: PASS WITH NO_ACTION AND RUNTIME-PROOF HOLDS
+
+Scope:
+- Phase: PHASE_7 - Merge and Consolidation
+- Grouped review unit: B19-B22
+- Start HEAD: 32804a91
+- Inspection scope: B19, B20, B21, B22 only
+- B23-B29 touched: NO
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Authority sources reviewed:
+- control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json B19, B20, B21, and B22 membership
+- control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json B19, B20, B21, and B22 register coverage
+- PHASE 4 - B19-B22 LEGACY AND REPLACEMENT IDENTIFICATION EVIDENCE
+- PHASE 5 - B19-B22 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+- PHASE 6 - B19-B22 CANONICAL AUTHORITY SELECTION EVIDENCE
+
+Corrected membership/register audit:
+- B19 SKCS_KNOWLEDGE_KNOWLEDGE: declared 17, actual paths 17, on-disk missing 0, register missing 0, functional groups: DOCUMENTATION_KNOWLEDGE 17.
+- B20 SKCS_KNOWLEDGE_PROVIDERS: declared 18, actual paths 18, on-disk missing 0, register missing 0, functional groups: PROVIDER_INTEGRATION 18.
+- B21 PUBLIC_UI: declared 64, actual paths 64, on-disk missing 0, register missing 0, functional groups: FRONTEND_UI 38; GENERATED_OUTPUT 18; PUBLIC_ASSET 8.
+- B22 SUPABASE_MIGRATIONS: declared 61, actual paths 61, on-disk missing 0, register missing 0, functional groups: DATABASE_MIGRATION 61.
+
+B19 assets inspected (17):
+1. SKCS-KNOWLEDGE/knowledge/api_registry.md
+2. SKCS-KNOWLEDGE/knowledge/architecture_decisions.md
+3. SKCS-KNOWLEDGE/knowledge/business_rules.md
+4. SKCS-KNOWLEDGE/knowledge/cost_registry.md
+5. SKCS-KNOWLEDGE/knowledge/database_schema.md
+6. SKCS-KNOWLEDGE/knowledge/dependency_registry.md
+7. SKCS-KNOWLEDGE/knowledge/edge_functions.md
+8. SKCS-KNOWLEDGE/knowledge/formula_registry.md
+9. SKCS-KNOWLEDGE/knowledge/glossary.md
+10. SKCS-KNOWLEDGE/knowledge/pipeline_metrics_registry.md
+11. SKCS-KNOWLEDGE/knowledge/provider_registry.md
+12. SKCS-KNOWLEDGE/knowledge/scheduled_jobs.md
+13. SKCS-KNOWLEDGE/knowledge/semantic_field_mapping_registry.md
+14. SKCS-KNOWLEDGE/knowledge/semantic_violation_log.md
+15. SKCS-KNOWLEDGE/knowledge/system_topology.md
+16. SKCS-KNOWLEDGE/knowledge/views_and_materialized_views.md
+17. SKCS-KNOWLEDGE/README.md
+
+B20 assets inspected (18):
+1. SKCS-KNOWLEDGE/providers/bigballs_discovery_audit.md
+2. SKCS-KNOWLEDGE/providers/bigballs_endpoint_catalog.md
+3. SKCS-KNOWLEDGE/providers/bigballs_primary_assessment.md
+4. SKCS-KNOWLEDGE/providers/bigballs_provider_health.md
+5. SKCS-KNOWLEDGE/providers/bigballs_semantic_mapping.md
+6. SKCS-KNOWLEDGE/providers/bsd_coverage_audit.md
+7. SKCS-KNOWLEDGE/providers/bsd_endpoint_catalog.md
+8. SKCS-KNOWLEDGE/providers/bsd_league_inventory.md
+9. SKCS-KNOWLEDGE/providers/bsd_provider_health.md
+10. SKCS-KNOWLEDGE/providers/bsd_readiness_assessment.md
+11. SKCS-KNOWLEDGE/providers/bsd_semantic_mapping.md
+12. SKCS-KNOWLEDGE/providers/bzzoiro_discovery_audit.md
+13. SKCS-KNOWLEDGE/providers/bzzoiro_field_audit.md
+14. SKCS-KNOWLEDGE/providers/bzzoiro_provider_mapping.md
+15. SKCS-KNOWLEDGE/providers/soccerdata_call_restrictions.md
+16. SKCS-KNOWLEDGE/providers/soccerdata_endpoint_catalog.md
+17. SKCS-KNOWLEDGE/providers/soccerdata_notebooklm_synthesis.md
+18. SKCS-KNOWLEDGE/providers/soccerdata_provider_health.md
+
+B21 assets inspected (64):
+1. public/about-bg.jpg
+2. public/about-bg.webp
+3. public/accuracy.html
+4. public/admin-sync.html
+5. public/components/HeroCarousel.jsx
+6. public/components/TrendDashboard.jsx
+7. public/control-center.html
+8. public/css/control-center.css
+9. public/css/hero-carousel.css
+10. public/css/input.css
+11. public/css/output.css
+12. public/css/react-components.css
+13. public/data/all_leagues_raw.json
+14. public/data/all_sports_raw.json
+15. public/data/context-pack-2026-05-17.json
+16. public/data/event-details-cache.json
+17. public/data/h2h-2026-05-17.json
+18. public/data/importance-2026-05-17.json
+19. public/data/injuries-2026-05-17.json
+20. public/data/news-injury-cache.json
+21. public/data/pipeline-dry-2026-05-17.json
+22. public/data/standings-cache.json
+23. public/data/team-form-2026-05-17.json
+24. public/data/team-form-cache.json
+25. public/data/travel-2026-05-17.json
+26. public/data/tsdb-coverage-2026-05-17.json
+27. public/data/tsdb-coverage-2026-05-18.json
+28. public/data/tsdb-coverage-2026-05-19.json
+29. public/data/tsdb-day-2026-05-17.json
+30. public/data/vip-stress-saturday.json
+31. public/direct-markets.html
+32. public/experience.html
+33. public/favicon.ico
+34. public/hero-page.jpg
+35. public/hero-page.webp
+36. public/index.html
+37. public/js/acca-builder.js
+38. public/js/ai-reasoning-display.js
+39. public/js/config.js
+40. public/js/control-center.js
+41. public/js/doubleChanceCombos.js
+42. public/js/hero-carousel.js
+43. public/js/semantic-drift-dashboard.js
+44. public/js/smh-hub-master-rulebook.js
+45. public/js/smh-hub.js
+46. public/js/supabase-bundle.js
+47. public/js/supabase-init.js
+48. public/js/system-health-banner.js
+49. public/js/user-experience-feedback.js
+50. public/js/vip-stress-dashboard.js
+51. public/language-switch.html
+52. public/language.jpg
+53. public/login.html
+54. public/login.jpg
+55. public/market-explorer.html
+56. public/payment.html
+57. public/privacy.html
+58. public/robots.txt
+59. public/style.css
+60. public/subscribe/index.html
+61. public/subscription.html
+62. public/terms.html
+63. public/vip-stress-dashboard.html
+64. public/windrawwin.jpg
+
+B22 assets inspected (61):
+1. supabase/migrations/20260415000001_create_insight_usage.sql
+2. supabase/migrations/20260418000002_update_predictions_final_risk_level_check.sql
+3. supabase/migrations/20260501_skcs_comprehensive_engine.sql
+4. supabase/migrations/20260512000001_create_canonical_bookmakers.sql
+5. supabase/migrations/20260512000002_add_odds_to_match_context.sql
+6. supabase/migrations/20260512000003_create_sport_sync_table.sql
+7. supabase/migrations/20260512000004_create_upsert_raw_fixture_rpc.sql
+8. supabase/migrations/20260512000005_create_context_enrichment_trigger.sql
+9. supabase/migrations/20260512000006_create_fixture_processing_log.sql
+10. supabase/migrations/20260512000007_create_admin_views.sql
+11. supabase/migrations/20260512000008_create_event_odds_snapshots.sql
+12. supabase/migrations/20260512000009_create_get_prediction_rpc.sql
+13. supabase/migrations/20260512000010_populate_sport_sync.sql
+14. supabase/migrations/20260512000012_create_get_prediction_function.sql
+15. supabase/migrations/20260512000013_disable_rls_match_context.sql
+16. supabase/migrations/20260522000001_add_watchlist_column.sql
+17. supabase/migrations/20260522000002_add_sport_to_tier_rules.sql
+18. supabase/migrations/20260523000001_drop_insight_usage.sql
+19. supabase/migrations/20260524000001_remove_dev_rls_policies.sql
+20. supabase/migrations/20260524000002_create_upsert_canonical_event_rpc.sql
+21. supabase/migrations/20260531000001_skcs_engine_v2_phase0_identity.sql
+22. supabase/migrations/20260531000002_skcs_engine_v2_phase0b_match_results.sql
+23. supabase/migrations/20260617_add_market_tier.sql
+24. supabase/migrations/20260619000001_rename_predictions_final_to_direct1x2.sql
+25. supabase/migrations/20260619000002_align_direct1x2_columns.sql
+26. supabase/migrations/20260619000003_direct1x2_risk_tier_and_secondary_markets.sql
+27. supabase/migrations/20260621000001_enforce_league_country_on_direct_matches.sql
+28. supabase/migrations/20260701000001_normalize_sport_names.sql
+29. supabase/migrations/20260717000001_create_f1_schema.sql
+30. supabase/migrations/20260718000001_db_rule_alignment_75_55_30.sql
+31. supabase/migrations/20260820000001_rename_risk_tiers_and_safe_haven.sql
+32. supabase/migrations/20260820000002_fix_secondary_governance_80_75.sql
+33. supabase/migrations/20260822000001_add_partitioning.sql
+34. supabase/migrations/20260822000002_create_relational_odds_tables.sql
+35. supabase/migrations/20260822000002a_create_relational_tables.sql
+36. supabase/migrations/20260822000002b_create_relational_indexes.sql
+37. supabase/migrations/20260822000002c_create_relational_functions_triggers.sql
+38. supabase/migrations/20260822000002d_create_relational_views.sql
+39. supabase/migrations/20260822000003_normalize_prediction_tables.sql
+40. supabase/migrations/20260822000003a_create_prediction_tables.sql
+41. supabase/migrations/20260822000003b_create_prediction_indexes.sql
+42. supabase/migrations/20260822000003c_create_prediction_functions_triggers.sql
+43. supabase/migrations/20260822000003d_create_prediction_views.sql
+44. supabase/migrations/20260822000004_create_materialized_admin_views.sql
+45. supabase/migrations/20260822000005_skcs_engine_v2_engine_core.sql
+46. supabase/migrations/20260822000006_ai_governance_telemetry.sql
+47. supabase/migrations/20260822000007_ai_governance_rls_policies.sql
+48. supabase/migrations/20260822000008_service_role_rls_policies.sql
+49. supabase/migrations/20260822000009_public_read_config_rls_policies.sql
+50. supabase/migrations/20260822000010_public_read_reference_rls.sql
+51. supabase/migrations/20260822000011_system_health_state.sql
+52. supabase/migrations/20260822000012_semantic_violations.sql
+53. supabase/migrations/20260822000013_semantic_violation_summary.sql
+54. supabase/migrations/20260822000014_system_health_state_contract.sql
+55. supabase/migrations/20260902000000_pipeline_health_feed.sql
+56. supabase/migrations/20261001000000_runtime_truth_mirror.sql
+57. supabase/migrations/20261005000000_runtime_truth_mirror_alignment.sql
+58. supabase/migrations/20261005000001_fix_calculate_team_strength_ambiguity.sql
+59. supabase/migrations/20261006000000_sportsdataio_contract_alignment.sql
+60. supabase/migrations/20261006000001_canonical_events.sql
+61. supabase/migrations/20261007000000_user_experience_feedback.sql
+
+Evidence summary:
+- Phase 4 B19-B22 closed B19 as 17 CURRENT assets, B20 as 18 CURRENT assets, B21 as 64 CURRENT assets, and B22 as 61 CURRENT assets, with UNKNOWN 0 and no cleanup action authorized.
+- Phase 5 B19-B22 proved functional overlap candidates across public frontend surfaces, auth/subscription/account surfaces, operator/control-plane widgets, public legal/product pages, static presentation assets, and Supabase migration families, but authorized no deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation.
+- Phase 6 B19-B22 kept public frontend, auth, subscription, operator, legal, static, style, generated public output, and public presentation assets as CANONICAL_KEEP where recorded.
+- Phase 6 B19-B22 held Supabase migration files behind NEEDS_RUNTIME_PROOF before execution, replacement, consolidation, rewrite, deletion, or retirement.
+- No Phase 6 decision directly authorizes implementation-level merge/consolidation for B19-B22.
+
+Merge/consolidation decision:
+- B19 SKCS-KNOWLEDGE knowledge registry/reference assets: NO_ACTION; no merge target or replacement authority is proven in this phase.
+- B20 provider knowledge assets: NO_ACTION where provider/reference role is preserved; HOLD_NEEDS_RUNTIME_PROOF before any provider-policy consolidation, replacement, or retirement.
+- B21 public UI, generated public output, and public static/presentation assets: NO_ACTION for current public delivery assets; no UI, route, auth, subscription, legal, styling, generated-output, or browser-delivered behavior is changed.
+- B22 Supabase migration assets: HOLD_NEEDS_RUNTIME_PROOF; migrations remain historical/ordered database-change artifacts and must not be executed, rewritten, merged, deleted, consolidated, or retired in this phase.
+
+Implementation boundary:
+- B19-B22 only.
+- B23-B29 not inspected for implementation in this packet.
+- No runtime/source files changed.
+- No Supabase, database, SQL, deployment, dependency, security, legal, subscription, prediction-content, user-data, UI, route, generated-output, or public asset behavior changed.
+
+Batch decision:
+- B19-B22 merge/consolidation gate is evidence-complete with NO_ACTION for proven current knowledge/reference and public delivery assets, and HOLD_NEEDS_RUNTIME_PROOF for provider-policy and Supabase migration consolidation candidates.
+- Grouped unit B19-B22 is closed.
+- Next deterministic group: B23-B26
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, vulnerability remediation, legal text change, subscription behavior change, prediction-content change, user-data change, UI behavior change, route change, generated-output change, or public asset change is authorized by this packet.
