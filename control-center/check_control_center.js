@@ -335,11 +335,11 @@ function createControlCenterGateState(overrides = {}) {
     },
     active_phase: ACTIVE_CLEANUP_PHASE,
     active_phase_question: PHASE_QUESTIONS[ACTIVE_CLEANUP_PHASE],
-    lifecycle_state: "PHASE_ACTIVE",
+    lifecycle_state: "BATCH_COMPLETE",
     active_batch: null,
-    completed_batches: [],
-    remaining_batches: [...batchIds],
-    next_deterministic_batch: batchIds[0] || null,
+    completed_batches: ["B01"],
+    remaining_batches: batchIds.filter((batchId) => batchId !== "B01"),
+    next_deterministic_batch: "B02",
     phase_3_outcomes: [...PHASE_3_OUTCOMES],
     phase_3_no_deletion_law: "NO_CURRENT_USE_FOUND does not authorize deletion.",
     future_phase_notes: [],
@@ -956,8 +956,8 @@ function validateControlCenterPolicy(documentText) {
     errors.push("Control Center state lifecycle_state invalid");
   }
 
-  if (state.lifecycle_state !== "PHASE_ACTIVE") {
-    errors.push("Control Center state lifecycle_state must be PHASE_ACTIVE");
+  if (state.lifecycle_state !== "BATCH_COMPLETE") {
+    errors.push("Control Center state lifecycle_state must be BATCH_COMPLETE");
   }
 
   if (!Array.isArray(state.completed_batches)) {
@@ -1018,6 +1018,14 @@ function validateControlCenterPolicy(documentText) {
     )
   ) {
     errors.push("EDGE_CONTROL_CENTER.md missing PHASE_7 activation warning");
+  }
+
+  if (
+    !String(documentText).includes(
+      "## PHASE 7 - B01 MERGE AND CONSOLIDATION EVIDENCE"
+    )
+  ) {
+    errors.push("EDGE_CONTROL_CENTER.md missing PHASE 7 B01 evidence");
   }
 
   if (
