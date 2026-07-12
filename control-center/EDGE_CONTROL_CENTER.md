@@ -5406,3 +5406,284 @@ Batch decision:
 Validation boundary:
 - Evidence only.
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+
+## PHASE 5 - B07-B10 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+
+Result: PASS WITH OVERLAP CANDIDATES
+
+Scope:
+- Phase: PHASE_5 - Functional Overlap Identification
+- Batches: B07-B10
+- Evidence type: functional-overlap identification only
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Batch manifest evidence:
+- Batch group: B07-B10
+- Start HEAD: 427ccfce
+- Compact overlap scan inspected backend service assets, provider-service assets, unified service assets, audit scripts, gatekeeper scripts, and rule/market/prediction scripts.
+
+Outcome vocabulary used:
+- NO_OVERLAP
+- PARTIAL_OVERLAP
+- MAJOR_OVERLAP
+- POTENTIAL_MERGE_GROUP
+
+Candidate group 1: pipeline, sync, scheduler, and execution orchestration
+
+Assets:
+- backend/services/syncService.js
+- backend/services/cronJobs.js
+- backend/services/thesportsdbPipeline.js
+- backend/services/dataProvider.js
+- backend/services/hybridSportsDataService.js
+- backend/services/pipelineMetricsService.js
+- backend/services/systemTruthLogger.js
+- scripts/gatekeeper-pipeline.js
+- scripts/audit-execution-spine.js
+
+Outcome:
+- MAJOR_OVERLAP
+
+Evidence:
+- syncService.js coordinates aiPipeline, dataProvider, canonicalEvents, dataProviders cache wall, normalizerService, quotaPlanner, executionPipeline, verificationController, and pipelineLogger.
+- cronJobs.js schedules automated pipeline tasks and uses thesportsdbPipeline, apiQueue, database access, governance gatekeeper, pipeline metrics, and executionPipeline.
+- thesportsdbPipeline.js describes a data pipeline with fixture sync, context enrichment, and EdgeMind insight generation.
+- pipelineMetricsService.js and systemTruthLogger.js inspect or log pipeline health and execution truth.
+- scripts/gatekeeper-pipeline.js and audit-execution-spine.js overlap with execution-pipeline governance and audit boundaries.
+
+Decision:
+- Major functional overlap is proven across pipeline orchestration, scheduler, truth logging, and audit surfaces.
+- No canonical pipeline authority is selected in Phase 5.
+- No refactor, deletion, merge, or behavior change is authorized.
+- Carry forward as a future pipeline-boundary/canonicalization candidate.
+
+Candidate group 2: provider access, provider quota, RapidAPI, and cache boundaries
+
+Assets:
+- backend/services/dataProvider.js
+- backend/services/dataProviders.js
+- backend/services/providerQuotaService.js
+- backend/services/quotaPlanner.js
+- backend/services/oddsBudgetService.js
+- backend/services/divanscoreService.js
+- backend/services/metrxFactoryService.js
+- backend/services/football536Service.js
+- backend/services/freeLivescoreApiService.js
+- backend/services/liveFootballApiService.js
+- backend/services/sportsApiProFootballService.js
+- backend/services/proFootballDataService.js
+- backend/services/soccerDataApiClient.js
+- backend/services/sportsrcHealthService.js
+- scripts/audit-api-call-map.js
+- scripts/audit-api-sports-usage.js
+- scripts/audit-v2-provider-coverage.js
+
+Outcome:
+- MAJOR_OVERLAP
+
+Evidence:
+- Multiple service files configure external provider hosts, keys, cache, quota, pacing, provider fallback, provider health, and RapidAPI access.
+- providerQuotaService.js records rapidapi_quota_usage.
+- quotaPlanner.js plans provider usage from provider quota state.
+- oddsBudgetService.js manages odds/provider usage budget.
+- dataProvider.js and dataProviders.js both represent provider acquisition/routing concerns.
+- Audit scripts inspect API call maps, API-Sports usage, and provider coverage.
+
+Decision:
+- Major functional overlap is proven across provider access and quota governance surfaces.
+- No provider retirement or dependency/security change is authorized.
+- Carry forward as a future external-provider boundary/canonicalization candidate.
+
+Candidate group 3: cricket service boundary
+
+Assets:
+- backend/services/cricApiCacheService.js
+- backend/services/cricbuzzService.js
+- backend/services/cricketLiveEnrichmentService.js
+- backend/services/cricketLiveMatchResolver.js
+- backend/services/cricketRulesEngine.js
+- scripts/audit-cricket-final-tables.js
+- scripts/audit-cricket-rules.js
+- scripts/audit-cricket-storage.js
+- scripts/audit-cricket-tables.js
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- cricApiCacheService.js writes and reads cricket_data.json cache material.
+- cricbuzzService.js calls Cricbuzz RapidAPI feeds and validates cricket match data.
+- cricketLiveEnrichmentService.js and cricketLiveMatchResolver.js both use cricket-live-line-advance RapidAPI and ingestion gates.
+- cricketRulesEngine.js controls cricket market rules/confidence bands/risk tiers.
+- Cricket audit scripts inspect cricket tables, storage, and rules.
+
+Decision:
+- Cricket functional overlap is proven across cache, live resolver, enrichment, rules, and audit surfaces.
+- No consolidation, deletion, or database action is authorized.
+- Carry forward as a future cricket-service boundary candidate.
+
+Candidate group 4: football provider, extractor, ranking, and enrichment surfaces
+
+Assets:
+- backend/services/football536Extractor.js
+- backend/services/football536Service.js
+- backend/services/footballH2HExtractor.js
+- backend/services/footballHighlightsService.js
+- backend/services/footballRankExtractor.js
+- backend/services/footballRiskTierMapper.js
+- backend/services/freeLivescoreApiExtractor.js
+- backend/services/freeLivescoreApiService.js
+- backend/services/liveFootballApiExtractor.js
+- backend/services/liveFootballApiService.js
+- backend/services/sportsApiProFootballExtractor.js
+- backend/services/sportsApiProFootballService.js
+- backend/services/sportsLiveScoresExtractor.js
+- backend/services/sportsLiveScoresService.js
+- scripts/audit-bigballs-discovery.js
+- scripts/audit-bsd-discovery.js
+- scripts/audit-bsd-league-inventory.js
+- scripts/audit-soccerdata-discovery.js
+- scripts/audit-soccerdata-summer-coverage.js
+- scripts/audit-sportsdataio-boundary.ps1
+
+Outcome:
+- MAJOR_OVERLAP
+
+Evidence:
+- Several services and extractors normalize football provider payloads, classify provider responses, extract fixture/ranking/odds/prediction-like data, and manage provider-specific RapidAPI configuration.
+- Discovery/audit scripts inspect provider coverage, boundaries, and league inventories.
+- Some repeated provider/extractor pattern is expected, but the number of provider-specific boundaries is high.
+
+Decision:
+- Major provider-boundary overlap is proven.
+- No provider is selected as canonical in Phase 5.
+- No provider deletion, merge, or retirement is authorized.
+- Carry forward as a future football-provider boundary/canonicalization candidate.
+
+Candidate group 5: prediction, market, ACCA, rulebook, and scoring surfaces
+
+Assets:
+- backend/services/direct1x2Builder.js
+- backend/services/direct1x2Engine.js
+- backend/services/filterEngine.js
+- backend/services/marketIntelligence.js
+- backend/services/marketScoringEngine.js
+- backend/services/masterRulebookRiskClassification.js
+- backend/services/reEvaluationEngine.js
+- backend/services/safeHavenSelector.js
+- backend/services/saveDirectInsights.js
+- backend/services/unifiedPredictionsService.js
+- backend/services/unifiedRulesService.js
+- scripts/audit-football-rules-alignment.js
+- scripts/audit-sport-values.js
+- scripts/secondary-market-gatekeeper.js
+
+Outcome:
+- MAJOR_OVERLAP
+
+Evidence:
+- direct1x2Builder.js builds and saves prediction output, uses secondary markets, AI provider, football rules, config, Supabase, and executionPipeline.
+- direct1x2Engine.js evaluates 1X2 predictions and ACCA eligibility using football rules.
+- marketIntelligence.js, marketScoringEngine.js, masterRulebookRiskClassification.js, safeHavenSelector.js, and secondary-market-gatekeeper.js all touch market/rule/scoring boundaries.
+- unifiedPredictionsService.js and unifiedRulesService.js provide cross-sport prediction/rule access surfaces.
+- audit-football-rules-alignment.js checks rule alignment across runtime services.
+
+Decision:
+- Major rule/prediction/market overlap is proven.
+- No canonical rulebook or market-scoring authority is selected in Phase 5.
+- No rule threshold, prediction behavior, or ACCA behavior is changed.
+- Carry forward as a future prediction/rule-authority canonicalization candidate.
+
+Candidate group 6: grading, accuracy, semantic drift, and operational health
+
+Assets:
+- backend/services/gradingAccuracyCore.js
+- backend/services/gradingSnapshotService.js
+- backend/services/semanticDriftSummaryService.js
+- backend/services/pipelineMetricsService.js
+- backend/services/systemTruthLogger.js
+- scripts/audit-grading-pipeline.js
+- scripts/audit-placeholders-and-insights.js
+- scripts/master-qa.js
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- gradingAccuracyCore.js and gradingSnapshotService.js both support grading/accuracy surfaces.
+- semanticDriftSummaryService.js summarizes semantic drift and pipeline/provider context.
+- pipelineMetricsService.js and systemTruthLogger.js inspect execution/pipeline health.
+- Audit and QA scripts inspect grading pipeline and quality surfaces.
+
+Decision:
+- Partial overlap is proven across operational health, grading, and QA/audit surfaces.
+- No merge group is selected yet.
+- Carry forward as operational-reporting boundary evidence.
+
+Candidate group 7: unified data access surfaces
+
+Assets:
+- backend/services/unifiedFixturesService.js
+- backend/services/unifiedPredictionsService.js
+- backend/services/unifiedRulesService.js
+- backend/services/normalizerService.js
+- backend/services/saveContextData.js
+- backend/services/saveDirectInsights.js
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- unifiedFixturesService.js, unifiedPredictionsService.js, and unifiedRulesService.js provide unified read surfaces over fixture, prediction, and rule tables.
+- normalizerService.js normalizes provider data into match-context shape.
+- saveContextData.js and saveDirectInsights.js persist context/insight data to Supabase.
+- These files overlap around canonical data access and persistence boundaries.
+
+Decision:
+- Functional overlap is proven.
+- No data-access architecture decision is made in Phase 5.
+- No SQL or Supabase mutation is authorized.
+- Carry forward as a future unified-data-access boundary candidate.
+
+Candidate group 8: Control Center read service bridge
+
+Assets:
+- backend/services/controlCenterReadService.js
+- control-center/check_edge_asset_classification.js
+- control-center/check_control_center.js
+- control-center/check_edge_system_runtime_inventory.js
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- controlCenterReadService.js reads and caches Control Center, EAC, and runtime checker outputs for backend/API consumption.
+- It overlaps with Control Center checkers by consuming their outputs, but it is a backend read bridge rather than the governance checker authority.
+
+Decision:
+- Keep separate.
+- No merge or refactor is authorized.
+- Carry forward only as a backend/governance bridge boundary note.
+
+Distinct-role findings:
+- backend/services/subscriptionTiming.js is subscription timing/status logic; no B07-B10 same-job merge group proven.
+- backend/services/tier1BootstrapService.js and backend/services/tier1SchemaProfile.js relate to Tier 1 schema/profile/provisioning and are not proven duplicates of the main provider services by this scan.
+- backend/services/contradictionGovernance.js is market contradiction governance; it relates to market/rule surfaces but is not separately selected as a merge group in this packet.
+- scripts/apply-db-governance.js and scripts/apply-migrations.js are database mutation-capable scripts but were not executed and are not remediated in Phase 5.
+- scripts/audit-database.js, audit-table-usage.js, audit-v2-foundation.js, and audit-v2-identity-deep.js are database audit scripts; their overlap is recorded as audit/runtime evidence only.
+
+Batch decision:
+- B07-B10 contains proven functional overlap candidates.
+- Potential future canonicalization candidates are recorded for pipeline orchestration, provider access/quota, cricket services, football provider/extractor surfaces, prediction/rule/market authority, operational reporting, unified data access, and Control Center backend bridge boundaries.
+- No cleanup action is authorized by this outcome.
+- B07-B10 Phase 5 evidence is closed.
+- Next batch group: B11-B14.
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
