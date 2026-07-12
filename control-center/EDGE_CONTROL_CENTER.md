@@ -589,13 +589,13 @@ Required state snapshot:
     "B07-B10",
     "B11-B14",
     "B15-B18",
-    "B19-B22"
+    "B19-B22",
+    "B23-B26"
   ],
   "remaining_batches": [
-    "B23-B26",
     "B27-B29"
   ],
-  "next_deterministic_batch": "B23-B26",
+  "next_deterministic_batch": "B27-B29",
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,
@@ -7803,6 +7803,109 @@ B04-B06 Phase 6 decision summary:
 
 Next batch group:
 - B07-B10
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized by this packet.
+
+## PHASE 6 - B23-B26 CANONICAL AUTHORITY SELECTION EVIDENCE
+
+Decision vocabulary used:
+- CANONICAL_KEEP
+- NEEDS_RUNTIME_PROOF
+
+Existing runtime/service authorities from earlier B04-B06, B07-B10, B15-B18, and B19-B22 decisions remain CANONICAL_KEEP where already recorded.
+This packet records the B23-B26 Phase 5 overlap candidate families only and does not replace earlier authorities with SQL, function, scratch, or deployment artifacts.
+
+Candidate group 1: SQL prediction, ACCA, market, and rulebook surfaces
+
+Phase 6 decisions:
+- sql/acca_rules.sql: NEEDS_RUNTIME_PROOF - historical SQL seed artifact, not canonical runtime authority.
+- sql/extreme_smb_data.sql: NEEDS_RUNTIME_PROOF - historical SQL schema artifact, not canonical runtime authority.
+- sql/market_correlations_schema.sql: NEEDS_RUNTIME_PROOF - historical SQL schema artifact, not canonical runtime authority.
+- sql/master_rulebook_triggers.sql: NEEDS_RUNTIME_PROOF - historical SQL trigger artifact, not canonical runtime authority.
+- sql/performance_optimizations.sql: NEEDS_RUNTIME_PROOF - historical SQL optimization artifact, not canonical runtime authority.
+- sql/schema_refactor.sql: NEEDS_RUNTIME_PROOF - historical SQL schema artifact, not canonical runtime authority.
+- sql/tables.sql: NEEDS_RUNTIME_PROOF - historical SQL schema artifact, not canonical runtime authority.
+- sql/tier_rules.sql: NEEDS_RUNTIME_PROOF - historical SQL seed artifact, not canonical runtime authority.
+- supabase/schema/ai_pipeline_schema.sql: NEEDS_RUNTIME_PROOF - historical pipeline schema artifact, not canonical runtime authority.
+
+No canonical SQL rulebook/schema authority is selected.
+These assets remain historical/ordered database-change artifacts held behind NEEDS_RUNTIME_PROOF before execution, replacement, consolidation, rewrite, deletion, or retirement.
+
+Candidate group 2: Supabase RLS, subscription, test-user, and access setup scripts
+
+Phase 6 decisions:
+- sql/day_zero_subscription.sql: NEEDS_RUNTIME_PROOF - subscription setup SQL, not canonical access authority.
+- sql/fix_rls_policies.sql: NEEDS_RUNTIME_PROOF - RLS repair SQL, not canonical access authority.
+- sql/supabase_test_user_reset_and_seed.sql: NEEDS_RUNTIME_PROOF - test-user reset/seed SQL, not canonical access authority.
+- sql/supabase_test_user_seed_access.sql: NEEDS_RUNTIME_PROOF - test-user access seed SQL, not canonical access authority.
+
+No canonical Supabase access/test-user script is selected.
+These assets remain held behind NEEDS_RUNTIME_PROOF before execution, replacement, consolidation, rewrite, deletion, or retirement.
+
+Candidate group 3: RapidAPI cache, monitoring, and operational SQL surfaces
+
+Phase 6 decisions:
+- sql/rapidapi_cache.sql: NEEDS_RUNTIME_PROOF - operational SQL artifact, not canonical cache authority.
+- sql/monitoring_tables.sql: NEEDS_RUNTIME_PROOF - operational SQL artifact, not canonical monitoring authority.
+- sql/performance_optimizations.sql: NEEDS_RUNTIME_PROOF - operational SQL artifact, not canonical monitoring authority.
+- supabase/schema/ai_pipeline_schema.sql: NEEDS_RUNTIME_PROOF - pipeline schema artifact, not canonical operational authority.
+
+No canonical operational SQL authority is selected.
+These assets remain held behind NEEDS_RUNTIME_PROOF before execution, replacement, consolidation, rewrite, deletion, or retirement.
+
+Candidate group 4: Supabase scheduled sync, refresh, and semantic function surfaces
+
+Phase 6 decisions:
+- supabase/edge-functions/scheduled-fixture-sync/index.ts: NEEDS_RUNTIME_PROOF - scheduled sync function surface, not canonical authority until overlap with scheduledFixtureSync is resolved.
+- supabase/edge-functions/scheduledFixtureSync/index.ts: NEEDS_RUNTIME_PROOF - scheduled sync function surface, not canonical authority until overlap with scheduled-fixture-sync is resolved.
+- supabase/functions/scheduled-prediction-refresh/index.ts: NEEDS_RUNTIME_PROOF - scheduled refresh function surface, not canonical authority.
+- supabase/functions/semantic-drift-summary/index.ts: NEEDS_RUNTIME_PROOF - semantic drift function surface, not canonical authority.
+- supabase/functions/sync-sports-data/index.ts: NEEDS_RUNTIME_PROOF - manifest-listed path absent from working tree; recorded as evidence only. No restore, delete, deploy, or repair is authorized.
+
+No canonical Supabase function authority is selected among overlapping scheduled/sync surfaces.
+Missing manifest asset is recorded only as future governance evidence.
+
+Candidate group 5: Control Center and governance test surfaces
+
+Phase 6 decisions:
+- tests/edge-asset-classification.test.js: CANONICAL_KEEP - distinct asset-classification governance contract.
+- tests/edge-control-center-ledger.test.js: CANONICAL_KEEP - distinct Control Center ledger governance contract.
+- tests/edge-control-center-ui.test.js: CANONICAL_KEEP - distinct Control Center UI governance contract.
+- tests/edge-project-register.test.js: CANONICAL_KEEP - distinct project-register governance contract.
+- tests/edge-repository-asset-register.test.js: CANONICAL_KEEP - distinct repository asset-register governance contract.
+- tests/edge-system-runtime-inventory.test.js: CANONICAL_KEEP - distinct system runtime inventory governance contract.
+
+Governance tests remain separate canonical authorities for their distinct Control Center contracts.
+
+Candidate group 6: scratch database scripts
+
+Phase 6 decisions:
+- scratch/db_normalize.js: NEEDS_RUNTIME_PROOF - mutation-capable scratch script, not canonical authority.
+- scratch/db_sync.js: NEEDS_RUNTIME_PROOF - mutation-capable scratch script, not canonical authority.
+
+No scratch database script is selected as canonical authority.
+These assets remain held behind NEEDS_RUNTIME_PROOF before execution, replacement, consolidation, rewrite, deletion, or retirement.
+
+Candidate group 7: deployment and hosting configuration surfaces
+
+Phase 6 decisions:
+- Dockerfile: CANONICAL_KEEP - distinct container hosting authority.
+- render.yaml: CANONICAL_KEEP - distinct Render hosting authority.
+- vercel.json: CANONICAL_KEEP - distinct Vercel hosting authority.
+
+Deployment configuration surfaces remain separate canonical authorities for their distinct hosting surfaces.
+
+B23-B26 Phase 6 decision summary:
+- Candidate groups reviewed: 7
+- CANONICAL_KEEP decisions recorded: YES
+- NEEDS_RUNTIME_PROOF holds recorded: YES
+- Merge, deletion, retirement, refactor, SQL execution, Supabase mutation, deployment change, dependency, security, or runtime action authorized: NO
+- B23-B26 Phase 6 canonical authority selection is evidence-complete.
+
+Next batch group:
+- B27-B29
 
 Validation boundary:
 - Evidence only.

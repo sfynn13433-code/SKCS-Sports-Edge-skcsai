@@ -332,6 +332,7 @@ function createControlCenterGateState(overrides = {}) {
       "B11-B14",
       "B15-B18",
       "B19-B22",
+      "B23-B26",
     ],
     remaining_batches: reviewUnits.filter(
       (unit) =>
@@ -340,9 +341,10 @@ function createControlCenterGateState(overrides = {}) {
       unit !== "B07-B10" &&
       unit !== "B11-B14" &&
       unit !== "B15-B18" &&
-      unit !== "B19-B22"
+      unit !== "B19-B22" &&
+      unit !== "B23-B26"
     ),
-    next_deterministic_batch: "B23-B26",
+    next_deterministic_batch: "B27-B29",
     phase_3_outcomes: [...PHASE_3_OUTCOMES],
     phase_3_no_deletion_law: "NO_CURRENT_USE_FOUND does not authorize deletion.",
     future_phase_notes: [],
