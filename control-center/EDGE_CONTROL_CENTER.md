@@ -5154,3 +5154,255 @@ Batch decision:
 Validation boundary:
 - Evidence only.
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+
+## PHASE 5 - B04-B06 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+
+Result: PASS WITH OVERLAP CANDIDATES
+
+Scope:
+- Phase: PHASE_5 - Functional Overlap Identification
+- Batches: B04 - BACKEND_UTILS_SEMANTIC_CORE_AND_TEST; B05 - BACKEND_SCRIPTS; B06 - BACKEND_PROVIDERS
+- Evidence type: functional-overlap identification only
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Batch manifest evidence:
+- B04 asset_count: 46
+- B05 asset_count: 15
+- B06 asset_count: 10
+- Combined reviewed assets: 71
+- Start HEAD: cb368c49
+- Compact overlap scan inspected B04-B06 membership, semantic/core utilities, backend utility helpers, backend scripts, and football provider/normalizer assets.
+
+Outcome vocabulary used:
+- NO_OVERLAP
+- PARTIAL_OVERLAP
+- MAJOR_OVERLAP
+- POTENTIAL_MERGE_GROUP
+
+Candidate group 1: verification controller boundary
+
+Assets:
+- backend/core/verificationController.js
+- backend/semantic-layer/verificationController.js
+- backend/core/verificationSignalContract.js
+- backend/core/executionPipeline.js
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- backend/core/verificationController.js is a core verification controller and uses database query access plus verification signal contracts.
+- backend/semantic-layer/verificationController.js imports the core verification controller and adapts semantic-layer context into verification signals.
+- backend/core/verificationSignalContract.js defines verification signal types.
+- backend/core/executionPipeline.js consumes semantic-layer verification, preflight, gatekeeper, control-plane, fingerprint, and error-memory components.
+- These files overlap around verification and pipeline health concepts, but the current evidence shows layered roles rather than identical jobs.
+
+Decision:
+- Keep separate for now.
+- No merge group is selected in Phase 5.
+- Carry forward only as a boundary-review candidate.
+
+Candidate group 2: semantic governance and control-plane pipeline
+
+Assets:
+- backend/core/executionPipeline.js
+- backend/semantic-layer/controlPlaneEvaluator.js
+- backend/semantic-layer/decisionFingerprintService.js
+- backend/semantic-layer/enforcementGuard.js
+- backend/semantic-layer/errorMemoryLayer.js
+- backend/semantic-layer/gatekeeperAdapter.js
+- backend/semantic-layer/governanceGatekeeper.js
+- backend/semantic-layer/normalizer.js
+- backend/semantic-layer/preflightSimulator.js
+- backend/semantic-layer/registry.js
+- backend/semantic-layer/sportsdataioContractHelpers.js
+- backend/semantic-layer/violationLogger.js
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- These files share semantic governance, rule, violation, pipeline, provider, and verification vocabulary.
+- backend/core/executionPipeline.js orchestrates the semantic-layer components.
+- controlPlaneEvaluator, preflightSimulator, gatekeeperAdapter, governanceGatekeeper, normalizer, registry, and violationLogger each appear to handle separate parts of the pipeline-control chain.
+- The evidence proves related layered control-plane responsibilities, not a single same-job implementation.
+
+Decision:
+- Keep separate.
+- No merge, refactor, or consolidation is authorized.
+- Carry forward as a semantic boundary review area only.
+
+Candidate group 3: ACCA, market consistency, and insight-rule surfaces
+
+Assets:
+- backend/utils/accaLogicEngine.js
+- backend/utils/insightEngine.js
+- backend/utils/insightValidationMatrix.js
+- backend/utils/marketConsistency.js
+- backend/utils/conflictResolver.js
+- backend/utils/secondaryMarketSelector.js
+- backend/utils/validation.js
+- backend/test/smoke-test-insight-engine.js
+- backend/test/smoke-test-skcs-law.js
+- backend/scripts/add-avg-total-log.js
+- backend/scripts/add-diagnostics.js
+- backend/scripts/patch-acca-builder.js
+- backend/scripts/patch-card-uniqueness.js
+- backend/scripts/patch-final-flow.js
+- backend/scripts/patch-row-cleanup.js
+- backend/scripts/patch-skcs-law.js
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- ACCA, market validation, market diversity, market consistency, conflict detection, and secondary-market selection logic appears across multiple utility files.
+- backend/utils/insightEngine.js describes itself as SKCS ACCA core law and references the pipeline insightEngine -> accaLogicEngine -> accaBuilder -> routes -> client.
+- backend/utils/accaLogicEngine.js contains ACCA math and leg-selection utilities.
+- backend/utils/insightValidationMatrix.js validates insight leg groups.
+- backend/utils/marketConsistency.js and backend/utils/conflictResolver.js both relate to market conflict/consistency governance.
+- B05 patch scripts target accaBuilder.js and ACCA/card/final-flow/row-cleanup/SKCS-law behavior, creating overlap between runtime rule surfaces, smoke tests, and manual patch utilities.
+
+Decision:
+- Functional overlap is proven.
+- No canonical ACCA/market rule authority is selected in Phase 5.
+- No patch script is executed.
+- No merge, deletion, retirement, or refactor is authorized.
+- Carry forward as a future ACCA/rule-authority canonicalization candidate.
+
+Candidate group 4: database/cache/job utility surfaces
+
+Assets:
+- backend/utils/db.js
+- backend/utils/apiCache.js
+- backend/utils/jobLogger.js
+- backend/utils/purgeStaleData.js
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- backend/utils/db.js redirects to backend/db.js to prevent duplicate pools.
+- backend/utils/apiCache.js creates its own pg Pool for API cache storage.
+- backend/utils/jobLogger.js creates its own pg Pool for cron/job logging.
+- backend/utils/purgeStaleData.js imports pool from backend/database.js and deletes stale prediction data.
+- This creates proven overlap with the already-recorded B02-B03 database access authority candidate group.
+
+Decision:
+- Database/cache/job utility overlap is proven.
+- No database authority is selected in Phase 5.
+- No SQL is executed.
+- No merge, deletion, refactor, or database mutation is authorized.
+- Carry forward with the database access authority candidate group.
+
+Candidate group 5: external provider access, quota, key, cache, and circuit-breaker utilities
+
+Assets:
+- backend/errors/ProviderQuotaExceededError.js
+- backend/utils/apiCache.js
+- backend/utils/apiQueue.js
+- backend/utils/apiUsageLimiter.js
+- backend/utils/keyPool.js
+- backend/utils/providerCircuitBreaker.js
+- backend/utils/rapidApiWaterfall.js
+- backend/utils/availability.js
+- backend/utils/weather.js
+- backend/providers/football/bigBallsDataProvider.js
+- backend/providers/football/bsdProvider.js
+- backend/providers/football/bzzoiroProvider.js
+- backend/providers/football/soccerDataApiProvider.js
+- backend/providers/football/sportsApiProFootballAdapter.js
+
+Outcome:
+- MAJOR_OVERLAP
+
+Evidence:
+- Multiple B04 utilities manage external API access concerns: cache, queueing, usage limiting, key pools, circuit breaking, provider quota errors, RapidAPI waterfall, availability, and weather enrichment.
+- B06 provider files also implement external football provider access surfaces.
+- The evidence proves broad provider-access overlap across utility and provider layers.
+- Some overlap may be architectural layering, but the provider-access boundary is not singular.
+
+Decision:
+- Major provider-access overlap is proven.
+- No provider retirement, deletion, dependency update, or security work is authorized.
+- Carry forward as a future external-provider boundary/canonicalization candidate.
+
+Candidate group 6: football provider and normalizer families
+
+Assets:
+- backend/providers/football/bigBallsDataProvider.js
+- backend/providers/football/bigBallsDataNormalizer.js
+- backend/providers/football/bsdProvider.js
+- backend/providers/football/bsdNormalizer.js
+- backend/providers/football/bzzoiroProvider.js
+- backend/providers/football/bzzoiroNormalizer.js
+- backend/providers/football/soccerDataApiProvider.js
+- backend/providers/football/soccerDataApiNormalizer.js
+- backend/providers/football/sportsApiProFootballAdapter.js
+- backend/providers/football/sportsApiProFootballNormalizer.js
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- B06 contains repeated provider/normalizer pairs for multiple football providers.
+- The files share provider, provider fixture ID, league ID, event ID, and normalization vocabulary.
+- Several providers explicitly state disabled or not connected to prediction/canonical ingest behavior.
+- This proves repeated pattern overlap, but each provider/normalizer pair handles a different external source.
+
+Decision:
+- Keep separate for now.
+- No merge group is selected solely because provider adapter patterns repeat.
+- Carry forward as provider-boundary review evidence.
+
+Candidate group 7: sports normalization and ingestion scripts
+
+Assets:
+- backend/parsers/base_sport_parser.py
+- backend/workers/now_api_pulse.py
+- backend/scripts/bridge_frontend.py
+- backend/scripts/generate_vip_master.py
+- backend/scripts/ingest_football.py
+- backend/scripts/populate_sports_data.py
+- backend/scripts/sync-sportsrc-fixtures.js
+- backend/scripts/requirements.txt
+- backend/utils/sportsrcNormalizer.js
+- backend/audit/system_integrity_audit.md
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- Python scripts and parser/worker files share ingestion, Supabase, football, provider, and prediction-context vocabulary.
+- backend/audit/system_integrity_audit.md documents ingestion-to-frontend gaps and Supabase compatibility.
+- backend/scripts/ingest_football.py and populate_sports_data.py use Supabase and external football/sports data workflows.
+- backend/scripts/sync-sportsrc-fixtures.js and backend/utils/sportsrcNormalizer.js relate to SportsRC fixture synchronization/normalization.
+
+Decision:
+- Functional relationship is proven, but same-job overlap is not fully proven by this scan.
+- Keep separate.
+- No script execution, deletion, or consolidation is authorized.
+
+Distinct-role findings:
+- backend/errors/ProviderQuotaExceededError.js is a provider quota error class; related to provider utilities but not a same-job provider adapter.
+- backend/logic/edgeMind_manifest.json is EdgeMind logic metadata; no same-job B04-B06 file proven.
+- backend/middleware/supabaseJwt.js is authentication/subscription middleware; no same-job B04-B06 file proven.
+- backend/utils/auth.js is request key/role helper logic; related to authentication but not proven duplicate of supabaseJwt.js.
+- backend/utils/contextInsights.js, dateNormalization.js, pipelineLogger.js, sportsrcNormalizer.js, weather.js, and availability.js each provide domain utility roles with partial pipeline/provider relationships only.
+- backend/scripts/test_ai_providers.py and backend/scripts/test_ai_real_matches.py are AI provider/manual test scripts; no same-job B04-B06 merge group proven.
+
+Batch decision:
+- B04-B06 contains proven functional overlap candidates.
+- Potential future canonicalization candidates are recorded for ACCA/rule authority, database/cache/job utilities, provider-access utilities, semantic boundary, and provider adapter families.
+- No cleanup action is authorized by this outcome.
+- B04-B06 Phase 5 evidence is closed.
+- Next batch group: B07-B10.
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
