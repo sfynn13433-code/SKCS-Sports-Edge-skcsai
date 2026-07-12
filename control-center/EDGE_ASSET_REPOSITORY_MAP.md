@@ -1,14 +1,14 @@
 # EDGE ASSET REPOSITORY MAP
 EAC_PROJECT_ID: EAC-001
 MANIFEST_SCHEMA_VERSION: 1.0.0
-TOTAL_GOVERNED_ASSETS: 902
-TOTAL_BATCHED_ASSETS: 902
+TOTAL_GOVERNED_ASSETS: 904
+TOTAL_BATCHED_ASSETS: 904
 FULLY_CLASSIFIED_ASSETS: 0
-CLASSIFICATION_PENDING_ASSETS: 902
+CLASSIFICATION_PENDING_ASSETS: 904
 CLOSURE_READY: NO
 
 CURRENT_STATE_COUNTS
-- CURRENT: 12
+- CURRENT: 14
 - PARALLEL: 0
 - LEGACY: 0
 - HISTORICAL_EVIDENCE: 0
@@ -19,7 +19,7 @@ CURRENT_STATE_COUNTS
 FUNCTIONAL_GROUP_COUNTS
 - SCRIPT_TOOL: 156
 - PROVIDER_INTEGRATION: 115
-- DOCUMENTATION_KNOWLEDGE: 109
+- DOCUMENTATION_KNOWLEDGE: 111
 - DATABASE_MIGRATION: 96
 - TEST_PROOF: 93
 - GENERATED_OUTPUT: 59
@@ -46,14 +46,14 @@ RELATIONSHIP_TAG_COUNTS
 - DATABASE: 234
 - PROVIDER: 195
 - API: 169
-- DOCUMENTATION: 135
-- GOVERNANCE: 134
+- DOCUMENTATION: 137
+- GOVERNANCE: 136
 - MIGRATION: 101
 - PREDICTION: 100
 - OBSERVABILITY: 99
 - TEST_PROOF: 92
 - UI: 91
-- AUDIT: 81
+- AUDIT: 82
 - GENERATED: 69
 - ROUTE: 61
 - DEPLOYMENT: 56
@@ -71,10 +71,10 @@ RELATIONSHIP_TAG_COUNTS
 - CONTROLLER: 2
 - RPC: 1
 
-NEXT_VALIDATION_NON_EMPTY_ASSETS: 902
+NEXT_VALIDATION_NON_EMPTY_ASSETS: 904
 
 BATCH_COMPLETION_SUMMARY
-- B01 | CONTROL_CENTER | ASSET_COUNT=15 | CLASSIFIED=0 | PENDING=15
+- B01 | CONTROL_CENTER | ASSET_COUNT=17 | CLASSIFIED=0 | PENDING=17
 - B02 | BACKEND_DIRECT_FILES | ASSET_COUNT=13 | CLASSIFIED=0 | PENDING=13
 - B03 | BACKEND_ROUTES_AND_CONTROLLERS | ASSET_COUNT=28 | CLASSIFIED=0 | PENDING=28
 - B04 | BACKEND_UTILS_SEMANTIC_CORE_AND_TEST | ASSET_COUNT=46 | CLASSIFIED=0 | PENDING=46
@@ -124,6 +124,8 @@ PER_ASSET_BY_BATCH
 | control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json | Repository Asset Register enumerating all tracked repository paths (902 assets) and storing the EAC-001 classification contract fields per asset for governance-controlled review. | GOVERNANCE | CURRENT | ["CONFIGURATION","RULEBOOK","GENERATED","AUDIT","GOVERNANCE"] | ["EDGE_REPOSITORY_ASSET_REGISTER.v1.json declares tracked_path_count=906 and each asset entry includes purpose_description/functional_group/relationship_tags/classification_evidence fields; check_edge_repository_asset_register.js loads/writes it at ASSET_REGISTER_PATH."] | Validate with the governing Control Center project proof. |
 | control-center/EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json | Static runtime inventory listing Edge system runtime surfaces (ESA-001 scope) with captured runtime dependencies and database-role/object metadata for architecture review. | BACKEND_RUNTIME | UNKNOWN | ["RUNTIME","DATABASE","GENERATED","GOVERNANCE"] | ["EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json declares inventory_version and a surfaces[] array containing runtime_dependencies and database_objects alongside next_validation and evidence entries."] | Revalidate canonical runtime inventory coverage and map synchronization during ESA-001 closure and each governed runtime architecture review. |
 | control-center/EDGE_SYSTEM_RUNTIME_MAP.md | Observational synchronized runtime map that mirrors `EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json` surfaces with caller/consumer and database-role details for review. | GENERATED_OUTPUT | UNKNOWN | ["RUNTIME","DOCUMENTATION","GENERATED","GOVERNANCE"] | ["EDGE_SYSTEM_RUNTIME_MAP.md includes an Inventory SHA-256 and 'Synchronized review surface' text, and it is produced/updated by check_edge_system_runtime_inventory.js via MAP_PATH synchronization."] | Revalidate deterministic synchronization with the canonical Edge System Runtime Inventory during ESA-001 closure and each inventory update. |
+| control-center/EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md | Defines the explicit fail-closed Scout-Edge marriage gate law: prerequisites, allowed E2E proof sources, blocked conditions, pass/fail rules, and required evidence before EFI-001 intake implementation. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE"] | ["EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md seals scout_edge_marriage_gate law and references MARRIAGE_PREREQUISITES from the Edge build-control ledger."] | Validate with EMG-001 contract validator when separately authorized. |
+| control-center/SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md | Records read-only SEE-001 inspection of Scout-Edge runtime paths, forbidden proof sources, and NEEDS IMPLEMENTATION decision for first E2E marriage proof. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","AUDIT"] | ["SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md documents committed runtime entrypoints, missing FIP intake boundary, and defers marriage proof until EMG-001 and EFI-001."] | Validate against EFI-001 intake implementation when separately authorized. |
 
 ## B02 BACKEND_DIRECT_FILES
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |

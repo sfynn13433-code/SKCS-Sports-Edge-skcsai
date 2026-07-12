@@ -358,7 +358,7 @@
       "category": "Scout Handoff",
       "description": "Define the explicit evidence and approval conditions required before Scout becomes Edge's sole sports-truth provider.",
       "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
-      "current_status": "PROPOSED",
+      "current_status": "APPROVED",
       "priority": "critical",
       "blocked_by": [
         "ESA-001",
@@ -378,7 +378,8 @@
         "EMG-001"
       ],
       "related_contracts": [
-        "FIP-001"
+        "FIP-001",
+        "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1"
       ],
       "related_files": [],
       "related_tables": [],
@@ -395,11 +396,15 @@
         "Control Center sequencing bypass"
       ],
       "recommended_order": 7,
-      "next_action": "Wait for Edge inventory and project registration.",
+      "next_action": "Contract sealed (EMG-001-C1). Proceed to EFI-001 contract inspection when separately authorized. Gate remains BLOCKED.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
-      "last_updated": "2026-07-05",
+      "last_updated": "2026-07-12",
       "governed_by_control_task_id": "EMG-001",
-      "current_evidence": []
+      "current_evidence": [
+        "EMG-001-C1 sealed control-center/EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md",
+        "SEE-001 inspection packet records committed runtime gaps and forbidden proof sources",
+        "scout_edge_marriage_gate remains BLOCKED pending prerequisite completion and separate explicit approval"
+      ]
     },
     {
       "project_id": "EFI-001",

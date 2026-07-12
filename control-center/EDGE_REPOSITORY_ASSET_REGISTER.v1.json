@@ -5,8 +5,8 @@
   "source_command": "git ls-files",
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
-  "tracked_path_count": 903,
-  "registered_asset_count": 902,
+  "tracked_path_count": 905,
+  "registered_asset_count": 904,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -13290,6 +13290,77 @@
       ],
       "classification_evidence": [
         "EDGE_CONTROL_CENTER.md is generated and documents current Edge state (e.g., 'Scout ? Edge marriage remains BLOCKED') and includes the check command `npm run control:center` referencing the ledger and checker."
+      ]
+    },
+    {
+      "asset_path": "control-center/EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md",
+      "asset_type": "CONTROL_CENTER",
+      "asset_role": "CONTROL_GOVERNANCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "EMG-001",
+      "governed_by_control_task_id": "EMG-001",
+      "related_assets": [
+        "control-center/SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [
+        "control-center/check_control_center.js"
+      ],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "REGISTERED",
+      "next_validation": "Validate with EMG-001 contract validator when separately authorized.",
+      "notes": "EMG-001-C1 marriage gate contract. Gate remains BLOCKED at seal time.",
+      "purpose_description": "Defines the explicit fail-closed Scout-Edge marriage gate law: prerequisites, allowed E2E proof sources, blocked conditions, pass/fail rules, and required evidence before EFI-001 intake implementation.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md seals scout_edge_marriage_gate law and references MARRIAGE_PREREQUISITES from the Edge build-control ledger."
+      ]
+    },
+    {
+      "asset_path": "control-center/SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md",
+      "asset_type": "CONTROL_CENTER",
+      "asset_role": "CONTROL_GOVERNANCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "EMG-001",
+      "governed_by_control_task_id": "EMG-001",
+      "related_assets": [
+        "control-center/EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "REGISTERED",
+      "next_validation": "Validate against EFI-001 intake implementation when separately authorized.",
+      "notes": "SEE-001 read-only inspection evidence packet preceding EMG-001-C1 contract seal.",
+      "purpose_description": "Records read-only SEE-001 inspection of Scout-Edge runtime paths, forbidden proof sources, and NEEDS IMPLEMENTATION decision for first E2E marriage proof.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE",
+        "AUDIT"
+      ],
+      "classification_evidence": [
+        "SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md documents committed runtime entrypoints, missing FIP intake boundary, and defers marriage proof until EMG-001 and EFI-001."
       ]
     },
     {

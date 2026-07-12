@@ -57,7 +57,7 @@ The following technical prerequisites must be satisfied:
 
 | ID | Prerequisite | Current state |
 |---|---|---|
-| EMG-001 | Scout-Edge Marriage Gate Contract | PROPOSED |
+| EMG-001 | Scout-Edge Marriage Gate Contract | APPROVED (contract sealed; gate remains BLOCKED) |
 | EFI-001 | FIP Intake Handshake | PROPOSED |
 | EST-001 | Supabase Storage and FIP Retention Contract | PROPOSED |
 | ESEC-001 | Subscriber and Security Boundary | PROPOSED |
@@ -553,7 +553,7 @@ Required state snapshot:
   ],
   "eac_evidence_reusable": true,
   "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
-  "total_governed_assets": 902,
+  "total_governed_assets": 904,
   "phase_0": {
     "status": "PHASE_CLOSED",
     "question": "What exact repository state is the cleanup programme starting from?",
@@ -562,7 +562,7 @@ Required state snapshot:
       "active_branch": "main",
       "head_commit": "7d21fc276629bb6aec056299d70e1541b462934f",
       "working_tree_status": "dirty_unrelated_changes_preserved",
-      "governed_asset_count": 902,
+      "governed_asset_count": 904,
       "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
       "eac_batch_count": 29,
       "already_completed_or_removal_work": "Partial external sports provider removal (PARTIAL); EAC-001 B01-B29 classification inventory complete; prior Control Center per-asset investigations preserved as historical evidence",
@@ -10059,3 +10059,43 @@ Important non-actions:
 
 Validation boundary:
 - SEE-001 evidence recording only. Does not authorize marriage-gate clearance or implementation.
+
+## EMG-001-C1 — SCOUT–EDGE MARRIAGE GATE CONTRACT
+
+Result: **APPROVED (contract sealed; gate remains BLOCKED)**
+
+Scope:
+- Mini-project: EMG-001-C1 — Scout–Edge Marriage Gate Contract (contract-only)
+- Start commit: b64526cd812fb92bd6c1e1c712af147d9cd5eecb
+- Mode: contract-only; no intake implementation
+- Cleanup programme: PROGRAMME_CLOSED (not reopened)
+- Prior evidence: SEE-001
+
+Start-point verification:
+- git status --short: clean at start
+- git rev-parse HEAD == b64526cd at start
+- npm run control:center: PASS (required before commit)
+- npm run control:verify: PASS (required before commit)
+- npm run verify:rulebook: PASS (required before commit)
+
+Contract decision:
+- EMG-001 marriage gate contract sealed at control-center/EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md
+- EMG-001 task status: APPROVED (contract validator/tests deferred)
+- scout_edge_marriage_gate: BLOCKED (unchanged)
+- Prerequisites complete: NO
+- Allowed first E2E proof source: validated canonical Scout FIP through future EFI-001 intake boundary only
+- Forbidden proof sources include buildLiveData(), parallel acquisition surfaces, and POST /api/pipeline/run { matches }
+- Governed sequence: EMG-001 → EFI-001 → EST-001 → E2E-001 → separate explicit gate clearance
+
+Evidence artifacts:
+- control-center/EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md
+- control-center/SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md (registered)
+
+Next recommended mini-project:
+- EFI-001-C1 — FIP Intake Handshake contract inspection (contract-only), when separately authorized
+
+Important non-actions:
+- No intake implementation, runtime/API/UI change, SQL, Supabase mutation, deployment, provider removal, dependency/security remediation, or gate clearance
+
+Validation boundary:
+- EMG-001-C1 contract recording only. Does not authorize EFI-001 implementation or marriage-gate clearance.

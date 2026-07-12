@@ -330,7 +330,7 @@
       "task_name": "Scout-Edge Marriage Gate Contract",
       "workstream": "Scout Handoff",
       "description": "Define the explicit evidence and approval conditions required before Scout becomes Edge's sole sports-truth provider.",
-      "status": "PROPOSED",
+      "status": "APPROVED",
       "priority": "critical",
       "blocked_by": [
         "ESA-001",
@@ -347,9 +347,13 @@
         "architecture"
       ],
       "related_contracts": [
-        "FIP-001"
+        "FIP-001",
+        "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1"
       ],
-      "affected_files": [],
+      "affected_files": [
+        "control-center/EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md",
+        "control-center/SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md"
+      ],
       "affected_tables": [],
       "completion_definition": "A tested marriage-gate contract defines required FIP, storage, security, provider-removal, pipeline-integrity, and end-to-end proof conditions.",
       "proof_required": [
@@ -357,13 +361,18 @@
         "Contract validator",
         "Tests proving incomplete prerequisites cannot clear the gate"
       ],
-      "current_evidence": [],
-      "open_gaps": [
-        "No Edge-side marriage gate contract exists"
+      "current_evidence": [
+        "EMG-001-C1 sealed control-center/EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md",
+        "SEE-001 inspection packet records committed runtime gaps and forbidden proof sources",
+        "scout_edge_marriage_gate remains BLOCKED pending prerequisite completion and separate explicit approval"
       ],
-      "next_action": "Wait for Edge inventory and project registration.",
-      "owner_note": "Scout and Edge integration remains explicitly blocked until this gate is separately cleared.",
-      "last_updated": "2026-07-05"
+      "open_gaps": [
+        "Contract validator and automated prerequisite gate tests not yet implemented",
+        "EFI-001, EST-001, ESEC-001, EPI-001, EPRV-001, and E2E-001 remain incomplete"
+      ],
+      "next_action": "Contract sealed (EMG-001-C1). Proceed to EFI-001 contract inspection when separately authorized. Gate remains BLOCKED.",
+      "owner_note": "Scout and Edge integration remains explicitly blocked until prerequisites are satisfied and this gate is separately cleared.",
+      "last_updated": "2026-07-12"
     },
     {
       "task_id": "EFI-001",

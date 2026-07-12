@@ -46,7 +46,7 @@ Blocks: none
 
 ## EMG-001 — Scout-Edge Marriage Gate Contract
 
-Status: PROPOSED
+Status: APPROVED
 Governed by: EMG-001
 Blocked by: ESA-001, EAC-001
 Blocks: EFI-001, EST-001, ESEC-001
