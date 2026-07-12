@@ -594,10 +594,10 @@ Required state snapshot:
   "lifecycle_state": "BATCH_COMPLETE",
   "active_batch": null,
   "completed_batches": [
-    "B01-B03"
+    "B01-B03",
+    "B04-B06"
   ],
   "remaining_batches": [
-    "B04-B06",
     "B07-B10",
     "B11-B14",
     "B15-B18",
@@ -605,7 +605,7 @@ Required state snapshot:
     "B23-B26",
     "B27-B29"
   ],
-  "next_deterministic_batch": "B04-B06",
+  "next_deterministic_batch": "B07-B10",
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,
@@ -8359,6 +8359,165 @@ Batch decision:
 - B01-B03 merge/consolidation gate is evidence-complete with NO_ACTION across carried-forward B01 and newly inspected B02/B03 assets except explicit HOLD_NEEDS_RUNTIME_PROOF carries.
 - Grouped unit B01-B03 is closed.
 - Phase 7 sequencing is now grouped: B01-B03 complete; next deterministic group B04-B06.
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized by this packet.
+
+## PHASE 7 - B04-B06 MERGE AND CONSOLIDATION EVIDENCE
+
+Result: PASS WITH NO_ACTION AND RUNTIME-PROOF HOLDS
+
+Scope:
+- Phase: PHASE_7 - Merge and Consolidation
+- Grouped review unit: B04-B06
+- Start HEAD: 12a887da
+- Inspection scope: B04, B05, B06 only
+- B07-B29 touched: NO
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Authority sources reviewed:
+- control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json B04, B05, and B06 membership
+- PHASE 4 - B03-B06 LEGACY AND REPLACEMENT IDENTIFICATION EVIDENCE
+- PHASE 5 - B04-B06 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+- PHASE 6 - B04-B06 CANONICAL AUTHORITY SELECTION EVIDENCE
+
+B04 assets inspected (46):
+1. backend/audit/system_integrity_audit.md
+2. backend/core/executionPipeline.js
+3. backend/core/verificationController.js
+4. backend/core/verificationSignalContract.js
+5. backend/errors/ProviderQuotaExceededError.js
+6. backend/logic/edgeMind_manifest.json
+7. backend/middleware/supabaseJwt.js
+8. backend/parsers/base_sport_parser.py
+9. backend/semantic-layer/controlPlaneEvaluator.js
+10. backend/semantic-layer/decisionFingerprintService.js
+11. backend/semantic-layer/enforcementGuard.js
+12. backend/semantic-layer/errorMemoryLayer.js
+13. backend/semantic-layer/gatekeeperAdapter.js
+14. backend/semantic-layer/governanceGatekeeper.js
+15. backend/semantic-layer/normalizer.js
+16. backend/semantic-layer/preflightSimulator.js
+17. backend/semantic-layer/registry.js
+18. backend/semantic-layer/sportsdataioContractHelpers.js
+19. backend/semantic-layer/verificationController.js
+20. backend/semantic-layer/violationLogger.js
+21. backend/test/smoke-test-insight-engine.js
+22. backend/test/smoke-test-skcs-law.js
+23. backend/utils/accaLogicEngine.js
+24. backend/utils/apiCache.js
+25. backend/utils/apiQueue.js
+26. backend/utils/apiUsageLimiter.js
+27. backend/utils/auth.js
+28. backend/utils/availability.js
+29. backend/utils/conflictResolver.js
+30. backend/utils/contextInsights.js
+31. backend/utils/dateNormalization.js
+32. backend/utils/db.js
+33. backend/utils/insightEngine.js
+34. backend/utils/insightValidationMatrix.js
+35. backend/utils/jobLogger.js
+36. backend/utils/keyPool.js
+37. backend/utils/marketConsistency.js
+38. backend/utils/pipelineLogger.js
+39. backend/utils/providerCircuitBreaker.js
+40. backend/utils/purgeStaleData.js
+41. backend/utils/rapidApiWaterfall.js
+42. backend/utils/secondaryMarketSelector.js
+43. backend/utils/sportsrcNormalizer.js
+44. backend/utils/validation.js
+45. backend/utils/weather.js
+46. backend/workers/now_api_pulse.py
+
+B05 assets inspected (15):
+1. backend/scripts/add-avg-total-log.js
+2. backend/scripts/add-diagnostics.js
+3. backend/scripts/bridge_frontend.py
+4. backend/scripts/generate_vip_master.py
+5. backend/scripts/ingest_football.py
+6. backend/scripts/patch-acca-builder.js
+7. backend/scripts/patch-card-uniqueness.js
+8. backend/scripts/patch-final-flow.js
+9. backend/scripts/patch-row-cleanup.js
+10. backend/scripts/patch-skcs-law.js
+11. backend/scripts/populate_sports_data.py
+12. backend/scripts/requirements.txt
+13. backend/scripts/sync-sportsrc-fixtures.js
+14. backend/scripts/test_ai_providers.py
+15. backend/scripts/test_ai_real_matches.py
+
+B06 assets inspected (10):
+1. backend/providers/football/bigBallsDataNormalizer.js
+2. backend/providers/football/bigBallsDataProvider.js
+3. backend/providers/football/bsdNormalizer.js
+4. backend/providers/football/bsdProvider.js
+5. backend/providers/football/bzzoiroNormalizer.js
+6. backend/providers/football/bzzoiroProvider.js
+7. backend/providers/football/soccerDataApiNormalizer.js
+8. backend/providers/football/soccerDataApiProvider.js
+9. backend/providers/football/sportsApiProFootballAdapter.js
+10. backend/providers/football/sportsApiProFootballNormalizer.js
+
+B04-B06 Phase 7 decision summary:
+- IMPLEMENT_CONSOLIDATION: 0 assets
+- NO_ACTION: 49 assets
+- HOLD_NEEDS_RUNTIME_PROOF: 22 assets
+
+HOLD_NEEDS_RUNTIME_PROOF assets:
+1. backend/audit/system_integrity_audit.md
+2. backend/core/executionPipeline.js
+3. backend/logic/edgeMind_manifest.json
+4. backend/parsers/base_sport_parser.py
+5. backend/test/smoke-test-insight-engine.js
+6. backend/test/smoke-test-skcs-law.js
+7. backend/utils/purgeStaleData.js
+8. backend/workers/now_api_pulse.py
+9. backend/scripts/add-avg-total-log.js
+10. backend/scripts/add-diagnostics.js
+11. backend/scripts/bridge_frontend.py
+12. backend/scripts/generate_vip_master.py
+13. backend/scripts/ingest_football.py
+14. backend/scripts/patch-acca-builder.js
+15. backend/scripts/patch-card-uniqueness.js
+16. backend/scripts/patch-final-flow.js
+17. backend/scripts/patch-row-cleanup.js
+18. backend/scripts/patch-skcs-law.js
+19. backend/scripts/populate_sports_data.py
+20. backend/scripts/requirements.txt
+21. backend/scripts/sync-sportsrc-fixtures.js
+22. backend/providers/football/sportsApiProFootballAdapter.js
+
+NO_ACTION basis:
+- Phase 6 selected canonical runtime/helper/provider/normalizer authorities that must remain separate.
+- Phase 5 found functional overlap in several areas, but did not authorize merge, deletion, retirement, or refactor.
+- Phase 4 identified three B04 LEGACY assets, but Phase 7 cannot remove or retire them without runtime proof and reference safety.
+- Phase 6 placed scripts, audit/proof artifacts, parser/worker support surfaces, purge helper, and the shared provider adapter behind NEEDS_RUNTIME_PROOF.
+- No safe B04-B06 consolidation path is proven in the current evidence.
+
+Implementation actions performed:
+- None.
+
+Why no B04-B06 consolidation was authorized:
+- Verification, semantic governance, ACCA/rule, database/cache/job, provider-access, provider/normalizer, and ingestion/script surfaces have layered or supporting roles.
+- Canonical authority decisions keep core/runtime/provider/normalizer utilities separate.
+- Runtime-proof holds prevent safe deletion, replacement, retirement, execution, or consolidation of support scripts, adapters, parser/worker surfaces, audit evidence, and purge helpers.
+- Implementing consolidation now would risk breaking runtime callers, provider behavior, package scripts, database/cache paths, or manual/operator workflows without proof.
+
+Explicit scope confirmation:
+- B04-B06 only.
+- B07-B29 not inspected for implementation in this packet.
+- No runtime/source files changed.
+
+Batch decision:
+- B04-B06 merge/consolidation gate is evidence-complete with NO_ACTION for canonical/current assets and HOLD_NEEDS_RUNTIME_PROOF for held/legacy/support surfaces.
+- Grouped unit B04-B06 is closed.
+- Next deterministic group: B07-B10
 
 Validation boundary:
 - Evidence only.
