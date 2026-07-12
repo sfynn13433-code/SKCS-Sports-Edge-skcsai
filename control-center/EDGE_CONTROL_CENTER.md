@@ -579,22 +579,53 @@ Required state snapshot:
       "closure_note": "Phase 5 Functional Overlap Identification is evidence-complete. No canonical authority was selected during Phase 5."
     }
   },
-  "active_phase": "PHASE_6",
-  "active_phase_question": "Which Phase 5 overlap candidate families should have canonical authority selected?",
-  "lifecycle_state": "PHASE_READY_TO_CLOSE",
+  "phase_6": {
+    "status": "PHASE_CLOSED",
+    "question": "Which Phase 5 overlap candidate families should have canonical authority selected?",
+    "evidence": {
+      "result": "PASS WITH CANONICAL AUTHORITY DECISIONS",
+      "batches_reviewed": "B02-B03,B04-B06,B07-B10,B11-B14,B15-B18,B19-B22,B23-B26,B27-B29",
+      "closure_commit": "1bd3adad",
+      "closure_note": "Phase 6 Canonical Authority Selection is closed. PHASE_7 activation does not authorize merge/consolidation implementation until a separate Phase 7 batch mini-project is approved."
+    }
+  },
+  "active_phase": "PHASE_7",
+  "active_phase_question": "Which confirmed canonical authority decisions should be implemented through merge and consolidation?",
+  "lifecycle_state": "PHASE_ACTIVE",
   "active_batch": null,
-  "completed_batches": [
-    "B02-B03",
-    "B04-B06",
-    "B07-B10",
-    "B11-B14",
-    "B15-B18",
-    "B19-B22",
-    "B23-B26",
-    "B27-B29"
+  "completed_batches": [],
+  "remaining_batches": [
+    "B01",
+    "B02",
+    "B03",
+    "B04",
+    "B05",
+    "B06",
+    "B07",
+    "B08",
+    "B09",
+    "B10",
+    "B11",
+    "B12",
+    "B13",
+    "B14",
+    "B15",
+    "B16",
+    "B17",
+    "B18",
+    "B19",
+    "B20",
+    "B21",
+    "B22",
+    "B23",
+    "B24",
+    "B25",
+    "B26",
+    "B27",
+    "B28",
+    "B29"
   ],
-  "remaining_batches": [],
-  "next_deterministic_batch": null,
+  "next_deterministic_batch": "B01",
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,
@@ -8052,3 +8083,63 @@ B27-B29 Phase 6 decision summary:
 Validation boundary:
 - Evidence only.
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized by this packet.
+
+## PHASE 6 CLOSURE SUMMARY
+
+Result: PASS WITH CANONICAL AUTHORITY DECISIONS
+
+Scope:
+- Phase: PHASE_6 - Canonical Authority Selection
+- Phase question: Which Phase 5 overlap candidate families should have canonical authority selected?
+- Closure commit: 1bd3adad
+- Pre-closure lifecycle state: PHASE_READY_TO_CLOSE
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Closed Phase 6 batch packets:
+- B02-B03 complete
+- B04-B06 complete
+- B07-B10 complete
+- B11-B14 complete
+- B15-B18 complete
+- B19-B22 complete
+- B23-B26 complete
+- B27-B29 complete
+
+Phase 6 outcome summary:
+- Canonical authority decisions were recorded across all eight Phase 6 review units using CANONICAL_KEEP and NEEDS_RUNTIME_PROOF only.
+- Phase 5 overlap candidate families were reviewed without merge, deletion, retirement, refactor, SQL execution, deployment change, or runtime action.
+- NEEDS_RUNTIME_PROOF holds remain in force until separately resolved through approved future work.
+- No cleanup implementation was authorized during Phase 6.
+
+Important non-actions:
+- No file was deleted.
+- No file was merged.
+- No file was retired.
+- No runtime code was changed.
+- No UI behavior was changed.
+- No SQL was executed.
+- No Supabase/database state was changed.
+- No deployment or hosting config was changed.
+- No dependency/security/vulnerability remediation was performed.
+
+Phase 6 closure decision:
+- PHASE_6 canonical authority selection is complete across B02-B03 through B27-B29.
+- PHASE_6 is now closed.
+- PHASE_7 is activated as the next cleanup phase.
+
+PHASE_7 activation warning:
+- PHASE_7 activation does not authorize implementation until a separate Phase 7 batch mini-project is approved.
+- Activating PHASE_7 establishes merge-and-consolidation scope only; it does not authorize deletion, merge execution, retirement, refactor, SQL, Supabase mutation, deployment change, dependency update, or vulnerability remediation.
+
+Next recommended control action:
+- Open the first approved PHASE_7 batch mini-project at B01 when separately authorized.
+- Do not begin merge/consolidation implementation without an explicit Phase 7 batch gate.
+
+Validation boundary:
+- Control Center state transition only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.

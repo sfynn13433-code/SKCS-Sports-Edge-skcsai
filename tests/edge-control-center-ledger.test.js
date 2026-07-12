@@ -33,9 +33,9 @@ function buildPhaseWorkProposal(overrides = {}) {
   return {
     request_type: "PHASE_WORK",
     mode: "PHASE_WORK",
-    phase: "PHASE_6",
-    batch_id: "B07-B10",
-    work_kind: "CANONICAL_AUTHORITY_SELECTION",
+    phase: "PHASE_7",
+    batch_id: "B01",
+    work_kind: "MERGE_CONSOLIDATION",
     requires_full_forensic_evidence: false,
     preserves_unrelated_changes: true,
     ...overrides,
@@ -122,25 +122,17 @@ describe("Edge Control Center Ledger v1", () => {
     assert.equal(result.state.phase_1.status, "PHASE_CLOSED");
     assert.equal(result.state.phase_2.status, "PHASE_CLOSED");
     assert.equal(result.state.phase_5.status, "PHASE_CLOSED");
-    assert.equal(result.state.active_phase, "PHASE_6");
+    assert.equal(result.state.phase_6.status, "PHASE_CLOSED");
+    assert.equal(result.state.active_phase, "PHASE_7");
     assert.equal(
       result.state.active_phase_question,
-      "Which Phase 5 overlap candidate families should have canonical authority selected?"
+      "Which confirmed canonical authority decisions should be implemented through merge and consolidation?"
     );
-    assert.equal(result.state.lifecycle_state, "PHASE_READY_TO_CLOSE");
+    assert.equal(result.state.lifecycle_state, "PHASE_ACTIVE");
     assert.equal(result.state.active_batch, null);
-    assert.deepEqual(result.state.completed_batches, [
-      "B02-B03",
-      "B04-B06",
-      "B07-B10",
-      "B11-B14",
-      "B15-B18",
-      "B19-B22",
-      "B23-B26",
-      "B27-B29",
-    ]);
-    assert.deepEqual(result.state.remaining_batches, []);
-    assert.equal(result.state.next_deterministic_batch, null);
+    assert.deepEqual(result.state.completed_batches, []);
+    assert.deepEqual(result.state.remaining_batches, [...EAC_BATCH_IDS]);
+    assert.equal(result.state.next_deterministic_batch, "B01");
     assert.deepEqual(result.state.phase_3_outcomes, [
       "ACTIVE",
       "INDIRECTLY_ACTIVE",
@@ -169,14 +161,14 @@ describe("Edge Control Center Ledger v1", () => {
     const state = createControlCenterGateState();
     assert.equal(state.eac_evidence_reusable, true);
     assert.deepEqual(getEacBatchIds(), [...EAC_BATCH_IDS]);
-    assert.equal(getNextIncompleteBatch(state), null);
-    assert.equal(state.next_deterministic_batch, null);
+    assert.equal(getNextIncompleteBatch(state), "B01");
+    assert.equal(state.next_deterministic_batch, "B01");
     assert.equal(EAC_BATCH_IDS.length, 29);
   });
 
   it("exposes exactly one active cleanup phase", () => {
     const state = createControlCenterGateState();
-    assert.equal(state.active_phase, "PHASE_6");
+    assert.equal(state.active_phase, "PHASE_7");
     assert.equal(CLEANUP_PHASE_ORDER.filter((p) => p === state.active_phase).length, 1);
   });
 
@@ -202,10 +194,42 @@ describe("Edge Control Center Ledger v1", () => {
     assert.equal(result.reason, "MISSING_INSTRUCTION_OR_STATE");
   });
 
-  it("Phase 6 canonical authority selection work is GREEN", () => {
+  it("Phase 7 merge consolidation work is GREEN", () => {
     const state = createControlCenterGateState();
     const result = evaluateControlCenterProposal(
       buildPhaseWorkProposal(),
+      state
+    );
+
+    assert.equal(result.gate, "GREEN");
+    assert.equal(result.mode, "PHASE_WORK");
+    assert.equal(result.reason, "PHASE_WORK_ACCEPTED");
+    assert.equal(result.nextState.lifecycle_state, "BATCH_ACTIVE");
+    assert.equal(result.nextState.active_batch, "B01");
+  });
+
+  it("Phase 6 canonical authority selection work is GREEN with historical state", () => {
+    const state = createControlCenterGateState({
+      active_phase: "PHASE_6",
+      active_phase_question: PHASE_QUESTIONS.PHASE_6,
+      lifecycle_state: "BATCH_COMPLETE",
+      completed_batches: ["B02-B03", "B04-B06"],
+      remaining_batches: [
+        "B07-B10",
+        "B11-B14",
+        "B15-B18",
+        "B19-B22",
+        "B23-B26",
+        "B27-B29",
+      ],
+      next_deterministic_batch: "B07-B10",
+    });
+    const result = evaluateControlCenterProposal(
+      buildPhaseWorkProposal({
+        phase: "PHASE_6",
+        batch_id: "B07-B10",
+        work_kind: "CANONICAL_AUTHORITY_SELECTION",
+      }),
       state
     );
 
@@ -259,8 +283,8 @@ describe("Edge Control Center Ledger v1", () => {
     );
     assert.equal(result.gate, "GREEN");
     assert.equal(result.reason, "FUTURE_PHASE_NOTE_RECORDED");
-    assert.equal(result.nextState.active_phase, "PHASE_6");
-    assert.equal(result.nextState.lifecycle_state, "PHASE_READY_TO_CLOSE");
+    assert.equal(result.nextState.active_phase, "PHASE_7");
+    assert.equal(result.nextState.lifecycle_state, "PHASE_ACTIVE");
     assert.equal(result.nextState.future_phase_notes.length, 1);
     assert.equal(
       result.nextState.future_phase_notes[0].likely_future_phase,
@@ -386,6 +410,48 @@ describe("Edge Control Center Ledger v1", () => {
     );
     assert.equal(result.gate, "HOLD");
     assert.equal(result.reason, "PHASE_ORDER_VIOLATION");
+  });
+
+  it("closing ready Phase 6 activates Phase 7 in order", () => {
+    const state = {
+      ...createControlCenterGateState(),
+      active_phase: "PHASE_6",
+      active_phase_question: PHASE_QUESTIONS.PHASE_6,
+      lifecycle_state: "PHASE_READY_TO_CLOSE",
+      active_batch: null,
+      completed_batches: [
+        "B02-B03",
+        "B04-B06",
+        "B07-B10",
+        "B11-B14",
+        "B15-B18",
+        "B19-B22",
+        "B23-B26",
+        "B27-B29",
+      ],
+      remaining_batches: [],
+      next_deterministic_batch: null,
+    };
+
+    const result = evaluateControlCenterProposal(
+      buildClosePhaseProposal({
+        phase: "PHASE_6",
+        activate_phase: "PHASE_7",
+      }),
+      state
+    );
+
+    assert.equal(result.gate, "GREEN");
+    assert.equal(result.reason, "PHASE_CLOSED_NEXT_ACTIVATED");
+    assert.equal(result.nextState.active_phase, "PHASE_7");
+    assert.equal(
+      result.nextState.active_phase_question,
+      PHASE_QUESTIONS.PHASE_7
+    );
+    assert.equal(result.nextState.lifecycle_state, "PHASE_ACTIVE");
+    assert.deepEqual(result.nextState.completed_batches, []);
+    assert.deepEqual(result.nextState.remaining_batches, [...EAC_BATCH_IDS]);
+    assert.equal(result.nextState.next_deterministic_batch, "B01");
   });
 
   it("closing ready Phase 1 activates Phase 2 in order", () => {

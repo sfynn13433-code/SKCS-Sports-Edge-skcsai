@@ -97,7 +97,7 @@ const RECOGNIZED_REQUEST_TYPES = Object.freeze([
   "ACTIVATE_NEXT_GROUP",
 ]);
 
-const ACTIVE_CLEANUP_PHASE = "PHASE_6";
+const ACTIVE_CLEANUP_PHASE = "PHASE_7";
 
 const PHASE_6_CANONICAL_AUTHORITY_REVIEW_ORDER = Object.freeze([
   "B02-B03",
@@ -321,22 +321,25 @@ function createControlCenterGateState(overrides = {}) {
           "Phase 5 Functional Overlap Identification is evidence-complete. No canonical authority was selected during Phase 5.",
       },
     },
+    phase_6: {
+      status: "PHASE_CLOSED",
+      question: PHASE_QUESTIONS.PHASE_6,
+      evidence: {
+        result: "PASS WITH CANONICAL AUTHORITY DECISIONS",
+        batches_reviewed:
+          "B02-B03,B04-B06,B07-B10,B11-B14,B15-B18,B19-B22,B23-B26,B27-B29",
+        closure_commit: "1bd3adad",
+        closure_note:
+          "Phase 6 Canonical Authority Selection is closed. PHASE_7 activation does not authorize merge/consolidation implementation until a separate Phase 7 batch mini-project is approved.",
+      },
+    },
     active_phase: ACTIVE_CLEANUP_PHASE,
     active_phase_question: PHASE_QUESTIONS[ACTIVE_CLEANUP_PHASE],
-    lifecycle_state: "PHASE_READY_TO_CLOSE",
+    lifecycle_state: "PHASE_ACTIVE",
     active_batch: null,
-    completed_batches: [
-      "B02-B03",
-      "B04-B06",
-      "B07-B10",
-      "B11-B14",
-      "B15-B18",
-      "B19-B22",
-      "B23-B26",
-      "B27-B29",
-    ],
-    remaining_batches: [],
-    next_deterministic_batch: null,
+    completed_batches: [],
+    remaining_batches: [...batchIds],
+    next_deterministic_batch: batchIds[0] || null,
     phase_3_outcomes: [...PHASE_3_OUTCOMES],
     phase_3_no_deletion_law: "NO_CURRENT_USE_FOUND does not authorize deletion.",
     future_phase_notes: [],
@@ -926,6 +929,10 @@ function validateControlCenterPolicy(documentText) {
     errors.push("Control Center state phase_2 must be PHASE_CLOSED");
   }
 
+  if (!state.phase_6 || state.phase_6.status !== "PHASE_CLOSED") {
+    errors.push("Control Center state phase_6 must be PHASE_CLOSED");
+  }
+
   if (state.active_phase !== ACTIVE_CLEANUP_PHASE) {
     errors.push(`Control Center state active_phase must be ${ACTIVE_CLEANUP_PHASE}`);
   }
@@ -949,8 +956,8 @@ function validateControlCenterPolicy(documentText) {
     errors.push("Control Center state lifecycle_state invalid");
   }
 
-  if (state.lifecycle_state !== "PHASE_READY_TO_CLOSE") {
-    errors.push("Control Center state lifecycle_state must be PHASE_READY_TO_CLOSE");
+  if (state.lifecycle_state !== "PHASE_ACTIVE") {
+    errors.push("Control Center state lifecycle_state must be PHASE_ACTIVE");
   }
 
   if (!Array.isArray(state.completed_batches)) {
@@ -999,6 +1006,18 @@ function validateControlCenterPolicy(documentText) {
 
   if (!String(documentText).includes("### Historical Control Center evidence")) {
     errors.push("EDGE_CONTROL_CENTER.md missing historical evidence section");
+  }
+
+  if (!String(documentText).includes("## PHASE 6 CLOSURE SUMMARY")) {
+    errors.push("EDGE_CONTROL_CENTER.md missing PHASE 6 closure summary");
+  }
+
+  if (
+    !String(documentText).includes(
+      "PHASE_7 activation does not authorize implementation"
+    )
+  ) {
+    errors.push("EDGE_CONTROL_CENTER.md missing PHASE_7 activation warning");
   }
 
   if (
