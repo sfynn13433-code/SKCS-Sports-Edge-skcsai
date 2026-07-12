@@ -595,17 +595,17 @@ Required state snapshot:
   "active_batch": null,
   "completed_batches": [
     "B01-B03",
-    "B04-B06"
+    "B04-B06",
+    "B07-B10"
   ],
   "remaining_batches": [
-    "B07-B10",
     "B11-B14",
     "B15-B18",
     "B19-B22",
     "B23-B26",
     "B27-B29"
   ],
-  "next_deterministic_batch": "B07-B10",
+  "next_deterministic_batch": "B11-B14",
   "future_phase_notes": [],
   "standing_git_authority": true,
   "dangerous_git_actions_approval_gated": true,
@@ -8518,6 +8518,236 @@ Batch decision:
 - B04-B06 merge/consolidation gate is evidence-complete with NO_ACTION for canonical/current assets and HOLD_NEEDS_RUNTIME_PROOF for held/legacy/support surfaces.
 - Grouped unit B04-B06 is closed.
 - Next deterministic group: B07-B10
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized by this packet.
+
+## PHASE 7 - B07-B10 MERGE AND CONSOLIDATION EVIDENCE
+
+Result: PASS WITH NO_ACTION AND RUNTIME-PROOF HOLDS
+
+Scope:
+- Phase: PHASE_7 - Merge and Consolidation
+- Grouped review unit: B07-B10
+- Start HEAD: 6162af97
+- Inspection scope: B07, B08, B09, B10 only
+- B11-B29 touched: NO
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Authority sources reviewed:
+- control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json B07, B08, B09, and B10 membership
+- PHASE 4 - B07-B10 LEGACY AND REPLACEMENT IDENTIFICATION EVIDENCE
+- PHASE 5 - B07-B10 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+- PHASE 6 - B07-B10 CANONICAL AUTHORITY SELECTION EVIDENCE
+
+B07 assets inspected (9):
+1. backend/src/services/contextIntelligence/adjustProbability.js
+2. backend/src/services/contextIntelligence/aiPipeline_core.js
+3. backend/src/services/contextIntelligence/aiPipeline.js
+4. backend/src/services/contextIntelligence/availabilitySignal.js
+5. backend/src/services/contextIntelligence/cacheService.js
+6. backend/src/services/contextIntelligence/disciplineSignal.js
+7. backend/src/services/contextIntelligence/stabilitySignal.js
+8. backend/src/services/contextIntelligence/weatherSignal.js
+9. backend/src/services/marketRouter/waterfall.js
+
+B08 assets inspected (13):
+1. backend/adapters/f1Adapter.js
+2. backend/adapters/footballAdapter.js
+3. backend/adapters/index.js
+4. backend/adapters/tennisAdapter.js
+5. backend/config/activeSports.js
+6. backend/config/apiEndpoints.js
+7. backend/config/bigBallsLeagueMap.js
+8. backend/config/footballRules.js
+9. backend/config/predictionOutcomes.js
+10. backend/config/soccerDataLeagueMap.js
+11. backend/config/sportRules.js
+12. backend/config/subscriptionMatrix.js
+13. backend/config/subscriptionPlans.js
+
+B09 assets inspected (86):
+1. backend/services/accaBuilder.js
+2. backend/services/accaMathUtils.js
+3. backend/services/aiPipeline.js
+4. backend/services/aiPipelineOrchestrator.js
+5. backend/services/aiProvider_odds_update.js
+6. backend/services/aiProvider.js
+7. backend/services/aiScoring.js
+8. backend/services/aiTelemetryService.js
+9. backend/services/antigravity/WorkflowEngine.js
+10. backend/services/apiCacheService.js
+11. backend/services/apiQuotaRouter.js
+12. backend/services/apiQuotaRouterProviders.js
+13. backend/services/bigBallsDataApiClient.js
+14. backend/services/bigBallsFootballBridge.js
+15. backend/services/blockedApiCallsLog.js
+16. backend/services/bzzoiroApiClient.js
+17. backend/services/bzzoiroCrosswalk.js
+18. backend/services/canonicalEvents.js
+19. backend/services/canonicalIngestFirewall.js
+20. backend/services/comboEngine.js
+21. backend/services/conflictEngine.js
+22. backend/services/contextEnrichmentService.js
+23. backend/services/contextIngestionService.js
+24. backend/services/contradictionGovernance.js
+25. backend/services/controlCenterReadService.js
+26. backend/services/cricApiCacheService.js
+27. backend/services/cricbuzzService.js
+28. backend/services/cricketLiveEnrichmentService.js
+29. backend/services/cricketLiveMatchResolver.js
+30. backend/services/cricketRulesEngine.js
+31. backend/services/cronJobs.js
+32. backend/services/dataProvider.js
+33. backend/services/dataProviders.js
+34. backend/services/direct1x2Builder.js
+35. backend/services/direct1x2Engine.js
+36. backend/services/divanscoreService.js
+37. backend/services/enhancedMatchDetailsService.js
+38. backend/services/espnHiddenApiService.js
+39. backend/services/filterEngine.js
+40. backend/services/football536Extractor.js
+41. backend/services/football536Service.js
+42. backend/services/footballH2HExtractor.js
+43. backend/services/footballHighlightsService.js
+44. backend/services/footballRankExtractor.js
+45. backend/services/footballRiskTierMapper.js
+46. backend/services/freeLivescoreApiExtractor.js
+47. backend/services/freeLivescoreApiService.js
+48. backend/services/gradingAccuracyCore.js
+49. backend/services/gradingSnapshotService.js
+50. backend/services/hybridSportsDataService.js
+51. backend/services/liveFootballApiExtractor.js
+52. backend/services/liveFootballApiService.js
+53. backend/services/marketIntelligence.js
+54. backend/services/marketScoringEngine.js
+55. backend/services/masterRulebookRiskClassification.js
+56. backend/services/metrxFactoryExtractor.js
+57. backend/services/metrxFactoryService.js
+58. backend/services/normalizerService.js
+59. backend/services/oddsApiPipeline.js
+60. backend/services/oddsBudgetService.js
+61. backend/services/pipelineMetricsService.js
+62. backend/services/proFootballDataService.js
+63. backend/services/providerQuotaService.js
+64. backend/services/quotaPlanner.js
+65. backend/services/rateLimitsAnalysis.js
+66. backend/services/reEvaluationEngine.js
+67. backend/services/safeHavenSelector.js
+68. backend/services/saveContextData.js
+69. backend/services/saveDirectInsights.js
+70. backend/services/semanticDriftSummaryService.js
+71. backend/services/skcsHeartbeat.js
+72. backend/services/soccerDataApiClient.js
+73. backend/services/sportsApiProFootballExtractor.js
+74. backend/services/sportsApiProFootballService.js
+75. backend/services/sportsLiveScoresExtractor.js
+76. backend/services/sportsLiveScoresService.js
+77. backend/services/sportsrcHealthService.js
+78. backend/services/subscriptionTiming.js
+79. backend/services/syncService.js
+80. backend/services/systemTruthLogger.js
+81. backend/services/thesportsdbPipeline.js
+82. backend/services/tier1BootstrapService.js
+83. backend/services/tier1SchemaProfile.js
+84. backend/services/unifiedFixturesService.js
+85. backend/services/unifiedPredictionsService.js
+86. backend/services/unifiedRulesService.js
+
+B10 assets inspected (27):
+1. scripts/apply-db-governance.js
+2. scripts/apply-migrations.js
+3. scripts/audit-api-call-map.js
+4. scripts/audit-api-sports-usage.js
+5. scripts/audit-bigballs-discovery.js
+6. scripts/audit-bsd-discovery.js
+7. scripts/audit-bsd-league-inventory.js
+8. scripts/audit-cricket-final-tables.js
+9. scripts/audit-cricket-rules.js
+10. scripts/audit-cricket-storage.js
+11. scripts/audit-cricket-tables.js
+12. scripts/audit-database.js
+13. scripts/audit-execution-spine.js
+14. scripts/audit-football-rules-alignment.js
+15. scripts/audit-grading-pipeline.js
+16. scripts/audit-placeholders-and-insights.js
+17. scripts/audit-soccerdata-discovery.js
+18. scripts/audit-soccerdata-summer-coverage.js
+19. scripts/audit-sport-values.js
+20. scripts/audit-sportsdataio-boundary.ps1
+21. scripts/audit-table-usage.js
+22. scripts/audit-v2-foundation.js
+23. scripts/audit-v2-identity-deep.js
+24. scripts/audit-v2-provider-coverage.js
+25. scripts/gatekeeper-pipeline.js
+26. scripts/master-qa.js
+27. scripts/secondary-market-gatekeeper.js
+
+B07-B10 Phase 7 decision summary:
+- IMPLEMENT_CONSOLIDATION: 0 assets
+- NO_ACTION: 108 assets
+- HOLD_NEEDS_RUNTIME_PROOF: 27 assets
+
+HOLD_NEEDS_RUNTIME_PROOF assets:
+1. backend/src/services/contextIntelligence/cacheService.js
+2. backend/src/services/marketRouter/waterfall.js
+3. backend/adapters/f1Adapter.js
+4. backend/services/comboEngine.js
+5. backend/services/rateLimitsAnalysis.js
+6. backend/services/accaMathUtils.js
+7. backend/services/aiProvider_odds_update.js
+8. scripts/gatekeeper-pipeline.js
+9. scripts/audit-execution-spine.js
+10. scripts/audit-api-call-map.js
+11. scripts/audit-api-sports-usage.js
+12. scripts/audit-bigballs-discovery.js
+13. scripts/audit-bsd-discovery.js
+14. scripts/audit-bsd-league-inventory.js
+15. scripts/audit-soccerdata-discovery.js
+16. scripts/audit-cricket-final-tables.js
+17. scripts/audit-cricket-rules.js
+18. scripts/audit-cricket-storage.js
+19. scripts/audit-cricket-tables.js
+20. scripts/audit-football-rules-alignment.js
+21. scripts/audit-sport-values.js
+22. scripts/secondary-market-gatekeeper.js
+23. scripts/audit-grading-pipeline.js
+24. scripts/audit-placeholders-and-insights.js
+25. scripts/master-qa.js
+26. scripts/apply-db-governance.js
+27. scripts/apply-migrations.js
+
+NO_ACTION basis:
+- Phase 6 selected many service, provider, config, route-support, normalization, prediction, grading, health, and Control Center read authorities as CANONICAL_KEEP.
+- Phase 5 overlap evidence did not authorize merge, deletion, retirement, or refactor.
+- Phase 4 legacy/superseded/historical findings do not authorize removal without runtime proof and reference safety.
+- Phase 6 placed audit, discovery, migration-capable, QA, gatekeeper, and operational scripts behind NEEDS_RUNTIME_PROOF.
+- No safe B07-B10 consolidation path is proven in the current evidence.
+
+Implementation actions performed:
+- None.
+
+Why no B07-B10 consolidation was authorized:
+- Pipeline, provider, cricket, football, prediction, grading, unified data access, and Control Center read surfaces have distinct service boundaries.
+- Audit/discovery/QA/governance scripts are not canonical runtime authorities and may perform reads, audits, or mutation-capable actions, so they require separate runtime proof before execution, retirement, or consolidation.
+- Legacy/superseded/historical assets remain held because Phase 7 has no live caller/reference proof authorizing removal.
+- Implementing consolidation now would risk breaking runtime callers, provider behavior, prediction flows, scripts, database operations, or manual/operator workflows without proof.
+
+Explicit scope confirmation:
+- B07-B10 only.
+- B11-B29 not inspected for implementation in this packet.
+- No runtime/source files changed.
+
+Batch decision:
+- B07-B10 merge/consolidation gate is evidence-complete with NO_ACTION for canonical/current assets and HOLD_NEEDS_RUNTIME_PROOF for held/legacy/superseded/script surfaces.
+- Grouped unit B07-B10 is closed.
+- Next deterministic group: B11-B14
 
 Validation boundary:
 - Evidence only.

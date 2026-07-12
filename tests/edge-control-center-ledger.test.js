@@ -34,7 +34,7 @@ function buildPhaseWorkProposal(overrides = {}) {
     request_type: "PHASE_WORK",
     mode: "PHASE_WORK",
     phase: "PHASE_7",
-    batch_id: "B07-B10",
+    batch_id: "B11-B14",
     work_kind: "MERGE_CONSOLIDATION",
     requires_full_forensic_evidence: false,
     preserves_unrelated_changes: true,
@@ -130,16 +130,15 @@ describe("Edge Control Center Ledger v1", () => {
     );
     assert.equal(result.state.lifecycle_state, "BATCH_COMPLETE");
     assert.equal(result.state.active_batch, null);
-    assert.deepEqual(result.state.completed_batches, ["B01-B03", "B04-B06"]);
+    assert.deepEqual(result.state.completed_batches, ["B01-B03", "B04-B06", "B07-B10"]);
     assert.deepEqual(result.state.remaining_batches, [
-      "B07-B10",
       "B11-B14",
       "B15-B18",
       "B19-B22",
       "B23-B26",
       "B27-B29",
     ]);
-    assert.equal(result.state.next_deterministic_batch, "B07-B10");
+    assert.equal(result.state.next_deterministic_batch, "B11-B14");
     assert.deepEqual(result.state.phase_3_outcomes, [
       "ACTIVE",
       "INDIRECTLY_ACTIVE",
@@ -168,8 +167,8 @@ describe("Edge Control Center Ledger v1", () => {
     const state = createControlCenterGateState();
     assert.equal(state.eac_evidence_reusable, true);
     assert.deepEqual(getEacBatchIds(), [...EAC_BATCH_IDS]);
-    assert.equal(getNextIncompleteBatch(state), "B07-B10");
-    assert.equal(state.next_deterministic_batch, "B07-B10");
+    assert.equal(getNextIncompleteBatch(state), "B11-B14");
+    assert.equal(state.next_deterministic_batch, "B11-B14");
     assert.equal(EAC_BATCH_IDS.length, 29);
   });
 
@@ -212,7 +211,7 @@ describe("Edge Control Center Ledger v1", () => {
     assert.equal(result.mode, "PHASE_WORK");
     assert.equal(result.reason, "PHASE_WORK_ACCEPTED");
     assert.equal(result.nextState.lifecycle_state, "BATCH_ACTIVE");
-    assert.equal(result.nextState.active_batch, "B07-B10");
+    assert.equal(result.nextState.active_batch, "B11-B14");
   });
 
   it("B01-B03 grouped batch completion advances Phase 7 to B04-B06", () => {
@@ -284,6 +283,43 @@ describe("Edge Control Center Ledger v1", () => {
       "B27-B29",
     ]);
     assert.equal(result.nextState.next_deterministic_batch, "B07-B10");
+    assert.equal(result.nextState.lifecycle_state, "BATCH_COMPLETE");
+  });
+
+  it("B07-B10 grouped batch completion advances Phase 7 to B11-B14", () => {
+    const state = createControlCenterGateState({
+      lifecycle_state: "BATCH_ACTIVE",
+      active_batch: "B07-B10",
+      completed_batches: ["B01-B03", "B04-B06"],
+      remaining_batches: [
+        "B07-B10",
+        "B11-B14",
+        "B15-B18",
+        "B19-B22",
+        "B23-B26",
+        "B27-B29",
+      ],
+      next_deterministic_batch: "B07-B10",
+    });
+    const result = evaluateControlCenterProposal(
+      buildCompleteBatchProposal({ batch_id: "B07-B10" }),
+      state
+    );
+    assert.equal(result.gate, "GREEN");
+    assert.equal(result.reason, "BATCH_COMPLETED");
+    assert.deepEqual(result.nextState.completed_batches, [
+      "B01-B03",
+      "B04-B06",
+      "B07-B10",
+    ]);
+    assert.deepEqual(result.nextState.remaining_batches, [
+      "B11-B14",
+      "B15-B18",
+      "B19-B22",
+      "B23-B26",
+      "B27-B29",
+    ]);
+    assert.equal(result.nextState.next_deterministic_batch, "B11-B14");
     assert.equal(result.nextState.lifecycle_state, "BATCH_COMPLETE");
   });
 
