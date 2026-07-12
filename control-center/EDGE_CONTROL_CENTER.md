@@ -3813,3 +3813,47 @@ Validation boundary:
 - No active-use outcome authorizes deletion.
 - B27 batch state not advanced in this patch.
 - GitHub vulnerability and Dependabot notices remain future dependency/security work and were not touched.
+
+## PHASE 3 - B28 ACTIVE USE IDENTIFICATION EVIDENCE
+
+Result: PASS
+
+Scope:
+- Phase: PHASE_3 - Active Use Identification
+- Batch: B28 / ROOT_NON_MD_TXT_FILES
+- Deletion/merge/retirement/refactor performed: NO
+- Script execution performed: NO
+- Database mutation performed: NO
+- Deployment change performed: NO
+- Runtime/product change performed: NO
+- Dependency/security/vulnerability notice work performed: NO
+
+Outcome summary:
+- ACTIVE: 5
+- INDIRECTLY_ACTIVE: 0
+- MANUAL_USE: 50
+- NO_CURRENT_USE_FOUND: 0
+- UNKNOWN: 0
+
+B28 ACTIVE assets:
+- .gitignore
+- .vercelignore
+- package-lock.json
+- package.json
+- tailwind.config.js
+
+B28 MANUAL_USE summary:
+- Remaining 50 B28 root non-MD/TXT assets are manual utility, report, config, launcher, SQL/reference, standalone HTML, or diagnostic assets.
+
+Evidence:
+- B28 manifest validation confirmed 55 governed root non-MD/TXT assets.
+- ACTIVE assets are limited to Git/Vercel/npm/Tailwind configuration currently used by repository, build, install, or deployment workflows.
+- Root scripts, reports, diagnostics, launchers, SQL/reference files, and standalone root HTML are manual-use assets in this phase.
+- No root script, SQL file, deployment action, database action, or cleanup action was executed.
+- No active-use outcome authorizes deletion.
+
+Validation boundary:
+- Evidence only.
+- No source/runtime/product files changed except this Control Center evidence append.
+- B28 batch state not advanced in this patch.
+- GitHub vulnerability and Dependabot notices remain future dependency/security work and were not touched.
