@@ -97,7 +97,7 @@ const RECOGNIZED_REQUEST_TYPES = Object.freeze([
   "ACTIVATE_NEXT_GROUP",
 ]);
 
-const ACTIVE_CLEANUP_PHASE = "PHASE_3";
+const ACTIVE_CLEANUP_PHASE = "PHASE_5";
 
 const PHASE_3_OUTCOMES = Object.freeze([
   "ACTIVE",

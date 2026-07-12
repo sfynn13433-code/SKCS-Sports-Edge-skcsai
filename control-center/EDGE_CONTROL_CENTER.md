@@ -4790,3 +4790,70 @@ Validation boundary:
 - No file removal, merge, retirement, refactor, source change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
 - B27-B29 Phase 4 evidence is closed.
 - Phase 4 batch review is complete through B29.
+
+## PHASE 5 - FUNCTIONAL OVERLAP IDENTIFICATION - ACTIVATED
+
+Result: ACTIVE
+
+Activation scope:
+- Phase: PHASE_5 - Functional Overlap Identification
+- Activation HEAD: 48019118
+- Previous phase: PHASE_4 - Legacy and Replacement Identification
+- Previous phase status: CLOSED
+- Activation type: Control Center activation only
+- Batch inspection begun by this activation: NO
+- Deletion/merge/retirement/refactor authorized by this activation: NO
+- Source/runtime/product change authorized by this activation: NO
+- SQL execution authorized by this activation: NO
+- Deployment change authorized by this activation: NO
+- Database/Supabase mutation authorized by this activation: NO
+- Dependency/security/vulnerability remediation authorized by this activation: NO
+
+Objective:
+Identify whether different remaining governed files do the same or substantially overlapping job, based on repository evidence only.
+
+Allowed work:
+- Inspect governed asset evidence.
+- Compare purpose, consumers, runtime role, dependency role, and governance role.
+- Record Phase 5 functional-overlap findings in the Control Center.
+- Run approved local guards/checks.
+- Commit/push scoped governance evidence only.
+
+Forbidden work:
+- No deletion.
+- No merge implementation.
+- No retirement.
+- No refactor.
+- No source file repair.
+- No runtime behavior change.
+- No product behavior change.
+- No SQL execution.
+- No deployment change.
+- No database mutation.
+- No Supabase mutation.
+- No dependency update.
+- No vulnerability remediation.
+
+Phase 5 outcome vocabulary:
+- NO_OVERLAP
+- PARTIAL_OVERLAP
+- MAJOR_OVERLAP
+- POTENTIAL_MERGE_GROUP
+
+Batch plan:
+- B01-B29 will be inspected in deterministic order.
+- B01 is the next batch.
+- Each batch must record evidence before outcome.
+- Overlap identification does not authorize cleanup.
+
+Definition of Done:
+- B01-B29 have Phase 5 evidence recorded.
+- Functional overlap groups are identified where proven.
+- Non-overlap is recorded where files have distinct responsibilities.
+- Final Phase 5 roll-up is recorded.
+- Rulebook guard passes.
+
+Validation boundary:
+- This activation creates the Phase 5 governance boundary only.
+- No Phase 5 batch inspection is started by this activation.
+- Stop after activation commit and report exact start point for B01 before beginning inspection.
