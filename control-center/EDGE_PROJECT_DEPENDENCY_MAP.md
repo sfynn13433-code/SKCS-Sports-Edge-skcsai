@@ -28,7 +28,7 @@ Blocks: none
 Status: TESTED
 Governed by: ESA-001
 Blocked by: EPR-001
-Blocks: EAC-001, EMG-001, EFI-001, EST-001, ESEC-001, EPI-001, EGR-001, EAI-001, EUI-001, EOPS-001
+Blocks: EAC-001, EMG-001, EFI-001, EST-001, ESEC-001, EPI-001, EGR-001, EAI-001, EUI-001, EOPS-001, FIP-001
 
 ## EAC-001 — Edge Asset Classification and Repository Map
 
@@ -49,7 +49,7 @@ Blocks: none
 Status: APPROVED
 Governed by: EMG-001
 Blocked by: ESA-001, EAC-001
-Blocks: EFI-001, EST-001, ESEC-001
+Blocks: EFI-001, EST-001, ESEC-001, FIP-001
 
 ## EFI-001 — FIP Intake Handshake
 
@@ -119,6 +119,13 @@ Blocks: none
 Status: PROPOSED
 Governed by: EOPS-001
 Blocked by: ESA-001, EST-001, ESEC-001
+Blocks: none
+
+## FIP-001 — Scout FIP Authority Contract
+
+Status: APPROVED
+Governed by: FIP-001
+Blocked by: ESA-001, EMG-001
 Blocks: none
 
 ## E2E-001 — Scout to Edge End-to-End Proof

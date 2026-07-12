@@ -14,7 +14,7 @@
                                                     "control-center/"
                                                 ]
                                  },
-                        "asset_count":  20,
+                        "asset_count":  21,
                         "asset_paths":  [
                                             "control-center/check_control_center.js",
                                             "control-center/check_edge_asset_classification.js",
@@ -35,6 +35,7 @@
                                             "control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md",
                                             "control-center/EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md",
                                             "control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md",
+                                            "control-center/FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md",
                                             "control-center/SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md"
                                         ]
                     },

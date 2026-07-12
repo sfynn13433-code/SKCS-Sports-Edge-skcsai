@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 20,
+  "project_count": 21,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -203,7 +203,8 @@
         "EGR-001",
         "EAI-001",
         "EUI-001",
-        "EOPS-001"
+        "EOPS-001",
+        "FIP-001"
       ],
       "affected_layers": [
         "architecture",
@@ -367,7 +368,8 @@
       "blocks": [
         "EFI-001",
         "EST-001",
-        "ESEC-001"
+        "ESEC-001",
+        "FIP-001"
       ],
       "affected_layers": [
         "Scout handoff",
@@ -378,7 +380,7 @@
         "EMG-001"
       ],
       "related_contracts": [
-        "FIP-001",
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
         "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1"
       ],
       "related_files": [],
@@ -431,7 +433,7 @@
         "EFI-001"
       ],
       "related_contracts": [
-        "FIP-001",
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
         "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
         "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1"
       ],
@@ -452,7 +454,7 @@
         "Control Center sequencing bypass"
       ],
       "recommended_order": 8,
-      "next_action": "Contract sealed (EFI-001-C1). Proceed to EST-001 contract inspection when separately authorized. Implementation remains forbidden.",
+      "next_action": "FIP-001 authority registered (FIP-001-C1). Proceed to EFI-001-I1 intake implementation when separately authorized.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-12",
       "governed_by_control_task_id": "EFI-001",
@@ -644,7 +646,7 @@
         "EPRV-001"
       ],
       "related_contracts": [
-        "FIP-001"
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1"
       ],
       "related_files": [],
       "related_tables": [],
@@ -897,6 +899,59 @@
       ]
     },
     {
+      "project_id": "FIP-001",
+      "project_name": "Scout FIP Authority Contract",
+      "category": "Scout Handoff",
+      "description": "Register the committed Scout Fixture Intelligence Package authority that Edge recognizes as the sole valid canonical sports-truth contract for governed intake and proof work.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
+      "current_status": "APPROVED",
+      "priority": "critical",
+      "blocked_by": [
+        "ESA-001",
+        "EMG-001"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "Scout handoff",
+        "governance",
+        "architecture"
+      ],
+      "related_tasks": [
+        "FIP-001"
+      ],
+      "related_contracts": [
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
+        "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
+        "E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1"
+      ],
+      "related_files": [],
+      "related_tables": [],
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "A committed FIP authority contract defines schema identity, required payload shape, validation/hash authority, fixture identity, market/context requirements, allowed proof modes, and forbidden non-canonical sources.",
+      "proof_required": [
+        "FIP authority contract committed",
+        "EFI-001 to FIP-001 crosswalk drift test",
+        "Control Center pointer to committed authority"
+      ],
+      "risks_if_ignored": [
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
+      ],
+      "recommended_order": 18,
+      "next_action": "Authority registered (FIP-001-C1). Proceed to EFI-001-I1 intake implementation when separately authorized.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
+      "last_updated": "2026-07-12",
+      "governed_by_control_task_id": "FIP-001",
+      "current_evidence": [
+        "FIP-001-C1 sealed control-center/FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md",
+        "Schema identity, payload shape, validation/hash law, fixture/market/context requirements, proof modes, and forbidden sources defined",
+        "Scout confirmed as canonical sports-truth owner; marriage gate remains BLOCKED"
+      ]
+    },
+    {
       "project_id": "E2E-001",
       "project_name": "Scout to Edge End-to-End Proof",
       "category": "Scout Handoff",
@@ -922,7 +977,7 @@
         "E2E-001"
       ],
       "related_contracts": [
-        "FIP-001",
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
         "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1",
         "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
         "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
@@ -946,8 +1001,8 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 18,
-      "next_action": "Planning complete (E2E-001-C1). Remain BLOCKED until implementation prerequisites satisfied and separate proof execution authorization.",
+      "recommended_order": 19,
+      "next_action": "Planning complete (E2E-001-C1). FIP-001 authority registered. Remain BLOCKED until implementation prerequisites satisfied and separate proof execution authorization.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-12",
       "governed_by_control_task_id": "E2E-001",
@@ -989,7 +1044,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 19,
+      "recommended_order": 20,
       "next_action": "Proceed to ESA-RR-002 scope refinement and sealing (contract-only).",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-07",
@@ -1031,7 +1086,7 @@
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
-      "recommended_order": 20,
+      "recommended_order": 21,
       "next_action": "Resume EAC-001 classification at B02 / file 16.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-07",

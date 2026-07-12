@@ -13,7 +13,7 @@ A repository file is an asset. It is not automatically a project.
 | EAC-001 | Edge Asset Classification and Repository Map | Repository Organization | APPROVED | critical | EAC-001 | Perform EAC-001 full classification closure inspection. |
 | EAC-R1-001 | EAC-001 B18 Manifest and Repository Map Alignment Repair | Repository Organization | DONE | critical | EAC-R1-001 | No further action. |
 | EMG-001 | Scout-Edge Marriage Gate Contract | Scout Handoff | APPROVED | critical | EMG-001 | Contract sealed (EMG-001-C1). Proceed to EFI-001 contract inspection when separately authorized. Gate remains BLOCKED. |
-| EFI-001 | FIP Intake Handshake | Scout Handoff | APPROVED | critical | EFI-001 | Contract sealed (EFI-001-C1). Proceed to EST-001 contract inspection when separately authorized. Implementation remains forbidden. |
+| EFI-001 | FIP Intake Handshake | Scout Handoff | APPROVED | critical | EFI-001 | FIP-001 authority registered (FIP-001-C1). Proceed to EFI-001-I1 intake implementation when separately authorized. |
 | EST-001 | Supabase Storage and FIP Retention Contract | Data and Storage | APPROVED | critical | EST-001 | Contract sealed (EST-001-C1). Proceed to E2E-001 proof planning when separately authorized. Storage implementation remains forbidden. |
 | ESEC-001 | Subscriber and Security Boundary | Security and Commercial Boundary | PROPOSED | critical | ESEC-001 | Wait for Edge inventory. |
 | EPI-001 | Prediction Pipeline Integrity | Prediction Pipeline | PROPOSED | critical | EPI-001 | Wait for Edge inventory. |
@@ -23,6 +23,7 @@ A repository file is an asset. It is not automatically a project.
 | EUI-001 | Subscriber UI and Prediction Delivery | UI and Delivery | PROPOSED | high | EUI-001 | Wait for security and pipeline inventory. |
 | ECU-001 | Edge Control Center Operator UI | UI and Delivery | APPROVED | high | ECU-001 | Implement ECU-001 Edge Control Center operator UI v1 |
 | EOPS-001 | Deployment and Operations Governance | Deployment and Operations | PROPOSED | high | EOPS-001 | Wait for system, storage, and security inventory. |
-| E2E-001 | Scout to Edge End-to-End Proof | Scout Handoff | BLOCKED | critical | E2E-001 | Planning complete (E2E-001-C1). Remain BLOCKED until implementation prerequisites satisfied and separate proof execution authorization. |
+| FIP-001 | Scout FIP Authority Contract | Scout Handoff | APPROVED | critical | FIP-001 | Authority registered (FIP-001-C1). Proceed to EFI-001-I1 intake implementation when separately authorized. |
+| E2E-001 | Scout to Edge End-to-End Proof | Scout Handoff | BLOCKED | critical | E2E-001 | Planning complete (E2E-001-C1). FIP-001 authority registered. Remain BLOCKED until implementation prerequisites satisfied and separate proof execution authorization. |
 | ESA-RR-001 | ESA-RR-001 Runtime Repair Base Contract (Approved) | Governance and Contract Refinement | APPROVED | high | ESA-RR-001 | Proceed to ESA-RR-002 scope refinement and sealing (contract-only). |
 | ESA-RR-002 | ESA-RR-002 Implementation Law Seal (Hold) | Governance and Contract Refinement | TESTED | critical | ESA-RR-002 | Resume EAC-001 classification at B02 / file 16. |

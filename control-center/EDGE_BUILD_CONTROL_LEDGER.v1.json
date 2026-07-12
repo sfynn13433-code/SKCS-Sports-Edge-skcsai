@@ -347,7 +347,7 @@
         "architecture"
       ],
       "related_contracts": [
-        "FIP-001",
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
         "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1"
       ],
       "affected_files": [
@@ -395,7 +395,7 @@
         "runtime"
       ],
       "related_contracts": [
-        "FIP-001",
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
         "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
         "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1"
       ],
@@ -420,12 +420,11 @@
         "No committed runtime FIP intake boundary exists"
       ],
       "open_gaps": [
-        "FIP-001 committed authority artifact still pending",
         "Runtime intake service/route not implemented",
-        "EST-001 transport and retention law not defined",
-        "Input validation, idempotency, and provenance runtime proofs not implemented"
+        "Input validation, idempotency, and provenance runtime proofs not implemented",
+        "EFI-001 §5 to FIP-001 crosswalk drift test not yet automated"
       ],
-      "next_action": "Contract sealed (EFI-001-C1). Proceed to EST-001 contract inspection when separately authorized. Implementation remains forbidden.",
+      "next_action": "FIP-001 authority registered (FIP-001-C1). Proceed to EFI-001-I1 intake implementation when separately authorized.",
       "owner_note": "This resumes the intentionally deferred Scout-to-Edge bridge at contract layer only.",
       "last_updated": "2026-07-12"
     },
@@ -597,7 +596,7 @@
         "Scout handoff"
       ],
       "related_contracts": [
-        "FIP-001"
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1"
       ],
       "affected_files": [
         "backend/server-express.js",
@@ -842,6 +841,53 @@
       "last_updated": "2026-07-05"
     },
     {
+      "task_id": "FIP-001",
+      "task_name": "Scout FIP Authority Contract",
+      "workstream": "Scout Handoff",
+      "description": "Register the committed Scout Fixture Intelligence Package authority that Edge recognizes as the sole valid canonical sports-truth contract for governed intake and proof work.",
+      "status": "APPROVED",
+      "priority": "critical",
+      "blocked_by": [
+        "ESA-001",
+        "EMG-001"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "Scout handoff",
+        "governance",
+        "architecture"
+      ],
+      "related_contracts": [
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
+        "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
+        "E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1"
+      ],
+      "affected_files": [
+        "control-center/FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md"
+      ],
+      "affected_tables": [],
+      "completion_definition": "A committed FIP authority contract defines schema identity, required payload shape, validation/hash authority, fixture identity, market/context requirements, allowed proof modes, and forbidden non-canonical sources.",
+      "proof_required": [
+        "FIP authority contract committed",
+        "EFI-001 to FIP-001 crosswalk drift test",
+        "Control Center pointer to committed authority"
+      ],
+      "current_evidence": [
+        "FIP-001-C1 sealed control-center/FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md",
+        "Schema identity, payload shape, validation/hash law, fixture/market/context requirements, proof modes, and forbidden sources defined",
+        "Scout confirmed as canonical sports-truth owner; marriage gate remains BLOCKED"
+      ],
+      "open_gaps": [
+        "EFI-001 §5 to FIP-001 crosswalk drift test not yet automated",
+        "Runtime intake not implemented (EFI-001-I1)"
+      ],
+      "next_action": "Authority registered (FIP-001-C1). Proceed to EFI-001-I1 intake implementation when separately authorized.",
+      "owner_note": "Edge recognizes Scout Neon validated FIP per this contract. Full FIP body remains canonical in Scout.",
+      "last_updated": "2026-07-12"
+    },
+    {
       "task_id": "E2E-001",
       "task_name": "Scout to Edge End-to-End Proof",
       "workstream": "Scout Handoff",
@@ -863,7 +909,7 @@
         "end-to-end"
       ],
       "related_contracts": [
-        "FIP-001",
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
         "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1",
         "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
         "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
@@ -889,7 +935,6 @@
         "Execution remains BLOCKED; no actual E2E proof run performed"
       ],
       "open_gaps": [
-        "FIP-001 committed authority artifact pending",
         "EFI-001 runtime intake boundary not implemented",
         "EST-001 schema and storage enforcement not implemented",
         "ESEC-001 security boundary not proven",
@@ -898,7 +943,7 @@
         "Controlled Scout FIP proof sample not yet authorized for execution",
         "Marriage and storage gates remain BLOCKED"
       ],
-      "next_action": "Planning complete (E2E-001-C1). Remain BLOCKED until implementation prerequisites satisfied and separate proof execution authorization.",
+      "next_action": "Planning complete (E2E-001-C1). FIP-001 authority registered. Remain BLOCKED until implementation prerequisites satisfied and separate proof execution authorization.",
       "owner_note": "This is the final technical proof before the Scout-Edge marriage gate can be separately approved. Planning does not clear the gate.",
       "last_updated": "2026-07-12"
     },

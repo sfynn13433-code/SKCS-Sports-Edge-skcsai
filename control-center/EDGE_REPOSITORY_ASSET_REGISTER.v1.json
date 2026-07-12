@@ -5,8 +5,8 @@
   "source_command": "git ls-files",
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
-  "tracked_path_count": 908,
-  "registered_asset_count": 907,
+  "tracked_path_count": 909,
+  "registered_asset_count": 908,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -13395,6 +13395,43 @@
       ],
       "classification_evidence": [
         "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md seals intake handshake law upstream of aiPipeline.buildRawPredictionFromProviderItem() per EMG-001 sequence."
+      ]
+    },
+    {
+      "asset_path": "control-center/FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md",
+      "asset_type": "CONTROL_CENTER",
+      "asset_role": "CONTROL_GOVERNANCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "FIP-001",
+      "governed_by_control_task_id": "FIP-001",
+      "related_assets": [
+        "control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md",
+        "control-center/EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md",
+        "control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md",
+        "control-center/E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1.md",
+        "control-center/SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "REGISTERED",
+      "next_validation": "Validate EFI-001 §5 crosswalk against FIP-001 before EFI-001-I1 implementation.",
+      "notes": "FIP-001-C1 Scout FIP authority contract. Runtime intake and proof execution forbidden at seal time.",
+      "purpose_description": "Registers the committed Scout FIP authority: schema identity, required payload shape, validation/hash law, fixture identity, market/context requirements, allowed proof modes, and forbidden non-canonical sources.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md establishes Scout as canonical sports-truth owner and sole FIP contract Edge may recognize for governed intake."
       ]
     },
     {

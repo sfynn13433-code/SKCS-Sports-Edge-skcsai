@@ -553,7 +553,7 @@ Required state snapshot:
   ],
   "eac_evidence_reusable": true,
   "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
-  "total_governed_assets": 907,
+  "total_governed_assets": 908,
   "phase_0": {
     "status": "PHASE_CLOSED",
     "question": "What exact repository state is the cleanup programme starting from?",
@@ -562,7 +562,7 @@ Required state snapshot:
       "active_branch": "main",
       "head_commit": "7d21fc276629bb6aec056299d70e1541b462934f",
       "working_tree_status": "dirty_unrelated_changes_preserved",
-      "governed_asset_count": 907,
+      "governed_asset_count": 908,
       "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
       "eac_batch_count": 29,
       "already_completed_or_removal_work": "Partial external sports provider removal (PARTIAL); EAC-001 B01-B29 classification inventory complete; prior Control Center per-asset investigations preserved as historical evidence",
@@ -10220,3 +10220,46 @@ Important non-actions:
 
 Validation boundary:
 - E2E-001-C1 planning recording only. Does not authorize proof execution or gate clearance.
+
+## FIP-001-C1 — REGISTER COMMITTED SCOUT FIP AUTHORITY
+
+Result: **APPROVED (authority registered; gates remain BLOCKED)**
+
+Scope:
+- Mini-project: FIP-001-C1 — Register Committed Scout FIP Authority (contract-only)
+- Start commit: ecebdc9fab4ae5ee89c23c0f3785894cc45da47e
+- Mode: contract/authority registration only
+- Cleanup programme: PROGRAMME_CLOSED (not reopened)
+- Prior mini-project: E2E-001-C1 closed
+
+Start-point verification:
+- git status --short: clean at start
+- git rev-parse HEAD == ecebdc9f at start
+- npm run control:center: PASS (required before commit)
+- npm run control:verify: PASS (required before commit)
+- npm run verify:rulebook: PASS (required before commit)
+
+Authority decision:
+- Scout FIP authority contract sealed at control-center/FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md
+- FIP-001 task status: APPROVED (authority registered)
+- scout_edge_marriage_gate: BLOCKED (unchanged)
+- supabase_storage_gate: BLOCKED (unchanged)
+- Allowed fip_schema_version: 1.0.0
+- Hash authority: Scout scout-fip-sha256-v1; Edge verifies at future EFI-001 boundary
+- Scout confirmed as canonical sports-truth owner; Edge holds references only per EST-001
+- First proof mode: PROOF_FIXTURE only; reserved proof_fixture_id E2E-001-PROOF-001
+- Forbidden non-canonical sources include buildLiveData(), POST /api/pipeline/run { matches }, workspace candidates, Supabase FIP replay
+
+Evidence artifacts:
+- control-center/FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md
+
+Next recommended mini-projects (sequenced):
+- EFI-001-I1 — Smallest fail-closed intake implementation
+- EST-001-I1 — Schema + retention enforcement implementation
+- E2E-001-X1 — Controlled proof execution (when separately authorized)
+
+Important non-actions:
+- No intake implementation, E2E proof run, runtime/API/pipeline/UI change, SQL, Supabase mutation, deployment, provider removal, dependency/security remediation, or gate clearance
+
+Validation boundary:
+- FIP-001-C1 authority registration only. Does not authorize intake implementation or proof execution.

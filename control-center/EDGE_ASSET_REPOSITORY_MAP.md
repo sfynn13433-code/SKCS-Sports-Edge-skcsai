@@ -1,14 +1,14 @@
 # EDGE ASSET REPOSITORY MAP
 EAC_PROJECT_ID: EAC-001
 MANIFEST_SCHEMA_VERSION: 1.0.0
-TOTAL_GOVERNED_ASSETS: 907
-TOTAL_BATCHED_ASSETS: 907
+TOTAL_GOVERNED_ASSETS: 908
+TOTAL_BATCHED_ASSETS: 908
 FULLY_CLASSIFIED_ASSETS: 0
-CLASSIFICATION_PENDING_ASSETS: 907
+CLASSIFICATION_PENDING_ASSETS: 908
 CLOSURE_READY: NO
 
 CURRENT_STATE_COUNTS
-- CURRENT: 17
+- CURRENT: 18
 - PARALLEL: 0
 - LEGACY: 0
 - HISTORICAL_EVIDENCE: 0
@@ -18,8 +18,8 @@ CURRENT_STATE_COUNTS
 
 FUNCTIONAL_GROUP_COUNTS
 - SCRIPT_TOOL: 156
+- DOCUMENTATION_KNOWLEDGE: 115
 - PROVIDER_INTEGRATION: 115
-- DOCUMENTATION_KNOWLEDGE: 114
 - DATABASE_MIGRATION: 96
 - TEST_PROOF: 93
 - GENERATED_OUTPUT: 59
@@ -46,8 +46,8 @@ RELATIONSHIP_TAG_COUNTS
 - DATABASE: 235
 - PROVIDER: 195
 - API: 169
-- DOCUMENTATION: 140
-- GOVERNANCE: 139
+- DOCUMENTATION: 141
+- GOVERNANCE: 140
 - MIGRATION: 101
 - PREDICTION: 100
 - OBSERVABILITY: 99
@@ -71,10 +71,10 @@ RELATIONSHIP_TAG_COUNTS
 - CONTROLLER: 2
 - RPC: 1
 
-NEXT_VALIDATION_NON_EMPTY_ASSETS: 907
+NEXT_VALIDATION_NON_EMPTY_ASSETS: 908
 
 BATCH_COMPLETION_SUMMARY
-- B01 | CONTROL_CENTER | ASSET_COUNT=20 | CLASSIFIED=0 | PENDING=20
+- B01 | CONTROL_CENTER | ASSET_COUNT=21 | CLASSIFIED=0 | PENDING=21
 - B02 | BACKEND_DIRECT_FILES | ASSET_COUNT=13 | CLASSIFIED=0 | PENDING=13
 - B03 | BACKEND_ROUTES_AND_CONTROLLERS | ASSET_COUNT=28 | CLASSIFIED=0 | PENDING=28
 - B04 | BACKEND_UTILS_SEMANTIC_CORE_AND_TEST | ASSET_COUNT=46 | CLASSIFIED=0 | PENDING=46
@@ -128,6 +128,7 @@ PER_ASSET_BY_BATCH
 | control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md | Defines the governed fail-closed Scout FIP intake boundary law: accepted source, minimum payload, crosswalk to Edge analysis envelope, validation, idempotency, provenance, and evidence recording. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE"] | ["EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md seals intake handshake law upstream of aiPipeline.buildRawPredictionFromProviderItem() per EMG-001 sequence."] | Validate against EFI-001 runtime intake implementation when separately authorized. |
 | control-center/EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md | Defines the explicit fail-closed Scout-Edge marriage gate law: prerequisites, allowed E2E proof sources, blocked conditions, pass/fail rules, and required evidence before EFI-001 intake implementation. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE"] | ["EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md seals scout_edge_marriage_gate law and references MARRIAGE_PREREQUISITES from the Edge build-control ledger."] | Validate with EMG-001 contract validator when separately authorized. |
 | control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md | Defines Supabase storage and FIP retention law: canonical Scout truth vs Edge-derived state, forbidden mirrors, data classes, retention periods, budget thresholds, replay/audit, and fail-closed persistence rules. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","DATABASE"] | ["EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md seals transport-vs-retention law and keeps supabase_storage_gate BLOCKED per Edge Control Center storage policy."] | Validate against EST-001 storage enforcement implementation when separately authorized. |
+| control-center/FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md | Registers the committed Scout FIP authority: schema identity, required payload shape, validation/hash law, fixture identity, market/context requirements, allowed proof modes, and forbidden non-canonical sources. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE"] | ["FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md establishes Scout as canonical sports-truth owner and sole FIP contract Edge may recognize for governed intake."] | Validate EFI-001 §5 crosswalk against FIP-001 before EFI-001-I1 implementation. |
 | control-center/SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md | Records read-only SEE-001 inspection of Scout-Edge runtime paths, forbidden proof sources, and NEEDS IMPLEMENTATION decision for first E2E marriage proof. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","AUDIT"] | ["SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md documents committed runtime entrypoints, missing FIP intake boundary, and defers marriage proof until EMG-001 and EFI-001."] | Validate against EFI-001 intake implementation when separately authorized. |
 
 ## B02 BACKEND_DIRECT_FILES
