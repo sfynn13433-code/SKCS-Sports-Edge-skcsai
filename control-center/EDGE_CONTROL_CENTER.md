@@ -6407,3 +6407,222 @@ Batch decision:
 Validation boundary:
 - Evidence only.
 - No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
+
+## PHASE 5 - B23-B26 FUNCTIONAL OVERLAP IDENTIFICATION EVIDENCE
+
+Result: PASS WITH OVERLAP CANDIDATES
+
+Scope:
+- Phase: PHASE_5 - Functional Overlap Identification
+- Batches: B23-B26
+- Evidence type: functional-overlap identification only
+- Deletion/merge/retirement/refactor performed: NO
+- Source/runtime/product change performed: NO
+- SQL execution performed: NO
+- Deployment change performed: NO
+- Database/Supabase mutation performed: NO
+- Dependency/security/vulnerability remediation performed: NO
+
+Batch manifest evidence:
+- Batch group: B23-B26
+- Start HEAD: 88ce49ae
+- B23 DB_SQL_AND_SUPABASE_OTHER asset_count: 20
+- B24 TESTS asset_count: 6
+- B25 SCRATCH asset_count: 2
+- B26 DEPLOYMENT_CI asset_count: 3
+- Combined reviewed assets: 31
+- Compact overlap scan inspected SQL scripts, Supabase Edge Function assets, Supabase Function assets, AI pipeline schema, Control Center tests, scratch database scripts, Dockerfile, render.yaml, and vercel.json.
+
+Outcome vocabulary used:
+- NO_OVERLAP
+- PARTIAL_OVERLAP
+- MAJOR_OVERLAP
+- POTENTIAL_MERGE_GROUP
+
+Candidate group 1: SQL prediction, ACCA, market, and rulebook surfaces
+
+Assets:
+- sql/acca_rules.sql
+- sql/extreme_smb_data.sql
+- sql/market_correlations_schema.sql
+- sql/master_rulebook_triggers.sql
+- sql/performance_optimizations.sql
+- sql/schema_refactor.sql
+- sql/tables.sql
+- sql/tier_rules.sql
+- supabase/schema/ai_pipeline_schema.sql
+
+Outcome:
+- MAJOR_OVERLAP
+
+Evidence:
+- Multiple SQL assets define or modify prediction, ACCA, SMB, market correlation, tier, rulebook trigger, and pipeline schema structures.
+- sql/acca_rules.sql seeds ACCA rules.
+- sql/extreme_smb_data.sql defines an SMB correlation matrix.
+- sql/market_correlations_schema.sql creates market correlation structures for ACCA conflict detection.
+- sql/master_rulebook_triggers.sql defines database-level Master Rulebook trigger behavior.
+- sql/performance_optimizations.sql optimizes trigger/rulebook-related tables.
+- sql/schema_refactor.sql and sql/tables.sql define normalized fixtures and prediction pipeline tables.
+- sql/tier_rules.sql seeds tier confidence and ACCA limits.
+- supabase/schema/ai_pipeline_schema.sql defines raw fixtures, enriched match data, and AI prediction pipeline schema.
+
+Decision:
+- Major SQL rule/prediction/schema overlap is proven.
+- No SQL is executed.
+- No database schema, trigger, rule, or migration is changed.
+- No canonical SQL authority is selected in Phase 5.
+- Carry forward as a future SQL/rulebook/schema canonicalization candidate.
+
+Candidate group 2: Supabase RLS, subscription, test-user, and access setup scripts
+
+Assets:
+- sql/day_zero_subscription.sql
+- sql/fix_rls_policies.sql
+- sql/supabase_test_user_reset_and_seed.sql
+- sql/supabase_test_user_seed_access.sql
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- These SQL assets overlap around subscription setup, RLS policy repair, profile/subscription access, test-user reset, and seeded access state.
+- sql/day_zero_subscription.sql creates subscription structures.
+- sql/fix_rls_policies.sql enables RLS and creates authenticated read policies for prediction tables.
+- test-user scripts seed or reset profiles, tiers, subscriptions, and access metadata.
+
+Decision:
+- Functional access/subscription overlap is proven.
+- No SQL, RLS, auth, subscription, or profile change is authorized.
+- Carry forward as a future Supabase access/test-user script-boundary candidate.
+
+Candidate group 3: RapidAPI cache, monitoring, and operational SQL surfaces
+
+Assets:
+- sql/rapidapi_cache.sql
+- sql/monitoring_tables.sql
+- sql/performance_optimizations.sql
+- supabase/schema/ai_pipeline_schema.sql
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- sql/rapidapi_cache.sql defines RapidAPI cache storage and indexes.
+- sql/monitoring_tables.sql defines prediction request logging and monitoring indexes.
+- sql/performance_optimizations.sql defines performance indexes and constraints.
+- supabase/schema/ai_pipeline_schema.sql includes pipeline schema structures that relate to monitoring and operational data flow.
+
+Decision:
+- Partial SQL operational overlap is proven.
+- No monitoring table, cache table, index, or constraint change is authorized.
+- Carry forward as operational SQL boundary evidence.
+
+Candidate group 4: Supabase scheduled sync, refresh, and semantic function surfaces
+
+Assets:
+- supabase/edge-functions/scheduled-fixture-sync/index.ts
+- supabase/edge-functions/scheduledFixtureSync/index.ts
+- supabase/functions/scheduled-prediction-refresh/index.ts
+- supabase/functions/semantic-drift-summary/index.ts
+- supabase/functions/sync-sports-data/index.ts
+
+Outcome:
+- MAJOR_OVERLAP
+
+Evidence:
+- scheduled-fixture-sync and scheduledFixtureSync both implement scheduled fixture sync concepts using Supabase service-role access.
+- scheduled-prediction-refresh implements scheduled prediction refresh behavior.
+- semantic-drift-summary implements semantic drift summary endpoint behavior.
+- supabase/functions/sync-sports-data/index.ts is listed in the manifest but is missing on disk during this scan.
+- These assets overlap with earlier scheduler, sync, cron, semantic drift, and provider-ingestion candidates.
+
+Decision:
+- Major Supabase Function/Edge Function overlap is proven.
+- Missing manifest asset is recorded as evidence only.
+- No function is executed, restored, deleted, renamed, deployed, or repaired in Phase 5.
+- Carry forward as a future Supabase function boundary and missing-asset review candidate.
+
+Candidate group 5: Control Center and governance test surfaces
+
+Assets:
+- tests/edge-asset-classification.test.js
+- tests/edge-control-center-ledger.test.js
+- tests/edge-control-center-ui.test.js
+- tests/edge-project-register.test.js
+- tests/edge-repository-asset-register.test.js
+- tests/edge-system-runtime-inventory.test.js
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- All B24 test assets verify Control Center, repository asset register, project register, runtime inventory, UI, and ledger governance behavior.
+- Tests share Control Center checker dependencies and governance artifact expectations.
+- The tests overlap by governance domain, but each validates a separate Control Center contract.
+
+Decision:
+- Partial governance-test overlap is proven.
+- Keep tests separate for now.
+- No test refactor, merge, or deletion is authorized.
+- Carry forward as governance-test boundary evidence.
+
+Candidate group 6: scratch database scripts
+
+Assets:
+- scratch/db_normalize.js
+- scratch/db_sync.js
+
+Outcome:
+- POTENTIAL_MERGE_GROUP
+
+Evidence:
+- Both scratch scripts use backend/database query access.
+- scratch/db_normalize.js mutates sport labels in predictions_raw and leagues.
+- scratch/db_sync.js reads distinct sports from predictions_raw and leagues.
+- Both overlap around ad hoc database normalization/sync inspection.
+
+Decision:
+- Functional overlap is proven.
+- No scratch script is executed.
+- No database mutation or cleanup is authorized.
+- Carry forward as a future scratch/database script retirement-or-canonicalization candidate.
+
+Candidate group 7: deployment and hosting configuration surfaces
+
+Assets:
+- Dockerfile
+- render.yaml
+- vercel.json
+
+Outcome:
+- PARTIAL_OVERLAP
+
+Evidence:
+- Dockerfile defines the container startup surface for the pipeline server.
+- render.yaml defines Render build, health check, autoDeploy, and provider environment variables.
+- vercel.json defines public output, API function configuration, cron configuration, and API routing.
+- These files overlap around deployment/hosting behavior but target different hosting surfaces.
+
+Decision:
+- Partial deployment configuration overlap is proven.
+- No deployment config, autoDeploy setting, cron, route, build command, or environment variable is changed.
+- Carry forward as deployment-surface boundary evidence.
+
+Distinct-role findings:
+- B23 SQL files are database-change artifacts and must not be merged, rewritten, or executed during Phase 5.
+- Supabase functions are runtime/deployment assets and must not be deployed or repaired during this evidence pass.
+- B24 tests are governance protection assets and repeated Control Center vocabulary alone does not authorize consolidation.
+- B25 scratch scripts are mutation-capable and were not executed.
+- B26 deployment configs overlap by hosting responsibility but are not identical jobs.
+- supabase/functions/sync-sports-data/index.ts was reported MISSING and is recorded only as a future review note.
+
+Batch decision:
+- B23-B26 contains proven functional overlap candidates.
+- Potential future canonicalization candidates are recorded for SQL rulebook/schema authority, Supabase access/test-user scripts, operational SQL, Supabase scheduled/function surfaces, governance tests, scratch database scripts, and deployment configuration boundaries.
+- No cleanup action is authorized by this outcome.
+- B23-B26 Phase 5 evidence is closed.
+- Next batch group: B27-B29.
+
+Validation boundary:
+- Evidence only.
+- No deletion, merge, retirement, refactor, source/runtime/product change, SQL execution, deployment change, database/Supabase mutation, dependency update, or vulnerability remediation is authorized.
