@@ -152,7 +152,7 @@ describe("Edge Control Center Ledger v1", () => {
       result.state.historical_per_asset_forensic_lifecycle,
       "PRESERVED_AS_HISTORY_ONLY"
     );
-    assert.equal(result.state.total_governed_assets, 918);
+    assert.equal(result.state.total_governed_assets, 921);
     assert.ok(documentText.includes("### Historical Control Center evidence"));
     assert.ok(
       documentText.includes("## PHASE 8 FINAL REPOSITORY VALIDATION EVIDENCE")

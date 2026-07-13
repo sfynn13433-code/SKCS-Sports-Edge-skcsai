@@ -5,8 +5,8 @@
   "source_command": "git ls-files",
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
-  "tracked_path_count": 923,
-  "registered_asset_count": 919,
+  "tracked_path_count": 925,
+  "registered_asset_count": 921,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -13988,6 +13988,51 @@
       ],
       "classification_evidence": [
         "SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md documents committed runtime entrypoints, missing FIP intake boundary, and defers marriage proof until EMG-001 and EFI-001."
+      ]
+    },
+    {
+      "asset_path": "control-center/SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md",
+      "asset_type": "CONTROL_CENTER",
+      "asset_role": "CONTROL_GOVERNANCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_CONTRACT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001A",
+      "governed_by_control_task_id": "SEM-GOV-001A",
+      "related_assets": [
+        "control-center/EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md",
+        "control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md",
+        "control-center/EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1.md",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "tests/sem-gov-001-lifecycle-contract.test.js"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [
+        "Seven-day sync window vs eight-day visibility",
+        "P1-B01 provisional 48-hour FIP horizon",
+        "Competing elite_6_stage and core_4_stage customer labels"
+      ],
+      "validation_status": "APPROVED",
+      "next_validation": "Before SEM-GOV-001B runtime implementation, validate lifecycle persistence design against EST-001 retention law and EPI-001 protected surfaces.",
+      "notes": "SEM-GOV-001A-C1 canonical lifecycle contract. Runtime Governor, SQL, SMH UI, and Help implementation forbidden at seal time.",
+      "purpose_description": "Defines the Unified Sports Intelligence Lifecycle Governor law: canonical stages, states, rolling eight-day funnel, public information boundary, safe BOT taxonomy, SMH navigation, Help contract, timing-window conflicts, and football-first multi-sport rollout sequence.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE",
+        "LIFECYCLE",
+        "UI"
+      ],
+      "classification_evidence": [
+        "SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md seals canonical lifecycle stages, states, eight-day funnel, Help contract, and public boundary.",
+        "Contract classifies provisional P1-B01 48-hour rule and records timing conflicts without approving runtime cutoffs.",
+        "Contract keeps unified_lifecycle_governor BLOCKED until SEM-GOV-001B."
       ]
     },
     {
@@ -30445,6 +30490,54 @@
         "Test reads the EPRV-001-C1 contract and verifies provider surfaces and forbidden boundaries.",
         "Test verifies ledger/project register EPRV-001 state remains PARTIAL and gates remain BLOCKED.",
         "Test verifies package control-center test suite includes the focused EPRV proof."
+      ]
+    },
+    {
+      "asset_path": "tests/sem-gov-001-lifecycle-contract.test.js",
+      "asset_type": "TEST",
+      "asset_role": "TEST_PROOF",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001A",
+      "governed_by_control_task_id": "SEM-GOV-001A",
+      "related_assets": [
+        "control-center/SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
+        "package.json"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [
+        "node:test",
+        "node:assert/strict",
+        "node:fs",
+        "node:path",
+        "control-center/SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
+        "package.json"
+      ],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "Run node --test tests/sem-gov-001-lifecycle-contract.test.js and npm run control:verify after any SEM-GOV-001 contract or sequencing change.",
+      "notes": "Focused SEM-GOV-001A-C1 proof that the lifecycle contract exists, gates remain blocked, and governance registration is present.",
+      "purpose_description": "Tests the SEM-GOV-001A Unified Sports Intelligence Lifecycle contract and its Control Center registration without importing or mutating runtime code.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "LIFECYCLE"
+      ],
+      "classification_evidence": [
+        "Test reads SEM-GOV-001 contract and verifies canonical lifecycle law sections.",
+        "Test verifies ledger unified_lifecycle_governor BLOCKED and SEM-GOV-001A registration.",
+        "Test verifies package control-center test suite includes the focused SEM-GOV proof."
       ]
     },
     {

@@ -7,8 +7,9 @@
   "supabase_storage_policy": "Supabase must not become a permanent mirror of Scout raw evidence or historical intelligence. FIP transport and Supabase retention are separate decisions. FIP reference, provenance, hash, and derived Edge outputs are preferred over permanent duplication of Scout evidence.",
   "scout_edge_marriage_gate": "BLOCKED",
   "supabase_storage_gate": "BLOCKED",
+  "unified_lifecycle_governor": "BLOCKED",
   "provider_removal_state": "PARTIAL",
-  "current_workstream": "Edge Control Foundation",
+  "current_workstream": "SEM-GOV-001 Unified Sports Intelligence Lifecycle",
   "current_note": "Build Edge project-control foundations before resuming Scout FIP intake or mixed-provider runtime removal.",
   "tasks": [
     {
@@ -1087,6 +1088,67 @@
       "next_action": "Resume EAC-001 classification at B02 / file 16.",
       "owner_note": "GOVERNANCE and CONTRACT refinement only; do not implement ESA-RR-002 runtime repair in this packet.",
       "last_updated": "2026-07-07"
+    },
+    {
+      "task_id": "SEM-GOV-001A",
+      "task_name": "Canonical Lifecycle, Terminology, Rolling Eight-Day Funnel and Help Contract",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001: seal the canonical Unified Sports Intelligence Lifecycle contract governing fixture states, stages, rolling eight-day funnel, public information boundary, safe BOT taxonomy, SMH navigation, Help/onboarding, and football-first multi-sport rollout sequence.",
+      "status": "APPROVED",
+      "priority": "critical",
+      "blocked_by": [
+        "ESA-001",
+        "EPI-001"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "UI",
+        "Scout handoff",
+        "prediction"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1",
+        "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
+        "EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1"
+      ],
+      "affected_files": [
+        "control-center/SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
+        "control-center/EDGE_PROJECT_BACKLOG.md",
+        "tests/sem-gov-001-lifecycle-contract.test.js"
+      ],
+      "affected_tables": [],
+      "completion_definition": "SEM-GOV-001A-C1 seals the Unified Sports Intelligence Lifecycle contract; registers programme SEM-GOV-001 and task SEM-GOV-001A in Control Center; documents canonical lifecycle stages, states, rolling eight-day funnel, Help contract, public boundary, safe explanation taxonomy, timing-window conflicts, provisional 48-hour rule classification, and implementation phases SEM-GOV-001B through SEM-GOV-001H without runtime, SQL, Supabase, or UI implementation.",
+      "proof_required": [
+        "control-center/SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md exists and validates",
+        "unified_lifecycle_governor remains BLOCKED in ledger",
+        "SEM-GOV-001A registered in ledger and master project register",
+        "Focused contract test passes",
+        "npm run control:center passes",
+        "control:verify passes except independently proven ALI-001, RLL-001, SPM-001 baseline defects"
+      ],
+      "current_evidence": [
+        "SEM-GOV-001A-C1 sealed control-center/SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md",
+        "P1-B02 inspection evidence incorporated",
+        "Rolling eight-day funnel, Help contract, and public information boundary documented",
+        "Provisional P1-B01 48-hour rule classified; not treated as permanent policy",
+        "unified_lifecycle_governor remains BLOCKED"
+      ],
+      "open_gaps": [
+        "No LifecycleGovernor runtime implementation (SEM-GOV-001B)",
+        "No lifecycle persistence tables (SEM-GOV-001B)",
+        "No SMH fixture-first UI (SEM-GOV-001D)",
+        "Timing window cutoffs (scoring, publication) not yet approved",
+        "Scout_edge_marriage_gate remains BLOCKED"
+      ],
+      "next_action": "SEM-GOV-001A contract sealed. Proceed to SEM-GOV-001B (Football lifecycle persistence and Governor runtime foundation) only when separately authorized.",
+      "owner_note": "One platform language. One fixture lifecycle. One source of truth. Football first.",
+      "last_updated": "2026-07-13"
     }
   ]
 }

@@ -1,14 +1,14 @@
 # EDGE ASSET REPOSITORY MAP
 EAC_PROJECT_ID: EAC-001
 MANIFEST_SCHEMA_VERSION: 1.0.0
-TOTAL_GOVERNED_ASSETS: 918
-TOTAL_BATCHED_ASSETS: 918
+TOTAL_GOVERNED_ASSETS: 921
+TOTAL_BATCHED_ASSETS: 921
 FULLY_CLASSIFIED_ASSETS: 0
-CLASSIFICATION_PENDING_ASSETS: 918
+CLASSIFICATION_PENDING_ASSETS: 921
 CLOSURE_READY: NO
 
 CURRENT_STATE_COUNTS
-- CURRENT: 27
+- CURRENT: 30
 - PARALLEL: 0
 - LEGACY: 0
 - HISTORICAL_EVIDENCE: 0
@@ -18,9 +18,9 @@ CURRENT_STATE_COUNTS
 
 FUNCTIONAL_GROUP_COUNTS
 - SCRIPT_TOOL: 156
+- DOCUMENTATION_KNOWLEDGE: 116
 - PROVIDER_INTEGRATION: 116
-- DOCUMENTATION_KNOWLEDGE: 115
-- TEST_PROOF: 97
+- TEST_PROOF: 99
 - DATABASE_MIGRATION: 96
 - GENERATED_OUTPUT: 59
 - DATABASE: 42
@@ -42,19 +42,19 @@ FUNCTIONAL_GROUP_COUNTS
 - (PENDING): 1
 
 RELATIONSHIP_TAG_COUNTS
-- RUNTIME: 295
+- RUNTIME: 296
 - SCRIPT_TOOL: 283
 - DATABASE: 238
 - SQL: 238
-- PROVIDER: 198
+- PROVIDER: 199
 - API: 169
-- GOVERNANCE: 149
-- DOCUMENTATION: 143
+- GOVERNANCE: 152
+- DOCUMENTATION: 144
 - PREDICTION: 105
 - MIGRATION: 101
 - OBSERVABILITY: 99
-- TEST_PROOF: 96
-- UI: 91
+- TEST_PROOF: 98
+- UI: 92
 - AUDIT: 83
 - GENERATED: 69
 - ROUTE: 61
@@ -69,16 +69,17 @@ RELATIONSHIP_TAG_COUNTS
 - RULEBOOK: 25
 - AI_EDGEMIND: 19
 - GRADING: 8
-- FIP: 6
-- SCOUT: 5
+- FIP: 7
+- SCOUT: 6
 - SUBSCRIBER: 4
 - CONTROLLER: 2
+- LIFECYCLE: 2
 - RPC: 1
 
-NEXT_VALIDATION_NON_EMPTY_ASSETS: 918
+NEXT_VALIDATION_NON_EMPTY_ASSETS: 921
 
 BATCH_COMPLETION_SUMMARY
-- B01 | CONTROL_CENTER | ASSET_COUNT=25 | CLASSIFIED=0 | PENDING=25
+- B01 | CONTROL_CENTER | ASSET_COUNT=26 | CLASSIFIED=0 | PENDING=26
 - B02 | BACKEND_DIRECT_FILES | ASSET_COUNT=13 | CLASSIFIED=0 | PENDING=13
 - B03 | BACKEND_ROUTES_AND_CONTROLLERS | ASSET_COUNT=28 | CLASSIFIED=0 | PENDING=28
 - B04 | BACKEND_UTILS_SEMANTIC_CORE_AND_TEST | ASSET_COUNT=46 | CLASSIFIED=0 | PENDING=46
@@ -101,7 +102,7 @@ BATCH_COMPLETION_SUMMARY
 - B21 | PUBLIC_UI | ASSET_COUNT=64 | CLASSIFIED=0 | PENDING=64
 - B22 | SUPABASE_MIGRATIONS | ASSET_COUNT=61 | CLASSIFIED=0 | PENDING=61
 - B23 | DB_SQL_AND_SUPABASE_OTHER | ASSET_COUNT=19 | CLASSIFIED=0 | PENDING=19
-- B24 | TESTS | ASSET_COUNT=10 | CLASSIFIED=0 | PENDING=10
+- B24 | TESTS | ASSET_COUNT=12 | CLASSIFIED=0 | PENDING=12
 - B25 | SCRATCH | ASSET_COUNT=2 | CLASSIFIED=0 | PENDING=2
 - B26 | DEPLOYMENT_CI | ASSET_COUNT=3 | CLASSIFIED=0 | PENDING=3
 - B27 | ARCHIVE | ASSET_COUNT=58 | CLASSIFIED=0 | PENDING=58
@@ -138,6 +139,7 @@ PER_ASSET_BY_BATCH
 | control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md | Defines Supabase storage and FIP retention law: canonical Scout truth vs Edge-derived state, forbidden mirrors, data classes, retention periods, budget thresholds, replay/audit, and fail-closed persistence rules. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","DATABASE"] | ["EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md seals transport-vs-retention law and keeps supabase_storage_gate BLOCKED per Edge Control Center storage policy."] | Validate against EST-001 storage enforcement implementation when separately authorized. |
 | control-center/FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md | Registers the committed Scout FIP authority: schema identity, required payload shape, validation/hash law, fixture identity, market/context requirements, allowed proof modes, and forbidden non-canonical sources. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE"] | ["FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md establishes Scout as canonical sports-truth owner and sole FIP contract Edge may recognize for governed intake."] | Validate EFI-001 §5 crosswalk against FIP-001 before EFI-001-I1 implementation. |
 | control-center/SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md | Records read-only SEE-001 inspection of Scout-Edge runtime paths, forbidden proof sources, and NEEDS IMPLEMENTATION decision for first E2E marriage proof. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","AUDIT"] | ["SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md documents committed runtime entrypoints, missing FIP intake boundary, and defers marriage proof until EMG-001 and EFI-001."] | Validate against EFI-001 intake implementation when separately authorized. |
+| control-center/SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md | Defines the Unified Sports Intelligence Lifecycle Governor law: canonical stages, states, rolling eight-day funnel, public information boundary, safe BOT taxonomy, SMH navigation, Help contract, timing-window conflicts, and football-first multi-sport rollout sequence. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","LIFECYCLE","UI"] | ["SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md seals canonical lifecycle stages, states, eight-day funnel, Help contract, and public boundary.","Contract classifies provisional P1-B01 48-hour rule and records timing conflicts without approving runtime cutoffs.","Contract keeps unified_lifecycle_governor BLOCKED until SEM-GOV-001B."] | Before SEM-GOV-001B runtime implementation, validate lifecycle persistence design against EST-001 retention law and EPI-001 protected surfaces. |
 
 ## B02 BACKEND_DIRECT_FILES
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |
@@ -979,6 +981,8 @@ PER_ASSET_BY_BATCH
 | tests/eprv-provider-removal-contract.test.js | Tests the EPRV-001-C1 provider-removal inspection contract and governance registration without importing or mutating runtime provider code. | TEST_PROOF | CURRENT | ["TEST_PROOF","PROVIDER","RUNTIME","PREDICTION","GOVERNANCE"] | ["Test reads the EPRV-001-C1 contract and verifies provider surfaces and forbidden boundaries.","Test verifies ledger/project register EPRV-001 state remains PARTIAL and gates remain BLOCKED.","Test verifies package control-center test suite includes the focused EPRV proof."] | Run node --test tests/eprv-provider-removal-contract.test.js and npm run control:verify after any EPRV contract or sequencing change. |
 | tests/fip-intake-service.test.js | Focused Node test coverage for the EFI-001 fail-closed FIP intake boundary accept/reject behavior and Edge envelope mapping. | TEST_PROOF | CURRENT | ["TEST_PROOF","SCOUT","FIP","RUNTIME","GOVERNANCE"] | ["Builds a valid FIP-001 v1 fixture with the service hash algorithm and verifies accepted envelope output.","Covers rejection for unsupported schema version, non-VALIDATED status, tampered hash, missing required fields, forbidden origins, and AUTHORIZED_PRODUCTION while the marriage gate remains blocked."] | EFI-001-I1: run node --test tests/fip-intake-service.test.js after any FIP intake boundary change. |
 | tests/fip-storage-policy-service.test.js | Focused Node test coverage for EST-001 Supabase storage-policy enforcement, including R1/R2 minimal records, full FIP body blocking, audit-only rejection handling, and storage budget thresholds. | TEST_PROOF | CURRENT | ["TEST_PROOF","SCOUT","FIP","DATABASE","GOVERNANCE"] | ["Verifies accepted EFI intake produces minimal R1 provenance and R2 audit records only.","Verifies full FIP body, Scout mirror, provider payload, markets, context, and fixture body data are not persisted in EST records.","Verifies rejected EFI intake creates audit-only records and Supabase hard block prevents new EST records."] | EST-001-I1: run node --test tests/fip-storage-policy-service.test.js after any EST storage policy change. |
+| tests/p1-b01-configured-fip-input.test.js | Verifies governed Scout FIP configured input, provider bypass, mapped-envelope-only flow, atomic batch rejection and request-contract validation. | TEST_PROOF | CURRENT | ["TEST_PROOF","SCOUT","FIP","RUNTIME","GOVERNANCE","PROVIDER"] | ["Exercises resolveConfiguredPredictionInput via aiPipeline.__test with injected provider and intake dependencies.","Verifies provider path remains active when fip_envelopes is absent and is bypassed when a valid PROOF_FIXTURE batch is supplied.","Verifies atomic batch rejection, malformed request-contract rejection, and mapped-envelope-only output without calling external providers."] | P1-B01: run node --test tests/p1-b01-configured-fip-input.test.js after any governed Scout FIP configured-input or aiPipeline intake-routing change. |
+| tests/sem-gov-001-lifecycle-contract.test.js | Tests the SEM-GOV-001A Unified Sports Intelligence Lifecycle contract and its Control Center registration without importing or mutating runtime code. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","LIFECYCLE"] | ["Test reads SEM-GOV-001 contract and verifies canonical lifecycle law sections.","Test verifies ledger unified_lifecycle_governor BLOCKED and SEM-GOV-001A registration.","Test verifies package control-center test suite includes the focused SEM-GOV proof."] | Run node --test tests/sem-gov-001-lifecycle-contract.test.js and npm run control:verify after any SEM-GOV-001 contract or sequencing change. |
 
 ## B25 SCRATCH
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |

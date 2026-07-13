@@ -148,3 +148,10 @@ Status: TESTED
 Governed by: ESA-RR-002
 Blocked by: none
 Blocks: none
+
+## SEM-GOV-001A — Canonical Lifecycle, Terminology, Rolling Eight-Day Funnel and Help Contract
+
+Status: APPROVED
+Governed by: SEM-GOV-001A
+Blocked by: ESA-001, EPI-001
+Blocks: none

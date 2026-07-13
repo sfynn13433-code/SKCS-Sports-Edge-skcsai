@@ -33,7 +33,7 @@
     "test:asset-classification": "node --test tests/edge-asset-classification.test.js",
     "control:classification": "node control-center/check_edge_asset_classification.js",
     "control:classification:closure": "node control-center/check_edge_asset_classification.js --closure",
-    "test:control-center": "node --test tests/edge-control-center-ledger.test.js tests/edge-project-register.test.js tests/edge-repository-asset-register.test.js tests/epi-pipeline-integrity-contract.test.js tests/eprv-provider-removal-contract.test.js",
+    "test:control-center": "node --test tests/edge-control-center-ledger.test.js tests/edge-project-register.test.js tests/edge-repository-asset-register.test.js tests/epi-pipeline-integrity-contract.test.js tests/eprv-provider-removal-contract.test.js tests/sem-gov-001-lifecycle-contract.test.js",
     "test:control-center-ui": "node --test tests/edge-control-center-ui.test.js",
     "control:runtime": "node control-center/check_edge_system_runtime_inventory.js",
     "control:verify": "npm run test:control-center && npm run control:center && npm run control:projects && npm run control:assets && npm run control:classification && npm run control:runtime",
@@ -70,7 +70,8 @@
     "antigravity:status": "curl -s http://localhost:10000/api/antigravity/status | jq .",
     "antigravity:trigger": "curl -X POST http://localhost:10000/api/antigravity/workflows/automated-data-sync/trigger | jq .",
     "test:epi-pipeline-integrity": "node --test tests/epi-pipeline-integrity-contract.test.js",
-    "test:eprv-provider-removal-contract": "node --test tests/eprv-provider-removal-contract.test.js"
+    "test:eprv-provider-removal-contract": "node --test tests/eprv-provider-removal-contract.test.js",
+    "test:sem-gov": "node --test tests/sem-gov-001-lifecycle-contract.test.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
