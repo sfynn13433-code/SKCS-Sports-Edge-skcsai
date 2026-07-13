@@ -1,14 +1,14 @@
 # EDGE ASSET REPOSITORY MAP
 EAC_PROJECT_ID: EAC-001
 MANIFEST_SCHEMA_VERSION: 1.0.0
-TOTAL_GOVERNED_ASSETS: 917
-TOTAL_BATCHED_ASSETS: 917
+TOTAL_GOVERNED_ASSETS: 918
+TOTAL_BATCHED_ASSETS: 918
 FULLY_CLASSIFIED_ASSETS: 0
-CLASSIFICATION_PENDING_ASSETS: 917
+CLASSIFICATION_PENDING_ASSETS: 918
 CLOSURE_READY: NO
 
 CURRENT_STATE_COUNTS
-- CURRENT: 26
+- CURRENT: 27
 - PARALLEL: 0
 - LEGACY: 0
 - HISTORICAL_EVIDENCE: 0
@@ -28,7 +28,7 @@ FUNCTIONAL_GROUP_COUNTS
 - DEPLOYMENT_OPERATIONS: 39
 - PREDICTION: 28
 - SCHEDULER_BACKGROUND: 25
-- GOVERNANCE: 23
+- GOVERNANCE: 24
 - API_ROUTE: 18
 - ACCA: 17
 - PUBLIC_ASSET: 10
@@ -46,11 +46,11 @@ RELATIONSHIP_TAG_COUNTS
 - SCRIPT_TOOL: 283
 - DATABASE: 238
 - SQL: 238
-- PROVIDER: 197
+- PROVIDER: 198
 - API: 169
-- GOVERNANCE: 148
+- GOVERNANCE: 149
 - DOCUMENTATION: 143
-- PREDICTION: 104
+- PREDICTION: 105
 - MIGRATION: 101
 - OBSERVABILITY: 99
 - TEST_PROOF: 96
@@ -69,16 +69,16 @@ RELATIONSHIP_TAG_COUNTS
 - RULEBOOK: 25
 - AI_EDGEMIND: 19
 - GRADING: 8
-- FIP: 5
-- SCOUT: 4
+- FIP: 6
+- SCOUT: 5
 - SUBSCRIBER: 4
 - CONTROLLER: 2
 - RPC: 1
 
-NEXT_VALIDATION_NON_EMPTY_ASSETS: 917
+NEXT_VALIDATION_NON_EMPTY_ASSETS: 918
 
 BATCH_COMPLETION_SUMMARY
-- B01 | CONTROL_CENTER | ASSET_COUNT=24 | CLASSIFIED=0 | PENDING=24
+- B01 | CONTROL_CENTER | ASSET_COUNT=25 | CLASSIFIED=0 | PENDING=25
 - B02 | BACKEND_DIRECT_FILES | ASSET_COUNT=13 | CLASSIFIED=0 | PENDING=13
 - B03 | BACKEND_ROUTES_AND_CONTROLLERS | ASSET_COUNT=28 | CLASSIFIED=0 | PENDING=28
 - B04 | BACKEND_UTILS_SEMANTIC_CORE_AND_TEST | ASSET_COUNT=46 | CLASSIFIED=0 | PENDING=46
@@ -132,6 +132,7 @@ PER_ASSET_BY_BATCH
 | control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md | Defines the governed fail-closed Scout FIP intake boundary law: accepted source, minimum payload, crosswalk to Edge analysis envelope, validation, idempotency, provenance, and evidence recording. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE"] | ["EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md seals intake handshake law upstream of aiPipeline.buildRawPredictionFromProviderItem() per EMG-001 sequence."] | Validate against EFI-001 runtime intake implementation when separately authorized. |
 | control-center/EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md | Defines the explicit fail-closed Scout-Edge marriage gate law: prerequisites, allowed E2E proof sources, blocked conditions, pass/fail rules, and required evidence before EFI-001 intake implementation. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE"] | ["EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md seals scout_edge_marriage_gate law and references MARRIAGE_PREREQUISITES from the Edge build-control ledger."] | Validate with EMG-001 contract validator when separately authorized. |
 | control-center/EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1.md | Defines the protected Edge prediction/scoring/filtering/direct-market/market-intelligence/ACCA invariants that must be preserved before FIP runtime integration, provider removal, or E2E proof. | PREDICTION | CURRENT | ["PREDICTION","ACCA","DATABASE","GOVERNANCE","DOCUMENTATION"] | ["Contract names the six protected prediction pipeline surfaces and their responsibilities.","Contract records inspection evidence and risk surfaces without authorizing runtime repair.","Contract forbids runtime code changes, SQL, Supabase mutation, migrations, provider removal, E2E proof, and gate clearance."] | Before runtime prediction changes, create a separate EPI implementation packet with baseline regression proof, FIP input mapping, provider bypass proof, and ACCA compatibility proof. |
+| control-center/EPRV-001_EXTERNAL_PROVIDER_REMOVAL_IMPLEMENTATION_PLAN.v1.md | Defines the 5-stage sequential bypass plan for external provider removal, fail-closed boundaries, and EPI/EST/EAC regression tests. | GOVERNANCE | CURRENT | ["GOVERNANCE","SCOUT","FIP","PROVIDER","PREDICTION"] | ["Plan records the 8 reachable external acquisition surfaces and FIP-to-provider fact matrix.","Plan defines sequential provider waterfall bypass, fail-closed context mapping, and storage restrictions.","Plan enforces 6 regression test suites and hold/rollback conditions."] | Review FIP integration, provider waterfall bypass, and fail-closed intake boundary before P1-B01 closeout. |
 | control-center/EPRV-001_EXTERNAL_PROVIDER_REMOVAL_INSPECTION_CONTRACT.v1.md | Records current Edge external sports-provider acquisition surfaces and the proof boundary required before provider removal can proceed. | PROVIDER_INTEGRATION | CURRENT | ["PROVIDER","RUNTIME","PREDICTION","FIP","GOVERNANCE","DOCUMENTATION"] | ["Contract names inspected provider/acquisition surfaces.","Contract records live acquisition chain from aiPipeline getPredictionInputs to dataProvider buildLiveData.","Contract forbids runtime provider edits, provider deletion, SQL, Supabase mutation, E2E proof, and gate clearance."] | Before runtime provider-removal changes, create a separate EPRV implementation packet with FIP replacement mapping, runtime reachability proof, fail-closed no-input proof, and prediction regression proof. |
 | control-center/ESG-001_SPORT_GOVERNOR_AND_CANONICAL_RULE_REGISTRY_PROPOSAL.v1.md | PENDING | PENDING | UNKNOWN | PENDING | PENDING | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md | Defines Supabase storage and FIP retention law: canonical Scout truth vs Edge-derived state, forbidden mirrors, data classes, retention periods, budget thresholds, replay/audit, and fail-closed persistence rules. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","DATABASE"] | ["EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md seals transport-vs-retention law and keeps supabase_storage_gate BLOCKED per Edge Control Center storage policy."] | Validate against EST-001 storage enforcement implementation when separately authorized. |

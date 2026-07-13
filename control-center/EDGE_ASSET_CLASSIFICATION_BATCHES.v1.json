@@ -14,7 +14,7 @@
           "control-center/"
         ]
       },
-      "asset_count": 24,
+      "asset_count": 25,
       "asset_paths": [
         "control-center/check_control_center.js",
         "control-center/check_edge_asset_classification.js",
@@ -35,6 +35,7 @@
         "control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md",
         "control-center/EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md",
         "control-center/EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1.md",
+        "control-center/EPRV-001_EXTERNAL_PROVIDER_REMOVAL_IMPLEMENTATION_PLAN.v1.md",
         "control-center/EPRV-001_EXTERNAL_PROVIDER_REMOVAL_INSPECTION_CONTRACT.v1.md",
         "control-center/ESG-001_SPORT_GOVERNOR_AND_CANONICAL_RULE_REGISTRY_PROPOSAL.v1.md",
         "control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md",
