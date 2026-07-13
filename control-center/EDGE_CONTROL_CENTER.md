@@ -43,7 +43,7 @@ It is the governed resumption of the intentionally deferred Scout ↔ Edge integ
 | **Full Edge system/runtime inventory** | TESTED |
 | **Scout ↔ Edge marriage gate** | BLOCKED |
 | **Supabase storage gate** | BLOCKED |
-| **External sports provider removal** | PARTIAL |
+| **External sports provider removal** | PARTIAL (inspection contract sealed; removal not implemented) |
 | **FIP intake handshake** | PROPOSED |
 | **Subscriber/security boundary inventory** | PROPOSED |
 | **Prediction pipeline integrity inventory** | TESTED (contract sealed; runtime unchanged) |
@@ -62,7 +62,7 @@ The following technical prerequisites must be satisfied:
 | EST-001 | Supabase Storage and FIP Retention Contract | APPROVED (contract sealed; storage gate remains BLOCKED) |
 | ESEC-001 | Subscriber and Security Boundary | PROPOSED |
 | EPI-001 | Prediction Pipeline Integrity | TESTED (contract sealed; runtime unchanged) |
-| EPRV-001 | External Sports Provider Removal | PARTIAL |
+| EPRV-001 | External Sports Provider Removal | PARTIAL (inspection contract sealed; removal not implemented) |
 | E2E-001 | Scout to Edge End-to-End Proof | BLOCKED |
 
 Even when all technical prerequisites are TESTED, COMMITTED, or DONE, `scout_edge_marriage_gate` requires separate explicit approval.
@@ -553,7 +553,7 @@ Required state snapshot:
   ],
   "eac_evidence_reusable": true,
   "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
-  "total_governed_assets": 914,
+  "total_governed_assets": 917,
   "phase_0": {
     "status": "PHASE_CLOSED",
     "question": "What exact repository state is the cleanup programme starting from?",
@@ -562,7 +562,7 @@ Required state snapshot:
       "active_branch": "main",
       "head_commit": "7d21fc276629bb6aec056299d70e1541b462934f",
       "working_tree_status": "dirty_unrelated_changes_preserved",
-      "governed_asset_count": 914,
+      "governed_asset_count": 917,
       "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
       "eac_batch_count": 29,
       "already_completed_or_removal_work": "Partial external sports provider removal (PARTIAL); EAC-001 B01-B29 classification inventory complete; prior Control Center per-asset investigations preserved as historical evidence",
@@ -10368,5 +10368,29 @@ Evidence:
 - Contract sealed at `control-center/EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1.md`.
 - Focused proof added at `tests/epi-pipeline-integrity-contract.test.js`.
 - Protected surfaces: `aiPipeline.js`, `aiScoring.js`, `filterEngine.js`, `direct1x2Engine.js`, `marketIntelligence.js`, and `accaBuilder.js`.
+- `scout_edge_marriage_gate` remains BLOCKED.
+- `supabase_storage_gate` remains BLOCKED.
+
+---
+## EPRV-001-C1 External Sports Provider Removal Inspection Contract Evidence
+
+Result: PARTIAL — contract sealed; removal not implemented
+
+Scope:
+- Mini-project: EPRV-001-C1 — External Sports Provider Removal Inspection Contract
+- Runtime provider code changed: NO
+- Provider deletion performed: NO
+- SQL executed: NO
+- Supabase mutation/call performed: NO
+- Migration created: NO
+- Route wiring performed: NO
+- E2E proof executed: NO
+- Gate clearance performed: NO
+
+Evidence:
+- Contract sealed at `control-center/EPRV-001_EXTERNAL_PROVIDER_REMOVAL_INSPECTION_CONTRACT.v1.md`.
+- Focused proof added at `tests/eprv-provider-removal-contract.test.js`.
+- Provider/acquisition surfaces recorded across dataProvider, dataProviders, context ingestion/enrichment, football highlights, odds pipeline, heartbeat, hybrid sports data, RapidAPI waterfall, API clients, AI pipeline, and snapshot import surfaces.
+- EPRV-001 remains PARTIAL.
 - `scout_edge_marriage_gate` remains BLOCKED.
 - `supabase_storage_gate` remains BLOCKED.

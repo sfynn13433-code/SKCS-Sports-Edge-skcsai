@@ -643,7 +643,8 @@
         "Scout handoff"
       ],
       "related_contracts": [
-        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1"
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
+        "EPRV-001_EXTERNAL_PROVIDER_REMOVAL_INSPECTION_CONTRACT.v1"
       ],
       "affected_files": [
         "backend/server-express.js",
@@ -658,32 +659,56 @@
         "backend/utils/rapidApiWaterfall.js",
         "backend/apiClients.js",
         "backend/services/aiPipeline.js",
-        "scripts/import-today-snapshot-pipeline.js"
+        "scripts/import-today-snapshot-pipeline.js",
+        "control-center/EPRV-001_EXTERNAL_PROVIDER_REMOVAL_INSPECTION_CONTRACT.v1.md",
+        "tests/eprv-provider-removal-contract.test.js",
+        "package.json",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
+        "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
+        "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
+        "control-center/EDGE_ASSET_REPOSITORY_MAP.md",
+        "control-center/EDGE_CONTROL_CENTER.md",
+        "tests/edge-control-center-ledger.test.js",
+        "control-center/EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json",
+        "control-center/EDGE_SYSTEM_RUNTIME_MAP.md"
       ],
       "affected_tables": [],
-      "completion_definition": "No reachable Edge runtime path independently acquires canonical sports truth from external sports providers.",
+      "completion_definition": "No reachable Edge runtime path independently acquires canonical sports truth from external sports providers; EPRV-001-C1 records the current acquisition inventory and proof boundary but does not complete provider removal.",
       "proof_required": [
         "Runtime reachability audit",
         "Provider environment-key audit",
         "External domain acquisition audit",
         "Scout/FIP replacement proof",
-        "Fail-closed no-input proof"
+        "Fail-closed no-input proof",
+        "EPRV-001-C1 contract test proving provider removal, runtime edits, SQL, Supabase mutation, E2E proof, and gate clearance remain forbidden"
       ],
       "current_evidence": [
-        "Phase 1 public provider routes and provider-heartbeat startup were cut",
-        "Phase 2 stopped because getPredictionInputs() still depends on buildLiveData() external acquisition",
-        "Additional acquisition surfaces were found outside the original nine-file inventory"
+        "Phase 1 public provider routes and provider-heartbeat startup were cut.",
+        "Phase 2 stopped because getPredictionInputs() still depends on buildLiveData() external acquisition.",
+        "Additional acquisition surfaces were found outside the original nine-file inventory.",
+        "EPRV-001-C1 sealed control-center/EPRV-001_EXTERNAL_PROVIDER_REMOVAL_INSPECTION_CONTRACT.v1.md.",
+        "Inspection confirmed aiPipeline imports getPredictionInputs from dataProvider and still imports context-provider helpers.",
+        "Inspection confirmed dataProvider live mode still routes getPredictionInputs() through buildLiveData().",
+        "Inspection recorded provider markers for TheSportsDB, API-Sports, Odds API, RapidAPI, SportsData.io, CricketData, Big Balls Data, SportSRC, ESPN Hidden API, and FootballData.org.",
+        "Focused proof: node --test tests/eprv-provider-removal-contract.test.js passes.",
+        "No runtime provider code, provider deletion, SQL, migration, Supabase mutation, route wiring, E2E proof, or gate clearance performed."
       ],
       "open_gaps": [
-        "FIP intake does not yet exist",
-        "Direct weather acquisition remains",
-        "Direct news/context acquisition remains",
-        "Direct H2H acquisition remains",
-        "Legacy snapshot acquisition remains"
+        "FIP intake is not yet wired into live prediction execution.",
+        "Direct live provider acquisition remains in dataProvider.js.",
+        "Direct weather acquisition remains.",
+        "Direct news/context acquisition remains.",
+        "Direct H2H acquisition remains.",
+        "Legacy snapshot acquisition remains.",
+        "Provider bypass/removal implementation has not been performed.",
+        "Fail-closed no-input runtime proof has not been performed.",
+        "E2E proof has not been executed; E2E-001 remains BLOCKED.",
+        "Scout ↔ Edge marriage gate remains BLOCKED."
       ],
-      "next_action": "Remain PARTIAL and blocked until EFI-001 provides a governed Scout input origin.",
+      "next_action": "EPRV-001-C1 tested. Continue only with a separately authorized provider-removal implementation packet after FIP replacement mapping and fail-closed no-input proof are prepared; do not edit runtime provider code, delete providers, run SQL, mutate Supabase, execute E2E proof, or clear gates from this packet.",
       "owner_note": "Do not delete analysis logic merely because acquisition and analysis are currently mixed in the same file.",
-      "last_updated": "2026-07-05"
+      "last_updated": "2026-07-13"
     },
     {
       "task_id": "EGR-001",
