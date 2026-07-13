@@ -6,6 +6,10 @@ const { validateRawPredictionInput } = require('../utils/validation');
 const { filterRawPrediction } = require('./filterEngine');
 const { buildFinalForTier } = require('./accaBuilder');
 const { getPredictionInputs } = require('./dataProvider');
+const {
+    receiveValidatedFip,
+    PROOF_FIXTURE_MODE
+} = require('./fipIntakeService');
 const { scoreMatch } = require('./aiScoring');
 const { buildMatchContext } = require('./normalizerService');
 const {
@@ -2150,9 +2154,175 @@ async function runPipelineForMatches({ matches, telemetry = {} }) {
     }
 }
 
-async function runPipelineFromConfiguredDataMode() {
+function hasOwn(value, key) {
+    return Boolean(value)
+        && typeof value === 'object'
+        && Object.prototype.hasOwnProperty.call(value, key);
+}
+
+function buildConfiguredInputRejection(code, message, details = {}) {
+    return {
+        mode: 'scout_fip',
+        accepted: false,
+        batch_rejected: true,
+        rejection_code: code,
+        message,
+        intake_results: [],
+        details,
+        inserted: [],
+        filtered: [],
+        filtered_valid: 0,
+        filtered_invalid: 0
+    };
+}
+
+async function resolveConfiguredPredictionInput(options = {}, deps = {}) {
+    const providerLoader = deps.getPredictionInputs || getPredictionInputs;
+    const intakeReceiver = deps.receiveValidatedFip || receiveValidatedFip;
+
+    if (!hasOwn(options, 'fip_envelopes')) {
+        const providerInput = await providerLoader();
+        return {
+            ok: true,
+            mode: providerInput.mode,
+            predictions: Array.isArray(providerInput.predictions)
+                ? providerInput.predictions
+                : [],
+            intake_results: null,
+            source: 'configured_provider'
+        };
+    }
+
+    const fipEnvelopes = options.fip_envelopes;
+
+    if (!Array.isArray(fipEnvelopes)) {
+        return {
+            ok: false,
+            response: buildConfiguredInputRejection(
+                'FIP_BATCH_INVALID',
+                'fip_envelopes must be an array.'
+            )
+        };
+    }
+
+    if (fipEnvelopes.length < 1 || fipEnvelopes.length > 100) {
+        return {
+            ok: false,
+            response: buildConfiguredInputRejection(
+                'FIP_BATCH_SIZE_INVALID',
+                'fip_envelopes must contain between 1 and 100 FIPs.',
+                {
+                    count: fipEnvelopes.length,
+                    minimum: 1,
+                    maximum: 100
+                }
+            )
+        };
+    }
+
+    const malformedIndex = fipEnvelopes.findIndex(
+        (item) => !item || typeof item !== 'object' || Array.isArray(item)
+    );
+
+    if (malformedIndex !== -1) {
+        return {
+            ok: false,
+            response: buildConfiguredInputRejection(
+                'FIP_BATCH_ITEM_INVALID',
+                'Every fip_envelopes item must be a non-null object.',
+                {
+                    index: malformedIndex
+                }
+            )
+        };
+    }
+
+    if (options.governed_mode !== PROOF_FIXTURE_MODE) {
+        return {
+            ok: false,
+            response: buildConfiguredInputRejection(
+                'FIP_GOVERNED_MODE_INVALID',
+                'P1-B01 only accepts PROOF_FIXTURE governed mode.',
+                {
+                    expected: PROOF_FIXTURE_MODE,
+                    actual: options.governed_mode || null
+                }
+            )
+        };
+    }
+
+    const caller = typeof options.caller === 'string'
+        ? options.caller.trim()
+        : '';
+
+    if (!caller) {
+        return {
+            ok: false,
+            response: buildConfiguredInputRejection(
+                'FIP_CALLER_INVALID',
+                'A non-empty governed caller is required.'
+            )
+        };
+    }
+
+    const receivedAt = options.received_at || new Date().toISOString();
+
+    const intakeResults = fipEnvelopes.map((fipPayload) =>
+        intakeReceiver(fipPayload, {
+            caller,
+            governedMode: options.governed_mode,
+            receivedAt,
+            scoutEdgeMarriageGate: 'BLOCKED',
+            supabaseStorageGate: 'BLOCKED'
+        })
+    );
+
+    const rejectedIndexes = [];
+    intakeResults.forEach((result, index) => {
+        if (!result || result.accepted !== true || !result.envelope) {
+            rejectedIndexes.push(index);
+        }
+    });
+
+    if (rejectedIndexes.length > 0) {
+        return {
+            ok: false,
+            response: {
+                ...buildConfiguredInputRejection(
+                    'FIP_BATCH_REJECTED',
+                    'The complete FIP batch was rejected atomically.',
+                    {
+                        rejected_indexes: rejectedIndexes
+                    }
+                ),
+                intake_results: intakeResults
+            }
+        };
+    }
+
+    return {
+        ok: true,
+        mode: 'scout_fip',
+        predictions: intakeResults.map((result) => result.envelope),
+        intake_results: intakeResults,
+        source: 'scout_fip'
+    };
+}
+
+async function runPipelineFromConfiguredDataMode(options = {}) {
      console.log('PIPELINE STARTED');
-     const { mode, predictions } = await getPredictionInputs();
+
+     const resolvedInput = await resolveConfiguredPredictionInput(options);
+     if (!resolvedInput.ok) {
+         return resolvedInput.response;
+     }
+
+     const {
+         mode,
+         predictions,
+         intake_results: intakeResults
+     } = resolvedInput;
+
      const eligiblePredictions = (Array.isArray(predictions) ? predictions : []).filter((item) =>
          isDeploymentSportEnabled(
              item?.sport
@@ -2213,6 +2383,7 @@ async function runPipelineFromConfiguredDataMode() {
 
             return {
                 mode,
+                intake_results: intakeResults,
                 inserted,
                 filtered,
                 filtered_valid: filteredValid,
@@ -2366,6 +2537,8 @@ module.exports = {
     rebuildFinalOutputs,
     __test: {
         extractFootballHighlightsTeamIds,
-        applyFootballH2HEnrichment
+        applyFootballH2HEnrichment,
+        resolveConfiguredPredictionInput,
+        buildConfiguredInputRejection
     }
 };

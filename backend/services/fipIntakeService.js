@@ -7,6 +7,10 @@ const HASH_ALGORITHM = 'scout-fip-sha256-v1';
 const SCOUT_FIP_ORIGIN = 'SCOUT_FIP';
 const PROOF_FIXTURE_MODE = 'PROOF_FIXTURE';
 
+const MAX_VALIDATION_AGE_MS = 30 * 60 * 1000;
+const MAX_FUTURE_CLOCK_SKEW_MS = 5 * 60 * 1000;
+const MAX_KICKOFF_HORIZON_MS = 48 * 60 * 60 * 1000;
+
 const FORBIDDEN_ORIGIN_VALUES = new Set([
   'BUILD_LIVE_DATA',
   'BUILDLIVEDATA',
@@ -204,8 +208,10 @@ function validateRequiredFields(fipPayload) {
     'validation.status',
     'validation.algorithm',
     'validation.hash',
+    'validation.validated_at',
     'fixture.fixture_id',
     'fixture.sport',
+    'fixture.kickoff_time',
     'fixture.home_team',
     'fixture.away_team',
     'markets',
@@ -242,6 +248,176 @@ function validateRequiredFields(fipPayload) {
   }
 
   return { ok: true };
+}
+
+function parseTimestamp(value) {
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  const normalized = value.trim();
+  const utcIsoPattern =
+    /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?Z$/;
+  const match = normalized.match(utcIsoPattern);
+
+  if (!match) {
+    return null;
+  }
+
+  const [
+    ,
+    yearText,
+    monthText,
+    dayText,
+    hourText,
+    minuteText,
+    secondText,
+    millisecondText = ''
+  ] = match;
+
+  const year = Number(yearText);
+  const month = Number(monthText);
+  const day = Number(dayText);
+  const hour = Number(hourText);
+  const minute = Number(minuteText);
+  const second = Number(secondText);
+  const millisecond = Number(millisecondText.padEnd(3, '0'));
+
+  const timestampMs = Date.UTC(
+    year,
+    month - 1,
+    day,
+    hour,
+    minute,
+    second,
+    millisecond
+  );
+
+  if (!Number.isFinite(timestampMs)) {
+    return null;
+  }
+
+  const parsed = new Date(timestampMs);
+
+  if (
+    parsed.getUTCFullYear() !== year ||
+    parsed.getUTCMonth() !== month - 1 ||
+    parsed.getUTCDate() !== day ||
+    parsed.getUTCHours() !== hour ||
+    parsed.getUTCMinutes() !== minute ||
+    parsed.getUTCSeconds() !== second ||
+    parsed.getUTCMilliseconds() !== millisecond
+  ) {
+    return null;
+  }
+
+  return timestampMs;
+}
+
+function validateFreshness(fipPayload, options = {}) {
+  const receivedAt = options.receivedAt || new Date().toISOString();
+  const receivedAtMs = parseTimestamp(receivedAt);
+  const validatedAtMs = parseTimestamp(fipPayload?.validation?.validated_at);
+  const kickoffAtMs = parseTimestamp(fipPayload?.fixture?.kickoff_time);
+
+  if (receivedAtMs === null) {
+    return {
+      ok: false,
+      code: 'FIP_TIME_INVALID',
+      message: 'Edge intake receivedAt must be a valid ISO-8601 timestamp.',
+      details: {
+        field: 'receivedAt',
+        value: receivedAt
+      }
+    };
+  }
+
+  if (validatedAtMs === null) {
+    return {
+      ok: false,
+      code: 'FIP_TIME_INVALID',
+      message: 'Scout FIP validation.validated_at must be a valid ISO-8601 timestamp.',
+      details: {
+        field: 'validation.validated_at',
+        value: fipPayload?.validation?.validated_at || null
+      }
+    };
+  }
+
+  if (kickoffAtMs === null) {
+    return {
+      ok: false,
+      code: 'FIP_TIME_INVALID',
+      message: 'Scout FIP fixture.kickoff_time must be a valid ISO-8601 timestamp.',
+      details: {
+        field: 'fixture.kickoff_time',
+        value: fipPayload?.fixture?.kickoff_time || null
+      }
+    };
+  }
+
+  const futureValidationSkewMs = validatedAtMs - receivedAtMs;
+  if (futureValidationSkewMs > MAX_FUTURE_CLOCK_SKEW_MS) {
+    return {
+      ok: false,
+      code: 'FIP_TIME_INVALID',
+      message: 'Scout FIP validation time exceeds the permitted future clock-skew allowance.',
+      details: {
+        validated_at: fipPayload.validation.validated_at,
+        received_at: receivedAt,
+        future_skew_ms: futureValidationSkewMs,
+        maximum_future_skew_ms: MAX_FUTURE_CLOCK_SKEW_MS
+      }
+    };
+  }
+
+  const validationAgeMs = receivedAtMs - validatedAtMs;
+  if (validationAgeMs > MAX_VALIDATION_AGE_MS) {
+    return {
+      ok: false,
+      code: 'FIP_STALE',
+      message: 'Scout FIP validation is older than the permitted freshness window.',
+      details: {
+        validated_at: fipPayload.validation.validated_at,
+        received_at: receivedAt,
+        validation_age_ms: validationAgeMs,
+        maximum_validation_age_ms: MAX_VALIDATION_AGE_MS
+      }
+    };
+  }
+
+  const kickoffDelayMs = kickoffAtMs - receivedAtMs;
+  if (kickoffDelayMs <= 0) {
+    return {
+      ok: false,
+      code: 'FIP_STALE',
+      message: 'Scout FIP fixture has already started or reached kickoff.',
+      details: {
+        kickoff_time: fipPayload.fixture.kickoff_time,
+        received_at: receivedAt,
+        kickoff_delay_ms: kickoffDelayMs
+      }
+    };
+  }
+
+  if (kickoffDelayMs > MAX_KICKOFF_HORIZON_MS) {
+    return {
+      ok: false,
+      code: 'FIP_STALE',
+      message: 'Scout FIP fixture kickoff exceeds the permitted intake horizon.',
+      details: {
+        kickoff_time: fipPayload.fixture.kickoff_time,
+        received_at: receivedAt,
+        kickoff_delay_ms: kickoffDelayMs,
+        maximum_kickoff_horizon_ms: MAX_KICKOFF_HORIZON_MS
+      }
+    };
+  }
+
+  return {
+    ok: true,
+    receivedAt
+  };
 }
 
 function mapToEdgeAnalysisEnvelope(fipPayload, evidence) {
@@ -375,6 +551,20 @@ function receiveValidatedFip(fipPayload, options = {}) {
     );
   }
 
+  const freshness = validateFreshness(fipPayload, options);
+  if (!freshness.ok) {
+    return rejectIntake(
+      freshness.code,
+      freshness.message,
+      fipPayload,
+      {
+        ...options,
+        receivedAt: freshness.receivedAt || options.receivedAt
+      },
+      freshness.details
+    );
+  }
+
   if (
     options.governedMode === 'AUTHORIZED_PRODUCTION' &&
     options.scoutEdgeMarriageGate !== 'CLEARED'
@@ -411,7 +601,11 @@ module.exports = {
   HASH_ALGORITHM,
   SCOUT_FIP_ORIGIN,
   PROOF_FIXTURE_MODE,
+  MAX_VALIDATION_AGE_MS,
+  MAX_FUTURE_CLOCK_SKEW_MS,
+  MAX_KICKOFF_HORIZON_MS,
   receiveValidatedFip,
+  validateFreshness,
   computeFipHash,
   computeIdempotencyKey,
   stableStringify

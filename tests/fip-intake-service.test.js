@@ -10,7 +10,10 @@ const {
   PROOF_FIXTURE_MODE,
   receiveValidatedFip,
   computeFipHash,
-  computeIdempotencyKey
+  computeIdempotencyKey,
+  MAX_VALIDATION_AGE_MS,
+  MAX_FUTURE_CLOCK_SKEW_MS,
+  MAX_KICKOFF_HORIZON_MS
 } = require('../backend/services/fipIntakeService');
 
 function buildValidFip(overrides = {}) {
@@ -22,7 +25,8 @@ function buildValidFip(overrides = {}) {
     validation: {
       status: 'VALIDATED',
       algorithm: HASH_ALGORITHM,
-      hash: ''
+      hash: '',
+      validated_at: '2026-07-12T12:00:00.000Z'
     },
     fixture: {
       fixture_id: 'E2E-001-PROOF-001',
@@ -197,4 +201,117 @@ test('rejects production intake while the marriage gate remains blocked', () => 
   assert.equal(result.accepted, false);
   assert.equal(result.rejection_code, 'PRODUCTION_GATE_BLOCKED');
   assert.equal(result.envelope, null);
+});
+
+test('rejects FIP validation older than the 30-minute freshness window', () => {
+  const fip = buildValidFip({
+    validation: {
+      validated_at: '2026-07-12T11:29:59.999Z'
+    }
+  });
+  fip.validation.hash = computeFipHash(fip);
+
+  const result = receiveValidatedFip(fip, proofOptions());
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.rejection_code, 'FIP_STALE');
+  assert.equal(result.envelope, null);
+  assert.ok(result.evidence.details.validation_age_ms > MAX_VALIDATION_AGE_MS);
+});
+
+test('rejects FIP validation beyond the five-minute future clock-skew allowance', () => {
+  const fip = buildValidFip({
+    validation: {
+      validated_at: '2026-07-12T12:05:00.001Z'
+    }
+  });
+  fip.validation.hash = computeFipHash(fip);
+
+  const result = receiveValidatedFip(fip, proofOptions());
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.rejection_code, 'FIP_TIME_INVALID');
+  assert.equal(result.envelope, null);
+  assert.ok(
+    result.evidence.details.future_skew_ms > MAX_FUTURE_CLOCK_SKEW_MS
+  );
+});
+
+test('rejects malformed freshness timestamps', () => {
+  const fip = buildValidFip({
+    validation: {
+      validated_at: 'not-a-timestamp'
+    }
+  });
+  fip.validation.hash = computeFipHash(fip);
+
+  const result = receiveValidatedFip(fip, proofOptions());
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.rejection_code, 'FIP_TIME_INVALID');
+  assert.equal(result.evidence.details.field, 'validation.validated_at');
+});
+
+test('rejects a parseable timestamp that is not UTC ISO-8601', () => {
+  const fip = buildValidFip({
+    validation: {
+      validated_at: '2026-07-12 12:00:00'
+    }
+  });
+  fip.validation.hash = computeFipHash(fip);
+
+  const result = receiveValidatedFip(fip, proofOptions());
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.rejection_code, 'FIP_TIME_INVALID');
+  assert.equal(result.evidence.details.field, 'validation.validated_at');
+});
+
+test('rejects an impossible UTC ISO-8601 calendar timestamp', () => {
+  const fip = buildValidFip({
+    validation: {
+      validated_at: '2026-02-30T12:00:00.000Z'
+    }
+  });
+  fip.validation.hash = computeFipHash(fip);
+
+  const result = receiveValidatedFip(fip, proofOptions());
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.rejection_code, 'FIP_TIME_INVALID');
+  assert.equal(result.evidence.details.field, 'validation.validated_at');
+});
+
+test('rejects a fixture that has already reached kickoff', () => {
+  const fip = buildValidFip({
+    fixture: {
+      kickoff_time: '2026-07-12T12:00:00.000Z'
+    }
+  });
+  fip.validation.hash = computeFipHash(fip);
+
+  const result = receiveValidatedFip(fip, proofOptions());
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.rejection_code, 'FIP_STALE');
+  assert.equal(result.envelope, null);
+  assert.ok(result.evidence.details.kickoff_delay_ms <= 0);
+});
+
+test('rejects a fixture beyond the 48-hour kickoff horizon', () => {
+  const fip = buildValidFip({
+    fixture: {
+      kickoff_time: '2026-07-14T12:00:00.001Z'
+    }
+  });
+  fip.validation.hash = computeFipHash(fip);
+
+  const result = receiveValidatedFip(fip, proofOptions());
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.rejection_code, 'FIP_STALE');
+  assert.equal(result.envelope, null);
+  assert.ok(
+    result.evidence.details.kickoff_delay_ms > MAX_KICKOFF_HORIZON_MS
+  );
 });

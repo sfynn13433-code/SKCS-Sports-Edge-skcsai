@@ -5,8 +5,8 @@
   "source_command": "git ls-files",
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
-  "tracked_path_count": 919,
-  "registered_asset_count": 918,
+  "tracked_path_count": 923,
+  "registered_asset_count": 919,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -30492,6 +30492,56 @@
       "classification_evidence": [
         "Builds a valid FIP-001 v1 fixture with the service hash algorithm and verifies accepted envelope output.",
         "Covers rejection for unsupported schema version, non-VALIDATED status, tampered hash, missing required fields, forbidden origins, and AUTHORIZED_PRODUCTION while the marriage gate remains blocked."
+      ]
+    },
+    {
+      "asset_path": "tests/p1-b01-configured-fip-input.test.js",
+      "asset_type": "TEST",
+      "asset_role": "TEST_PROOF",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "EPRV-001",
+      "governed_by_control_task_id": "EPRV-001",
+      "related_assets": [
+        "backend/services/aiPipeline.js",
+        "backend/services/fipIntakeService.js",
+        "control-center/EPRV-001_EXTERNAL_PROVIDER_REMOVAL_IMPLEMENTATION_PLAN.v1.md",
+        "tests/fip-intake-service.test.js"
+      ],
+      "related_tables": [],
+      "related_functions": [
+        "resolveConfiguredPredictionInput",
+        "buildConfiguredInputRejection",
+        "receiveValidatedFip"
+      ],
+      "runtime_consumers": [],
+      "runtime_dependencies": [
+        "node:test",
+        "node:assert/strict",
+        "backend/services/aiPipeline.js"
+      ],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "REGISTERED",
+      "next_validation": "P1-B01: run node --test tests/p1-b01-configured-fip-input.test.js after any governed Scout FIP configured-input or aiPipeline intake-routing change.",
+      "notes": "Owning mini-project batch P1-B01. Focused test-only regression proof; no production entrypoint or deployment role.",
+      "purpose_description": "Verifies governed Scout FIP configured input, provider bypass, mapped-envelope-only flow, atomic batch rejection and request-contract validation.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "SCOUT",
+        "FIP",
+        "RUNTIME",
+        "GOVERNANCE",
+        "PROVIDER"
+      ],
+      "classification_evidence": [
+        "Exercises resolveConfiguredPredictionInput via aiPipeline.__test with injected provider and intake dependencies.",
+        "Verifies provider path remains active when fip_envelopes is absent and is bypassed when a valid PROOF_FIXTURE batch is supplied.",
+        "Verifies atomic batch rejection, malformed request-contract rejection, and mapped-envelope-only output without calling external providers."
       ]
     },
     {
