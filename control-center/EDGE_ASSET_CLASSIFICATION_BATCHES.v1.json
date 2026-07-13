@@ -14,13 +14,14 @@
           "control-center/"
         ]
       },
-      "asset_count": 21,
+      "asset_count": 22,
       "asset_paths": [
         "control-center/check_control_center.js",
         "control-center/check_edge_asset_classification.js",
         "control-center/check_edge_project_register.js",
         "control-center/check_edge_repository_asset_register.js",
         "control-center/check_edge_system_runtime_inventory.js",
+        "control-center/E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1.md",
         "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
         "control-center/EDGE_ASSET_REPOSITORY_MAP.md",
         "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
@@ -31,9 +32,9 @@
         "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
         "control-center/EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json",
         "control-center/EDGE_SYSTEM_RUNTIME_MAP.md",
-        "control-center/E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1.md",
         "control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md",
         "control-center/EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md",
+        "control-center/EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1.md",
         "control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md",
         "control-center/FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md",
         "control-center/SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md"
@@ -331,6 +332,8 @@
         "backend/services/enhancedMatchDetailsService.js",
         "backend/services/espnHiddenApiService.js",
         "backend/services/filterEngine.js",
+        "backend/services/fipIntakeService.js",
+        "backend/services/fipStoragePolicyService.js",
         "backend/services/football536Extractor.js",
         "backend/services/football536Service.js",
         "backend/services/footballH2HExtractor.js",
@@ -350,8 +353,6 @@
         "backend/services/metrxFactoryExtractor.js",
         "backend/services/metrxFactoryService.js",
         "backend/services/normalizerService.js",
-        "backend/services/fipIntakeService.js",
-        "backend/services/fipStoragePolicyService.js",
         "backend/services/oddsApiPipeline.js",
         "backend/services/oddsBudgetService.js",
         "backend/services/pipelineMetricsService.js",
@@ -942,9 +943,9 @@
         "SKCS-KNOWLEDGE/governance/bsd_governance_hold.md",
         "SKCS-KNOWLEDGE/governance/bsd_provider_suitability_scorecard.md",
         "SKCS-KNOWLEDGE/governance/documentation_policy.md",
+        "SKCS-KNOWLEDGE/governance/edge_asset_work_sequence_policy.md",
         "SKCS-KNOWLEDGE/governance/feature_risk_registry.md",
         "SKCS-KNOWLEDGE/governance/naming_standards.md",
-        "SKCS-KNOWLEDGE/governance/edge_asset_work_sequence_policy.md",
         "SKCS-KNOWLEDGE/governance/provider_scorecard_bsd.md",
         "SKCS-KNOWLEDGE/governance/verification_layer_spec.md"
       ]
@@ -1212,7 +1213,7 @@
           "tests/"
         ]
       },
-      "asset_count": 8,
+      "asset_count": 9,
       "asset_paths": [
         "tests/edge-asset-classification.test.js",
         "tests/edge-control-center-ledger.test.js",
@@ -1220,6 +1221,7 @@
         "tests/edge-project-register.test.js",
         "tests/edge-repository-asset-register.test.js",
         "tests/edge-system-runtime-inventory.test.js",
+        "tests/epi-pipeline-integrity-contract.test.js",
         "tests/fip-intake-service.test.js",
         "tests/fip-storage-policy-service.test.js"
       ]

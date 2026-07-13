@@ -46,7 +46,7 @@ It is the governed resumption of the intentionally deferred Scout ↔ Edge integ
 | **External sports provider removal** | PARTIAL |
 | **FIP intake handshake** | PROPOSED |
 | **Subscriber/security boundary inventory** | PROPOSED |
-| **Prediction pipeline integrity inventory** | PROPOSED |
+| **Prediction pipeline integrity inventory** | TESTED (contract sealed; runtime unchanged) |
 | **Scout → Edge end-to-end proof** | BLOCKED |
 
 ---
@@ -61,7 +61,7 @@ The following technical prerequisites must be satisfied:
 | EFI-001 | FIP Intake Handshake | APPROVED (contract sealed; implementation forbidden) |
 | EST-001 | Supabase Storage and FIP Retention Contract | APPROVED (contract sealed; storage gate remains BLOCKED) |
 | ESEC-001 | Subscriber and Security Boundary | PROPOSED |
-| EPI-001 | Prediction Pipeline Integrity | PROPOSED |
+| EPI-001 | Prediction Pipeline Integrity | TESTED (contract sealed; runtime unchanged) |
 | EPRV-001 | External Sports Provider Removal | PARTIAL |
 | E2E-001 | Scout to Edge End-to-End Proof | BLOCKED |
 
@@ -553,7 +553,7 @@ Required state snapshot:
   ],
   "eac_evidence_reusable": true,
   "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
-  "total_governed_assets": 912,
+  "total_governed_assets": 914,
   "phase_0": {
     "status": "PHASE_CLOSED",
     "question": "What exact repository state is the cleanup programme starting from?",
@@ -562,7 +562,7 @@ Required state snapshot:
       "active_branch": "main",
       "head_commit": "7d21fc276629bb6aec056299d70e1541b462934f",
       "working_tree_status": "dirty_unrelated_changes_preserved",
-      "governed_asset_count": 912,
+      "governed_asset_count": 914,
       "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
       "eac_batch_count": 29,
       "already_completed_or_removal_work": "Partial external sports provider removal (PARTIAL); EAC-001 B01-B29 classification inventory complete; prior Control Center per-asset investigations preserved as historical evidence",
@@ -10350,3 +10350,23 @@ Gate state:
 Next recommended control action:
 - Continue only with separately authorized EPI/EPRV blocker work, a physical Supabase persistence packet if required, or E2E-001-X1 sequencing.
 - Do not clear the marriage gate or storage gate from EST-001-I1.
+
+---
+## EPI-001-C1 Prediction Pipeline Integrity Contract Evidence
+Result: TESTED
+Scope:
+- Mini-project: EPI-001-C1 — Prediction Pipeline Integrity Contract
+- Runtime prediction code changed: NO
+- SQL executed: NO
+- Supabase mutation/call performed: NO
+- Migration created: NO
+- Route wiring performed: NO
+- Provider removal performed: NO
+- E2E proof executed: NO
+- Gate clearance performed: NO
+Evidence:
+- Contract sealed at `control-center/EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1.md`.
+- Focused proof added at `tests/epi-pipeline-integrity-contract.test.js`.
+- Protected surfaces: `aiPipeline.js`, `aiScoring.js`, `filterEngine.js`, `direct1x2Engine.js`, `marketIntelligence.js`, and `accaBuilder.js`.
+- `scout_edge_marriage_gate` remains BLOCKED.
+- `supabase_storage_gate` remains BLOCKED.

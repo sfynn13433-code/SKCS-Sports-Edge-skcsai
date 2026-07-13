@@ -1,14 +1,14 @@
 # EDGE ASSET REPOSITORY MAP
 EAC_PROJECT_ID: EAC-001
 MANIFEST_SCHEMA_VERSION: 1.0.0
-TOTAL_GOVERNED_ASSETS: 912
-TOTAL_BATCHED_ASSETS: 912
+TOTAL_GOVERNED_ASSETS: 914
+TOTAL_BATCHED_ASSETS: 914
 FULLY_CLASSIFIED_ASSETS: 0
-CLASSIFICATION_PENDING_ASSETS: 912
+CLASSIFICATION_PENDING_ASSETS: 914
 CLOSURE_READY: NO
 
 CURRENT_STATE_COUNTS
-- CURRENT: 22
+- CURRENT: 24
 - PARALLEL: 0
 - LEGACY: 0
 - HISTORICAL_EVIDENCE: 0
@@ -21,12 +21,12 @@ FUNCTIONAL_GROUP_COUNTS
 - DOCUMENTATION_KNOWLEDGE: 115
 - PROVIDER_INTEGRATION: 115
 - DATABASE_MIGRATION: 96
-- TEST_PROOF: 95
+- TEST_PROOF: 96
 - GENERATED_OUTPUT: 59
 - DATABASE: 42
 - FRONTEND_UI: 40
 - DEPLOYMENT_OPERATIONS: 39
-- PREDICTION: 27
+- PREDICTION: 28
 - SCHEDULER_BACKGROUND: 25
 - GOVERNANCE: 23
 - API_ROUTE: 18
@@ -43,16 +43,16 @@ FUNCTIONAL_GROUP_COUNTS
 RELATIONSHIP_TAG_COUNTS
 - RUNTIME: 293
 - SCRIPT_TOOL: 283
+- DATABASE: 238
 - SQL: 238
-- DATABASE: 237
 - PROVIDER: 195
 - API: 169
-- GOVERNANCE: 144
-- DOCUMENTATION: 141
+- GOVERNANCE: 146
+- DOCUMENTATION: 142
+- PREDICTION: 102
 - MIGRATION: 101
-- PREDICTION: 100
 - OBSERVABILITY: 99
-- TEST_PROOF: 94
+- TEST_PROOF: 95
 - UI: 91
 - AUDIT: 83
 - GENERATED: 69
@@ -64,8 +64,8 @@ RELATIONSHIP_TAG_COUNTS
 - PUBLIC_ASSET: 30
 - BACKGROUND_JOB: 28
 - SCHEDULER: 27
+- ACCA: 26
 - RULEBOOK: 25
-- ACCA: 24
 - AI_EDGEMIND: 19
 - GRADING: 8
 - FIP: 4
@@ -74,10 +74,10 @@ RELATIONSHIP_TAG_COUNTS
 - CONTROLLER: 2
 - RPC: 1
 
-NEXT_VALIDATION_NON_EMPTY_ASSETS: 912
+NEXT_VALIDATION_NON_EMPTY_ASSETS: 914
 
 BATCH_COMPLETION_SUMMARY
-- B01 | CONTROL_CENTER | ASSET_COUNT=21 | CLASSIFIED=0 | PENDING=21
+- B01 | CONTROL_CENTER | ASSET_COUNT=22 | CLASSIFIED=0 | PENDING=22
 - B02 | BACKEND_DIRECT_FILES | ASSET_COUNT=13 | CLASSIFIED=0 | PENDING=13
 - B03 | BACKEND_ROUTES_AND_CONTROLLERS | ASSET_COUNT=28 | CLASSIFIED=0 | PENDING=28
 - B04 | BACKEND_UTILS_SEMANTIC_CORE_AND_TEST | ASSET_COUNT=46 | CLASSIFIED=0 | PENDING=46
@@ -100,7 +100,7 @@ BATCH_COMPLETION_SUMMARY
 - B21 | PUBLIC_UI | ASSET_COUNT=64 | CLASSIFIED=0 | PENDING=64
 - B22 | SUPABASE_MIGRATIONS | ASSET_COUNT=61 | CLASSIFIED=0 | PENDING=61
 - B23 | DB_SQL_AND_SUPABASE_OTHER | ASSET_COUNT=19 | CLASSIFIED=0 | PENDING=19
-- B24 | TESTS | ASSET_COUNT=8 | CLASSIFIED=0 | PENDING=8
+- B24 | TESTS | ASSET_COUNT=9 | CLASSIFIED=0 | PENDING=9
 - B25 | SCRATCH | ASSET_COUNT=2 | CLASSIFIED=0 | PENDING=2
 - B26 | DEPLOYMENT_CI | ASSET_COUNT=3 | CLASSIFIED=0 | PENDING=3
 - B27 | ARCHIVE | ASSET_COUNT=58 | CLASSIFIED=0 | PENDING=58
@@ -130,6 +130,7 @@ PER_ASSET_BY_BATCH
 | control-center/EDGE_SYSTEM_RUNTIME_MAP.md | Observational synchronized runtime map that mirrors `EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json` surfaces with caller/consumer and database-role details for review. | GENERATED_OUTPUT | UNKNOWN | ["RUNTIME","DOCUMENTATION","GENERATED","GOVERNANCE"] | ["EDGE_SYSTEM_RUNTIME_MAP.md includes an Inventory SHA-256 and 'Synchronized review surface' text, and it is produced/updated by check_edge_system_runtime_inventory.js via MAP_PATH synchronization."] | Revalidate deterministic synchronization with the canonical Edge System Runtime Inventory during ESA-001 closure and each inventory update. |
 | control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md | Defines the governed fail-closed Scout FIP intake boundary law: accepted source, minimum payload, crosswalk to Edge analysis envelope, validation, idempotency, provenance, and evidence recording. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE"] | ["EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md seals intake handshake law upstream of aiPipeline.buildRawPredictionFromProviderItem() per EMG-001 sequence."] | Validate against EFI-001 runtime intake implementation when separately authorized. |
 | control-center/EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md | Defines the explicit fail-closed Scout-Edge marriage gate law: prerequisites, allowed E2E proof sources, blocked conditions, pass/fail rules, and required evidence before EFI-001 intake implementation. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE"] | ["EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md seals scout_edge_marriage_gate law and references MARRIAGE_PREREQUISITES from the Edge build-control ledger."] | Validate with EMG-001 contract validator when separately authorized. |
+| control-center/EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1.md | Defines the protected Edge prediction/scoring/filtering/direct-market/market-intelligence/ACCA invariants that must be preserved before FIP runtime integration, provider removal, or E2E proof. | PREDICTION | CURRENT | ["PREDICTION","ACCA","DATABASE","GOVERNANCE","DOCUMENTATION"] | ["Contract names the six protected prediction pipeline surfaces and their responsibilities.","Contract records inspection evidence and risk surfaces without authorizing runtime repair.","Contract forbids runtime code changes, SQL, Supabase mutation, migrations, provider removal, E2E proof, and gate clearance."] | Before runtime prediction changes, create a separate EPI implementation packet with baseline regression proof, FIP input mapping, provider bypass proof, and ACCA compatibility proof. |
 | control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md | Defines Supabase storage and FIP retention law: canonical Scout truth vs Edge-derived state, forbidden mirrors, data classes, retention periods, budget thresholds, replay/audit, and fail-closed persistence rules. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","DATABASE"] | ["EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md seals transport-vs-retention law and keeps supabase_storage_gate BLOCKED per Edge Control Center storage policy."] | Validate against EST-001 storage enforcement implementation when separately authorized. |
 | control-center/FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md | Registers the committed Scout FIP authority: schema identity, required payload shape, validation/hash law, fixture identity, market/context requirements, allowed proof modes, and forbidden non-canonical sources. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE"] | ["FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md establishes Scout as canonical sports-truth owner and sole FIP contract Edge may recognize for governed intake."] | Validate EFI-001 §5 crosswalk against FIP-001 before EFI-001-I1 implementation. |
 | control-center/SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md | Records read-only SEE-001 inspection of Scout-Edge runtime paths, forbidden proof sources, and NEEDS IMPLEMENTATION decision for first E2E marriage proof. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","AUDIT"] | ["SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md documents committed runtime entrypoints, missing FIP intake boundary, and defers marriage proof until EMG-001 and EFI-001."] | Validate against EFI-001 intake implementation when separately authorized. |
@@ -970,6 +971,7 @@ PER_ASSET_BY_BATCH
 | tests/edge-project-register.test.js | Governance test asset validating the Edge Master Project Register schema integrity and that ledger task IDs match registered projects. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","AUDIT"] | ["File uses `check_edge_project_register.js` helpers to assert the register loads, has canonical version `1.0`, and that every required field is present for each project.","It validates that ledger task IDs map exactly onto `register.projects` and that project status/blocked_by mirrors ledger task data."] | Revalidate this test asset??????s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change. |
 | tests/edge-repository-asset-register.test.js | Repository governance/asset-register test asset validating tracked asset register integrity and EAC structured classification field correctness. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","AUDIT","DATABASE"] | ["File asserts the asset register exists/canonical version and iterates required field sets over all assets.","It validates EAC-001 structured classification fields types (`purpose_description`/`functional_group`/`relationship_tags`/`classification_evidence`) and checks enum legality for current_state and other fields."] | Revalidate this test asset??????s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change. |
 | tests/edge-system-runtime-inventory.test.js | Runtime inventory contract test asset validating ESA-001 discovery surfaces are governed and validation rules fail closed on removal or unknown task bindings. | TEST_PROOF | UNKNOWN | ["TEST_PROOF","RUNTIME","OBSERVABILITY","GOVERNANCE"] | ["File imports runtime inventory helpers (`discoverMaterialSurfaces`, `validateInventory`, `renderRuntimeMap`) and validates the canonical runtime inventory passes.","It includes fail-closed tests (e.g., removing a governed surface or altering control-task bindings) and asserts validation errors start with the expected failure markers."] | Revalidate this test asset??????s authority and coverage whenever the EAC-001 classification contract, batch manifest, or closure semantics change. |
+| tests/epi-pipeline-integrity-contract.test.js | Tests the EPI-001-C1 prediction pipeline integrity contract and its governance registration without importing or mutating runtime prediction code. | TEST_PROOF | CURRENT | ["TEST_PROOF","PREDICTION","ACCA","GOVERNANCE"] | ["Test reads the EPI-001-C1 contract and verifies protected surfaces and forbidden boundaries.","Test verifies ledger/project register EPI-001 state and BLOCKED gates.","Test verifies package control-center test suite includes the focused EPI proof."] | Run node --test tests/epi-pipeline-integrity-contract.test.js and npm run control:verify after any EPI contract or sequencing change. |
 | tests/fip-intake-service.test.js | Focused Node test coverage for the EFI-001 fail-closed FIP intake boundary accept/reject behavior and Edge envelope mapping. | TEST_PROOF | CURRENT | ["TEST_PROOF","SCOUT","FIP","RUNTIME","GOVERNANCE"] | ["Builds a valid FIP-001 v1 fixture with the service hash algorithm and verifies accepted envelope output.","Covers rejection for unsupported schema version, non-VALIDATED status, tampered hash, missing required fields, forbidden origins, and AUTHORIZED_PRODUCTION while the marriage gate remains blocked."] | EFI-001-I1: run node --test tests/fip-intake-service.test.js after any FIP intake boundary change. |
 | tests/fip-storage-policy-service.test.js | Focused Node test coverage for EST-001 Supabase storage-policy enforcement, including R1/R2 minimal records, full FIP body blocking, audit-only rejection handling, and storage budget thresholds. | TEST_PROOF | CURRENT | ["TEST_PROOF","SCOUT","FIP","DATABASE","GOVERNANCE"] | ["Verifies accepted EFI intake produces minimal R1 provenance and R2 audit records only.","Verifies full FIP body, Scout mirror, provider payload, markets, context, and fixture body data are not persisted in EST records.","Verifies rejected EFI intake creates audit-only records and Supabase hard block prevents new EST records."] | EST-001-I1: run node --test tests/fip-storage-policy-service.test.js after any EST storage policy change. |
 

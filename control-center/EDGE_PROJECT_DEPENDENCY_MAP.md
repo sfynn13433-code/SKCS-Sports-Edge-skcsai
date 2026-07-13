@@ -53,14 +53,14 @@ Blocks: EFI-001, EST-001, ESEC-001, FIP-001
 
 ## EFI-001 — FIP Intake Handshake
 
-Status: APPROVED
+Status: TESTED
 Governed by: EFI-001
 Blocked by: ESA-001, EMG-001
 Blocks: EPRV-001, E2E-001
 
 ## EST-001 — Supabase Storage and FIP Retention Contract
 
-Status: APPROVED
+Status: TESTED
 Governed by: EST-001
 Blocked by: ESA-001, EMG-001
 Blocks: EOPS-001, E2E-001
@@ -74,7 +74,7 @@ Blocks: EUI-001, EOPS-001, E2E-001
 
 ## EPI-001 — Prediction Pipeline Integrity
 
-Status: PROPOSED
+Status: TESTED
 Governed by: EPI-001
 Blocked by: ESA-001
 Blocks: EGR-001, EAI-001, EUI-001, E2E-001

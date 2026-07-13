@@ -556,7 +556,7 @@
       "task_name": "Prediction Pipeline Integrity",
       "workstream": "Prediction Pipeline",
       "description": "Map and protect raw input, normalization, scoring, contextual adjustment, filtering, direct markets, secondary markets, same-match logic, ACCA construction, and publication.",
-      "status": "PROPOSED",
+      "status": "TESTED",
       "priority": "critical",
       "blocked_by": [
         "ESA-001"
@@ -573,35 +573,56 @@
         "filtering",
         "ACCA"
       ],
-      "related_contracts": [],
+      "related_contracts": [
+        "EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1"
+      ],
       "affected_files": [
         "backend/services/aiPipeline.js",
         "backend/services/aiScoring.js",
         "backend/services/filterEngine.js",
         "backend/services/direct1x2Engine.js",
         "backend/services/marketIntelligence.js",
-        "backend/services/accaBuilder.js"
+        "backend/services/accaBuilder.js",
+        "control-center/EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1.md",
+        "tests/epi-pipeline-integrity-contract.test.js",
+        "package.json",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
+        "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
+        "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
+        "control-center/EDGE_ASSET_REPOSITORY_MAP.md",
+        "control-center/EDGE_CONTROL_CENTER.md",
+        "tests/edge-control-center-ledger.test.js"
       ],
       "affected_tables": [
         "predictions_raw"
       ],
-      "completion_definition": "Critical Edge prediction surfaces and invariants are registered with tests protecting existing scoring and ACCA behaviour during FIP integration.",
+      "completion_definition": "A tested prediction-pipeline integrity contract identifies the protected Edge scoring, filtering, direct-market, market-intelligence, ACCA, and publication invariants that must be preserved before FIP runtime integration, provider removal, or E2E proof work can proceed.",
       "proof_required": [
         "Prediction execution map",
         "Protected invariant list",
         "Existing test coverage map",
-        "Regression proof before and after FIP intake"
+        "Regression proof before and after FIP intake",
+        "Contract test proving runtime implementation, provider removal, SQL, Supabase mutation, migration, E2E proof, and gate clearance remain forbidden in EPI-001-C1"
       ],
       "current_evidence": [
-        "aiPipeline remains the primary Edge analysis/orchestration path",
-        "Existing ACCA and prediction logic must be preserved during provider removal"
+        "EPI-001-C1 sealed control-center/EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1.md.",
+        "Protected pipeline surfaces recorded: aiPipeline, aiScoring, filterEngine, direct1x2Engine, marketIntelligence, and accaBuilder.",
+        "Inspection evidence confirms aiPipeline remains the primary orchestration path and still contains acquisition risk surfaces for later EPRV/EPI work.",
+        "Inspection evidence confirms filterEngine and accaBuilder depend on existing prediction tables that future FIP integration must preserve.",
+        "Focused proof: node --test tests/epi-pipeline-integrity-contract.test.js passes.",
+        "No prediction runtime code, SQL, migration, Supabase mutation, route wiring, provider removal, E2E proof, or gate clearance performed."
       ],
       "open_gaps": [
-        "Canonical protected-pipeline inventory pending"
+        "No FIP runtime mapping into aiPipeline implemented.",
+        "No provider bypass/removal performed.",
+        "No prediction baseline regression fixture created yet.",
+        "No E2E proof executed; E2E-001 remains BLOCKED.",
+        "No marriage gate clearance; scout_edge_marriage_gate remains BLOCKED."
       ],
-      "next_action": "Wait for Edge inventory.",
+      "next_action": "EPI-001-C1 tested. Continue only with separately authorized EPI implementation, EPRV provider-removal, or E2E sequencing; do not change prediction runtime, remove providers, run SQL, mutate Supabase, or clear gates from this packet.",
       "owner_note": "Do not break the existing ACCA engine while changing the origin of sports truth.",
-      "last_updated": "2026-07-05"
+      "last_updated": "2026-07-13"
     },
     {
       "task_id": "EPRV-001",

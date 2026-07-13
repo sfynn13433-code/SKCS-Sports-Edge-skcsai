@@ -615,7 +615,7 @@
       "category": "Prediction Pipeline",
       "description": "Map and protect raw input, normalization, scoring, contextual adjustment, filtering, direct markets, secondary markets, same-match logic, ACCA construction, and publication.",
       "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
-      "current_status": "PROPOSED",
+      "current_status": "TESTED",
       "priority": "critical",
       "blocked_by": [
         "ESA-001"
@@ -635,30 +635,61 @@
       "related_tasks": [
         "EPI-001"
       ],
-      "related_contracts": [],
-      "related_files": [],
+      "related_contracts": [
+        "EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1"
+      ],
+      "related_files": [
+        "backend/services/aiPipeline.js",
+        "backend/services/aiScoring.js",
+        "backend/services/filterEngine.js",
+        "backend/services/direct1x2Engine.js",
+        "backend/services/marketIntelligence.js",
+        "backend/services/accaBuilder.js",
+        "control-center/EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1.md",
+        "tests/epi-pipeline-integrity-contract.test.js",
+        "package.json",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
+        "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
+        "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
+        "control-center/EDGE_ASSET_REPOSITORY_MAP.md",
+        "control-center/EDGE_CONTROL_CENTER.md",
+        "tests/edge-control-center-ledger.test.js"
+      ],
       "related_tables": [],
       "known_issues": [],
       "required_decisions": [],
-      "completion_definition": "Critical Edge prediction surfaces and invariants are registered with tests protecting existing scoring and ACCA behaviour during FIP integration.",
+      "completion_definition": "A tested prediction-pipeline integrity contract identifies the protected Edge scoring, filtering, direct-market, market-intelligence, ACCA, and publication invariants that must be preserved before FIP runtime integration, provider removal, or E2E proof work can proceed.",
       "proof_required": [
         "Prediction execution map",
         "Protected invariant list",
         "Existing test coverage map",
-        "Regression proof before and after FIP intake"
+        "Regression proof before and after FIP intake",
+        "Contract test proving runtime implementation, provider removal, SQL, Supabase mutation, migration, E2E proof, and gate clearance remain forbidden in EPI-001-C1"
       ],
       "risks_if_ignored": [
         "Hidden Edge work",
         "Control Center sequencing bypass"
       ],
       "recommended_order": 11,
-      "next_action": "Wait for Edge inventory.",
+      "next_action": "EPI-001-C1 tested. Continue only with separately authorized EPI implementation, EPRV provider-removal, or E2E sequencing; do not change prediction runtime, remove providers, run SQL, mutate Supabase, or clear gates from this packet.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
-      "last_updated": "2026-07-05",
+      "last_updated": "2026-07-13",
       "governed_by_control_task_id": "EPI-001",
       "current_evidence": [
-        "aiPipeline remains the primary Edge analysis/orchestration path",
-        "Existing ACCA and prediction logic must be preserved during provider removal"
+        "EPI-001-C1 sealed control-center/EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1.md.",
+        "Protected pipeline surfaces recorded: aiPipeline, aiScoring, filterEngine, direct1x2Engine, marketIntelligence, and accaBuilder.",
+        "Inspection evidence confirms aiPipeline remains the primary orchestration path and still contains acquisition risk surfaces for later EPRV/EPI work.",
+        "Inspection evidence confirms filterEngine and accaBuilder depend on existing prediction tables that future FIP integration must preserve.",
+        "Focused proof: node --test tests/epi-pipeline-integrity-contract.test.js passes.",
+        "No prediction runtime code, SQL, migration, Supabase mutation, route wiring, provider removal, E2E proof, or gate clearance performed."
+      ],
+      "open_gaps": [
+        "No FIP runtime mapping into aiPipeline implemented.",
+        "No provider bypass/removal performed.",
+        "No prediction baseline regression fixture created yet.",
+        "No E2E proof executed; E2E-001 remains BLOCKED.",
+        "No marriage gate clearance; scout_edge_marriage_gate remains BLOCKED."
       ]
     },
     {
