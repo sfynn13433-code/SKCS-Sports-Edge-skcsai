@@ -1162,7 +1162,8 @@
       ],
       "blocks": [
         "SEM-GOV-001B-I2",
-        "SEM-GOV-001B-I3"
+        "SEM-GOV-001B-I3",
+        "SEM-GOV-001B-I4-CAP"
       ],
       "affected_layers": [
         "governance",
@@ -1200,15 +1201,17 @@
         "Inspection 1 evidence incorporated",
         "unified_lifecycle_governor remains BLOCKED",
         "supabase_storage_gate remains BLOCKED — no R1/R2 migration authorized",
-        "SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed"
+        "SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed",
+        "SEM-GOV-001B-I4-CAP free-tier capacity design sealed with HOLD activation decision"
       ],
       "open_gaps": [
         "No lifecycle persistence DDL while supabase_storage_gate BLOCKED",
+        "Conservative 80/day admission model exceeds 380 MB activation ceiling — governed cap required",
         "No Scout FIP pipeline hooks (SEM-GOV-001C)",
         "48-hour FIP horizon unchanged until 001C",
         "LIFECYCLE_GOVERNOR_ENABLED defaults false"
       ],
-      "next_action": "SEM-GOV-001B-C1 contract sealed. SEM-GOV-001B-I2 design packet sealed. SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed. SEM-GOV-001B-I4 persistence adapter remains blocked pending separate authorization and supabase_storage_gate approval.",
+      "next_action": "SEM-GOV-001B-C1 contract sealed. SEM-GOV-001B-I2 design packet sealed. SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed. SEM-GOV-001B-I4-CAP closed with HOLD. I4 implementation blocked pending separate 50/day mitigation packet and supabase_storage_gate clearance.",
       "owner_note": "fixture_uid is Edge-minted UUID. Aliases are not primary keys. Football first.",
       "last_updated": "2026-07-14"
     },
@@ -1287,7 +1290,9 @@
       "blocked_by": [
         "SEM-GOV-001B-I2"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001B-I4-CAP"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -1331,14 +1336,80 @@
         "Focused proof: node --test tests/lifecycle-governor.test.js passes"
       ],
       "open_gaps": [
-        "No persistence adapter or DDL (SEM-GOV-001B-I4)",
+        "No persistence adapter or DDL (SEM-GOV-001B-I4 implementation)",
         "No rollover worker (SEM-GOV-001B-I5)",
         "No Scout FIP pipeline hooks (SEM-GOV-001C)",
         "supabase_storage_gate remains BLOCKED",
-        "unified_lifecycle_governor remains BLOCKED"
+        "unified_lifecycle_governor remains BLOCKED",
+        "I4-CAP capacity design HOLD — conservative 80/day exceeds activation ceiling"
       ],
-      "next_action": "SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed. SEM-GOV-001B-I4 persistence adapter remains blocked pending separate authorization and supabase_storage_gate approval.",
+      "next_action": "SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed. SEM-GOV-001B-I4-CAP closed with HOLD. I4 implementation blocked pending separate 50/day mitigation packet.",
       "owner_note": "Pure evaluators only. Gate before flag. No DB while blocked.",
+      "last_updated": "2026-07-14"
+    },
+    {
+      "task_id": "SEM-GOV-001B-I4-CAP",
+      "task_name": "Supabase Free-Tier Capacity and Retention Design",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001: seal the SEM-GOV-001B-I4 Supabase free-tier capacity and retention design — verified dashboard usage, per-table growth models, bounded retention and purge law, resource controls, Scout non-duplication proof, and activation decision — without SQL, migrations, tables, persistence adapter, or production runtime implementation.",
+      "status": "DONE",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001B-I3"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "database"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1",
+        "SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001B-I4_SUPABASE_FREE_TIER_CAPACITY_AND_RETENTION_DESIGN.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
+      ],
+      "affected_files": [
+        "control-center/SEM-GOV-001B-I4_SUPABASE_FREE_TIER_CAPACITY_AND_RETENTION_DESIGN.v1.md",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
+        "control-center/EDGE_PROJECT_BACKLOG.md",
+        "control-center/EDGE_PROJECT_DEPENDENCY_MAP.md"
+      ],
+      "affected_tables": [],
+      "completion_definition": "SEM-GOV-001B-I4-CAP seals the Supabase free-tier capacity and retention design with verified dashboard baseline 167 MB, normal and conservative growth models, explicit retention and bounded purge design, resource controls, Scout non-duplication law, and HOLD activation decision until governed admission/retention caps are approved — without SQL, migrations, tables, persistence adapter, or gate clearance.",
+      "proof_required": [
+        "control-center/SEM-GOV-001B-I4_SUPABASE_FREE_TIER_CAPACITY_AND_RETENTION_DESIGN.v1.md exists and validates",
+        "Normal projected total remains below 300 MB",
+        "Conservative 80/day model documented with HOLD and mitigated options",
+        "All three governance gates remain BLOCKED in ledger",
+        "SEM-GOV-001B-I4-CAP registered in ledger and master project register",
+        "npm run control:center passes",
+        "SEM-GOV contract regression tests pass",
+        "npm run verify:rulebook passes"
+      ],
+      "current_evidence": [
+        "SEM-GOV-001B-I4-CAP sealed control-center/SEM-GOV-001B-I4_SUPABASE_FREE_TIER_CAPACITY_AND_RETENTION_DESIGN.v1.md",
+        "Verified dashboard baseline 167 MB at 33% of 500 MB Free Plan",
+        "Normal projected total 186.10 MB below 300 MB preferred ceiling",
+        "Conservative 80/day projected total 470.58 MB exceeds 380 MB activation ceiling — HOLD closed",
+        "Stephen approved Option A direction: 50 admissions/day ceiling; Option B rejected; 180d retention unchanged",
+        "50/day enforcement requires separate governed mitigation packet — not proven here",
+        "Bounded retention and purge design documented",
+        "I4 owner authorization approved; supabase_storage_gate remains BLOCKED",
+        "I4 implementation remains BLOCKED"
+      ],
+      "open_gaps": [
+        "supabase_storage_gate remains BLOCKED",
+        "unified_lifecycle_governor remains BLOCKED",
+        "Separate 50/day capacity recalculation and enforcement-design packet required before gate clearance",
+        "No persistence adapter or DDL (SEM-GOV-001B-I4 implementation)",
+        "No purge service implementation",
+        "No Scout FIP pipeline hooks (SEM-GOV-001C)"
+      ],
+      "next_action": "SEM-GOV-001B-I4-CAP closed with HOLD. Separate governed mitigation packet required for 50/day admission enforcement design before supabase_storage_gate clearance and I4 implementation.",
+      "owner_note": "Closed HOLD. 167 MB baseline. 80/day unconstrained evidence preserved. 50/day owner direction only — not enforced.",
       "last_updated": "2026-07-14"
     }
   ]

@@ -1,14 +1,14 @@
 # EDGE ASSET REPOSITORY MAP
 EAC_PROJECT_ID: EAC-001
 MANIFEST_SCHEMA_VERSION: 1.0.0
-TOTAL_GOVERNED_ASSETS: 923
-TOTAL_BATCHED_ASSETS: 923
+TOTAL_GOVERNED_ASSETS: 928
+TOTAL_BATCHED_ASSETS: 928
 FULLY_CLASSIFIED_ASSETS: 0
-CLASSIFICATION_PENDING_ASSETS: 923
+CLASSIFICATION_PENDING_ASSETS: 928
 CLOSURE_READY: NO
 
 CURRENT_STATE_COUNTS
-- CURRENT: 32
+- CURRENT: 37
 - PARALLEL: 0
 - LEGACY: 0
 - HISTORICAL_EVIDENCE: 0
@@ -18,17 +18,17 @@ CURRENT_STATE_COUNTS
 
 FUNCTIONAL_GROUP_COUNTS
 - SCRIPT_TOOL: 156
-- DOCUMENTATION_KNOWLEDGE: 117
+- DOCUMENTATION_KNOWLEDGE: 119
 - PROVIDER_INTEGRATION: 116
-- TEST_PROOF: 100
+- TEST_PROOF: 102
 - DATABASE_MIGRATION: 96
 - GENERATED_OUTPUT: 59
 - DATABASE: 42
 - FRONTEND_UI: 40
 - DEPLOYMENT_OPERATIONS: 39
 - PREDICTION: 28
+- GOVERNANCE: 25
 - SCHEDULER_BACKGROUND: 25
-- GOVERNANCE: 24
 - API_ROUTE: 18
 - ACCA: 17
 - PUBLIC_ASSET: 10
@@ -44,16 +44,16 @@ FUNCTIONAL_GROUP_COUNTS
 RELATIONSHIP_TAG_COUNTS
 - RUNTIME: 296
 - SCRIPT_TOOL: 283
-- DATABASE: 239
+- DATABASE: 240
 - SQL: 238
 - PROVIDER: 199
 - API: 169
-- GOVERNANCE: 154
-- DOCUMENTATION: 145
+- GOVERNANCE: 159
+- DOCUMENTATION: 147
 - PREDICTION: 105
 - MIGRATION: 101
+- TEST_PROOF: 101
 - OBSERVABILITY: 99
-- TEST_PROOF: 99
 - UI: 92
 - AUDIT: 83
 - GENERATED: 69
@@ -61,25 +61,25 @@ RELATIONSHIP_TAG_COUNTS
 - DEPLOYMENT: 56
 - SECURITY: 55
 - CONFIGURATION: 52
-- SERVICE: 48
+- SERVICE: 49
 - PUBLIC_ASSET: 30
 - BACKGROUND_JOB: 28
+- RULEBOOK: 27
 - SCHEDULER: 27
 - ACCA: 26
-- RULEBOOK: 25
 - AI_EDGEMIND: 19
 - GRADING: 8
 - FIP: 7
+- LIFECYCLE: 6
 - SCOUT: 6
-- LIFECYCLE: 4
 - SUBSCRIBER: 4
 - CONTROLLER: 2
 - RPC: 1
 
-NEXT_VALIDATION_NON_EMPTY_ASSETS: 923
+NEXT_VALIDATION_NON_EMPTY_ASSETS: 928
 
 BATCH_COMPLETION_SUMMARY
-- B01 | CONTROL_CENTER | ASSET_COUNT=27 | CLASSIFIED=0 | PENDING=27
+- B01 | CONTROL_CENTER | ASSET_COUNT=29 | CLASSIFIED=0 | PENDING=29
 - B02 | BACKEND_DIRECT_FILES | ASSET_COUNT=13 | CLASSIFIED=0 | PENDING=13
 - B03 | BACKEND_ROUTES_AND_CONTROLLERS | ASSET_COUNT=28 | CLASSIFIED=0 | PENDING=28
 - B04 | BACKEND_UTILS_SEMANTIC_CORE_AND_TEST | ASSET_COUNT=46 | CLASSIFIED=0 | PENDING=46
@@ -102,7 +102,7 @@ BATCH_COMPLETION_SUMMARY
 - B21 | PUBLIC_UI | ASSET_COUNT=64 | CLASSIFIED=0 | PENDING=64
 - B22 | SUPABASE_MIGRATIONS | ASSET_COUNT=61 | CLASSIFIED=0 | PENDING=61
 - B23 | DB_SQL_AND_SUPABASE_OTHER | ASSET_COUNT=19 | CLASSIFIED=0 | PENDING=19
-- B24 | TESTS | ASSET_COUNT=14 | CLASSIFIED=0 | PENDING=14
+- B24 | TESTS | ASSET_COUNT=15 | CLASSIFIED=0 | PENDING=15
 - B25 | SCRATCH | ASSET_COUNT=2 | CLASSIFIED=0 | PENDING=2
 - B26 | DEPLOYMENT_CI | ASSET_COUNT=3 | CLASSIFIED=0 | PENDING=3
 - B27 | ARCHIVE | ASSET_COUNT=58 | CLASSIFIED=0 | PENDING=58
@@ -141,7 +141,8 @@ PER_ASSET_BY_BATCH
 | control-center/SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md | Records read-only SEE-001 inspection of Scout-Edge runtime paths, forbidden proof sources, and NEEDS IMPLEMENTATION decision for first E2E marriage proof. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","AUDIT"] | ["SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md documents committed runtime entrypoints, missing FIP intake boundary, and defers marriage proof until EMG-001 and EFI-001."] | Validate against EFI-001 intake implementation when separately authorized. |
 | control-center/SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md | Defines the Unified Sports Intelligence Lifecycle Governor law: canonical stages, states, rolling eight-day funnel, public information boundary, safe BOT taxonomy, SMH navigation, Help contract, timing-window conflicts, and football-first multi-sport rollout sequence. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","LIFECYCLE","UI"] | ["SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md seals canonical lifecycle stages, states, eight-day funnel, Help contract, and public boundary.","Contract classifies provisional P1-B01 48-hour rule and records timing conflicts without approving runtime cutoffs.","Contract keeps unified_lifecycle_governor BLOCKED until SEM-GOV-001B."] | Before SEM-GOV-001B runtime implementation, validate lifecycle persistence design against EST-001 retention law and EPI-001 protected surfaces. |
 | control-center/SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md | Defines football lifecycle persistence law: Edge-minted UUID fixture_uid, identity alias registry, current projection and append-only transition events, legal transition matrix, eight-day SAST window, rollover semantics, admission and processing tolerance, and Governor activation sequence per OD-1 through OD-10. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","LIFECYCLE","DATABASE"] | ["SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md seals fixture_uid UUID law, alias registry, transition matrix, and future table shapes.","Contract records owner decisions OD-1 through OD-10 and preserves EST-001 forbidden-persistence law.","Contract keeps unified_lifecycle_governor BLOCKED and forbids R1/R2 migration while supabase_storage_gate BLOCKED."] | Before runtime Governor implementation, validate DDL design against EST-001 retention law and confirm supabase_storage_gate authorization. |
-| control-center/SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1.md | Defines the Lifecycle Governor foundation design: gate reader via controlCenterReadService, pure evaluator contract, persistence adapter interface, rollover worker design, fail-closed ordering, and future implementation sequence I3 through SEM-GOV-001C without runtime code. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","LIFECYCLE"] | ["SEM-GOV-001B-I2 packet documents future lifecycleGovernor, lifecyclePersistenceService, and lifecycleRolloverService files without creating them.","Packet defines readLifecycleGovernorGate and evaluateGovernorGate fail-closed order.","Packet keeps all three governance gates BLOCKED."] | Run node --test tests/sem-gov-001b-governor-foundation-packet.test.js after any I2 packet or sequencing change. |
+| control-center/SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1.md | Defines the Lifecycle Governor foundation design: gate reader via controlCenterReadService, pure evaluator contract, persistence adapter interface, rollover worker design, fail-closed ordering, and future implementation sequence I3 through SEM-GOV-001C. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","LIFECYCLE"] | ["SEM-GOV-001B-I2 packet documents future lifecycleGovernor, lifecyclePersistenceService, and lifecycleRolloverService without creating them.","Packet defines readLifecycleGovernorGate and evaluateGovernorGate fail-closed order.","Packet keeps all three governance gates BLOCKED."] | Run node --test tests/sem-gov-001b-governor-foundation-packet.test.js after any I2 packet or sequencing change. |
+| control-center/SEM-GOV-001B-I4_SUPABASE_FREE_TIER_CAPACITY_AND_RETENTION_DESIGN.v1.md | Defines Supabase free-tier capacity and retention design for I4 lifecycle persistence: verified 167 MB baseline, normal and conservative growth models, bounded purge law, resource controls, and HOLD activation decision. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","DATABASE"] | ["Packet models four lifecycle tables only with 167 MB dashboard baseline.","Normal projected total 186.10 MB below 300 MB preferred ceiling.","Conservative 80/day projected total 470.58 MB exceeds activation ceiling — HOLD.","supabase_storage_gate remains BLOCKED."] | Review after Stephen approval of governed admission/retention cap or before supabase_storage_gate clearance. |
 
 ## B02 BACKEND_DIRECT_FILES
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |
@@ -349,7 +350,6 @@ PER_ASSET_BY_BATCH
 | backend/services/filterEngine.js | Backend service: filterEngine | DATABASE | UNKNOWN | ["DATABASE","SQL","PROVIDER"] | ["Top-level skim: require('../db') \| require('../utils/validation') \| require('@supabase/supabase-js') \| require('../config').","Detected Supabase usage (createClient/from/SQL-like queries)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/fipIntakeService.js | Single fail-closed EFI-001 runtime boundary for accepting validated Scout FIP-001 v1 payloads, verifying hash/provenance/required fields/forbidden origins, and mapping to the Edge analysis envelope. | SCOUT_FIP | CURRENT | ["SERVICE","SCOUT","FIP","RUNTIME","GOVERNANCE"] | ["Exports receiveValidatedFip plus hash/idempotency helpers for EFI-001 validation.","Rejects unsupported schema, non-VALIDATED status, hash mismatch, missing required fields, forbidden origins, and production intake while the marriage gate remains blocked.","Maps accepted payloads to match_info, sharp_odds, contextual_intelligence, and SCOUT_FIP metadata without external provider or database calls."] | EFI-001-I1: keep this as the single fail-closed FIP intake boundary; revalidate schema, hash, forbidden-origin, gate-block, and envelope tests before any route, storage, or E2E proof wiring. |
 | backend/services/fipStoragePolicyService.js | Pure EST-001 Supabase storage-policy enforcement layer that builds minimal R1 provenance and R2 audit records from EFI intake results while forbidding full FIP body, Scout mirror, and provider payload persistence. | SCOUT_FIP | CURRENT | ["SERVICE","SCOUT","FIP","DATABASE","GOVERNANCE"] | ["Exports buildEstStorageRecords for transforming EFI intake results into EST-001 R1/R2 storage-ready evidence.","Rejects full FIP body, Scout mirror, provider payload, and Supabase replay candidate payloads.","Evaluates Supabase budget thresholds at 80%, 95%, and 100% without performing database or Supabase calls.","Does not create migrations, run SQL, call Supabase, wire routes, run E2E proof, or clear gates."] | EST-001-I1: run node --test tests/fip-storage-policy-service.test.js after any storage policy change; do not persist full FIP bodies. |
-| backend/services/lifecycleGovernor.js | Pure SEM-GOV-001B Lifecycle Governor foundation exporting gate-before-flag evaluation, SAST admission window, legal transition matrix, deterministic idempotency, and rollover plan without DB, SQL, Supabase, or pipeline hooks. Pure isolated service foundation; governed as a repository asset. No production runtime caller or pipeline reachability until separately authorized integration. | GOVERNANCE | CURRENT | ["SERVICE","GOVERNANCE","RULEBOOK"] | ["Exports evaluateGovernorGate, calculateSastWindow, calculateDayLabel, evaluateAdmission, evaluateTransition, buildTransitionEvent, and calculateRolloverPlan as pure evaluators.","Gate reader evaluates EDGE_BUILD_CONTROL_LEDGER.v1.json unifiedLifecycleGovernor before LIFECYCLE_GOVERNOR_ENABLED feature flag.","Module forbids direct DB, Supabase, SQL, predictions_raw, direct1x2_prediction_final, fixture_context_cache, aiPipeline, fipIntakeService, and syncService imports."] | SEM-GOV-001B-I3: run node --test tests/lifecycle-governor.test.js after any lifecycle governor evaluator change; do not wire persistence or pipeline hooks until separately authorized. |
 | backend/services/football536Extractor.js | Backend service: football536Extractor | DATABASE | UNKNOWN | ["DATABASE","PROVIDER"] | ["Detected Supabase usage (createClient/from/SQL-like queries)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/football536Service.js | Backend service: football536Service | PROVIDER_INTEGRATION | UNKNOWN | ["PROVIDER","API"] | ["Top-level skim: require('axios').","Detected external HTTP client usage (axios/fetch)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/footballH2HExtractor.js | Backend service: footballH2HExtractor | PROVIDER_INTEGRATION | UNKNOWN | ["PROVIDER"] | ["Skim: file exports service functions and participates in backend pipelines."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
@@ -361,6 +361,7 @@ PER_ASSET_BY_BATCH
 | backend/services/gradingAccuracyCore.js | Grading/accuracy computation service | GRADING_ACCURACY | UNKNOWN | ["GRADING","DATABASE","SQL","PROVIDER"] | ["Detected Supabase usage (createClient/from/SQL-like queries)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/gradingSnapshotService.js | Grading/accuracy computation service | GRADING_ACCURACY | UNKNOWN | ["GRADING","DATABASE","SQL","PROVIDER"] | ["Top-level skim: require('../db') \| require('./gradingAccuracyCore').","Detected Supabase usage (createClient/from/SQL-like queries).","Detected external HTTP client usage (axios/fetch)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/hybridSportsDataService.js | Scheduled job / background maintenance | SCHEDULER_BACKGROUND | UNKNOWN | ["SCHEDULER","BACKGROUND_JOB","PROVIDER","API"] | ["Top-level skim: require('./thesportsdbPipeline') \| require('../utils/apiQueue') \| require('../db') \| require('node-fetch') \| require('../config') \| require('./espnHiddenApiService').","Detected external HTTP client usage (axios/fetch)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
+| backend/services/lifecycleGovernor.js | Pure SEM-GOV-001B Lifecycle Governor foundation exporting gate-before-flag evaluation, SAST admission window, legal transition matrix, deterministic idempotency, and rollover plan without DB, SQL, Supabase, or pipeline hooks. | GOVERNANCE | CURRENT | ["SERVICE","GOVERNANCE","RULEBOOK"] | ["Exports evaluateGovernorGate, calculateSastWindow, calculateDayLabel, evaluateAdmission, evaluateTransition, buildTransitionEvent, and calculateRolloverPlan as pure evaluators.","Gate reader evaluates EDGE_BUILD_CONTROL_LEDGER.v1.json unifiedLifecycleGovernor before LIFECYCLE_GOVERNOR_ENABLED feature flag.","Module forbids direct DB, Supabase, SQL, predictions_raw, direct1x2_prediction_final, fixture_context_cache, aiPipeline, fipIntakeService, and syncService imports."] | SEM-GOV-001B-I3: run node --test tests/lifecycle-governor.test.js after any lifecycle governor evaluator change; do not wire persistence or pipeline hooks until separately authorized. |
 | backend/services/liveFootballApiExtractor.js | Backend service: liveFootballApiExtractor | DATABASE | UNKNOWN | ["DATABASE","PROVIDER"] | ["Detected Supabase usage (createClient/from/SQL-like queries).","Detected external HTTP client usage (axios/fetch)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/liveFootballApiService.js | Backend service: liveFootballApiService | PROVIDER_INTEGRATION | UNKNOWN | ["PROVIDER","API"] | ["Top-level skim: require('axios').","Detected external HTTP client usage (axios/fetch)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/marketIntelligence.js | Backend service: marketIntelligence | DATABASE | UNKNOWN | ["PREDICTION","DATABASE","PROVIDER"] | ["Top-level skim: require('../utils/pipelineLogger').","Detected Supabase usage (createClient/from/SQL-like queries)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
@@ -987,8 +988,8 @@ PER_ASSET_BY_BATCH
 | tests/lifecycle-governor.test.js | Focused Node test coverage for SEM-GOV-001B-I3 pure Lifecycle Governor foundation: gate-before-flag, SAST window, admission, transitions, idempotency, rollover plan, and module isolation from DB, Supabase, SQL, and protected pipeline modules. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","RULEBOOK"] | ["Verifies evaluateGovernorGate fail-closed ordering and feature-flag normalization.","Verifies eight-day SAST labels, football-only admission, 15-minute processing tolerance, legal transition matrix, deterministic SHA-256 idempotency, and rollover duplicate/gap rejection.","Verifies lifecycleGovernor.js source excludes DB, Supabase, SQL, predictions_raw, direct1x2_prediction_final, fixture_context_cache, aiPipeline, fipIntakeService, and syncService imports."] | SEM-GOV-001B-I3: run node --test tests/lifecycle-governor.test.js after any lifecycle governor evaluator change. |
 | tests/p1-b01-configured-fip-input.test.js | Verifies governed Scout FIP configured input, provider bypass, mapped-envelope-only flow, atomic batch rejection and request-contract validation. | TEST_PROOF | CURRENT | ["TEST_PROOF","SCOUT","FIP","RUNTIME","GOVERNANCE","PROVIDER"] | ["Exercises resolveConfiguredPredictionInput via aiPipeline.__test with injected provider and intake dependencies.","Verifies provider path remains active when fip_envelopes is absent and is bypassed when a valid PROOF_FIXTURE batch is supplied.","Verifies atomic batch rejection, malformed request-contract rejection, and mapped-envelope-only output without calling external providers."] | P1-B01: run node --test tests/p1-b01-configured-fip-input.test.js after any governed Scout FIP configured-input or aiPipeline intake-routing change. |
 | tests/sem-gov-001-lifecycle-contract.test.js | Tests the SEM-GOV-001A Unified Sports Intelligence Lifecycle contract and its Control Center registration without importing or mutating runtime code. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","LIFECYCLE"] | ["Test reads SEM-GOV-001 contract and verifies canonical lifecycle law sections.","Test verifies ledger unified_lifecycle_governor BLOCKED and SEM-GOV-001A registration.","Test verifies package control-center test suite includes the focused SEM-GOV proof."] | Run node --test tests/sem-gov-001-lifecycle-contract.test.js and npm run control:verify after any SEM-GOV-001 contract or sequencing change. |
+| tests/sem-gov-001b-governor-foundation-packet.test.js | Tests the SEM-GOV-001B-I2 Lifecycle Governor foundation implementation packet and its Control Center registration without importing or mutating runtime code. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","LIFECYCLE"] | ["Test verifies I2 packet sections and that future runtime files do not exist on disk.","Test verifies ledger registers SEM-GOV-001B-I2 APPROVED with all gates BLOCKED.","Test verifies package control-center test suite includes the focused I2 proof."] | Run node --test tests/sem-gov-001b-governor-foundation-packet.test.js and npm run control:verify after any I2 packet or sequencing change. |
 | tests/sem-gov-001b-lifecycle-persistence-contract.test.js | Tests the SEM-GOV-001B Football Lifecycle Persistence contract and its Control Center registration without importing or mutating runtime code. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","LIFECYCLE"] | ["Test reads SEM-GOV-001B contract and verifies fixture_uid, alias, transition, timing, and gate preservation sections.","Test verifies ledger gates remain BLOCKED and SEM-GOV-001B registration.","Test verifies package control-center test suite includes the focused SEM-GOV-001B proof."] | Run node --test tests/sem-gov-001b-lifecycle-persistence-contract.test.js and npm run control:verify after any SEM-GOV-001B contract or sequencing change. |
-| tests/sem-gov-001b-governor-foundation-packet.test.js | Tests the SEM-GOV-001B-I2 Lifecycle Governor foundation implementation packet, future file plan, gate reader design, and governance registration without importing or mutating runtime code. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","LIFECYCLE"] | ["Test verifies I2 packet sections and that future runtime files do not exist on disk.","Test verifies ledger registers SEM-GOV-001B-I2 APPROVED with all gates BLOCKED.","Test verifies package control-center test suite includes the focused I2 proof."] | Run node --test tests/sem-gov-001b-governor-foundation-packet.test.js and npm run control:verify after any I2 packet or sequencing change. |
 
 ## B25 SCRATCH
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |

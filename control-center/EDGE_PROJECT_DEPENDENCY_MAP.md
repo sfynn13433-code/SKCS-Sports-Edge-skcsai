@@ -175,4 +175,11 @@ Blocks: SEM-GOV-001B-I3
 Status: APPROVED
 Governed by: SEM-GOV-001B-I3
 Blocked by: SEM-GOV-001B-I2
+Blocks: SEM-GOV-001B-I4-CAP
+
+## SEM-GOV-001B-I4-CAP — Supabase Free-Tier Capacity and Retention Design
+
+Status: DONE
+Governed by: SEM-GOV-001B-I4-CAP
+Blocked by: SEM-GOV-001B-I3
 Blocks: none
