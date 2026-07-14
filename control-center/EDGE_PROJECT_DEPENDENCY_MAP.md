@@ -182,4 +182,11 @@ Blocks: SEM-GOV-001B-I4-CAP
 Status: DONE
 Governed by: SEM-GOV-001B-I4-CAP
 Blocked by: SEM-GOV-001B-I3
+Blocks: SEM-GOV-001B-I4-CAP2
+
+## SEM-GOV-001B-I4-CAP2 — 50-Fixture Daily Admission Capacity and Enforcement Design
+
+Status: DONE
+Governed by: SEM-GOV-001B-I4-CAP2
+Blocked by: SEM-GOV-001B-I4-CAP
 Blocks: none

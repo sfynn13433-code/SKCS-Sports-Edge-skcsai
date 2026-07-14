@@ -5,8 +5,8 @@
   "source_command": "git ls-files",
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
-  "tracked_path_count": 932,
-  "registered_asset_count": 928,
+  "tracked_path_count": 933,
+  "registered_asset_count": 929,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -14208,6 +14208,47 @@
         "Packet models four lifecycle tables only with 167 MB dashboard baseline.",
         "Normal projected total 186.10 MB below 300 MB preferred ceiling.",
         "Conservative 80/day projected total 470.58 MB exceeds activation ceiling — HOLD.",
+        "supabase_storage_gate remains BLOCKED."
+      ]
+    },
+    {
+      "asset_path": "control-center/SEM-GOV-001B-I4_CAP2_DAILY_ADMISSION_LIMIT_DESIGN.v1.md",
+      "asset_type": "CONTROL_CENTER",
+      "asset_role": "CONTROL_GOVERNANCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001B-I4-CAP2",
+      "governed_by_control_task_id": "SEM-GOV-001B-I4-CAP2",
+      "related_assets": [
+        "control-center/SEM-GOV-001B-I4_SUPABASE_FREE_TIER_CAPACITY_AND_RETENTION_DESIGN.v1.md",
+        "control-center/SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md",
+        "control-center/SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1.md",
+        "control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "Review before I4 implementation packet or supabase_storage_gate clearance.",
+      "notes": "SEM-GOV-001B-I4-CAP2 governance-only 50/day capacity proof and admission-cap enforcement design. PASS FOR I4 CONTROL CENTER ACTIVATION. No SQL, migrations, counter runtime, or gate clearance.",
+      "purpose_description": "Recalculates lifecycle persistence capacity at 50/day SAST admission ceiling from 167 MB baseline and defines deterministic fail-closed counter enforcement design.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Conservative 50/day projected total 357.10 MB below 380 MB activation ceiling.",
+        "22.90 MB headroom below 380 MB; 42.90 MB below 400 MB hard block.",
+        "Admission-cap enforcement design APPROVED DESIGN; capacity proof TESTED.",
         "supabase_storage_gate remains BLOCKED."
       ]
     },

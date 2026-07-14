@@ -1211,7 +1211,7 @@
         "48-hour FIP horizon unchanged until 001C",
         "LIFECYCLE_GOVERNOR_ENABLED defaults false"
       ],
-      "next_action": "SEM-GOV-001B-C1 contract sealed. SEM-GOV-001B-I2 design packet sealed. SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed. SEM-GOV-001B-I4-CAP closed with HOLD. I4 implementation blocked pending separate 50/day mitigation packet and supabase_storage_gate clearance.",
+      "next_action": "SEM-GOV-001B-C1 contract sealed. SEM-GOV-001B-I2 design packet sealed. SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed. SEM-GOV-001B-I4-CAP closed with HOLD. SEM-GOV-001B-I4-CAP2 closed with PASS FOR I4 CONTROL CENTER ACTIVATION. I4 implementation blocked pending separate implementation packet and supabase_storage_gate clearance.",
       "owner_note": "fixture_uid is Edge-minted UUID. Aliases are not primary keys. Football first.",
       "last_updated": "2026-07-14"
     },
@@ -1343,7 +1343,7 @@
         "unified_lifecycle_governor remains BLOCKED",
         "I4-CAP capacity design HOLD — conservative 80/day exceeds activation ceiling"
       ],
-      "next_action": "SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed. SEM-GOV-001B-I4-CAP closed with HOLD. I4 implementation blocked pending separate 50/day mitigation packet.",
+      "next_action": "SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed. SEM-GOV-001B-I4-CAP closed with HOLD. SEM-GOV-001B-I4-CAP2 closed with PASS FOR I4 CONTROL CENTER ACTIVATION. I4 implementation blocked pending separate implementation packet and supabase_storage_gate clearance.",
       "owner_note": "Pure evaluators only. Gate before flag. No DB while blocked.",
       "last_updated": "2026-07-14"
     },
@@ -1357,7 +1357,9 @@
       "blocked_by": [
         "SEM-GOV-001B-I3"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001B-I4-CAP2"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -1403,13 +1405,78 @@
       "open_gaps": [
         "supabase_storage_gate remains BLOCKED",
         "unified_lifecycle_governor remains BLOCKED",
-        "Separate 50/day capacity recalculation and enforcement-design packet required before gate clearance",
+        "50/day admission enforcement design approved in CAP2 — runtime implementation not yet authorized",
         "No persistence adapter or DDL (SEM-GOV-001B-I4 implementation)",
         "No purge service implementation",
         "No Scout FIP pipeline hooks (SEM-GOV-001C)"
       ],
-      "next_action": "SEM-GOV-001B-I4-CAP closed with HOLD. Separate governed mitigation packet required for 50/day admission enforcement design before supabase_storage_gate clearance and I4 implementation.",
-      "owner_note": "Closed HOLD. 167 MB baseline. 80/day unconstrained evidence preserved. 50/day owner direction only — not enforced.",
+      "next_action": "SEM-GOV-001B-I4-CAP closed with HOLD. SEM-GOV-001B-I4-CAP2 closed with PASS FOR I4 CONTROL CENTER ACTIVATION. I4 implementation blocked pending separate implementation packet and supabase_storage_gate clearance.",
+      "owner_note": "Closed HOLD. 167 MB baseline. 80/day unconstrained evidence preserved. 50/day capacity proof and enforcement design sealed in CAP2 — not implemented.",
+      "last_updated": "2026-07-14"
+    },
+    {
+      "task_id": "SEM-GOV-001B-I4-CAP2",
+      "task_name": "50-Fixture Daily Admission Capacity and Enforcement Design",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001: recalculate Supabase free-tier capacity at the owner-selected 50/day SAST admission ceiling from the sealed 167 MB baseline, and define deterministic fail-closed admission-cap enforcement design — without SQL, migrations, tables, counter runtime, or gate clearance.",
+      "status": "DONE",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001B-I4-CAP"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "database"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1",
+        "SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001B-I4_SUPABASE_FREE_TIER_CAPACITY_AND_RETENTION_DESIGN.v1",
+        "SEM-GOV-001B-I4_CAP2_DAILY_ADMISSION_LIMIT_DESIGN.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
+      ],
+      "affected_files": [
+        "control-center/SEM-GOV-001B-I4_CAP2_DAILY_ADMISSION_LIMIT_DESIGN.v1.md",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
+        "control-center/EDGE_PROJECT_BACKLOG.md",
+        "control-center/EDGE_PROJECT_DEPENDENCY_MAP.md"
+      ],
+      "affected_tables": [],
+      "completion_definition": "SEM-GOV-001B-I4-CAP2 seals the 50/day capacity recalculation from 167 MB baseline, SAST admission-cap law, counter persistence design, atomic transaction sequence, audit and monitoring design, and PASS FOR I4 CONTROL CENTER ACTIVATION decision — without SQL, migrations, tables, counter runtime, persistence adapter, or gate clearance.",
+      "proof_required": [
+        "control-center/SEM-GOV-001B-I4_CAP2_DAILY_ADMISSION_LIMIT_DESIGN.v1.md exists and validates",
+        "Conservative 50/day projected total below 380 MB with required headroom",
+        "Admission-cap enforcement design APPROVED DESIGN",
+        "All three governance gates remain BLOCKED in ledger",
+        "SEM-GOV-001B-I4-CAP2 registered in ledger and master project register",
+        "npm run control:center passes",
+        "SEM-GOV contract regression tests pass",
+        "npm run verify:rulebook passes"
+      ],
+      "current_evidence": [
+        "SEM-GOV-001B-I4-CAP2 sealed control-center/SEM-GOV-001B-I4_CAP2_DAILY_ADMISSION_LIMIT_DESIGN.v1.md",
+        "50/day conservative projected total 357.10 MB — 22.90 MB headroom below 380 MB activation ceiling",
+        "42.90 MB headroom below 400 MB hard block",
+        "Transition-event growth bounded at 108,000 steady-state rows",
+        "SAST calendar-day admission-cap law and counter design APPROVED DESIGN",
+        "capacity proof TESTED",
+        "supabase_storage_gate remains BLOCKED",
+        "unified_lifecycle_governor remains BLOCKED",
+        "I4 implementation remains BLOCKED"
+      ],
+      "open_gaps": [
+        "supabase_storage_gate remains BLOCKED",
+        "unified_lifecycle_governor remains BLOCKED",
+        "Counter runtime and persistence adapter not implemented (SEM-GOV-001B-I4 implementation packet)",
+        "No purge service implementation",
+        "No Scout FIP pipeline hooks (SEM-GOV-001C)"
+      ],
+      "next_action": "SEM-GOV-001B-I4-CAP2 closed with PASS FOR I4 CONTROL CENTER ACTIVATION. I4 implementation blocked pending separate implementation packet and supabase_storage_gate clearance.",
+      "owner_note": "50/day capacity proof TESTED. Enforcement design APPROVED DESIGN only — not implemented. No gate clearance.",
       "last_updated": "2026-07-14"
     }
   ]
