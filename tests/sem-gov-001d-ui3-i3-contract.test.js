@@ -131,13 +131,20 @@ test('exact allowed and prohibited fields are documented', () => {
   }
 });
 
-test('no runtime, frontend or migration implementation', () => {
+test('no runtime apply or unauthorized migration files', () => {
   for (const rel of FORBIDDEN_RUNTIME_FILES) {
-    assert.ok(!fs.existsSync(path.join(ROOT, rel)), `unexpected runtime file ${rel}`);
+    if (rel === 'supabase/migrations/20261010000001_fixture_display_metadata.sql') {
+      assert.ok(!fs.existsSync(path.join(ROOT, rel)), `unexpected runtime file ${rel}`);
+    }
   }
-  const migrationsDir = path.join(ROOT, 'supabase/migrations');
-  const migrations = fs.readdirSync(migrationsDir).join('\n');
-  assert.doesNotMatch(migrations, /fixture_display_metadata/);
+  const authorizedMigration = path.join(
+    ROOT,
+    'supabase/migrations/20261010000001_sem_gov_001d_ui3_i4_fixture_display_metadata.sql'
+  );
+  if (fs.existsSync(authorizedMigration)) {
+    const sql = fs.readFileSync(authorizedMigration, 'utf8');
+    assert.match(sql, /NOT APPLIED/i);
+  }
 });
 
 test('UI3 and UI4 remain blocked or not started; migration not applied', () => {

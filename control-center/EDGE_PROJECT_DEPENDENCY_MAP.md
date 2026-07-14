@@ -253,4 +253,12 @@ Status: TESTED
 Governed by: SEM-GOV-001D-UI3-I4
 Blocked by: SEM-GOV-001D-UI3-I3
 Blocks: none
-Notes: PASS WITH CORRECTION. D3 fixture_display_metadata schema design sealed. FK CASCADE to fixture_lifecycle_current. Persistence service interface documented. Idempotency and stale-update law sealed. Migration NOT AUTHORIZED. Lifecycle migration NOT APPLIED. EFI-001 NOT IMPLEMENTED. UI3/UI4 NOT STARTED. All gates BLOCKED.
+Notes: PASS WITH CORRECTION. D3 fixture_display_metadata schema design sealed. FK CASCADE to fixture_lifecycle_current. Persistence service interface documented. Migration NOT AUTHORIZED. Lifecycle migration NOT APPLIED. EFI-001 NOT IMPLEMENTED. UI3/UI4 NOT STARTED. All gates BLOCKED.
+
+## SEM-GOV-001D-UI3-I5 — Source B Migration and Isolated Persistence Implementation
+
+Status: TESTED
+Governed by: SEM-GOV-001D-UI3-I5
+Blocked by: SEM-GOV-001D-UI3-I4
+Blocks: none
+Notes: PASS WITH CORRECTION. 25 physical columns in migration SQL. fixtureDisplayMetadataPersistenceService implemented. Mock-first tests pass. Migration NOT APPLIED. No production caller. Lifecycle migration NOT APPLIED. All gates BLOCKED.

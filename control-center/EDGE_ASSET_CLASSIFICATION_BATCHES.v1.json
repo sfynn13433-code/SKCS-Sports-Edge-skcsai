@@ -14,7 +14,7 @@
           "control-center/"
         ]
       },
-      "asset_count": 35,
+      "asset_count": 36,
       "asset_paths": [
         "control-center/check_control_center.js",
         "control-center/check_edge_asset_classification.js",
@@ -53,7 +53,8 @@
         "control-center/SEM-GOV-001D-UI3-I1_LIFECYCLE_READ_MODEL_API_INSPECTION_AND_CONTRACT.v1.md",
         "control-center/SEM-GOV-001D-UI3-I2_CANONICAL_FIXTURE_METADATA_PROJECTION_INSPECTION_AND_CONTRACT.v1.md",
         "control-center/SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1.md",
-        "control-center/SEM-GOV-001D-UI3-I4_SOURCE_B_SCHEMA_AND_PERSISTENCE_IMPLEMENTATION_DESIGN.v1.md"
+        "control-center/SEM-GOV-001D-UI3-I4_SOURCE_B_SCHEMA_AND_PERSISTENCE_IMPLEMENTATION_DESIGN.v1.md",
+        "control-center/SEM-GOV-001D-UI3-I5_SOURCE_B_MIGRATION_AND_ISOLATED_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md"
       ]
     },
     {
@@ -307,7 +308,7 @@
           "backend/services/"
         ]
       },
-      "asset_count": 90,
+      "asset_count": 91,
       "asset_paths": [
         "backend/services/accaBuilder.js",
         "backend/services/accaMathUtils.js",
@@ -350,6 +351,7 @@
         "backend/services/filterEngine.js",
         "backend/services/fipIntakeService.js",
         "backend/services/fipStoragePolicyService.js",
+        "backend/services/fixtureDisplayMetadataPersistenceService.js",
         "backend/services/lifecycleGovernor.js",
         "backend/services/lifecyclePersistenceService.js",
         "backend/services/football536Extractor.js",
@@ -1128,7 +1130,7 @@
           "supabase/migrations/"
         ]
       },
-      "asset_count": 62,
+      "asset_count": 63,
       "asset_paths": [
         "supabase/migrations/20260415000001_create_insight_usage.sql",
         "supabase/migrations/20260418000002_update_predictions_final_risk_level_check.sql",
@@ -1191,7 +1193,8 @@
         "supabase/migrations/20261006000000_sportsdataio_contract_alignment.sql",
         "supabase/migrations/20261006000001_canonical_events.sql",
         "supabase/migrations/20261007000000_user_experience_feedback.sql",
-        "supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql"
+        "supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql",
+        "supabase/migrations/20261010000001_sem_gov_001d_ui3_i4_fixture_display_metadata.sql"
       ]
     },
     {
@@ -1238,7 +1241,7 @@
           "tests/"
         ]
       },
-      "asset_count": 25,
+      "asset_count": 27,
       "asset_paths": [
         "tests/edge-asset-classification.test.js",
         "tests/edge-control-center-ledger.test.js",
@@ -1264,7 +1267,9 @@
         "tests/sem-gov-001d-ui3-i1-contract.test.js",
         "tests/sem-gov-001d-ui3-i2-contract.test.js",
         "tests/sem-gov-001d-ui3-i3-contract.test.js",
-        "tests/sem-gov-001d-ui3-i4-contract.test.js"
+        "tests/sem-gov-001d-ui3-i4-contract.test.js",
+        "tests/sem-gov-001d-ui3-i5-implementation-packet.test.js",
+        "tests/fixture-display-metadata-persistence-service.test.js"
       ]
     },
     {

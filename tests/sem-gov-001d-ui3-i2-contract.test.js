@@ -163,10 +163,23 @@ test('no runtime, frontend or migration files are added', () => {
   assert.ok(fs.existsSync(publicDir));
   assert.ok(fs.existsSync(supabaseMigrations));
   const migrationFiles = fs.readdirSync(supabaseMigrations);
-  assert.doesNotMatch(
-    migrationFiles.join('\n'),
-    /fixture_display_metadata|fixture_metadata_projection/i
+  const unauthorized = migrationFiles.filter(
+    (f) =>
+      /fixture_display_metadata|fixture_metadata_projection/i.test(f) &&
+      f !== '20261010000001_sem_gov_001d_ui3_i4_fixture_display_metadata.sql'
   );
+  assert.equal(
+    unauthorized.length,
+    0,
+    `unexpected migration files: ${unauthorized.join(', ')}`
+  );
+  const authorized = path.join(
+    supabaseMigrations,
+    '20261010000001_sem_gov_001d_ui3_i4_fixture_display_metadata.sql'
+  );
+  if (fs.existsSync(authorized)) {
+    assert.match(fs.readFileSync(authorized, 'utf8'), /NOT APPLIED/i);
+  }
 });
 
 test('ledger registers SEM-GOV-001D-UI3-I2 with blocked gates', () => {

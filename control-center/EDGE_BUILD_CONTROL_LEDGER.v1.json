@@ -1913,7 +1913,9 @@
       "blocked_by": [
         "SEM-GOV-001D-UI3-I3"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI3-I5"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -1958,8 +1960,69 @@
         "UI3 read-model service not implemented",
         "public_fixture_id resolver BLOCKED"
       ],
-      "next_action": "SEM-GOV-001D-UI3-I4 PASS WITH CORRECTION. D3 migration implementation NOT AUTHORIZED pending separate packet.",
+      "next_action": "SEM-GOV-001D-UI3-I4 PASS WITH CORRECTION. UI3-I5 implementation authorized.",
       "owner_note": "Design packet and guard test only.",
+      "last_updated": "2026-07-14"
+    },
+    {
+      "task_id": "SEM-GOV-001D-UI3-I5",
+      "task_name": "Source B Migration and Isolated Persistence Implementation",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: author D3 fixture_display_metadata migration and isolated fixtureDisplayMetadataPersistenceService with mock-first tests — without migration apply, production caller, or gate clearance.",
+      "status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I4"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "database",
+        "backend"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-UI3-I4_SOURCE_B_SCHEMA_AND_PERSISTENCE_IMPLEMENTATION_DESIGN.v1",
+        "SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1",
+        "SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
+      ],
+      "affected_files": [
+        "supabase/migrations/20261010000001_sem_gov_001d_ui3_i4_fixture_display_metadata.sql",
+        "backend/services/fixtureDisplayMetadataPersistenceService.js",
+        "tests/fixture-display-metadata-persistence-service.test.js",
+        "control-center/SEM-GOV-001D-UI3-I5_SOURCE_B_MIGRATION_AND_ISOLATED_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md",
+        "tests/sem-gov-001d-ui3-i5-implementation-packet.test.js",
+        "package.json"
+      ],
+      "affected_tables": [
+        "fixture_display_metadata"
+      ],
+      "completion_definition": "SEM-GOV-001D-UI3-I5 PASS WITH CORRECTION — migration authored, persistence service implemented, migration NOT APPLIED, gates BLOCKED.",
+      "proof_required": [
+        "npm run test:sem-gov-001d-ui3-i5 passes",
+        "25-column schema in migration SQL",
+        "No production caller",
+        "All gates BLOCKED"
+      ],
+      "current_evidence": [
+        "D3 migration SQL authored",
+        "fixtureDisplayMetadataPersistenceService implemented",
+        "Mock-first tests pass",
+        "Migration NOT APPLIED",
+        "Lifecycle migration NOT APPLIED",
+        "All gates BLOCKED"
+      ],
+      "open_gaps": [
+        "Migration apply blocked by supabase_storage_gate",
+        "Lifecycle migration NOT APPLIED",
+        "EFI-001 intake not implemented",
+        "D3 purge runtime not implemented",
+        "UI3 read-model service not implemented"
+      ],
+      "next_action": "SEM-GOV-001D-UI3-I5 PASS WITH CORRECTION. Migration apply NOT AUTHORIZED.",
+      "owner_note": "Isolated implementation only.",
       "last_updated": "2026-07-14"
     }
   ]

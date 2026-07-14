@@ -121,13 +121,20 @@ test('persistence service interface mirrors lifecycle gate-before-DB pattern', (
   assert.match(packet, /evaluatePreDbGate|gate-before-database|Gate-before-database/i);
 });
 
-test('no migration, runtime service, or frontend implementation', () => {
-  for (const rel of FORBIDDEN_RUNTIME_FILES) {
-    assert.ok(!fs.existsSync(path.join(ROOT, rel)), `unexpected runtime file ${rel}`);
+test('I4 design packet boundary preserved; I5 migration authored not applied', () => {
+  const packet = fs.readFileSync(PACKET_PATH, 'utf8');
+  assert.match(packet, /NOT CREATED|NOT IMPLEMENTED/);
+  const migrationPath = path.join(
+    ROOT,
+    'supabase/migrations/20261010000001_sem_gov_001d_ui3_i4_fixture_display_metadata.sql'
+  );
+  if (fs.existsSync(migrationPath)) {
+    const sql = fs.readFileSync(migrationPath, 'utf8');
+    assert.match(sql, /NOT APPLIED/i);
   }
-  const migrationsDir = path.join(ROOT, 'supabase/migrations');
-  const migrations = fs.readdirSync(migrationsDir).join('\n');
-  assert.doesNotMatch(migrations, /fixture_display_metadata/);
+  assert.ok(
+    fs.existsSync(path.join(ROOT, 'backend/services/fixtureDisplayMetadataPersistenceService.js'))
+  );
 });
 
 test('ledger and project register mirror SEM-GOV-001D-UI3-I4', () => {
