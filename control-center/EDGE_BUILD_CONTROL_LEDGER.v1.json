@@ -2159,7 +2159,9 @@
       "blocked_by": [
         "SEM-GOV-001D-UI3-I7"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI3-I9"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -2206,11 +2208,68 @@
       "open_gaps": [
         "HTTP intake route",
         "Migration apply blocked",
-        "Marriage gate clearance",
-        "Production composition root"
+        "Marriage gate clearance"
       ],
-      "next_action": "SEM-GOV-001D-UI3-I8 PASS WITH CORRECTION. Migration apply NOT AUTHORIZED.",
+      "next_action": "SEM-GOV-001D-UI3-I8 PASS WITH CORRECTION. Composition root authorized in UI3-I9.",
       "owner_note": "Isolated evidence storage foundation only.",
+      "last_updated": "2026-07-14"
+    },
+    {
+      "task_id": "SEM-GOV-001D-UI3-I9",
+      "task_name": "Production Composition and M2M Auth Foundation",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: wire isolated governed FIP intake composition root with HMAC M2M authenticator — no route, migration apply, or production activation.",
+      "status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I8"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "backend"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-UI3-I8_DURABLE_INTAKE_EVIDENCE_STORAGE_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001D-UI3-I7_GOVERNED_FIP_INTAKE_ADAPTER_IMPLEMENTATION_PACKET.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I9_PRODUCTION_COMPOSITION_AND_M2M_AUTH_FOUNDATION_PACKET.v1"
+      ],
+      "affected_files": [
+        "backend/services/fipIntakeM2MAuthenticator.js",
+        "backend/services/governedFipIntakeComposition.js",
+        "tests/fip-intake-m2m-authenticator.test.js",
+        "tests/governed-fip-intake-composition.test.js",
+        "control-center/SEM-GOV-001D-UI3-I9_PRODUCTION_COMPOSITION_AND_M2M_AUTH_FOUNDATION_PACKET.v1.md",
+        "tests/sem-gov-001d-ui3-i9-implementation-packet.test.js",
+        "package.json"
+      ],
+      "affected_tables": [],
+      "completion_definition": "SEM-GOV-001D-UI3-I9 PASS — composition and M2M auth implemented, feature flag disabled by default, no route or production caller, gates BLOCKED.",
+      "proof_required": [
+        "npm run test:sem-gov-001d-ui3-i9 passes",
+        "No secrets in source",
+        "Feature flag fail-closed",
+        "All gates BLOCKED"
+      ],
+      "current_evidence": [
+        "governedFipIntakeComposition implemented",
+        "fipIntakeM2MAuthenticator implemented",
+        "Mock-first tests pass",
+        "No HTTP route",
+        "No production caller",
+        "All gates BLOCKED"
+      ],
+      "open_gaps": [
+        "HTTP intake route",
+        "Migration apply blocked",
+        "Marriage gate clearance",
+        "Feature flag enablement"
+      ],
+      "next_action": "SEM-GOV-001D-UI3-I9 PASS. HTTP boundary NOT AUTHORIZED.",
+      "owner_note": "Isolated composition foundation only.",
       "last_updated": "2026-07-14"
     }
   ]

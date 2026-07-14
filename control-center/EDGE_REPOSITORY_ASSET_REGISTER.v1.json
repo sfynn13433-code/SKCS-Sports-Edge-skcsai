@@ -5,8 +5,8 @@
   "source_command": "git ls-files",
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
-  "tracked_path_count": 978,
-  "registered_asset_count": 974,
+  "tracked_path_count": 984,
+  "registered_asset_count": 980,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -33136,6 +33136,242 @@
       "classification_evidence": [
         "Verifies packet sections",
         "Verifies evidence service exists",
+        "Verifies ledger registration"
+      ]
+    },
+    {
+      "asset_path": "backend/services/fipIntakeM2MAuthenticator.js",
+      "asset_type": "SOURCE_CODE",
+      "asset_role": "APPLICATION_SOURCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I9",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I9",
+      "related_assets": [
+        "backend/services/governedFipIntakeComposition.js",
+        "tests/fip-intake-m2m-authenticator.test.js"
+      ],
+      "related_tables": [],
+      "related_functions": [
+        "createHmacM2MAuthenticator",
+        "authorizeCaller",
+        "buildSigningPayload",
+        "computeSignature"
+      ],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [
+        "render"
+      ],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i9 after authenticator change",
+      "notes": "HMAC M2M auth with injected secretResolver and nonceStore. No process.env.",
+      "purpose_description": "Verifies bounded machine-authentication context for governed FIP intake callers.",
+      "functional_group": "BACKEND_RUNTIME",
+      "relationship_tags": [
+        "BACKEND",
+        "LIFECYCLE",
+        "SECURITY"
+      ],
+      "classification_evidence": [
+        "HMAC-SHA256 signing",
+        "Nonce replay prevention",
+        "No secrets in source"
+      ]
+    },
+    {
+      "asset_path": "backend/services/governedFipIntakeComposition.js",
+      "asset_type": "SOURCE_CODE",
+      "asset_role": "APPLICATION_SOURCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I9",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I9",
+      "related_assets": [
+        "backend/services/governedFipIntakeAdapter.js",
+        "backend/services/fipIntakeM2MAuthenticator.js",
+        "tests/governed-fip-intake-composition.test.js"
+      ],
+      "related_tables": [],
+      "related_functions": [
+        "createGovernedFipIntakeComposition"
+      ],
+      "runtime_consumers": [],
+      "runtime_dependencies": [
+        "backend/services/governedFipIntakeAdapter.js",
+        "backend/services/fipIntakeEvidenceService.js",
+        "backend/services/fixtureDisplayMetadataPersistenceService.js",
+        "backend/services/fixtureIdentityResolverService.js"
+      ],
+      "database_objects": [],
+      "deployment_surface": [
+        "render"
+      ],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i9 after composition change",
+      "notes": "Isolated composition root. Feature flag disabled by default. No route.",
+      "purpose_description": "Wires adapter, authenticator, identity resolver, D3 persistence, and evidence recorder.",
+      "functional_group": "BACKEND_RUNTIME",
+      "relationship_tags": [
+        "BACKEND",
+        "LIFECYCLE"
+      ],
+      "classification_evidence": [
+        "Fail-closed activation surface",
+        "No router/listen/fetch",
+        "Mock-first tests"
+      ]
+    },
+    {
+      "asset_path": "tests/fip-intake-m2m-authenticator.test.js",
+      "asset_type": "TEST",
+      "asset_role": "CONTROL_AUDIT",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I9",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I9",
+      "related_assets": [
+        "backend/services/fipIntakeM2MAuthenticator.js"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i9 after authenticator change",
+      "notes": "Mock-first M2M authenticator tests.",
+      "purpose_description": "Verifies HMAC auth acceptance, replay rejection, and caller validation.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "SECURITY"
+      ],
+      "classification_evidence": [
+        "Valid HMAC acceptance",
+        "Replay rejection",
+        "Unknown caller rejection"
+      ]
+    },
+    {
+      "asset_path": "tests/governed-fip-intake-composition.test.js",
+      "asset_type": "TEST",
+      "asset_role": "CONTROL_AUDIT",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I9",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I9",
+      "related_assets": [
+        "backend/services/governedFipIntakeComposition.js"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i9 after composition change",
+      "notes": "Mock-first composition wiring tests.",
+      "purpose_description": "Verifies fail-closed defaults, component exposure, and zero DB on disabled feature.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "LIFECYCLE"
+      ],
+      "classification_evidence": [
+        "Feature flag disabled default",
+        "Zero DB on reject",
+        "No route surface"
+      ]
+    },
+    {
+      "asset_path": "control-center/SEM-GOV-001D-UI3-I9_PRODUCTION_COMPOSITION_AND_M2M_AUTH_FOUNDATION_PACKET.v1.md",
+      "asset_type": "DOCUMENTATION",
+      "asset_role": "GOVERNANCE_PACKET",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I9",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I9",
+      "related_assets": [
+        "tests/sem-gov-001d-ui3-i9-implementation-packet.test.js"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i9 after packet change",
+      "notes": "I9 closure packet PASS.",
+      "purpose_description": "Seals composition root and M2M auth foundation with fail-closed boundaries.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE",
+        "LIFECYCLE",
+        "SECURITY"
+      ],
+      "classification_evidence": [
+        "PASS",
+        "No route",
+        "Feature flag disabled",
+        "All gates BLOCKED"
+      ]
+    },
+    {
+      "asset_path": "tests/sem-gov-001d-ui3-i9-implementation-packet.test.js",
+      "asset_type": "TEST",
+      "asset_role": "CONTROL_AUDIT",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I9",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I9",
+      "related_assets": [
+        "control-center/SEM-GOV-001D-UI3-I9_PRODUCTION_COMPOSITION_AND_M2M_AUTH_FOUNDATION_PACKET.v1.md"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i9 after UI3-I9 packet change",
+      "notes": "Packet guard test for SEM-GOV-001D-UI3-I9 closure.",
+      "purpose_description": "Guards UI3-I9 PASS, composition files, and blocked gates.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "LIFECYCLE"
+      ],
+      "classification_evidence": [
+        "Verifies packet sections",
+        "Verifies composition files exist",
         "Verifies ledger registration"
       ]
     }

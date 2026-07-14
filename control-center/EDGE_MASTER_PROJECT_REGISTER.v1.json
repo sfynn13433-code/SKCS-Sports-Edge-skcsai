@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 39,
+  "project_count": 40,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -2294,7 +2294,9 @@
       "blocked_by": [
         "SEM-GOV-001D-UI3-I7"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI3-I9"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -2323,7 +2325,6 @@
       "known_issues": [
         "Migration NOT APPLIED",
         "No HTTP intake route",
-        "No production composition root",
         "All gates BLOCKED"
       ],
       "required_decisions": [
@@ -2341,7 +2342,7 @@
         "Intake evidence could be lost or duplicated without durable R2 authority"
       ],
       "recommended_order": 39,
-      "next_action": "SEM-GOV-001D-UI3-I8 PASS WITH CORRECTION. Migration apply NOT AUTHORIZED.",
+      "next_action": "SEM-GOV-001D-UI3-I8 PASS WITH CORRECTION. Composition root authorized in UI3-I9.",
       "owner_note": "Isolated evidence storage foundation only.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I8",
@@ -2349,6 +2350,71 @@
         "Migration and service implemented",
         "Mock-first tests pass",
         "Migration NOT APPLIED"
+      ]
+    },
+    {
+      "project_id": "SEM-GOV-001D-UI3-I9",
+      "project_name": "Production Composition and M2M Auth Foundation",
+      "category": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: wire isolated governed FIP intake composition root with HMAC M2M authenticator — no route or production activation.",
+      "why_it_matters": "Production intake requires a composition root and machine authentication before HTTP boundary authorization.",
+      "current_status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I8"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "backend"
+      ],
+      "related_tasks": [
+        "SEM-GOV-001D-UI3-I9"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-UI3-I9_PRODUCTION_COMPOSITION_AND_M2M_AUTH_FOUNDATION_PACKET.v1",
+        "SEM-GOV-001D-UI3-I8_DURABLE_INTAKE_EVIDENCE_STORAGE_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001D-UI3-I7_GOVERNED_FIP_INTAKE_ADAPTER_IMPLEMENTATION_PACKET.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1"
+      ],
+      "related_files": [
+        "backend/services/governedFipIntakeComposition.js",
+        "backend/services/fipIntakeM2MAuthenticator.js",
+        "tests/governed-fip-intake-composition.test.js",
+        "tests/fip-intake-m2m-authenticator.test.js"
+      ],
+      "related_tables": [],
+      "known_issues": [
+        "No HTTP intake route",
+        "Feature flag disabled by default",
+        "Migrations NOT APPLIED",
+        "All gates BLOCKED"
+      ],
+      "required_decisions": [
+        "HTTP boundary authorization",
+        "Feature flag enablement",
+        "Marriage gate clearance"
+      ],
+      "completion_definition": "SEM-GOV-001D-UI3-I9 PASS — composition and M2M auth implemented with fail-closed defaults.",
+      "proof_required": [
+        "test:sem-gov-001d-ui3-i9 passes",
+        "No secrets in source",
+        "Gates BLOCKED"
+      ],
+      "risks_if_ignored": [
+        "Intake could be wired without authenticated caller verification"
+      ],
+      "recommended_order": 40,
+      "next_action": "SEM-GOV-001D-UI3-I9 PASS. HTTP boundary NOT AUTHORIZED.",
+      "owner_note": "Isolated composition foundation only.",
+      "last_updated": "2026-07-14",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I9",
+      "current_evidence": [
+        "Composition and authenticator implemented",
+        "Mock-first tests pass",
+        "No production caller"
       ]
     }
   ]
