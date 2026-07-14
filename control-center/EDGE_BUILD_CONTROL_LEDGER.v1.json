@@ -1736,6 +1736,59 @@
       "next_action": "SEM-GOV-001D-HOME1 home landing TESTED. UI3/UI4 NOT STARTED.",
       "owner_note": "Static home only. Hub files untouched.",
       "last_updated": "2026-07-14"
+    },
+    {
+      "task_id": "SEM-GOV-001D-UI3-I1",
+      "task_name": "Lifecycle Read-Model API Inspection and Contract",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: read-only inspection of lifecycle API readiness, blocker registry, and sealed public read-model contract — without routes, services, migration apply, or gate clearance.",
+      "status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-HOME1",
+        "SEM-GOV-001B-I4"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I1_LIFECYCLE_READ_MODEL_API_INSPECTION_AND_CONTRACT.v1"
+      ],
+      "affected_files": [
+        "control-center/SEM-GOV-001D-UI3-I1_LIFECYCLE_READ_MODEL_API_INSPECTION_AND_CONTRACT.v1.md",
+        "tests/sem-gov-001d-ui3-i1-contract.test.js",
+        "package.json"
+      ],
+      "affected_tables": [],
+      "completion_definition": "SEM-GOV-001D-UI3-I1 seals inspection PASS WITH BLOCKER and read-model API contract — UI3/UI4 implementation NOT STARTED, migration NOT APPLIED, gates BLOCKED.",
+      "proof_required": [
+        "npm run test:sem-gov-001d-ui3-i1 passes",
+        "npm run test:sem-gov-001d-ui1 passes",
+        "No /api/lifecycle route mounted",
+        "All gates BLOCKED"
+      ],
+      "current_evidence": [
+        "Read-only inspection findings recorded",
+        "Two-source read-model law sealed",
+        "No lifecycle route or read-model service implemented",
+        "Migration NOT APPLIED",
+        "UI3/UI4 NOT STARTED",
+        "All gates BLOCKED"
+      ],
+      "open_gaps": [
+        "Canonical fixture metadata projection not proven",
+        "public_fixture_id resolver design BLOCKED",
+        "Migration not applied",
+        "UI3 read-model service not implemented",
+        "UI4 live integration not started"
+      ],
+      "next_action": "SEM-GOV-001D-UI3-I1 inspection PASS WITH BLOCKER. UI3 implementation BLOCKED pending metadata projection, identifier design, migration apply, and gate clearance.",
+      "owner_note": "Inspection and contract only. No API implementation.",
+      "last_updated": "2026-07-14"
     }
   ]
 }

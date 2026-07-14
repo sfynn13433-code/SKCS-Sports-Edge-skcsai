@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 31,
+  "project_count": 32,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -1830,6 +1830,68 @@
       "current_evidence": [
         "Hub-aligned dark index.html",
         "HOME1 tests pass",
+        "Migration NOT APPLIED"
+      ]
+    },
+    {
+      "project_id": "SEM-GOV-001D-UI3-I1",
+      "project_name": "Lifecycle Read-Model API Inspection and Contract",
+      "category": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: read-only inspection closure and sealed lifecycle read-model API contract with two-source law and blocker registry — no routes or services.",
+      "why_it_matters": "UI4 live Hub integration must not invent API sources, fields, or fallbacks before a governed read-model contract exists.",
+      "current_status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-HOME1",
+        "SEM-GOV-001B-I4"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center"
+      ],
+      "related_tasks": [
+        "SEM-GOV-001D-UI3-I1"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I1_LIFECYCLE_READ_MODEL_API_INSPECTION_AND_CONTRACT.v1"
+      ],
+      "related_files": [
+        "control-center/SEM-GOV-001D-UI3-I1_LIFECYCLE_READ_MODEL_API_INSPECTION_AND_CONTRACT.v1.md",
+        "tests/sem-gov-001d-ui3-i1-contract.test.js"
+      ],
+      "related_tables": [],
+      "known_issues": [
+        "No lifecycle route mounted",
+        "fixture_lifecycle_current lacks public fixture metadata columns",
+        "Canonical fixture_uid-to-metadata join not proven",
+        "public_fixture_id resolver BLOCKED"
+      ],
+      "required_decisions": [
+        "Canonical fixture metadata projection approval",
+        "Non-reversible public_fixture_id design",
+        "UI3 implementation authorization after blockers cleared"
+      ],
+      "completion_definition": "SEM-GOV-001D-UI3-I1 inspection PASS WITH BLOCKER with packet guard test and Control Center registration — UI3/UI4 NOT STARTED.",
+      "proof_required": [
+        "test:sem-gov-001d-ui3-i1 passes",
+        "Gates BLOCKED",
+        "Migration NOT APPLIED"
+      ],
+      "risks_if_ignored": [
+        "Live API could expose persistence rows, Scout identifiers, or unsafe fallback sources"
+      ],
+      "recommended_order": 32,
+      "next_action": "SEM-GOV-001D-UI3-I1 PASS WITH BLOCKER. UI3 implementation BLOCKED.",
+      "owner_note": "Inspection and contract only.",
+      "last_updated": "2026-07-14",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I1",
+      "current_evidence": [
+        "Inspection findings sealed",
+        "Two-source read-model law documented",
+        "No backend lifecycle route implemented",
         "Migration NOT APPLIED"
       ]
     }

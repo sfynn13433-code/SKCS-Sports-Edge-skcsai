@@ -222,3 +222,11 @@ Governed by: SEM-GOV-001D-HOME1
 Blocked by: SEM-GOV-001D-UI2
 Blocks: none
 Notes: Hub-aligned dark home landing TESTED. Static preview only. Hub files unchanged. UI3/UI4 NOT STARTED. Migration NOT APPLIED. All gates BLOCKED.
+
+## SEM-GOV-001D-UI3-I1 — Lifecycle Read-Model API Inspection and Contract
+
+Status: TESTED
+Governed by: SEM-GOV-001D-UI3-I1
+Blocked by: SEM-GOV-001D-HOME1, SEM-GOV-001B-I4
+Blocks: none
+Notes: Inspection PASS WITH BLOCKER. Two-source read-model contract sealed. No lifecycle route mounted. UI3/UI4 implementation NOT STARTED. Migration NOT APPLIED. public_fixture_id resolver BLOCKED. All gates BLOCKED.
