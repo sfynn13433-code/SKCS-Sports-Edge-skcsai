@@ -1,14 +1,14 @@
 # Edge System Runtime Map
 
 Inventory version: 1.0.0
-Inventory SHA-256: e3791b80de65abd077874303ab645c197daa22544965b2e1a7d7356635dbdbf7
+Inventory SHA-256: 907bc6ffc290ccb29f4b32fc40558ab3c258cb4431f1882b922983ab83e217d0
 
 > Synchronized review surface for `EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json`.
 > This map is observational and does not declare future Edge architecture or canonical authority.
 
 ## Summary
 
-- Runtime/system surfaces: 221
+- Runtime/system surfaces: 222
 - Candidate status establishes authority: false
 - Inventory declares future architecture: false
 
@@ -2847,6 +2847,19 @@ Inventory SHA-256: e3791b80de65abd077874303ab645c197daa22544965b2e1a7d7356635dbd
 - Database objects: IF, public.user_experience_feedback
 - External providers: None recorded
 - Next validation: Revalidate runtime reachability and relationships during the next governed Edge architecture review.
+
+### supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql
+
+- Surface classes: DATABASE_SURFACE
+- Reachability: CANDIDATE
+- Source state: COMMITTED_REPOSITORY
+- Governed by: SEM-GOV-001B-I4
+- Runtime callers: None recorded
+- Runtime consumers: None recorded
+- Database role: MIGRATION
+- Database objects: IF
+- External providers: None recorded
+- Next validation: Apply only after supabase_storage_gate clearance; revalidate reachability if production migration path is authorized.
 
 ### supabase/schema/ai_pipeline_schema.sql
 

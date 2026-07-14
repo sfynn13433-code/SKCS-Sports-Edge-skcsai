@@ -26,11 +26,14 @@ const PACKET_FUTURE_FILES = [
   'tests/lifecycle-rollover-service.test.js'
 ];
 
-const I4_I5_FUTURE_FILES = [
-  'backend/services/lifecyclePersistenceService.js',
+const I5_FUTURE_FILES = [
   'backend/services/lifecycleRolloverService.js',
-  'tests/lifecycle-persistence-service.test.js',
   'tests/lifecycle-rollover-service.test.js'
+];
+
+const I4_IMPLEMENTATION_FILES = [
+  'backend/services/lifecyclePersistenceService.js',
+  'tests/lifecycle-persistence-service.test.js'
 ];
 
 const PROTECTED_RUNTIME_FILES = [
@@ -67,12 +70,25 @@ test('packet documents future file plan and forbids creating I4/I5 files during 
   for (const rel of PACKET_FUTURE_FILES) {
     assert.ok(packet.includes(rel), `packet must list future file: ${rel}`);
   }
-  for (const rel of I4_I5_FUTURE_FILES) {
+  for (const rel of I5_FUTURE_FILES) {
     assert.equal(
       fs.existsSync(path.join(ROOT, rel)),
       false,
-      `I4/I5 future file must not exist yet: ${rel}`
+      `I5 future file must not exist yet: ${rel}`
     );
+  }
+  const i4Packet = path.join(
+    ROOT,
+    'control-center/SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md'
+  );
+  if (!fs.existsSync(i4Packet)) {
+    for (const rel of I4_IMPLEMENTATION_FILES) {
+      assert.equal(
+        fs.existsSync(path.join(ROOT, rel)),
+        false,
+        `I4 future file must not exist before I4 packet: ${rel}`
+      );
+    }
   }
   assert.match(packet, /MUST NOT\*\* be created/i);
 });

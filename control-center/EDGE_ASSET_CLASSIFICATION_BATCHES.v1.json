@@ -14,7 +14,7 @@
           "control-center/"
         ]
       },
-      "asset_count": 30,
+      "asset_count": 31,
       "asset_paths": [
         "control-center/check_control_center.js",
         "control-center/check_edge_asset_classification.js",
@@ -45,7 +45,8 @@
         "control-center/SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md",
         "control-center/SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1.md",
         "control-center/SEM-GOV-001B-I4_SUPABASE_FREE_TIER_CAPACITY_AND_RETENTION_DESIGN.v1.md",
-        "control-center/SEM-GOV-001B-I4_CAP2_DAILY_ADMISSION_LIMIT_DESIGN.v1.md"
+        "control-center/SEM-GOV-001B-I4_CAP2_DAILY_ADMISSION_LIMIT_DESIGN.v1.md",
+        "control-center/SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md"
       ]
     },
     {
@@ -299,7 +300,7 @@
           "backend/services/"
         ]
       },
-      "asset_count": 89,
+      "asset_count": 90,
       "asset_paths": [
         "backend/services/accaBuilder.js",
         "backend/services/accaMathUtils.js",
@@ -343,6 +344,7 @@
         "backend/services/fipIntakeService.js",
         "backend/services/fipStoragePolicyService.js",
         "backend/services/lifecycleGovernor.js",
+        "backend/services/lifecyclePersistenceService.js",
         "backend/services/football536Extractor.js",
         "backend/services/football536Service.js",
         "backend/services/footballH2HExtractor.js",
@@ -1113,7 +1115,7 @@
           "supabase/migrations/"
         ]
       },
-      "asset_count": 61,
+      "asset_count": 62,
       "asset_paths": [
         "supabase/migrations/20260415000001_create_insight_usage.sql",
         "supabase/migrations/20260418000002_update_predictions_final_risk_level_check.sql",
@@ -1175,7 +1177,8 @@
         "supabase/migrations/20261005000001_fix_calculate_team_strength_ambiguity.sql",
         "supabase/migrations/20261006000000_sportsdataio_contract_alignment.sql",
         "supabase/migrations/20261006000001_canonical_events.sql",
-        "supabase/migrations/20261007000000_user_experience_feedback.sql"
+        "supabase/migrations/20261007000000_user_experience_feedback.sql",
+        "supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql"
       ]
     },
     {
@@ -1222,7 +1225,7 @@
           "tests/"
         ]
       },
-      "asset_count": 14,
+      "asset_count": 16,
       "asset_paths": [
         "tests/edge-asset-classification.test.js",
         "tests/edge-control-center-ledger.test.js",
@@ -1235,9 +1238,11 @@
         "tests/fip-intake-service.test.js",
         "tests/fip-storage-policy-service.test.js",
         "tests/lifecycle-governor.test.js",
+        "tests/lifecycle-persistence-service.test.js",
         "tests/sem-gov-001-lifecycle-contract.test.js",
         "tests/sem-gov-001b-lifecycle-persistence-contract.test.js",
-        "tests/sem-gov-001b-governor-foundation-packet.test.js"
+        "tests/sem-gov-001b-governor-foundation-packet.test.js",
+        "tests/sem-gov-001b-i4-lifecycle-persistence-implementation-packet.test.js"
       ]
     },
     {

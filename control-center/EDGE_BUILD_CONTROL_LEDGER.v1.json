@@ -1424,7 +1424,9 @@
       "blocked_by": [
         "SEM-GOV-001B-I4-CAP"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001B-I4"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -1475,8 +1477,90 @@
         "No purge service implementation",
         "No Scout FIP pipeline hooks (SEM-GOV-001C)"
       ],
-      "next_action": "SEM-GOV-001B-I4-CAP2 closed with PASS FOR I4 CONTROL CENTER ACTIVATION. I4 implementation blocked pending separate implementation packet and supabase_storage_gate clearance.",
+      "next_action": "SEM-GOV-001B-I4-CAP2 closed with PASS FOR I4 CONTROL CENTER ACTIVATION. SEM-GOV-001B-I4 implementation foundation TESTED; migration authored NOT APPLIED; production activation BLOCKED.",
       "owner_note": "50/day capacity proof TESTED. Enforcement design APPROVED DESIGN only — not implemented. No gate clearance.",
+      "last_updated": "2026-07-14"
+    },
+    {
+      "task_id": "SEM-GOV-001B-I4",
+      "task_name": "Lifecycle Persistence Implementation",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001: implement isolated lifecycle persistence foundation behind dependency injection — gate-before-database admission orchestration, immutable fixture_uid, alias resolution, durable admission idempotency, atomic lifecycle admission, 50-new-fixtures-per-SAST-day enforcement, atomic transition-event and projection updates, rollover storage adapter methods only — without production caller or Supabase migration apply.",
+      "status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001B-I4-CAP2"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "database",
+        "backend"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1",
+        "SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001B-I4_SUPABASE_FREE_TIER_CAPACITY_AND_RETENTION_DESIGN.v1",
+        "SEM-GOV-001B-I4_CAP2_DAILY_ADMISSION_LIMIT_DESIGN.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
+      ],
+      "affected_files": [
+        "control-center/SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md",
+        "backend/services/lifecyclePersistenceService.js",
+        "supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql",
+        "tests/lifecycle-persistence-service.test.js",
+        "tests/sem-gov-001b-i4-lifecycle-persistence-implementation-packet.test.js",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
+        "control-center/EDGE_PROJECT_BACKLOG.md",
+        "control-center/EDGE_PROJECT_DEPENDENCY_MAP.md",
+        "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
+        "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
+        "control-center/EDGE_ASSET_REPOSITORY_MAP.md",
+        "control-center/EDGE_CONTROL_CENTER.md",
+        "package.json"
+      ],
+      "affected_tables": [
+        "fixture_lifecycle_current",
+        "fixture_identity_aliases",
+        "fixture_lifecycle_transition_events",
+        "fixture_lifecycle_rollover_events",
+        "lifecycle_daily_admission_counters",
+        "lifecycle_admission_idempotency"
+      ],
+      "completion_definition": "SEM-GOV-001B-I4 seals isolated lifecycle persistence implementation foundation TESTED with migration SQL authored NOT APPLIED, mock-first proofs for admission cap, idempotency, alias safety, atomic transitions, and rollover storage adapter only — without production caller, gate clearance, or Supabase mutation.",
+      "proof_required": [
+        "control-center/SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md exists and validates",
+        "backend/services/lifecyclePersistenceService.js exists with gate-before-DB admission and transition orchestration",
+        "Migration defines exactly six lifecycle tables and is not applied",
+        "npm run test:lifecycle-persistence passes",
+        "All three governance gates remain BLOCKED in ledger",
+        "SEM-GOV-001B-I4 registered in ledger and master project register",
+        "npm run control:center passes",
+        "npm run verify:rulebook passes"
+      ],
+      "current_evidence": [
+        "SEM-GOV-001B-I4 sealed control-center/SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md",
+        "lifecyclePersistenceService.js implements admitFixture and applyTransition with DI and gate-before-DB law",
+        "Migration 20261008000001_sem_gov_001b_lifecycle_persistence.sql authored — NOT APPLIED",
+        "Mock-first tests prove admission 50/51, idempotency, alias reuse, atomic transitions, zero DB on gate rejection",
+        "supabase_storage_gate remains BLOCKED",
+        "unified_lifecycle_governor remains BLOCKED",
+        "scout_edge_marriage_gate remains BLOCKED",
+        "No production runtime caller introduced"
+      ],
+      "open_gaps": [
+        "supabase_storage_gate remains BLOCKED — migration not applied",
+        "unified_lifecycle_governor remains BLOCKED — no production caller",
+        "No purge service (I4-PURGE)",
+        "No rollover worker (I5)",
+        "No Scout FIP pipeline hooks (SEM-GOV-001C)"
+      ],
+      "next_action": "SEM-GOV-001B-I4 implementation foundation TESTED. Migration authored NOT APPLIED. Production activation BLOCKED pending supabase_storage_gate clearance and separate authorization.",
+      "owner_note": "Foundation only. Six tables authored. Gates remain BLOCKED. No Supabase apply.",
       "last_updated": "2026-07-14"
     }
   ]

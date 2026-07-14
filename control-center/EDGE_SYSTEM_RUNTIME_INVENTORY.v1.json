@@ -8532,6 +8532,40 @@
       }
     },
     {
+      "asset_path": "supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql",
+      "source_state": "COMMITTED_REPOSITORY",
+      "surface_classes": [
+        "DATABASE_SURFACE"
+      ],
+      "reachability_state": "CANDIDATE",
+      "mount_paths": [],
+      "runtime_callers": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "external_providers": [],
+      "environment_key_names": [],
+      "database_role": "MIGRATION",
+      "database_objects": [
+        "IF"
+      ],
+      "schedule_or_trigger": "",
+      "deployment_surface": "",
+      "governance_reachability_type": "NONE",
+      "governed_by_control_task_id": "SEM-GOV-001B-I4",
+      "next_validation": "Apply only after supabase_storage_gate clearance; revalidate reachability if production migration path is authorized.",
+      "evidence": [
+        "Authored SEM-GOV-001B-I4 lifecycle persistence DDL only; migration not applied at I4 closure.",
+        "No runtime callers, schedule, or deployment surface recorded.",
+        "supabase_storage_gate remains BLOCKED."
+      ],
+      "notes": "SEM-GOV-001B-I4 material database schema surface. Authored migration SQL only — not executed, not production-enabled, no active runtime execution.",
+      "relationship_evidence_provenance": {
+        "source_content_sha256": "f704c93fb71dde22cbfca678f6c7e0edae38530f8099785b98cb907503923c38",
+        "relationship_evidence_sha256": "ae6a55996e82bbe2394b9ab486c684606a4146fe6136c740038d095294313802",
+        "captured_source_presence_state": "PRESENT_TRACKED"
+      }
+    },
+    {
       "asset_path": "supabase/schema/ai_pipeline_schema.sql",
       "source_state": "COMMITTED_REPOSITORY",
       "surface_classes": [

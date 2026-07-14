@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 27,
+  "project_count": 28,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -1525,7 +1525,9 @@
       "blocked_by": [
         "SEM-GOV-001B-I4-CAP"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001B-I4"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -1571,7 +1573,84 @@
         "SEM-GOV-001B-I4-CAP2 sealed control-center/SEM-GOV-001B-I4_CAP2_DAILY_ADMISSION_LIMIT_DESIGN.v1.md",
         "Conservative 50/day projected total 357.10 MB with 22.90 MB headroom below 380 MB",
         "SAST admission-cap law and lifecycle_daily_admission_counters design APPROVED DESIGN",
-        "supabase_storage_gate remains BLOCKED; I4 implementation remains BLOCKED"
+        "supabase_storage_gate remains BLOCKED; I4 implementation foundation TESTED"
+      ]
+    },
+    {
+      "project_id": "SEM-GOV-001B-I4",
+      "project_name": "Lifecycle Persistence Implementation",
+      "category": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001: implement isolated lifecycle persistence foundation behind dependency injection with gate-before-DB admission, durable idempotency, 50/day SAST cap, and atomic transitions — migration authored NOT APPLIED, no production caller.",
+      "why_it_matters": "Without tested persistence foundation and six-table DDL, lifecycle governor cannot durably admit fixtures or record transitions while respecting Free-Tier capacity law.",
+      "current_status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001B-I4-CAP2"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "database",
+        "backend"
+      ],
+      "related_tasks": [
+        "SEM-GOV-001B-I4"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1",
+        "SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001B-I4_SUPABASE_FREE_TIER_CAPACITY_AND_RETENTION_DESIGN.v1",
+        "SEM-GOV-001B-I4_CAP2_DAILY_ADMISSION_LIMIT_DESIGN.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
+      ],
+      "related_files": [
+        "control-center/SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md",
+        "backend/services/lifecyclePersistenceService.js",
+        "supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql",
+        "tests/lifecycle-persistence-service.test.js",
+        "tests/sem-gov-001b-i4-lifecycle-persistence-implementation-packet.test.js"
+      ],
+      "related_tables": [
+        "fixture_lifecycle_current",
+        "fixture_identity_aliases",
+        "fixture_lifecycle_transition_events",
+        "fixture_lifecycle_rollover_events",
+        "lifecycle_daily_admission_counters",
+        "lifecycle_admission_idempotency"
+      ],
+      "known_issues": [
+        "supabase_storage_gate BLOCKED — migration not applied",
+        "unified_lifecycle_governor BLOCKED — no production caller"
+      ],
+      "required_decisions": [
+        "supabase_storage_gate clearance before migration apply",
+        "Separate authorization before production caller wiring"
+      ],
+      "completion_definition": "SEM-GOV-001B-I4 seals isolated persistence foundation TESTED with six-table migration authored NOT APPLIED, mock-first proofs, and all gates BLOCKED.",
+      "proof_required": [
+        "Implementation packet sealed",
+        "lifecyclePersistenceService.js with gate-before-DB law",
+        "Six-table migration authored NOT APPLIED",
+        "test:lifecycle-persistence passes",
+        "All gates BLOCKED"
+      ],
+      "risks_if_ignored": [
+        "Premature migration apply could breach Free-Tier capacity without gate clearance",
+        "Production caller before governor gate clearance could bypass fail-closed ordering"
+      ],
+      "recommended_order": 28,
+      "next_action": "SEM-GOV-001B-I4 implementation foundation TESTED. Migration authored NOT APPLIED. Production activation BLOCKED pending supabase_storage_gate clearance.",
+      "owner_note": "Foundation only. No Supabase apply. No production caller.",
+      "last_updated": "2026-07-14",
+      "governed_by_control_task_id": "SEM-GOV-001B-I4",
+      "current_evidence": [
+        "SEM-GOV-001B-I4 sealed implementation packet and persistence service",
+        "Migration 20261008000001 authored — NOT APPLIED",
+        "Mock-first admission cap, idempotency, and transition proofs pass",
+        "supabase_storage_gate remains BLOCKED; unified_lifecycle_governor remains BLOCKED"
       ]
     }
   ]
