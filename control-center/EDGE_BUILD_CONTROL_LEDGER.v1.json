@@ -1856,7 +1856,9 @@
       "blocked_by": [
         "SEM-GOV-001D-UI3-I2"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI3-I4"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -1897,8 +1899,67 @@
         "UI3 read-model service not implemented",
         "public_fixture_id resolver BLOCKED"
       ],
-      "next_action": "SEM-GOV-001D-UI3-I3 PASS WITH CORRECTION. D3 table migration NOT AUTHORIZED pending separate implementation packet.",
+      "next_action": "SEM-GOV-001D-UI3-I3 PASS WITH CORRECTION. D3 schema design packet SEM-GOV-001D-UI3-I4 authorized.",
       "owner_note": "Storage policy and EST-001 amendment only.",
+      "last_updated": "2026-07-14"
+    },
+    {
+      "task_id": "SEM-GOV-001D-UI3-I4",
+      "task_name": "Source B Schema and Persistence Implementation Design",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: implementation-ready design for D3 public.fixture_display_metadata and future persistence service aligned with lifecycle persistence architecture — without migration, runtime, EFI-001, or gate clearance.",
+      "status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I3"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "database"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-UI3-I1_LIFECYCLE_READ_MODEL_API_INSPECTION_AND_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I2_CANONICAL_FIXTURE_METADATA_PROJECTION_INSPECTION_AND_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I4_SOURCE_B_SCHEMA_AND_PERSISTENCE_IMPLEMENTATION_DESIGN.v1",
+        "SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1"
+      ],
+      "affected_files": [
+        "control-center/SEM-GOV-001D-UI3-I4_SOURCE_B_SCHEMA_AND_PERSISTENCE_IMPLEMENTATION_DESIGN.v1.md",
+        "tests/sem-gov-001d-ui3-i4-contract.test.js",
+        "package.json"
+      ],
+      "affected_tables": [],
+      "completion_definition": "SEM-GOV-001D-UI3-I4 seals PASS WITH CORRECTION design for fixture_display_metadata and persistence service — migration NOT AUTHORIZED, gates BLOCKED.",
+      "proof_required": [
+        "npm run test:sem-gov-001d-ui3-i4 passes",
+        "Schema design documents FK CASCADE and RLS",
+        "No migration or runtime files created",
+        "All gates BLOCKED"
+      ],
+      "current_evidence": [
+        "D3 schema design sealed",
+        "Persistence service interface documented",
+        "Idempotency and stale-update law documented",
+        "fixture_display_metadata reserved not created",
+        "Lifecycle migration NOT APPLIED",
+        "All gates BLOCKED"
+      ],
+      "open_gaps": [
+        "D3 migration not authorized",
+        "Persistence service not implemented",
+        "EFI-001 intake not implemented",
+        "D3 purge runtime not implemented",
+        "UI3 read-model service not implemented",
+        "public_fixture_id resolver BLOCKED"
+      ],
+      "next_action": "SEM-GOV-001D-UI3-I4 PASS WITH CORRECTION. D3 migration implementation NOT AUTHORIZED pending separate packet.",
+      "owner_note": "Design packet and guard test only.",
       "last_updated": "2026-07-14"
     }
   ]

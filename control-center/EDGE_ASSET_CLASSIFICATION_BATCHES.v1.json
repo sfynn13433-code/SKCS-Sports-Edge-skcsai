@@ -14,7 +14,7 @@
           "control-center/"
         ]
       },
-      "asset_count": 34,
+      "asset_count": 35,
       "asset_paths": [
         "control-center/check_control_center.js",
         "control-center/check_edge_asset_classification.js",
@@ -52,7 +52,8 @@
         "control-center/SEM-GOV-001D-HOME1_HOME_PAGE_INFORMATION_ARCHITECTURE_AND_VISUAL_CONSOLIDATION.v1.md",
         "control-center/SEM-GOV-001D-UI3-I1_LIFECYCLE_READ_MODEL_API_INSPECTION_AND_CONTRACT.v1.md",
         "control-center/SEM-GOV-001D-UI3-I2_CANONICAL_FIXTURE_METADATA_PROJECTION_INSPECTION_AND_CONTRACT.v1.md",
-        "control-center/SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1.md"
+        "control-center/SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1.md",
+        "control-center/SEM-GOV-001D-UI3-I4_SOURCE_B_SCHEMA_AND_PERSISTENCE_IMPLEMENTATION_DESIGN.v1.md"
       ]
     },
     {
@@ -1237,7 +1238,7 @@
           "tests/"
         ]
       },
-      "asset_count": 24,
+      "asset_count": 25,
       "asset_paths": [
         "tests/edge-asset-classification.test.js",
         "tests/edge-control-center-ledger.test.js",
@@ -1262,7 +1263,8 @@
         "tests/sem-gov-001d-ui2-visual-acceptance.test.js",
         "tests/sem-gov-001d-ui3-i1-contract.test.js",
         "tests/sem-gov-001d-ui3-i2-contract.test.js",
-        "tests/sem-gov-001d-ui3-i3-contract.test.js"
+        "tests/sem-gov-001d-ui3-i3-contract.test.js",
+        "tests/sem-gov-001d-ui3-i4-contract.test.js"
       ]
     },
     {

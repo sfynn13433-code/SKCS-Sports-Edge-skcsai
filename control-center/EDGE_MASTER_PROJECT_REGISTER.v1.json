@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 34,
+  "project_count": 35,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -2018,6 +2018,67 @@
         "D3 class sealed in EST-001",
         "30-day post-closure retention law",
         "20.50 MB headroom preserved"
+      ]
+    },
+    {
+      "project_id": "SEM-GOV-001D-UI3-I4",
+      "project_name": "Source B Schema and Persistence Implementation Design",
+      "category": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: implementation-ready design for D3 fixture_display_metadata table and future persistence service — no migration apply or runtime implementation.",
+      "why_it_matters": "Source B persistence requires an exact schema, upsert law, and service interface aligned with lifecycle persistence before any migration or EFI-001 wiring.",
+      "current_status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I3"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "database"
+      ],
+      "related_tasks": [
+        "SEM-GOV-001D-UI3-I4"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I4_SOURCE_B_SCHEMA_AND_PERSISTENCE_IMPLEMENTATION_DESIGN.v1",
+        "SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1"
+      ],
+      "related_files": [
+        "control-center/SEM-GOV-001D-UI3-I4_SOURCE_B_SCHEMA_AND_PERSISTENCE_IMPLEMENTATION_DESIGN.v1.md",
+        "tests/sem-gov-001d-ui3-i4-contract.test.js"
+      ],
+      "related_tables": [],
+      "known_issues": [
+        "fixture_display_metadata reserved not created",
+        "Lifecycle migration NOT APPLIED",
+        "supabase_storage_gate BLOCKED"
+      ],
+      "required_decisions": [
+        "D3 migration implementation packet",
+        "Lifecycle migration apply before FK activation"
+      ],
+      "completion_definition": "SEM-GOV-001D-UI3-I4 PASS WITH CORRECTION with schema design, service interface, and packet guard test.",
+      "proof_required": [
+        "test:sem-gov-001d-ui3-i4 passes",
+        "FK CASCADE and RLS documented",
+        "Gates BLOCKED"
+      ],
+      "risks_if_ignored": [
+        "D3 implementation could diverge from lifecycle persistence patterns or retention law"
+      ],
+      "recommended_order": 35,
+      "next_action": "SEM-GOV-001D-UI3-I4 PASS WITH CORRECTION. D3 migration NOT AUTHORIZED.",
+      "owner_note": "Design only.",
+      "last_updated": "2026-07-14",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I4",
+      "current_evidence": [
+        "Schema design sealed",
+        "Persistence service interface documented",
+        "Idempotency law documented"
       ]
     }
   ]

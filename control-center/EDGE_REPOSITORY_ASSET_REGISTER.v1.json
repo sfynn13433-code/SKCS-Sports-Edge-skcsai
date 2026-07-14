@@ -5,8 +5,8 @@
   "source_command": "git ls-files",
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
-  "tracked_path_count": 952,
-  "registered_asset_count": 954,
+  "tracked_path_count": 960,
+  "registered_asset_count": 956,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -32275,6 +32275,86 @@
         "Verifies EST-001 D3 recognition",
         "Verifies no migration files added"
       ]
+    },
+    {
+      "asset_path": "control-center/SEM-GOV-001D-UI3-I4_SOURCE_B_SCHEMA_AND_PERSISTENCE_IMPLEMENTATION_DESIGN.v1.md",
+      "asset_type": "CONTROL_CENTER",
+      "asset_role": "CONTROL_GOVERNANCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I4",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I4",
+      "related_assets": [
+        "control-center/SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1.md",
+        "control-center/SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md",
+        "control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md",
+        "tests/sem-gov-001d-ui3-i4-contract.test.js"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i4 after UI3-I4 packet or registration change",
+      "notes": "UI3-I4 PASS WITH CORRECTION. D3 schema design sealed. No migration. Gates BLOCKED.",
+      "purpose_description": "Seals implementation-ready D3 fixture_display_metadata schema, persistence service interface, and upsert law without migration or runtime.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE",
+        "LIFECYCLE",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Documents FK CASCADE and RLS",
+        "Documents idempotency and stale-update law",
+        "Documents EFI-001 intake boundary",
+        "Verifies migration NOT AUTHORIZED"
+      ]
+    },
+    {
+      "asset_path": "tests/sem-gov-001d-ui3-i4-contract.test.js",
+      "asset_type": "TEST",
+      "asset_role": "CONTROL_AUDIT",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I4",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I4",
+      "related_assets": [
+        "control-center/SEM-GOV-001D-UI3-I4_SOURCE_B_SCHEMA_AND_PERSISTENCE_IMPLEMENTATION_DESIGN.v1.md",
+        "control-center/SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1.md"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i4 after UI3-I4 packet or registration change",
+      "notes": "Packet guard test for SEM-GOV-001D-UI3-I4 schema design closure.",
+      "purpose_description": "Guards UI3-I4 PASS WITH CORRECTION, schema design, service interface, and no runtime implementation.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "LIFECYCLE",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Verifies schema sections and FK law",
+        "Verifies idempotency law",
+        "Verifies no migration files added",
+        "Verifies ledger registration"
+      ]
     }
   ],
   "explicit_exclusions": [
@@ -32611,6 +32691,78 @@
       },
       {
         "asset_path": "try_regions.js",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "evidence-home1-scratch/desktop-1440x900-hero-repair.png",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "evidence-home1-scratch/desktop-1440x900.png",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "evidence-home1-scratch/desktop-fullpage.png",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "evidence-home1-scratch/mobile-390x844.png",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "evidence-home1-scratch/tablet-768x1024.png",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "evidence/sem-gov-001d-ui2-vr1/desktop-1440x1200-today.png",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "evidence/sem-gov-001d-ui2-vr1/desktop-1440x900.png",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "evidence/sem-gov-001d-ui2-vr1/mobile-390x844.png",
+        "source_state": "PRE_EXISTING_UNTRACKED",
+        "candidate_disposition": "PRESERVED_CANDIDATE",
+        "governed_by_control_task_id": "EPR-001",
+        "next_validation": "EPR-001 governed workspace candidate review: decide preserve evidence, explicitly exclude, or register later; evidence of discovery only.",
+        "notes": "Observed as a non-ignored pre-existing untracked workspace candidate. This record preserves evidence of path discovery only; it does not establish permanent asset ownership, runtime use, or authority classification."
+      },
+      {
+        "asset_path": "evidence/sem-gov-001d-ui2-vr1/tablet-768x1024.png",
         "source_state": "PRE_EXISTING_UNTRACKED",
         "candidate_disposition": "PRESERVED_CANDIDATE",
         "governed_by_control_task_id": "EPR-001",
