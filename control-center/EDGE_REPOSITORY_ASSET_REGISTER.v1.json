@@ -5,8 +5,8 @@
   "source_command": "git ls-files",
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
-  "tracked_path_count": 940,
-  "registered_asset_count": 936,
+  "tracked_path_count": 947,
+  "registered_asset_count": 943,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -31595,6 +31595,282 @@
       "classification_evidence": [
         "Vercel config defines `buildCommand: npm run build`, output `public`, and a cron entry for `/api/pipeline/run-full` scheduled as `0 2 * * 1`.",
         "Defines `rewrites` for `/api/*` passthrough and SPA-like route rewrites (e.g., `/subscribe` and `/terms`), plus function `api/pipeline/run-full.js` max duration."
+      ]
+    },
+    {
+      "asset_path": "control-center/SEM-GOV-001D-UI2_STATIC_SPORTS_MATCH_HUB_IMPLEMENTATION_PACKET.v1.md",
+      "asset_type": "CONTROL_CENTER",
+      "asset_role": "CONTROL_GOVERNANCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI2",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI2",
+      "related_assets": [
+        "control-center/SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1.md",
+        "public/sports-match-hub.html",
+        "tests/sem-gov-001d-ui2-static-hub.test.js"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui2 after UI2 changes",
+      "notes": "UI2 static implementation TESTED. Mock only. Gates BLOCKED.",
+      "purpose_description": "Seals static Sports Match Hub implementation scope and Definition of Done.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE",
+        "LIFECYCLE",
+        "FRONTEND"
+      ],
+      "classification_evidence": [
+        "Static mock fixtures only",
+        "No fetch or API",
+        "UI3/UI4 NOT STARTED"
+      ]
+    },
+    {
+      "asset_path": "public/sports-match-hub.html",
+      "asset_type": "SOURCE_CODE",
+      "asset_role": "APPLICATION_SOURCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI2",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI2",
+      "related_assets": [
+        "public/css/sports-match-hub.css",
+        "public/js/sports-match-hub.js",
+        "public/js/sports-match-hub-mock-data.js"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [
+        "VERCEL_STATIC"
+      ],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "UI2 visual acceptance after Hub changes",
+      "notes": "Dedicated lifecycle Hub page. Mock data only.",
+      "purpose_description": "Static Sports Match Hub page with lifecycle day navigation and fixture cards.",
+      "functional_group": "USER_INTERFACE",
+      "relationship_tags": [
+        "FRONTEND",
+        "LIFECYCLE",
+        "UI"
+      ],
+      "classification_evidence": [
+        "References isolated sports-match-hub assets only",
+        "No smh-hub.js or /api/ calls"
+      ]
+    },
+    {
+      "asset_path": "public/css/sports-match-hub.css",
+      "asset_type": "SOURCE_CODE",
+      "asset_role": "APPLICATION_SOURCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI2",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI2",
+      "related_assets": [
+        "public/sports-match-hub.html"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [
+        "VERCEL_STATIC"
+      ],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "UI2 responsive checks after CSS changes",
+      "notes": "Isolated Hub stylesheet.",
+      "purpose_description": "Responsive and accessible styles for Sports Match Hub.",
+      "functional_group": "USER_INTERFACE",
+      "relationship_tags": [
+        "FRONTEND",
+        "CSS",
+        "LIFECYCLE"
+      ],
+      "classification_evidence": [
+        "44px touch targets",
+        "reduced-motion support",
+        "lifecycle badge colors with text"
+      ]
+    },
+    {
+      "asset_path": "public/js/sports-match-hub.js",
+      "asset_type": "SOURCE_CODE",
+      "asset_role": "APPLICATION_SOURCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI2",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI2",
+      "related_assets": [
+        "public/js/sports-match-hub-mock-data.js",
+        "public/sports-match-hub.html"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [
+        "VERCEL_STATIC"
+      ],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui2 after controller changes",
+      "notes": "Mock-only controller. No network calls.",
+      "purpose_description": "Hub UI controller: day tabs, filters, fixture cards, detail, a11y.",
+      "functional_group": "USER_INTERFACE",
+      "relationship_tags": [
+        "FRONTEND",
+        "JAVASCRIPT",
+        "LIFECYCLE"
+      ],
+      "classification_evidence": [
+        "No fetch XMLHttpRequest supabase or /api/",
+        "URL state for day and filters"
+      ]
+    },
+    {
+      "asset_path": "public/js/sports-match-hub-mock-data.js",
+      "asset_type": "SOURCE_CODE",
+      "asset_role": "APPLICATION_SOURCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI2",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI2",
+      "related_assets": [
+        "public/js/sports-match-hub.js"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [
+        "VERCEL_STATIC"
+      ],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui2 after mock data changes",
+      "notes": "Governed public DTO mock fixtures.",
+      "purpose_description": "Deterministic mock fixtures covering all lifecycle states.",
+      "functional_group": "USER_INTERFACE",
+      "relationship_tags": [
+        "FRONTEND",
+        "JAVASCRIPT",
+        "LIFECYCLE"
+      ],
+      "classification_evidence": [
+        "public_fixture_id only",
+        "No fixture_uid confidence or probability"
+      ]
+    },
+    {
+      "asset_path": "tests/sem-gov-001d-ui2-static-hub.test.js",
+      "asset_type": "TEST",
+      "asset_role": "TEST_PROOF",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI2",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI2",
+      "related_assets": [
+        "control-center/SEM-GOV-001D-UI2_STATIC_SPORTS_MATCH_HUB_IMPLEMENTATION_PACKET.v1.md",
+        "public/sports-match-hub.html"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [
+        "node:test",
+        "node:assert/strict",
+        "node:fs",
+        "node:path"
+      ],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui2",
+      "notes": "UI2 static contract guard test.",
+      "purpose_description": "Guards UI2 file boundary, lifecycle mappings, no API callers, landmarks.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "FRONTEND",
+        "LIFECYCLE"
+      ],
+      "classification_evidence": [
+        "Verifies eight day tokens",
+        "Verifies no fetch in JS",
+        "Verifies ledger UI2 registration"
+      ]
+    },
+    {
+      "asset_path": "tests/sem-gov-001d-ui2-visual-acceptance.test.js",
+      "asset_type": "TEST",
+      "asset_role": "TEST_PROOF",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI2",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI2",
+      "related_assets": [
+        "public/sports-match-hub.html",
+        "public/css/sports-match-hub.css"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [
+        "node:test",
+        "node:assert/strict",
+        "node:fs",
+        "node:path"
+      ],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui2",
+      "notes": "UI2 visual acceptance static checks.",
+      "purpose_description": "Validates responsive CSS, UI state demos, and detail focus contract.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "FRONTEND"
+      ],
+      "classification_evidence": [
+        "Desktop tablet mobile breakpoints",
+        "UI state query contract",
+        "reduced-motion CSS"
       ]
     }
   ],

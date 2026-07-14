@@ -1630,6 +1630,64 @@
       "next_action": "SEM-GOV-001D-UI1 screen contract PROPOSED. UI2 static implementation NOT STARTED pending separate authorization.",
       "owner_note": "Design-only packet. No frontend code. Gates remain BLOCKED.",
       "last_updated": "2026-07-14"
+    },
+    {
+      "task_id": "SEM-GOV-001D-UI2",
+      "task_name": "Static Sports Match Hub Implementation",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: build the visible Sports Match Hub static frontend with governed mock fixtures, day navigation, lifecycle language, filters, fixture detail, responsive and accessibility acceptance — without live API, Supabase, backend, or gate clearance.",
+      "status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI1"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "frontend"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1",
+        "SEM-GOV-001D-UI2_STATIC_SPORTS_MATCH_HUB_IMPLEMENTATION_PACKET.v1"
+      ],
+      "affected_files": [
+        "public/sports-match-hub.html",
+        "public/css/sports-match-hub.css",
+        "public/js/sports-match-hub.js",
+        "public/js/sports-match-hub-mock-data.js",
+        "public/index.html",
+        "tests/sem-gov-001d-ui2-static-hub.test.js",
+        "tests/sem-gov-001d-ui2-visual-acceptance.test.js",
+        "control-center/SEM-GOV-001D-UI2_STATIC_SPORTS_MATCH_HUB_IMPLEMENTATION_PACKET.v1.md",
+        "package.json"
+      ],
+      "affected_tables": [],
+      "completion_definition": "SEM-GOV-001D-UI2 seals static Sports Match Hub TESTED with mock fixtures, UI2 tests, Control Center registration — UI3/UI4 NOT STARTED, gates BLOCKED, migration NOT APPLIED.",
+      "proof_required": [
+        "npm run test:sem-gov-001d-ui2 passes",
+        "npm run test:sem-gov-001d-ui1 passes",
+        "All gates BLOCKED",
+        "No fetch or /api/ in UI2 JavaScript"
+      ],
+      "current_evidence": [
+        "Dedicated sports-match-hub.html with isolated CSS/JS",
+        "Governed mock fixtures with public DTO fields only",
+        "index.html Hub nav and CTA only",
+        "UI3/UI4 NOT STARTED",
+        "Migration NOT APPLIED",
+        "All gates BLOCKED"
+      ],
+      "open_gaps": [
+        "No lifecycle read-model API (UI3)",
+        "No live frontend integration (UI4)",
+        "Help and History pages not implemented",
+        "Embedded prediction Hub not retired"
+      ],
+      "next_action": "SEM-GOV-001D-UI2 static Hub TESTED. UI3 read-model API NOT STARTED pending separate authorization.",
+      "owner_note": "Static mock only. No production lifecycle caller.",
+      "last_updated": "2026-07-14"
     }
   ]
 }

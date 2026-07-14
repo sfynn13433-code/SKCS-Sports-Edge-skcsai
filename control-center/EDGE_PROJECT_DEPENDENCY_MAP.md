@@ -206,3 +206,11 @@ Governed by: SEM-GOV-001D-UI1
 Blocked by: SEM-GOV-001A, SEM-GOV-001B-I4
 Blocks: none
 Notes: Screen contract PROPOSED. UI2/UI3/UI4 NOT STARTED. No frontend code. Migration NOT APPLIED. All gates BLOCKED.
+
+## SEM-GOV-001D-UI2 — Static Sports Match Hub Implementation
+
+Status: TESTED
+Governed by: SEM-GOV-001D-UI2
+Blocked by: SEM-GOV-001D-UI1
+Blocks: none
+Notes: Static Hub TESTED with mock fixtures. UI3/UI4 NOT STARTED. No live API. Migration NOT APPLIED. All gates BLOCKED.

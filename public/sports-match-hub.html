@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sports Match Hub — SKCS AI</title>
+  <meta name="description" content="Football fixture lifecycle status in South Africa (SAST). Informational only — not betting advice.">
+  <link rel="icon" href="data:,">
+  <link href="css/output.css" rel="stylesheet">
+  <link href="css/sports-match-hub.css" rel="stylesheet">
+</head>
+<body class="smh-page">
+  <a class="smh-skip" href="#smh-main">Skip to main content</a>
+
+  <header class="smh-header">
+    <div class="smh-header__inner">
+      <a class="smh-logo" href="index.html">SKCS AI Sports Edge</a>
+      <button type="button" class="smh-nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="site-nav">
+        Menu
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="sports-match-hub.html" aria-current="page">Sports Match Hub</a>
+        <a href="accuracy.html">Match Intelligence</a>
+        <a href="subscribe">Subscribe</a>
+        <a href="login.html">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="smh-main" id="smh-main">
+    <section class="smh-context" aria-labelledby="smh-title">
+      <h1 id="smh-title">Sports Match Hub</h1>
+      <p>Football fixtures · All times South Africa (SAST) · <span id="sast-context-date"></span></p>
+      <p class="smh-trust">Status may change as review progresses. Informational only — not guaranteed and not betting advice.</p>
+    </section>
+
+    <div class="smh-layout">
+      <aside class="smh-filters filter-sheet" id="filter-sheet" aria-label="Fixture filters">
+        <h2 class="smh-visually-hidden">Filters</h2>
+        <label for="filter-lifecycle">Lifecycle status</label>
+        <select id="filter-lifecycle">
+          <option value="">All statuses</option>
+          <option value="VISIBLE">Listed</option>
+          <option value="UNDER_REVIEW">Under Review</option>
+          <option value="HELD">On Hold</option>
+          <option value="ELIMINATED">Not Publishing</option>
+          <option value="FINAL_APPROVED">Review Complete</option>
+          <option value="CANCELLED">Cancelled</option>
+          <option value="POSTPONED">Postponed</option>
+          <option value="ARCHIVED">Archived</option>
+        </select>
+
+        <label for="filter-competition">Competition</label>
+        <select id="filter-competition">
+          <option value="">All competitions</option>
+        </select>
+
+        <label for="filter-team">Team search</label>
+        <input type="search" id="filter-team" autocomplete="off" placeholder="Min. 2 characters">
+
+        <label for="filter-archive">Show</label>
+        <select id="filter-archive">
+          <option value="active">Active fixtures</option>
+          <option value="archived">Archived only</option>
+          <option value="all">All</option>
+        </select>
+
+        <div class="smh-demo-panel" aria-label="UI state demonstration">
+          <label for="ui-state-demo">Preview UI state (static demo)</label>
+          <select id="ui-state-demo">
+            <option value="normal">Normal results</option>
+            <option value="loading">Initial loading</option>
+            <option value="refresh">Incremental refresh</option>
+            <option value="empty">Empty day</option>
+            <option value="no_match">No filter matches</option>
+            <option value="stale">Stale data banner</option>
+            <option value="unavailable">Hub unavailable</option>
+            <option value="lifecycle_unavailable">Lifecycle unavailable</option>
+            <option value="no_data">No production data</option>
+            <option value="error">Unexpected error</option>
+          </select>
+        </div>
+      </aside>
+
+      <section class="smh-content" aria-label="Fixture results">
+        <button type="button" class="smh-filter-toggle" id="filter-toggle" aria-expanded="false" aria-controls="filter-sheet">
+          Filters
+        </button>
+
+        <div class="filter-chips" id="filter-chips" aria-live="polite"></div>
+        <button type="button" class="btn btn--ghost" id="clear-filters" hidden>Clear all filters</button>
+
+        <div class="day-tabs" id="day-tabs" role="tablist" aria-label="Fixture day"></div>
+
+        <div class="smh-meta">
+          <span id="result-count" aria-live="polite"></span>
+          <span id="freshness-indicator"></span>
+        </div>
+
+        <div id="fixture-panel"></div>
+        <div id="status-announcer" class="smh-visually-hidden" aria-live="polite" aria-atomic="true"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="smh-footer">
+    <p>Times shown in SAST (Africa/Johannesburg). UI2 static demonstration — governed mock data only.</p>
+    <p><a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a></p>
+  </footer>
+
+  <script src="js/sports-match-hub-mock-data.js"></script>
+  <script src="js/sports-match-hub.js"></script>
+</body>
+</html>

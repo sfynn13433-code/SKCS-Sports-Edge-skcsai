@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 29,
+  "project_count": 30,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -1715,6 +1715,67 @@
         "SEM-GOV-001D-UI1 packet sealed with day-token reconciliation",
         "Canonical navigation and lifecycle language fixed",
         "Migration remains NOT APPLIED"
+      ]
+    },
+    {
+      "project_id": "SEM-GOV-001D-UI2",
+      "project_name": "Static Sports Match Hub Implementation",
+      "category": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: static Sports Match Hub HTML/CSS/JS with governed mock fixtures, lifecycle UI, filters, and accessibility acceptance — no live API.",
+      "why_it_matters": "Users need a fixture-first lifecycle Hub before UI3 read-model and UI4 live integration can ship.",
+      "current_status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI1"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "frontend"
+      ],
+      "related_tasks": [
+        "SEM-GOV-001D-UI2"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1",
+        "SEM-GOV-001D-UI2_STATIC_SPORTS_MATCH_HUB_IMPLEMENTATION_PACKET.v1"
+      ],
+      "related_files": [
+        "public/sports-match-hub.html",
+        "public/css/sports-match-hub.css",
+        "public/js/sports-match-hub.js",
+        "public/js/sports-match-hub-mock-data.js",
+        "tests/sem-gov-001d-ui2-static-hub.test.js",
+        "tests/sem-gov-001d-ui2-visual-acceptance.test.js"
+      ],
+      "related_tables": [],
+      "known_issues": [
+        "Mock data only — no production lifecycle API",
+        "Embedded prediction Hub remains on Home"
+      ],
+      "required_decisions": [
+        "UI3 read-model API packet before live data"
+      ],
+      "completion_definition": "SEM-GOV-001D-UI2 static Hub TESTED with UI2 tests and Control Center registration.",
+      "proof_required": [
+        "test:sem-gov-001d-ui2 passes",
+        "Gates BLOCKED",
+        "No fetch in UI2 JS"
+      ],
+      "risks_if_ignored": [
+        "Live integration could ship without visual and accessibility baseline"
+      ],
+      "recommended_order": 30,
+      "next_action": "SEM-GOV-001D-UI2 TESTED. UI3 NOT STARTED.",
+      "owner_note": "Static mock only.",
+      "last_updated": "2026-07-14",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI2",
+      "current_evidence": [
+        "sports-match-hub.html and isolated assets",
+        "UI2 tests pass",
+        "Migration NOT APPLIED"
       ]
     }
   ]

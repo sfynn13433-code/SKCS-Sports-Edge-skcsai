@@ -1,14 +1,14 @@
 # EDGE ASSET REPOSITORY MAP
 EAC_PROJECT_ID: EAC-001
 MANIFEST_SCHEMA_VERSION: 1.0.0
-TOTAL_GOVERNED_ASSETS: 928
-TOTAL_BATCHED_ASSETS: 928
+TOTAL_GOVERNED_ASSETS: 943
+TOTAL_BATCHED_ASSETS: 943
 FULLY_CLASSIFIED_ASSETS: 0
-CLASSIFICATION_PENDING_ASSETS: 928
+CLASSIFICATION_PENDING_ASSETS: 943
 CLOSURE_READY: NO
 
 CURRENT_STATE_COUNTS
-- CURRENT: 37
+- CURRENT: 52
 - PARALLEL: 0
 - LEGACY: 0
 - HISTORICAL_EVIDENCE: 0
@@ -18,16 +18,16 @@ CURRENT_STATE_COUNTS
 
 FUNCTIONAL_GROUP_COUNTS
 - SCRIPT_TOOL: 156
-- DOCUMENTATION_KNOWLEDGE: 119
+- DOCUMENTATION_KNOWLEDGE: 123
 - PROVIDER_INTEGRATION: 116
-- TEST_PROOF: 102
-- DATABASE_MIGRATION: 96
+- TEST_PROOF: 107
+- DATABASE_MIGRATION: 97
 - GENERATED_OUTPUT: 59
 - DATABASE: 42
 - FRONTEND_UI: 40
 - DEPLOYMENT_OPERATIONS: 39
 - PREDICTION: 28
-- GOVERNANCE: 25
+- GOVERNANCE: 26
 - SCHEDULER_BACKGROUND: 25
 - API_ROUTE: 18
 - ACCA: 17
@@ -36,6 +36,7 @@ FUNCTIONAL_GROUP_COUNTS
 - AI_EDGEMIND: 8
 - GRADING_ACCURACY: 7
 - SERVICE: 4
+- USER_INTERFACE: 4
 - SECURITY_SUBSCRIBER: 3
 - SCOUT_FIP: 2
 - UNCATEGORIZED: 2
@@ -44,42 +45,45 @@ FUNCTIONAL_GROUP_COUNTS
 RELATIONSHIP_TAG_COUNTS
 - RUNTIME: 296
 - SCRIPT_TOOL: 283
-- DATABASE: 240
-- SQL: 238
+- DATABASE: 245
+- SQL: 239
 - PROVIDER: 199
+- GOVERNANCE: 170
 - API: 169
-- GOVERNANCE: 159
-- DOCUMENTATION: 147
+- DOCUMENTATION: 151
+- TEST_PROOF: 106
 - PREDICTION: 105
-- MIGRATION: 101
-- TEST_PROOF: 101
+- MIGRATION: 102
 - OBSERVABILITY: 99
-- UI: 92
+- UI: 93
 - AUDIT: 83
 - GENERATED: 69
 - ROUTE: 61
 - DEPLOYMENT: 56
 - SECURITY: 55
 - CONFIGURATION: 52
-- SERVICE: 49
+- SERVICE: 50
 - PUBLIC_ASSET: 30
 - BACKGROUND_JOB: 28
 - RULEBOOK: 27
 - SCHEDULER: 27
 - ACCA: 26
 - AI_EDGEMIND: 19
+- LIFECYCLE: 19
+- FRONTEND: 9
 - GRADING: 8
 - FIP: 7
-- LIFECYCLE: 6
 - SCOUT: 6
 - SUBSCRIBER: 4
 - CONTROLLER: 2
+- JAVASCRIPT: 2
+- CSS: 1
 - RPC: 1
 
-NEXT_VALIDATION_NON_EMPTY_ASSETS: 928
+NEXT_VALIDATION_NON_EMPTY_ASSETS: 943
 
 BATCH_COMPLETION_SUMMARY
-- B01 | CONTROL_CENTER | ASSET_COUNT=29 | CLASSIFIED=0 | PENDING=29
+- B01 | CONTROL_CENTER | ASSET_COUNT=33 | CLASSIFIED=0 | PENDING=33
 - B02 | BACKEND_DIRECT_FILES | ASSET_COUNT=13 | CLASSIFIED=0 | PENDING=13
 - B03 | BACKEND_ROUTES_AND_CONTROLLERS | ASSET_COUNT=28 | CLASSIFIED=0 | PENDING=28
 - B04 | BACKEND_UTILS_SEMANTIC_CORE_AND_TEST | ASSET_COUNT=46 | CLASSIFIED=0 | PENDING=46
@@ -87,7 +91,7 @@ BATCH_COMPLETION_SUMMARY
 - B06 | BACKEND_PROVIDERS | ASSET_COUNT=10 | CLASSIFIED=0 | PENDING=10
 - B07 | BACKEND_SRC_SERVICES | ASSET_COUNT=9 | CLASSIFIED=0 | PENDING=9
 - B08 | BACKEND_ADAPTERS_AND_CONFIG | ASSET_COUNT=13 | CLASSIFIED=0 | PENDING=13
-- B09 | BACKEND_SERVICES | ASSET_COUNT=89 | CLASSIFIED=0 | PENDING=89
+- B09 | BACKEND_SERVICES | ASSET_COUNT=90 | CLASSIFIED=0 | PENDING=90
 - B10 | SCRIPTS_AUDIT_GOV | ASSET_COUNT=27 | CLASSIFIED=0 | PENDING=27
 - B11 | SCRIPTS_CHECK_VALIDATE_VERIFY | ASSET_COUNT=59 | CLASSIFIED=0 | PENDING=59
 - B12 | SCRIPTS_TEST_DIAG_TRACE | ASSET_COUNT=66 | CLASSIFIED=0 | PENDING=66
@@ -99,10 +103,10 @@ BATCH_COMPLETION_SUMMARY
 - B18 | SKCS_KNOWLEDGE_GOV_AND_AUDIT | ASSET_COUNT=23 | CLASSIFIED=0 | PENDING=23
 - B19 | SKCS_KNOWLEDGE_KNOWLEDGE | ASSET_COUNT=17 | CLASSIFIED=0 | PENDING=17
 - B20 | SKCS_KNOWLEDGE_PROVIDERS | ASSET_COUNT=18 | CLASSIFIED=0 | PENDING=18
-- B21 | PUBLIC_UI | ASSET_COUNT=64 | CLASSIFIED=0 | PENDING=64
-- B22 | SUPABASE_MIGRATIONS | ASSET_COUNT=61 | CLASSIFIED=0 | PENDING=61
+- B21 | PUBLIC_UI | ASSET_COUNT=68 | CLASSIFIED=0 | PENDING=68
+- B22 | SUPABASE_MIGRATIONS | ASSET_COUNT=62 | CLASSIFIED=0 | PENDING=62
 - B23 | DB_SQL_AND_SUPABASE_OTHER | ASSET_COUNT=19 | CLASSIFIED=0 | PENDING=19
-- B24 | TESTS | ASSET_COUNT=15 | CLASSIFIED=0 | PENDING=15
+- B24 | TESTS | ASSET_COUNT=20 | CLASSIFIED=0 | PENDING=20
 - B25 | SCRATCH | ASSET_COUNT=2 | CLASSIFIED=0 | PENDING=2
 - B26 | DEPLOYMENT_CI | ASSET_COUNT=3 | CLASSIFIED=0 | PENDING=3
 - B27 | ARCHIVE | ASSET_COUNT=58 | CLASSIFIED=0 | PENDING=58
@@ -142,12 +146,11 @@ PER_ASSET_BY_BATCH
 | control-center/SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md | Defines the Unified Sports Intelligence Lifecycle Governor law: canonical stages, states, rolling eight-day funnel, public information boundary, safe BOT taxonomy, SMH navigation, Help contract, timing-window conflicts, and football-first multi-sport rollout sequence. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","LIFECYCLE","UI"] | ["SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md seals canonical lifecycle stages, states, eight-day funnel, Help contract, and public boundary.","Contract classifies provisional P1-B01 48-hour rule and records timing conflicts without approving runtime cutoffs.","Contract keeps unified_lifecycle_governor BLOCKED until SEM-GOV-001B."] | Before SEM-GOV-001B runtime implementation, validate lifecycle persistence design against EST-001 retention law and EPI-001 protected surfaces. |
 | control-center/SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md | Defines football lifecycle persistence law: Edge-minted UUID fixture_uid, identity alias registry, current projection and append-only transition events, legal transition matrix, eight-day SAST window, rollover semantics, admission and processing tolerance, and Governor activation sequence per OD-1 through OD-10. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","LIFECYCLE","DATABASE"] | ["SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md seals fixture_uid UUID law, alias registry, transition matrix, and future table shapes.","Contract records owner decisions OD-1 through OD-10 and preserves EST-001 forbidden-persistence law.","Contract keeps unified_lifecycle_governor BLOCKED and forbids R1/R2 migration while supabase_storage_gate BLOCKED."] | Before runtime Governor implementation, validate DDL design against EST-001 retention law and confirm supabase_storage_gate authorization. |
 | control-center/SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1.md | Defines the Lifecycle Governor foundation design: gate reader via controlCenterReadService, pure evaluator contract, persistence adapter interface, rollover worker design, fail-closed ordering, and future implementation sequence I3 through SEM-GOV-001C. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","LIFECYCLE"] | ["SEM-GOV-001B-I2 packet documents future lifecycleGovernor, lifecyclePersistenceService, and lifecycleRolloverService without creating them.","Packet defines readLifecycleGovernorGate and evaluateGovernorGate fail-closed order.","Packet keeps all three governance gates BLOCKED."] | Run node --test tests/sem-gov-001b-governor-foundation-packet.test.js after any I2 packet or sequencing change. |
-| control-center/SEM-GOV-001B-I4_SUPABASE_FREE_TIER_CAPACITY_AND_RETENTION_DESIGN.v1.md | Defines Supabase free-tier capacity and retention design for I4 lifecycle persistence: verified 167 MB baseline, normal and conservative growth models, bounded purge law, resource controls, and HOLD activation decision. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","DATABASE"] | ["Packet models four lifecycle tables only with 167 MB dashboard baseline.","Normal projected total 186.10 MB below 300 MB preferred ceiling.","Conservative 80/day projected total 470.58 MB exceeds activation ceiling — HOLD.","supabase_storage_gate remains BLOCKED."] | Review after Stephen approval of governed admission/retention cap or before supabase_storage_gate clearance. |
 | control-center/SEM-GOV-001B-I4_CAP2_DAILY_ADMISSION_LIMIT_DESIGN.v1.md | Recalculates lifecycle persistence capacity at 50/day SAST admission ceiling from 167 MB baseline and defines deterministic fail-closed counter enforcement design. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","DATABASE"] | ["Conservative 50/day projected total 357.10 MB below 380 MB activation ceiling.","22.90 MB headroom below 380 MB; 42.90 MB below 400 MB hard block.","Admission-cap enforcement design APPROVED DESIGN; capacity proof TESTED.","supabase_storage_gate remains BLOCKED."] | Review before I4 implementation packet or supabase_storage_gate clearance. |
-| control-center/SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md | Seals SEM-GOV-001B-I4 isolated lifecycle persistence implementation: six-table schema, gate-before-DB law, admission and transition sequences, migration NOT APPLIED boundary. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","DATABASE","LIFECYCLE"] | ["Implementation foundation TESTED; migration authored NOT APPLIED.","50/day admission-cap law and 180-day retention law controlling.","All gates BLOCKED; no production caller.","I4-PURGE, I5, SEM-GOV-001C deferred."] | Review before supabase_storage_gate clearance or production activation. |
-| control-center/SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1.md | Seals Sports Match Hub UI information architecture and screen contracts: navigation, day labels, lifecycle language, fixture cards, filters, UI states, and future read-model API fields — design only. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","LIFECYCLE","FRONTEND"] | ["Packet PROPOSED; UI2/UI3/UI4 NOT STARTED.","Day tokens reconciled with lifecycleGovernor (no DAY_1).","No production UI mutation; all gates BLOCKED.","Migration NOT APPLIED."] | Run npm run test:sem-gov-001d-ui1 after any screen contract change. |
-| backend/services/lifecyclePersistenceService.js | Isolated lifecycle persistence service with DI: admitFixture, applyTransition, alias/idempotency dedup, 50/day cap, rollover storage adapter only. | APPLICATION_SOURCE | CURRENT | ["SERVICE","GOVERNANCE","DATABASE","LIFECYCLE"] | ["Gate-before-DB admission and transition orchestration.","Mock-first tests pass without Supabase credentials.","No production runtime caller.","Does not import backend/database.js or pipeline services."] | Run npm run test:lifecycle-persistence after changes; do not wire production until gates cleared. |
-| supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql | Six-table lifecycle persistence DDL with CHECK constraints, indexes, and commented rollback — authored NOT APPLIED. | DATABASE_MIGRATION | CURRENT | ["DATABASE","MIGRATION","SQL","LIFECYCLE"] | ["Exactly six lifecycle tables; no prediction/publication tables.","ceiling <= 50 enforced at schema level.","Rollback section lists I4 tables only.","Not invoked by package scripts."] | Apply only after supabase_storage_gate clearance. |
+| control-center/SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md | Seals isolated lifecycle persistence implementation scope, six-table schema, gate-before-DB law, admission and transition sequences, and migration non-execution boundary. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","DATABASE","LIFECYCLE"] | ["Packet documents six approved lifecycle tables and migration NOT APPLIED boundary.","50/day admission-cap law and 180-day retention law referenced from CAP2.","All three governance gates remain BLOCKED at closure.","I4-PURGE, I5, and SEM-GOV-001C deferred."] | Review before supabase_storage_gate clearance or production caller authorization. |
+| control-center/SEM-GOV-001B-I4_SUPABASE_FREE_TIER_CAPACITY_AND_RETENTION_DESIGN.v1.md | Defines Supabase free-tier capacity and retention design for I4 lifecycle persistence: verified 167 MB baseline, normal and conservative growth models, bounded purge law, resource controls, and HOLD activation decision. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","DATABASE"] | ["Packet models four lifecycle tables only with 167 MB dashboard baseline.","Normal projected total 186.10 MB below 300 MB preferred ceiling.","Conservative 80/day projected total 470.58 MB exceeds activation ceiling — HOLD.","supabase_storage_gate remains BLOCKED."] | Review after Stephen approval of governed admission/retention cap or before supabase_storage_gate clearance. |
+| control-center/SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1.md | Seals Sports Match Hub information architecture and screen contracts: navigation, day navigation, lifecycle language, fixture cards, filters, UI states, and future API read-model fields without frontend implementation. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","LIFECYCLE","FRONTEND"] | ["Packet sections A–Y fix canonical navigation and lifecycle user language.","Day tokens reconciled with lifecycleGovernor DAY_LABELS (no DAY_1).","UI2/UI3/UI4 explicitly NOT STARTED; migration NOT APPLIED.","All three governance gates remain BLOCKED."] | SEM-GOV-001D-UI1: run npm run test:sem-gov-001d-ui1 after any screen contract or registration change. |
+| control-center/SEM-GOV-001D-UI2_STATIC_SPORTS_MATCH_HUB_IMPLEMENTATION_PACKET.v1.md | Seals static Sports Match Hub implementation scope and Definition of Done. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","LIFECYCLE","FRONTEND"] | ["Static mock fixtures only","No fetch or API","UI3/UI4 NOT STARTED"] | npm run test:sem-gov-001d-ui2 after UI2 changes |
 
 ## B02 BACKEND_DIRECT_FILES
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |
@@ -367,6 +370,7 @@ PER_ASSET_BY_BATCH
 | backend/services/gradingSnapshotService.js | Grading/accuracy computation service | GRADING_ACCURACY | UNKNOWN | ["GRADING","DATABASE","SQL","PROVIDER"] | ["Top-level skim: require('../db') \| require('./gradingAccuracyCore').","Detected Supabase usage (createClient/from/SQL-like queries).","Detected external HTTP client usage (axios/fetch)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/hybridSportsDataService.js | Scheduled job / background maintenance | SCHEDULER_BACKGROUND | UNKNOWN | ["SCHEDULER","BACKGROUND_JOB","PROVIDER","API"] | ["Top-level skim: require('./thesportsdbPipeline') \| require('../utils/apiQueue') \| require('../db') \| require('node-fetch') \| require('../config') \| require('./espnHiddenApiService').","Detected external HTTP client usage (axios/fetch)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/lifecycleGovernor.js | Pure SEM-GOV-001B Lifecycle Governor foundation exporting gate-before-flag evaluation, SAST admission window, legal transition matrix, deterministic idempotency, and rollover plan without DB, SQL, Supabase, or pipeline hooks. | GOVERNANCE | CURRENT | ["SERVICE","GOVERNANCE","RULEBOOK"] | ["Exports evaluateGovernorGate, calculateSastWindow, calculateDayLabel, evaluateAdmission, evaluateTransition, buildTransitionEvent, and calculateRolloverPlan as pure evaluators.","Gate reader evaluates EDGE_BUILD_CONTROL_LEDGER.v1.json unifiedLifecycleGovernor before LIFECYCLE_GOVERNOR_ENABLED feature flag.","Module forbids direct DB, Supabase, SQL, predictions_raw, direct1x2_prediction_final, fixture_context_cache, aiPipeline, fipIntakeService, and syncService imports."] | SEM-GOV-001B-I3: run node --test tests/lifecycle-governor.test.js after any lifecycle governor evaluator change; do not wire persistence or pipeline hooks until separately authorized. |
+| backend/services/lifecyclePersistenceService.js | Isolated lifecycle persistence service implementing admitFixture, applyTransition, alias resolution, durable admission idempotency, 50/day SAST cap enforcement, and rollover storage adapter methods behind dependency injection. | GOVERNANCE | CURRENT | ["SERVICE","GOVERNANCE","DATABASE","LIFECYCLE"] | ["admitFixture enforces gate, feature flag, and pure validation before db.withTransaction.","Durable admission idempotency and alias resolution prevent duplicate slot consumption.","applyTransition commits transition event and projection update atomically with optimistic versioning.","Module does not import backend/database.js, db.js, aiPipeline, fipIntakeService, or syncService."] | SEM-GOV-001B-I4: run npm run test:lifecycle-persistence after any persistence service change; do not wire production callers until gates cleared. |
 | backend/services/liveFootballApiExtractor.js | Backend service: liveFootballApiExtractor | DATABASE | UNKNOWN | ["DATABASE","PROVIDER"] | ["Detected Supabase usage (createClient/from/SQL-like queries).","Detected external HTTP client usage (axios/fetch)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/liveFootballApiService.js | Backend service: liveFootballApiService | PROVIDER_INTEGRATION | UNKNOWN | ["PROVIDER","API"] | ["Top-level skim: require('axios').","Detected external HTTP client usage (axios/fetch)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
 | backend/services/marketIntelligence.js | Backend service: marketIntelligence | DATABASE | UNKNOWN | ["PREDICTION","DATABASE","PROVIDER"] | ["Top-level skim: require('../utils/pipelineLogger').","Detected Supabase usage (createClient/from/SQL-like queries)."] | Resolve ownership, purpose, consumers, dependencies, database role, Scout/FIP relationship, conflicts, and governed outcome during project review. |
@@ -836,6 +840,7 @@ PER_ASSET_BY_BATCH
 | public/css/input.css | Public CSS stylesheet for frontend UI styling: input.css. | FRONTEND_UI | UNKNOWN | ["UI","OBSERVABILITY"] | ["Fast skim: public/css/input.css under public/ indicates browser-delivered UI asset.","Filename suggests CSS styling delivered to browser.","Top chunk first line: @tailwind base;"] | Verify actual frontend references and whether input.css remains current vs superseded. |
 | public/css/output.css | Public CSS stylesheet for frontend UI styling: output.css. | FRONTEND_UI | UNKNOWN | ["UI","OBSERVABILITY"] | ["Fast skim: public/css/output.css under public/ indicates browser-delivered UI asset.","Filename suggests CSS styling delivered to browser."] | Verify actual frontend references and whether output.css remains current vs superseded. |
 | public/css/react-components.css | Public CSS stylesheet for frontend UI styling: react-components.css. | FRONTEND_UI | UNKNOWN | ["UI","OBSERVABILITY"] | ["Fast skim: public/css/react-components.css under public/ indicates browser-delivered UI asset.","Filename suggests CSS styling delivered to browser.","Top chunk first line: /**"] | Verify actual frontend references and whether react-components.css remains current vs superseded. |
+| public/css/sports-match-hub.css | Responsive and accessible styles for Sports Match Hub. | USER_INTERFACE | CURRENT | ["FRONTEND","CSS","LIFECYCLE"] | ["44px touch targets","reduced-motion support","lifecycle badge colors with text"] | UI2 responsive checks after CSS changes |
 | public/data/all_leagues_raw.json | Generated/static public data output (all_leagues_raw.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component. | GENERATED_OUTPUT | UNKNOWN | ["UI","GENERATED","PUBLIC_ASSET"] | ["Fast skim: public/data/all_leagues_raw.json under public/ indicates browser-delivered UI asset.","Top chunk first line: {","Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."] | Verify actual frontend references and whether all_leagues_raw.json remains current vs superseded. |
 | public/data/all_sports_raw.json | Generated/static public data output (all_sports_raw.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component. | GENERATED_OUTPUT | UNKNOWN | ["UI","GENERATED","PUBLIC_ASSET"] | ["Fast skim: public/data/all_sports_raw.json under public/ indicates browser-delivered UI asset.","Top chunk first line: [","Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."] | Verify actual frontend references and whether all_sports_raw.json remains current vs superseded. |
 | public/data/context-pack-2026-05-17.json | Generated/static public data output (context-pack-2026-05-17.json) delivered from public/data for frontend/runtime sports data consumption, not a UI component. | GENERATED_OUTPUT | UNKNOWN | ["UI","GENERATED","PUBLIC_ASSET"] | ["Fast skim: public/data/context-pack-2026-05-17.json under public/ indicates browser-delivered UI asset.","Top chunk first line: {","Phase 2 B21 purpose review: source inspection showed JSON data/cache content and references from scripts/frontend fetch paths; corrected functional_group FRONTEND_UI to GENERATED_OUTPUT."] | Verify actual frontend references and whether context-pack-2026-05-17.json remains current vs superseded. |
@@ -869,6 +874,8 @@ PER_ASSET_BY_BATCH
 | public/js/semantic-drift-dashboard.js | Public JavaScript/JSX frontend helper or component: semantic-drift-dashboard.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/semantic-drift-dashboard.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: (function () {"] | Verify actual frontend references and whether semantic-drift-dashboard.js remains current vs superseded. |
 | public/js/smh-hub-master-rulebook.js | Public JavaScript/JSX frontend helper or component: smh-hub-master-rulebook.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/smh-hub-master-rulebook.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: // Master Rulebook Secondary Market Processing for smh-hub.js"] | Verify actual frontend references and whether smh-hub-master-rulebook.js remains current vs superseded. |
 | public/js/smh-hub.js | Public JavaScript/JSX frontend helper or component: smh-hub.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/smh-hub.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: /**"] | Verify actual frontend references and whether smh-hub.js remains current vs superseded. |
+| public/js/sports-match-hub-mock-data.js | Deterministic mock fixtures covering all lifecycle states. | USER_INTERFACE | CURRENT | ["FRONTEND","JAVASCRIPT","LIFECYCLE"] | ["public_fixture_id only","No fixture_uid confidence or probability"] | npm run test:sem-gov-001d-ui2 after mock data changes |
+| public/js/sports-match-hub.js | Hub UI controller: day tabs, filters, fixture cards, detail, a11y. | USER_INTERFACE | CURRENT | ["FRONTEND","JAVASCRIPT","LIFECYCLE"] | ["No fetch XMLHttpRequest supabase or /api/","URL state for day and filters"] | npm run test:sem-gov-001d-ui2 after controller changes |
 | public/js/supabase-bundle.js | Public JavaScript/JSX frontend helper or component: supabase-bundle.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/supabase-bundle.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: var supabase = (() => {"] | Verify actual frontend references and whether supabase-bundle.js remains current vs superseded. |
 | public/js/supabase-init.js | Public JavaScript/JSX frontend helper or component: supabase-init.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/supabase-init.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: // SKCS AI Sports Edge - Supabase Client Initialization"] | Verify actual frontend references and whether supabase-init.js remains current vs superseded. |
 | public/js/system-health-banner.js | Public JavaScript/JSX frontend helper or component: system-health-banner.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/system-health-banner.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: (function () {"] | Verify actual frontend references and whether system-health-banner.js remains current vs superseded. |
@@ -882,6 +889,7 @@ PER_ASSET_BY_BATCH
 | public/payment.html | Public HTML page apparently delivered for UI routes: payment.html. | FRONTEND_UI | UNKNOWN | ["UI"] | ["Fast skim: public/payment.html under public/ indicates browser-delivered UI asset.","Filename suggests HTML route/page entrypoint for UI delivery.","Top chunk first line: <!DOCTYPE html>"] | Verify actual frontend references and whether payment.html remains current vs superseded. |
 | public/privacy.html | Public HTML page apparently delivered for UI routes: privacy.html. | FRONTEND_UI | UNKNOWN | ["UI"] | ["Fast skim: public/privacy.html under public/ indicates browser-delivered UI asset.","Filename suggests HTML route/page entrypoint for UI delivery.","Top chunk first line: <!DOCTYPE html>"] | Verify actual frontend references and whether privacy.html remains current vs superseded. |
 | public/robots.txt | Public robots.txt for client discovery and crawler guidance. | FRONTEND_UI | UNKNOWN | ["UI"] | ["Fast skim: public/robots.txt under public/ indicates browser-delivered UI asset.","Top chunk first line: User-agent: *"] | Verify actual frontend references and whether robots.txt remains current vs superseded. |
+| public/sports-match-hub.html | Static Sports Match Hub page with lifecycle day navigation and fixture cards. | USER_INTERFACE | CURRENT | ["FRONTEND","LIFECYCLE","UI"] | ["References isolated sports-match-hub assets only","No smh-hub.js or /api/ calls"] | UI2 visual acceptance after Hub changes |
 | public/style.css | Public CSS stylesheet for frontend UI styling: style.css. | FRONTEND_UI | UNKNOWN | ["UI","OBSERVABILITY"] | ["Fast skim: public/style.css under public/ indicates browser-delivered UI asset.","Filename suggests CSS styling delivered to browser.","Top chunk first line: body {"] | Verify actual frontend references and whether style.css remains current vs superseded. |
 | public/subscribe/index.html | Public HTML page apparently delivered for UI routes: index.html. | FRONTEND_UI | UNKNOWN | ["UI"] | ["Fast skim: public/subscribe/index.html under public/ indicates browser-delivered UI asset.","Filename suggests HTML route/page entrypoint for UI delivery.","Top chunk first line: <!doctype html>"] | Verify actual frontend references and whether index.html remains current vs superseded. |
 | public/subscription.html | Public HTML page apparently delivered for UI routes: subscription.html. | FRONTEND_UI | UNKNOWN | ["UI"] | ["Fast skim: public/subscription.html under public/ indicates browser-delivered UI asset.","Filename suggests HTML route/page entrypoint for UI delivery.","Top chunk first line: <!DOCTYPE html>"] | Verify actual frontend references and whether subscription.html remains current vs superseded. |
@@ -953,6 +961,7 @@ PER_ASSET_BY_BATCH
 | supabase/migrations/20261006000000_sportsdataio_contract_alignment.sql | Supabase SQL migration intended to sportsdataio contract alignment schema; evidence: CREATE TABLE IF NOT EXISTS public.data_contracts (. | DATABASE_MIGRATION | UNKNOWN | ["DATABASE","MIGRATION","SQL"] | ["Fast skim: 20261006000000_sportsdataio_contract_alignment.sql is a supabase SQL migration (path: supabase/migrations/20261006000000_sportsdataio_contract_alignment.sql) targeting sportsdataio contract alignment schema.","Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS public.data_contracts ("] | Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers. |
 | supabase/migrations/20261006000001_canonical_events.sql | Supabase SQL migration intended to canonical events schema; evidence: CREATE TABLE IF NOT EXISTS public.canonical_events (. | DATABASE_MIGRATION | UNKNOWN | ["DATABASE","MIGRATION","SQL"] | ["Fast skim: 20261006000001_canonical_events.sql is a supabase SQL migration (path: supabase/migrations/20261006000001_canonical_events.sql) targeting canonical events schema.","Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS public.canonical_events ("] | Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers. |
 | supabase/migrations/20261007000000_user_experience_feedback.sql | Supabase SQL migration intended to user experience feedback schema; evidence: CREATE TABLE IF NOT EXISTS public.user_experience_feedback (. | DATABASE_MIGRATION | UNKNOWN | ["DATABASE","MIGRATION","SQL"] | ["Fast skim: 20261007000000_user_experience_feedback.sql is a supabase SQL migration (path: supabase/migrations/20261007000000_user_experience_feedback.sql) targeting user experience feedback schema.","Fast skim: dominant SQL statement appears to be: CREATE TABLE IF NOT EXISTS public.user_experience_feedback ("] | Verify migration execution and resulting live schema objects later; validate any policy/RLS and dependency implications for consumers. |
+| supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql | PostgreSQL migration creating six governed lifecycle persistence tables with CHECK constraints, indexes, and commented rollback section. | DATABASE_MIGRATION | CURRENT | ["DATABASE","MIGRATION","SQL","LIFECYCLE","GOVERNANCE"] | ["Creates exactly six lifecycle tables per SEM-GOV-001B-I4 packet.","Ceiling CHECK constraint enforces admitted_count <= ceiling <= 50.","Rollback section lists only I4 tables in FK-safe order.","Migration not invoked by package scripts."] | Apply only after supabase_storage_gate clearance; verify six-table schema and indexes before production activation. |
 
 ## B23 DB_SQL_AND_SUPABASE_OTHER
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |
@@ -991,11 +1000,15 @@ PER_ASSET_BY_BATCH
 | tests/fip-intake-service.test.js | Focused Node test coverage for the EFI-001 fail-closed FIP intake boundary accept/reject behavior and Edge envelope mapping. | TEST_PROOF | CURRENT | ["TEST_PROOF","SCOUT","FIP","RUNTIME","GOVERNANCE"] | ["Builds a valid FIP-001 v1 fixture with the service hash algorithm and verifies accepted envelope output.","Covers rejection for unsupported schema version, non-VALIDATED status, tampered hash, missing required fields, forbidden origins, and AUTHORIZED_PRODUCTION while the marriage gate remains blocked."] | EFI-001-I1: run node --test tests/fip-intake-service.test.js after any FIP intake boundary change. |
 | tests/fip-storage-policy-service.test.js | Focused Node test coverage for EST-001 Supabase storage-policy enforcement, including R1/R2 minimal records, full FIP body blocking, audit-only rejection handling, and storage budget thresholds. | TEST_PROOF | CURRENT | ["TEST_PROOF","SCOUT","FIP","DATABASE","GOVERNANCE"] | ["Verifies accepted EFI intake produces minimal R1 provenance and R2 audit records only.","Verifies full FIP body, Scout mirror, provider payload, markets, context, and fixture body data are not persisted in EST records.","Verifies rejected EFI intake creates audit-only records and Supabase hard block prevents new EST records."] | EST-001-I1: run node --test tests/fip-storage-policy-service.test.js after any EST storage policy change. |
 | tests/lifecycle-governor.test.js | Focused Node test coverage for SEM-GOV-001B-I3 pure Lifecycle Governor foundation: gate-before-flag, SAST window, admission, transitions, idempotency, rollover plan, and module isolation from DB, Supabase, SQL, and protected pipeline modules. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","RULEBOOK"] | ["Verifies evaluateGovernorGate fail-closed ordering and feature-flag normalization.","Verifies eight-day SAST labels, football-only admission, 15-minute processing tolerance, legal transition matrix, deterministic SHA-256 idempotency, and rollover duplicate/gap rejection.","Verifies lifecycleGovernor.js source excludes DB, Supabase, SQL, predictions_raw, direct1x2_prediction_final, fixture_context_cache, aiPipeline, fipIntakeService, and syncService imports."] | SEM-GOV-001B-I3: run node --test tests/lifecycle-governor.test.js after any lifecycle governor evaluator change. |
+| tests/lifecycle-persistence-service.test.js | Focused Node test coverage for lifecycle persistence admission cap, idempotency, alias safety, atomic transitions, gate-before-DB law, and migration static validation. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","LIFECYCLE","DATABASE"] | ["Gate and feature-flag rejection causes zero withTransaction calls.","Admission 50 succeeds and 51 returns DAILY_ADMISSION_CAP_REACHED.","Alternate alias and durable idempotency reuse do not consume additional slots.","Migration static tests verify six tables and no prediction table alteration."] | SEM-GOV-001B-I4: run npm run test:lifecycle-persistence after any persistence service or migration change. |
 | tests/p1-b01-configured-fip-input.test.js | Verifies governed Scout FIP configured input, provider bypass, mapped-envelope-only flow, atomic batch rejection and request-contract validation. | TEST_PROOF | CURRENT | ["TEST_PROOF","SCOUT","FIP","RUNTIME","GOVERNANCE","PROVIDER"] | ["Exercises resolveConfiguredPredictionInput via aiPipeline.__test with injected provider and intake dependencies.","Verifies provider path remains active when fip_envelopes is absent and is bypassed when a valid PROOF_FIXTURE batch is supplied.","Verifies atomic batch rejection, malformed request-contract rejection, and mapped-envelope-only output without calling external providers."] | P1-B01: run node --test tests/p1-b01-configured-fip-input.test.js after any governed Scout FIP configured-input or aiPipeline intake-routing change. |
 | tests/sem-gov-001-lifecycle-contract.test.js | Tests the SEM-GOV-001A Unified Sports Intelligence Lifecycle contract and its Control Center registration without importing or mutating runtime code. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","LIFECYCLE"] | ["Test reads SEM-GOV-001 contract and verifies canonical lifecycle law sections.","Test verifies ledger unified_lifecycle_governor BLOCKED and SEM-GOV-001A registration.","Test verifies package control-center test suite includes the focused SEM-GOV proof."] | Run node --test tests/sem-gov-001-lifecycle-contract.test.js and npm run control:verify after any SEM-GOV-001 contract or sequencing change. |
 | tests/sem-gov-001b-governor-foundation-packet.test.js | Tests the SEM-GOV-001B-I2 Lifecycle Governor foundation implementation packet and its Control Center registration without importing or mutating runtime code. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","LIFECYCLE"] | ["Test verifies I2 packet sections and that future runtime files do not exist on disk.","Test verifies ledger registers SEM-GOV-001B-I2 APPROVED with all gates BLOCKED.","Test verifies package control-center test suite includes the focused I2 proof."] | Run node --test tests/sem-gov-001b-governor-foundation-packet.test.js and npm run control:verify after any I2 packet or sequencing change. |
+| tests/sem-gov-001b-i4-lifecycle-persistence-implementation-packet.test.js | Guards I4 implementation packet sections, allowed files, blocked gates, migration-not-applied state, and Control Center registration. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","LIFECYCLE"] | ["Verifies all packet sections A through V are present.","Verifies gates remain BLOCKED and migration is NOT APPLIED.","Verifies 50/day and 180-day retention law references.","Verifies I4-PURGE, I5, and SEM-GOV-001C are deferred."] | SEM-GOV-001B-I4: run npm run test:lifecycle-persistence after any I4 packet or registration change. |
 | tests/sem-gov-001b-lifecycle-persistence-contract.test.js | Tests the SEM-GOV-001B Football Lifecycle Persistence contract and its Control Center registration without importing or mutating runtime code. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","LIFECYCLE"] | ["Test reads SEM-GOV-001B contract and verifies fixture_uid, alias, transition, timing, and gate preservation sections.","Test verifies ledger gates remain BLOCKED and SEM-GOV-001B registration.","Test verifies package control-center test suite includes the focused SEM-GOV-001B proof."] | Run node --test tests/sem-gov-001b-lifecycle-persistence-contract.test.js and npm run control:verify after any SEM-GOV-001B contract or sequencing change. |
-| tests/sem-gov-001d-ui1-screen-contract.test.js | Guards SEM-GOV-001D-UI1 screen contract sections A–Y, canonical day tokens, lifecycle language, blocked gates, and UI2/UI3/UI4 not-started boundaries. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","LIFECYCLE","FRONTEND"] | ["Verifies packet PROPOSED and start commit 2d4c6a3.","Verifies day tokens match governor authority without DAY_1.","Verifies gates BLOCKED and migration NOT APPLIED.","Verifies no frontend implementation in UI1 scope."] | Run npm run test:sem-gov-001d-ui1 after any UI1 packet or registration change. |
+| tests/sem-gov-001d-ui1-screen-contract.test.js | Guards UI1 packet sections A–Y, canonical day tokens, lifecycle language, blocked gates, UI2/UI3/UI4 not-started boundaries, and Control Center registration. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","LIFECYCLE","FRONTEND"] | ["Verifies packet status PROPOSED and start commit 2d4c6a3.","Verifies day-token sequence matches governor authority without DAY_1.","Verifies gates remain BLOCKED and migration NOT APPLIED.","Verifies no frontend implementation files are in-scope for UI1."] | SEM-GOV-001D-UI1: run npm run test:sem-gov-001d-ui1 after any UI1 packet or registration change. |
+| tests/sem-gov-001d-ui2-static-hub.test.js | Guards UI2 file boundary, lifecycle mappings, no API callers, landmarks. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","FRONTEND","LIFECYCLE"] | ["Verifies eight day tokens","Verifies no fetch in JS","Verifies ledger UI2 registration"] | npm run test:sem-gov-001d-ui2 |
+| tests/sem-gov-001d-ui2-visual-acceptance.test.js | Validates responsive CSS, UI state demos, and detail focus contract. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","FRONTEND"] | ["Desktop tablet mobile breakpoints","UI state query contract","reduced-motion CSS"] | npm run test:sem-gov-001d-ui2 |
 
 ## B25 SCRATCH
 | asset_path | purpose_description | functional_group | current_state | relationship_tags | classification_evidence | next_validation |
