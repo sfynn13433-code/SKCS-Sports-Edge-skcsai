@@ -1845,6 +1845,61 @@
       "next_action": "SEM-GOV-001D-UI3-I2 inspection PASS WITH BLOCKER. Source B persistence NOT AUTHORIZED pending EST-001 and storage-policy mini-project.",
       "owner_note": "Inspection and contract only. No table or intake implementation.",
       "last_updated": "2026-07-14"
+    },
+    {
+      "task_id": "SEM-GOV-001D-UI3-I3",
+      "task_name": "Source B Storage Policy and Retention Contract",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: seal D3 DERIVED FIXTURE DISPLAY STATE storage class, retention law, capacity proof, and EST-001 amendment for UI3 Source B — without migration, purge, or runtime implementation.",
+      "status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I2"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "database"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-UI3-I2_CANONICAL_FIXTURE_METADATA_PROJECTION_INSPECTION_AND_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
+      ],
+      "affected_files": [
+        "control-center/SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1.md",
+        "control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md",
+        "tests/sem-gov-001d-ui3-i3-contract.test.js",
+        "package.json"
+      ],
+      "affected_tables": [],
+      "completion_definition": "SEM-GOV-001D-UI3-I3 seals PASS WITH CORRECTION and D3 storage policy — EST-001 amended, UI3/UI4 NOT STARTED, migration NOT APPLIED, gates BLOCKED.",
+      "proof_required": [
+        "npm run test:sem-gov-001d-ui3-i3 passes",
+        "EST-001 recognizes D3",
+        "Capacity proof >= 20 MB headroom",
+        "All gates BLOCKED"
+      ],
+      "current_evidence": [
+        "D3 storage class sealed",
+        "8-day active + 30-day post-closure retention",
+        "359.50 MB projected total with 20.50 MB headroom",
+        "fixture_display_metadata reserved not created",
+        "No migration or runtime implementation",
+        "All gates BLOCKED"
+      ],
+      "open_gaps": [
+        "D3 migration not authorized",
+        "D3 purge runtime not implemented",
+        "EFI-001 intake not implemented",
+        "UI3 read-model service not implemented",
+        "public_fixture_id resolver BLOCKED"
+      ],
+      "next_action": "SEM-GOV-001D-UI3-I3 PASS WITH CORRECTION. D3 table migration NOT AUTHORIZED pending separate implementation packet.",
+      "owner_note": "Storage policy and EST-001 amendment only.",
+      "last_updated": "2026-07-14"
     }
   ]
 }

@@ -6,7 +6,7 @@
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
   "tracked_path_count": 952,
-  "registered_asset_count": 952,
+  "registered_asset_count": 954,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -32195,6 +32195,85 @@
         "Verifies prohibited sources and field contract",
         "Verifies logo ownership law",
         "Verifies no migration or runtime files added"
+      ]
+    },
+    {
+      "asset_path": "control-center/SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1.md",
+      "asset_type": "CONTROL_CENTER",
+      "asset_role": "CONTROL_GOVERNANCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I3",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I3",
+      "related_assets": [
+        "control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md",
+        "control-center/SEM-GOV-001D-UI3-I2_CANONICAL_FIXTURE_METADATA_PROJECTION_INSPECTION_AND_CONTRACT.v1.md",
+        "tests/sem-gov-001d-ui3-i3-contract.test.js"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i3 after UI3-I3 packet or registration change",
+      "notes": "UI3-I3 PASS WITH CORRECTION. D3 policy sealed. No migration. Gates BLOCKED.",
+      "purpose_description": "Seals D3 DERIVED FIXTURE DISPLAY STATE storage policy, retention law, capacity proof, and EST-001 amendment.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE",
+        "LIFECYCLE",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "PASS WITH CORRECTION",
+        "D3 storage class",
+        "359.50 MB capacity proof",
+        "EST-001 amended"
+      ]
+    },
+    {
+      "asset_path": "tests/sem-gov-001d-ui3-i3-contract.test.js",
+      "asset_type": "TEST",
+      "asset_role": "TEST_PROOF",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I3",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I3",
+      "related_assets": [
+        "control-center/SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1.md",
+        "control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i3 after UI3-I3 packet or registration change",
+      "notes": "Packet guard test for SEM-GOV-001D-UI3-I3 storage policy closure.",
+      "purpose_description": "Guards UI3-I3 PASS WITH CORRECTION, D3 law, EST-001 amendment, capacity proof, and no runtime implementation.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "LIFECYCLE",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Verifies D3 and retention law",
+        "Verifies 20.50 MB headroom",
+        "Verifies EST-001 D3 recognition",
+        "Verifies no migration files added"
       ]
     }
   ],

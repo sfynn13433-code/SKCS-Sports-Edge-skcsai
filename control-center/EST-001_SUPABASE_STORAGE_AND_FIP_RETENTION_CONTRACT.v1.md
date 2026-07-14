@@ -11,6 +11,7 @@
 | **`supabase_storage_gate`** | **BLOCKED** (unchanged) |
 | **Runtime implementation** | **FORBIDDEN** in this packet |
 | **Date sealed** | 2026-07-12 |
+| **Amended** | 2026-07-14 by `SEM-GOV-001D-UI3-I3` — adds **D3 DERIVED FIXTURE DISPLAY STATE** (law only; gates unchanged) |
 | **Prior contracts** | `EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1`, `EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1`, `SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1` |
 
 ---
@@ -76,6 +77,7 @@ This contract **does not** create tables, run SQL, mutate Supabase, or implement
 | **R3** | Derived analysis envelope snapshot | Optional compact envelope hash or redacted subset for audit | **Optional** — proof mode only; not default production |
 | **D1** | Derived prediction state | `predictions_raw`, filtered stages, `direct1x2_prediction_final`, grading outputs | **Yes** — existing Edge lifecycle |
 | **D2** | Subscriber/commercial state | profiles, subscriptions, auth-related tables | **Yes** — existing Edge lifecycle |
+| **D3** | Derived fixture display state | Bounded `fixture_display_metadata` row per `fixture_uid`; display fields derived from validated Scout FIP via EFI-001 only | **Yes** — replaceable; not a Scout mirror |
 | **F1** | Forbidden Scout mirror | Raw provider dumps, Scout evidence archives, full FIP body, H2H/history mirrors | **FORBIDDEN** |
 
 ### 4.2 What Edge stores (allowed)
@@ -87,6 +89,18 @@ This contract **does not** create tables, run SQL, mutate Supabase, or implement
 | Idempotency registry entry | R1 | Key + outcome + timestamp |
 | Compact envelope hash (optional) | R3 | Allowed only in `PROOF_FIXTURE` mode |
 | Existing Edge prediction/subscriber tables | D1, D2 | Unchanged; provenance fields added by future implementation |
+| Bounded fixture display metadata (D3) | D3 | One row per `fixture_uid`; idempotent upsert; EFI-001 population only; no full FIP body |
+
+### 4.3a D3 law (SEM-GOV-001D-UI3-I3 amendment)
+
+| Principle | Law |
+|---|---|
+| **Not a Scout mirror** | D3 stores replaceable display state only; Scout remains canonical sports-truth and replay authority |
+| **Population** | Validated Scout FIP through governed EFI-001 intake only — no direct Scout DB read, no `raw_fixtures`, no provider/mock fallback |
+| **Cardinality** | One row maximum per `fixture_uid`; idempotent upsert; no metadata version history |
+| **Replacement** | Corrected or newer validated Scout FIP may replace the row; rebuild requires fresh Scout FIP |
+| **Public read** | D3 readable only through future UI3 read-model service — not direct table exposure |
+| **Logo law** | Scout governs emblem references; Edge maps home/away placement only; no independent logo acquisition |
 
 ### 4.3 What Edge does not store (forbidden)
 
@@ -126,6 +140,9 @@ EST-001-C1 **declares** the following future schema classes. **No migration is a
 | `fip_intake_events` | R2 | Audit log for EFI-001 intake attempts | No `fip_body` column |
 | `fip_provenance_refs` | R1 | Idempotency + provenance registry | Reference fields only |
 | `fip_prediction_links` | R1 | Join provenance ref → prediction row ids | Foreign keys only |
+| `fixture_display_metadata` | D3 | Bounded fixture display state for UI3 Source B; one row per `fixture_uid` | No `fip_body`, `raw_json`, or provider payload columns |
+
+**`fixture_display_metadata` is reserved by SEM-GOV-001D-UI3-I3. No migration or table creation is authorized by the EST-001 amendment.**
 
 ### 5.2 Allowed extensions to existing tables
 
@@ -156,6 +173,7 @@ EST-001-C1 **declares** the following future schema classes. **No migration is a
 | **R3** Envelope snapshot (optional) | **30 days** proof-only | Purge on proof packet close |
 | **D1** Derived predictions | Existing Edge grading/accuracy lifecycle | Existing Edge policies |
 | **D2** Subscriber state | Existing commercial policies | Existing Edge policies |
+| **D3** Derived fixture display | Active while fixture in eight-day lifecycle window; **30 days** maximum after lifecycle archive/closure | Future governed purge job; `purge_eligible_at` law; no indefinite retention; **no 180-day D3 retention** |
 | **F1** Forbidden | Must never be written | N/A |
 
 ### Retention override law
@@ -262,6 +280,7 @@ In explicitly authorized `PROOF_FIXTURE` mode:
 | Purge of R1 provenance refs | Permitted only after linked predictions reach retention closure |
 | Purge under budget pressure | Requires Control Center authorized purge packet; prefer R3 → R2 → oldest settled R1 |
 | Deletion of D1 predictions | Existing Edge lifecycle only |
+| Purge of D3 `fixture_display_metadata` rows | Permitted after 30-day post-closure window via future governed purge mechanism; must not retain metadata version history |
 | Deletion of Scout canonical data from Edge | **N/A** — Edge must not hold it |
 
 ---
@@ -274,6 +293,7 @@ In explicitly authorized `PROOF_FIXTURE` mode:
 | **EFI-001** | R2 stores EFI-001 §9 evidence; R1 stores §8 provenance; T0 is transient only |
 | **E2E-001** | Proof mode retention rules enable auditable E2E without full FIP mirror |
 | **FIP-001** | Canonical FIP body remains in Scout; Edge holds references only |
+| **SEM-GOV-001D-UI3-I3** | Adds D3 class, `fixture_display_metadata` reservation, 8-day active + 30-day post-closure retention; does not clear gates or authorize migration |
 
 ---
 
@@ -288,6 +308,8 @@ In explicitly authorized `PROOF_FIXTURE` mode:
 | `supabase_storage_gate` clearance | Separate explicit approval after proofs |
 | EFI-001 runtime intake persistence | Future EFI-001 implementation packet |
 | Marriage gate clearance | Separate explicit approval after E2E-001 |
+| D3 `fixture_display_metadata` migration | Future implementation packet after UI3-I3; gate clearance separate |
+| D3 purge job runtime | Future governed purge packet |
 
 ---
 
@@ -303,6 +325,7 @@ In explicitly authorized `PROOF_FIXTURE` mode:
 | Runtime implementation forbidden | **PASS** |
 | Marriage gate remains BLOCKED | **PASS** |
 | `supabase_storage_gate` remains BLOCKED | **PASS** |
+| D3 DERIVED FIXTURE DISPLAY STATE recognized (UI3-I3 amendment) | **PASS** |
 
 ---
 

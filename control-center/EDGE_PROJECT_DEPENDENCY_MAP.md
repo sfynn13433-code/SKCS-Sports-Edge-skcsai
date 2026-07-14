@@ -238,3 +238,11 @@ Governed by: SEM-GOV-001D-UI3-I2
 Blocked by: SEM-GOV-001D-UI3-I1, EST-001
 Blocks: none
 Notes: Inspection PASS WITH BLOCKER — NEW GOVERNED METADATA PROJECTION REQUIRED. raw_fixtures rejected as Source B. Scout FIP-001 canonical authority. Bounded projection fields sealed. EST-001 authorization pending. Source B persistence NOT AUTHORIZED. UI3/UI4 NOT STARTED. Migration NOT APPLIED. All gates BLOCKED.
+
+## SEM-GOV-001D-UI3-I3 — Source B Storage Policy and Retention Contract
+
+Status: TESTED
+Governed by: SEM-GOV-001D-UI3-I3
+Blocked by: SEM-GOV-001D-UI3-I2
+Blocks: none
+Notes: PASS WITH CORRECTION. D3 DERIVED FIXTURE DISPLAY STATE sealed. EST-001 amended. 8-day active + 30-day post-closure retention. 359.50 MB projected total with 20.50 MB headroom. fixture_display_metadata reserved not created. D3 migration NOT AUTHORIZED. UI3/UI4 NOT STARTED. Migration NOT APPLIED. All gates BLOCKED.

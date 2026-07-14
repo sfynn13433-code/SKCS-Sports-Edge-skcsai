@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 33,
+  "project_count": 34,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -1957,6 +1957,67 @@
         "Bounded projection fields documented",
         "EST-001 blocker recorded",
         "No runtime files added"
+      ]
+    },
+    {
+      "project_id": "SEM-GOV-001D-UI3-I3",
+      "project_name": "Source B Storage Policy and Retention Contract",
+      "category": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: seal D3 DERIVED FIXTURE DISPLAY STATE, retention and purge law, capacity proof, and EST-001 amendment for UI3 Source B — no migration or runtime.",
+      "why_it_matters": "Source B persistence must have explicit EST-001 authorization, bounded retention, and capacity proof before any fixture_display_metadata implementation.",
+      "current_status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I2"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "database"
+      ],
+      "related_tasks": [
+        "SEM-GOV-001D-UI3-I3"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-UI3-I2_CANONICAL_FIXTURE_METADATA_PROJECTION_INSPECTION_AND_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
+      ],
+      "related_files": [
+        "control-center/SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1.md",
+        "control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md",
+        "tests/sem-gov-001d-ui3-i3-contract.test.js"
+      ],
+      "related_tables": [],
+      "known_issues": [
+        "fixture_display_metadata reserved not created",
+        "D3 purge runtime not authorized",
+        "supabase_storage_gate BLOCKED"
+      ],
+      "required_decisions": [
+        "D3 migration implementation packet",
+        "EFI-001 intake before D3 population"
+      ],
+      "completion_definition": "SEM-GOV-001D-UI3-I3 PASS WITH CORRECTION with D3 policy, EST-001 amendment, and packet guard test.",
+      "proof_required": [
+        "test:sem-gov-001d-ui3-i3 passes",
+        "359.50 MB capacity proof",
+        "Gates BLOCKED"
+      ],
+      "risks_if_ignored": [
+        "Source B could retain indefinite metadata or exceed free-tier capacity"
+      ],
+      "recommended_order": 34,
+      "next_action": "SEM-GOV-001D-UI3-I3 PASS WITH CORRECTION. D3 migration NOT AUTHORIZED.",
+      "owner_note": "Storage policy only.",
+      "last_updated": "2026-07-14",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I3",
+      "current_evidence": [
+        "D3 class sealed in EST-001",
+        "30-day post-closure retention law",
+        "20.50 MB headroom preserved"
       ]
     }
   ]
