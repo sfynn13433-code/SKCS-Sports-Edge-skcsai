@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 37,
+  "project_count": 38,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -2159,7 +2159,9 @@
       "blocked_by": [
         "SEM-GOV-001D-UI3-I5"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI3-I7"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -2203,7 +2205,7 @@
         "scout.fixture_id could be misused as fixture_uid"
       ],
       "recommended_order": 37,
-      "next_action": "SEM-GOV-001D-UI3-I6 PASS WITH BLOCKER. Adapter implementation NOT AUTHORIZED.",
+      "next_action": "SEM-GOV-001D-UI3-I6 PASS WITH BLOCKER. UI3-I7 adapter implementation authorized.",
       "owner_note": "Inspection and contract only.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I6",
@@ -2212,6 +2214,73 @@
         "Hash verification proven",
         "D3 DTO crosswalk sealed",
         "fixture_uid resolution BLOCKER documented"
+      ]
+    },
+    {
+      "project_id": "SEM-GOV-001D-UI3-I7",
+      "project_name": "Governed FIP Intake Adapter Implementation",
+      "category": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: implement isolated governed FIP intake adapter with identity resolution, D3 orchestration, and injected evidence — no route or production caller.",
+      "why_it_matters": "EFI-001 requires a governed adapter before HTTP boundary, durable evidence, or pipeline activation.",
+      "current_status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I6"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "backend"
+      ],
+      "related_tasks": [
+        "SEM-GOV-001D-UI3-I7"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-UI3-I6_EFI_001_GOVERNED_INTAKE_INSPECTION_AND_ADAPTER_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I7_GOVERNED_FIP_INTAKE_ADAPTER_IMPLEMENTATION_PACKET.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1"
+      ],
+      "related_files": [
+        "backend/services/governedFipIntakeAdapter.js",
+        "backend/services/fixtureIdentityResolverService.js",
+        "backend/services/fipIntakeService.js",
+        "tests/governed-fip-intake-adapter.test.js",
+        "tests/fixture-identity-resolver-service.test.js"
+      ],
+      "related_tables": [],
+      "known_issues": [
+        "No HTTP intake route",
+        "No durable evidence storage",
+        "Migrations NOT APPLIED",
+        "All gates BLOCKED"
+      ],
+      "required_decisions": [
+        "HTTP boundary authorization",
+        "Evidence persistence migration",
+        "Marriage gate clearance"
+      ],
+      "completion_definition": "SEM-GOV-001D-UI3-I7 PASS WITH CORRECTION — adapter implemented with mock-first tests, no production caller.",
+      "proof_required": [
+        "test:sem-gov-001d-ui3-i7 passes",
+        "FIP-001 validation",
+        "Identity resolver isolated",
+        "Gates BLOCKED"
+      ],
+      "risks_if_ignored": [
+        "Intake could be wired without durable evidence or HTTP auth"
+      ],
+      "recommended_order": 38,
+      "next_action": "SEM-GOV-001D-UI3-I7 PASS WITH CORRECTION. HTTP boundary NOT AUTHORIZED.",
+      "owner_note": "Isolated adapter only.",
+      "last_updated": "2026-07-14",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I7",
+      "current_evidence": [
+        "Adapter and resolver implemented",
+        "Mock-first tests pass",
+        "No production caller"
       ]
     }
   ]

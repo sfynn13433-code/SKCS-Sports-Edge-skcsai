@@ -2037,7 +2037,9 @@
       "blocked_by": [
         "SEM-GOV-001D-UI3-I5"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI3-I7"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -2081,8 +2083,69 @@
         "HTTP intake route",
         "Migration apply blocked"
       ],
-      "next_action": "SEM-GOV-001D-UI3-I6 PASS WITH BLOCKER. Adapter implementation NOT AUTHORIZED.",
+      "next_action": "SEM-GOV-001D-UI3-I6 PASS WITH BLOCKER. UI3-I7 adapter implementation authorized.",
       "owner_note": "Inspection and contract only.",
+      "last_updated": "2026-07-14"
+    },
+    {
+      "task_id": "SEM-GOV-001D-UI3-I7",
+      "task_name": "Governed FIP Intake Adapter Implementation",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: implement isolated governed FIP intake adapter with identity resolution, D3 orchestration, envelope mapping, and injected evidence — no route, migration apply, or production caller.",
+      "status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I6"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "backend"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-UI3-I6_EFI_001_GOVERNED_INTAKE_INSPECTION_AND_ADAPTER_CONTRACT.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I7_GOVERNED_FIP_INTAKE_ADAPTER_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001D-UI3-I5_SOURCE_B_MIGRATION_AND_ISOLATED_PERSISTENCE_IMPLEMENTATION_PACKET.v1"
+      ],
+      "affected_files": [
+        "backend/services/fipIntakeService.js",
+        "backend/services/fixtureIdentityResolverService.js",
+        "backend/services/governedFipIntakeAdapter.js",
+        "tests/fip-intake-service.test.js",
+        "tests/fixture-identity-resolver-service.test.js",
+        "tests/governed-fip-intake-adapter.test.js",
+        "control-center/SEM-GOV-001D-UI3-I7_GOVERNED_FIP_INTAKE_ADAPTER_IMPLEMENTATION_PACKET.v1.md",
+        "tests/sem-gov-001d-ui3-i7-implementation-packet.test.js",
+        "package.json"
+      ],
+      "affected_tables": [],
+      "completion_definition": "SEM-GOV-001D-UI3-I7 PASS WITH CORRECTION — adapter implemented with mock-first tests, no route or production caller, gates BLOCKED.",
+      "proof_required": [
+        "npm run test:sem-gov-001d-ui3-i7 passes",
+        "FIP-001 canonical validation",
+        "Identity resolver isolated",
+        "All gates BLOCKED"
+      ],
+      "current_evidence": [
+        "governedFipIntakeAdapter implemented",
+        "fixtureIdentityResolverService implemented",
+        "fipIntakeService FIP-001 aligned",
+        "Mock-first tests pass",
+        "No production caller",
+        "All gates BLOCKED"
+      ],
+      "open_gaps": [
+        "HTTP intake route",
+        "Durable intake evidence storage",
+        "Migration apply blocked",
+        "Marriage gate clearance"
+      ],
+      "next_action": "SEM-GOV-001D-UI3-I7 PASS WITH CORRECTION. HTTP boundary NOT AUTHORIZED.",
+      "owner_note": "Isolated adapter implementation only.",
       "last_updated": "2026-07-14"
     }
   ]

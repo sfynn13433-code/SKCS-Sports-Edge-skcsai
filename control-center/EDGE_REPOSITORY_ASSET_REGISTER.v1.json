@@ -5,8 +5,8 @@
   "source_command": "git ls-files",
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
-  "tracked_path_count": 967,
-  "registered_asset_count": 963,
+  "tracked_path_count": 973,
+  "registered_asset_count": 969,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -32666,6 +32666,264 @@
         "Verifies packet sections",
         "Verifies fipIntakeService classification",
         "Verifies no intake route",
+        "Verifies ledger registration"
+      ]
+    },
+    {
+      "asset_path": "control-center/SEM-GOV-001D-UI3-I7_GOVERNED_FIP_INTAKE_ADAPTER_IMPLEMENTATION_PACKET.v1.md",
+      "asset_type": "CONTROL_CENTER",
+      "asset_role": "CONTROL_GOVERNANCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I7",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I7",
+      "related_assets": [
+        "control-center/SEM-GOV-001D-UI3-I6_EFI_001_GOVERNED_INTAKE_INSPECTION_AND_ADAPTER_CONTRACT.v1.md",
+        "backend/services/governedFipIntakeAdapter.js",
+        "tests/sem-gov-001d-ui3-i7-implementation-packet.test.js"
+      ],
+      "related_tables": [],
+      "related_functions": [
+        "createGovernedFipIntakeAdapter",
+        "receiveValidatedFip"
+      ],
+      "runtime_consumers": [],
+      "runtime_dependencies": [
+        "backend/services/fipIntakeService.js",
+        "backend/services/fixtureIdentityResolverService.js",
+        "backend/services/fixtureDisplayMetadataPersistenceService.js"
+      ],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i7 after UI3-I7 packet or registration change",
+      "notes": "UI3-I7 PASS WITH CORRECTION. Adapter implemented. No route. Gates BLOCKED.",
+      "purpose_description": "Seals isolated governed FIP intake adapter implementation scope and Definition of Done.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE",
+        "LIFECYCLE",
+        "BACKEND"
+      ],
+      "classification_evidence": [
+        "Documents adapter orchestration",
+        "Documents identity resolver law",
+        "Documents no HTTP route boundary",
+        "Verifies gates BLOCKED"
+      ]
+    },
+    {
+      "asset_path": "backend/services/fixtureIdentityResolverService.js",
+      "asset_type": "SOURCE_CODE",
+      "asset_role": "APPLICATION_SOURCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I7",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I7",
+      "related_assets": [
+        "backend/services/governedFipIntakeAdapter.js",
+        "tests/fixture-identity-resolver-service.test.js"
+      ],
+      "related_tables": [
+        "fixture_identity_aliases",
+        "fixture_lifecycle_current"
+      ],
+      "related_functions": [
+        "createFixtureIdentityResolver",
+        "resolveScoutFixtureId",
+        "confirmLifecycleParent"
+      ],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [
+        "public.fixture_identity_aliases",
+        "public.fixture_lifecycle_current"
+      ],
+      "deployment_surface": [
+        "render"
+      ],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i7 after resolver change",
+      "notes": "Isolated scout.fixture_id to fixture_uid resolver. No admission.",
+      "purpose_description": "Resolves scout.fixture_id through fixture_identity_aliases and confirms lifecycle parent.",
+      "functional_group": "BACKEND_RUNTIME",
+      "relationship_tags": [
+        "BACKEND",
+        "LIFECYCLE",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Explicit SELECT columns only",
+        "No fixture_uid minting",
+        "Mock-first tests"
+      ]
+    },
+    {
+      "asset_path": "backend/services/governedFipIntakeAdapter.js",
+      "asset_type": "SOURCE_CODE",
+      "asset_role": "APPLICATION_SOURCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I7",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I7",
+      "related_assets": [
+        "backend/services/fipIntakeService.js",
+        "backend/services/fixtureIdentityResolverService.js",
+        "tests/governed-fip-intake-adapter.test.js"
+      ],
+      "related_tables": [
+        "fixture_display_metadata",
+        "fixture_identity_aliases",
+        "fixture_lifecycle_current"
+      ],
+      "related_functions": [
+        "createGovernedFipIntakeAdapter",
+        "receiveValidatedFip",
+        "buildBoundedEvidenceRecord"
+      ],
+      "runtime_consumers": [],
+      "runtime_dependencies": [
+        "backend/services/fipIntakeService.js",
+        "backend/services/fixtureDisplayMetadataPersistenceService.js"
+      ],
+      "database_objects": [],
+      "deployment_surface": [
+        "render"
+      ],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i7 after adapter change",
+      "notes": "Isolated EFI-001 adapter. No route. No aiPipeline.",
+      "purpose_description": "Orchestrates governed FIP validation, identity resolution, D3 persistence, envelope mapping, and bounded evidence.",
+      "functional_group": "BACKEND_RUNTIME",
+      "relationship_tags": [
+        "BACKEND",
+        "LIFECYCLE",
+        "GOVERNANCE"
+      ],
+      "classification_evidence": [
+        "Gate-before-downstream law",
+        "Injected evidence interface",
+        "No production caller"
+      ]
+    },
+    {
+      "asset_path": "tests/fixture-identity-resolver-service.test.js",
+      "asset_type": "TEST",
+      "asset_role": "CONTROL_AUDIT",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I7",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I7",
+      "related_assets": [
+        "backend/services/fixtureIdentityResolverService.js"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i7 after resolver change",
+      "notes": "Mock-first identity resolver tests for UI3-I7.",
+      "purpose_description": "Guards alias resolution, lifecycle confirmation, and bounded query law.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "LIFECYCLE"
+      ],
+      "classification_evidence": [
+        "Verifies scout_fixture_id namespace",
+        "Verifies no fixture_uid minting",
+        "Verifies bounded queries"
+      ]
+    },
+    {
+      "asset_path": "tests/governed-fip-intake-adapter.test.js",
+      "asset_type": "TEST",
+      "asset_role": "CONTROL_AUDIT",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I7",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I7",
+      "related_assets": [
+        "backend/services/governedFipIntakeAdapter.js"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i7 after adapter change",
+      "notes": "Mock-first governed adapter tests for UI3-I7.",
+      "purpose_description": "Guards gate-before-downstream, D3 DTO bounds, idempotency, and evidence interface.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "LIFECYCLE",
+        "BACKEND"
+      ],
+      "classification_evidence": [
+        "Verifies FIP-001 canonical intake",
+        "Verifies no aiPipeline",
+        "Verifies blocked gates"
+      ]
+    },
+    {
+      "asset_path": "tests/sem-gov-001d-ui3-i7-implementation-packet.test.js",
+      "asset_type": "TEST",
+      "asset_role": "CONTROL_AUDIT",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I7",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I7",
+      "related_assets": [
+        "control-center/SEM-GOV-001D-UI3-I7_GOVERNED_FIP_INTAKE_ADAPTER_IMPLEMENTATION_PACKET.v1.md"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i7 after UI3-I7 packet change",
+      "notes": "Packet guard test for SEM-GOV-001D-UI3-I7 closure.",
+      "purpose_description": "Guards UI3-I7 PASS WITH CORRECTION, adapter files, and blocked gates.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "LIFECYCLE",
+        "BACKEND"
+      ],
+      "classification_evidence": [
+        "Verifies packet sections",
+        "Verifies adapter services exist",
+        "Verifies no route",
         "Verifies ledger registration"
       ]
     }

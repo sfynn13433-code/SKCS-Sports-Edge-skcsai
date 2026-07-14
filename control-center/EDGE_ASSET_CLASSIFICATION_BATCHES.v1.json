@@ -14,7 +14,7 @@
           "control-center/"
         ]
       },
-      "asset_count": 37,
+      "asset_count": 38,
       "asset_paths": [
         "control-center/check_control_center.js",
         "control-center/check_edge_asset_classification.js",
@@ -55,7 +55,8 @@
         "control-center/SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1.md",
         "control-center/SEM-GOV-001D-UI3-I4_SOURCE_B_SCHEMA_AND_PERSISTENCE_IMPLEMENTATION_DESIGN.v1.md",
         "control-center/SEM-GOV-001D-UI3-I5_SOURCE_B_MIGRATION_AND_ISOLATED_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md",
-        "control-center/SEM-GOV-001D-UI3-I6_EFI_001_GOVERNED_INTAKE_INSPECTION_AND_ADAPTER_CONTRACT.v1.md"
+        "control-center/SEM-GOV-001D-UI3-I6_EFI_001_GOVERNED_INTAKE_INSPECTION_AND_ADAPTER_CONTRACT.v1.md",
+        "control-center/SEM-GOV-001D-UI3-I7_GOVERNED_FIP_INTAKE_ADAPTER_IMPLEMENTATION_PACKET.v1.md"
       ]
     },
     {
@@ -309,7 +310,7 @@
           "backend/services/"
         ]
       },
-      "asset_count": 91,
+      "asset_count": 93,
       "asset_paths": [
         "backend/services/accaBuilder.js",
         "backend/services/accaMathUtils.js",
@@ -350,11 +351,13 @@
         "backend/services/enhancedMatchDetailsService.js",
         "backend/services/espnHiddenApiService.js",
         "backend/services/filterEngine.js",
+        "backend/services/fixtureIdentityResolverService.js",
         "backend/services/fipIntakeService.js",
         "backend/services/fipStoragePolicyService.js",
         "backend/services/fixtureDisplayMetadataPersistenceService.js",
         "backend/services/lifecycleGovernor.js",
         "backend/services/lifecyclePersistenceService.js",
+        "backend/services/governedFipIntakeAdapter.js",
         "backend/services/football536Extractor.js",
         "backend/services/football536Service.js",
         "backend/services/footballH2HExtractor.js",
@@ -1242,7 +1245,7 @@
           "tests/"
         ]
       },
-      "asset_count": 28,
+      "asset_count": 31,
       "asset_paths": [
         "tests/edge-asset-classification.test.js",
         "tests/edge-control-center-ledger.test.js",
@@ -1271,7 +1274,10 @@
         "tests/sem-gov-001d-ui3-i4-contract.test.js",
         "tests/sem-gov-001d-ui3-i5-implementation-packet.test.js",
         "tests/fixture-display-metadata-persistence-service.test.js",
-        "tests/sem-gov-001d-ui3-i6-contract.test.js"
+        "tests/fixture-identity-resolver-service.test.js",
+        "tests/governed-fip-intake-adapter.test.js",
+        "tests/sem-gov-001d-ui3-i6-contract.test.js",
+        "tests/sem-gov-001d-ui3-i7-implementation-packet.test.js"
       ]
     },
     {

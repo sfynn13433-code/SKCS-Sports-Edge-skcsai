@@ -11,6 +11,8 @@ const {
   receiveValidatedFip,
   computeFipHash,
   computeIdempotencyKey,
+  normalizeLegacyProofFip,
+  isLegacyProofFipShape,
   MAX_VALIDATION_AGE_MS,
   MAX_FUTURE_CLOCK_SKEW_MS,
   MAX_KICKOFF_HORIZON_MS
@@ -133,7 +135,7 @@ test('rejects unsupported FIP schema versions', () => {
   const result = receiveValidatedFip(fip, proofOptions());
 
   assert.equal(result.accepted, false);
-  assert.equal(result.rejection_code, 'UNSUPPORTED_SCHEMA_VERSION');
+  assert.equal(result.rejection_code, 'FIP_SCHEMA_UNSUPPORTED');
   assert.equal(result.envelope, null);
 });
 
@@ -148,7 +150,7 @@ test('rejects FIP payloads that are not Scout VALIDATED', () => {
   const result = receiveValidatedFip(fip, proofOptions());
 
   assert.equal(result.accepted, false);
-  assert.equal(result.rejection_code, 'VALIDATION_STATUS_NOT_VALIDATED');
+  assert.equal(result.rejection_code, 'FIP_NOT_VALIDATED');
 });
 
 test('rejects tampered FIP payload hash mismatch', () => {
@@ -158,7 +160,7 @@ test('rejects tampered FIP payload hash mismatch', () => {
   const result = receiveValidatedFip(fip, proofOptions());
 
   assert.equal(result.accepted, false);
-  assert.equal(result.rejection_code, 'HASH_MISMATCH');
+  assert.equal(result.rejection_code, 'FIP_HASH_MISMATCH');
 });
 
 test('rejects missing required fixture identity', () => {
@@ -169,7 +171,7 @@ test('rejects missing required fixture identity', () => {
   const result = receiveValidatedFip(fip, proofOptions());
 
   assert.equal(result.accepted, false);
-  assert.equal(result.rejection_code, 'REQUIRED_FIELD_MISSING');
+  assert.equal(result.rejection_code, 'FIP_REQUIRED_FIELD_MISSING');
   assert.equal(result.evidence.details.path, 'fixture.fixture_id');
 });
 
@@ -184,7 +186,7 @@ test('rejects forbidden provider/manual/workspace origins', () => {
   const result = receiveValidatedFip(fip, proofOptions());
 
   assert.equal(result.accepted, false);
-  assert.equal(result.rejection_code, 'FORBIDDEN_ORIGIN');
+  assert.equal(result.rejection_code, 'FIP_FORBIDDEN_ORIGIN');
 });
 
 test('rejects production intake while the marriage gate remains blocked', () => {
@@ -199,7 +201,7 @@ test('rejects production intake while the marriage gate remains blocked', () => 
   );
 
   assert.equal(result.accepted, false);
-  assert.equal(result.rejection_code, 'PRODUCTION_GATE_BLOCKED');
+  assert.equal(result.rejection_code, 'FIP_MARRIAGE_GATE_BLOCKED');
   assert.equal(result.envelope, null);
 });
 
@@ -314,4 +316,16 @@ test('rejects a fixture beyond the 48-hour kickoff horizon', () => {
   assert.ok(
     result.evidence.details.kickoff_delay_ms > MAX_KICKOFF_HORIZON_MS
   );
+});
+
+test('legacy proof fixtures normalize to canonical hash_algorithm internally', () => {
+  const fip = buildValidFip();
+  assert.equal(isLegacyProofFipShape(fip), true);
+
+  const canonical = normalizeLegacyProofFip(fip);
+  assert.equal(canonical.scout.fixture_id, 'E2E-001-PROOF-001');
+  assert.equal(canonical.validation.hash_algorithm, HASH_ALGORITHM);
+  assert.equal(canonical.validation.algorithm, undefined);
+  assert.equal(canonical.fixture.kickoff_utc, '2026-07-12T18:00:00Z');
+  assert.equal(canonical.fixture.home_team.id, 'Scout Home FC');
 });

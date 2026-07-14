@@ -268,5 +268,13 @@ Notes: PASS WITH CORRECTION. 25 physical columns in migration SQL. fixtureDispla
 Status: TESTED
 Governed by: SEM-GOV-001D-UI3-I6
 Blocked by: SEM-GOV-001D-UI3-I5
+Blocks: SEM-GOV-001D-UI3-I7
+Notes: PASS WITH BLOCKER. fipIntakeService classified PARTIAL proof-only. Hash law proven. FIP-to-D3 DTO crosswalk sealed. Lifecycle-before-D3 sequence sealed. fixture_uid resolution BLOCKER. UI3-I7 implemented. All gates BLOCKED.
+
+## SEM-GOV-001D-UI3-I7 — Governed FIP Intake Adapter Implementation
+
+Status: TESTED
+Governed by: SEM-GOV-001D-UI3-I7
+Blocked by: SEM-GOV-001D-UI3-I6
 Blocks: none
-Notes: PASS WITH BLOCKER. fipIntakeService classified PARTIAL proof-only. Hash law proven. FIP-to-D3 DTO crosswalk sealed. Lifecycle-before-D3 sequence sealed. fixture_uid resolution BLOCKER. No runtime changes. All gates BLOCKED.
+Notes: PASS WITH CORRECTION. governedFipIntakeAdapter and fixtureIdentityResolverService implemented. fipIntakeService FIP-001 aligned. Mock-first tests pass. No HTTP route. No production caller. Migrations NOT APPLIED. All gates BLOCKED.
