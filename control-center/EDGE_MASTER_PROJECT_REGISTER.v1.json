@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 28,
+  "project_count": 29,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -1651,6 +1651,70 @@
         "Migration 20261008000001 authored — NOT APPLIED",
         "Mock-first admission cap, idempotency, and transition proofs pass",
         "supabase_storage_gate remains BLOCKED; unified_lifecycle_governor remains BLOCKED"
+      ]
+    },
+    {
+      "project_id": "SEM-GOV-001D-UI1",
+      "project_name": "Sports Match Hub UI Information Architecture and Screen Contract",
+      "category": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001: seal Sports Match Hub UI information architecture and screen contract — navigation, day funnel presentation, lifecycle language, fixture cards, filters, UI states, and future read-model API fields — without frontend or runtime implementation.",
+      "why_it_matters": "Without a fixed screen contract, UI2 implementation would invent layout, lifecycle terminology, API fields, and user states inconsistent with SEM-GOV-001 law.",
+      "current_status": "PROPOSED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001A",
+        "SEM-GOV-001B-I4"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "frontend"
+      ],
+      "related_tasks": [
+        "SEM-GOV-001D-UI1"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1",
+        "SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1",
+        "SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1"
+      ],
+      "related_files": [
+        "control-center/SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1.md",
+        "tests/sem-gov-001d-ui1-screen-contract.test.js"
+      ],
+      "related_tables": [],
+      "known_issues": [
+        "Current index.html embeds prediction-centric Hub",
+        "No dedicated Hub route",
+        "Help and History pages missing"
+      ],
+      "required_decisions": [
+        "Separate UI2 authorization for static implementation",
+        "UI3 read-model API packet before live data"
+      ],
+      "completion_definition": "SEM-GOV-001D-UI1 seals UI information architecture and screen contract PROPOSED with packet guard test and Control Center registration — UI2/UI3/UI4 NOT STARTED.",
+      "proof_required": [
+        "Packet sections A–Y",
+        "test:sem-gov-001d-ui1 passes",
+        "All gates BLOCKED",
+        "No frontend code modified in UI1"
+      ],
+      "risks_if_ignored": [
+        "UI2 could expose prediction-centric patterns as lifecycle truth",
+        "Inconsistent day labels could confuse users and break governor alignment"
+      ],
+      "recommended_order": 29,
+      "next_action": "SEM-GOV-001D-UI1 screen contract PROPOSED. UI2 NOT STARTED.",
+      "owner_note": "Design-only. No UI code in UI1.",
+      "last_updated": "2026-07-14",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI1",
+      "current_evidence": [
+        "SEM-GOV-001D-UI1 packet sealed with day-token reconciliation",
+        "Canonical navigation and lifecycle language fixed",
+        "Migration remains NOT APPLIED"
       ]
     }
   ]

@@ -1562,6 +1562,74 @@
       "next_action": "SEM-GOV-001B-I4 implementation foundation TESTED. Migration authored NOT APPLIED. Production activation BLOCKED pending supabase_storage_gate clearance and separate authorization.",
       "owner_note": "Foundation only. Six tables authored. Gates remain BLOCKED. No Supabase apply.",
       "last_updated": "2026-07-14"
+    },
+    {
+      "task_id": "SEM-GOV-001D-UI1",
+      "task_name": "Sports Match Hub UI Information Architecture and Screen Contract",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001: seal the Sports Match Hub user-facing information architecture and screen contract — canonical navigation, day navigation, lifecycle language, fixture cards, filters, UI states, future API read-model fields, responsive and accessibility law — without HTML, CSS, JavaScript, API, migration, or runtime implementation.",
+      "status": "PROPOSED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001A",
+        "SEM-GOV-001B-I4"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "frontend"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1",
+        "SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1",
+        "SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1"
+      ],
+      "affected_files": [
+        "control-center/SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1.md",
+        "tests/sem-gov-001d-ui1-screen-contract.test.js",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
+        "control-center/EDGE_PROJECT_BACKLOG.md",
+        "control-center/EDGE_PROJECT_DEPENDENCY_MAP.md",
+        "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
+        "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
+        "control-center/EDGE_ASSET_REPOSITORY_MAP.md",
+        "control-center/EDGE_CONTROL_CENTER.md",
+        "package.json"
+      ],
+      "affected_tables": [],
+      "completion_definition": "SEM-GOV-001D-UI1 seals Sports Match Hub UI information architecture and screen contract PROPOSED with day-token reconciliation, lifecycle language, API read-model design only, and explicit UI2/UI3/UI4 boundaries — without frontend, API, migration, or gate clearance.",
+      "proof_required": [
+        "control-center/SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1.md exists with sections A–Y",
+        "npm run test:sem-gov-001d-ui1 passes",
+        "All three governance gates remain BLOCKED",
+        "SEM-GOV-001D-UI1 registered in ledger and master project register",
+        "npm run control:center passes",
+        "npm run verify:rulebook passes"
+      ],
+      "current_evidence": [
+        "SEM-GOV-001D-UI1 sealed control-center/SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1.md",
+        "Read-only UI1 inspection baseline recorded",
+        "Day tokens reconciled with lifecycleGovernor DAY_LABELS (no DAY_1)",
+        "UI2/UI3/UI4 NOT STARTED",
+        "supabase_storage_gate remains BLOCKED; migration NOT APPLIED",
+        "unified_lifecycle_governor remains BLOCKED",
+        "scout_edge_marriage_gate remains BLOCKED",
+        "No production UI mutation"
+      ],
+      "open_gaps": [
+        "No dedicated Sports Match Hub page (UI2)",
+        "No lifecycle read-model API (UI3)",
+        "No live frontend integration (UI4)",
+        "Help and History pages do not exist",
+        "Current smh-hub.js remains prediction-centric"
+      ],
+      "next_action": "SEM-GOV-001D-UI1 screen contract PROPOSED. UI2 static implementation NOT STARTED pending separate authorization.",
+      "owner_note": "Design-only packet. No frontend code. Gates remain BLOCKED.",
+      "last_updated": "2026-07-14"
     }
   ]
 }

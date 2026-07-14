@@ -198,3 +198,11 @@ Governed by: SEM-GOV-001B-I4
 Blocked by: SEM-GOV-001B-I4-CAP2
 Blocks: none
 Notes: Implementation foundation TESTED. Migration authored NOT APPLIED. Production activation BLOCKED. All gates BLOCKED. I4-PURGE, I5, SEM-GOV-001C not started.
+
+## SEM-GOV-001D-UI1 — Sports Match Hub UI Information Architecture and Screen Contract
+
+Status: PROPOSED
+Governed by: SEM-GOV-001D-UI1
+Blocked by: SEM-GOV-001A, SEM-GOV-001B-I4
+Blocks: none
+Notes: Screen contract PROPOSED. UI2/UI3/UI4 NOT STARTED. No frontend code. Migration NOT APPLIED. All gates BLOCKED.
