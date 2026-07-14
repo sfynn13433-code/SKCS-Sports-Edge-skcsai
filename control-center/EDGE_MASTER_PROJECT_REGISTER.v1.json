@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 30,
+  "project_count": 31,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -1775,6 +1775,61 @@
       "current_evidence": [
         "sports-match-hub.html and isolated assets",
         "UI2 tests pass",
+        "Migration NOT APPLIED"
+      ]
+    },
+    {
+      "project_id": "SEM-GOV-001D-HOME1",
+      "project_name": "Home Page Information Architecture and Visual Consolidation",
+      "category": "Unified Sports Intelligence Lifecycle",
+      "description": "Rebuild public/index.html into a concise Hub-aligned dark landing page; remove legacy embedded Hub and sprawl from home rendering.",
+      "why_it_matters": "Users need a professional entry point that matches the governed Sports Match Hub before deeper lifecycle features ship.",
+      "current_status": "TESTED",
+      "priority": "high",
+      "blocked_by": [
+        "SEM-GOV-001D-UI2"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "control-center",
+        "frontend"
+      ],
+      "related_tasks": [
+        "SEM-GOV-001D-HOME1"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-HOME1_HOME_PAGE_INFORMATION_ARCHITECTURE_AND_VISUAL_CONSOLIDATION.v1"
+      ],
+      "related_files": [
+        "public/index.html",
+        "public/css/home-page.css",
+        "public/js/home-page.js",
+        "tests/sem-gov-001d-home1-static-home.test.js",
+        "tests/sem-gov-001d-home1-visual-acceptance.test.js"
+      ],
+      "related_tables": [],
+      "known_issues": [
+        "Static landing only — no live lifecycle API on home"
+      ],
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001D-HOME1 home landing TESTED with focused tests and Control Center registration.",
+      "proof_required": [
+        "test:sem-gov-001d-home1 passes",
+        "Hub files unchanged",
+        "Gates BLOCKED"
+      ],
+      "risks_if_ignored": [
+        "Home page could remain visually inconsistent with the governed Hub"
+      ],
+      "recommended_order": 31,
+      "next_action": "SEM-GOV-001D-HOME1 TESTED. UI3 NOT STARTED.",
+      "owner_note": "Home consolidation only.",
+      "last_updated": "2026-07-14",
+      "governed_by_control_task_id": "SEM-GOV-001D-HOME1",
+      "current_evidence": [
+        "Hub-aligned dark index.html",
+        "HOME1 tests pass",
         "Migration NOT APPLIED"
       ]
     }

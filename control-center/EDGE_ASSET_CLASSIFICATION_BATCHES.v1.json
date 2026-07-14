@@ -14,7 +14,7 @@
           "control-center/"
         ]
       },
-      "asset_count": 33,
+      "asset_count": 34,
       "asset_paths": [
         "control-center/check_control_center.js",
         "control-center/check_edge_asset_classification.js",
@@ -48,7 +48,8 @@
         "control-center/SEM-GOV-001B-I4_CAP2_DAILY_ADMISSION_LIMIT_DESIGN.v1.md",
         "control-center/SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md",
         "control-center/SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1.md",
-        "control-center/SEM-GOV-001D-UI2_STATIC_SPORTS_MATCH_HUB_IMPLEMENTATION_PACKET.v1.md"
+        "control-center/SEM-GOV-001D-UI2_STATIC_SPORTS_MATCH_HUB_IMPLEMENTATION_PACKET.v1.md",
+        "control-center/SEM-GOV-001D-HOME1_HOME_PAGE_INFORMATION_ARCHITECTURE_AND_VISUAL_CONSOLIDATION.v1.md"
       ]
     },
     {
@@ -1039,7 +1040,7 @@
           "public/"
         ]
       },
-      "asset_count": 68,
+      "asset_count": 70,
       "asset_paths": [
         "public/about-bg.jpg",
         "public/about-bg.webp",
@@ -1050,6 +1051,7 @@
         "public/control-center.html",
         "public/css/control-center.css",
         "public/css/hero-carousel.css",
+        "public/css/home-page.css",
         "public/css/input.css",
         "public/css/output.css",
         "public/css/react-components.css",
@@ -1084,6 +1086,7 @@
         "public/js/control-center.js",
         "public/js/doubleChanceCombos.js",
         "public/js/hero-carousel.js",
+        "public/js/home-page.js",
         "public/js/semantic-drift-dashboard.js",
         "public/js/smh-hub-master-rulebook.js",
         "public/js/smh-hub.js",
@@ -1231,7 +1234,7 @@
           "tests/"
         ]
       },
-      "asset_count": 19,
+      "asset_count": 21,
       "asset_paths": [
         "tests/edge-asset-classification.test.js",
         "tests/edge-control-center-ledger.test.js",
@@ -1250,6 +1253,8 @@
         "tests/sem-gov-001b-governor-foundation-packet.test.js",
         "tests/sem-gov-001b-i4-lifecycle-persistence-implementation-packet.test.js",
         "tests/sem-gov-001d-ui1-screen-contract.test.js",
+        "tests/sem-gov-001d-home1-static-home.test.js",
+        "tests/sem-gov-001d-home1-visual-acceptance.test.js",
         "tests/sem-gov-001d-ui2-static-hub.test.js",
         "tests/sem-gov-001d-ui2-visual-acceptance.test.js"
       ]

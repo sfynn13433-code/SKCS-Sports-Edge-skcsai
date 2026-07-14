@@ -1688,6 +1688,54 @@
       "next_action": "SEM-GOV-001D-UI2 static Hub TESTED. UI3 read-model API NOT STARTED pending separate authorization.",
       "owner_note": "Static mock only. No production lifecycle caller.",
       "last_updated": "2026-07-14"
+    },
+    {
+      "task_id": "SEM-GOV-001D-HOME1",
+      "task_name": "Home Page Information Architecture and Visual Consolidation",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: rebuild public/index.html into a concise Hub-aligned dark landing page; remove embedded legacy Hub, chatbot, and technical sprawl from home rendering.",
+      "status": "TESTED",
+      "priority": "high",
+      "blocked_by": [
+        "SEM-GOV-001D-UI2"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "control-center",
+        "frontend"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-HOME1_HOME_PAGE_INFORMATION_ARCHITECTURE_AND_VISUAL_CONSOLIDATION"
+      ],
+      "affected_files": [
+        "public/index.html",
+        "public/css/home-page.css",
+        "public/js/home-page.js",
+        "tests/sem-gov-001d-home1-static-home.test.js",
+        "tests/sem-gov-001d-home1-visual-acceptance.test.js",
+        "control-center/SEM-GOV-001D-HOME1_HOME_PAGE_INFORMATION_ARCHITECTURE_AND_VISUAL_CONSOLIDATION.v1.md",
+        "package.json"
+      ],
+      "affected_tables": [],
+      "completion_definition": "SEM-GOV-001D-HOME1 seals Hub-aligned home landing TESTED with focused tests and Control Center registration — Hub files unchanged, gates BLOCKED.",
+      "proof_required": [
+        "npm run test:sem-gov-001d-home1 passes",
+        "npm run test:sem-gov-001d-ui2 passes",
+        "Hub files unchanged",
+        "No fetch or /api/ on home-page.js"
+      ],
+      "current_evidence": [
+        "Dark Hub-aligned index.html landing",
+        "Isolated home-page.css and home-page.js",
+        "Legacy embedded Hub and chat removed from home",
+        "HOME1 tests pass",
+        "All gates BLOCKED"
+      ],
+      "open_gaps": [],
+      "next_action": "SEM-GOV-001D-HOME1 home landing TESTED. UI3/UI4 NOT STARTED.",
+      "owner_note": "Static home only. Hub files untouched.",
+      "last_updated": "2026-07-14"
     }
   ]
 }

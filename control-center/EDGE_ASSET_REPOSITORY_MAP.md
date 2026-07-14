@@ -1,26 +1,26 @@
 # EDGE ASSET REPOSITORY MAP
 EAC_PROJECT_ID: EAC-001
 MANIFEST_SCHEMA_VERSION: 1.0.0
-TOTAL_GOVERNED_ASSETS: 943
-TOTAL_BATCHED_ASSETS: 943
+TOTAL_GOVERNED_ASSETS: 948
+TOTAL_BATCHED_ASSETS: 948
 FULLY_CLASSIFIED_ASSETS: 0
-CLASSIFICATION_PENDING_ASSETS: 943
+CLASSIFICATION_PENDING_ASSETS: 948
 CLOSURE_READY: NO
 
 CURRENT_STATE_COUNTS
-- CURRENT: 52
+- CURRENT: 58
 - PARALLEL: 0
 - LEGACY: 0
 - HISTORICAL_EVIDENCE: 0
 - STALE_OR_SUPERSEDED: 58
-- UNKNOWN: 833
+- UNKNOWN: 832
 - GENERATED: 0
 
 FUNCTIONAL_GROUP_COUNTS
 - SCRIPT_TOOL: 156
-- DOCUMENTATION_KNOWLEDGE: 123
+- DOCUMENTATION_KNOWLEDGE: 124
 - PROVIDER_INTEGRATION: 116
-- TEST_PROOF: 107
+- TEST_PROOF: 109
 - DATABASE_MIGRATION: 97
 - GENERATED_OUTPUT: 59
 - DATABASE: 42
@@ -35,8 +35,8 @@ FUNCTIONAL_GROUP_COUNTS
 - BACKEND_RUNTIME: 9
 - AI_EDGEMIND: 8
 - GRADING_ACCURACY: 7
+- USER_INTERFACE: 6
 - SERVICE: 4
-- USER_INTERFACE: 4
 - SECURITY_SUBSCRIBER: 3
 - SCOUT_FIP: 2
 - UNCATEGORIZED: 2
@@ -48,14 +48,14 @@ RELATIONSHIP_TAG_COUNTS
 - DATABASE: 245
 - SQL: 239
 - PROVIDER: 199
-- GOVERNANCE: 170
+- GOVERNANCE: 173
 - API: 169
-- DOCUMENTATION: 151
-- TEST_PROOF: 106
+- DOCUMENTATION: 152
+- TEST_PROOF: 108
 - PREDICTION: 105
 - MIGRATION: 102
 - OBSERVABILITY: 99
-- UI: 93
+- UI: 94
 - AUDIT: 83
 - GENERATED: 69
 - ROUTE: 61
@@ -68,22 +68,22 @@ RELATIONSHIP_TAG_COUNTS
 - RULEBOOK: 27
 - SCHEDULER: 27
 - ACCA: 26
+- LIFECYCLE: 21
 - AI_EDGEMIND: 19
-- LIFECYCLE: 19
-- FRONTEND: 9
+- FRONTEND: 15
 - GRADING: 8
 - FIP: 7
 - SCOUT: 6
 - SUBSCRIBER: 4
+- JAVASCRIPT: 3
 - CONTROLLER: 2
-- JAVASCRIPT: 2
 - CSS: 1
 - RPC: 1
 
-NEXT_VALIDATION_NON_EMPTY_ASSETS: 943
+NEXT_VALIDATION_NON_EMPTY_ASSETS: 948
 
 BATCH_COMPLETION_SUMMARY
-- B01 | CONTROL_CENTER | ASSET_COUNT=33 | CLASSIFIED=0 | PENDING=33
+- B01 | CONTROL_CENTER | ASSET_COUNT=34 | CLASSIFIED=0 | PENDING=34
 - B02 | BACKEND_DIRECT_FILES | ASSET_COUNT=13 | CLASSIFIED=0 | PENDING=13
 - B03 | BACKEND_ROUTES_AND_CONTROLLERS | ASSET_COUNT=28 | CLASSIFIED=0 | PENDING=28
 - B04 | BACKEND_UTILS_SEMANTIC_CORE_AND_TEST | ASSET_COUNT=46 | CLASSIFIED=0 | PENDING=46
@@ -103,10 +103,10 @@ BATCH_COMPLETION_SUMMARY
 - B18 | SKCS_KNOWLEDGE_GOV_AND_AUDIT | ASSET_COUNT=23 | CLASSIFIED=0 | PENDING=23
 - B19 | SKCS_KNOWLEDGE_KNOWLEDGE | ASSET_COUNT=17 | CLASSIFIED=0 | PENDING=17
 - B20 | SKCS_KNOWLEDGE_PROVIDERS | ASSET_COUNT=18 | CLASSIFIED=0 | PENDING=18
-- B21 | PUBLIC_UI | ASSET_COUNT=68 | CLASSIFIED=0 | PENDING=68
+- B21 | PUBLIC_UI | ASSET_COUNT=70 | CLASSIFIED=0 | PENDING=70
 - B22 | SUPABASE_MIGRATIONS | ASSET_COUNT=62 | CLASSIFIED=0 | PENDING=62
 - B23 | DB_SQL_AND_SUPABASE_OTHER | ASSET_COUNT=19 | CLASSIFIED=0 | PENDING=19
-- B24 | TESTS | ASSET_COUNT=20 | CLASSIFIED=0 | PENDING=20
+- B24 | TESTS | ASSET_COUNT=22 | CLASSIFIED=0 | PENDING=22
 - B25 | SCRATCH | ASSET_COUNT=2 | CLASSIFIED=0 | PENDING=2
 - B26 | DEPLOYMENT_CI | ASSET_COUNT=3 | CLASSIFIED=0 | PENDING=3
 - B27 | ARCHIVE | ASSET_COUNT=58 | CLASSIFIED=0 | PENDING=58
@@ -149,6 +149,7 @@ PER_ASSET_BY_BATCH
 | control-center/SEM-GOV-001B-I4_CAP2_DAILY_ADMISSION_LIMIT_DESIGN.v1.md | Recalculates lifecycle persistence capacity at 50/day SAST admission ceiling from 167 MB baseline and defines deterministic fail-closed counter enforcement design. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","DATABASE"] | ["Conservative 50/day projected total 357.10 MB below 380 MB activation ceiling.","22.90 MB headroom below 380 MB; 42.90 MB below 400 MB hard block.","Admission-cap enforcement design APPROVED DESIGN; capacity proof TESTED.","supabase_storage_gate remains BLOCKED."] | Review before I4 implementation packet or supabase_storage_gate clearance. |
 | control-center/SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md | Seals isolated lifecycle persistence implementation scope, six-table schema, gate-before-DB law, admission and transition sequences, and migration non-execution boundary. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","DATABASE","LIFECYCLE"] | ["Packet documents six approved lifecycle tables and migration NOT APPLIED boundary.","50/day admission-cap law and 180-day retention law referenced from CAP2.","All three governance gates remain BLOCKED at closure.","I4-PURGE, I5, and SEM-GOV-001C deferred."] | Review before supabase_storage_gate clearance or production caller authorization. |
 | control-center/SEM-GOV-001B-I4_SUPABASE_FREE_TIER_CAPACITY_AND_RETENTION_DESIGN.v1.md | Defines Supabase free-tier capacity and retention design for I4 lifecycle persistence: verified 167 MB baseline, normal and conservative growth models, bounded purge law, resource controls, and HOLD activation decision. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","DATABASE"] | ["Packet models four lifecycle tables only with 167 MB dashboard baseline.","Normal projected total 186.10 MB below 300 MB preferred ceiling.","Conservative 80/day projected total 470.58 MB exceeds activation ceiling — HOLD.","supabase_storage_gate remains BLOCKED."] | Review after Stephen approval of governed admission/retention cap or before supabase_storage_gate clearance. |
+| control-center/SEM-GOV-001D-HOME1_HOME_PAGE_INFORMATION_ARCHITECTURE_AND_VISUAL_CONSOLIDATION.v1.md | Seals HOME1 home landing consolidation scope and Definition of Done. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","FRONTEND"] | ["Static home only","Hub files unchanged","UI3/UI4 NOT STARTED"] | npm run test:sem-gov-001d-home1 after HOME1 changes |
 | control-center/SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1.md | Seals Sports Match Hub information architecture and screen contracts: navigation, day navigation, lifecycle language, fixture cards, filters, UI states, and future API read-model fields without frontend implementation. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","LIFECYCLE","FRONTEND"] | ["Packet sections A–Y fix canonical navigation and lifecycle user language.","Day tokens reconciled with lifecycleGovernor DAY_LABELS (no DAY_1).","UI2/UI3/UI4 explicitly NOT STARTED; migration NOT APPLIED.","All three governance gates remain BLOCKED."] | SEM-GOV-001D-UI1: run npm run test:sem-gov-001d-ui1 after any screen contract or registration change. |
 | control-center/SEM-GOV-001D-UI2_STATIC_SPORTS_MATCH_HUB_IMPLEMENTATION_PACKET.v1.md | Seals static Sports Match Hub implementation scope and Definition of Done. | DOCUMENTATION_KNOWLEDGE | CURRENT | ["DOCUMENTATION","GOVERNANCE","LIFECYCLE","FRONTEND"] | ["Static mock fixtures only","No fetch or API","UI3/UI4 NOT STARTED"] | npm run test:sem-gov-001d-ui2 after UI2 changes |
 
@@ -837,6 +838,7 @@ PER_ASSET_BY_BATCH
 | public/control-center.html | Operator UI shell for SKCS EDGE CONTROL CENTER (read-only dashboard) at /control-center.html with admin-key unlock. | FRONTEND_UI | UNKNOWN | ["UI","PUBLIC_ASSET","GOVERNANCE","SECURITY"] | ["Fast skim: locked-by-default HTML with admin API key input, Unlock button, and dashboard sections for Overview/Projects/Assets/Gates/Runtime/Findings.","Top chunk first line: <!doctype html>"] | Revalidate operator UI sections and admin-key unlock flow whenever ECU-001 API projections or dashboard requirements change. |
 | public/css/control-center.css | Stylesheet for Edge Control Center operator dashboard UI (dark admin theme, lock screen, tables, badges). | FRONTEND_UI | UNKNOWN | ["UI","PUBLIC_ASSET"] | ["Fast skim: public/css/control-center.css linked from control-center.html for operator dashboard presentation.","Filename and path indicate browser-delivered CSS for the ECU-001 control center page."] | Revalidate operator dashboard styling whenever ECU-001 UI layout or section requirements change. |
 | public/css/hero-carousel.css | Public CSS stylesheet for frontend UI styling: hero-carousel.css. | FRONTEND_UI | UNKNOWN | ["UI","OBSERVABILITY"] | ["Fast skim: public/css/hero-carousel.css under public/ indicates browser-delivered UI asset.","Filename suggests CSS styling delivered to browser.","Top chunk first line: /**"] | Verify actual frontend references and whether hero-carousel.css remains current vs superseded. |
+| public/css/home-page.css | Dark Hub-aligned stylesheet for consolidated home landing page. | USER_INTERFACE | CURRENT | ["FRONTEND","UI","LIFECYCLE"] | ["Isolated home-page.css only","No inline stylesheet on index.html"] | npm run test:sem-gov-001d-home1 after HOME1 changes |
 | public/css/input.css | Public CSS stylesheet for frontend UI styling: input.css. | FRONTEND_UI | UNKNOWN | ["UI","OBSERVABILITY"] | ["Fast skim: public/css/input.css under public/ indicates browser-delivered UI asset.","Filename suggests CSS styling delivered to browser.","Top chunk first line: @tailwind base;"] | Verify actual frontend references and whether input.css remains current vs superseded. |
 | public/css/output.css | Public CSS stylesheet for frontend UI styling: output.css. | FRONTEND_UI | UNKNOWN | ["UI","OBSERVABILITY"] | ["Fast skim: public/css/output.css under public/ indicates browser-delivered UI asset.","Filename suggests CSS styling delivered to browser."] | Verify actual frontend references and whether output.css remains current vs superseded. |
 | public/css/react-components.css | Public CSS stylesheet for frontend UI styling: react-components.css. | FRONTEND_UI | UNKNOWN | ["UI","OBSERVABILITY"] | ["Fast skim: public/css/react-components.css under public/ indicates browser-delivered UI asset.","Filename suggests CSS styling delivered to browser.","Top chunk first line: /**"] | Verify actual frontend references and whether react-components.css remains current vs superseded. |
@@ -864,13 +866,14 @@ PER_ASSET_BY_BATCH
 | public/favicon.ico | Static public asset apparently associated with UI presentation: favicon.ico. | PUBLIC_ASSET | UNKNOWN | ["UI","PUBLIC_ASSET"] | ["Fast skim: public/favicon.ico under public/ indicates browser-delivered UI asset.","Filename favicon.ico suggests a static visual asset (image/font)."] | Verify actual frontend references and whether favicon.ico remains current vs superseded. |
 | public/hero-page.jpg | Static public asset apparently associated with UI presentation: hero-page.jpg. | PUBLIC_ASSET | UNKNOWN | ["UI","PUBLIC_ASSET"] | ["Fast skim: public/hero-page.jpg under public/ indicates browser-delivered UI asset.","Filename hero-page.jpg suggests a static visual asset (image/font)."] | Verify actual frontend references and whether hero-page.jpg remains current vs superseded. |
 | public/hero-page.webp | Static public asset apparently associated with UI presentation: hero-page.webp. | PUBLIC_ASSET | UNKNOWN | ["UI","PUBLIC_ASSET"] | ["Fast skim: public/hero-page.webp under public/ indicates browser-delivered UI asset.","Filename hero-page.webp suggests a static visual asset (image/font)."] | Verify actual frontend references and whether hero-page.webp remains current vs superseded. |
-| public/index.html | Public HTML page apparently delivered for UI routes: index.html. | FRONTEND_UI | UNKNOWN | ["UI"] | ["Fast skim: public/index.html under public/ indicates browser-delivered UI asset.","Filename suggests HTML route/page entrypoint for UI delivery."] | Verify actual frontend references and whether index.html remains current vs superseded. |
+| public/index.html | Hub-aligned dark home landing page with Sports Match Hub CTA and static lifecycle preview. | FRONTEND_UI | CURRENT | ["FRONTEND","UI","LIFECYCLE"] | ["Consolidated HOME1 landing","References home-page.css and home-page.js only"] | npm run test:sem-gov-001d-home1 after home changes |
 | public/js/acca-builder.js | Public JavaScript/JSX frontend helper or component: acca-builder.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/acca-builder.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: // Handles building ACCAs via the /api/v1/acca/build endpoint"] | Verify actual frontend references and whether acca-builder.js remains current vs superseded. |
 | public/js/ai-reasoning-display.js | Public JavaScript/JSX frontend helper or component: ai-reasoning-display.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/ai-reasoning-display.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: // Provides AI reasoning tooltips/display logic"] | Verify actual frontend references and whether ai-reasoning-display.js remains current vs superseded. |
 | public/js/config.js | Public JavaScript/JSX frontend helper or component: config.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/config.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: // Default to the live Render API, but allow an earlier override for migration tests."] | Verify actual frontend references and whether config.js remains current vs superseded. |
 | public/js/control-center.js | Client-side logic for Edge Control Center operator dashboard; admin-key unlock via localStorage and authenticated fetches to /api/control-center endpoints. | FRONTEND_UI | UNKNOWN | ["UI","API","SECURITY","GOVERNANCE"] | ["Skim: stores admin key in localStorage key skcs_admin_api_key and sends x-api-key header on fetch to /api/control-center/* routes.","Renders Overview, Projects, Assets (with filters/pagination), Gates, Runtime, and Findings sections from API projections."] | Revalidate admin-key unlock and /api/control-center fetch behavior whenever ECU-001 API routes or dashboard sections change. |
 | public/js/doubleChanceCombos.js | Public JavaScript/JSX frontend helper or component: doubleChanceCombos.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/doubleChanceCombos.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: // FINAL DOUBLE CHANCE COMBOS ALGORITHM (with Consistency Engine)"] | Verify actual frontend references and whether doubleChanceCombos.js remains current vs superseded. |
 | public/js/hero-carousel.js | Public JavaScript/JSX frontend helper or component: hero-carousel.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/hero-carousel.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: /**"] | Verify actual frontend references and whether hero-carousel.js remains current vs superseded. |
+| public/js/home-page.js | Static home page interactions: mobile nav, smooth anchors, back-to-top. | USER_INTERFACE | CURRENT | ["FRONTEND","JAVASCRIPT"] | ["No fetch XMLHttpRequest supabase or /api/","npm run test:sem-gov-001d-home1"] | npm run test:sem-gov-001d-home1 after HOME1 changes |
 | public/js/semantic-drift-dashboard.js | Public JavaScript/JSX frontend helper or component: semantic-drift-dashboard.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/semantic-drift-dashboard.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: (function () {"] | Verify actual frontend references and whether semantic-drift-dashboard.js remains current vs superseded. |
 | public/js/smh-hub-master-rulebook.js | Public JavaScript/JSX frontend helper or component: smh-hub-master-rulebook.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/smh-hub-master-rulebook.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: // Master Rulebook Secondary Market Processing for smh-hub.js"] | Verify actual frontend references and whether smh-hub-master-rulebook.js remains current vs superseded. |
 | public/js/smh-hub.js | Public JavaScript/JSX frontend helper or component: smh-hub.js. | FRONTEND_UI | UNKNOWN | ["UI","SCRIPT_TOOL"] | ["Fast skim: public/js/smh-hub.js under public/ indicates browser-delivered UI asset.","Filename suggests frontend script/component code delivered to browser.","Top chunk first line: /**"] | Verify actual frontend references and whether smh-hub.js remains current vs superseded. |
@@ -1006,6 +1009,8 @@ PER_ASSET_BY_BATCH
 | tests/sem-gov-001b-governor-foundation-packet.test.js | Tests the SEM-GOV-001B-I2 Lifecycle Governor foundation implementation packet and its Control Center registration without importing or mutating runtime code. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","LIFECYCLE"] | ["Test verifies I2 packet sections and that future runtime files do not exist on disk.","Test verifies ledger registers SEM-GOV-001B-I2 APPROVED with all gates BLOCKED.","Test verifies package control-center test suite includes the focused I2 proof."] | Run node --test tests/sem-gov-001b-governor-foundation-packet.test.js and npm run control:verify after any I2 packet or sequencing change. |
 | tests/sem-gov-001b-i4-lifecycle-persistence-implementation-packet.test.js | Guards I4 implementation packet sections, allowed files, blocked gates, migration-not-applied state, and Control Center registration. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","LIFECYCLE"] | ["Verifies all packet sections A through V are present.","Verifies gates remain BLOCKED and migration is NOT APPLIED.","Verifies 50/day and 180-day retention law references.","Verifies I4-PURGE, I5, and SEM-GOV-001C are deferred."] | SEM-GOV-001B-I4: run npm run test:lifecycle-persistence after any I4 packet or registration change. |
 | tests/sem-gov-001b-lifecycle-persistence-contract.test.js | Tests the SEM-GOV-001B Football Lifecycle Persistence contract and its Control Center registration without importing or mutating runtime code. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","LIFECYCLE"] | ["Test reads SEM-GOV-001B contract and verifies fixture_uid, alias, transition, timing, and gate preservation sections.","Test verifies ledger gates remain BLOCKED and SEM-GOV-001B registration.","Test verifies package control-center test suite includes the focused SEM-GOV-001B proof."] | Run node --test tests/sem-gov-001b-lifecycle-persistence-contract.test.js and npm run control:verify after any SEM-GOV-001B contract or sequencing change. |
+| tests/sem-gov-001d-home1-static-home.test.js | Guards HOME1 landing structure, nav, removals, and Hub file immutability. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","FRONTEND"] | ["npm run test:sem-gov-001d-home1"] | npm run test:sem-gov-001d-home1 after HOME1 changes |
+| tests/sem-gov-001d-home1-visual-acceptance.test.js | Validates dark shell, responsive breakpoints, and legacy sprawl regression guards. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","FRONTEND"] | ["npm run test:sem-gov-001d-home1"] | npm run test:sem-gov-001d-home1 after HOME1 changes |
 | tests/sem-gov-001d-ui1-screen-contract.test.js | Guards UI1 packet sections A–Y, canonical day tokens, lifecycle language, blocked gates, UI2/UI3/UI4 not-started boundaries, and Control Center registration. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","LIFECYCLE","FRONTEND"] | ["Verifies packet status PROPOSED and start commit 2d4c6a3.","Verifies day-token sequence matches governor authority without DAY_1.","Verifies gates remain BLOCKED and migration NOT APPLIED.","Verifies no frontend implementation files are in-scope for UI1."] | SEM-GOV-001D-UI1: run npm run test:sem-gov-001d-ui1 after any UI1 packet or registration change. |
 | tests/sem-gov-001d-ui2-static-hub.test.js | Guards UI2 file boundary, lifecycle mappings, no API callers, landmarks. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","FRONTEND","LIFECYCLE"] | ["Verifies eight day tokens","Verifies no fetch in JS","Verifies ledger UI2 registration"] | npm run test:sem-gov-001d-ui2 |
 | tests/sem-gov-001d-ui2-visual-acceptance.test.js | Validates responsive CSS, UI state demos, and detail focus contract. | TEST_PROOF | CURRENT | ["TEST_PROOF","GOVERNANCE","FRONTEND"] | ["Desktop tablet mobile breakpoints","UI state query contract","reduced-motion CSS"] | npm run test:sem-gov-001d-ui2 |

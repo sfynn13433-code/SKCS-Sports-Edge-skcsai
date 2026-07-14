@@ -214,3 +214,11 @@ Governed by: SEM-GOV-001D-UI2
 Blocked by: SEM-GOV-001D-UI1
 Blocks: none
 Notes: Static Hub TESTED with mock fixtures. UI3/UI4 NOT STARTED. No live API. Migration NOT APPLIED. All gates BLOCKED.
+
+## SEM-GOV-001D-HOME1 — Home Page Information Architecture and Visual Consolidation
+
+Status: TESTED
+Governed by: SEM-GOV-001D-HOME1
+Blocked by: SEM-GOV-001D-UI2
+Blocks: none
+Notes: Hub-aligned dark home landing TESTED. Static preview only. Hub files unchanged. UI3/UI4 NOT STARTED. Migration NOT APPLIED. All gates BLOCKED.
