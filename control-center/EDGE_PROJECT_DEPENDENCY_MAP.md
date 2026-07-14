@@ -260,5 +260,13 @@ Notes: PASS WITH CORRECTION. D3 fixture_display_metadata schema design sealed. F
 Status: TESTED
 Governed by: SEM-GOV-001D-UI3-I5
 Blocked by: SEM-GOV-001D-UI3-I4
-Blocks: none
+Blocks: SEM-GOV-001D-UI3-I6
 Notes: PASS WITH CORRECTION. 25 physical columns in migration SQL. fixtureDisplayMetadataPersistenceService implemented. Mock-first tests pass. Migration NOT APPLIED. No production caller. Lifecycle migration NOT APPLIED. All gates BLOCKED.
+
+## SEM-GOV-001D-UI3-I6 — EFI-001 Governed Intake Inspection and Adapter Contract
+
+Status: TESTED
+Governed by: SEM-GOV-001D-UI3-I6
+Blocked by: SEM-GOV-001D-UI3-I5
+Blocks: none
+Notes: PASS WITH BLOCKER. fipIntakeService classified PARTIAL proof-only. Hash law proven. FIP-to-D3 DTO crosswalk sealed. Lifecycle-before-D3 sequence sealed. fixture_uid resolution BLOCKER. No runtime changes. All gates BLOCKED.

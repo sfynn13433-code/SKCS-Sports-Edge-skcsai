@@ -14,7 +14,7 @@
           "control-center/"
         ]
       },
-      "asset_count": 36,
+      "asset_count": 37,
       "asset_paths": [
         "control-center/check_control_center.js",
         "control-center/check_edge_asset_classification.js",
@@ -54,7 +54,8 @@
         "control-center/SEM-GOV-001D-UI3-I2_CANONICAL_FIXTURE_METADATA_PROJECTION_INSPECTION_AND_CONTRACT.v1.md",
         "control-center/SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1.md",
         "control-center/SEM-GOV-001D-UI3-I4_SOURCE_B_SCHEMA_AND_PERSISTENCE_IMPLEMENTATION_DESIGN.v1.md",
-        "control-center/SEM-GOV-001D-UI3-I5_SOURCE_B_MIGRATION_AND_ISOLATED_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md"
+        "control-center/SEM-GOV-001D-UI3-I5_SOURCE_B_MIGRATION_AND_ISOLATED_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md",
+        "control-center/SEM-GOV-001D-UI3-I6_EFI_001_GOVERNED_INTAKE_INSPECTION_AND_ADAPTER_CONTRACT.v1.md"
       ]
     },
     {
@@ -1241,7 +1242,7 @@
           "tests/"
         ]
       },
-      "asset_count": 27,
+      "asset_count": 28,
       "asset_paths": [
         "tests/edge-asset-classification.test.js",
         "tests/edge-control-center-ledger.test.js",
@@ -1269,7 +1270,8 @@
         "tests/sem-gov-001d-ui3-i3-contract.test.js",
         "tests/sem-gov-001d-ui3-i4-contract.test.js",
         "tests/sem-gov-001d-ui3-i5-implementation-packet.test.js",
-        "tests/fixture-display-metadata-persistence-service.test.js"
+        "tests/fixture-display-metadata-persistence-service.test.js",
+        "tests/sem-gov-001d-ui3-i6-contract.test.js"
       ]
     },
     {

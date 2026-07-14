@@ -1974,7 +1974,9 @@
       "blocked_by": [
         "SEM-GOV-001D-UI3-I4"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI3-I6"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -2021,8 +2023,66 @@
         "D3 purge runtime not implemented",
         "UI3 read-model service not implemented"
       ],
-      "next_action": "SEM-GOV-001D-UI3-I5 PASS WITH CORRECTION. Migration apply NOT AUTHORIZED.",
+      "next_action": "SEM-GOV-001D-UI3-I5 PASS WITH CORRECTION. UI3-I6 adapter contract authorized.",
       "owner_note": "Isolated implementation only.",
+      "last_updated": "2026-07-14"
+    },
+    {
+      "task_id": "SEM-GOV-001D-UI3-I6",
+      "task_name": "EFI-001 Governed Intake Inspection and Adapter Contract",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: inspect fipIntakeService and EFI-001 contracts; seal governed adapter contract for FIP-to-envelope and FIP-to-D3 DTO mapping — no runtime implementation.",
+      "status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I5"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "backend"
+      ],
+      "related_contracts": [
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I6_EFI_001_GOVERNED_INTAKE_INSPECTION_AND_ADAPTER_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I5_SOURCE_B_MIGRATION_AND_ISOLATED_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001D-UI3-I4_SOURCE_B_SCHEMA_AND_PERSISTENCE_IMPLEMENTATION_DESIGN.v1",
+        "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1"
+      ],
+      "affected_files": [
+        "control-center/SEM-GOV-001D-UI3-I6_EFI_001_GOVERNED_INTAKE_INSPECTION_AND_ADAPTER_CONTRACT.v1.md",
+        "tests/sem-gov-001d-ui3-i6-contract.test.js",
+        "package.json"
+      ],
+      "affected_tables": [],
+      "completion_definition": "SEM-GOV-001D-UI3-I6 PASS WITH BLOCKER — intake inspected, adapter contract sealed, no runtime changes, gates BLOCKED.",
+      "proof_required": [
+        "npm run test:sem-gov-001d-ui3-i6 passes",
+        "Hash law proven",
+        "Lifecycle-before-D3 sealed",
+        "All gates BLOCKED"
+      ],
+      "current_evidence": [
+        "fipIntakeService classified PARTIAL proof-only",
+        "Hash verification proven",
+        "D3 DTO crosswalk sealed",
+        "fixture_uid resolution BLOCKER documented",
+        "No runtime changes",
+        "All gates BLOCKED"
+      ],
+      "open_gaps": [
+        "FIP-001 shape alignment in fipIntakeService",
+        "fixture_uid resolution adapter",
+        "D3 DTO mapper implementation",
+        "Intake evidence persistence",
+        "HTTP intake route",
+        "Migration apply blocked"
+      ],
+      "next_action": "SEM-GOV-001D-UI3-I6 PASS WITH BLOCKER. Adapter implementation NOT AUTHORIZED.",
+      "owner_note": "Inspection and contract only.",
       "last_updated": "2026-07-14"
     }
   ]
