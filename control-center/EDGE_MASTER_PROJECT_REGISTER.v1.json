@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 22,
+  "project_count": 23,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -1264,7 +1264,7 @@
         "Unsafe BOT narratives without event binding"
       ],
       "recommended_order": 22,
-      "next_action": "SEM-GOV-001A contract sealed. Proceed to SEM-GOV-001B only when separately authorized.",
+      "next_action": "SEM-GOV-001A contract sealed. SEM-GOV-001B-C1 persistence contract sealed.",
       "owner_note": "One platform language. One fixture lifecycle. One source of truth. Football first.",
       "last_updated": "2026-07-13",
       "governed_by_control_task_id": "SEM-GOV-001A",
@@ -1272,6 +1272,61 @@
         "SEM-GOV-001A-C1 sealed control-center/SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md",
         "Rolling eight-day funnel and Help contract documented",
         "Provisional P1-B01 48-hour rule classified"
+      ]
+    },
+    {
+      "project_id": "SEM-GOV-001B",
+      "project_name": "Football Lifecycle Persistence Contract",
+      "category": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001: seal the football lifecycle persistence law — immutable UUID fixture_uid, identity alias registry, current projection and append-only transition events, legal transition matrix, eight-day SAST admission window, rollover semantics, and Governor activation sequence.",
+      "why_it_matters": "Without governed fixture identity and durable transition history, eliminated fixtures vanish, timing rules fragment, and the eight-day funnel cannot be replayed or audited.",
+      "current_status": "APPROVED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001A"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "database"
+      ],
+      "related_tasks": [
+        "SEM-GOV-001B"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1",
+        "SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
+      ],
+      "related_files": [
+        "control-center/SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md"
+      ],
+      "related_tables": [],
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001B-C1 seals the Football Lifecycle Persistence contract and records OD-1 through OD-10 without runtime, SQL, Supabase, API, or UI implementation.",
+      "proof_required": [
+        "SEM-GOV-001B contract exists and validates",
+        "unified_lifecycle_governor remains BLOCKED",
+        "Focused contract test passes",
+        "Control Center registration complete"
+      ],
+      "risks_if_ignored": [
+        "match_id collisions persist across providers",
+        "No durable lifecycle transition ledger",
+        "Rollover history absent",
+        "48-hour and seven-day rules remain fragmented"
+      ],
+      "recommended_order": 23,
+      "next_action": "SEM-GOV-001B-C1 contract sealed. Runtime Governor and persistence DDL remain blocked until separately authorized.",
+      "owner_note": "fixture_uid is Edge-minted UUID. Aliases are not primary keys. Football first.",
+      "last_updated": "2026-07-13",
+      "governed_by_control_task_id": "SEM-GOV-001B",
+      "current_evidence": [
+        "SEM-GOV-001B-C1 sealed control-center/SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md",
+        "Owner decisions OD-1 through OD-10 recorded"
       ]
     }
   ]

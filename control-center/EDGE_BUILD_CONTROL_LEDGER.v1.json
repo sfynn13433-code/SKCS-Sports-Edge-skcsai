@@ -1146,8 +1146,67 @@
         "Timing window cutoffs (scoring, publication) not yet approved",
         "Scout_edge_marriage_gate remains BLOCKED"
       ],
-      "next_action": "SEM-GOV-001A contract sealed. Proceed to SEM-GOV-001B (Football lifecycle persistence and Governor runtime foundation) only when separately authorized.",
+      "next_action": "SEM-GOV-001A contract sealed. SEM-GOV-001B-C1 persistence contract sealed. Runtime Governor implementation remains blocked until separately authorized.",
       "owner_note": "One platform language. One fixture lifecycle. One source of truth. Football first.",
+      "last_updated": "2026-07-13"
+    },
+    {
+      "task_id": "SEM-GOV-001B",
+      "task_name": "Football Lifecycle Persistence Contract",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001: seal the football lifecycle persistence law — immutable UUID fixture_uid, identity alias registry, current projection and append-only transition events, legal transition matrix, eight-day SAST admission window, rollover semantics, post-kickoff policy, and Governor activation sequence per owner decisions OD-1 through OD-10.",
+      "status": "APPROVED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001A"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "database"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1",
+        "SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1"
+      ],
+      "affected_files": [
+        "control-center/SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
+        "control-center/EDGE_PROJECT_BACKLOG.md",
+        "tests/sem-gov-001b-lifecycle-persistence-contract.test.js"
+      ],
+      "affected_tables": [],
+      "completion_definition": "SEM-GOV-001B-C1 seals the Football Lifecycle Persistence contract; records OD-1 through OD-10; defines fixture_uid UUID law, alias registry, transition matrix, projection and event schemas, SAST eight-day window, rollover law, admission and processing tolerance, EST-001 alignment, and activation sequence without runtime, SQL, Supabase, API, or UI implementation.",
+      "proof_required": [
+        "control-center/SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md exists and validates",
+        "unified_lifecycle_governor remains BLOCKED in ledger",
+        "SEM-GOV-001B registered in ledger and master project register",
+        "Focused contract test passes",
+        "npm run control:center passes",
+        "control:verify passes except independently proven baseline defects"
+      ],
+      "current_evidence": [
+        "SEM-GOV-001B-C1 sealed control-center/SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md",
+        "Owner decisions OD-1 through OD-10 recorded",
+        "Inspection 1 evidence incorporated",
+        "unified_lifecycle_governor remains BLOCKED",
+        "supabase_storage_gate remains BLOCKED — no R1/R2 migration authorized"
+      ],
+      "open_gaps": [
+        "No LifecycleGovernor runtime service",
+        "No lifecycle persistence DDL while supabase_storage_gate BLOCKED",
+        "No Scout FIP pipeline hooks (SEM-GOV-001C)",
+        "48-hour FIP horizon unchanged until 001C",
+        "LIFECYCLE_GOVERNOR_ENABLED defaults false"
+      ],
+      "next_action": "SEM-GOV-001B-C1 contract sealed. Runtime Governor and persistence DDL remain blocked until separately authorized implementation packet.",
+      "owner_note": "fixture_uid is Edge-minted UUID. Aliases are not primary keys. Football first.",
       "last_updated": "2026-07-13"
     }
   ]

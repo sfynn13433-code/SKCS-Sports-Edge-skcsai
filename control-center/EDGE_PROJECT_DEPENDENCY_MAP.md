@@ -155,3 +155,10 @@ Status: APPROVED
 Governed by: SEM-GOV-001A
 Blocked by: ESA-001, EPI-001
 Blocks: none
+
+## SEM-GOV-001B — Football Lifecycle Persistence Contract
+
+Status: APPROVED
+Governed by: SEM-GOV-001B
+Blocked by: SEM-GOV-001A
+Blocks: none
