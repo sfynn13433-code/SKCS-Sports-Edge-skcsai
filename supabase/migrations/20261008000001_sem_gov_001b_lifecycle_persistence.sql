@@ -193,6 +193,24 @@ CREATE TABLE IF NOT EXISTS public.lifecycle_admission_idempotency (
         CHECK (outcome IN ('ADMITTED'))
 );
 
+ALTER TABLE public.fixture_lifecycle_current
+    ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public.fixture_identity_aliases
+    ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public.fixture_lifecycle_transition_events
+    ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public.fixture_lifecycle_rollover_events
+    ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public.lifecycle_daily_admission_counters
+    ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public.lifecycle_admission_idempotency
+    ENABLE ROW LEVEL SECURITY;
+
 -- ---------------------------------------------------------------------------
 -- ROLLBACK (NON-EXECUTING — manual only, I4 lifecycle tables)
 -- DROP TABLE IF EXISTS public.lifecycle_admission_idempotency;

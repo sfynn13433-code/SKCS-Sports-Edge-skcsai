@@ -1,0 +1,57 @@
+{
+  "task": "SEM-GOV-001D-UI3-I10",
+  "mode": "READINESS_ONLY",
+  "generatedAt": "2026-07-14T18:46:38.383Z",
+  "static": {
+    "migrations": [
+      {
+        "id": "20261008000001",
+        "path": "supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql",
+        "sha256": "90009b3614683ec371053dfa388638d044ea6c9b8ef6cfe9db7c80658db27965",
+        "tables": [
+          "fixture_lifecycle_current",
+          "fixture_identity_aliases",
+          "fixture_lifecycle_transition_events",
+          "fixture_lifecycle_rollover_events",
+          "lifecycle_daily_admission_counters",
+          "lifecycle_admission_idempotency"
+        ]
+      },
+      {
+        "id": "20261010000001",
+        "path": "supabase/migrations/20261010000001_sem_gov_001d_ui3_i4_fixture_display_metadata.sql",
+        "sha256": "111cb9970125d1db894154e606c2c14a55d348b406f0ef3150822260bbfb0c44",
+        "tables": [
+          "fixture_display_metadata"
+        ]
+      },
+      {
+        "id": "20261011000001",
+        "path": "supabase/migrations/20261011000001_sem_gov_001d_ui3_i8_fip_intake_evidence.sql",
+        "sha256": "226b615dfd0ec7fd76e06ad937504b086cedd44a091626d098fa0cc0a761ec1b",
+        "tables": [
+          "fip_intake_evidence"
+        ]
+      }
+    ],
+    "findings": []
+  },
+  "live": {
+    "inspected": true,
+    "connectionTarget": {
+      "protocol": "postgresql:",
+      "host": "aws-1-eu-central-1.pooler.supabase.com",
+      "port": "6543",
+      "database": "postgres"
+    },
+    "snapshot": {
+      "databaseBytes": 152095891,
+      "pgcryptoInstalled": true,
+      "migrationHistoryTableExists": true,
+      "migrationHistory": [],
+      "targetTableInventory": []
+    },
+    "findings": []
+  },
+  "decision": "PASS"
+}

@@ -2224,7 +2224,9 @@
       "blocked_by": [
         "SEM-GOV-001D-UI3-I8"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI3-I10"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -2268,8 +2270,76 @@
         "Marriage gate clearance",
         "Feature flag enablement"
       ],
-      "next_action": "SEM-GOV-001D-UI3-I9 PASS. HTTP boundary NOT AUTHORIZED.",
+      "next_action": "SEM-GOV-001D-UI3-I9 PASS. Migration readiness authorized in UI3-I10.",
       "owner_note": "Isolated composition foundation only.",
+      "last_updated": "2026-07-14"
+    },
+    {
+      "task_id": "SEM-GOV-001D-UI3-I10",
+      "task_name": "Migration Readiness and Controlled Apply",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: install migration readiness checker, static tests, read-only live Supabase inspection — Gate B apply NOT EXECUTED.",
+      "status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I9"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "database"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001D-UI3-I5_SOURCE_B_MIGRATION_AND_ISOLATED_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001D-UI3-I8_DURABLE_INTAKE_EVIDENCE_STORAGE_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001D-UI3-I10_MIGRATION_READINESS_AND_CONTROLLED_APPLY_PACKET.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
+      ],
+      "affected_files": [
+        "scripts/check-ui3-i10-migration-readiness.js",
+        "tests/sem-gov-001d-ui3-i10-migration-readiness.test.js",
+        "tests/sem-gov-001d-ui3-i10-implementation-packet.test.js",
+        "reports/ui3-i10/migration-readiness.json",
+        "supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql",
+        "control-center/SEM-GOV-001D-UI3-I10_MIGRATION_READINESS_AND_CONTROLLED_APPLY_PACKET.v1.md",
+        "package.json"
+      ],
+      "affected_tables": [
+        "fixture_lifecycle_current",
+        "fixture_identity_aliases",
+        "fixture_lifecycle_transition_events",
+        "fixture_lifecycle_rollover_events",
+        "lifecycle_daily_admission_counters",
+        "lifecycle_admission_idempotency",
+        "fixture_display_metadata",
+        "fip_intake_evidence"
+      ],
+      "completion_definition": "SEM-GOV-001D-UI3-I10 PASS WITH CORRECTION — Gate A readiness PASS, lifecycle RLS correction, live inspection complete, Gate B apply NOT EXECUTED.",
+      "proof_required": [
+        "npm run test:sem-gov-001d-ui3-i10 passes",
+        "migration-readiness.json decision PASS",
+        "No migration apply",
+        "All gates BLOCKED"
+      ],
+      "current_evidence": [
+        "Readiness checker implemented",
+        "Static inspection PASS",
+        "Live read-only inspection PASS",
+        "Lifecycle RLS correction applied",
+        "Gate B apply NOT EXECUTED",
+        "All gates BLOCKED"
+      ],
+      "open_gaps": [
+        "Gate B controlled migration apply",
+        "supabase_storage_gate clearance",
+        "HTTP intake route",
+        "Production activation"
+      ],
+      "next_action": "SEM-GOV-001D-UI3-I10 PASS WITH CORRECTION. Gate B apply NOT AUTHORIZED.",
+      "owner_note": "Readiness only — no migration apply in I10 closure.",
       "last_updated": "2026-07-14"
     }
   ]

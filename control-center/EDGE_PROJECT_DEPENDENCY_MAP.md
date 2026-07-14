@@ -292,5 +292,13 @@ Notes: PASS WITH CORRECTION. fip_intake_evidence migration authored. fipIntakeEv
 Status: TESTED
 Governed by: SEM-GOV-001D-UI3-I9
 Blocked by: SEM-GOV-001D-UI3-I8
-Blocks: none
+Blocks: SEM-GOV-001D-UI3-I10
 Notes: PASS. governedFipIntakeComposition and fipIntakeM2MAuthenticator implemented. Feature flag disabled by default. No HTTP route. No production caller. All gates BLOCKED.
+
+## SEM-GOV-001D-UI3-I10 — Migration Readiness and Controlled Apply
+
+Status: TESTED
+Governed by: SEM-GOV-001D-UI3-I10
+Blocked by: SEM-GOV-001D-UI3-I9
+Blocks: none
+Notes: PASS WITH CORRECTION. Gate A readiness PASS. Lifecycle RLS correction. Live read-only inspection PASS. Gate B apply NOT EXECUTED. All gates BLOCKED.

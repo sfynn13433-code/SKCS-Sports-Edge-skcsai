@@ -5,8 +5,8 @@
   "source_command": "git ls-files",
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
-  "tracked_path_count": 984,
-  "registered_asset_count": 980,
+  "tracked_path_count": 989,
+  "registered_asset_count": 985,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -33373,6 +33373,190 @@
         "Verifies packet sections",
         "Verifies composition files exist",
         "Verifies ledger registration"
+      ]
+    },
+    {
+      "asset_path": "scripts/check-ui3-i10-migration-readiness.js",
+      "asset_type": "SCRIPT_TOOL",
+      "asset_role": "CONTROL_AUDIT",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I10",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I10",
+      "related_assets": [
+        "reports/ui3-i10/migration-readiness.json",
+        "tests/sem-gov-001d-ui3-i10-migration-readiness.test.js"
+      ],
+      "related_tables": [],
+      "related_functions": [
+        "inspectStaticMigrations",
+        "evaluateLiveSnapshot",
+        "runLiveInspection"
+      ],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "node scripts/check-ui3-i10-migration-readiness.js after checker change",
+      "notes": "Read-only migration readiness inspector. No apply.",
+      "purpose_description": "Static and live read-only Supabase migration readiness checker for UI3 lifecycle/D3/evidence DDL.",
+      "functional_group": "SCRIPT_TOOL",
+      "relationship_tags": [
+        "SCRIPT_TOOL",
+        "GOVERNANCE",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Static migration inspection",
+        "Read-only live snapshot",
+        "Credential redaction"
+      ]
+    },
+    {
+      "asset_path": "tests/sem-gov-001d-ui3-i10-migration-readiness.test.js",
+      "asset_type": "TEST",
+      "asset_role": "CONTROL_AUDIT",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I10",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I10",
+      "related_assets": [
+        "scripts/check-ui3-i10-migration-readiness.js"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i10 after checker change",
+      "notes": "Static readiness checker tests.",
+      "purpose_description": "Verifies migration order, RLS detection, collision evaluation, and credential redaction.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "8 static tests",
+        "No live DB in unit tests"
+      ]
+    },
+    {
+      "asset_path": "reports/ui3-i10/migration-readiness.json",
+      "asset_type": "OTHER",
+      "asset_role": "CONTROL_AUDIT",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I10",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I10",
+      "related_assets": [
+        "scripts/check-ui3-i10-migration-readiness.js"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "Regenerate after readiness re-run",
+      "notes": "Gate A readiness artifact. No credentials.",
+      "purpose_description": "Records static and live migration readiness decision PASS for I10 closure.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "GOVERNANCE",
+        "DATABASE",
+        "AUDIT"
+      ],
+      "classification_evidence": [
+        "decision PASS",
+        "Redacted connection target",
+        "Zero collisions"
+      ]
+    },
+    {
+      "asset_path": "control-center/SEM-GOV-001D-UI3-I10_MIGRATION_READINESS_AND_CONTROLLED_APPLY_PACKET.v1.md",
+      "asset_type": "DOCUMENTATION",
+      "asset_role": "GOVERNANCE_PACKET",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I10",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I10",
+      "related_assets": [
+        "tests/sem-gov-001d-ui3-i10-implementation-packet.test.js"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i10 after packet change",
+      "notes": "I10 closure packet PASS WITH CORRECTION.",
+      "purpose_description": "Seals Gate A readiness PASS, lifecycle RLS correction, Gate B apply HOLD.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Gate A PASS",
+        "Gate B HOLD",
+        "All gates BLOCKED"
+      ]
+    },
+    {
+      "asset_path": "tests/sem-gov-001d-ui3-i10-implementation-packet.test.js",
+      "asset_type": "TEST",
+      "asset_role": "CONTROL_AUDIT",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I10",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I10",
+      "related_assets": [
+        "control-center/SEM-GOV-001D-UI3-I10_MIGRATION_READINESS_AND_CONTROLLED_APPLY_PACKET.v1.md"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i10 after UI3-I10 packet change",
+      "notes": "Packet guard test for SEM-GOV-001D-UI3-I10 closure.",
+      "purpose_description": "Guards UI3-I10 PASS WITH CORRECTION, readiness report, and blocked gates.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Verifies packet sections",
+        "Verifies readiness report PASS",
+        "Verifies lifecycle RLS"
       ]
     }
   ],

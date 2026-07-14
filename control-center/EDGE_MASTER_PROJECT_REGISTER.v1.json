@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 40,
+  "project_count": 41,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -2363,7 +2363,9 @@
       "blocked_by": [
         "SEM-GOV-001D-UI3-I8"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI3-I10"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -2407,7 +2409,7 @@
         "Intake could be wired without authenticated caller verification"
       ],
       "recommended_order": 40,
-      "next_action": "SEM-GOV-001D-UI3-I9 PASS. HTTP boundary NOT AUTHORIZED.",
+      "next_action": "SEM-GOV-001D-UI3-I9 PASS. Migration readiness authorized in UI3-I10.",
       "owner_note": "Isolated composition foundation only.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I9",
@@ -2415,6 +2417,73 @@
         "Composition and authenticator implemented",
         "Mock-first tests pass",
         "No production caller"
+      ]
+    },
+    {
+      "project_id": "SEM-GOV-001D-UI3-I10",
+      "project_name": "Migration Readiness and Controlled Apply",
+      "category": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: migration readiness checker, static tests, read-only live inspection — Gate B apply deferred.",
+      "why_it_matters": "Controlled migration apply requires proven static and live readiness before any DDL execution.",
+      "current_status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I9"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "database"
+      ],
+      "related_tasks": [
+        "SEM-GOV-001D-UI3-I10"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-UI3-I10_MIGRATION_READINESS_AND_CONTROLLED_APPLY_PACKET.v1",
+        "SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001D-UI3-I5_SOURCE_B_MIGRATION_AND_ISOLATED_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001D-UI3-I8_DURABLE_INTAKE_EVIDENCE_STORAGE_IMPLEMENTATION_PACKET.v1"
+      ],
+      "related_files": [
+        "scripts/check-ui3-i10-migration-readiness.js",
+        "reports/ui3-i10/migration-readiness.json",
+        "supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql"
+      ],
+      "related_tables": [
+        "fixture_lifecycle_current",
+        "fixture_display_metadata",
+        "fip_intake_evidence"
+      ],
+      "known_issues": [
+        "Gate B apply NOT EXECUTED",
+        "supabase_storage_gate BLOCKED",
+        "All gates BLOCKED"
+      ],
+      "required_decisions": [
+        "Gate B controlled apply authorization",
+        "supabase_storage_gate clearance",
+        "Backup confirmation"
+      ],
+      "completion_definition": "SEM-GOV-001D-UI3-I10 PASS WITH CORRECTION — Gate A readiness PASS, Gate B apply deferred.",
+      "proof_required": [
+        "test:sem-gov-001d-ui3-i10 passes",
+        "migration-readiness.json PASS",
+        "Gates BLOCKED"
+      ],
+      "risks_if_ignored": [
+        "Migrations could be applied without collision or capacity proof"
+      ],
+      "recommended_order": 41,
+      "next_action": "SEM-GOV-001D-UI3-I10 PASS WITH CORRECTION. Gate B apply NOT AUTHORIZED.",
+      "owner_note": "Readiness only.",
+      "last_updated": "2026-07-14",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I10",
+      "current_evidence": [
+        "Readiness checker PASS",
+        "Live inspection PASS",
+        "Lifecycle RLS correction"
       ]
     }
   ]
