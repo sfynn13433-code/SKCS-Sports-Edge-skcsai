@@ -18,7 +18,7 @@
 
   var DAY_USER_LABELS = {
     TODAY: 'Today',
-    DAY_2: 'Tomorrow',
+    DAY_2: 'Day 2',
     DAY_3: 'Day 3',
     DAY_4: 'Day 4',
     DAY_5: 'Day 5',
@@ -46,6 +46,77 @@
     PUBLICATION_REVIEW: 'Publication Review',
     FINAL_DECISION: 'Final Decision'
   };
+
+  var STAGE_SEQUENCE = [
+    'ADMITTED',
+    'EVIDENCE_REVIEW',
+    'CONTEXT_REVIEW',
+    'STABILITY_REVIEW',
+    'PUBLICATION_REVIEW',
+    'FINAL_DECISION'
+  ];
+
+  var SYSTEM_STATUS_TEXT = 'Ready';
+
+  function badgeFor(team) {
+    var parts = String(team).trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+    }
+    return String(team).slice(0, 2).toUpperCase();
+  }
+
+  function funnelForDay(day) {
+    var base = {
+      TODAY: { admitted: 42, evidence: 35, context: 28, stability: 18, publication: 9, final: 4 },
+      DAY_2: { admitted: 48, evidence: 40, context: 32, stability: 20, publication: 11, final: 5 },
+      DAY_3: { admitted: 55, evidence: 46, context: 38, stability: 24, publication: 12, final: 6 },
+      DAY_4: { admitted: 62, evidence: 52, context: 42, stability: 28, publication: 14, final: 7 },
+      DAY_5: { admitted: 70, evidence: 58, context: 46, stability: 32, publication: 16, final: 8 },
+      DAY_6: { admitted: 78, evidence: 64, context: 50, stability: 36, publication: 18, final: 9 },
+      DAY_7: { admitted: 86, evidence: 72, context: 56, stability: 40, publication: 20, final: 10 },
+      DAY_8: { admitted: 500, evidence: 420, context: 350, stability: 220, publication: 90, final: 40 }
+    };
+    var row = base[day] || base.TODAY;
+    var admitted = row.admitted;
+    return STAGE_SEQUENCE.map(function (stage, index) {
+      var keys = ['admitted', 'evidence', 'context', 'stability', 'publication', 'final'];
+      var count = row[keys[index]];
+      return {
+        stage: stage,
+        label: STAGE_LABELS[stage],
+        sequence: index + 1,
+        count: count,
+        percent: admitted ? Math.round((count / admitted) * 100) : 0
+      };
+    });
+  }
+
+  function movementForDay(day) {
+    var map = {
+      TODAY: { newToDay: 8, movedFromPrevious: 12, eliminated: 3, held: 2, approved: 1, cancelledPostponed: 1 },
+      DAY_2: { newToDay: 10, movedFromPrevious: 14, eliminated: 4, held: 2, approved: 2, cancelledPostponed: 1 },
+      DAY_3: { newToDay: 12, movedFromPrevious: 16, eliminated: 5, held: 3, approved: 2, cancelledPostponed: 2 },
+      DAY_4: { newToDay: 14, movedFromPrevious: 18, eliminated: 5, held: 3, approved: 3, cancelledPostponed: 2 },
+      DAY_5: { newToDay: 16, movedFromPrevious: 20, eliminated: 6, held: 4, approved: 3, cancelledPostponed: 2 },
+      DAY_6: { newToDay: 18, movedFromPrevious: 22, eliminated: 6, held: 4, approved: 4, cancelledPostponed: 3 },
+      DAY_7: { newToDay: 20, movedFromPrevious: 24, eliminated: 7, held: 5, approved: 4, cancelledPostponed: 3 },
+      DAY_8: { newToDay: 120, movedFromPrevious: 380, eliminated: 45, held: 12, approved: 8, cancelledPostponed: 3 }
+    };
+    return map[day] || map.TODAY;
+  }
+
+  function narrativeForDay(day) {
+    var m = movementForDay(day);
+    var label = DAY_USER_LABELS[day] || day;
+    return [
+      m.newToDay + ' fixtures entered the review window on ' + label + ' (static mock).',
+      m.movedFromPrevious + ' fixtures moved from the previous day in this demonstration.',
+      m.eliminated + ' fixtures were eliminated during governed review.',
+      m.held + ' fixtures are on hold pending additional context.',
+      m.approved + ' fixtures reached final review completion in the mock dataset.'
+    ];
+  }
 
   function timeline(eventKey, fromState, toState, label, occurredAt) {
     return {
@@ -346,13 +417,32 @@
     }
   ];
 
+  fixtures.forEach(function (fx) {
+    fx.home_badge = badgeFor(fx.home_team);
+    fx.away_badge = badgeFor(fx.away_team);
+    if (!fx.competition_country && fx.country) {
+      fx.competition_country = fx.country;
+    }
+  });
+
   global.SportsMatchHubMock = {
     DAY_TOKENS: DAY_TOKENS,
     DAY_USER_LABELS: DAY_USER_LABELS,
     STATE_LABELS: STATE_LABELS,
     STAGE_LABELS: STAGE_LABELS,
+    STAGE_SEQUENCE: STAGE_SEQUENCE,
+    SYSTEM_STATUS_TEXT: SYSTEM_STATUS_TEXT,
     TIMEZONE: 'Africa/Johannesburg',
     fixtures: fixtures,
+    getLifecycleFunnel: function (day) {
+      return funnelForDay(day);
+    },
+    getMovementSummary: function (day) {
+      return movementForDay(day);
+    },
+    getDayNarrative: function (day) {
+      return narrativeForDay(day);
+    },
     getFixtureById: function (id) {
       for (var i = 0; i < fixtures.length; i += 1) {
         if (fixtures[i].public_fixture_id === id) return fixtures[i];

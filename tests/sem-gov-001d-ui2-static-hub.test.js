@@ -77,6 +77,7 @@ test('UI2 frontend files exist and page references approved assets only', () => 
   assert.match(html, /sports-match-hub\.js/);
   assert.doesNotMatch(html, /smh-hub\.js/);
   assert.doesNotMatch(html, /\/api\//);
+  assert.doesNotMatch(html, /output\.css/);
 });
 
 test('mock data exposes canonical day tokens without DAY_1', () => {
@@ -87,7 +88,10 @@ test('mock data exposes canonical day tokens without DAY_1', () => {
     assert.ok(count >= 1, `expected ${token} in mock authority`);
   }
   assert.match(src, /Africa\/Johannesburg/);
-  assert.match(src, /Tomorrow/);
+  assert.match(src, /Day 2/);
+  assert.match(src, /getLifecycleFunnel/);
+  assert.match(src, /getMovementSummary/);
+  assert.match(src, /getDayNarrative/);
 });
 
 test('lifecycle state and stage mappings match UI1 contract', () => {
@@ -129,8 +133,32 @@ test('hub page includes required landmarks and ARIA structures', () => {
   assert.match(html, /role="tablist"/);
   assert.match(html, /aria-current="page"/);
   assert.match(html, /aria-live/);
+  assert.match(html, /id="lifecycle-funnel"/);
+  assert.match(html, /id="movement-counters"/);
+  assert.match(html, /id="edgemind-panel"/);
+  assert.match(html, /id="lifecycle-legend"/);
   const js = read('public/js/sports-match-hub.js');
   assert.match(js, /<time datetime=/);
+  assert.match(js, /renderFunnel/);
+  assert.match(js, /renderFixtureTable/);
+});
+
+test('dark dashboard visual contract is present in HTML and CSS', () => {
+  const html = read('public/sports-match-hub.html');
+  const css = read('public/css/sports-match-hub.css');
+  assert.match(html, /smh-dashboard/);
+  assert.match(html, /smh-control-strip/);
+  assert.match(html, /data-control="1"/);
+  assert.match(html, /data-control="4"/);
+  assert.match(html, /smh-funnel-panel/);
+  assert.match(html, /smh-guide-rail/);
+  assert.doesNotMatch(html, /smh-context/);
+  assert.doesNotMatch(css, /\.fixture-grid/);
+  assert.match(css, /\.fixture-table/);
+  assert.match(css, /--smh-bg:\s*#/);
+  assert.match(css, /body\.smh-page[\s\S]*background:\s*var\(--smh-bg\)/);
+  assert.doesNotMatch(css, /background:\s*#fff/);
+  assert.doesNotMatch(css, /background:\s*#f4f7fb/);
 });
 
 test('index.html links to Sports Match Hub', () => {

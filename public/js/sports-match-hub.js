@@ -1,5 +1,5 @@
 /**
- * SEM-GOV-001D-UI2 — Static Sports Match Hub controller (mock data only).
+ * SEM-GOV-001D-UI2-VR1 — Static Sports Match Hub controller (mock data only).
  */
 (function () {
   'use strict';
@@ -11,6 +11,37 @@
   var MIN_SEARCH = 2;
   var searchTimer = null;
   var lastFocusedCard = null;
+
+  var STAGE_CLASS = {
+    ADMITTED: 'admitted',
+    EVIDENCE_REVIEW: 'evidence',
+    CONTEXT_REVIEW: 'context',
+    STABILITY_REVIEW: 'stability',
+    PUBLICATION_REVIEW: 'publication',
+    FINAL_DECISION: 'final'
+  };
+
+  var MOVEMENT_LABELS = [
+    { key: 'newToDay', label: 'New to selected day' },
+    { key: 'movedFromPrevious', label: 'Moved from previous day' },
+    { key: 'eliminated', label: 'Eliminated today' },
+    { key: 'held', label: 'Held today' },
+    { key: 'approved', label: 'Approved today' },
+    { key: 'cancelledPostponed', label: 'Cancelled/Postponed' }
+  ];
+
+  var LEGEND_STATES = [
+    { code: 'VISIBLE', label: 'Listed' },
+    { code: 'UNDER_REVIEW', label: 'Under Review' },
+    { code: 'HELD', label: 'On Hold' },
+    { code: 'ELIMINATED', label: 'Not Publishing' },
+    { code: 'FINAL_APPROVED', label: 'Review Complete' },
+    { code: 'CANCELLED', label: 'Cancelled' },
+    { code: 'POSTPONED', label: 'Postponed' },
+    { code: 'ARCHIVED', label: 'Archived' }
+  ];
+
+  var NARRATIVE_ICONS = ['✓', '↔', '✕', '⏸', '★'];
 
   var els = {};
 
@@ -53,6 +84,21 @@
     history.replaceState(null, '', url);
   }
 
+  function sastYmdFromDate(date) {
+    var fmt = new Intl.DateTimeFormat('en-CA', {
+      timeZone: mock.TIMEZONE,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+    var parts = fmt.formatToParts(date);
+    var map = {};
+    parts.forEach(function (p) {
+      if (p.type !== 'literal') map[p.type] = p.value;
+    });
+    return map;
+  }
+
   function sastParts(date) {
     var fmt = new Intl.DateTimeFormat('en-ZA', {
       timeZone: mock.TIMEZONE,
@@ -64,17 +110,14 @@
     var parts = fmt.formatToParts(date);
     var map = {};
     parts.forEach(function (p) {
-      map[p.type] = p.value;
+      if (p.type !== 'literal') map[p.type] = p.value;
     });
     return map;
   }
 
   function sastOffsetDate(offsetDays) {
-    var now = new Date();
-    var parts = sastParts(now);
-    var base = new Date(
-      parts.year + '-' + parts.month + '-' + parts.day + 'T12:00:00+02:00'
-    );
+    var map = sastYmdFromDate(new Date());
+    var base = new Date(map.year + '-' + map.month + '-' + map.day + 'T12:00:00+02:00');
     base.setDate(base.getDate() + offsetDays);
     return base;
   }
@@ -87,8 +130,11 @@
 
   function formatTabDate(token) {
     var d = sastOffsetDate(dayTokenOffset(token));
-    var parts = sastParts(d);
-    return parts.day + ' ' + parts.month;
+    return new Intl.DateTimeFormat('en-ZA', {
+      timeZone: mock.TIMEZONE,
+      day: '2-digit',
+      month: 'short'
+    }).format(d);
   }
 
   function formatKickoff(iso) {
@@ -102,6 +148,16 @@
       minute: '2-digit',
       hour12: false
     }).format(d) + ' SAST';
+  }
+
+  function formatKickoffTime(iso) {
+    var d = new Date(iso);
+    return new Intl.DateTimeFormat('en-ZA', {
+      timeZone: mock.TIMEZONE,
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }).format(d);
   }
 
   function formatShortTime(iso) {
@@ -148,11 +204,23 @@
     return 'lifecycle-badge lifecycle-badge--' + String(code || '').toLowerCase().replace(/_/g, '-');
   }
 
+  function stageClass(stage) {
+    return 'stage-badge stage-badge--' + (STAGE_CLASS[stage] || 'admitted');
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
   function renderDayTabs(state) {
     var container = els.dayTabs;
     if (!container) return;
     container.innerHTML = '';
-    mock.DAY_TOKENS.forEach(function (token, index) {
+    mock.DAY_TOKENS.forEach(function (token) {
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'day-tab' + (state.day === token ? ' day-tab--active' : '');
@@ -193,25 +261,17 @@
     };
   }
 
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
   function renderFilterChips(state) {
     var chips = els.filterChips;
     if (!chips) return;
     chips.innerHTML = '';
     var active = [];
     if (state.lifecycle) {
-      active.push({ key: 'state', label: mock.STATE_LABELS[state.lifecycle] || state.lifecycle });
+      active.push({ label: mock.STATE_LABELS[state.lifecycle] || state.lifecycle });
     }
-    if (state.competition) active.push({ key: 'competition', label: state.competition });
-    if (state.q.length >= MIN_SEARCH) active.push({ key: 'q', label: 'Team: ' + state.q });
-    if (state.archive !== 'active') active.push({ key: 'archive', label: state.archive });
+    if (state.competition) active.push({ label: state.competition });
+    if (state.q.length >= MIN_SEARCH) active.push({ label: 'Team: ' + state.q });
+    if (state.archive !== 'active') active.push({ label: state.archive });
     active.forEach(function (chip) {
       var span = document.createElement('span');
       span.className = 'filter-chip';
@@ -224,81 +284,184 @@
   }
 
   function syncFilterControls(state) {
-    if (els.lifecycleFilter) {
-      els.lifecycleFilter.value = state.lifecycle || '';
-    }
-    if (els.competitionFilter) {
-      els.competitionFilter.value = state.competition || '';
-    }
+    if (els.lifecycleFilter) els.lifecycleFilter.value = state.lifecycle || '';
+    if (els.competitionFilter) els.competitionFilter.value = state.competition || '';
     if (els.teamSearch && document.activeElement !== els.teamSearch) {
       els.teamSearch.value = state.q;
     }
-    if (els.archiveFilter) {
-      els.archiveFilter.value = state.archive;
-    }
-    if (els.uiStateSelect) {
-      els.uiStateSelect.value = state.uiState;
+    if (els.archiveFilter) els.archiveFilter.value = state.archive;
+    if (els.uiStateSelect) els.uiStateSelect.value = state.uiState;
+    if (els.systemStatus) {
+      els.systemStatus.textContent = mock.SYSTEM_STATUS_TEXT || 'Ready';
     }
   }
 
-  function renderFixtureCard(fx) {
-    var card = document.createElement('article');
-    card.className = 'fixture-card fixture-card--' + fx.lifecycle_state.toLowerCase().replace(/_/g, '-');
-    card.setAttribute('data-fixture-id', fx.public_fixture_id);
+  function renderFunnel(state) {
+    var container = els.funnel;
+    if (!container) return;
+    container.innerHTML = '';
+    var stages = mock.getLifecycleFunnel(state.day);
+    stages.forEach(function (stage) {
+      var card = document.createElement('article');
+      card.className =
+        'funnel-stage funnel-stage--' + (STAGE_CLASS[stage.stage] || 'admitted');
+      card.innerHTML =
+        '<span class="funnel-stage__seq">' +
+        stage.sequence +
+        '.</span>' +
+        '<div class="funnel-stage__icon" aria-hidden="true">●</div>' +
+        '<p class="funnel-stage__label">' +
+        escapeHtml(stage.label) +
+        '</p>' +
+        '<p class="funnel-stage__count">' +
+        escapeHtml(String(stage.count)) +
+        '</p>' +
+        '<p class="funnel-stage__percent">' +
+        escapeHtml(String(stage.percent)) +
+        '%</p>';
+      container.appendChild(card);
+    });
+  }
 
-    var stageHint = '';
-    if (
-      (fx.lifecycle_state === 'UNDER_REVIEW' || fx.lifecycle_state === 'HELD') &&
-      fx.lifecycle_stage_label
-    ) {
-      stageHint =
-        '<p class="fixture-card__stage-hint">' + escapeHtml(fx.lifecycle_stage_label) + '</p>';
-    }
+  function renderMovement(state) {
+    var container = els.movement;
+    if (!container) return;
+    container.innerHTML = '';
+    var summary = mock.getMovementSummary(state.day);
+    MOVEMENT_LABELS.forEach(function (item) {
+      var card = document.createElement('div');
+      card.className = 'movement-card';
+      card.innerHTML =
+        '<p class="movement-card__label">' +
+        escapeHtml(item.label) +
+        '</p><p class="movement-card__value">' +
+        escapeHtml(String(summary[item.key])) +
+        '</p>';
+      container.appendChild(card);
+    });
+  }
 
-    card.innerHTML =
-      '<div class="fixture-card__header">' +
-      '<span class="' +
+  function renderEdgeMind(state) {
+    var container = els.edgemindContent;
+    if (!container) return;
+    var bullets = mock.getDayNarrative(state.day);
+    var html =
+      '<p class="smh-edgemind-mock-note">Static UI2 mock explanation — not live EdgeMind inference.</p>' +
+      '<ul class="smh-edgemind-list">';
+    bullets.forEach(function (text, index) {
+      html +=
+        '<li><span class="smh-edgemind-list__icon" aria-hidden="true">' +
+        escapeHtml(NARRATIVE_ICONS[index] || '•') +
+        '</span><span>' +
+        escapeHtml(text) +
+        '</span></li>';
+    });
+    html +=
+      '</ul>' +
+      '<div class="smh-edgemind-ask">' +
+      '<input type="text" disabled placeholder="Ask EdgeMind BOT" aria-label="Ask EdgeMind BOT (static demo)">' +
+      '<button type="button" disabled aria-label="Send (static demo)">→</button>' +
+      '</div>';
+    container.innerHTML = html;
+  }
+
+  function renderLegend() {
+    var container = els.legend;
+    if (!container) return;
+    var html = '<span class="smh-legend__title">Lifecycle States:</span>';
+    LEGEND_STATES.forEach(function (item) {
+      html +=
+        '<span class="' +
+        stateClass(item.code) +
+        '" aria-label="' +
+        escapeHtml(item.label) +
+        '">' +
+        escapeHtml(item.label) +
+        '</span>';
+    });
+    container.innerHTML = html;
+  }
+
+  function renderFixtureRow(fx) {
+    var tr = document.createElement('tr');
+    tr.setAttribute('data-fixture-id', fx.public_fixture_id);
+
+    var stageLabel = fx.lifecycle_stage_label || '';
+    tr.innerHTML =
+      '<td data-label="Fixture">' +
+      '<div class="fixture-teams">' +
+      '<span class="team-badge" aria-hidden="true">' +
+      escapeHtml(fx.home_badge || '') +
+      '</span>' +
+      '<span class="fixture-teams__names">' +
+      escapeHtml(fx.home_team) +
+      ' <span class="fixture-teams__vs">vs</span> ' +
+      escapeHtml(fx.away_team) +
+      '</span>' +
+      '<span class="team-badge" aria-hidden="true">' +
+      escapeHtml(fx.away_badge || '') +
+      '</span>' +
+      '</div></td>' +
+      '<td data-label="Competition">' +
+      '<div class="fixture-competition">' +
+      escapeHtml(fx.competition) +
+      '<span class="fixture-competition__country">' +
+      escapeHtml(fx.competition_country || fx.country || '') +
+      '</span></div></td>' +
+      '<td data-label="Kickoff"><time datetime="' +
+      escapeHtml(fx.kickoff_at) +
+      '">' +
+      escapeHtml(formatKickoffTime(fx.kickoff_at)) +
+      '</time></td>' +
+      '<td data-label="Stage"><span class="' +
+      stageClass(fx.lifecycle_stage) +
+      '">' +
+      escapeHtml(stageLabel) +
+      '</span></td>' +
+      '<td data-label="State"><span class="' +
       stateClass(fx.lifecycle_state) +
       '" aria-label="Status: ' +
       escapeHtml(fx.lifecycle_state_label) +
       '">' +
       escapeHtml(fx.lifecycle_state_label) +
-      '</span>' +
-      '</div>' +
-      '<h3 class="fixture-card__teams">' +
-      escapeHtml(fx.home_team) +
-      ' <span class="fixture-card__vs">vs</span> ' +
-      escapeHtml(fx.away_team) +
-      '</h3>' +
-      '<p class="fixture-card__competition">' +
-      escapeHtml(fx.competition) +
-      '</p>' +
-      '<p class="fixture-card__kickoff"><time datetime="' +
-      escapeHtml(fx.kickoff_at) +
-      '">' +
-      escapeHtml(formatKickoff(fx.kickoff_at)) +
-      '</time></p>' +
-      '<p class="fixture-card__day">' +
-      escapeHtml(mock.DAY_USER_LABELS[fx.day_label] || fx.day_label) +
-      '</p>' +
-      stageHint +
-      '<p class="fixture-card__summary">' +
+      '</span></td>' +
+      '<td data-label="Status / EdgeMind BOT Summary"><span class="fixture-summary">' +
       escapeHtml(fx.status_summary || '') +
-      '</p>' +
-      '<p class="fixture-card__freshness">Updated <time datetime="' +
-      escapeHtml(fx.updated_at) +
-      '">' +
-      escapeHtml(formatShortTime(fx.updated_at)) +
-      '</time></p>' +
-      '<button type="button" class="fixture-card__action btn btn--primary">View fixture</button>';
+      '</span></td>' +
+      '<td class="fixture-table__action-cell" data-label="Action">' +
+      '<button type="button" class="btn btn--ghost fixture-row__action">View fixture</button></td>';
 
-    var btn = card.querySelector('.fixture-card__action');
+    var btn = tr.querySelector('.fixture-row__action');
     btn.addEventListener('click', function () {
       lastFocusedCard = btn;
       writeState({ detail: fx.public_fixture_id });
       render();
     });
-    return card;
+    return tr;
+  }
+
+  function renderFixtureTable(fixtures) {
+    var wrap = document.createElement('div');
+    wrap.className = 'fixture-table-wrap';
+    var table = document.createElement('table');
+    table.className = 'fixture-table';
+    table.innerHTML =
+      '<thead><tr>' +
+      '<th scope="col">Fixture</th>' +
+      '<th scope="col">Competition</th>' +
+      '<th scope="col">Kickoff</th>' +
+      '<th scope="col">Stage</th>' +
+      '<th scope="col">State</th>' +
+      '<th scope="col">Status / EdgeMind BOT Summary</th>' +
+      '<th scope="col"><span class="smh-visually-hidden">Action</span></th>' +
+      '</tr></thead>';
+    var tbody = document.createElement('tbody');
+    fixtures.forEach(function (fx) {
+      tbody.appendChild(renderFixtureRow(fx));
+    });
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+    return wrap;
   }
 
   function renderPanelContent(state) {
@@ -417,15 +580,7 @@
       panel.appendChild(banner);
     }
 
-    var grid = document.createElement('div');
-    grid.className = 'fixture-grid';
-    grid.setAttribute('role', 'list');
-    fixtures.forEach(function (fx) {
-      var card = renderFixtureCard(fx);
-      card.setAttribute('role', 'listitem');
-      grid.appendChild(card);
-    });
-    panel.appendChild(grid);
+    panel.appendChild(renderFixtureTable(fixtures));
 
     if (els.resultCount) {
       els.resultCount.textContent = fixtures.length + ' fixture' + (fixtures.length === 1 ? '' : 's');
@@ -482,7 +637,10 @@
     dialog.setAttribute('aria-modal', 'true');
     dialog.setAttribute('aria-labelledby', 'fixture-detail-title');
 
-    var stages = ['ADMITTED', 'EVIDENCE_REVIEW', 'CONTEXT_REVIEW', 'STABILITY_REVIEW', 'PUBLICATION_REVIEW', 'FINAL_DECISION'];
+    var stages = mock.STAGE_SEQUENCE || [
+      'ADMITTED', 'EVIDENCE_REVIEW', 'CONTEXT_REVIEW',
+      'STABILITY_REVIEW', 'PUBLICATION_REVIEW', 'FINAL_DECISION'
+    ];
     var stepper = '<ol class="stage-stepper" aria-label="Lifecycle stages">';
     stages.forEach(function (st) {
       var active = fx.lifecycle_stage === st ? ' stage-stepper__item--active' : '';
@@ -529,6 +687,9 @@
       '</h2>' +
       '<p class="fixture-detail__competition">' +
       escapeHtml(fx.competition) +
+      (fx.competition_country || fx.country
+        ? ' · ' + escapeHtml(fx.competition_country || fx.country)
+        : '') +
       '</p>' +
       '<p class="fixture-detail__kickoff"><time datetime="' +
       escapeHtml(fx.kickoff_at) +
@@ -595,7 +756,7 @@
   function populateCompetitions() {
     if (!els.competitionFilter) return;
     var current = els.competitionFilter.value;
-    els.competitionFilter.innerHTML = '<option value="">All competitions</option>';
+    els.competitionFilter.innerHTML = '<option value="">All Competitions</option>';
     mock.getCompetitions().forEach(function (c) {
       var opt = document.createElement('option');
       opt.value = c;
@@ -608,7 +769,7 @@
   function bindEvents() {
     if (els.lifecycleFilter) {
       els.lifecycleFilter.addEventListener('change', function () {
-        writeState({ lifecycle: els.lifecycleFilter.value }, false);
+        writeState({ state: els.lifecycleFilter.value }, false);
         render();
       });
     }
@@ -643,10 +804,14 @@
         render();
       });
     }
-    if (els.filterToggle) {
+    if (els.filterToggle && els.filterSheet) {
       els.filterToggle.addEventListener('click', function () {
-        els.filterSheet.classList.toggle('filter-sheet--open');
-        var open = els.filterSheet.classList.contains('filter-sheet--open');
+        var open = els.filterSheet.hasAttribute('hidden');
+        if (open) {
+          els.filterSheet.removeAttribute('hidden');
+        } else {
+          els.filterSheet.setAttribute('hidden', '');
+        }
         els.filterToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
       });
     }
@@ -655,6 +820,11 @@
         els.siteNav.classList.toggle('site-nav--open');
         var open = els.siteNav.classList.contains('site-nav--open');
         els.navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    }
+    if (els.edgemindTrigger && els.edgemindPanel) {
+      els.edgemindTrigger.addEventListener('click', function () {
+        els.edgemindPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       });
     }
   }
@@ -668,10 +838,11 @@
     renderDayTabs(state);
     syncFilterControls(state);
     renderFilterChips(state);
+    renderFunnel(state);
+    renderMovement(state);
+    renderEdgeMind(state);
+    renderLegend();
     renderPanelContent(state);
-    if (els.contextDate) {
-      els.contextDate.textContent = formatTabDate(state.day);
-    }
   }
 
   function init() {
@@ -691,7 +862,13 @@
     els.filterSheet = qs('filter-sheet');
     els.navToggle = qs('nav-toggle');
     els.siteNav = qs('site-nav');
-    els.contextDate = qs('sast-context-date');
+    els.systemStatus = qs('system-status-text');
+    els.funnel = qs('lifecycle-funnel');
+    els.movement = qs('movement-counters');
+    els.edgemindContent = qs('edgemind-content');
+    els.edgemindPanel = qs('edgemind-panel');
+    els.edgemindTrigger = qs('edgemind-trigger');
+    els.legend = qs('lifecycle-legend');
 
     populateCompetitions();
     bindEvents();
