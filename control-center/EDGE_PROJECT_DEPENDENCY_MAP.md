@@ -230,3 +230,11 @@ Governed by: SEM-GOV-001D-UI3-I1
 Blocked by: SEM-GOV-001D-HOME1, SEM-GOV-001B-I4
 Blocks: none
 Notes: Inspection PASS WITH BLOCKER. Two-source read-model contract sealed. No lifecycle route mounted. UI3/UI4 implementation NOT STARTED. Migration NOT APPLIED. public_fixture_id resolver BLOCKED. All gates BLOCKED.
+
+## SEM-GOV-001D-UI3-I2 — Canonical Fixture Metadata Projection Inspection and Contract
+
+Status: TESTED
+Governed by: SEM-GOV-001D-UI3-I2
+Blocked by: SEM-GOV-001D-UI3-I1, EST-001
+Blocks: none
+Notes: Inspection PASS WITH BLOCKER — NEW GOVERNED METADATA PROJECTION REQUIRED. raw_fixtures rejected as Source B. Scout FIP-001 canonical authority. Bounded projection fields sealed. EST-001 authorization pending. Source B persistence NOT AUTHORIZED. UI3/UI4 NOT STARTED. Migration NOT APPLIED. All gates BLOCKED.

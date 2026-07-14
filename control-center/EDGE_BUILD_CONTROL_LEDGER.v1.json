@@ -1789,6 +1789,62 @@
       "next_action": "SEM-GOV-001D-UI3-I1 inspection PASS WITH BLOCKER. UI3 implementation BLOCKED pending metadata projection, identifier design, migration apply, and gate clearance.",
       "owner_note": "Inspection and contract only. No API implementation.",
       "last_updated": "2026-07-14"
+    },
+    {
+      "task_id": "SEM-GOV-001D-UI3-I2",
+      "task_name": "Canonical Fixture Metadata Projection Inspection and Contract",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: read-only inspection of Source B canonical fixture metadata authority, rejection of raw_fixtures and unsafe fallbacks, and sealed bounded projection field contract — without schema, persistence, or intake implementation.",
+      "status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I1",
+        "EST-001"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-UI3-I1_LIFECYCLE_READ_MODEL_API_INSPECTION_AND_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I2_CANONICAL_FIXTURE_METADATA_PROJECTION_INSPECTION_AND_CONTRACT.v1",
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
+      ],
+      "affected_files": [
+        "control-center/SEM-GOV-001D-UI3-I2_CANONICAL_FIXTURE_METADATA_PROJECTION_INSPECTION_AND_CONTRACT.v1.md",
+        "tests/sem-gov-001d-ui3-i2-contract.test.js",
+        "package.json"
+      ],
+      "affected_tables": [],
+      "completion_definition": "SEM-GOV-001D-UI3-I2 seals inspection PASS WITH BLOCKER and Source B metadata projection contract — UI3/UI4 NOT STARTED, migration NOT APPLIED, EST-001 authorization pending, gates BLOCKED.",
+      "proof_required": [
+        "npm run test:sem-gov-001d-ui3-i2 passes",
+        "npm run test:sem-gov-001d-ui3-i1 passes",
+        "raw_fixtures rejected as Source B",
+        "All gates BLOCKED"
+      ],
+      "current_evidence": [
+        "raw_fixtures rejected as canonical Source B",
+        "Scout FIP-001 named metadata authority",
+        "Bounded projection fields sealed",
+        "EST-001 authorization blocker recorded",
+        "No schema or runtime implementation",
+        "Migration NOT APPLIED",
+        "All gates BLOCKED"
+      ],
+      "open_gaps": [
+        "EST-001 explicit projection authorization",
+        "Source B storage-policy mini-project",
+        "EFI-001 FIP intake not implemented",
+        "public_fixture_id resolver BLOCKED",
+        "UI3 read-model service not implemented"
+      ],
+      "next_action": "SEM-GOV-001D-UI3-I2 inspection PASS WITH BLOCKER. Source B persistence NOT AUTHORIZED pending EST-001 and storage-policy mini-project.",
+      "owner_note": "Inspection and contract only. No table or intake implementation.",
+      "last_updated": "2026-07-14"
     }
   ]
 }

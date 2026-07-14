@@ -6,7 +6,7 @@
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
   "tracked_path_count": 952,
-  "registered_asset_count": 950,
+  "registered_asset_count": 952,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -32117,6 +32117,84 @@
         "Verifies both /api/lifecycle endpoint paths documented",
         "Verifies prohibited sources and internal fields",
         "Verifies no backend lifecycle route mounted"
+      ]
+    },
+    {
+      "asset_path": "control-center/SEM-GOV-001D-UI3-I2_CANONICAL_FIXTURE_METADATA_PROJECTION_INSPECTION_AND_CONTRACT.v1.md",
+      "asset_type": "CONTROL_CENTER",
+      "asset_role": "CONTROL_GOVERNANCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I2",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I2",
+      "related_assets": [
+        "control-center/SEM-GOV-001D-UI3-I1_LIFECYCLE_READ_MODEL_API_INSPECTION_AND_CONTRACT.v1.md",
+        "tests/sem-gov-001d-ui3-i2-contract.test.js"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i2 after UI3-I2 packet or registration change",
+      "notes": "UI3-I2 inspection PASS WITH BLOCKER. Source B persistence NOT AUTHORIZED. Gates BLOCKED.",
+      "purpose_description": "Seals Source B canonical fixture metadata inspection and bounded projection field contract without schema or persistence.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE",
+        "LIFECYCLE",
+        "API",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "raw_fixtures rejected as Source B",
+        "Scout FIP-001 canonical authority",
+        "EST-001 authorization blocker",
+        "Migration NOT APPLIED"
+      ]
+    },
+    {
+      "asset_path": "tests/sem-gov-001d-ui3-i2-contract.test.js",
+      "asset_type": "TEST",
+      "asset_role": "TEST_PROOF",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I2",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I2",
+      "related_assets": [
+        "control-center/SEM-GOV-001D-UI3-I2_CANONICAL_FIXTURE_METADATA_PROJECTION_INSPECTION_AND_CONTRACT.v1.md"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i2 after UI3-I2 packet or registration change",
+      "notes": "Packet guard test for SEM-GOV-001D-UI3-I2 inspection closure state.",
+      "purpose_description": "Guards UI3-I2 PASS WITH BLOCKER, raw_fixtures rejection, Scout FIP authority, projection fields, EST-001 blocker, and no runtime files added.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "LIFECYCLE",
+        "API"
+      ],
+      "classification_evidence": [
+        "Verifies PASS WITH BLOCKER and bounded projection requirement",
+        "Verifies prohibited sources and field contract",
+        "Verifies logo ownership law",
+        "Verifies no migration or runtime files added"
       ]
     }
   ],

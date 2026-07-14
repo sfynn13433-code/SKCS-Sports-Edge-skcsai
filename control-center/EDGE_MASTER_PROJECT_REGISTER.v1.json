@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 32,
+  "project_count": 33,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -1893,6 +1893,70 @@
         "Two-source read-model law documented",
         "No backend lifecycle route implemented",
         "Migration NOT APPLIED"
+      ]
+    },
+    {
+      "project_id": "SEM-GOV-001D-UI3-I2",
+      "project_name": "Canonical Fixture Metadata Projection Inspection and Contract",
+      "category": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: read-only inspection closure and sealed Source B bounded fixture-display metadata projection contract with Scout FIP authority and raw_fixtures rejection — no schema or persistence.",
+      "why_it_matters": "UI3 Source B must not inherit provider payloads or prediction tables; canonical metadata authority and bounded projection fields must be fixed before any persistence design.",
+      "current_status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I1",
+        "EST-001"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center"
+      ],
+      "related_tasks": [
+        "SEM-GOV-001D-UI3-I2"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-UI3-I1_LIFECYCLE_READ_MODEL_API_INSPECTION_AND_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I2_CANONICAL_FIXTURE_METADATA_PROJECTION_INSPECTION_AND_CONTRACT.v1",
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
+      ],
+      "related_files": [
+        "control-center/SEM-GOV-001D-UI3-I2_CANONICAL_FIXTURE_METADATA_PROJECTION_INSPECTION_AND_CONTRACT.v1.md",
+        "tests/sem-gov-001d-ui3-i2-contract.test.js"
+      ],
+      "related_tables": [],
+      "known_issues": [
+        "raw_fixtures rejected as Source B",
+        "No fixture_uid-to-metadata projection proven",
+        "EST-001 does not yet authorize bounded projection",
+        "EFI-001 intake not implemented"
+      ],
+      "required_decisions": [
+        "EST-001 explicit authorization for bounded metadata projection",
+        "Source B storage-policy mini-project",
+        "EFI-001 intake before projection population"
+      ],
+      "completion_definition": "SEM-GOV-001D-UI3-I2 inspection PASS WITH BLOCKER with packet guard test and Control Center registration — Source B persistence NOT AUTHORIZED.",
+      "proof_required": [
+        "test:sem-gov-001d-ui3-i2 passes",
+        "Gates BLOCKED",
+        "Migration NOT APPLIED"
+      ],
+      "risks_if_ignored": [
+        "UI3 could use raw_fixtures or provider payloads as fixture metadata authority"
+      ],
+      "recommended_order": 33,
+      "next_action": "SEM-GOV-001D-UI3-I2 PASS WITH BLOCKER. Source B persistence NOT AUTHORIZED.",
+      "owner_note": "Inspection and contract only.",
+      "last_updated": "2026-07-14",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I2",
+      "current_evidence": [
+        "Scout FIP canonical authority sealed",
+        "Bounded projection fields documented",
+        "EST-001 blocker recorded",
+        "No runtime files added"
       ]
     }
   ]
