@@ -555,3 +555,36 @@ test('all gates remain blocked in adapter proof context', async () => {
   assert.equal(blockedGates.supabaseStorageGate, 'BLOCKED');
   assert.equal(blockedGates.unifiedLifecycleGovernor, 'BLOCKED');
 });
+
+test('durable evidence service envelope unwraps for idempotent acceptance', async () => {
+  const priorRecord = buildBoundedEvidenceRecord({
+    intakeId: 'prior-intake',
+    canonicalFip: buildCanonicalFip(),
+    fixtureUid: FIXTURE_UID,
+    receivedAt: RECEIVED_AT,
+    outcome: 'ACCEPTED',
+    rejectionCode: null,
+    governedMode: PROOF_FIXTURE_MODE,
+    callerIdentityRef: 'proof',
+    idempotencyKey: computeIdempotencyKey({
+      fipId: 'scout-fip-i7-001',
+      validationHash: buildCanonicalFip().validation.hash,
+      fipSchemaVersion: '1.0.0'
+    })
+  });
+
+  const durableRecorder = {
+    async recordIntakeEvidence() {
+      return { ok: true, evidenceId: 'evidence-1' };
+    },
+    async findAcceptedByIdempotencyKey() {
+      return { ok: true, found: true, record: priorRecord };
+    }
+  };
+
+  const { adapter, d3Calls } = createAdapterDeps({ evidenceRecorder: durableRecorder });
+  const result = await adapter.receiveValidatedFip(buildCanonicalFip(), proofContext());
+  assert.equal(result.accepted, true);
+  assert.equal(result.persistence_result.idempotent, true);
+  assert.equal(d3Calls.upsert, 0);
+});

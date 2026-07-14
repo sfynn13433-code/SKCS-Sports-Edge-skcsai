@@ -5,8 +5,8 @@
   "source_command": "git ls-files",
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
-  "tracked_path_count": 973,
-  "registered_asset_count": 969,
+  "tracked_path_count": 978,
+  "registered_asset_count": 974,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -32924,6 +32924,218 @@
         "Verifies packet sections",
         "Verifies adapter services exist",
         "Verifies no route",
+        "Verifies ledger registration"
+      ]
+    },
+    {
+      "asset_path": "supabase/migrations/20261011000001_sem_gov_001d_ui3_i8_fip_intake_evidence.sql",
+      "asset_type": "DATABASE_MIGRATION",
+      "asset_role": "SCHEMA_DEFINITION",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I8",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I8",
+      "related_assets": [
+        "backend/services/fipIntakeEvidenceService.js",
+        "control-center/SEM-GOV-001D-UI3-I8_DURABLE_INTAKE_EVIDENCE_STORAGE_IMPLEMENTATION_PACKET.v1.md"
+      ],
+      "related_tables": [
+        "fip_intake_evidence"
+      ],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [
+        "public.fip_intake_evidence"
+      ],
+      "deployment_surface": [
+        "supabase"
+      ],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i8 after migration change",
+      "notes": "AUTHOR ONLY — NOT APPLIED by I8 closure.",
+      "purpose_description": "Creates bounded R2 fip_intake_evidence table with outcome checks, partial unique idempotency index, and RLS.",
+      "functional_group": "DATABASE_MIGRATION",
+      "relationship_tags": [
+        "DATABASE",
+        "MIGRATION",
+        "GOVERNANCE",
+        "LIFECYCLE"
+      ],
+      "classification_evidence": [
+        "17 physical columns",
+        "No JSONB",
+        "RLS enabled",
+        "Migration NOT APPLIED"
+      ]
+    },
+    {
+      "asset_path": "backend/services/fipIntakeEvidenceService.js",
+      "asset_type": "SOURCE_CODE",
+      "asset_role": "APPLICATION_SOURCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I8",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I8",
+      "related_assets": [
+        "backend/services/governedFipIntakeAdapter.js",
+        "tests/fip-intake-evidence-service.test.js"
+      ],
+      "related_tables": [
+        "fip_intake_evidence"
+      ],
+      "related_functions": [
+        "createFipIntakeEvidenceService",
+        "recordIntakeEvidence",
+        "findAcceptedByIdempotencyKey",
+        "createEst001RetentionPolicy"
+      ],
+      "runtime_consumers": [],
+      "runtime_dependencies": [
+        "backend/services/fipIntakeService.js"
+      ],
+      "database_objects": [
+        "public.fip_intake_evidence"
+      ],
+      "deployment_surface": [
+        "render"
+      ],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i8 after evidence service change",
+      "notes": "Isolated R2 intake evidence recorder. Gate-before-DB. No production caller.",
+      "purpose_description": "Persists bounded EFI-001 intake evidence with EST-001 R2 retention and accepted idempotency authority.",
+      "functional_group": "BACKEND_RUNTIME",
+      "relationship_tags": [
+        "BACKEND",
+        "LIFECYCLE",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "Gate-before-DB",
+        "Explicit SQL columns",
+        "EST-001 retention",
+        "Mock-first tests"
+      ]
+    },
+    {
+      "asset_path": "tests/fip-intake-evidence-service.test.js",
+      "asset_type": "TEST",
+      "asset_role": "CONTROL_AUDIT",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I8",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I8",
+      "related_assets": [
+        "backend/services/fipIntakeEvidenceService.js"
+      ],
+      "related_tables": [
+        "fip_intake_evidence"
+      ],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i8 after evidence service change",
+      "notes": "Mock-first evidence service tests.",
+      "purpose_description": "Verifies gate-before-DB, validation, idempotency, retention, and migration static law for I8.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "LIFECYCLE",
+        "BACKEND"
+      ],
+      "classification_evidence": [
+        "33 test cases",
+        "Zero DB on blocked gate",
+        "Migration static checks"
+      ]
+    },
+    {
+      "asset_path": "control-center/SEM-GOV-001D-UI3-I8_DURABLE_INTAKE_EVIDENCE_STORAGE_IMPLEMENTATION_PACKET.v1.md",
+      "asset_type": "DOCUMENTATION",
+      "asset_role": "GOVERNANCE_PACKET",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I8",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I8",
+      "related_assets": [
+        "tests/sem-gov-001d-ui3-i8-implementation-packet.test.js"
+      ],
+      "related_tables": [
+        "fip_intake_evidence"
+      ],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i8 after packet change",
+      "notes": "I8 closure packet PASS WITH CORRECTION.",
+      "purpose_description": "Seals durable intake evidence storage design, retention law, security, and non-execution boundary.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE",
+        "LIFECYCLE",
+        "DATABASE"
+      ],
+      "classification_evidence": [
+        "PASS WITH CORRECTION",
+        "17 columns",
+        "Migration NOT APPLIED",
+        "All gates BLOCKED"
+      ]
+    },
+    {
+      "asset_path": "tests/sem-gov-001d-ui3-i8-implementation-packet.test.js",
+      "asset_type": "TEST",
+      "asset_role": "CONTROL_AUDIT",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001D-UI3-I8",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I8",
+      "related_assets": [
+        "control-center/SEM-GOV-001D-UI3-I8_DURABLE_INTAKE_EVIDENCE_STORAGE_IMPLEMENTATION_PACKET.v1.md"
+      ],
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "npm run test:sem-gov-001d-ui3-i8 after UI3-I8 packet change",
+      "notes": "Packet guard test for SEM-GOV-001D-UI3-I8 closure.",
+      "purpose_description": "Guards UI3-I8 PASS WITH CORRECTION, evidence files, and blocked gates.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "LIFECYCLE",
+        "BACKEND"
+      ],
+      "classification_evidence": [
+        "Verifies packet sections",
+        "Verifies evidence service exists",
         "Verifies ledger registration"
       ]
     }

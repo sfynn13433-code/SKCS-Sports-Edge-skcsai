@@ -276,5 +276,13 @@ Notes: PASS WITH BLOCKER. fipIntakeService classified PARTIAL proof-only. Hash l
 Status: TESTED
 Governed by: SEM-GOV-001D-UI3-I7
 Blocked by: SEM-GOV-001D-UI3-I6
-Blocks: none
+Blocks: SEM-GOV-001D-UI3-I8
 Notes: PASS WITH CORRECTION. governedFipIntakeAdapter and fixtureIdentityResolverService implemented. fipIntakeService FIP-001 aligned. Mock-first tests pass. No HTTP route. No production caller. Migrations NOT APPLIED. All gates BLOCKED.
+
+## SEM-GOV-001D-UI3-I8 — Durable Intake Evidence Storage and Isolated Implementation
+
+Status: TESTED
+Governed by: SEM-GOV-001D-UI3-I8
+Blocked by: SEM-GOV-001D-UI3-I7
+Blocks: none
+Notes: PASS WITH CORRECTION. fip_intake_evidence migration authored. fipIntakeEvidenceService implemented with EST-001 R2 retention. I7 adapter envelope unwrap correction. Migration NOT APPLIED. No route or production caller. All gates BLOCKED.

@@ -2097,7 +2097,9 @@
       "blocked_by": [
         "SEM-GOV-001D-UI3-I6"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI3-I8"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -2140,12 +2142,75 @@
       ],
       "open_gaps": [
         "HTTP intake route",
-        "Durable intake evidence storage",
         "Migration apply blocked",
         "Marriage gate clearance"
       ],
-      "next_action": "SEM-GOV-001D-UI3-I7 PASS WITH CORRECTION. HTTP boundary NOT AUTHORIZED.",
+      "next_action": "SEM-GOV-001D-UI3-I7 PASS WITH CORRECTION. Durable evidence storage authorized in UI3-I8.",
       "owner_note": "Isolated adapter implementation only.",
+      "last_updated": "2026-07-14"
+    },
+    {
+      "task_id": "SEM-GOV-001D-UI3-I8",
+      "task_name": "Durable Intake Evidence Storage and Isolated Implementation",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: author bounded fip_intake_evidence migration and isolated intake evidence service with mock-first tests — no migration apply, route, or production caller.",
+      "status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I7"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "backend",
+        "database"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-UI3-I7_GOVERNED_FIP_INTAKE_ADAPTER_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001D-UI3-I6_EFI_001_GOVERNED_INTAKE_INSPECTION_AND_ADAPTER_CONTRACT.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I8_DURABLE_INTAKE_EVIDENCE_STORAGE_IMPLEMENTATION_PACKET.v1"
+      ],
+      "affected_files": [
+        "supabase/migrations/20261011000001_sem_gov_001d_ui3_i8_fip_intake_evidence.sql",
+        "backend/services/fipIntakeEvidenceService.js",
+        "backend/services/governedFipIntakeAdapter.js",
+        "tests/fip-intake-evidence-service.test.js",
+        "tests/governed-fip-intake-adapter.test.js",
+        "control-center/SEM-GOV-001D-UI3-I8_DURABLE_INTAKE_EVIDENCE_STORAGE_IMPLEMENTATION_PACKET.v1.md",
+        "tests/sem-gov-001d-ui3-i8-implementation-packet.test.js",
+        "package.json"
+      ],
+      "affected_tables": [
+        "fip_intake_evidence"
+      ],
+      "completion_definition": "SEM-GOV-001D-UI3-I8 PASS WITH CORRECTION — migration authored, evidence service implemented, mock-first tests pass, migration NOT APPLIED, gates BLOCKED.",
+      "proof_required": [
+        "npm run test:sem-gov-001d-ui3-i8 passes",
+        "EST-001 R2 retention sealed",
+        "Gate-before-DB proof",
+        "All gates BLOCKED"
+      ],
+      "current_evidence": [
+        "fip_intake_evidence migration authored",
+        "fipIntakeEvidenceService implemented",
+        "Mock-first tests pass",
+        "I7 adapter envelope unwrap correction",
+        "Migration NOT APPLIED",
+        "All gates BLOCKED"
+      ],
+      "open_gaps": [
+        "HTTP intake route",
+        "Migration apply blocked",
+        "Marriage gate clearance",
+        "Production composition root"
+      ],
+      "next_action": "SEM-GOV-001D-UI3-I8 PASS WITH CORRECTION. Migration apply NOT AUTHORIZED.",
+      "owner_note": "Isolated evidence storage foundation only.",
       "last_updated": "2026-07-14"
     }
   ]

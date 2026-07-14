@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 38,
+  "project_count": 39,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -2227,7 +2227,9 @@
       "blocked_by": [
         "SEM-GOV-001D-UI3-I6"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI3-I8"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -2253,13 +2255,11 @@
       "related_tables": [],
       "known_issues": [
         "No HTTP intake route",
-        "No durable evidence storage",
         "Migrations NOT APPLIED",
         "All gates BLOCKED"
       ],
       "required_decisions": [
         "HTTP boundary authorization",
-        "Evidence persistence migration",
         "Marriage gate clearance"
       ],
       "completion_definition": "SEM-GOV-001D-UI3-I7 PASS WITH CORRECTION — adapter implemented with mock-first tests, no production caller.",
@@ -2273,7 +2273,7 @@
         "Intake could be wired without durable evidence or HTTP auth"
       ],
       "recommended_order": 38,
-      "next_action": "SEM-GOV-001D-UI3-I7 PASS WITH CORRECTION. HTTP boundary NOT AUTHORIZED.",
+      "next_action": "SEM-GOV-001D-UI3-I7 PASS WITH CORRECTION. Durable evidence storage authorized in UI3-I8.",
       "owner_note": "Isolated adapter only.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I7",
@@ -2281,6 +2281,74 @@
         "Adapter and resolver implemented",
         "Mock-first tests pass",
         "No production caller"
+      ]
+    },
+    {
+      "project_id": "SEM-GOV-001D-UI3-I8",
+      "project_name": "Durable Intake Evidence Storage and Isolated Implementation",
+      "category": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001D: author bounded fip_intake_evidence migration and isolated intake evidence service — no migration apply, route, or production caller.",
+      "why_it_matters": "I7 adapter requires durable R2 intake evidence authority before production intake activation.",
+      "current_status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I7"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "backend",
+        "database"
+      ],
+      "related_tasks": [
+        "SEM-GOV-001D-UI3-I8"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001D-UI3-I8_DURABLE_INTAKE_EVIDENCE_STORAGE_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001D-UI3-I7_GOVERNED_FIP_INTAKE_ADAPTER_IMPLEMENTATION_PACKET.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1"
+      ],
+      "related_files": [
+        "supabase/migrations/20261011000001_sem_gov_001d_ui3_i8_fip_intake_evidence.sql",
+        "backend/services/fipIntakeEvidenceService.js",
+        "backend/services/governedFipIntakeAdapter.js",
+        "tests/fip-intake-evidence-service.test.js"
+      ],
+      "related_tables": [
+        "fip_intake_evidence"
+      ],
+      "known_issues": [
+        "Migration NOT APPLIED",
+        "No HTTP intake route",
+        "No production composition root",
+        "All gates BLOCKED"
+      ],
+      "required_decisions": [
+        "Migration apply authorization",
+        "HTTP boundary authorization",
+        "Marriage gate clearance"
+      ],
+      "completion_definition": "SEM-GOV-001D-UI3-I8 PASS WITH CORRECTION — migration authored, evidence service implemented, mock-first tests pass.",
+      "proof_required": [
+        "test:sem-gov-001d-ui3-i8 passes",
+        "EST-001 R2 retention sealed",
+        "Gates BLOCKED"
+      ],
+      "risks_if_ignored": [
+        "Intake evidence could be lost or duplicated without durable R2 authority"
+      ],
+      "recommended_order": 39,
+      "next_action": "SEM-GOV-001D-UI3-I8 PASS WITH CORRECTION. Migration apply NOT AUTHORIZED.",
+      "owner_note": "Isolated evidence storage foundation only.",
+      "last_updated": "2026-07-14",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I8",
+      "current_evidence": [
+        "Migration and service implemented",
+        "Mock-first tests pass",
+        "Migration NOT APPLIED"
       ]
     }
   ]

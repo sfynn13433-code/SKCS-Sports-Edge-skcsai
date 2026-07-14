@@ -86,6 +86,42 @@ function buildBoundedEvidenceRecord({
   };
 }
 
+async function invokeEvidenceRecorder(recorder, method, args) {
+  if (!recorder || typeof recorder[method] !== 'function') {
+    return null;
+  }
+
+  const result = await recorder[method](...args);
+
+  if (method === 'findAcceptedByIdempotencyKey') {
+    if (!result) {
+      return null;
+    }
+    if (typeof result === 'object' && Object.prototype.hasOwnProperty.call(result, 'ok')) {
+      if (!result.ok) {
+        const err = new Error(result.code || DOMAIN_CODES.FIP_INTAKE_EVIDENCE_UNAVAILABLE);
+        err.code = result.code || DOMAIN_CODES.FIP_INTAKE_EVIDENCE_UNAVAILABLE;
+        throw err;
+      }
+      return result.found ? result.record : null;
+    }
+    return result;
+  }
+
+  if (
+    result &&
+    typeof result === 'object' &&
+    Object.prototype.hasOwnProperty.call(result, 'ok') &&
+    result.ok === false
+  ) {
+    const err = new Error(result.code || DOMAIN_CODES.FIP_INTAKE_EVIDENCE_UNAVAILABLE);
+    err.code = result.code || DOMAIN_CODES.FIP_INTAKE_EVIDENCE_UNAVAILABLE;
+    throw err;
+  }
+
+  return result;
+}
+
 function createGovernedFipIntakeAdapter(deps = {}) {
   assertDependency('fipIntakeService', deps.fipIntakeService);
   assertDependency('fixtureIdentityResolver', deps.fixtureIdentityResolver);
@@ -107,7 +143,7 @@ function createGovernedFipIntakeAdapter(deps = {}) {
     }
 
     try {
-      await deps.evidenceRecorder.recordIntakeEvidence(record);
+      await invokeEvidenceRecorder(deps.evidenceRecorder, 'recordIntakeEvidence', [record]);
       return {
         ...downstreamCalls,
         evidence: (downstreamCalls.evidence || 0) + 1
@@ -220,7 +256,11 @@ function createGovernedFipIntakeAdapter(deps = {}) {
       }) || validation.intake_id;
 
     if (deps.evidenceRecorder?.findAcceptedByIdempotencyKey) {
-      const prior = await deps.evidenceRecorder.findAcceptedByIdempotencyKey(idempotencyKey);
+      const prior = await invokeEvidenceRecorder(
+        deps.evidenceRecorder,
+        'findAcceptedByIdempotencyKey',
+        [idempotencyKey]
+      );
       if (prior) {
         if (
           prior.fipValidationHash &&
