@@ -297,7 +297,7 @@
           "backend/services/"
         ]
       },
-      "asset_count": 88,
+      "asset_count": 89,
       "asset_paths": [
         "backend/services/accaBuilder.js",
         "backend/services/accaMathUtils.js",
@@ -340,6 +340,7 @@
         "backend/services/filterEngine.js",
         "backend/services/fipIntakeService.js",
         "backend/services/fipStoragePolicyService.js",
+        "backend/services/lifecycleGovernor.js",
         "backend/services/football536Extractor.js",
         "backend/services/football536Service.js",
         "backend/services/footballH2HExtractor.js",
@@ -1219,7 +1220,7 @@
           "tests/"
         ]
       },
-      "asset_count": 13,
+      "asset_count": 14,
       "asset_paths": [
         "tests/edge-asset-classification.test.js",
         "tests/edge-control-center-ledger.test.js",
@@ -1231,6 +1232,7 @@
         "tests/eprv-provider-removal-contract.test.js",
         "tests/fip-intake-service.test.js",
         "tests/fip-storage-policy-service.test.js",
+        "tests/lifecycle-governor.test.js",
         "tests/sem-gov-001-lifecycle-contract.test.js",
         "tests/sem-gov-001b-lifecycle-persistence-contract.test.js",
         "tests/sem-gov-001b-governor-foundation-packet.test.js"

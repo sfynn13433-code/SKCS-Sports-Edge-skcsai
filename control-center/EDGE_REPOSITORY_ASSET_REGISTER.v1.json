@@ -5,8 +5,8 @@
   "source_command": "git ls-files",
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
-  "tracked_path_count": 927,
-  "registered_asset_count": 925,
+  "tracked_path_count": 931,
+  "registered_asset_count": 927,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -10296,6 +10296,57 @@
         "Rejects full FIP body, Scout mirror, provider payload, and Supabase replay candidate payloads.",
         "Evaluates Supabase budget thresholds at 80%, 95%, and 100% without performing database or Supabase calls.",
         "Does not create migrations, run SQL, call Supabase, wire routes, run E2E proof, or clear gates."
+      ]
+    },
+    {
+      "asset_path": "backend/services/lifecycleGovernor.js",
+      "asset_type": "SOURCE_CODE",
+      "asset_role": "APPLICATION_SOURCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "CURRENT_AUTHORITY",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001B-I3",
+      "governed_by_control_task_id": "SEM-GOV-001B-I3",
+      "related_assets": [
+        "control-center/SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md",
+        "control-center/SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1.md",
+        "control-center/SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md",
+        "tests/lifecycle-governor.test.js"
+      ],
+      "related_tables": [],
+      "related_functions": [
+        "evaluateGovernorGate",
+        "calculateSastWindow",
+        "calculateDayLabel",
+        "evaluateAdmission",
+        "evaluateTransition",
+        "buildTransitionEvent",
+        "calculateRolloverPlan"
+      ],
+      "runtime_consumers": [
+        "tests/lifecycle-governor.test.js"
+      ],
+      "runtime_dependencies": [
+        "node:crypto"
+      ],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "SEM-GOV-001B-I3: run node --test tests/lifecycle-governor.test.js after any lifecycle governor evaluator change; do not wire persistence or pipeline hooks until separately authorized.",
+      "notes": "Pure SEM-GOV-001B-I3 evaluator foundation. No DB, SQL, Supabase, pipeline hooks, or persistence adapter. Pure isolated service foundation; governed as a repository asset. No production runtime caller or pipeline reachability until separately authorized integration.",
+      "purpose_description": "Pure SEM-GOV-001B Lifecycle Governor foundation exporting gate-before-flag evaluation, SAST admission window, legal transition matrix, deterministic idempotency, and rollover plan without DB, SQL, Supabase, or pipeline hooks.",
+      "functional_group": "GOVERNANCE",
+      "relationship_tags": [
+        "SERVICE",
+        "GOVERNANCE",
+        "RULEBOOK"
+      ],
+      "classification_evidence": [
+        "Exports evaluateGovernorGate, calculateSastWindow, calculateDayLabel, evaluateAdmission, evaluateTransition, buildTransitionEvent, and calculateRolloverPlan as pure evaluators.",
+        "Gate reader evaluates EDGE_BUILD_CONTROL_LEDGER.v1.json unifiedLifecycleGovernor before LIFECYCLE_GOVERNOR_ENABLED feature flag.",
+        "Module forbids direct DB, Supabase, SQL, predictions_raw, direct1x2_prediction_final, fixture_context_cache, aiPipeline, fipIntakeService, and syncService imports."
       ]
     },
     {
@@ -30721,6 +30772,60 @@
         "Test verifies I2 packet sections and that future runtime files do not exist on disk.",
         "Test verifies ledger registers SEM-GOV-001B-I2 APPROVED with all gates BLOCKED.",
         "Test verifies package control-center test suite includes the focused I2 proof."
+      ]
+    },
+    {
+      "asset_path": "tests/lifecycle-governor.test.js",
+      "asset_type": "TEST",
+      "asset_role": "TEST_PROOF",
+      "source_state": "COMMITTED_REPOSITORY",
+      "authority_class": "ACTIVE_AUDIT",
+      "current_state": "CURRENT",
+      "owner_project_id": "SEM-GOV-001B-I3",
+      "governed_by_control_task_id": "SEM-GOV-001B-I3",
+      "related_assets": [
+        "backend/services/lifecycleGovernor.js",
+        "control-center/SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md",
+        "control-center/SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1.md",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "package.json"
+      ],
+      "related_tables": [],
+      "related_functions": [
+        "evaluateGovernorGate",
+        "calculateSastWindow",
+        "calculateDayLabel",
+        "evaluateAdmission",
+        "evaluateTransition",
+        "buildTransitionEvent",
+        "calculateRolloverPlan"
+      ],
+      "runtime_consumers": [],
+      "runtime_dependencies": [
+        "node:test",
+        "node:assert/strict",
+        "node:crypto",
+        "node:fs",
+        "backend/services/lifecycleGovernor.js"
+      ],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "next_validation": "SEM-GOV-001B-I3: run node --test tests/lifecycle-governor.test.js after any lifecycle governor evaluator change.",
+      "notes": "Focused SEM-GOV-001B-I3 proof for pure Lifecycle Governor foundation without DB, SQL, Supabase, or pipeline mutation.",
+      "purpose_description": "Focused Node test coverage for SEM-GOV-001B-I3 pure Lifecycle Governor foundation: gate-before-flag, SAST window, admission, transitions, idempotency, rollover plan, and module isolation from DB, Supabase, SQL, and protected pipeline modules.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "RULEBOOK"
+      ],
+      "classification_evidence": [
+        "Verifies evaluateGovernorGate fail-closed ordering and feature-flag normalization.",
+        "Verifies eight-day SAST labels, football-only admission, 15-minute processing tolerance, legal transition matrix, deterministic SHA-256 idempotency, and rollover duplicate/gap rejection.",
+        "Verifies lifecycleGovernor.js source excludes DB, Supabase, SQL, predictions_raw, direct1x2_prediction_final, fixture_context_cache, aiPipeline, fipIntakeService, and syncService imports."
       ]
     },
     {

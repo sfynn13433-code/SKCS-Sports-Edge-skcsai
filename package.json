@@ -33,7 +33,7 @@
     "test:asset-classification": "node --test tests/edge-asset-classification.test.js",
     "control:classification": "node control-center/check_edge_asset_classification.js",
     "control:classification:closure": "node control-center/check_edge_asset_classification.js --closure",
-    "test:control-center": "node --test tests/edge-control-center-ledger.test.js tests/edge-project-register.test.js tests/edge-repository-asset-register.test.js tests/epi-pipeline-integrity-contract.test.js tests/eprv-provider-removal-contract.test.js tests/sem-gov-001-lifecycle-contract.test.js tests/sem-gov-001b-lifecycle-persistence-contract.test.js tests/sem-gov-001b-governor-foundation-packet.test.js",
+    "test:control-center": "node --test tests/edge-control-center-ledger.test.js tests/edge-project-register.test.js tests/edge-repository-asset-register.test.js tests/epi-pipeline-integrity-contract.test.js tests/eprv-provider-removal-contract.test.js tests/sem-gov-001-lifecycle-contract.test.js tests/sem-gov-001b-lifecycle-persistence-contract.test.js tests/sem-gov-001b-governor-foundation-packet.test.js tests/lifecycle-governor.test.js",
     "test:control-center-ui": "node --test tests/edge-control-center-ui.test.js",
     "control:runtime": "node control-center/check_edge_system_runtime_inventory.js",
     "control:verify": "npm run test:control-center && npm run control:center && npm run control:projects && npm run control:assets && npm run control:classification && npm run control:runtime",

@@ -168,4 +168,11 @@ Blocks: SEM-GOV-001B-I2
 Status: APPROVED
 Governed by: SEM-GOV-001B-I2
 Blocked by: SEM-GOV-001B
+Blocks: SEM-GOV-001B-I3
+
+## SEM-GOV-001B-I3 — Pure Lifecycle Governor Foundation
+
+Status: APPROVED
+Governed by: SEM-GOV-001B-I3
+Blocked by: SEM-GOV-001B-I2
 Blocks: none

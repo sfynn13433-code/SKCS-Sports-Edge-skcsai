@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 24,
+  "project_count": 25,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -1320,14 +1320,15 @@
         "48-hour and seven-day rules remain fragmented"
       ],
       "recommended_order": 23,
-      "next_action": "SEM-GOV-001B-C1 contract sealed. SEM-GOV-001B-I2 design packet sealed. Runtime Governor implementation remains blocked until separately authorized I3 packet.",
+      "next_action": "SEM-GOV-001B-C1 contract sealed. SEM-GOV-001B-I2 design packet sealed. SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed. SEM-GOV-001B-I4 persistence adapter remains blocked pending separate authorization and supabase_storage_gate approval.",
       "owner_note": "fixture_uid is Edge-minted UUID. Aliases are not primary keys. Football first.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001B",
       "current_evidence": [
         "SEM-GOV-001B-C1 sealed control-center/SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md",
         "Owner decisions OD-1 through OD-10 recorded",
-        "SEM-GOV-001B-I2 design packet sealed"
+        "SEM-GOV-001B-I2 design packet sealed",
+        "SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed"
       ]
     },
     {
@@ -1341,7 +1342,9 @@
       "blocked_by": [
         "SEM-GOV-001B"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001B-I3"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -1366,7 +1369,6 @@
       "proof_required": [
         "Implementation packet exists and validates",
         "All three gates remain BLOCKED",
-        "Future runtime files do not exist on disk",
         "Focused packet test passes",
         "Control Center registration complete"
       ],
@@ -1376,13 +1378,69 @@
         "Rollover may embed in sync or pipeline paths"
       ],
       "recommended_order": 24,
-      "next_action": "SEM-GOV-001B-I2 design packet sealed. SEM-GOV-001B-I3 pure LifecycleGovernor foundation remains blocked pending separate authorization.",
+      "next_action": "SEM-GOV-001B-I2 design packet sealed. SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed.",
       "owner_note": "Design only. Gate before flag. No DB calls while blocked.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001B-I2",
       "current_evidence": [
         "SEM-GOV-001B-I2 sealed control-center/SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1.md",
         "Gate reader design uses controlCenterReadService and canonical ledger",
+        "All three gates remain BLOCKED",
+        "SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed"
+      ]
+    },
+    {
+      "project_id": "SEM-GOV-001B-I3",
+      "project_name": "Pure Lifecycle Governor Foundation",
+      "category": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001: implement pure LifecycleGovernor foundation — gate evaluation, SAST window, admission, transition, idempotency, and rollover plan — without DB or pipeline hooks.",
+      "why_it_matters": "Without isolated pure evaluators, lifecycle law cannot be tested or enforced before persistence and pipeline integration.",
+      "current_status": "APPROVED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001B-I2"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "runtime"
+      ],
+      "related_tasks": [
+        "SEM-GOV-001B-I3"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1",
+        "SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1"
+      ],
+      "related_files": [
+        "backend/services/lifecycleGovernor.js",
+        "tests/lifecycle-governor.test.js"
+      ],
+      "related_tables": [],
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001B-I3 implements pure LifecycleGovernor foundation without DB, SQL, Supabase, pipeline hooks, or persistence adapter. Pure isolated service foundation; governed as a repository asset. No production runtime caller or pipeline reachability until separately authorized integration.",
+      "proof_required": [
+        "lifecycleGovernor.js exists and exports pure evaluators",
+        "All three gates remain BLOCKED",
+        "Focused lifecycle-governor test passes",
+        "Control Center registration complete"
+      ],
+      "risks_if_ignored": [
+        "Governor logic may embed in pipeline before persistence law is proven",
+        "Gate-before-flag ordering may be bypassed"
+      ],
+      "recommended_order": 25,
+      "next_action": "SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed. SEM-GOV-001B-I4 persistence adapter remains blocked pending separate authorization and supabase_storage_gate approval.",
+      "owner_note": "Pure evaluators only. Gate before flag. No DB while blocked.",
+      "last_updated": "2026-07-14",
+      "governed_by_control_task_id": "SEM-GOV-001B-I3",
+      "current_evidence": [
+        "SEM-GOV-001B-I3 implemented backend/services/lifecycleGovernor.js",
+        "Pure isolated service foundation; governed as a repository asset. No production runtime caller or pipeline reachability until separately authorized integration",
+        "Focused proof: node --test tests/lifecycle-governor.test.js passes",
         "All three gates remain BLOCKED"
       ]
     }

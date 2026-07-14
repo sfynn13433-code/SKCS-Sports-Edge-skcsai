@@ -402,13 +402,20 @@ function localDependencies(relativePath, source) {
   const dependencies = [];
   const patterns = [
     /require\(\s*["'](\.[^"']+)["']\s*\)/gu,
+    /require\(\s*["'](node:[^"']+)["']\s*\)/gu,
     /from\s+["'](\.[^"']+)["']/gu,
+    /from\s+["'](node:[^"']+)["']/gu,
     /import\s+["'](\.[^"']+)["']/gu,
+    /import\s+["'](node:[^"']+)["']/gu,
   ];
 
   for (const pattern of patterns) {
     for (const match of source.matchAll(pattern)) {
       const request = match[1];
+      if (request.startsWith("node:")) {
+        dependencies.push(request);
+        continue;
+      }
       const resolved = resolveLocalModule(relativePath, request);
       if (resolved) dependencies.push(resolved);
     }
@@ -786,6 +793,26 @@ function extractDatabaseObjects(relativePath, source) {
   return [...new Set(objects)].sort();
 }
 
+function hasDatabaseExecutableEvidence(relativePath, source) {
+  if (/\.sql$/iu.test(relativePath)) {
+    return true;
+  }
+
+  return (
+    /\bcreateClient\s*\(/u.test(source) ||
+    /\bnew\s+Pool\s*\(/u.test(source) ||
+    /\bnew\s+Client\s*\(/u.test(source) ||
+    /\brequire\s*\(\s*['"](?:pg|@supabase\/supabase-js|[^'"]*(?:\/db|\/database))['"]\s*\)/u.test(
+      source
+    ) ||
+    /\bfrom\s+['"](?:pg|@supabase\/supabase-js|[^'"]*(?:\/db|\/database))['"]/u.test(
+      source
+    ) ||
+    /\.rpc\s*\(/u.test(source) ||
+    /\.from\s*\(\s*['"][\w_]+['"]\s*\)/u.test(source)
+  );
+}
+
 function detectDatabaseRole(relativePath, source) {
   if (/\/migrations?\//iu.test(`/${relativePath}`)) return "MIGRATION";
   if (/trigger/iu.test(relativePath) && /\.sql$/iu.test(relativePath))
@@ -794,24 +821,22 @@ function detectDatabaseRole(relativePath, source) {
     return "SCHEMA";
   if (/seed/iu.test(relativePath)) return "SEED";
 
-  const hasClient =
-    /\bcreateClient\s*\(/u.test(source) ||
-    /\bnew\s+Pool\s*\(/u.test(source) ||
-    /\bnew\s+Client\s*\(/u.test(source);
-
+  const hasDbEvidence = hasDatabaseExecutableEvidence(relativePath, source);
   const hasRpc = /\.rpc\s*\(/u.test(source);
   const hasRead =
-    /\.select\s*\(/u.test(source) || /\bSELECT\b/iu.test(source);
+    hasDbEvidence &&
+    (/\.select\s*\(/u.test(source) || /\bSELECT\b/iu.test(source));
 
   const hasWrite =
-    /\.(?:insert|upsert|update|delete)\s*\(/iu.test(source) ||
-    /\b(?:INSERT|UPDATE|DELETE)\b/iu.test(source);
+    hasDbEvidence &&
+    (/\.(?:insert|upsert|update|delete)\s*\(/iu.test(source) ||
+      /\b(?:INSERT|UPDATE|DELETE)\b/iu.test(source));
 
   if (hasRead && hasWrite) return "READ_WRITE";
   if (hasWrite) return "WRITE";
   if (hasRead) return "READ";
   if (hasRpc) return "RPC";
-  if (hasClient) return "CONNECTION_OR_CLIENT";
+  if (hasDbEvidence) return "CONNECTION_OR_CLIENT";
   return "NONE";
 }
 
@@ -831,9 +856,25 @@ function isScoutFipSurface(relativePath, source) {
     return false;
   }
 
+  const hasScoutFipRuntimeImport =
+    /\brequire\s*\(\s*['"][^'"]*(?:fipIntake|fipStorage|\/scout)/iu.test(source) ||
+    /\bfrom\s+['"][^'"]*(?:fip|scout)/iu.test(source);
+
+  const hasScoutFipRuntimeCall =
+    /\b(?:receiveValidatedFip|buildEstStorageRecords|computeFipHash|computeIdempotencyKey)\s*\(/u.test(
+      source
+    );
+
+  const pathSignalsScoutFip =
+    /(?:^|\/)fip[A-Z]|fipIntake|fipStorage|scoutFip/iu.test(relativePath);
+
   return (
-    /scout|fixture intelligence package|\bfip\b|SCOUT_DATABASE_URL|scout_raw_match_signals/iu.test(
-      `${relativePath}\n${source}`
+    hasScoutFipRuntimeImport ||
+    hasScoutFipRuntimeCall ||
+    pathSignalsScoutFip ||
+    /\bSCOUT_DATABASE_URL\b/u.test(source) ||
+    /(?:^|\/)supabase\/migrations\/[^/]*scout_signal_mirror[^/]*\.sql$/iu.test(
+      relativePath
     )
   );
 }

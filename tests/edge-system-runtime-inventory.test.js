@@ -311,6 +311,81 @@ test("actual Edge Scout/FIP evidence remains discoverable", () => {
     ),
     true
   );
+
+  assert.equal(
+    isScoutFipSurface(
+      "backend/services/fipIntakeService.js",
+      "const { receiveValidatedFip } = require('./fipIntakeService');"
+    ),
+    true
+  );
+
+  assert.equal(
+    isScoutFipSurface(
+      "backend/services/exampleConsumer.js",
+      "const intake = require('../services/fipIntakeService');\nintake.receiveValidatedFip(payload);"
+    ),
+    true
+  );
+});
+
+test("crypto update is not classified as a database write", () => {
+  const cryptoOnlySource = `
+  const crypto = require('node:crypto');
+  crypto.createHash('sha256').update('value').digest('hex');
+`;
+  assert.equal(
+    detectDatabaseRole("backend/services/hashOnly.js", cryptoOnlySource),
+    "NONE"
+  );
+});
+
+test("Supabase update remains a database write", () => {
+  const supabaseWriteSource = `
+  const { createClient } = require('@supabase/supabase-js');
+  const client = createClient(url, key);
+  client.from('fixtures').update({ state: 'VISIBLE' });
+`;
+  assert.equal(
+    detectDatabaseRole("backend/services/supabaseWrite.js", supabaseWriteSource),
+    "WRITE"
+  );
+});
+
+test("SQL UPDATE remains a database write", () => {
+  const sqlWriteSource = `
+  UPDATE fixture_lifecycle_current
+  SET lifecycle_state = 'ARCHIVED';
+`;
+  assert.notEqual(
+    detectDatabaseRole("sql/example.sql", sqlWriteSource),
+    "NONE"
+  );
+});
+
+test("pure Scout-related terminology does not create SCOUT_FIP_SURFACE", () => {
+  const terminologyOnlySource = `
+  const scoutEdgeMarriageGate = 'BLOCKED';
+  function evaluateFixtureLifecycle() {}
+`;
+  assert.equal(
+    isScoutFipSurface(
+      "backend/services/lifecycleGovernor.js",
+      terminologyOnlySource
+    ),
+    false
+  );
+});
+
+test("real FIP intake import remains SCOUT_FIP_SURFACE", () => {
+  const fipImportSource = `
+  const { receiveValidatedFip } = require('../services/fipIntakeService');
+  module.exports = { accept: receiveValidatedFip };
+`;
+  assert.equal(
+    isScoutFipSurface("backend/services/exampleConsumer.js", fipImportSource),
+    true
+  );
 });
 
 test("Prose false positives: natural-language text does not create Edge/Scout objects, but .from('scout_raw_match_signals') still is detected", () => {

@@ -17,11 +17,18 @@ const PARENT_CONTRACT_PATH = path.join(
   'SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md'
 );
 
-const FUTURE_FILES = [
+const PACKET_FUTURE_FILES = [
   'backend/services/lifecycleGovernor.js',
   'backend/services/lifecyclePersistenceService.js',
   'backend/services/lifecycleRolloverService.js',
   'tests/lifecycle-governor.test.js',
+  'tests/lifecycle-persistence-service.test.js',
+  'tests/lifecycle-rollover-service.test.js'
+];
+
+const I4_I5_FUTURE_FILES = [
+  'backend/services/lifecyclePersistenceService.js',
+  'backend/services/lifecycleRolloverService.js',
   'tests/lifecycle-persistence-service.test.js',
   'tests/lifecycle-rollover-service.test.js'
 ];
@@ -55,14 +62,16 @@ test('SEM-GOV-001B-I2 packet exists with design-only boundary and blocked gates'
   assert.match(packet, /SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT\.v1/);
 });
 
-test('packet documents future file plan and forbids creating them in I2', () => {
+test('packet documents future file plan and forbids creating I4/I5 files during I2', () => {
   const packet = fs.readFileSync(PACKET_PATH, 'utf8');
-  for (const rel of FUTURE_FILES) {
+  for (const rel of PACKET_FUTURE_FILES) {
     assert.ok(packet.includes(rel), `packet must list future file: ${rel}`);
+  }
+  for (const rel of I4_I5_FUTURE_FILES) {
     assert.equal(
       fs.existsSync(path.join(ROOT, rel)),
       false,
-      `future file must not exist during I2: ${rel}`
+      `I4/I5 future file must not exist yet: ${rel}`
     );
   }
   assert.match(packet, /MUST NOT\*\* be created/i);
@@ -181,7 +190,7 @@ test('ledger registers SEM-GOV-001B-I2 APPROVED with blocked gates and empty tab
     )
   );
   assert.match(task.next_action, /I2.*sealed/i);
-  assert.match(task.next_action, /I3.*blocked/i);
+  assert.match(task.next_action, /I3.*sealed/i);
 });
 
 test('project register mirrors SEM-GOV-001B-I2 ledger state', () => {
@@ -193,7 +202,7 @@ test('project register mirrors SEM-GOV-001B-I2 ledger state', () => {
     project.related_contracts.includes('SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1')
   );
   assert.match(project.next_action, /I2.*sealed/i);
-  assert.match(project.next_action, /I3.*blocked/i);
+  assert.match(project.next_action, /I3.*sealed/i);
 });
 
 test('package control-center test suite includes SEM-GOV-001B-I2 proof', () => {
