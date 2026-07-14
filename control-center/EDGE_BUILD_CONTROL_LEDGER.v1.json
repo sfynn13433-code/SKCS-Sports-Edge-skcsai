@@ -1160,7 +1160,9 @@
       "blocked_by": [
         "SEM-GOV-001A"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001B-I2"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -1205,9 +1207,73 @@
         "48-hour FIP horizon unchanged until 001C",
         "LIFECYCLE_GOVERNOR_ENABLED defaults false"
       ],
-      "next_action": "SEM-GOV-001B-C1 contract sealed. Runtime Governor and persistence DDL remain blocked until separately authorized implementation packet.",
+      "next_action": "SEM-GOV-001B-C1 contract sealed. SEM-GOV-001B-I2 design packet sealed. Runtime Governor implementation remains blocked until separately authorized I3 packet.",
       "owner_note": "fixture_uid is Edge-minted UUID. Aliases are not primary keys. Football first.",
-      "last_updated": "2026-07-13"
+      "last_updated": "2026-07-14"
+    },
+    {
+      "task_id": "SEM-GOV-001B-I2",
+      "task_name": "Lifecycle Governor Foundation Design Packet",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001: seal the Lifecycle Governor foundation design — gate reader contract via controlCenterReadService, pure evaluator surface, persistence adapter interface, rollover worker design, fail-closed ordering, and future implementation sequence — without runtime code, SQL, Supabase, API, or UI implementation.",
+      "status": "APPROVED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001B"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1",
+        "SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
+      ],
+      "affected_files": [
+        "control-center/SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1.md",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
+        "control-center/EDGE_PROJECT_BACKLOG.md",
+        "control-center/EDGE_PROJECT_DEPENDENCY_MAP.md",
+        "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
+        "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
+        "control-center/EDGE_ASSET_REPOSITORY_MAP.md",
+        "tests/sem-gov-001b-governor-foundation-packet.test.js",
+        "package.json"
+      ],
+      "affected_tables": [],
+      "completion_definition": "SEM-GOV-001B-I2 seals the Lifecycle Governor foundation implementation packet; documents future file plan, protected files, gate reader design, pure evaluator contract, persistence adapter interface, rollover design, fail-closed order, test matrix, and implementation sequence I3 through SEM-GOV-001C without runtime, SQL, Supabase, API, or UI implementation.",
+      "proof_required": [
+        "control-center/SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1.md exists and validates",
+        "All three governance gates remain BLOCKED in ledger",
+        "Future runtime files listed in packet do not exist on disk",
+        "SEM-GOV-001B-I2 registered in ledger and master project register",
+        "Focused packet test passes",
+        "SEM-GOV-001A and SEM-GOV-001B contract regression tests pass",
+        "npm run control:verify passes",
+        "npm run verify:rulebook passes"
+      ],
+      "current_evidence": [
+        "SEM-GOV-001B-I2 sealed control-center/SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1.md",
+        "Gate reader design uses canonical ledger through controlCenterReadService",
+        "Future file plan documents lifecycleGovernor, lifecyclePersistenceService, lifecycleRolloverService without creating them",
+        "All three gates remain BLOCKED",
+        "Focused proof: node --test tests/sem-gov-001b-governor-foundation-packet.test.js passes"
+      ],
+      "open_gaps": [
+        "No lifecycleGovernor runtime service (SEM-GOV-001B-I3)",
+        "No persistence adapter or DDL (SEM-GOV-001B-I4)",
+        "No rollover worker (SEM-GOV-001B-I5)",
+        "No Scout FIP pipeline hooks (SEM-GOV-001C)",
+        "supabase_storage_gate remains BLOCKED"
+      ],
+      "next_action": "SEM-GOV-001B-I2 design packet sealed. SEM-GOV-001B-I3 pure LifecycleGovernor foundation remains blocked pending separate authorization.",
+      "owner_note": "Design only. Gate before flag. No DB calls while blocked.",
+      "last_updated": "2026-07-14"
     }
   ]
 }

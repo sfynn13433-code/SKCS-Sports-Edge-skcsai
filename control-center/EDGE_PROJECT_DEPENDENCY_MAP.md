@@ -161,4 +161,11 @@ Blocks: none
 Status: APPROVED
 Governed by: SEM-GOV-001B
 Blocked by: SEM-GOV-001A
+Blocks: SEM-GOV-001B-I2
+
+## SEM-GOV-001B-I2 — Lifecycle Governor Foundation Design Packet
+
+Status: APPROVED
+Governed by: SEM-GOV-001B-I2
+Blocked by: SEM-GOV-001B
 Blocks: none

@@ -14,7 +14,7 @@
           "control-center/"
         ]
       },
-      "asset_count": 27,
+      "asset_count": 28,
       "asset_paths": [
         "control-center/check_control_center.js",
         "control-center/check_edge_asset_classification.js",
@@ -42,7 +42,8 @@
         "control-center/FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md",
         "control-center/SEE-001_SCOUT_EDGE_E2E_MARRIAGE_PROOF.v1.md",
         "control-center/SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md",
-        "control-center/SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md"
+        "control-center/SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md",
+        "control-center/SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1.md"
       ]
     },
     {
@@ -1218,7 +1219,7 @@
           "tests/"
         ]
       },
-      "asset_count": 12,
+      "asset_count": 13,
       "asset_paths": [
         "tests/edge-asset-classification.test.js",
         "tests/edge-control-center-ledger.test.js",
@@ -1231,7 +1232,8 @@
         "tests/fip-intake-service.test.js",
         "tests/fip-storage-policy-service.test.js",
         "tests/sem-gov-001-lifecycle-contract.test.js",
-        "tests/sem-gov-001b-lifecycle-persistence-contract.test.js"
+        "tests/sem-gov-001b-lifecycle-persistence-contract.test.js",
+        "tests/sem-gov-001b-governor-foundation-packet.test.js"
       ]
     },
     {

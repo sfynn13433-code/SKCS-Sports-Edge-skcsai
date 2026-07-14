@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 23,
+  "project_count": 24,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -1320,13 +1320,70 @@
         "48-hour and seven-day rules remain fragmented"
       ],
       "recommended_order": 23,
-      "next_action": "SEM-GOV-001B-C1 contract sealed. Runtime Governor and persistence DDL remain blocked until separately authorized.",
+      "next_action": "SEM-GOV-001B-C1 contract sealed. SEM-GOV-001B-I2 design packet sealed. Runtime Governor implementation remains blocked until separately authorized I3 packet.",
       "owner_note": "fixture_uid is Edge-minted UUID. Aliases are not primary keys. Football first.",
-      "last_updated": "2026-07-13",
+      "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001B",
       "current_evidence": [
         "SEM-GOV-001B-C1 sealed control-center/SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md",
-        "Owner decisions OD-1 through OD-10 recorded"
+        "Owner decisions OD-1 through OD-10 recorded",
+        "SEM-GOV-001B-I2 design packet sealed"
+      ]
+    },
+    {
+      "project_id": "SEM-GOV-001B-I2",
+      "project_name": "Lifecycle Governor Foundation Design Packet",
+      "category": "Unified Sports Intelligence Lifecycle",
+      "description": "Programme SEM-GOV-001: seal the Lifecycle Governor foundation design — gate reader, pure evaluators, persistence adapter interface, rollover design, and implementation sequence — without runtime implementation.",
+      "why_it_matters": "Without an explicit foundation design, Governor runtime work risks ad-hoc gate parsing, pipeline coupling, and protected-table mutation.",
+      "current_status": "APPROVED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001B"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center"
+      ],
+      "related_tasks": [
+        "SEM-GOV-001B-I2"
+      ],
+      "related_contracts": [
+        "SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1",
+        "SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1"
+      ],
+      "related_files": [
+        "control-center/SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1.md",
+        "tests/sem-gov-001b-governor-foundation-packet.test.js"
+      ],
+      "related_tables": [],
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001B-I2 seals the Lifecycle Governor foundation implementation packet without runtime, SQL, Supabase, API, or UI implementation.",
+      "proof_required": [
+        "Implementation packet exists and validates",
+        "All three gates remain BLOCKED",
+        "Future runtime files do not exist on disk",
+        "Focused packet test passes",
+        "Control Center registration complete"
+      ],
+      "risks_if_ignored": [
+        "Governor runtime may bypass canonical gate reader",
+        "Persistence may couple to prediction tables",
+        "Rollover may embed in sync or pipeline paths"
+      ],
+      "recommended_order": 24,
+      "next_action": "SEM-GOV-001B-I2 design packet sealed. SEM-GOV-001B-I3 pure LifecycleGovernor foundation remains blocked pending separate authorization.",
+      "owner_note": "Design only. Gate before flag. No DB calls while blocked.",
+      "last_updated": "2026-07-14",
+      "governed_by_control_task_id": "SEM-GOV-001B-I2",
+      "current_evidence": [
+        "SEM-GOV-001B-I2 sealed control-center/SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1.md",
+        "Gate reader design uses controlCenterReadService and canonical ledger",
+        "All three gates remain BLOCKED"
       ]
     }
   ]
