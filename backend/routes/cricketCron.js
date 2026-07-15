@@ -8,6 +8,7 @@ const {
 } = require('../services/cricApiCacheService');
 const { getExecutionConstraints } = require('../semantic-layer/governanceGatekeeper');
 const { executeOperation } = require('../core/executionPipeline');
+const { requireSchedulerSecret } = require('../utils/auth');
 
 const router = express.Router();
 const { isSportIngestionEnabled } = require('../services/apiQuotaRouter');
@@ -29,18 +30,7 @@ function cricketControlPlaneResponse(res, constraints) {
     });
 }
 
-// Verify cron secret
-function verifyCronSecret(req) {
-    const providedSecret = req.headers["x-cron-secret"] || req.query.secret;
-    
-    if (!process.env.CRON_SECRET || providedSecret !== process.env.CRON_SECRET) {
-        return false;
-    }
-    
-    return true;
-}
-
-router.get('/cricket/cricbuzz', async (req, res) => {
+router.get('/cricket/cricbuzz', requireSchedulerSecret, async (req, res) => {
     try {
         const constraints = getExecutionConstraints();
         if (!constraints.proceed) {
@@ -49,14 +39,6 @@ router.get('/cricket/cricbuzz', async (req, res) => {
 
         if (!isSportIngestionEnabled('cricket')) {
             return cricketIngestionDisabledResponse(res);
-        }
-
-        // Verify cron secret
-        if (!verifyCronSecret(req)) {
-            return res.status(401).json({
-                ok: false,
-                error: "Unauthorized cron request"
-            });
         }
 
         console.log('[cron/cricket/cricbuzz] Starting daily Cricbuzz cricket publish...');
@@ -104,7 +86,7 @@ router.get('/cricket/cricbuzz', async (req, res) => {
     }
 });
 
-router.get('/cricket/cricapi/daily', async (req, res) => {
+router.get('/cricket/cricapi/daily', requireSchedulerSecret, async (req, res) => {
     try {
         const constraints = getExecutionConstraints();
         if (!constraints.proceed) {
@@ -113,13 +95,6 @@ router.get('/cricket/cricapi/daily', async (req, res) => {
 
         if (!isSportIngestionEnabled('cricket')) {
             return cricketIngestionDisabledResponse(res);
-        }
-
-        if (!verifyCronSecret(req)) {
-            return res.status(401).json({
-                ok: false,
-                error: 'Unauthorized cron request'
-            });
         }
 
         console.log('[cron/cricket/cricapi/daily] Building daily CricAPI cache...');
@@ -153,7 +128,7 @@ router.get('/cricket/cricapi/daily', async (req, res) => {
     }
 });
 
-router.get('/cricket/cricapi/live', async (req, res) => {
+router.get('/cricket/cricapi/live', requireSchedulerSecret, async (req, res) => {
     try {
         const constraints = getExecutionConstraints();
         if (!constraints.proceed) {
@@ -162,13 +137,6 @@ router.get('/cricket/cricapi/live', async (req, res) => {
 
         if (!isSportIngestionEnabled('cricket')) {
             return cricketIngestionDisabledResponse(res);
-        }
-
-        if (!verifyCronSecret(req)) {
-            return res.status(401).json({
-                ok: false,
-                error: 'Unauthorized cron request'
-            });
         }
 
         console.log('[cron/cricket/cricapi/live] Refreshing live CricAPI cache...');

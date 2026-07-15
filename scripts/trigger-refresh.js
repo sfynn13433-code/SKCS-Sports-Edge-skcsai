@@ -9,7 +9,8 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env'
 
 const BACKEND_HOST = process.env.SKCS_TRIGGER_HOST || 'skcs-sports-edge-skcsai.onrender.com';
 const BACKEND_URL = `https://${BACKEND_HOST}`;
-const ADMIN_KEY = process.env.ADMIN_API_KEY || process.env.CRON_SECRET || '';
+const ADMIN_KEY = String(process.env.ADMIN_API_KEY || '').trim();
+const CRON_SECRET = String(process.env.CRON_SECRET || '').trim();
 
 // Parse CLI args
 const args = process.argv.slice(2);
@@ -46,9 +47,13 @@ function httpRequest(url, options, postData) {
     console.log(`🏟️  Sport:  ${sport || 'ALL'}`);
     console.log(`⏳ Wait:    ${wait ? 'yes' : 'no (fire-and-forget)'}\n`);
 
-    if (!ADMIN_KEY) {
-        console.error('❌ ADMIN_API_KEY or CRON_SECRET must be set in .env');
-        console.error('   Create a .env file with: ADMIN_API_KEY=your_admin_key');
+    if (!CRON_SECRET) {
+        console.error('❌ CRON_SECRET must be set in .env for scheduler operations.');
+        process.exit(1);
+    }
+
+    if (sport && !ADMIN_KEY) {
+        console.error('❌ ADMIN_API_KEY must be set in .env for sport-specific manual sync.');
         process.exit(1);
     }
 
@@ -64,6 +69,10 @@ function httpRequest(url, options, postData) {
             ? JSON.stringify({ sport, wait: wait === true })
             : JSON.stringify({ wait: wait === true });
 
+        const syncAuthHeaders = sport
+            ? { 'x-admin-key': ADMIN_KEY }
+            : { 'x-cron-secret': CRON_SECRET };
+
         if (wait) {
             console.warn('⚠️  --wait holds the server connection open and can block cron-job.org triggers.');
             console.warn('   Prefer fire-and-forget unless you are debugging locally.\n');
@@ -73,7 +82,7 @@ function httpRequest(url, options, postData) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': ADMIN_KEY
+                ...syncAuthHeaders
             }
         }, syncBody);
 
@@ -94,7 +103,7 @@ function httpRequest(url, options, postData) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-admin-key': ADMIN_KEY
+                'x-cron-secret': CRON_SECRET
             }
         }, JSON.stringify({
             sport: sport || null

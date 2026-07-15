@@ -20,13 +20,13 @@ async function main() {
         process.env.RENDER_EXTERNAL_URL ||
         'https://skcsai.onrender.com'
     );
-    const apiKey = process.env.ADMIN_API_KEY || process.env.SKCS_REFRESH_KEY || process.env.CRON_SECRET;
+    const cronSecret = String(process.env.CRON_SECRET || '').trim();
 
     if (!host) {
         throw new Error('Missing backend host. Set SKCS_TRIGGER_HOST, SKCS_REFRESH_HOST, or RENDER_EXTERNAL_URL.');
     }
-    if (!apiKey) {
-        throw new Error('Missing ADMIN_API_KEY (or SKCS_REFRESH_KEY).');
+    if (!cronSecret) {
+        throw new Error('Missing CRON_SECRET.');
     }
 
     const url = new URL('/api/pipeline/run-full', host);
@@ -38,7 +38,7 @@ async function main() {
         response = await fetch(url.toString(), {
             method: 'POST',
             headers: {
-                'x-api-key': apiKey,
+                'x-cron-secret': cronSecret,
                 'content-type': 'application/json'
             },
             signal: abort.signal,

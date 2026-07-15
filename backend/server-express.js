@@ -20,7 +20,7 @@ const {
     applyOddsProviderHeaders,
     getOddsBudgetStatus
 } = require('./services/oddsBudgetService');
-const { requireRole }        = require('./utils/auth');
+const { requireRole, requireSchedulerSecret } = require('./utils/auth');
 const {
     createSubscriptionRecord,
     hasUsedDayZeroForUser,
@@ -58,9 +58,9 @@ const { syncDailyFixtures, enrichMatchContext, generateEdgeMindInsight } = requi
 const app = express();
 
 // Pipeline trigger endpoint for enrichment and AI processing
-app.post('/api/pipeline/trigger', async (req, res) => {
+app.post('/api/pipeline/trigger', requireSchedulerSecret, express.json({ limit: '10mb' }), async (req, res) => {
   try {
-    const { publishRunId } = req.body;
+    const { publishRunId } = req.body || {};
     
     if (!publishRunId) {
       return res.status(400).json({ 
@@ -441,7 +441,7 @@ const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 app.use(express.static(PUBLIC_DIR));
 
 // Internal endpoint for fixture fetching by sport
-app.post('/api/internal/fetch-fixtures', async (req, res) => {
+app.post('/api/internal/fetch-fixtures', requireSchedulerSecret, async (req, res) => {
   try {
     const { sport, start, end, publishRunId } = req.body;
     
@@ -1018,19 +1018,7 @@ if (!CRON_SECRET) {
     console.error('[startup] CRON_SECRET env var is not set — cron endpoints will reject all requests');
 }
 
-// Allow secret via header OR query parameter for easier cron-job.org configuration
-function verifyCronSecret(req, res, next) {
-    const headerSecret = req.headers['x-cron-secret'];
-    const querySecret = req.query.secret;
-
-    const validSecret = headerSecret || querySecret;
-
-    if (!CRON_SECRET || !validSecret || validSecret !== CRON_SECRET) {
-        console.warn(`[cron-auth] Rejected: missing or invalid secret from ${req.ip}`);
-        return res.status(401).json({ status: 'error', message: 'Unauthorized' });
-    }
-    next();
-}
+// Cron routes use the canonical header-only requireSchedulerSecret middleware.
 
 async function runCronWithLog(jobName, req, fn) {
     const startedAtMs = Date.now();
@@ -1111,7 +1099,7 @@ app.get('/api/admin/reset-tier-rules', async (_req, res) => {
 
 // TIER 1: LIVE SYNC -> Run every 5 minutes
 // Uses the main pipeline from fetch-live-fixtures.js with Master League filtering
-app.get('/api/cron/sync-live', verifyCronSecret, async (req, res) => {
+app.get('/api/cron/sync-live', requireSchedulerSecret, async (req, res) => {
     if (PRE_MATCH_ONLY_MODE) {
         return res.status(410).json({
             status: 'disabled',
@@ -1166,7 +1154,7 @@ app.get('/api/cron/sync-live', verifyCronSecret, async (req, res) => {
 });
 
 // TIER 1 ENTITY BOOTSTRAP (TheSportsDB + priority queue ordering)
-app.get('/api/cron/tier1-stage1-bootstrap', verifyCronSecret, async (req, res) => {
+app.get('/api/cron/tier1-stage1-bootstrap', requireSchedulerSecret, async (req, res) => {
     console.log('[cron/tier1-stage1-bootstrap] Starting Tier 1 entity bootstrap...');
     try {
         const result = await runCronWithLog('cron_tier1_stage1_bootstrap', req, async () => {
@@ -1219,7 +1207,7 @@ app.get('/api/direct-insights', async (_req, res) => {
 // TIER 2: STANDARD SYNC (Hits Tier 2 APIs) -> Run every 60 minutes
 // Hits AllSportsApi, Cricbuzz, Sofascore for general fixture generation
 // and injury updates for the upcoming week.
-app.get('/api/cron/sync-standard', verifyCronSecret, async (req, res) => {
+app.get('/api/cron/sync-standard', requireSchedulerSecret, async (req, res) => {
     console.log('[cron/sync-standard] Starting tier-2 standard sync...');
     
     try {
@@ -1307,7 +1295,7 @@ app.get('/api/cron/sync-standard', verifyCronSecret, async (req, res) => {
 // TIER 3: DEEP SYNC (Hits Tier 3 APIs) -> Run every 24 hours (Midnight)
 // Hits Football News API, MMA, F1 for deep EdgeMind context.
 // Saves summaries to Supabase so the AI has context for the day.
-app.get('/api/cron/sync-deep', verifyCronSecret, async (req, res) => {
+app.get('/api/cron/sync-deep', requireSchedulerSecret, async (req, res) => {
     console.log('[cron/sync-deep] Starting tier-3 deep sync...');
     
     try {
@@ -1348,7 +1336,7 @@ app.get('/api/cron/sync-deep', verifyCronSecret, async (req, res) => {
 });
 
 // SIMPLE SYNC - No validation, direct insert
-app.get('/api/cron/sync-simple', verifyCronSecret, async (req, res) => {
+app.get('/api/cron/sync-simple', requireSchedulerSecret, async (req, res) => {
     console.log('[cron/sync-simple] Starting simple sync (no validation)...');
     
     const scriptPath = path.join(__dirname, '..', 'scripts', 'simple-sync.js');
@@ -1387,7 +1375,7 @@ app.get('/api/cron/sync-simple', verifyCronSecret, async (req, res) => {
 });
 
 // FULL PIPELINE SYNC (Uses the main fetch-live-fixtures.js script)
-app.get('/api/cron/sync-full', verifyCronSecret, async (req, res) => {
+app.get('/api/cron/sync-full', requireSchedulerSecret, async (req, res) => {
     console.log('[cron/sync-full] Starting full pipeline sync...');
     
     try {
@@ -1424,7 +1412,7 @@ app.get('/api/cron/sync-full', verifyCronSecret, async (req, res) => {
 });
 
 // CRICKET DAILY FIXTURES CRON
-app.get('/api/cron/cricket-daily-fixtures', verifyCronSecret, async (req, res) => {
+app.get('/api/cron/cricket-daily-fixtures', requireSchedulerSecret, async (req, res) => {
     const { isSportIngestionEnabled } = require('./services/apiQuotaRouter');
     if (!isSportIngestionEnabled('cricket')) {
         console.log('[cron/cricket-daily-fixtures] Skipped — cricket ingestion disabled (CRICKET_INGESTION_ENABLED)');
@@ -1467,7 +1455,7 @@ app.get('/api/cron/cricket-daily-fixtures', verifyCronSecret, async (req, res) =
 // 🚀 MASTER PIPELINE CRON ENDPOINT
 // Triggers the full deterministic pipeline: Stage 1 → Stage 2 → Stage 3 → EdgeMind Judge
 // Configure your external cron (cron-job.org) to hit this every 4-6 hours.
-app.get('/api/cron/trigger-master-pipeline', verifyCronSecret, (req, res) => {
+app.get('/api/cron/trigger-master-pipeline', requireSchedulerSecret, (req, res) => {
     console.log('[cron/master-pipeline] Master Pipeline triggered via external cron.');
 
     // Respond immediately so the cron job doesn't timeout waiting for the AI
@@ -1498,12 +1486,7 @@ app.get('/api/admin/cdn-live-loop', requireAdminKey, async (req, res) => {
                 error: 'Live monitoring is disabled in pre-match-only mode'
             });
         }
-        const { key } = req.query;
-        
-        if (key !== 'skcs_super_secret_cron_key_2026') {
-            return res.status(401).json({ error: 'Invalid or missing admin key' });
-        }
-        
+
         console.log('[cdn-live-loop] Starting ESPN Hidden API live odds monitoring...');
         
         // Import ESPN hidden API service

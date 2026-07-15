@@ -4,10 +4,15 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const backendUrl = Deno.env.get("BACKEND_URL")!;
+const cronSecret = String(Deno.env.get("CRON_SECRET") || "").trim();
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 serve(async (req) => {
   try {
+    if (!cronSecret) {
+      throw new Error("CRON_SECRET is required for backend scheduler calls");
+    }
+
     console.log('Scheduled fixture sync started');
     
     // 1. Fetch all enabled sports
@@ -57,7 +62,10 @@ serve(async (req) => {
           `${backendUrl}/api/internal/fetch-fixtures`,
           {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              "x-cron-secret": cronSecret
+            },
             body: JSON.stringify({
               sport: sportConfig.sport,
               start: now.toISOString(),
@@ -111,7 +119,10 @@ serve(async (req) => {
       console.log('Triggering enrichment and AI pipeline...');
       const pipelineResponse = await fetch(`${backendUrl}/api/pipeline/trigger`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-cron-secret": cronSecret
+        },
         body: JSON.stringify({ publishRunId })
       });
       

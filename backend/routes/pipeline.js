@@ -9,28 +9,9 @@ const {
 const { syncAllSports, syncSports } = require('../services/syncService');
 const { executeOperation } = require('../core/executionPipeline');
 const config = require('../config');
-const { requireRole } = require('../utils/auth');
+const { requireRole, requireSchedulerSecret } = require('../utils/auth');
 
 const router = express.Router();
-
-function requirePipelineTriggerKey(req, res, next) {
-    const key = req.headers['x-api-key'];
-    if (!key) {
-        return res.status(401).json({ error: 'Missing API key' });
-    }
-
-    const allowedKeys = new Set(
-        [process.env.ADMIN_API_KEY, process.env.SKCS_REFRESH_KEY, process.env.CRON_SECRET]
-            .map((value) => String(value || '').trim())
-            .filter(Boolean)
-    );
-
-    if (!allowedKeys.has(String(key).trim())) {
-        return res.status(403).json({ error: 'Admin access required' });
-    }
-
-    return next();
-}
 
 function isProductionRuntime() {
     return String(process.env.NODE_ENV || '').toLowerCase() === 'production'
@@ -159,8 +140,8 @@ const runFullHandler = async (req, res) => {
     });
 };
 
-router.post('/run-full', requirePipelineTriggerKey, runFullHandler);
-router.get('/run-full', requirePipelineTriggerKey, runFullHandler);
+router.post('/run-full', requireSchedulerSecret, runFullHandler);
+router.get('/run-full', requireSchedulerSecret, runFullHandler);
 
 /**
  * SYNC WITH DETAILED PROGRESS

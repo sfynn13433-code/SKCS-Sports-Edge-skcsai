@@ -1,5 +1,7 @@
 'use strict';
 
+const { timingSafeEqual } = require('node:crypto');
+
 function normalizeHost(value) {
     if (!value) return null;
     return String(value).trim().replace(/\/+$/, '');
@@ -10,6 +12,12 @@ function extractBearerToken(req) {
     if (!headerValue) return null;
     const match = String(headerValue).match(/^Bearer\s+(.+)$/i);
     return match?.[1]?.trim() || null;
+}
+
+function secretsMatch(provided, configured) {
+    const left = Buffer.from(String(provided || ''), 'utf8');
+    const right = Buffer.from(String(configured || ''), 'utf8');
+    return left.length === right.length && left.length > 0 && timingSafeEqual(left, right);
 }
 
 function parseTimeoutMs(value, fallbackMs = 20000) {
@@ -30,18 +38,21 @@ module.exports = async function handler(req, res) {
         process.env.RENDER_EXTERNAL_URL ||
         'https://skcsai.onrender.com'
     );
-    const apiKey = (
-        process.env.ADMIN_API_KEY ||
-        process.env.SKCS_REFRESH_KEY ||
-        extractBearerToken(req) ||
-        req.headers?.['x-api-key'] ||
-        req.headers?.['X-API-KEY']
-    );
+    const cronSecret = String(process.env.CRON_SECRET || '').trim();
+    const providedSecret = extractBearerToken(req);
 
-    if (!host || !apiKey) {
+    if (!host || !cronSecret) {
         res.status(500).json({
             ok: false,
-            error: 'Missing scheduler API key'
+            error: 'Scheduler credential is not configured'
+        });
+        return;
+    }
+
+    if (!secretsMatch(providedSecret, cronSecret)) {
+        res.status(401).json({
+            ok: false,
+            error: 'Unauthorized scheduler request'
         });
         return;
     }
@@ -55,7 +66,7 @@ module.exports = async function handler(req, res) {
         const upstream = await fetch(target.toString(), {
             method: 'POST',
             headers: {
-                'x-api-key': apiKey,
+                'x-cron-secret': cronSecret,
                 'content-type': 'application/json'
             },
             signal: abort.signal,

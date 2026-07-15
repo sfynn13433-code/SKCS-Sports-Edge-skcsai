@@ -2,6 +2,7 @@ const express = require('express');
 const aiPipelineOrchestrator = require('../services/aiPipelineOrchestrator');
 const contextEnrichmentService = require('../services/contextEnrichmentService');
 const { requireSupabaseUser } = require('../middleware/supabaseJwt');
+const { requireSchedulerSecret } = require('../utils/auth');
 const { runPipelineForMatches } = require('../services/aiPipeline');
 const { buildLiveData } = require('../services/dataProvider');
 const { upsertCanonicalEvents } = require('../services/canonicalEvents');
@@ -11,7 +12,7 @@ const { executeOperation } = require('../core/executionPipeline');
 const router = express.Router();
 
 // Trigger fixture sync (for external scheduler)
-router.post('/trigger-fixture-sync', async (req, res) => {
+router.post('/trigger-fixture-sync', requireSchedulerSecret, async (req, res) => {
   try {
     console.log('Fixture sync triggered via API');
     const result = await executeOperation({
@@ -53,7 +54,7 @@ router.post('/trigger-fixture-sync', async (req, res) => {
 });
 
 // Trigger context enrichment processing
-router.post('/trigger-context-enrichment', async (req, res) => {
+router.post('/trigger-context-enrichment', requireSchedulerSecret, async (req, res) => {
   try {
     console.log('Context enrichment triggered via API');
     const result = await executeOperation({
@@ -85,7 +86,7 @@ router.post('/trigger-context-enrichment', async (req, res) => {
 });
 
 // Trigger SportSRC health & capability discovery
-router.post('/trigger-sportsrc-health', async (req, res) => {
+router.post('/trigger-sportsrc-health', requireSchedulerSecret, async (req, res) => {
   try {
     console.log('SportSRC health check triggered via API');
     const sportsrcHealthService = require('../services/sportsrcHealthService');
@@ -113,22 +114,6 @@ router.post('/trigger-sportsrc-health', async (req, res) => {
     });
   }
 });
-
-// Admin key validation middleware
-const requireAdminKey = (req, res, next) => {
-  const adminKey = req.headers['x-admin-key'];
-  const validKey = process.env.ADMIN_API_KEY;
-
-  if (!adminKey) {
-    return res.status(401).json({ error: 'Missing x-admin-key header' });
-  }
-
-  if (adminKey !== validKey) {
-    return res.status(403).json({ error: 'Invalid admin key' });
-  }
-
-  next();
-};
 
 async function runSchedulerAiPipeline(sport = null) {
     const sportsToProcess = sport ? [sport] : await getActiveSports();
@@ -209,7 +194,7 @@ async function runSchedulerAiPipeline(sport = null) {
 }
 
 // Trigger full AI pipeline (using same function as syncService)
-router.post('/trigger-ai-pipeline', requireAdminKey, (req, res) => {
+router.post('/trigger-ai-pipeline', requireSchedulerSecret, (req, res) => {
   const { sport } = req.body || {};
 
   console.log(`AI pipeline triggered via scheduler${sport ? ` for sport: ${sport}` : ' for all sports'}`);

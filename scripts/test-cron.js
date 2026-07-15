@@ -1,10 +1,14 @@
 require('dotenv').config();
 const axios = require('axios');
 
-const CRON_SECRET = process.env.CRON_SECRET || 'skcs_super_secret_cron_key_2026';
+const CRON_SECRET = String(process.env.CRON_SECRET || '').trim();
 const BASE_URL = process.env.RENDER_EXTERNAL_URL || 'https://skcs-sports-edge-skcsai.onrender.com';
 
 async function testCron() {
+    if (!CRON_SECRET) {
+        throw new Error('CRON_SECRET must be configured before testing cron endpoints.');
+    }
+
     console.log('\n=== TESTING CRON ENDPOINTS ===\n');
     console.log('Base URL:', BASE_URL);
     console.log('CRON Secret:', CRON_SECRET ? 'SET' : 'NOT SET');

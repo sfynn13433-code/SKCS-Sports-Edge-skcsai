@@ -4,8 +4,18 @@ const axios = require('axios');
 class ExternalScheduler {
   constructor() {
     this.backendUrl = process.env.BACKEND_URL || 'http://localhost:10000';
-    this.supabaseUrl = process.env.SUPABASE_URL;
-    this.serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    this.cronSecret = String(process.env.CRON_SECRET || '').trim();
+
+    if (!this.cronSecret) {
+      throw new Error('CRON_SECRET is required for the external scheduler.');
+    }
+  }
+
+  schedulerHeaders() {
+    return {
+      'Content-Type': 'application/json',
+      'x-cron-secret': this.cronSecret
+    };
   }
 
   start() {
@@ -53,9 +63,7 @@ class ExternalScheduler {
   async triggerFixtureSync() {
     try {
       const response = await axios.post(`${this.backendUrl}/api/scheduler/trigger-fixture-sync`, {}, {
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: this.schedulerHeaders(),
         timeout: 300000 // 5 minutes
       });
       
@@ -68,9 +76,7 @@ class ExternalScheduler {
   async triggerContextEnrichment() {
     try {
       const response = await axios.post(`${this.backendUrl}/api/scheduler/trigger-context-enrichment`, {}, {
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: this.schedulerHeaders(),
         timeout: 600000 // 10 minutes
       });
       
@@ -85,9 +91,7 @@ class ExternalScheduler {
       const response = await axios.post(`${this.backendUrl}/api/scheduler/trigger-ai-pipeline`, {
         runScope: 'UPCOMING_7_DAYS'
       }, {
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: this.schedulerHeaders(),
         timeout: 600000 // 10 minutes
       });
       
