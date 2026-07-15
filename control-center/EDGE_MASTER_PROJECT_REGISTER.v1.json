@@ -2451,6 +2451,7 @@
         "scripts/apply-ui3-i10-controlled-migrations.js",
         "reports/ui3-i10/migration-readiness.json",
         "reports/ui3-i10/controlled-apply-result.json",
+        "reports/ui3-i10/migration-history-reconciliation.json",
         "supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql"
       ],
       "related_tables": [
@@ -2468,24 +2469,27 @@
         "HTTP route authorization",
         "Production activation authorization"
       ],
-      "completion_definition": "SEM-GOV-001D-UI3-I10 PASS WITH CORRECTION — Gate A readiness PASS, Gate B schema apply PASS, runtime gates BLOCKED.",
+      "completion_definition": "SEM-GOV-001D-UI3-I10 PASS WITH CORRECTION — Gate A readiness PASS, Gate B schema apply PASS WITH CORRECTION, Gate B-C1 reconciliation PASS, formal Gate B closure, runtime gates BLOCKED.",
       "proof_required": [
         "test:sem-gov-001d-ui3-i10 passes",
         "test:sem-gov-001d-ui3-i10-apply passes",
         "controlled-apply-result.json PASS",
+        "migration-history-reconciliation.json PASS",
         "Gates BLOCKED"
       ],
       "risks_if_ignored": [
         "Migrations could be applied without collision or capacity proof"
       ],
       "recommended_order": 41,
-      "next_action": "SEM-GOV-001D-UI3-I10 PASS WITH CORRECTION. Schema applied; runtime activation BLOCKED.",
-      "owner_note": "Gate B schema-only apply complete.",
+      "next_action": "SEM-GOV-001D-UI3-I10 formal Gate B closure PASS. Gate B-C1 migration history reconciled. Schema applied; runtime activation BLOCKED.",
+      "owner_note": "Gate B schema apply and B-C1 history reconciliation complete.",
       "last_updated": "2026-07-15",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I10",
       "current_evidence": [
         "Readiness checker PASS",
-        "Gate B atomic apply PASS",
+        "Gate B atomic apply PASS WITH CORRECTION",
+        "Gate B-C1 migration history reconciliation PASS",
+        "Formal Gate B closure PASS",
         "Eight tables with RLS and zero rows",
         "Lifecycle RLS correction"
       ]

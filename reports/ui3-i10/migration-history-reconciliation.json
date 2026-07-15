@@ -1,0 +1,76 @@
+{
+  "task": "SEM-GOV-001D-UI3-I10",
+  "operation": "GATE_B_MIGRATION_HISTORY_RECONCILIATION",
+  "result": "PASS",
+  "closureDecision": "PASS WITH DOCUMENTED PRE-EXISTING GOVERNANCE EXCEPTION",
+  "repairedVersions": [
+    "20261008000001",
+    "20261010000001",
+    "20261011000001"
+  ],
+  "before": {
+    "20261008000001": {
+      "local": true,
+      "remote": false
+    },
+    "20261010000001": {
+      "local": true,
+      "remote": false
+    },
+    "20261011000001": {
+      "local": true,
+      "remote": false
+    }
+  },
+  "after": {
+    "20261008000001": {
+      "local": true,
+      "remote": true
+    },
+    "20261010000001": {
+      "local": true,
+      "remote": true
+    },
+    "20261011000001": {
+      "local": true,
+      "remote": true
+    }
+  },
+  "schemaReapplied": false,
+  "credentialsRecorded": false,
+  "unrelatedMigrationsChanged": false,
+  "runtimeGatesRemainBlocked": true,
+  "baselineComparison": {
+    "baselineHead": "e85a27ed115eced51eb77010494ede67dfa777bb",
+    "baselineExitCode": 1,
+    "currentExitCode": 1,
+    "identicalFailureSet": true,
+    "introducedByGateBC1": false,
+    "preExistingControlAssetsErrors": [
+      "INVALID_ASSET_TYPE: tests/sem-gov-001d-home1-static-home.test.js TEST_PROOF",
+      "INVALID_ASSET_TYPE: tests/sem-gov-001d-home1-visual-acceptance.test.js TEST_PROOF",
+      "INVALID_ASSET_TYPE: backend/services/fixtureDisplayMetadataPersistenceService.js BACKEND_SERVICE",
+      "INVALID_ASSET_TYPE: scripts/check-ui3-i10-migration-readiness.js SCRIPT_TOOL",
+      "INVALID_ASSET_TYPE: scripts/apply-ui3-i10-controlled-migrations.js SCRIPT_TOOL",
+      "TRACKED_ASSET_UNREGISTERED: control-center/ALI-001_ACCURACY_AND_LOSS_INTELLIGENCE_PROPOSAL.v1.md",
+      "UNCLASSIFIED_TRACKED_PATH: control-center/ALI-001_ACCURACY_AND_LOSS_INTELLIGENCE_PROPOSAL.v1.md",
+      "TRACKED_ASSET_UNREGISTERED: control-center/RLL-001_REGIONAL_LANGUAGE_AND_LEGAL_LOCALISATION_PROPOSAL.v1.md",
+      "UNCLASSIFIED_TRACKED_PATH: control-center/RLL-001_REGIONAL_LANGUAGE_AND_LEGAL_LOCALISATION_PROPOSAL.v1.md",
+      "TRACKED_ASSET_UNREGISTERED: control-center/SPM-001_UNIFIED_SUBSCRIPTION_MODEL_PROPOSAL.v1.md",
+      "UNCLASSIFIED_TRACKED_PATH: control-center/SPM-001_UNIFIED_SUBSCRIPTION_MODEL_PROPOSAL.v1.md"
+    ],
+    "countDifferences": {
+      "baseline": {
+        "tracked": 994,
+        "registered": 990
+      },
+      "current": {
+        "tracked": 995,
+        "registered": 991
+      },
+      "explanation": "Count increase is the new registered reconciliation report (reports/ui3-i10/migration-history-reconciliation.json)."
+    },
+    "discoveredUntrackedWorkspacePaths": 9,
+    "ungovernedWorkspaceCandidates": 0
+  }
+}
