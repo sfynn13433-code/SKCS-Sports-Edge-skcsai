@@ -511,8 +511,8 @@
       "task_id": "ESEC-001",
       "task_name": "Subscriber and Security Boundary",
       "workstream": "Security and Commercial Boundary",
-      "description": "Map and protect Edge authentication, subscriber, service-role, RLS, admin, secrets, and commercial application boundaries independently from Scout sports data.",
-      "status": "PROPOSED",
+      "description": "Inspect and govern Edge authentication, subscriber enforcement, API-key roles, service-role use, RLS, admin surfaces, secrets, and Scout M2M credential separation without changing runtime behavior.",
+      "status": "PARTIAL",
       "priority": "critical",
       "blocked_by": [
         "ESA-001",
@@ -529,28 +529,90 @@
         "authorization",
         "commercial"
       ],
-      "related_contracts": [],
+      "related_contracts": [
+        "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
+        "E2E-001_C2_EXECUTION_READINESS_BLOCKER_RECONCILIATION.v1",
+        "ESEC-001_C1_SECURITY_BOUNDARY_INSPECTION_AND_CONTRACT.v1"
+      ],
       "affected_files": [
-        "backend/",
-        "public/",
-        "supabase/"
+        "backend/middleware/supabaseJwt.js",
+        "backend/utils/auth.js",
+        "backend/server-express.js",
+        "backend/services/governedFipIntakeComposition.js",
+        "public/js/config.js",
+        ".env.example",
+        "supabase/migrations/20260822000008_service_role_rls_policies.sql",
+        "supabase/migrations/20261011000001_sem_gov_001d_ui3_i8_fip_intake_evidence.sql",
+        "reports/ui3-i10/controlled-apply-result.json",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
+        "control-center/EDGE_PROJECT_BACKLOG.md",
+        "control-center/EDGE_PROJECT_DEPENDENCY_MAP.md",
+        "control-center/ESEC-001_C1_SECURITY_BOUNDARY_INSPECTION_AND_CONTRACT.v1.md",
+        "reports/esec-001/security-boundary-inspection.json",
+        "tests/esec-001-c1-security-boundary.test.js",
+        "package.json"
       ],
-      "affected_tables": [],
-      "completion_definition": "Edge's user/subscriber/commercial security boundary is documented, tested, and isolated from Scout integration credentials and sports-truth transport.",
+      "affected_tables": [
+        "profiles",
+        "subscriptions",
+        "fip_intake_evidence"
+      ],
+      "completion_definition": "ESEC-001-C1 PASS WITH CRITICAL BLOCKERS — the security boundary is inspected and contractually classified; eight open findings are recorded; no runtime, SQL, migration, environment, credential, route, deployment, E2E, or gate changes occur; ESEC-001 remains PARTIAL and E2E-001 remains BLOCKED.",
       "proof_required": [
-        "Auth and subscriber surface inventory",
-        "Service-role use inventory",
-        "RLS/security inspection",
-        "Scout integration credential boundary",
-        "Security regression tests or proof"
+        "npm run test:esec-001-c1 passes",
+        "Authentication and subscriber surfaces inspected",
+        "Service-role use and credential aliases inspected without recording values",
+        "RLS state and missing-policy boundary recorded",
+        "Scout HMAC M2M credential boundary classified separately from subscriber and Supabase credentials",
+        "Eight security findings recorded",
+        "ESEC-001 remains PARTIAL",
+        "E2E-001 and all runtime gates remain BLOCKED",
+        "No runtime, SQL, migration, environment, credential, route, deployment, or external-system changes"
       ],
-      "current_evidence": [],
+      "current_evidence": [
+        "Supabase JWT validation currently contains an unconditional testing branch that promotes authenticated users to admin with all tiers",
+        "Active-subscription middleware currently bypasses enforcement",
+        "Legacy shared user API key is enabled by backend default and embedded in public JavaScript",
+        "Role middleware bypasses authorization for cron path prefixes",
+        "Mutation-capable pipeline and internal fixture endpoints are mounted without explicit authentication",
+        "Server startup contains automatic FORCE_BOOT_TEST database writes using a privileged-key preference chain",
+        "I10 applied RLS-enabled tables with zero policies, including public.fip_intake_evidence",
+        "Service-role aliases and Scout HMAC M2M credentials do not yet have a sealed operational separation contract",
+        "Supabase anon key is classified as public client configuration, not a service secret",
+        "No secret values were copied into ESEC evidence",
+        "E2E-001 and all runtime gates remain BLOCKED"
+      ],
       "open_gaps": [
-        "Full Edge security boundary has not been registered in a canonical project-control layer"
+        "AUTH-001: remove unconditional JWT-to-admin privilege promotion",
+        "SUB-001: restore fail-closed active-subscription enforcement",
+        "KEY-001: disable and remove the public legacy shared user key",
+        "CRON-001: replace path-based cron authorization bypass with explicit credential verification",
+        "ROUTE-001: protect mutation-capable pipeline and internal fixture routes",
+        "DB-001: remove automatic FORCE_BOOT_TEST startup writes and prohibit anon fallback for privileged writes",
+        "RLS-001: design and separately authorize explicit policies or server-only access law for new RLS tables",
+        "CRED-001: isolate Supabase service-role, subscriber/admin keys, scheduler secrets, and Scout M2M credentials"
       ],
-      "next_action": "Wait for Edge inventory.",
-      "owner_note": "Scout's lower commercial-data sensitivity does not justify weakening Edge's user-data boundary.",
-      "last_updated": "2026-07-05"
+      "next_action": "ESEC-001-C1 PASS WITH CRITICAL BLOCKERS. Next separately authorize ESEC-001-I1 fail-closed authentication and subscriber-boundary remediation: remove unconditional JWT admin/subscription bypasses, disable the public legacy user key, replace cron path bypasses with explicit authenticated scheduler credentials, protect mutation routes, remove startup test writes, and seal service-role/Scout M2M credential isolation. Do not execute E2E proof or clear any runtime gate.",
+      "owner_note": "Inspection and contract only. Security remediation requires ESEC-001-I1.",
+      "last_updated": "2026-07-15",
+      "known_issues": [
+        "Five CRITICAL security findings remain open",
+        "Three HIGH security findings remain open",
+        "ESEC-001 is not a satisfied marriage prerequisite",
+        "E2E-001 remains BLOCKED",
+        "Full marriage proof remains HOLD",
+        "All runtime gates remain BLOCKED"
+      ],
+      "required_decisions": [
+        "Authorize ESEC-001-I1 runtime security remediation",
+        "Approve replacement subscriber authentication model",
+        "Approve scheduler and cron credential model",
+        "Approve server-only service-role ownership boundary",
+        "Approve Scout M2M secret ownership, rotation, and nonce-store boundary",
+        "Approve RLS policy implementation packet"
+      ]
     },
     {
       "task_id": "EPI-001",
@@ -1027,17 +1089,18 @@
         "EPI-001 contract is TESTED but D1 prediction and R1 provenance runtime integration remain absent",
         "ESEC-001 remains PROPOSED",
         "EPRV-001 remains PARTIAL with direct external acquisition still reachable",
-        "Full marriage proof remains HOLD and all runtime governance gates remain BLOCKED"
+        "Full marriage proof remains HOLD and all runtime governance gates remain BLOCKED",
+        "ESEC-001-C1 inspection PASS WITH CRITICAL BLOCKERS; ESEC-001 is PARTIAL with five CRITICAL and three HIGH findings"
       ],
       "open_gaps": [
-        "ESEC-001 subscriber, service-role, RLS, secrets, and Scout-integration credential boundary is not inspected or tested",
+        "ESEC-001-C1 inspection is complete, but ESEC-001 remains PARTIAL with five CRITICAL and three HIGH findings requiring ESEC-001-I1 remediation",
         "D1 prediction output integration from the governed EdgeAnalysisEnvelope is not implemented",
         "R1 provenance linkage from FIP identity and validation hash to derived prediction output is not implemented",
         "EPRV-001 remains PARTIAL and direct external sports-truth acquisition remains reachable",
         "Controlled canonical Scout FIP sample and governed Scout-to-Edge transport are not authorized",
         "Live proof-mode route, feature flag, storage gate, lifecycle governor, rollback, and execution authorization remain blocked"
       ],
-      "next_action": "E2E-001-C2 execution-readiness reconciliation PASS WITH BLOCKERS. Next separately approve ESEC-001-C1 subscriber, service-role, RLS, secrets, and Scout-integration credential boundary inspection. Do not execute the live proof, authorize Scout transport, implement D1 or R1, alter provider runtime, enable routes or feature flags, or clear any runtime governance gate in this reconciliation.",
+      "next_action": "E2E-001-C2 readiness remains PASS WITH BLOCKERS after ESEC-001-C1. ESEC-001 is PARTIAL with eight open security findings. Next separately authorize ESEC-001-I1 fail-closed authentication and credential-boundary remediation. Do not execute the live proof, authorize Scout transport, implement D1 or R1, alter provider runtime, enable routes or feature flags, or clear any runtime governance gate.",
       "owner_note": "Readiness reconciliation only. E2E-001 remains BLOCKED; full marriage proof remains HOLD.",
       "last_updated": "2026-07-15"
     },

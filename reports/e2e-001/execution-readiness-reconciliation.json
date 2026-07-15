@@ -40,7 +40,7 @@
     {
       "id": "ESEC-001",
       "status": "BLOCKED",
-      "evidence": "Task remains PROPOSED with no canonical tested security-boundary proof."
+      "evidence": "Inspection complete; task remains PARTIAL with five CRITICAL and three HIGH findings requiring ESEC-001-I1 remediation."
     },
     {
       "id": "EPI-001-D1-R1",
@@ -68,7 +68,7 @@
     {
       "id": "ESEC-001",
       "status": "BLOCKED",
-      "evidence": "Task remains PROPOSED with no canonical tested security-boundary proof."
+      "evidence": "Inspection complete; task remains PARTIAL with five CRITICAL and three HIGH findings requiring ESEC-001-I1 remediation."
     },
     {
       "id": "EPI-001-D1-R1",
@@ -93,6 +93,8 @@
   ],
   "executionReady": false,
   "e2e001Status": "BLOCKED",
+  "esec001Status": "PARTIAL",
+  "esec001InspectionDecision": "SECURITY_BOUNDARY_INSPECTED_REMEDIATION_REQUIRED",
   "fullMarriageProofDecision": "HOLD",
   "liveProofExecutionAuthorized": false,
   "scoutTransportAuthorized": false,
@@ -102,9 +104,10 @@
   "r1Implemented": false,
   "externalConnections": 0,
   "nextAuthorizedMiniProject": {
-    "id": "ESEC-001-C1",
-    "mode": "SECURITY_BOUNDARY_INSPECTION_AND_CONTRACT",
-    "runtimeChangesAuthorized": false
+    "id": "ESEC-001-I1",
+    "mode": "FAIL_CLOSED_AUTHENTICATION_AND_CREDENTIAL_BOUNDARY_REMEDIATION",
+    "runtimeChangesAuthorized": false,
+    "separatelyAuthorized": false
   },
   "currentRuntimeGates": {
     "scout_edge_marriage_gate": "BLOCKED",
@@ -116,5 +119,5 @@
     "evidence/",
     "evidence-home1-scratch/"
   ],
-  "nextAction": "E2E-001-C2 execution-readiness reconciliation PASS WITH BLOCKERS. Next separately approve ESEC-001-C1 subscriber, service-role, RLS, secrets, and Scout-integration credential boundary inspection. Do not execute the live proof, authorize Scout transport, implement D1 or R1, alter provider runtime, enable routes or feature flags, or clear any runtime governance gate in this reconciliation."
+  "nextAction": "E2E-001-C2 readiness remains PASS WITH BLOCKERS after ESEC-001-C1. ESEC-001 is PARTIAL with eight open security findings. Next separately authorize ESEC-001-I1 fail-closed authentication and credential-boundary remediation. Do not execute the live proof, authorize Scout transport, implement D1 or R1, alter provider runtime, enable routes or feature flags, or clear any runtime governance gate."
 }

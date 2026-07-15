@@ -67,7 +67,7 @@ Blocks: EOPS-001, E2E-001
 
 ## ESEC-001 — Subscriber and Security Boundary
 
-Status: PROPOSED
+Status: PARTIAL
 Governed by: ESEC-001
 Blocked by: ESA-001, EMG-001
 Blocks: EUI-001, EOPS-001, E2E-001

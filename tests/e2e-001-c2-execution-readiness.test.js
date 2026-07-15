@@ -11,7 +11,7 @@ const START_HEAD =
   'c14f839cb6482c7d58dd04bdac5705bbd94e57fb';
 
 const NEXT_ACTION =
-  'E2E-001-C2 execution-readiness reconciliation PASS WITH BLOCKERS. Next separately approve ESEC-001-C1 subscriber, service-role, RLS, secrets, and Scout-integration credential boundary inspection. Do not execute the live proof, authorize Scout transport, implement D1 or R1, alter provider runtime, enable routes or feature flags, or clear any runtime governance gate in this reconciliation.';
+  'E2E-001-C2 readiness remains PASS WITH BLOCKERS after ESEC-001-C1. ESEC-001 is PARTIAL with eight open security findings. Next separately authorize ESEC-001-I1 fail-closed authentication and credential-boundary remediation. Do not execute the live proof, authorize Scout transport, implement D1 or R1, alter provider runtime, enable routes or feature flags, or clear any runtime governance gate.';
 
 const EXPECTED_GATES = {
   scout_edge_marriage_gate: 'BLOCKED',
@@ -173,7 +173,7 @@ test(
     assert.equal(fip.status, 'APPROVED');
     assert.equal(efi.status, 'TESTED');
     assert.equal(est.status, 'TESTED');
-    assert.equal(esec.status, 'PROPOSED');
+    assert.equal(esec.status, 'PARTIAL');
     assert.equal(epi.status, 'TESTED');
     assert.equal(eprv.status, 'PARTIAL');
     assert.equal(e2e.status, 'BLOCKED');
@@ -182,7 +182,7 @@ test(
 
     assert.equal(
       e2e.open_gaps.includes(
-        'ESEC-001 subscriber, service-role, RLS, secrets, and Scout-integration credential boundary is not inspected or tested'
+        'ESEC-001-C1 inspection is complete, but ESEC-001 remains PARTIAL with five CRITICAL and three HIGH findings requiring ESEC-001-I1 remediation'
       ),
       true
     );
@@ -349,7 +349,7 @@ test(
         id: 'ESEC-001',
         status: 'BLOCKED',
         evidence:
-          'Task remains PROPOSED with no canonical tested security-boundary proof.'
+          'Inspection complete; task remains PARTIAL with five CRITICAL and three HIGH findings requiring ESEC-001-I1 remediation.'
       },
       {
         id: 'EPI-001-D1-R1',
@@ -425,6 +425,9 @@ test(
 
       executionReady: false,
       e2e001Status: 'BLOCKED',
+      esec001Status: 'PARTIAL',
+      esec001InspectionDecision:
+        'SECURITY_BOUNDARY_INSPECTED_REMEDIATION_REQUIRED',
       fullMarriageProofDecision: 'HOLD',
       liveProofExecutionAuthorized: false,
       scoutTransportAuthorized: false,
@@ -435,10 +438,11 @@ test(
       externalConnections: 0,
 
       nextAuthorizedMiniProject: {
-        id: 'ESEC-001-C1',
+        id: 'ESEC-001-I1',
         mode:
-          'SECURITY_BOUNDARY_INSPECTION_AND_CONTRACT',
-        runtimeChangesAuthorized: false
+          'FAIL_CLOSED_AUTHENTICATION_AND_CREDENTIAL_BOUNDARY_REMEDIATION',
+        runtimeChangesAuthorized: false,
+        separatelyAuthorized: false
       },
 
       currentRuntimeGates: {
@@ -471,6 +475,7 @@ test(
       '| Code required | **YES** |',
       '| Reconciliation result | **PASS WITH BLOCKERS** |',
       '| E2E-001 | **BLOCKED** |',
+      '| ESEC-001 | **PARTIAL — 8 OPEN FINDINGS** |',
       '| Execution ready | **NO** |',
       '| Full marriage proof | **HOLD** |',
       '| Live proof authorized | **NO** |',
@@ -497,9 +502,9 @@ test(
       '',
       '## Next governed mini-project',
       '',
-      '**ESEC-001-C1 — Subscriber, Service-Role, RLS, Secrets and Scout-Integration Credential Boundary Inspection and Contract.**',
+      '**ESEC-001-I1 — Fail-Closed Authentication and Credential-Boundary Remediation.**',
       '',
-      'ESEC-001-C1 is inspection and governance only. It does not authorize runtime edits, credential creation, route wiring, database mutation, Scout transport, proof execution, D1, R1, provider removal, or gate clearance.',
+      'ESEC-001-I1 requires separate authorization. It is not started by this correction and does not authorize E2E proof, Scout transport, D1, R1, provider removal, or gate clearance.',
       '',
       '## Decision',
       '',

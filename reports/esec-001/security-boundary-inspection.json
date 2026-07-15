@@ -1,0 +1,107 @@
+{
+  "task": "ESEC-001",
+  "miniProject": "ESEC-001-C1",
+  "operation": "SECURITY_BOUNDARY_INSPECTION_AND_CONTRACT",
+  "startHead": "cce4d5bb6fea669d01856e4425ba2af804f3724a",
+  "generatedAt": "2026-07-15T00:00:00.000Z",
+  "result": "PASS_WITH_CRITICAL_BLOCKERS",
+  "decision": "SECURITY_BOUNDARY_INSPECTED_REMEDIATION_REQUIRED",
+  "codeRequired": true,
+  "esec001Status": "PARTIAL",
+  "e2e001Status": "BLOCKED",
+  "fullMarriageProofDecision": "HOLD",
+  "findingCount": 8,
+  "criticalFindingCount": 5,
+  "highFindingCount": 3,
+  "findings": [
+    {
+      "id": "AUTH-001",
+      "severity": "CRITICAL",
+      "state": "OPEN",
+      "title": "Validated Supabase JWT is unconditionally promoted to admin",
+      "requiredRepair": "Remove testing branch and derive roles only from governed server-side profile and authorization data."
+    },
+    {
+      "id": "SUB-001",
+      "severity": "CRITICAL",
+      "state": "OPEN",
+      "title": "Active-subscription enforcement always passes",
+      "requiredRepair": "Restore fail-closed subscription checks with explicit admin and test-user policy."
+    },
+    {
+      "id": "KEY-001",
+      "severity": "CRITICAL",
+      "state": "OPEN",
+      "title": "Legacy shared user key is public and enabled by backend default",
+      "requiredRepair": "Default legacy-key support off and remove the shared key from public assets."
+    },
+    {
+      "id": "CRON-001",
+      "severity": "CRITICAL",
+      "state": "OPEN",
+      "title": "Cron path prefixes bypass role authorization",
+      "requiredRepair": "Require a dedicated scheduler credential using constant-time comparison and explicit route middleware."
+    },
+    {
+      "id": "ROUTE-001",
+      "severity": "CRITICAL",
+      "state": "OPEN",
+      "title": "Mutation-capable pipeline and internal fixture routes lack explicit authentication",
+      "requiredRepair": "Mount explicit admin or scheduler middleware before request handling."
+    },
+    {
+      "id": "DB-001",
+      "severity": "HIGH",
+      "state": "OPEN",
+      "title": "Server startup performs FORCE_BOOT_TEST writes using a privileged-key preference chain",
+      "requiredRepair": "Remove automatic test writes and prohibit anon-key fallback for privileged database operations."
+    },
+    {
+      "id": "RLS-001",
+      "severity": "HIGH",
+      "state": "OPEN",
+      "title": "New RLS-enabled proof tables have zero explicit policies",
+      "requiredRepair": "Seal server-only ownership or implement least-privilege policies in a separately approved migration packet."
+    },
+    {
+      "id": "CRED-001",
+      "severity": "HIGH",
+      "state": "OPEN",
+      "title": "Service-role, subscriber, scheduler and Scout M2M credential boundaries are not operationally separated",
+      "requiredRepair": "Define distinct ownership, purpose, rotation, storage and revocation laws for every credential class."
+    }
+  ],
+  "credentialClasses": {
+    "supabaseAnonKey": "PUBLIC_CLIENT_IDENTIFIER_NOT_SERVICE_SECRET",
+    "supabaseServiceRole": "SERVER_ONLY_PRIVILEGED_SECRET",
+    "subscriberJwt": "END_USER_IDENTITY_TOKEN",
+    "adminApiKey": "SERVER_VALIDATED_OPERATOR_SECRET",
+    "schedulerSecret": "SERVER_TO_SERVER_SCHEDULER_SECRET",
+    "scoutM2MHmacSecret": "SCOUT_TO_EDGE_INTEGRATION_SECRET"
+  },
+  "secretValuesRecorded": false,
+  "externalConnections": 0,
+  "runtimeFilesChanged": [],
+  "sqlFilesChanged": [],
+  "migrationsApplied": false,
+  "credentialsChanged": false,
+  "runtimeRemediationAuthorized": false,
+  "e2eExecutionAuthorized": false,
+  "scoutTransportAuthorized": false,
+  "gateClearanceAuthorized": false,
+  "nextAuthorizedMiniProject": {
+    "id": "ESEC-001-I1",
+    "mode": "FAIL_CLOSED_AUTHENTICATION_AND_CREDENTIAL_BOUNDARY_REMEDIATION",
+    "separatelyAuthorized": false
+  },
+  "currentRuntimeGates": {
+    "scout_edge_marriage_gate": "BLOCKED",
+    "unified_lifecycle_governor": "BLOCKED",
+    "supabase_storage_gate": "BLOCKED"
+  },
+  "preservedUntrackedDirectories": [
+    "evidence/",
+    "evidence-home1-scratch/"
+  ],
+  "nextAction": "ESEC-001-C1 PASS WITH CRITICAL BLOCKERS. Next separately authorize ESEC-001-I1 fail-closed authentication and subscriber-boundary remediation: remove unconditional JWT admin/subscription bypasses, disable the public legacy user key, replace cron path bypasses with explicit authenticated scheduler credentials, protect mutation routes, remove startup test writes, and seal service-role/Scout M2M credential isolation. Do not execute E2E proof or clear any runtime gate."
+}

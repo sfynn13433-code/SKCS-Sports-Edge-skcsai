@@ -6,6 +6,7 @@
 | Code required | **YES** |
 | Reconciliation result | **PASS WITH BLOCKERS** |
 | E2E-001 | **BLOCKED** |
+| ESEC-001 | **PARTIAL — 8 OPEN FINDINGS** |
 | Execution ready | **NO** |
 | Full marriage proof | **HOLD** |
 | Live proof authorized | **NO** |
@@ -19,7 +20,7 @@
 | FIP-001 | SATISFIED_FOUNDATION | Committed canonical FIP authority is registered. |
 | EFI-001 | SATISFIED_MOCK_ONLY | Fail-closed intake, adapter, composition and HMAC foundation are tested; no production receive route exists. |
 | EST-001-R2 | SATISFIED_SCHEMA_ONLY | public.fip_intake_evidence exists with RLS; runtime gates remain blocked. |
-| ESEC-001 | BLOCKED | Task remains PROPOSED with no canonical tested security-boundary proof. |
+| ESEC-001 | BLOCKED | Inspection complete; task remains PARTIAL with five CRITICAL and three HIGH findings requiring ESEC-001-I1 remediation. |
 | EPI-001-D1-R1 | BLOCKED | Pipeline contract is tested, but governed D1 prediction and R1 provenance integration are absent. |
 | EPRV-001 | BLOCKED | Task remains PARTIAL and external acquisition is still reachable. |
 | SCOUT-TRANSPORT-SAMPLE | BLOCKED | No controlled Scout sample or governed transport is authorized. |
@@ -39,9 +40,9 @@
 
 ## Next governed mini-project
 
-**ESEC-001-C1 — Subscriber, Service-Role, RLS, Secrets and Scout-Integration Credential Boundary Inspection and Contract.**
+**ESEC-001-I1 — Fail-Closed Authentication and Credential-Boundary Remediation.**
 
-ESEC-001-C1 is inspection and governance only. It does not authorize runtime edits, credential creation, route wiring, database mutation, Scout transport, proof execution, D1, R1, provider removal, or gate clearance.
+ESEC-001-I1 requires separate authorization. It is not started by this correction and does not authorize E2E proof, Scout transport, D1, R1, provider removal, or gate clearance.
 
 ## Decision
 

@@ -54,6 +54,7 @@
     "test:sem-gov-001d-ui3-i11-gate-b-c1": "node --test tests/fip-intake-m2m-authenticator.test.js && node --test tests/sem-gov-001d-ui3-i11-gate-b-c1-body-hash-binding.test.js && npm run test:sem-gov-001d-ui3-i11-gate-b && node --test tests/sem-gov-001d-ui3-i11-gate-b-c1-governance.test.js",
     "test:sem-gov-001d-ui3-i11-gate-c": "node --test tests/sem-gov-001d-ui3-i11-gate-c-closure.test.js",
     "test:e2e-001-c2": "node --test tests/e2e-001-c2-execution-readiness.test.js",
+    "test:esec-001-c1": "node --test tests/esec-001-c1-security-boundary.test.js",
     "test:control-center-ui": "node --test tests/edge-control-center-ui.test.js",
     "control:runtime": "node control-center/check_edge_system_runtime_inventory.js",
     "control:verify": "npm run test:control-center && npm run control:center && npm run control:projects && npm run control:assets && npm run control:classification && npm run control:runtime",
