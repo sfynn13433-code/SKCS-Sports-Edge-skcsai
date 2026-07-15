@@ -33,15 +33,12 @@ const { resolveActiveDeploymentSports } = require('../config/activeSports');
 
 let isRunning = false;
 const ACTIVE_DEPLOYMENT_SPORTS = resolveActiveDeploymentSports();
-const DIRECT_INSIGHTS_SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
-const DIRECT_INSIGHTS_SUPABASE_KEY = String(
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-    || process.env.SUPABASE_KEY
-    || process.env.SUPABASE_ANON_KEY
-    || ''
+const DIRECT_INSIGHTS_WRITE_SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
+const DIRECT_INSIGHTS_WRITE_SERVICE_ROLE_KEY = String(
+    process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 ).trim();
-const directInsightsSupabase = DIRECT_INSIGHTS_SUPABASE_URL && DIRECT_INSIGHTS_SUPABASE_KEY
-    ? createClient(DIRECT_INSIGHTS_SUPABASE_URL, DIRECT_INSIGHTS_SUPABASE_KEY, {
+const directInsightsWriteSupabase = DIRECT_INSIGHTS_WRITE_SUPABASE_URL && DIRECT_INSIGHTS_WRITE_SERVICE_ROLE_KEY
+    ? createClient(DIRECT_INSIGHTS_WRITE_SUPABASE_URL, DIRECT_INSIGHTS_WRITE_SERVICE_ROLE_KEY, {
         auth: { persistSession: false, autoRefreshToken: false }
     })
     : null;
@@ -1500,7 +1497,7 @@ async function buildRawPredictionFromProviderItem(item) {
             };
 
             console.log('ATTEMPTING INSERT:', fixtureIdForIngestion);
-            const saveResult = await saveContextData(directInsightsSupabase, match_id, ingestedContextData);
+            const saveResult = await saveContextData(directInsightsWriteSupabase, match_id, ingestedContextData);
             if (saveResult?.saved === true) {
                 console.log('Context inserted:', match_id);
             } else if (saveResult?.reason === 'already_exists') {
@@ -1600,7 +1597,7 @@ async function buildRawPredictionFromProviderItem(item) {
         return { rejected: true, reason: 'low_confidence' };
     }
     try {
-        await saveDirectInsight(directInsightsSupabase, match_id, direct1x2Evaluation);
+        await saveDirectInsight(directInsightsWriteSupabase, match_id, direct1x2Evaluation);
     } catch (saveErr) {
         console.warn('[aiPipeline] direct_1x2_insights save failed match_id=%s: %s', match_id, saveErr.message);
     }

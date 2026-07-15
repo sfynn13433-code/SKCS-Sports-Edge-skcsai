@@ -248,68 +248,15 @@ const feedbackRouter    = require('./routes/feedback');
 const { runTier1Stage1Bootstrap } = require('./services/tier1BootstrapService');
 const { executeOperation } = require('./core/executionPipeline');
 
-const DIRECT_INSIGHTS_SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
-const DIRECT_INSIGHTS_SUPABASE_KEY = String(
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-    || process.env.SUPABASE_KEY
-    || process.env.SUPABASE_ANON_KEY
-    || ''
+const DIRECT_INSIGHTS_READ_SUPABASE_URL = String(process.env.SUPABASE_URL || '').trim();
+const DIRECT_INSIGHTS_READ_SUPABASE_ANON_KEY = String(
+    process.env.SUPABASE_ANON_KEY || ''
 ).trim();
-const directInsightsSupabase = DIRECT_INSIGHTS_SUPABASE_URL && DIRECT_INSIGHTS_SUPABASE_KEY
-    ? createClient(DIRECT_INSIGHTS_SUPABASE_URL, DIRECT_INSIGHTS_SUPABASE_KEY, {
+const directInsightsReadSupabase = DIRECT_INSIGHTS_READ_SUPABASE_URL && DIRECT_INSIGHTS_READ_SUPABASE_ANON_KEY
+    ? createClient(DIRECT_INSIGHTS_READ_SUPABASE_URL, DIRECT_INSIGHTS_READ_SUPABASE_ANON_KEY, {
         auth: { persistSession: false, autoRefreshToken: false }
     })
     : null;
-
-void (async () => {
-    if (!directInsightsSupabase) return;
-    
-    // First check if raw_fixtures table exists and has the test record
-    try {
-        const { data: fixtureCheck, error: fixtureError } = await directInsightsSupabase
-            .from('raw_fixtures')
-            .select('id_event')
-            .eq('id_event', 'FORCE_BOOT_TEST')
-            .single();
-            
-        if (fixtureError || !fixtureCheck) {
-            // Create the test fixture first to satisfy foreign key constraint
-            const { error: insertError } = await directInsightsSupabase
-                .from('raw_fixtures')
-                .insert({
-                    id_event: 'FORCE_BOOT_TEST',
-                    sport: 'Football',
-                    league_id: 'test_league',
-                    home_team_id: 'test_home',
-                    away_team_id: 'test_away',
-                    start_time: new Date().toISOString(),
-                    raw_json: { test: true }
-                });
-                
-            if (insertError) {
-                console.error('[boot-force-insert] failed to create test fixture:', insertError.message);
-                return;
-            }
-        }
-        
-        // Now insert the match_context_data record (use upsert to avoid duplicate key error)
-        const { error } = await directInsightsSupabase.from('match_context_data')
-            .upsert({
-                id_event: 'FORCE_BOOT_TEST',
-                injuries: { forced: true }
-            }, {
-                onConflict: 'id_event'
-            });
-
-        if (error) {
-            console.error('[boot-force-insert] failed:', error.message);
-        } else {
-            console.log('[boot-force-insert] inserted FORCE_BOOT_TEST');
-        }
-    } catch (err) {
-        console.error('[boot-force-insert] failed with exception:', err.message);
-    }
-})();
 
 app.disable('x-powered-by');
 
@@ -1186,11 +1133,11 @@ app.get('/api/cron/tier1-stage1-bootstrap', requireSchedulerSecret, async (req, 
 });
 
 app.get('/api/direct-insights', async (_req, res) => {
-    if (!directInsightsSupabase) {
+    if (!directInsightsReadSupabase) {
         return res.status(503).json({ error: 'Supabase is not configured' });
     }
 
-    const { data, error } = await directInsightsSupabase
+    const { data, error } = await directInsightsReadSupabase
         .from('direct_1x2_insights')
         .select('*')
         .order('created_at', { ascending: false })
