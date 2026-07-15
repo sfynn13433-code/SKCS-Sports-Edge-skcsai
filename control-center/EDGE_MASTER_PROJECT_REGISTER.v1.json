@@ -615,7 +615,9 @@
         "RLS-001 remains open and separately excluded",
         "No deployment, E2E, Scout activation, RLS migration or production credential change occurred",
         "E2E-001 and all runtime gates remain BLOCKED",
-        "Broad test:control-center result is HOLD because of repository-wide cleanup and asset-register drift; focused ESEC-I1 proof remains 32/32 PASS"
+        "Broad test:control-center result is HOLD because of repository-wide cleanup and asset-register drift; focused ESEC-I1 proof remains 32/32 PASS",
+        "Packet 4C registered the ESEC-I1 implementation contract, structured report and governance test in deterministic batches B01, B29 and B24",
+        "Packet 4C focused ESEC-I1 proof passed 33/33 without control:assets or broad Control Center execution"
       ]
     },
     {

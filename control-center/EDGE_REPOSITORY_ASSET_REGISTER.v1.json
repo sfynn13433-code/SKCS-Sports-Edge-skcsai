@@ -1,12 +1,12 @@
 {
   "version": "1.0",
   "title": "SKCS Edge Repository Asset Register",
-  "generated_at": "2026-07-05",
+  "generated_at": "2026-07-15",
   "source_command": "git ls-files",
   "coverage_policy": "Every tracked repository path must be REGISTERED_ASSET or EXPLICITLY_EXCLUDED. Registration records existence and governance visibility; it does not assert correctness, currency, approval, permanence, consumer presence, or Scout/FIP compatibility.",
   "unclassified_tracked_paths_allowed": false,
-  "tracked_path_count": 998,
-  "registered_asset_count": 994,
+  "tracked_path_count": 1028,
+  "registered_asset_count": 997,
   "explicit_exclusion_count": 1,
   "assets": [
     {
@@ -735,6 +735,46 @@
       ]
     },
     {
+      "asset_path": "control-center/ESEC-001_I1_FAIL_CLOSED_AUTHENTICATION_AND_CREDENTIAL_BOUNDARY_IMPLEMENTATION.v1.md",
+      "asset_type": "CONTROL_CENTER",
+      "asset_role": "CONTROL_GOVERNANCE",
+      "source_state": "COMMITTED_REPOSITORY",
+      "current_state": "CURRENT",
+      "owner_project_id": "ESEC-001",
+      "governed_by_control_task_id": "ESEC-001",
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "authority_class": "ACTIVE_GOVERNANCE",
+      "related_assets": [
+        "reports/esec-001/fail-closed-authentication-implementation.json",
+        "tests/esec-001-i1-governance.test.js",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json"
+      ],
+      "next_validation": "Review before ESEC-001 status advancement, RLS authorization or runtime gate clearance.",
+      "notes": "ESEC-001-I1 source-and-test remediation contract. ESEC remains PARTIAL; RLS and runtime proof remain open.",
+      "purpose_description": "Seals fail-closed authentication, subscription, scheduler and credential-boundary source remediation while retaining blocked runtime and RLS gates.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "DOCUMENTATION",
+        "GOVERNANCE",
+        "SECURITY",
+        "AUTHENTICATION"
+      ],
+      "classification_evidence": [
+        "Records ESEC-001-I1 source-and-test closure.",
+        "Preserves ESEC-001 PARTIAL and E2E-001 BLOCKED.",
+        "Excludes RLS migration, deployment and production credential rotation."
+      ]
+    },
+    {
       "asset_path": "CRON_SETUP.md",
       "asset_type": "DOCUMENTATION",
       "asset_role": "DOCUMENTATION",
@@ -1458,6 +1498,43 @@
       ],
       "classification_evidence": [
         "Fast skim: README_DATA_INGESTION.md is a top-level DOCUMENTATION_KNOWLEDGE doc/log artifact used for governance/navigation."
+      ]
+    },
+    {
+      "asset_path": "reports/esec-001/fail-closed-authentication-implementation.json",
+      "asset_type": "OTHER",
+      "asset_role": "CONTROL_AUDIT",
+      "source_state": "COMMITTED_REPOSITORY",
+      "current_state": "CURRENT",
+      "owner_project_id": "ESEC-001",
+      "governed_by_control_task_id": "ESEC-001",
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "authority_class": "ACTIVE_AUDIT",
+      "related_assets": [
+        "control-center/ESEC-001_I1_FAIL_CLOSED_AUTHENTICATION_AND_CREDENTIAL_BOUNDARY_IMPLEMENTATION.v1.md",
+        "tests/esec-001-i1-governance.test.js"
+      ],
+      "next_validation": "Update only after an authorized ESEC proof, RLS packet or production runtime verification.",
+      "notes": "Structured ESEC-001-I1 source-and-test remediation evidence. No credentials recorded.",
+      "purpose_description": "Records finding dispositions, focused proof results, exclusions and remaining ESEC security blockers.",
+      "functional_group": "DOCUMENTATION_KNOWLEDGE",
+      "relationship_tags": [
+        "GOVERNANCE",
+        "SECURITY",
+        "AUDIT"
+      ],
+      "classification_evidence": [
+        "Active I1 proof records fail-closed boundary coverage.",
+        "Historical C1 proof remains preserved.",
+        "RLS-001 and production runtime verification remain open."
       ]
     },
     {
@@ -30913,6 +30990,47 @@
         "Test reads the EPRV-001-C1 contract and verifies provider surfaces and forbidden boundaries.",
         "Test verifies ledger/project register EPRV-001 state remains PARTIAL and gates remain BLOCKED.",
         "Test verifies package control-center test suite includes the focused EPRV proof."
+      ]
+    },
+    {
+      "asset_path": "tests/esec-001-i1-governance.test.js",
+      "asset_type": "TEST",
+      "asset_role": "CONTROL_AUDIT",
+      "source_state": "COMMITTED_REPOSITORY",
+      "current_state": "CURRENT",
+      "owner_project_id": "ESEC-001",
+      "governed_by_control_task_id": "ESEC-001",
+      "related_tables": [],
+      "related_functions": [],
+      "runtime_consumers": [],
+      "runtime_dependencies": [],
+      "database_objects": [],
+      "deployment_surface": [],
+      "goes_somewhere": "YES",
+      "known_conflicts": [],
+      "validation_status": "APPROVED",
+      "authority_class": "ACTIVE_AUDIT",
+      "related_assets": [
+        "control-center/ESEC-001_I1_FAIL_CLOSED_AUTHENTICATION_AND_CREDENTIAL_BOUNDARY_IMPLEMENTATION.v1.md",
+        "reports/esec-001/fail-closed-authentication-implementation.json",
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
+        "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json"
+      ],
+      "next_validation": "Run npm run test:esec-001-i1 after any ESEC governance, report, register or batch change.",
+      "notes": "Read-only governance proof for ESEC-001-I1 source closure and blocked-gate preservation.",
+      "purpose_description": "Verifies the I1 report, contract, canonical ledger, projections, historical C1 boundary and targeted asset registration.",
+      "functional_group": "TEST_PROOF",
+      "relationship_tags": [
+        "TEST_PROOF",
+        "GOVERNANCE",
+        "SECURITY"
+      ],
+      "classification_evidence": [
+        "Validates ESEC-001 remains PARTIAL.",
+        "Validates RLS-001 remains OPEN.",
+        "Validates C1 evidence remains historical and non-mutating.",
+        "Validates Packet 4C deterministic registration."
       ]
     },
     {

@@ -55,7 +55,7 @@ The active implementation proof is:
 
 `npm run test:esec-001-i1`
 
-The suite contains 32 focused source, middleware, browser, scheduler, database, credential and governance tests.
+The suite contains 33 focused source, middleware, browser, scheduler, database, credential and governance tests.
 
 ## F. Historical C1 evidence
 
@@ -115,3 +115,21 @@ The broad failures include existing cleanup-programme count drift and repository
 - `tests/esec-001-i1-governance.test.js`
 
 These three files require a separately authorized asset-governance packet. They do not invalidate the focused ESEC-I1 source-and-test result, but the broad Control Center suite must not be represented as passing.
+
+## L. Packet 4C targeted asset registration
+
+**Decision:** PASS - TARGETED REGISTRATION
+
+The following ESEC-001-I1 governance assets were added to the canonical asset register:
+
+- `control-center/ESEC-001_I1_FAIL_CLOSED_AUTHENTICATION_AND_CREDENTIAL_BOUNDARY_IMPLEMENTATION.v1.md` - B01
+- `reports/esec-001/fail-closed-authentication-implementation.json` - B29
+- `tests/esec-001-i1-governance.test.js` - B24
+
+The canonical top-level asset-register counts were reconciled to current Git discovery.
+
+No unrelated historical asset records, enum defects or repository-wide classification gaps were repaired.
+
+`control:assets` was not executed. The broad Control Center suite was not rerun.
+
+Focused proof result: **33/33 PASS**.

@@ -59,7 +59,7 @@
   ],
   "activeProof": {
     "command": "npm run test:esec-001-i1",
-    "expectedTestCount": 32,
+    "expectedTestCount": 33,
     "expectedResult": "PASS"
   },
   "historicalEvidence": {
@@ -90,8 +90,8 @@
   "verification": {
     "activeI1Proof": {
       "result": "PASS",
-      "tests": 32,
-      "passed": 32,
+      "tests": 33,
+      "passed": 33,
       "failed": 0
     },
     "historicalC1Proof": {
@@ -120,7 +120,27 @@
         "Pre-existing cleanup-programme tracked-count expectation drift",
         "Pre-existing asset-register enum, count and unregistered-path drift",
         "Three Packet 4B governance assets deferred because control:assets and repository-wide asset repair were explicitly excluded"
-      ]
+      ],
+      "packetSpecificDeferredCandidateStatus": "RESOLVED_BY_PACKET_4C_TARGETED_REGISTRATION",
+      "broadSuiteRerunAfterPacket4C": false
     }
+  },
+  "packet4CAssetRegistration": {
+    "result": "PASS_TARGETED_REGISTRATION",
+    "recordedOn": "2026-07-15",
+    "registeredAssets": [
+      "control-center/ESEC-001_I1_FAIL_CLOSED_AUTHENTICATION_AND_CREDENTIAL_BOUNDARY_IMPLEMENTATION.v1.md",
+      "reports/esec-001/fail-closed-authentication-implementation.json",
+      "tests/esec-001-i1-governance.test.js"
+    ],
+    "deterministicBatches": {
+      "control-center/ESEC-001_I1_FAIL_CLOSED_AUTHENTICATION_AND_CREDENTIAL_BOUNDARY_IMPLEMENTATION.v1.md": "B01",
+      "reports/esec-001/fail-closed-authentication-implementation.json": "B29",
+      "tests/esec-001-i1-governance.test.js": "B24"
+    },
+    "repositoryWideAssetRepairPerformed": false,
+    "controlAssetsExecuted": false,
+    "remainingHistoricalAssetDrift": "OPEN_OUTSIDE_PACKET_4C",
+    "focusedVerification": "PASS"
   }
 }

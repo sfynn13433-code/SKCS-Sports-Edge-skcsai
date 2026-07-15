@@ -553,7 +553,7 @@ Required state snapshot:
   ],
   "eac_evidence_reusable": true,
   "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
-  "total_governed_assets": 994,
+  "total_governed_assets": 997,
   "phase_0": {
     "status": "PHASE_CLOSED",
     "question": "What exact repository state is the cleanup programme starting from?",
@@ -562,7 +562,7 @@ Required state snapshot:
       "active_branch": "main",
       "head_commit": "7d21fc276629bb6aec056299d70e1541b462934f",
       "working_tree_status": "dirty_unrelated_changes_preserved",
-      "governed_asset_count": 994,
+      "governed_asset_count": 997,
       "eac_batch_manifest": "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
       "eac_batch_count": 29,
       "already_completed_or_removal_work": "Partial external sports provider removal (PARTIAL); EAC-001 B01-B29 classification inventory complete; prior Control Center per-asset investigations preserved as historical evidence",
@@ -10409,4 +10409,23 @@ Evidence:
 - `scout_edge_marriage_gate`, `unified_lifecycle_governor` and `supabase_storage_gate` remain BLOCKED.
 - ESEC-001-C1 is preserved as read-only historical inspection evidence.
 - No deployment, E2E execution, Supabase function deployment, Scout activation, RLS migration, production credential change or `control:assets` execution occurred.
-- Broad `test:control-center` result: **HOLD** ? 319/331 tests passed; repository-wide cleanup/asset-register drift and three deferred Packet 4B asset registrations remain outside this packet.
+- Broad `test:control-center` historical result: **HOLD** - 319/331 tests passed. Packet 4C subsequently registered the three ESEC-I1 governance assets. Remaining repository-wide cleanup and asset-register drift stays outside ESEC scope. The broad suite was not rerun.
+
+---
+
+## ESEC-001-I1 Packet 4C targeted asset registration - 2026-07-15
+
+**Decision:** PASS - TARGETED REGISTRATION
+
+- Registered the I1 implementation contract in B01.
+- Registered the I1 structured report in B29.
+- Registered the I1 governance test in B24.
+- Active ESEC-I1 focused proof: 33/33 PASS.
+- Historical C1 proof remains read-only.
+- Asset-register counts were reconciled to current Git discovery.
+- No unrelated historical asset records or enum defects were repaired.
+- `control:assets` was not executed.
+- The broad Control Center suite was not rerun.
+- ESEC-001 remains PARTIAL.
+- RLS-001 and runtime/deployment proof remain open.
+- Every runtime and marriage gate remains BLOCKED.

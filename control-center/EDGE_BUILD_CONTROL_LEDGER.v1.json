@@ -563,7 +563,9 @@
         "tests/esec-001-i1-scheduler-caller-boundary.test.js",
         "tests/esec-001-i1-scheduler-route-boundary.test.js",
         "tests/esec-001-i1-db-credential-boundary.test.js",
-        "tests/esec-001-i1-governance.test.js"
+        "tests/esec-001-i1-governance.test.js",
+        "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
+        "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json"
       ],
       "affected_tables": [
         "profiles",
@@ -596,18 +598,19 @@
         "RLS-001 remains open and separately excluded",
         "No deployment, E2E, Scout activation, RLS migration or production credential change occurred",
         "E2E-001 and all runtime gates remain BLOCKED",
-        "Broad test:control-center result is HOLD because of repository-wide cleanup and asset-register drift; focused ESEC-I1 proof remains 32/32 PASS"
+        "Broad test:control-center result is HOLD because of repository-wide cleanup and asset-register drift; focused ESEC-I1 proof remains 32/32 PASS",
+        "Packet 4C registered the ESEC-I1 implementation contract, structured report and governance test in deterministic batches B01, B29 and B24",
+        "Packet 4C focused ESEC-I1 proof passed 33/33 without control:assets or broad Control Center execution"
       ],
       "open_gaps": [
         "RLS-001: design and separately authorize explicit policies or server-only access law for new RLS tables",
         "Production credential configuration, rotation and revocation proof remains unexecuted",
         "Runtime E2E and deployment verification remain blocked",
         "Supabase function deployment remains unexecuted",
-        "Final ESEC and marriage-gate clearance require separate explicit approval",
-        "Register the three new ESEC-I1 governance assets in a separately authorized repository asset-governance packet"
+        "Final ESEC and marriage-gate clearance require separate explicit approval"
       ],
       "next_action": "ESEC-001-I1 source-and-test remediation PASS. AUTH-001, SUB-001, KEY-001, CRON-001, ROUTE-001 and DB-001 are source-closed and tested; CRED-001 source credential separation is closed but production configuration and rotation proof remain unverified. RLS-001 remains OPEN and separately excluded. Keep ESEC-001 PARTIAL and all runtime gates BLOCKED. Next separately authorize RLS-001 or production runtime/deployment verification; do not deploy, execute E2E proof, activate Scout transport, apply RLS migrations or clear any gate without explicit approval.",
-      "owner_note": "I1 source-and-test remediation is complete. This is not production runtime, deployment, RLS or gate-clearance proof.",
+      "owner_note": "I1 source-and-test remediation and Packet 4C targeted asset registration are complete. This is not production runtime, deployment, RLS or gate-clearance proof.",
       "last_updated": "2026-07-15",
       "known_issues": [
         "RLS-001 remains open",

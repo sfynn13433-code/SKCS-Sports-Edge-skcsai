@@ -14,7 +14,7 @@
           "control-center/"
         ]
       },
-      "asset_count": 38,
+      "asset_count": 45,
       "asset_paths": [
         "control-center/check_control_center.js",
         "control-center/check_edge_asset_classification.js",
@@ -37,6 +37,7 @@
         "control-center/EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1.md",
         "control-center/EPRV-001_EXTERNAL_PROVIDER_REMOVAL_IMPLEMENTATION_PLAN.v1.md",
         "control-center/EPRV-001_EXTERNAL_PROVIDER_REMOVAL_INSPECTION_CONTRACT.v1.md",
+        "control-center/ESEC-001_I1_FAIL_CLOSED_AUTHENTICATION_AND_CREDENTIAL_BOUNDARY_IMPLEMENTATION.v1.md",
         "control-center/ESG-001_SPORT_GOVERNOR_AND_CANONICAL_RULE_REGISTRY_PROPOSAL.v1.md",
         "control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md",
         "control-center/FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md",
@@ -1248,7 +1249,7 @@
           "tests/"
         ]
       },
-      "asset_count": 31,
+      "asset_count": 32,
       "asset_paths": [
         "tests/edge-asset-classification.test.js",
         "tests/edge-control-center-ledger.test.js",
@@ -1258,6 +1259,7 @@
         "tests/edge-system-runtime-inventory.test.js",
         "tests/epi-pipeline-integrity-contract.test.js",
         "tests/eprv-provider-removal-contract.test.js",
+        "tests/esec-001-i1-governance.test.js",
         "tests/fip-intake-service.test.js",
         "tests/fip-storage-policy-service.test.js",
         "tests/lifecycle-governor.test.js",
@@ -1488,7 +1490,7 @@
           "js/"
         ]
       },
-      "asset_count": 26,
+      "asset_count": 27,
       "asset_paths": [
         ".gemini/antigravity/README.md",
         ".gemini/antigravity/workflows/automated-data-sync.toml",
@@ -1508,6 +1510,7 @@
         "js/supabase-bundle.js",
         "js/supabase-client-src.js",
         "js/supabase-init.js",
+        "reports/esec-001/fail-closed-authentication-implementation.json",
         "reports/execution-spine-compliance-map.json",
         "reports/execution-spine-compliance-map.md",
         "src/data/placeholder.txt",

@@ -42,7 +42,7 @@ test('I1 implementation report and contract record source closure with RLS open'
 
   assert.equal(
     report.verification.activeI1Proof.passed,
-    32
+    33
   );
 
   assert.equal(
@@ -183,5 +183,94 @@ test('Control Center and package scripts use the active I1 proof', () => {
   assert.equal(
     packageJson.scripts['test:esec-001-i1'],
     'node --test tests/esec-001-i1-auth-boundary.test.js tests/esec-001-i1-browser-auth-boundary.test.js tests/esec-001-i1-legacy-cron-boundary.test.js tests/esec-001-i1-scheduler-caller-boundary.test.js tests/esec-001-i1-scheduler-route-boundary.test.js tests/esec-001-i1-db-credential-boundary.test.js tests/esec-001-i1-governance.test.js'
+  );
+});
+
+test('Packet 4C registers the three I1 governance assets deterministically', () => {
+  const register = readJson(
+    'control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json'
+  );
+
+  const batches = readJson(
+    'control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json'
+  );
+
+  const expected = [
+    {
+      path: 'control-center/ESEC-001_I1_FAIL_CLOSED_AUTHENTICATION_AND_CREDENTIAL_BOUNDARY_IMPLEMENTATION.v1.md',
+      type: 'CONTROL_CENTER',
+      functionalGroup: 'DOCUMENTATION_KNOWLEDGE',
+      batch: 'B01'
+    },
+    {
+      path: 'reports/esec-001/fail-closed-authentication-implementation.json',
+      type: 'OTHER',
+      functionalGroup: 'DOCUMENTATION_KNOWLEDGE',
+      batch: 'B29'
+    },
+    {
+      path: 'tests/esec-001-i1-governance.test.js',
+      type: 'TEST',
+      functionalGroup: 'TEST_PROOF',
+      batch: 'B24'
+    }
+  ];
+
+  for (const item of expected) {
+    const assets = register.assets.filter(
+      (entry) => entry.asset_path === item.path
+    );
+
+    assert.equal(
+      assets.length,
+      1,
+      'expected one asset record for ' + item.path
+    );
+
+    const asset = assets[0];
+
+    assert.equal(asset.asset_type, item.type);
+
+    assert.equal(
+      asset.functional_group,
+      item.functionalGroup
+    );
+
+    assert.equal(
+      asset.owner_project_id,
+      'ESEC-001'
+    );
+
+    assert.equal(
+      asset.governed_by_control_task_id,
+      'ESEC-001'
+    );
+
+    assert.equal(
+      asset.current_state,
+      'CURRENT'
+    );
+
+    const memberships = batches.batches.filter(
+      (batch) =>
+        Array.isArray(batch.asset_paths) &&
+        batch.asset_paths.includes(item.path)
+    );
+
+    assert.equal(
+      memberships.length,
+      1,
+      item.path + ' must have exactly one batch'
+    );
+
+    assert.equal(
+      memberships[0].batch_id,
+      item.batch
+    );
+  }
+
+  assert.equal(
+    register.registered_asset_count,
+    register.assets.length
   );
 });
