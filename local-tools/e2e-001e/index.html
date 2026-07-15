@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKCS Scout × Edge — Controlled Marriage Laboratory</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <p class="eyebrow">SKCS SCOUT × EDGE</p>
+      <h1>Controlled Marriage Laboratory</h1>
+      <div class="banner" role="status">LOCAL CONTROLLED TEST — NOT PRODUCTION</div>
+      <p class="lede">
+        Press the button below to run one fresh governed Scout FIP through the real Edge
+        intake and prediction pipeline. Everything stays on this machine in memory.
+      </p>
+    </header>
+
+    <section class="controls">
+      <button id="run-button" type="button" class="run-button">
+        RUN A NEW MARRIAGE TEST
+      </button>
+      <p id="run-status" class="run-status" aria-live="polite">
+        Waiting for your first controlled marriage run.
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>Marriage Timeline</h2>
+      <ol id="timeline" class="timeline"></ol>
+    </section>
+
+    <section id="result-section" class="panel hidden">
+      <h2>Result Summary</h2>
+      <div class="cards" id="result-cards"></div>
+    </section>
+
+    <section id="failure-section" class="panel failure hidden">
+      <h2>Controlled Failure</h2>
+      <p id="failure-message" class="failure-message"></p>
+      <p class="failure-note">No production database, Supabase store, provider request, or deployment was performed.</p>
+    </section>
+  </div>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>

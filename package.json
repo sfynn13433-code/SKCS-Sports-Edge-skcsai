@@ -87,6 +87,7 @@
     "db:verify:rules": "node scripts/verify-db-rule-alignment.js",
     "verify:rulebook": "node scripts/verify-master-rulebook-alignment.js",
     "install:hooks": "node scripts/install-local-git-hooks.js",
+    "marriage:visual": "node scripts/e2e-001e-local-marriage-server.js",
     "antigravity:start": "node scripts/start-antigravity.js",
     "antigravity:test": "node scripts/test-antigravity.js",
     "antigravity:status": "curl -s http://localhost:10000/api/antigravity/status | jq .",
