@@ -2500,7 +2500,7 @@
       "project_id": "SEM-GOV-001D-UI3-I11",
       "project_name": "Controlled End-to-End Marriage Proof",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Contract reconciliation and mock-only marriage proof orchestration — full live marriage proof HOLD; runtime gates remain BLOCKED.",
+      "description": "Gate A contract reconciliation, Gate B mock-only orchestration proof, and Gate B-C1 HMAC submitted-body hash binding correction complete; full live marriage proof remains HOLD and all runtime gates remain BLOCKED.",
       "why_it_matters": "Marriage proof must not proceed to live execution until contract drift is reconciled and mock boundaries are sealed.",
       "current_status": "TESTED",
       "priority": "critical",
@@ -2523,46 +2523,80 @@
         "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
         "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
         "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
-        "SEM-GOV-001D-UI3-I11_CONTRACT_RECONCILIATION_AND_MOCK_PROOF_AUTHORIZATION_PACKET.v1"
+        "SEM-GOV-001D-UI3-I11_CONTRACT_RECONCILIATION_AND_MOCK_PROOF_AUTHORIZATION_PACKET.v1",
+        "SEM-GOV-001D-UI3-I11_GATE_B_MOCK_ONLY_ORCHESTRATION_PROOF_PACKET.v1",
+        "SEM-GOV-001D-UI3-I11_GATE_B_C1_HMAC_BODY_HASH_BINDING_CORRECTION_PACKET.v1",
+        "SEM-GOV-001D-UI3-I11_GATE_C_FORMAL_CLOSURE_AND_E2E_READINESS_PACKET.v1"
       ],
       "related_files": [
+        "backend/services/fipIntakeM2MAuthenticator.js",
+        "backend/services/governedFipIntakeAdapter.js",
         "reports/ui3-i11/marriage-proof-inspection.json",
+        "reports/ui3-i11/mock-orchestration-evidence.json",
+        "reports/ui3-i11/gate-b-c1-hmac-body-hash-binding-evidence.json",
+        "reports/ui3-i11/gate-c-formal-closure-evidence.json",
         "control-center/SEM-GOV-001D-UI3-I11_CONTRACT_RECONCILIATION_AND_MOCK_PROOF_AUTHORIZATION_PACKET.v1.md",
-        "tests/sem-gov-001d-ui3-i11-inspection.test.js"
+        "control-center/SEM-GOV-001D-UI3-I11_GATE_B_MOCK_ONLY_ORCHESTRATION_PROOF_PACKET.v1.md",
+        "control-center/SEM-GOV-001D-UI3-I11_GATE_B_C1_HMAC_BODY_HASH_BINDING_CORRECTION_PACKET.v1.md",
+        "control-center/SEM-GOV-001D-UI3-I11_GATE_C_FORMAL_CLOSURE_AND_E2E_READINESS_PACKET.v1.md",
+        "tests/helpers/ui3-i11-gate-b-harness.js",
+        "tests/helpers/ui3-i11-gate-b-hmac.js",
+        "tests/helpers/ui3-i11-in-memory-database.js",
+        "tests/sem-gov-001d-ui3-i11-inspection.test.js",
+        "tests/sem-gov-001d-ui3-i11-gate-b-security-preflight.test.js",
+        "tests/sem-gov-001d-ui3-i11-gate-b-mock-orchestration.test.js",
+        "tests/sem-gov-001d-ui3-i11-gate-b-governance.test.js",
+        "tests/sem-gov-001d-ui3-i11-gate-b-c1-body-hash-binding.test.js",
+        "tests/sem-gov-001d-ui3-i11-gate-b-c1-governance.test.js",
+        "tests/sem-gov-001d-ui3-i11-gate-c-closure.test.js",
+        "package.json"
       ],
       "related_tables": [
         "fip_intake_evidence"
       ],
       "known_issues": [
-        "Full marriage proof HOLD",
+        "Full live marriage proof HOLD",
+        "E2E-001 execution remains BLOCKED",
         "scout_edge_marriage_gate BLOCKED",
         "supabase_storage_gate BLOCKED",
         "unified_lifecycle_governor BLOCKED"
       ],
       "required_decisions": [
-        "Gate B mock orchestration authorization",
-        "E2E-001 execution authorization",
-        "D1 and R1 implementation authorization"
+        "E2E-001 execution-readiness blocker disposition",
+        "Controlled Scout FIP sample authorization",
+        "Governed Scout-to-Edge transport authorization",
+        "D1 and R1 implementation authorization",
+        "Runtime route and feature-flag authorization",
+        "Separate runtime governance-gate clearance"
       ],
-      "completion_definition": "SEM-GOV-001D-UI3-I11 Gate A PASS WITH CORRECTION — contract reconciliation sealed, mock-only Gate B authorized, full marriage proof HOLD, all runtime gates BLOCKED.",
+      "completion_definition": "SEM-GOV-001D-UI3-I11 CLOSED AS TESTED — Gate A PASS WITH CORRECTION, Gate B PASS_MOCK_ONLY, Gate B-C1 correction PASS, full live marriage proof HOLD, and all runtime gates BLOCKED.",
       "proof_required": [
-        "test:sem-gov-001d-ui3-i11 passes",
-        "marriage-proof-inspection.json PASS_WITH_CORRECTION",
-        "Full marriage proof HOLD",
-        "Gates BLOCKED"
+        "npm run test:sem-gov-001d-ui3-i11 passes",
+        "npm run test:sem-gov-001d-ui3-i11-gate-b passes",
+        "npm run test:sem-gov-001d-ui3-i11-gate-b-c1 passes",
+        "npm run test:sem-gov-001d-ui3-i11-gate-c passes",
+        "mock-orchestration-evidence.json result PASS and decision PASS_MOCK_ONLY",
+        "gate-b-c1-hmac-body-hash-binding-evidence.json result PASS and decision BODY_HASH_BINDING_CORRECTED",
+        "Full marriage proof decision HOLD",
+        "All runtime gates BLOCKED"
       ],
       "risks_if_ignored": [
         "Live marriage proof could be attempted before contract reconciliation"
       ],
       "recommended_order": 42,
-      "next_action": "SEM-GOV-001D-UI3-I11 Gate A PASS WITH CORRECTION. Gate B mock-only orchestration authorized next.",
-      "owner_note": "Gate A governance only. No runtime changes.",
+      "next_action": "SEM-GOV-001D-UI3-I11 is closed as TESTED with Gate B PASS_MOCK_ONLY and Gate B-C1 PASS. Next perform a separate E2E-001 execution-readiness blocker reconciliation. Do not authorize live proof execution, runtime activation, I12, D1, R1, Scout transport, or governance-gate clearance in this closure.",
+      "owner_note": "I11 mock-only proof is formally closed. No live execution, runtime route, gate clearance, I12, D1, or R1 authorization.",
       "last_updated": "2026-07-15",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I11",
       "current_evidence": [
         "Gate A contract reconciliation PASS WITH CORRECTION",
-        "Mock-only Gate B authorized",
-        "Full marriage proof HOLD",
+        "Gate B security preflight PASS with mismatched submitted body rejected before downstream work",
+        "Gate B mock-only orchestration PASS_MOCK_ONLY",
+        "Gate B-C1 HMAC submitted-body hash binding correction PASS",
+        "Valid HMAC intake remains accepted",
+        "HMAC nonce replay remains rejected",
+        "Zero external connections during the mock proof",
+        "Full live marriage proof HOLD",
         "All runtime gates BLOCKED"
       ]
     }
