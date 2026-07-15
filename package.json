@@ -50,6 +50,7 @@
     "test:sem-gov-001d-ui3-i10": "node --test tests/sem-gov-001d-ui3-i10-migration-readiness.test.js tests/sem-gov-001d-ui3-i10-implementation-packet.test.js tests/sem-gov-001d-ui3-i10-controlled-apply.test.js",
     "test:sem-gov-001d-ui3-i10-apply": "node --test tests/sem-gov-001d-ui3-i10-controlled-apply.test.js",
     "test:sem-gov-001d-ui3-i11": "node --test tests/sem-gov-001d-ui3-i11-inspection.test.js",
+    "test:sem-gov-001d-ui3-i11-gate-b": "node --test tests/sem-gov-001d-ui3-i11-gate-b-security-preflight.test.js && node --test tests/sem-gov-001d-ui3-i11-gate-b-mock-orchestration.test.js && node --test tests/sem-gov-001d-ui3-i11-gate-b-governance.test.js",
     "test:control-center-ui": "node --test tests/edge-control-center-ui.test.js",
     "control:runtime": "node control-center/check_edge_system_runtime_inventory.js",
     "control:verify": "npm run test:control-center && npm run control:center && npm run control:projects && npm run control:assets && npm run control:classification && npm run control:runtime",
