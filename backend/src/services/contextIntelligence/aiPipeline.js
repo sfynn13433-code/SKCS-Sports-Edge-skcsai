@@ -2,14 +2,71 @@
 const { createClient } = require('@supabase/supabase-js');
 const enrichFixtureWithContextCore = require('./aiPipeline_core');
 
+const SCOUT_FIP_ORIGIN = 'SCOUT_FIP';
+
 // Initialize Supabase (Ensure these are set in your Cloud Run environment variables)
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
 
+function isAuthoritativeScoutFipContext(fixture) {
+  const origin =
+    fixture?.metadata?.sports_truth_origin
+    || fixture?.match_info?.sports_truth_origin
+    || null;
+
+  return origin === SCOUT_FIP_ORIGIN;
+}
+
+function hasSuppliedContextualIntelligence(fixture) {
+  const context = fixture?.contextual_intelligence;
+
+  return Boolean(
+    context
+    && typeof context === 'object'
+    && !Array.isArray(context)
+    && Object.keys(context).length > 0
+  );
+}
+
+async function persistFixtureContextCache(fixtureId, contextPayload) {
+  if (!supabase || !fixtureId) {
+    return;
+  }
+
+  try {
+    const { error: upsertError } = await supabase
+      .from('fixture_context_cache')
+      .upsert({
+        fixture_id: fixtureId,
+        context_payload: contextPayload,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'fixture_id' });
+
+    if (upsertError) {
+      console.error(
+        `[SKCS Edge] Supabase Cache Upsert Failed for ${fixtureId}:`,
+        upsertError.message
+      );
+    }
+  } catch (upsertErr) {
+    console.error(
+      `[SKCS Edge] Supabase Cache Upsert Failed for ${fixtureId}:`,
+      upsertErr.message
+    );
+  }
+}
+
 async function getCachedContext(fixture) {
   const fixtureId = fixture?.match_info?.match_id || fixture?.match_id || fixture?.id;
   const CACHE_TTL_MS = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
+
+  if (
+    isAuthoritativeScoutFipContext(fixture)
+    && hasSuppliedContextualIntelligence(fixture)
+  ) {
+    return enrichFixtureWithContextCore(fixture);
+  }
 
   try {
     if (!supabase || !fixtureId) {
@@ -41,17 +98,7 @@ async function getCachedContext(fixture) {
     const enrichedData = await enrichFixtureWithContextCore(fixture);
 
     // 3. Upsert the fresh data back into Supabase for the next user
-    const { error: upsertError } = await supabase
-      .from('fixture_context_cache')
-      .upsert({
-        fixture_id: fixtureId,
-        context_payload: enrichedData.contextSignals,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'fixture_id' });
-
-    if (upsertError) {
-      console.error(`[SKCS Edge] Supabase Cache Upsert Failed for ${fixtureId}:`, upsertError.message);
-    }
+    await persistFixtureContextCache(fixtureId, enrichedData.contextSignals);
 
     return enrichedData;
 
@@ -63,3 +110,9 @@ async function getCachedContext(fixture) {
 }
 
 module.exports = getCachedContext;
+module.exports.__test = {
+  SCOUT_FIP_ORIGIN,
+  isAuthoritativeScoutFipContext,
+  hasSuppliedContextualIntelligence,
+  persistFixtureContextCache
+};

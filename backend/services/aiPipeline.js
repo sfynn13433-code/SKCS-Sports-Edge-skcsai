@@ -1271,6 +1271,7 @@ function buildContextFixture(matchContext, item, sport) {
     const context = matchContext?.contextual_intelligence || {};
     return {
         ...matchContext,
+        metadata: item?.metadata || matchContext?.metadata || null,
         id: info.match_id || item?.match_id || item?.id || null,
         match_id: info.match_id || item?.match_id || item?.id || null,
         sport,
@@ -1446,7 +1447,13 @@ async function buildRawPredictionFromProviderItem(item) {
 
     // Always ingest context for football fixtures before downstream pipeline filtering.
     let ingestedContextData = { injuries: {}, h2h: {}, weather: {}, news: [], sport };
-    const allowEnrichment = controlDecision.actions.allowEnrichment !== false;
+    const isScoutFipMode =
+        String(item?.data_mode || '').trim() === 'scout_fip'
+        || item?.metadata?.sports_truth_origin === 'SCOUT_FIP'
+        || matchInfo?.sports_truth_origin === 'SCOUT_FIP';
+    const allowEnrichment =
+        !isScoutFipMode
+        && controlDecision.actions.allowEnrichment !== false;
     const allowWeather = semanticState.contextPolicy?.allowWeather === true;
     const allowNews = semanticState.contextPolicy?.allowNews === true;
 

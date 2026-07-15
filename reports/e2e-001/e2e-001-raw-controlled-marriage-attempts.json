@@ -1,0 +1,562 @@
+{
+  "schema_version": "1.0.0",
+  "project_id": "E2E-001",
+  "evidence_scope": "RAW_CONTROLLED_SCOUT_EDGE_MARRIAGE",
+  "source_head": "5cf302f00d6c9baf3950d2321fef678086bc8d5d",
+  "governance_state": "HOLD",
+  "production_authorized": false,
+  "marriage_gate_cleared": false,
+  "captured_at": "2026-07-15T17:52:13.841Z",
+  "controlling_principle": "Run the real integration under controlled boundaries, preserve each genuine failure, and repair only proven blockers.",
+  "attempts": [
+    {
+      "attempt_id": "E2E-001A",
+      "attempt_name": "Raw controlled marriage attempt",
+      "result": "EXPECTED_CONTROLLED_FAILURE",
+      "source": {
+        "branch": "main",
+        "head": "5cf302f00d6c9baf3950d2321fef678086bc8d5d"
+      },
+      "fip": {
+        "fip_id": "E2E-001A-RAW-20260715172756",
+        "validation_hash": "de191f01d1ea1e5d99c8ab0de66eb57f32010849176c823d9f08eef49930054f",
+        "intake_id": "efi-d6f0ad207b0c58449c9397c4",
+        "idempotency_key": "b03ef7b76983c848a6ea794ef3d2216e41f6dcafbeff0ed101bf2b41ad014cd5"
+      },
+      "stages": [
+        {
+          "stage": 1,
+          "name": "FIP intake and envelope mapping",
+          "result": "PASS",
+          "intake_accepted": true,
+          "source": "scout_fip",
+          "provider_fallback_calls": 0
+        },
+        {
+          "stage": 2,
+          "name": "Invalid FIP proof",
+          "result": "PASS",
+          "rejection_code": "FIP_HASH_MISMATCH"
+        },
+        {
+          "stage": 3,
+          "name": "Replay idempotency observation",
+          "result": "PASS",
+          "replay_item_count": 2,
+          "identical_idempotency_keys": true
+        },
+        {
+          "stage": 4,
+          "name": "Raw Edge prediction execution",
+          "result": "EXPECTED_CONTROLLED_FAILURE",
+          "first_failure_code": "E2E001A_DATABASE_OPERATION_REACHED",
+          "first_failure_message": "The raw marriage reached the predictions_raw persistence boundary.",
+          "first_failure_sql": "insert into predictions_raw (match_id, sport, market, prediction, confidence, volatility, odds, metadata) values ($1, $2, $3, $4, $5, $6, $7, $8::jsonb) returning *;"
+        }
+      ],
+      "observed_runtime_progress": [
+        "Canonical Scout FIP accepted",
+        "FIP mapped to EdgeAnalysisEnvelope",
+        "Configured Scout FIP path bypassed provider input",
+        "Real AI prediction pipeline entered",
+        "Context acquisition boundaries reached but blocked",
+        "Direct insight persistence boundary reached but blocked",
+        "Transaction boundary entered",
+        "predictions_raw insert reached"
+      ],
+      "control_assertions": {
+        "real_fip_intake_used": true,
+        "real_edge_envelope_mapping_used": true,
+        "real_ai_pipeline_entrypoint_used": true,
+        "production_database_write": false,
+        "external_provider_request": false,
+        "supabase_write": false,
+        "public_route_used": false,
+        "deployment_performed": false,
+        "repository_changed_by_attempt": false
+      },
+      "conclusion": "Scout-to-Edge intake and prediction processing are connected. The first hard blocker was prediction persistence."
+    },
+    {
+      "attempt_id": "E2E-001B",
+      "attempt_name": "Controlled prediction persistence continuation",
+      "result": "EXPECTED_CONTROLLED_FAILURE",
+      "executed_at": "2026-07-15T17:52:20.442Z",
+      "source": {
+        "branch": "main",
+        "head": "5cf302f00d6c9baf3950d2321fef678086bc8d5d"
+      },
+      "fip": {
+        "fip_id": "E2E-001B-PERSIST-20260715175216",
+        "validation_hash": "c9f4d97e5fa414a6dfa9b17e1a308c4e420a8fd8ce147318576b9b1d0fd3ca05",
+        "received_at": "2026-07-15T17:52:16.337Z"
+      },
+      "persistence": {
+        "transaction_entered": true,
+        "transaction_completed": false,
+        "mode": "IN_MEMORY_ROLLBACK_ONLY",
+        "predictions_raw_insert_count": 1,
+        "inserted_row": {
+          "id": 900000001,
+          "match_id": "E2E-001B-PERSIST-20260715175216",
+          "sport": "Football",
+          "market": "home_win",
+          "prediction": "home_win",
+          "confidence": 55,
+          "volatility": "high",
+          "persistence_mode": "IN_MEMORY_ROLLBACK_ONLY"
+        }
+      },
+      "next_runtime_result": {
+        "outcome": "EXPECTED_CONTROLLED_FAILURE",
+        "first_failure_code": "E2E001B_NEXT_TRANSACTION_DATABASE_OPERATION_REACHED",
+        "failure_category": "RUNTIME_FAILURE",
+        "first_failure_message": "The marriage reached the next transaction database operation.",
+        "details": {
+          "sql": "select * from predictions_raw where id = $1 limit 1;",
+          "parameter_count": 1
+        }
+      },
+      "safety_events": [
+        {
+          "code": "E2E001B_BACKGROUND_DATABASE_OPERATION_BLOCKED",
+          "message": "A non-transaction database operation was blocked.",
+          "sql": "SELECT * FROM public.system_health_state ORDER BY recorded_at DESC LIMIT 1",
+          "parameter_count": 0
+        },
+        {
+          "code": "E2E001B_TRANSACTION_BOUNDARY_REACHED",
+          "message": "The real Edge prediction transaction boundary was entered."
+        },
+        {
+          "code": "E2E001B_EXTERNAL_SAFE_FETCH_BLOCKED",
+          "message": "External safeFetch acquisition was blocked."
+        },
+        {
+          "code": "E2E001B_EXTERNAL_SAFE_FETCH_BLOCKED",
+          "message": "External safeFetch acquisition was blocked."
+        },
+        {
+          "code": "E2E001B_DIRECT_INSIGHT_PERSISTENCE_BLOCKED",
+          "message": "Direct-insight persistence was blocked."
+        },
+        {
+          "code": "E2E001B_BACKGROUND_DATABASE_OPERATION_BLOCKED",
+          "message": "A non-transaction database operation was blocked.",
+          "sql": "SELECT state, last_transition, recorded_at FROM public.system_health_state ORDER BY recorded_at DESC LIMIT 1",
+          "parameter_count": 0
+        },
+        {
+          "code": "E2E001B_BACKGROUND_DATABASE_OPERATION_BLOCKED",
+          "message": "A non-transaction database operation was blocked.",
+          "sql": "SELECT state, recorded_at FROM public.system_health_state ORDER BY recorded_at DESC LIMIT 1",
+          "parameter_count": 0
+        },
+        {
+          "code": "E2E001B_RAW_INSERT_EMULATED",
+          "message": "predictions_raw insert completed in memory only.",
+          "row_id": 900000001,
+          "match_id": "E2E-001B-PERSIST-20260715175216",
+          "market": "home_win"
+        },
+        {
+          "code": "E2E001B_BACKGROUND_DATABASE_OPERATION_BLOCKED",
+          "message": "A non-transaction database operation was blocked.",
+          "sql": "INSERT INTO public.system_health_state ( recorded_at, state, state_score, transition_reason, pipeline_state, enrichment_state, quota_state, api_state, db_state, reasons, active_violations, active_degradations, last_transition, allow_publish, allow_write, use_fallback, signals, snapshot, updated_at ) VALUES ( NOW(), $1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10::jsonb, $11::jsonb, $12::timestamptz, $13, $14, $15, $16::jsonb, $17::jsonb, $18::timestamptz ) RETURNING *",
+          "parameter_count": 18
+        },
+        {
+          "code": "E2E001B_NEXT_TRANSACTION_DATABASE_OPERATION_REACHED",
+          "message": "The marriage reached the next transaction database operation.",
+          "sql": "select * from predictions_raw where id = $1 limit 1;",
+          "parameter_count": 1
+        }
+      ],
+      "control_assertions": {
+        "real_fip_intake_used": true,
+        "real_edge_envelope_mapping_used": true,
+        "real_ai_pipeline_entrypoint_used": true,
+        "predictions_raw_insert_emulated": true,
+        "production_database_write": false,
+        "external_provider_request": false,
+        "supabase_write": false,
+        "public_route_used": false,
+        "deployment_performed": false,
+        "supabase_read_absence_proven": false
+      },
+      "conclusion": "The marriage progressed through controlled predictions_raw persistence and exposed the next genuine runtime blocker.",
+      "control_notes": [
+        "E2E-001B did not explicitly stub the Supabase client.",
+        "Absence of Supabase reads was not independently proven in E2E-001B.",
+        "No Supabase write was authorized or observed in E2E-001B.",
+        "E2E-001C replaces Supabase with an explicit in-memory stub."
+      ]
+    },
+    {
+      "attempt_id": "E2E-001C",
+      "attempt_name": "Controlled raw read-back and filtering continuation",
+      "result": "PIPELINE_RETURNED",
+      "executed_at": "2026-07-15T18:02:09.122Z",
+      "source": {
+        "branch": "main",
+        "head": "5cf302f00d6c9baf3950d2321fef678086bc8d5d"
+      },
+      "fip": {
+        "fip_id": "E2E-001C-FILTER-20260715180209",
+        "validation_hash": "a4c5b90d1639721b02a0701ac888bd2ce78241303d812d48b3b9d4db5a30769a",
+        "received_at": "2026-07-15T18:02:09.079Z"
+      },
+      "controlled_runtime": {
+        "transaction_entered": true,
+        "transaction_completed": true,
+        "tier_rules_source": "IN_MEMORY_STUB",
+        "tier_rules_read_count": 2,
+        "predictions_raw_count": 1,
+        "predictions_filtered_count": 2,
+        "filtered_rows": [
+          {
+            "id": 910000101,
+            "raw_id": 900000101,
+            "tier": "normal",
+            "is_valid": true,
+            "reject_reason": null,
+            "is_watchlist": false,
+            "created_at": "2026-07-15T18:02:09.121Z",
+            "persistence_mode": "IN_MEMORY_ROLLBACK_ONLY"
+          },
+          {
+            "id": 910000102,
+            "raw_id": 900000101,
+            "tier": "deep",
+            "is_valid": true,
+            "reject_reason": null,
+            "is_watchlist": false,
+            "created_at": "2026-07-15T18:02:09.121Z",
+            "persistence_mode": "IN_MEMORY_ROLLBACK_ONLY"
+          }
+        ]
+      },
+      "runtime_result": {
+        "outcome": "PIPELINE_RETURNED",
+        "mode": "scout_fip",
+        "inserted_count": 1,
+        "filtered_count": 2,
+        "filtered_valid": 2,
+        "filtered_invalid": 0
+      },
+      "safety_events": [
+        {
+          "code": "E2E001C_SUPABASE_CLIENT_STUBBED",
+          "message": "Supabase client creation was replaced by an in-memory stub."
+        },
+        {
+          "code": "E2E001C_SUPABASE_CLIENT_STUBBED",
+          "message": "Supabase client creation was replaced by an in-memory stub."
+        },
+        {
+          "code": "E2E001C_BACKGROUND_DATABASE_OPERATION_BLOCKED",
+          "message": "A non-transaction database operation was blocked.",
+          "sql": "SELECT * FROM public.system_health_state ORDER BY recorded_at DESC LIMIT 1",
+          "parameter_count": 0
+        },
+        {
+          "code": "E2E001C_SUPABASE_CLIENT_STUBBED",
+          "message": "Supabase client creation was replaced by an in-memory stub."
+        },
+        {
+          "code": "E2E001C_TRANSACTION_BOUNDARY_REACHED",
+          "message": "The real Edge prediction transaction was entered."
+        },
+        {
+          "code": "E2E001C_EXTERNAL_CONTEXT_FETCH_BLOCKED",
+          "message": "External context acquisition was blocked."
+        },
+        {
+          "code": "E2E001C_EXTERNAL_CONTEXT_FETCH_BLOCKED",
+          "message": "External context acquisition was blocked."
+        },
+        {
+          "code": "E2E001C_NETWORK_OPERATION_BLOCKED",
+          "message": "An uncontrolled network request was blocked.",
+          "label": "https.request",
+          "target": "[object Object]"
+        },
+        {
+          "code": "E2E001C_UNEXPECTED_SUPABASE_READ",
+          "message": "An unexpected Supabase read was attempted.",
+          "table": "fixture_context_cache"
+        },
+        {
+          "code": "E2E001C_DIRECT_INSIGHT_PERSISTENCE_BLOCKED",
+          "message": "Direct-insight persistence was blocked."
+        },
+        {
+          "code": "E2E001C_BACKGROUND_DATABASE_OPERATION_BLOCKED",
+          "message": "A non-transaction database operation was blocked.",
+          "sql": "SELECT state, last_transition, recorded_at FROM public.system_health_state ORDER BY recorded_at DESC LIMIT 1",
+          "parameter_count": 0
+        },
+        {
+          "code": "E2E001C_BACKGROUND_DATABASE_OPERATION_BLOCKED",
+          "message": "A non-transaction database operation was blocked.",
+          "sql": "SELECT state, recorded_at FROM public.system_health_state ORDER BY recorded_at DESC LIMIT 1",
+          "parameter_count": 0
+        },
+        {
+          "code": "E2E001C_RAW_INSERT_EMULATED",
+          "message": "predictions_raw insert completed in memory.",
+          "row_id": 900000101,
+          "match_id": "E2E-001C-FILTER-20260715180209",
+          "market": "home_win"
+        },
+        {
+          "code": "E2E001C_BACKGROUND_DATABASE_OPERATION_BLOCKED",
+          "message": "A non-transaction database operation was blocked.",
+          "sql": "INSERT INTO public.system_health_state ( recorded_at, state, state_score, transition_reason, pipeline_state, enrichment_state, quota_state, api_state, db_state, reasons, active_violations, active_degradations, last_transition, allow_publish, allow_write, use_fallback, signals, snapshot, updated_at ) VALUES ( NOW(), $1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10::jsonb, $11::jsonb, $12::timestamptz, $13, $14, $15, $16::jsonb, $17::jsonb, $18::timestamptz ) RETURNING *",
+          "parameter_count": 18
+        },
+        {
+          "code": "E2E001C_TIER_RULES_READ_EMULATED",
+          "message": "tier_rules were supplied from the in-memory harness.",
+          "row_count": 2
+        },
+        {
+          "code": "E2E001C_RAW_READ_EMULATED",
+          "message": "predictions_raw read-back completed in memory.",
+          "row_id": 900000101,
+          "found": true
+        },
+        {
+          "code": "E2E001C_FILTERED_UPSERT_EMULATED",
+          "message": "predictions_filtered upsert completed in memory.",
+          "raw_id": 900000101,
+          "tier": "normal",
+          "is_valid": true
+        },
+        {
+          "code": "E2E001C_TIER_RULES_READ_EMULATED",
+          "message": "tier_rules were supplied from the in-memory harness.",
+          "row_count": 2
+        },
+        {
+          "code": "E2E001C_RAW_READ_EMULATED",
+          "message": "predictions_raw read-back completed in memory.",
+          "row_id": 900000101,
+          "found": true
+        },
+        {
+          "code": "E2E001C_FILTERED_UPSERT_EMULATED",
+          "message": "predictions_filtered upsert completed in memory.",
+          "raw_id": 900000101,
+          "tier": "deep",
+          "is_valid": true
+        },
+        {
+          "code": "E2E001C_TRANSACTION_COMPLETED_IN_MEMORY",
+          "message": "The controlled in-memory transaction completed."
+        }
+      ],
+      "control_assertions": {
+        "real_fip_intake_used": true,
+        "real_edge_envelope_mapping_used": true,
+        "real_ai_pipeline_entrypoint_used": true,
+        "predictions_raw_insert_emulated": true,
+        "predictions_raw_read_emulated": true,
+        "predictions_filtered_upserts_emulated": true,
+        "tier_rules_supplied_in_memory": true,
+        "supabase_client_stubbed": true,
+        "uncontrolled_network_request": false,
+        "production_database_write": false,
+        "supabase_write": false,
+        "external_sports_provider_request": false,
+        "public_route_used": false,
+        "deployment_performed": false
+      },
+      "conclusion": "Functional pipeline success with unresolved asynchronous process failure.",
+      "process_exit_code": 1,
+      "post_return_async_failure": "fixture_context_cache"
+    },
+    {
+      "attempt_id": "E2E-001D",
+      "attempt_name": "Async context-cache containment repair verification",
+      "result": "PIPELINE_RETURNED",
+      "executed_at": "2026-07-15T18:09:43.266Z",
+      "source": {
+        "branch": "main",
+        "head": "5cf302f00d6c9baf3950d2321fef678086bc8d5d"
+      },
+      "fip": {
+        "fip_id": "E2E-001D-ASYNC-20260715180943",
+        "validation_hash": "fe09ca56fb3becffc6b6b1f91a3b5b0a25064b328777fd9173feb79ca71726d0",
+        "received_at": "2026-07-15T18:09:43.124Z"
+      },
+      "controlled_runtime": {
+        "transaction_entered": true,
+        "transaction_completed": true,
+        "provider_fallback_calls": 0,
+        "tier_rules_source": "IN_MEMORY_STUB",
+        "tier_rules_read_count": 2,
+        "predictions_raw_count": 1,
+        "predictions_filtered_count": 2,
+        "filtered_rows": [
+          {
+            "id": 910000301,
+            "raw_id": 900000301,
+            "tier": "normal",
+            "is_valid": true,
+            "reject_reason": null,
+            "is_watchlist": false,
+            "created_at": "2026-07-15T18:09:43.201Z",
+            "persistence_mode": "IN_MEMORY_ROLLBACK_ONLY"
+          },
+          {
+            "id": 910000302,
+            "raw_id": 900000301,
+            "tier": "deep",
+            "is_valid": true,
+            "reject_reason": null,
+            "is_watchlist": false,
+            "created_at": "2026-07-15T18:09:43.202Z",
+            "persistence_mode": "IN_MEMORY_ROLLBACK_ONLY"
+          }
+        ],
+        "post_return_fixture_cache_operations": 0,
+        "unhandled_rejections": 0,
+        "uncaught_exceptions": 0,
+        "process_exit_code": 0
+      },
+      "runtime_result": {
+        "outcome": "PIPELINE_RETURNED",
+        "mode": "scout_fip",
+        "inserted_count": 1,
+        "filtered_count": 2,
+        "filtered_valid": 2,
+        "filtered_invalid": 0
+      },
+      "safety_events": [
+        {
+          "code": "E2E001D_SUPABASE_CLIENT_STUBBED",
+          "message": "Supabase client creation was replaced by an in-memory stub."
+        },
+        {
+          "code": "E2E001D_SUPABASE_CLIENT_STUBBED",
+          "message": "Supabase client creation was replaced by an in-memory stub."
+        },
+        {
+          "code": "E2E001D_BACKGROUND_DATABASE_OPERATION_BLOCKED",
+          "message": "A non-transaction database operation was blocked.",
+          "sql": "SELECT * FROM public.system_health_state ORDER BY recorded_at DESC LIMIT 1",
+          "parameter_count": 0
+        },
+        {
+          "code": "E2E001D_SUPABASE_CLIENT_STUBBED",
+          "message": "Supabase client creation was replaced by an in-memory stub."
+        },
+        {
+          "code": "E2E001D_TRANSACTION_BOUNDARY_REACHED",
+          "message": "The real Edge prediction transaction was entered."
+        },
+        {
+          "code": "E2E001D_NETWORK_OPERATION_BLOCKED",
+          "message": "An uncontrolled network request was blocked.",
+          "label": "https.request",
+          "target": "[object Object]"
+        },
+        {
+          "code": "E2E001D_DIRECT_INSIGHT_PERSISTENCE_BLOCKED",
+          "message": "Direct-insight persistence was blocked."
+        },
+        {
+          "code": "E2E001D_BACKGROUND_DATABASE_OPERATION_BLOCKED",
+          "message": "A non-transaction database operation was blocked.",
+          "sql": "SELECT state, last_transition, recorded_at FROM public.system_health_state ORDER BY recorded_at DESC LIMIT 1",
+          "parameter_count": 0
+        },
+        {
+          "code": "E2E001D_BACKGROUND_DATABASE_OPERATION_BLOCKED",
+          "message": "A non-transaction database operation was blocked.",
+          "sql": "SELECT state, recorded_at FROM public.system_health_state ORDER BY recorded_at DESC LIMIT 1",
+          "parameter_count": 0
+        },
+        {
+          "code": "E2E001D_RAW_INSERT_EMULATED",
+          "message": "predictions_raw insert completed in memory.",
+          "row_id": 900000301,
+          "match_id": "E2E-001D-ASYNC-20260715180943",
+          "market": "home_win"
+        },
+        {
+          "code": "E2E001D_BACKGROUND_DATABASE_OPERATION_BLOCKED",
+          "message": "A non-transaction database operation was blocked.",
+          "sql": "INSERT INTO public.system_health_state ( recorded_at, state, state_score, transition_reason, pipeline_state, enrichment_state, quota_state, api_state, db_state, reasons, active_violations, active_degradations, last_transition, allow_publish, allow_write, use_fallback, signals, snapshot, updated_at ) VALUES ( NOW(), $1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10::jsonb, $11::jsonb, $12::timestamptz, $13, $14, $15, $16::jsonb, $17::jsonb, $18::timestamptz ) RETURNING *",
+          "parameter_count": 18
+        },
+        {
+          "code": "E2E001D_TIER_RULES_READ_EMULATED",
+          "message": "tier_rules were supplied from the in-memory harness.",
+          "row_count": 2
+        },
+        {
+          "code": "E2E001D_RAW_READ_EMULATED",
+          "message": "predictions_raw read-back completed in memory.",
+          "row_id": 900000301,
+          "found": true
+        },
+        {
+          "code": "E2E001D_FILTERED_UPSERT_EMULATED",
+          "message": "predictions_filtered upsert completed in memory.",
+          "raw_id": 900000301,
+          "tier": "normal",
+          "is_valid": true
+        },
+        {
+          "code": "E2E001D_TIER_RULES_READ_EMULATED",
+          "message": "tier_rules were supplied from the in-memory harness.",
+          "row_count": 2
+        },
+        {
+          "code": "E2E001D_RAW_READ_EMULATED",
+          "message": "predictions_raw read-back completed in memory.",
+          "row_id": 900000301,
+          "found": true
+        },
+        {
+          "code": "E2E001D_FILTERED_UPSERT_EMULATED",
+          "message": "predictions_filtered upsert completed in memory.",
+          "raw_id": 900000301,
+          "tier": "deep",
+          "is_valid": true
+        },
+        {
+          "code": "E2E001D_TRANSACTION_COMPLETED_IN_MEMORY",
+          "message": "The controlled in-memory transaction completed."
+        }
+      ],
+      "control_assertions": {
+        "real_fip_intake_used": true,
+        "real_edge_envelope_mapping_used": true,
+        "real_ai_pipeline_entrypoint_used": true,
+        "predictions_raw_insert_emulated": true,
+        "predictions_raw_read_emulated": true,
+        "predictions_filtered_upserts_emulated": true,
+        "tier_rules_supplied_in_memory": true,
+        "supabase_client_stubbed": true,
+        "fixture_context_cache_bypassed_for_scout_fip": true,
+        "post_return_fixture_cache_operations": true,
+        "unhandled_rejections": true,
+        "uncaught_exceptions": true,
+        "process_exit_code_zero": true,
+        "uncontrolled_network_request": false,
+        "production_database_write": false,
+        "supabase_write": false,
+        "external_sports_provider_request": false,
+        "public_route_used": false,
+        "deployment_performed": false
+      },
+      "conclusion": "The repaired marriage completes intake, prediction persistence, filtering and returns with a clean process exit."
+    }
+  ],
+  "latest_attempt": "E2E-001D",
+  "latest_result": "PIPELINE_RETURNED",
+  "updated_at": "2026-07-15T18:09:43.267Z"
+}
