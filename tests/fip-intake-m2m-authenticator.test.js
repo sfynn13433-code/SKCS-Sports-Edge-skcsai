@@ -8,6 +8,7 @@ const {
   DOMAIN_CODES,
   buildSigningPayload,
   computeSignature,
+  computeSubmittedBodyHash,
   createHmacM2MAuthenticator
 } = require(
   '../backend/services/fipIntakeM2MAuthenticator'
@@ -75,6 +76,7 @@ function signedContext(overrides = {}) {
   return {
     caller: values.callerIdentityRef,
     governedMode: values.governedMode,
+    submittedBodyHash: values.bodyHash,
     context: {
       auth: {
         timestamp: values.timestamp,
@@ -111,6 +113,113 @@ test(
     assert.equal(
       result.authentication,
       'HMAC_SHA256'
+    );
+  }
+);
+
+test(
+  'computes the submitted-body hash deterministically',
+  () => {
+    const first = {
+      fixture: {
+        away: 'Away FC',
+        home: 'Home FC'
+      },
+      fip_id: 'fip-001'
+    };
+
+    const sameDifferentKeyOrder = {
+      fip_id: 'fip-001',
+      fixture: {
+        home: 'Home FC',
+        away: 'Away FC'
+      }
+    };
+
+    assert.equal(
+      computeSubmittedBodyHash(first),
+      computeSubmittedBodyHash(
+        sameDifferentKeyOrder
+      )
+    );
+  }
+);
+
+test(
+  'rejects a signed body-hash mismatch before nonce inspection or reservation',
+  async () => {
+    let secretCalls = 0;
+    let nonceLookupCalls = 0;
+    let nonceReservationCalls = 0;
+
+    const auth =
+      createHmacM2MAuthenticator({
+        secretResolver: {
+          async getSecretForCaller() {
+            secretCalls += 1;
+            return 'test-secret';
+          }
+        },
+
+        nonceStore: {
+          async hasNonce() {
+            nonceLookupCalls += 1;
+            return false;
+          },
+
+          async reserveNonce() {
+            nonceReservationCalls += 1;
+          }
+        },
+
+        clock: {
+          now: () =>
+            '2026-07-14T12:00:00.000Z'
+        }
+      });
+
+    const input = signedContext();
+
+    input.submittedBodyHash =
+      input.submittedBodyHash ===
+      'f'.repeat(64)
+        ? 'e'.repeat(64)
+        : 'f'.repeat(64);
+
+    const result =
+      await auth.authorizeCaller(input);
+
+    assert.equal(result.authorized, false);
+
+    assert.equal(
+      result.code,
+      DOMAIN_CODES
+        .FIP_AUTH_BODY_HASH_MISMATCH
+    );
+
+    assert.equal(secretCalls, 0);
+    assert.equal(nonceLookupCalls, 0);
+    assert.equal(nonceReservationCalls, 0);
+  }
+);
+
+test(
+  'rejects a missing actual submitted-body hash',
+  async () => {
+    const auth =
+      createHmacM2MAuthenticator(makeDeps());
+
+    const input = signedContext();
+    delete input.submittedBodyHash;
+
+    const result =
+      await auth.authorizeCaller(input);
+
+    assert.equal(result.authorized, false);
+
+    assert.equal(
+      result.code,
+      DOMAIN_CODES.FIP_AUTH_CONTEXT_INVALID
     );
   }
 );

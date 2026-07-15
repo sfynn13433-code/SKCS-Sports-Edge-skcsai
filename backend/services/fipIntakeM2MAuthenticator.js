@@ -2,13 +2,19 @@
 
 const crypto = require('node:crypto');
 
+const {
+  stableStringify
+} = require('./fipIntakeService');
+
 const DOMAIN_CODES = Object.freeze({
   FIP_INTAKE_UNAUTHORIZED: 'FIP_INTAKE_UNAUTHORIZED',
   FIP_AUTH_CONTEXT_INVALID: 'FIP_AUTH_CONTEXT_INVALID',
   FIP_AUTH_TIMESTAMP_INVALID: 'FIP_AUTH_TIMESTAMP_INVALID',
   FIP_AUTH_REPLAY_DETECTED: 'FIP_AUTH_REPLAY_DETECTED',
   FIP_AUTH_SIGNATURE_INVALID: 'FIP_AUTH_SIGNATURE_INVALID',
-  FIP_AUTH_CALLER_UNKNOWN: 'FIP_AUTH_CALLER_UNKNOWN'
+  FIP_AUTH_CALLER_UNKNOWN: 'FIP_AUTH_CALLER_UNKNOWN',
+  FIP_AUTH_BODY_HASH_MISMATCH:
+    'FIP_AUTH_BODY_HASH_MISMATCH'
 });
 
 const DEFAULT_MAX_CLOCK_SKEW_MS = 5 * 60 * 1000;
@@ -56,6 +62,21 @@ function constantTimeEqual(left, right) {
   return crypto.timingSafeEqual(a, b);
 }
 
+function computeSubmittedBodyHash(submittedBody) {
+  const serialized = stableStringify(submittedBody);
+
+  if (typeof serialized !== 'string') {
+    throw new TypeError(
+      'Submitted FIP body cannot be deterministically serialized.'
+    );
+  }
+
+  return crypto
+    .createHash('sha256')
+    .update(serialized, 'utf8')
+    .digest('hex');
+}
+
 function buildSigningPayload({
   callerIdentityRef,
   governedMode,
@@ -92,6 +113,7 @@ function createHmacM2MAuthenticator(deps = {}) {
   async function authorizeCaller({
     caller,
     governedMode,
+    submittedBodyHash,
     context = {}
   }) {
     const callerIdentityRef = String(caller || '').trim();
@@ -114,6 +136,11 @@ function createHmacM2MAuthenticator(deps = {}) {
     const nonce = String(auth.nonce || '').trim();
     const bodyHash = String(auth.bodyHash || '').trim().toLowerCase();
     const signature = String(auth.signature || '').trim().toLowerCase();
+    const actualSubmittedBodyHash = String(
+      submittedBodyHash || ''
+    )
+      .trim()
+      .toLowerCase();
 
     if (
       !timestampText ||
@@ -124,6 +151,25 @@ function createHmacM2MAuthenticator(deps = {}) {
       return reject(
         DOMAIN_CODES.FIP_AUTH_CONTEXT_INVALID,
         'Authentication metadata is malformed.'
+      );
+    }
+
+    if (!HEX_SHA256_RE.test(actualSubmittedBodyHash)) {
+      return reject(
+        DOMAIN_CODES.FIP_AUTH_CONTEXT_INVALID,
+        'Actual submitted-body hash is required.'
+      );
+    }
+
+    if (
+      !constantTimeEqual(
+        bodyHash,
+        actualSubmittedBodyHash
+      )
+    ) {
+      return reject(
+        DOMAIN_CODES.FIP_AUTH_BODY_HASH_MISMATCH,
+        'Authentication body hash does not match the actual submitted FIP payload.'
       );
     }
 
@@ -212,6 +258,7 @@ module.exports = {
   DEFAULT_MAX_CLOCK_SKEW_MS,
   buildSigningPayload,
   computeSignature,
+  computeSubmittedBodyHash,
   constantTimeEqual,
   createHmacM2MAuthenticator
 };

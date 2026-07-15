@@ -1,0 +1,77 @@
+{
+  "task": "SEM-GOV-001D-UI3-I11",
+  "miniProject": "SEM-GOV-001D-UI3-I11-GATE-B-C1",
+  "operation": "HMAC_SUBMITTED_BODY_HASH_BINDING_CORRECTION",
+  "startHead": "8db9f7d37836457aa04d17c06225c7e088b49085",
+  "generatedAt": "2026-07-15T10:00:00.000Z",
+  "generatedBy": "tests/sem-gov-001d-ui3-i11-gate-b-c1-body-hash-binding.test.js",
+  "result": "PASS",
+  "decision": "BODY_HASH_BINDING_CORRECTED",
+  "codeRequired": true,
+  "fullMarriageProofDecision": "HOLD",
+  "bodyHashDefinition": "SHA256_HEX(stableStringify(actual_submitted_fip_object))",
+  "securityCorrection": {
+    "bodyHashBoundToSubmittedPayload": true,
+    "comparison": "CRYPTO_TIMING_SAFE_EQUAL",
+    "fipBValidationAccepted": true,
+    "signedFipABodyHash": "4634ee308e5aa0ddc4abf0ffcd36450af1bdf7951d52bcdd6a5e6426bbcc0412",
+    "actualSubmittedFipBBodyHash": "aed5c7dbc589f54808db92cec6358d8a62c93e7492202062febdee47d1584a4d",
+    "hashesDiffer": true,
+    "submittedFipBRejected": true,
+    "rejectionCode": "FIP_AUTH_BODY_HASH_MISMATCH",
+    "nonceReservations": 0,
+    "downstreamCalls": {
+      "identity": 0,
+      "lifecycle": 0,
+      "d3": 0,
+      "evidence": 0
+    },
+    "metadataWrites": 0,
+    "evidenceWrites": 0
+  },
+  "regressionProof": {
+    "callerIdentityRef": "scout-ui3-i11-gate-b-test",
+    "validBodyHash": "4634ee308e5aa0ddc4abf0ffcd36450af1bdf7951d52bcdd6a5e6426bbcc0412",
+    "validSubmissionAccepted": true,
+    "validSubmissionResult": "ACCEPTED",
+    "nonceReservationsAfterValid": 1,
+    "replayRejected": true,
+    "replayRejectionCode": "FIP_AUTH_REPLAY_DETECTED",
+    "metadataWritesAfterValid": 1,
+    "evidenceWritesAfterValid": 1,
+    "additionalMetadataWritesAfterReplay": 0,
+    "additionalEvidenceWritesAfterReplay": 0
+  },
+  "currentRuntimeGates": {
+    "scout_edge_marriage_gate": "BLOCKED",
+    "unified_lifecycle_governor": "BLOCKED",
+    "supabase_storage_gate": "BLOCKED"
+  },
+  "boundaries": {
+    "mockOnly": true,
+    "supabaseConnection": false,
+    "externalDatabaseConnection": false,
+    "scoutConnection": false,
+    "neonConnection": false,
+    "httpRoute": false,
+    "sqlOrMigrationChange": false,
+    "featureFlagConfigurationChange": false,
+    "governanceGateClearance": false,
+    "d1PredictionImplementation": false,
+    "r1ProvenanceImplementation": false,
+    "productionWiring": false,
+    "controlAssetsRepair": false,
+    "i12Started": false
+  },
+  "changedRuntimeFiles": [
+    "backend/services/fipIntakeM2MAuthenticator.js",
+    "backend/services/governedFipIntakeAdapter.js"
+  ],
+  "credentialsRecorded": false,
+  "testSecretOnly": true,
+  "preservedUntrackedDirectories": [
+    "evidence/",
+    "evidence-home1-scratch/"
+  ],
+  "nextAction": "RERUN_COMPLETE_GATE_B_MOCK_ONLY_PROOF"
+}

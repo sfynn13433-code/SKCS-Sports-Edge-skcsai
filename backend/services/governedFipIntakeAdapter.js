@@ -9,6 +9,11 @@ const {
   buildIntakeId
 } = require('./fipIntakeService');
 
+const {
+  DOMAIN_CODES: AUTH_DOMAIN_CODES,
+  computeSubmittedBodyHash
+} = require('./fipIntakeM2MAuthenticator');
+
 function assertDependency(name, value) {
   if (value === null || value === undefined) {
     throw new TypeError(`Missing required dependency: ${name}`);
@@ -186,9 +191,25 @@ function createGovernedFipIntakeAdapter(deps = {}) {
       );
     }
 
+    let submittedBodyHash;
+
+    try {
+      submittedBodyHash =
+        computeSubmittedBodyHash(fipPayload);
+    } catch (error) {
+      return rejectAdapter(
+        AUTH_DOMAIN_CODES.FIP_AUTH_CONTEXT_INVALID,
+        'Actual submitted FIP body could not be deterministically hashed.',
+        {
+          downstream_calls: downstreamCalls
+        }
+      );
+    }
+
     const auth = await deps.authorizeCaller({
       caller: callerIdentityRef,
       governedMode,
+      submittedBodyHash,
       gates,
       context
     });
