@@ -13,7 +13,24 @@
 
 // Backend URL for API calls (defined outside IIFE for global helper function access)
 const BACKEND_URL = "https://skcs-sports-edge-skcsai.onrender.com";
-const API_KEY = window.USER_API_KEY || 'skcs_user_12345';
+
+async function getSubscriberHeaders(extraHeaders = {}) {
+    if (!window.supabaseClient || !window.supabaseClient.auth) {
+        throw new Error('Please sign in to access subscriber predictions.');
+    }
+
+    const result = await window.supabaseClient.auth.getSession();
+    const token = result?.data?.session?.access_token;
+
+    if (result?.error || !token) {
+        throw new Error('Please sign in to access subscriber predictions.');
+    }
+
+    return {
+        ...extraHeaders,
+        Authorization: 'Bearer ' + token
+    };
+}
 
 // Simple notification system
 function showNotification(message, type = 'info') {
@@ -70,7 +87,7 @@ function showNotification(message, type = 'info') {
     'use strict';
 
     // ── Constants ──────────────────────────────────────────────────────────────
-    // BACKEND_URL and API_KEY are defined globally at the top of this file
+    // BACKEND_URL and the session-auth helper are defined globally above.
 
     const SELECT_MAP = [
         { id: 'global-majors-select',   category: 'Global Majors'   },
@@ -154,11 +171,10 @@ function showNotification(message, type = 'info') {
 
         try {
             const response = await fetch(url, {
-                headers: { 
-                    'x-api-key': API_KEY,
+                headers: await getSubscriberHeaders({
                     'Cache-Control': 'no-cache',
                     'Pragma': 'no-cache'
-                },
+                }),
                 cache: 'no-store'
             });
 
@@ -1729,10 +1745,9 @@ window.openMatchDetail = async function(cardId) {
         try {
             const timestamp = Date.now();
             const response = await fetch(`${BACKEND_URL}/api/ai-predictions/${matchId}?t=${timestamp}&nocache=1`, {
-                headers: { 
-                    'x-api-key': API_KEY,
+                headers: await getSubscriberHeaders({
                     'Cache-Control': 'no-cache'
-                },
+                }),
                 cache: 'no-store'
             });
             

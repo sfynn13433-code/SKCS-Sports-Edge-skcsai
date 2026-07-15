@@ -31,9 +31,29 @@
     // API & CONFIG
     // ============================================
     const API_BASE = window.API_BASE_URL || 'https://skcs-sports-edge-skcsai.onrender.com';
-    const API_KEY = window.USER_API_KEY || (window.SKCS_CONFIG && window.SKCS_CONFIG.userApiKey) || 'skcs_user_12345';
     const includeAllParam = new URLSearchParams(window.location.search).get('include_all');
     const INCLUDE_ALL_MODE = !['0', 'false'].includes(String(includeAllParam || '1').trim().toLowerCase());
+
+    async function getSubscriberHeaders() {
+        if (!window.supabaseClient || !window.supabaseClient.auth) {
+            const error = new Error('Please sign in to access the VIP dashboard.');
+            error.code = 'AUTH_REQUIRED';
+            throw error;
+        }
+
+        const result = await window.supabaseClient.auth.getSession();
+        const token = result?.data?.session?.access_token;
+
+        if (result?.error || !token) {
+            const error = new Error('Please sign in to access the VIP dashboard.');
+            error.code = 'AUTH_REQUIRED';
+            throw error;
+        }
+
+        return {
+            Authorization: 'Bearer ' + token
+        };
+    }
 
     const daySelect = document.getElementById('daySelect');
     const refreshBtn = document.getElementById('refreshBtn');
@@ -498,9 +518,7 @@
         const endpoint = `${API_BASE}/api/vip/stress-payload?day=${encodeURIComponent(day)}${INCLUDE_ALL_MODE ? '&include_all=1' : ''}`;
         try {
             const response = await fetch(endpoint, {
-                headers: {
-                    'x-api-key': API_KEY
-                }
+                headers: await getSubscriberHeaders()
             });
 
             if (!response.ok) {
@@ -510,6 +528,17 @@
 
             return response.json();
         } catch (error) {
+            const status = Number(error?.status || 0);
+            const message = String(error?.message || '');
+            if (
+                error?.code === 'AUTH_REQUIRED'
+                || message.includes('(401)')
+                || message.includes('(403)')
+                || (status >= 400 && status < 500)
+            ) {
+                throw error;
+            }
+
             const Fallback = await fetch('data/vip-stress-saturday.json');
             if (!Fallback.ok) throw error;
             const payload = await Fallback.json();
@@ -1029,7 +1058,9 @@
             try {
                 const timestamp = Date.now();
                 const response = await fetch(API_BASE + '/api/ai-predictions/' + matchId + '?t=' + timestamp + '&nocache=1', {
-                    headers: { 'x-api-key': API_KEY, 'Cache-Control': 'no-cache' },
+                    headers: await getSubscriberHeaders({
+                        'Cache-Control': 'no-cache'
+                    }),
                     cache: 'no-store'
                 });
                 if (response.ok) {

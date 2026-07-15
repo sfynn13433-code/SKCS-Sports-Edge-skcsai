@@ -2,7 +2,6 @@
     'use strict';
 
     const API_BASE = window.API_BASE_URL || 'https://skcs-sports-edge-skcsai.onrender.com';
-    const API_KEY = window.USER_API_KEY || (window.SKCS_CONFIG && window.SKCS_CONFIG.userApiKey) || 'skcs_user_12345';
 
     const feedEl = document.getElementById('uxFeedbackFeed');
     const formEl = document.getElementById('uxFeedbackForm');
@@ -90,16 +89,21 @@
 
     async function getAuthHeaders() {
         const headers = {
-            'Content-Type': 'application/json',
-            'x-api-key': API_KEY
+            'Content-Type': 'application/json'
         };
 
-        if (window.supabaseClient) {
-            const result = await window.supabaseClient.auth.getSession();
-            const token = result?.data?.session?.access_token;
-            if (token) {
-                headers.Authorization = 'Bearer ' + token;
-            }
+        if (!window.supabaseClient || !window.supabaseClient.auth) {
+            return headers;
+        }
+
+        const result = await window.supabaseClient.auth.getSession();
+        if (result?.error) {
+            throw result.error;
+        }
+
+        const token = result?.data?.session?.access_token;
+        if (token) {
+            headers.Authorization = 'Bearer ' + token;
         }
 
         return headers;
