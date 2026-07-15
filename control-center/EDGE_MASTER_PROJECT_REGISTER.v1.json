@@ -204,7 +204,8 @@
         "EAI-001",
         "EUI-001",
         "EOPS-001",
-        "FIP-001"
+        "FIP-001",
+        "SEM-GOV-001A"
       ],
       "affected_layers": [
         "architecture",
@@ -437,13 +438,7 @@
         "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
         "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1"
       ],
-      "related_files": [
-        "backend/services/fipIntakeService.js",
-        "tests/fip-intake-service.test.js",
-        "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
-        "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
-        "control-center/EDGE_ASSET_REPOSITORY_MAP.md"
-      ],
+      "related_files": [],
       "related_tables": [],
       "known_issues": [],
       "required_decisions": [],
@@ -472,13 +467,6 @@
         "Boundary rejects missing required wrapper/fixture/market/context/hash fields, forbidden manual/provider/workspace/Supabase replay origins, and AUTHORIZED_PRODUCTION while scout_edge_marriage_gate remains BLOCKED.",
         "Accepted proof payload maps to Edge analysis envelope fields: match_info, sharp_odds, contextual_intelligence, and metadata.sports_truth_origin = SCOUT_FIP.",
         "Focused proof: node --test tests/fip-intake-service.test.js passes."
-      ],
-      "open_gaps": [
-        "No route/API receive surface implemented in EFI-001-I1.",
-        "No Supabase persistence, SQL, migration, or EST-001 storage implementation performed.",
-        "No E2E proof executed; E2E-001 remains BLOCKED.",
-        "No marriage gate clearance; scout_edge_marriage_gate remains BLOCKED.",
-        "No external provider removal or buildLiveData replacement performed."
       ]
     },
     {
@@ -495,7 +483,8 @@
       ],
       "blocks": [
         "EOPS-001",
-        "E2E-001"
+        "E2E-001",
+        "SEM-GOV-001D-UI3-I2"
       ],
       "affected_layers": [
         "Supabase",
@@ -510,15 +499,7 @@
         "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
         "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1"
       ],
-      "related_files": [
-        "backend/services/fipStoragePolicyService.js",
-        "tests/fip-storage-policy-service.test.js",
-        "backend/services/fipIntakeService.js",
-        "control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md",
-        "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
-        "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
-        "control-center/EDGE_ASSET_REPOSITORY_MAP.md"
-      ],
+      "related_files": [],
       "related_tables": [],
       "known_issues": [],
       "required_decisions": [],
@@ -549,14 +530,6 @@
         "Policy enforces Supabase budget levels: OK, WARNING at 80%, CRITICAL at 95%, HARD_BLOCK at 100%.",
         "Focused proof: node --test tests/fip-storage-policy-service.test.js passes.",
         "No SQL, migration, Supabase mutation, route wiring, E2E proof, provider removal, or gate clearance performed."
-      ],
-      "open_gaps": [
-        "No physical Supabase table or migration implementation performed in EST-001-I1.",
-        "No route/API receive surface wired to storage enforcement.",
-        "No E2E proof executed; E2E-001 remains BLOCKED.",
-        "No marriage gate clearance; scout_edge_marriage_gate remains BLOCKED.",
-        "No supabase_storage_gate clearance; supabase_storage_gate remains BLOCKED.",
-        "No external provider removal or buildLiveData replacement performed."
       ]
     },
     {
@@ -624,7 +597,8 @@
         "EGR-001",
         "EAI-001",
         "EUI-001",
-        "E2E-001"
+        "E2E-001",
+        "SEM-GOV-001A"
       ],
       "affected_layers": [
         "prediction",
@@ -638,24 +612,7 @@
       "related_contracts": [
         "EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1"
       ],
-      "related_files": [
-        "backend/services/aiPipeline.js",
-        "backend/services/aiScoring.js",
-        "backend/services/filterEngine.js",
-        "backend/services/direct1x2Engine.js",
-        "backend/services/marketIntelligence.js",
-        "backend/services/accaBuilder.js",
-        "control-center/EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1.md",
-        "tests/epi-pipeline-integrity-contract.test.js",
-        "package.json",
-        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
-        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
-        "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
-        "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
-        "control-center/EDGE_ASSET_REPOSITORY_MAP.md",
-        "control-center/EDGE_CONTROL_CENTER.md",
-        "tests/edge-control-center-ledger.test.js"
-      ],
+      "related_files": [],
       "related_tables": [],
       "known_issues": [],
       "required_decisions": [],
@@ -683,13 +640,6 @@
         "Inspection evidence confirms filterEngine and accaBuilder depend on existing prediction tables that future FIP integration must preserve.",
         "Focused proof: node --test tests/epi-pipeline-integrity-contract.test.js passes.",
         "No prediction runtime code, SQL, migration, Supabase mutation, route wiring, provider removal, E2E proof, or gate clearance performed."
-      ],
-      "open_gaps": [
-        "No FIP runtime mapping into aiPipeline implemented.",
-        "No provider bypass/removal performed.",
-        "No prediction baseline regression fixture created yet.",
-        "No E2E proof executed; E2E-001 remains BLOCKED.",
-        "No marriage gate clearance; scout_edge_marriage_gate remains BLOCKED."
       ]
     },
     {
@@ -718,33 +668,7 @@
         "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
         "EPRV-001_EXTERNAL_PROVIDER_REMOVAL_INSPECTION_CONTRACT.v1"
       ],
-      "related_files": [
-        "backend/server-express.js",
-        "backend/services/dataProvider.js",
-        "backend/services/dataProviders.js",
-        "backend/services/contextIngestionService.js",
-        "backend/services/contextEnrichmentService.js",
-        "backend/services/footballHighlightsService.js",
-        "backend/services/oddsApiPipeline.js",
-        "backend/services/skcsHeartbeat.js",
-        "backend/services/hybridSportsDataService.js",
-        "backend/utils/rapidApiWaterfall.js",
-        "backend/apiClients.js",
-        "backend/services/aiPipeline.js",
-        "scripts/import-today-snapshot-pipeline.js",
-        "control-center/EPRV-001_EXTERNAL_PROVIDER_REMOVAL_INSPECTION_CONTRACT.v1.md",
-        "tests/eprv-provider-removal-contract.test.js",
-        "package.json",
-        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
-        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
-        "control-center/EDGE_REPOSITORY_ASSET_REGISTER.v1.json",
-        "control-center/EDGE_ASSET_CLASSIFICATION_BATCHES.v1.json",
-        "control-center/EDGE_ASSET_REPOSITORY_MAP.md",
-        "control-center/EDGE_CONTROL_CENTER.md",
-        "tests/edge-control-center-ledger.test.js",
-        "control-center/EDGE_SYSTEM_RUNTIME_INVENTORY.v1.json",
-        "control-center/EDGE_SYSTEM_RUNTIME_MAP.md"
-      ],
+      "related_files": [],
       "related_tables": [],
       "known_issues": [],
       "required_decisions": [],
@@ -776,18 +700,6 @@
         "Inspection recorded provider markers for TheSportsDB, API-Sports, Odds API, RapidAPI, SportsData.io, CricketData, Big Balls Data, SportSRC, ESPN Hidden API, and FootballData.org.",
         "Focused proof: node --test tests/eprv-provider-removal-contract.test.js passes.",
         "No runtime provider code, provider deletion, SQL, migration, Supabase mutation, route wiring, E2E proof, or gate clearance performed."
-      ],
-      "open_gaps": [
-        "FIP intake is not yet wired into live prediction execution.",
-        "Direct live provider acquisition remains in dataProvider.js.",
-        "Direct weather acquisition remains.",
-        "Direct news/context acquisition remains.",
-        "Direct H2H acquisition remains.",
-        "Legacy snapshot acquisition remains.",
-        "Provider bypass/removal implementation has not been performed.",
-        "Fail-closed no-input runtime proof has not been performed.",
-        "E2E proof has not been executed; E2E-001 remains BLOCKED.",
-        "Scout ↔ Edge marriage gate remains BLOCKED."
       ]
     },
     {
@@ -1070,7 +982,7 @@
       "project_id": "E2E-001",
       "project_name": "Scout to Edge End-to-End Proof",
       "category": "Scout Handoff",
-      "description": "Prove one governed validated Scout FIP can cross the approved intake boundary, drive Edge analysis, and produce derived Edge output without direct external sports acquisition or unnecessary Scout-data retention in Supabase.",
+      "description": "Reconcile current execution readiness after the completed I11 mock-only proof, identify satisfied foundations and remaining live-proof blockers, and preserve fail-closed governance without executing the proof.",
       "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "BLOCKED",
       "priority": "critical",
@@ -1096,7 +1008,11 @@
         "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1",
         "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
         "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
-        "E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1"
+        "EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1",
+        "EPRV-001_EXTERNAL_PROVIDER_REMOVAL_INSPECTION_CONTRACT.v1",
+        "E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1",
+        "SEM-GOV-001D-UI3-I11_GATE_C_FORMAL_CLOSURE_AND_E2E_READINESS_PACKET.v1",
+        "E2E-001_C2_EXECUTION_READINESS_BLOCKER_RECONCILIATION.v1"
       ],
       "related_files": [],
       "related_tables": [],
@@ -1117,14 +1033,23 @@
         "Control Center sequencing bypass"
       ],
       "recommended_order": 19,
-      "next_action": "Planning complete (E2E-001-C1). FIP-001 authority registered. Remain BLOCKED until implementation prerequisites satisfied and separate proof execution authorization.",
+      "next_action": "E2E-001-C2 execution-readiness reconciliation PASS WITH BLOCKERS. Next separately approve ESEC-001-C1 subscriber, service-role, RLS, secrets, and Scout-integration credential boundary inspection. Do not execute the live proof, authorize Scout transport, implement D1 or R1, alter provider runtime, enable routes or feature flags, or clear any runtime governance gate in this reconciliation.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
-      "last_updated": "2026-07-12",
+      "last_updated": "2026-07-15",
       "governed_by_control_task_id": "E2E-001",
       "current_evidence": [
-        "E2E-001-C1 sealed control-center/E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1.md",
-        "Proof route, FIP sample requirements, EFI-001 intake behavior, EST-001 audit/retention behavior, and EMG-001 pass/fail mapping defined",
-        "Execution remains BLOCKED; no actual E2E proof run performed"
+        "FIP-001 committed authority is registered and recognized by Edge",
+        "EFI-001 is TESTED and the fail-closed canonical FIP intake foundation exists",
+        "Governed intake adapter, fixture identity resolution, composition root, and HMAC M2M authentication foundations exist",
+        "Gate B mock-only orchestration proof PASS_MOCK_ONLY",
+        "Gate B-C1 submitted-body HMAC binding correction PASS",
+        "I10 controlled schema apply PASS with eight RLS-enabled zero-seed tables",
+        "public.fip_intake_evidence is the canonical bounded R2 intake evidence table",
+        "No production FIP route or controlled Scout transport is authorized",
+        "EPI-001 contract is TESTED but D1 prediction and R1 provenance runtime integration remain absent",
+        "ESEC-001 remains PROPOSED",
+        "EPRV-001 remains PARTIAL with direct external acquisition still reachable",
+        "Full marriage proof remains HOLD and all runtime governance gates remain BLOCKED"
       ]
     },
     {
@@ -1216,14 +1141,17 @@
       "project_name": "Canonical Lifecycle, Terminology, Rolling Eight-Day Funnel and Help Contract",
       "category": "Unified Sports Intelligence Lifecycle",
       "description": "Programme SEM-GOV-001: seal the canonical Unified Sports Intelligence Lifecycle contract governing fixture states, stages, rolling eight-day funnel, public information boundary, safe BOT taxonomy, SMH navigation, Help/onboarding, and football-first multi-sport rollout sequence.",
-      "why_it_matters": "One platform language and one fixture lifecycle must synchronize Scout, Edge, SMH, EdgeMind BOT, Direct Insights, ACCAs, and all future sports.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "APPROVED",
       "priority": "critical",
       "blocked_by": [
         "ESA-001",
         "EPI-001"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001B",
+        "SEM-GOV-001D-UI1"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -1241,51 +1169,50 @@
         "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
         "EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1"
       ],
-      "related_files": [
-        "control-center/SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md"
-      ],
+      "related_files": [],
       "related_tables": [],
       "known_issues": [],
-      "required_decisions": [
-        "Exact scoring and publication window cutoffs deferred to SEM-GOV-001B/C",
-        "Postponement lifecycle reset policy deferred to SEM-GOV-001B"
-      ],
-      "completion_definition": "SEM-GOV-001A-C1 seals the Unified Sports Intelligence Lifecycle contract and registers programme SEM-GOV-001 without runtime, SQL, Supabase, or UI implementation.",
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001A-C1 seals the Unified Sports Intelligence Lifecycle contract; registers programme SEM-GOV-001 and task SEM-GOV-001A in Control Center; documents canonical lifecycle stages, states, rolling eight-day funnel, Help contract, public boundary, safe explanation taxonomy, timing-window conflicts, provisional 48-hour rule classification, and implementation phases SEM-GOV-001B through SEM-GOV-001H without runtime, SQL, Supabase, or UI implementation.",
       "proof_required": [
-        "SEM-GOV-001 contract exists and validates",
-        "unified_lifecycle_governor remains BLOCKED",
+        "control-center/SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md exists and validates",
+        "unified_lifecycle_governor remains BLOCKED in ledger",
+        "SEM-GOV-001A registered in ledger and master project register",
         "Focused contract test passes",
-        "Control Center registration complete"
+        "npm run control:center passes",
+        "control:verify passes except independently proven ALI-001, RLL-001, SPM-001 baseline defects"
       ],
       "risks_if_ignored": [
-        "Competing stage models persist across product surfaces",
-        "Eliminated fixtures silently disappear",
-        "Day 8 customer vision incompatible with seven-day sync",
-        "Unsafe BOT narratives without event binding"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 22,
-      "next_action": "SEM-GOV-001A contract sealed. SEM-GOV-001B-C1 persistence contract sealed.",
-      "owner_note": "One platform language. One fixture lifecycle. One source of truth. Football first.",
+      "next_action": "SEM-GOV-001A contract sealed. SEM-GOV-001B-C1 persistence contract sealed. Runtime Governor implementation remains blocked until separately authorized.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-13",
       "governed_by_control_task_id": "SEM-GOV-001A",
       "current_evidence": [
         "SEM-GOV-001A-C1 sealed control-center/SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1.md",
-        "Rolling eight-day funnel and Help contract documented",
-        "Provisional P1-B01 48-hour rule classified"
+        "P1-B02 inspection evidence incorporated",
+        "Rolling eight-day funnel, Help contract, and public information boundary documented",
+        "Provisional P1-B01 48-hour rule classified; not treated as permanent policy",
+        "unified_lifecycle_governor remains BLOCKED"
       ]
     },
     {
       "project_id": "SEM-GOV-001B",
       "project_name": "Football Lifecycle Persistence Contract",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Programme SEM-GOV-001: seal the football lifecycle persistence law — immutable UUID fixture_uid, identity alias registry, current projection and append-only transition events, legal transition matrix, eight-day SAST admission window, rollover semantics, and Governor activation sequence.",
-      "why_it_matters": "Without governed fixture identity and durable transition history, eliminated fixtures vanish, timing rules fragment, and the eight-day funnel cannot be replayed or audited.",
+      "description": "Programme SEM-GOV-001: seal the football lifecycle persistence law — immutable UUID fixture_uid, identity alias registry, current projection and append-only transition events, legal transition matrix, eight-day SAST admission window, rollover semantics, post-kickoff policy, and Governor activation sequence per owner decisions OD-1 through OD-10.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "APPROVED",
       "priority": "critical",
       "blocked_by": [
         "SEM-GOV-001A"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001B-I2"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -1298,47 +1225,48 @@
       "related_contracts": [
         "SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1",
         "SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1",
-        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1"
       ],
-      "related_files": [
-        "control-center/SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md"
-      ],
+      "related_files": [],
       "related_tables": [],
       "known_issues": [],
       "required_decisions": [],
-      "completion_definition": "SEM-GOV-001B-C1 seals the Football Lifecycle Persistence contract and records OD-1 through OD-10 without runtime, SQL, Supabase, API, or UI implementation.",
+      "completion_definition": "SEM-GOV-001B-C1 seals the Football Lifecycle Persistence contract; records OD-1 through OD-10; defines fixture_uid UUID law, alias registry, transition matrix, projection and event schemas, SAST eight-day window, rollover law, admission and processing tolerance, EST-001 alignment, and activation sequence without runtime, SQL, Supabase, API, or UI implementation.",
       "proof_required": [
-        "SEM-GOV-001B contract exists and validates",
-        "unified_lifecycle_governor remains BLOCKED",
+        "control-center/SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md exists and validates",
+        "unified_lifecycle_governor remains BLOCKED in ledger",
+        "SEM-GOV-001B registered in ledger and master project register",
         "Focused contract test passes",
-        "Control Center registration complete"
+        "npm run control:center passes",
+        "control:verify passes except independently proven baseline defects"
       ],
       "risks_if_ignored": [
-        "match_id collisions persist across providers",
-        "No durable lifecycle transition ledger",
-        "Rollover history absent",
-        "48-hour and seven-day rules remain fragmented"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 23,
       "next_action": "SEM-GOV-001B-C1 contract sealed. SEM-GOV-001B-I2 design packet sealed. SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed. SEM-GOV-001B-I4-CAP closed with HOLD. SEM-GOV-001B-I4-CAP2 closed with PASS FOR I4 CONTROL CENTER ACTIVATION. I4 implementation blocked pending separate implementation packet and supabase_storage_gate clearance.",
-      "owner_note": "fixture_uid is Edge-minted UUID. Aliases are not primary keys. Football first.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001B",
       "current_evidence": [
         "SEM-GOV-001B-C1 sealed control-center/SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1.md",
         "Owner decisions OD-1 through OD-10 recorded",
-        "SEM-GOV-001B-I2 design packet sealed",
+        "Inspection 1 evidence incorporated",
+        "unified_lifecycle_governor remains BLOCKED",
+        "supabase_storage_gate remains BLOCKED — no R1/R2 migration authorized",
         "SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed",
-        "SEM-GOV-001B-I4-CAP free-tier capacity design sealed with HOLD activation decision",
-        "SEM-GOV-001B-I4-CAP2 50/day capacity proof TESTED and admission-cap enforcement design APPROVED DESIGN"
+        "SEM-GOV-001B-I4-CAP free-tier capacity design sealed with HOLD activation decision"
       ]
     },
     {
       "project_id": "SEM-GOV-001B-I2",
       "project_name": "Lifecycle Governor Foundation Design Packet",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Programme SEM-GOV-001: seal the Lifecycle Governor foundation design — gate reader, pure evaluators, persistence adapter interface, rollover design, and implementation sequence — without runtime implementation.",
-      "why_it_matters": "Without an explicit foundation design, Governor runtime work risks ad-hoc gate parsing, pipeline coupling, and protected-table mutation.",
+      "description": "Programme SEM-GOV-001: seal the Lifecycle Governor foundation design — gate reader contract via controlCenterReadService, pure evaluator surface, persistence adapter interface, rollover worker design, fail-closed ordering, and future implementation sequence — without runtime code, SQL, Supabase, API, or UI implementation.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "APPROVED",
       "priority": "critical",
       "blocked_by": [
@@ -1358,45 +1286,47 @@
       "related_contracts": [
         "SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1",
         "SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1",
-        "SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1"
+        "SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
       ],
-      "related_files": [
-        "control-center/SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1.md",
-        "tests/sem-gov-001b-governor-foundation-packet.test.js"
-      ],
+      "related_files": [],
       "related_tables": [],
       "known_issues": [],
       "required_decisions": [],
-      "completion_definition": "SEM-GOV-001B-I2 seals the Lifecycle Governor foundation implementation packet without runtime, SQL, Supabase, API, or UI implementation.",
+      "completion_definition": "SEM-GOV-001B-I2 seals the Lifecycle Governor foundation implementation packet; documents future file plan, protected files, gate reader design, pure evaluator contract, persistence adapter interface, rollover design, fail-closed order, test matrix, and implementation sequence I3 through SEM-GOV-001C without runtime, SQL, Supabase, API, or UI implementation.",
       "proof_required": [
-        "Implementation packet exists and validates",
-        "All three gates remain BLOCKED",
+        "control-center/SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1.md exists and validates",
+        "All three governance gates remain BLOCKED in ledger",
+        "Future runtime files listed in packet do not exist on disk",
+        "SEM-GOV-001B-I2 registered in ledger and master project register",
         "Focused packet test passes",
-        "Control Center registration complete"
+        "SEM-GOV-001A and SEM-GOV-001B contract regression tests pass",
+        "npm run control:verify passes",
+        "npm run verify:rulebook passes"
       ],
       "risks_if_ignored": [
-        "Governor runtime may bypass canonical gate reader",
-        "Persistence may couple to prediction tables",
-        "Rollover may embed in sync or pipeline paths"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 24,
       "next_action": "SEM-GOV-001B-I2 design packet sealed. SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed.",
-      "owner_note": "Design only. Gate before flag. No DB calls while blocked.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001B-I2",
       "current_evidence": [
         "SEM-GOV-001B-I2 sealed control-center/SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1.md",
-        "Gate reader design uses controlCenterReadService and canonical ledger",
+        "Gate reader design uses canonical ledger through controlCenterReadService",
+        "Future file plan documents lifecycleGovernor, lifecyclePersistenceService, lifecycleRolloverService without creating them",
         "All three gates remain BLOCKED",
-        "SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed"
+        "Focused proof: node --test tests/sem-gov-001b-governor-foundation-packet.test.js passes"
       ]
     },
     {
       "project_id": "SEM-GOV-001B-I3",
       "project_name": "Pure Lifecycle Governor Foundation",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Programme SEM-GOV-001: implement pure LifecycleGovernor foundation — gate evaluation, SAST window, admission, transition, idempotency, and rollover plan — without DB or pipeline hooks.",
-      "why_it_matters": "Without isolated pure evaluators, lifecycle law cannot be tested or enforced before persistence and pipeline integration.",
+      "description": "Programme SEM-GOV-001: implement pure LifecycleGovernor foundation — gate evaluation, SAST window, admission, transition, idempotency, and rollover plan — without DB, pipeline hooks, or persistence adapter.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "APPROVED",
       "priority": "critical",
       "blocked_by": [
@@ -1416,45 +1346,47 @@
       "related_contracts": [
         "SEM-GOV-001B_FOOTBALL_LIFECYCLE_PERSISTENCE_CONTRACT.v1",
         "SEM-GOV-001B_LIFECYCLE_GOVERNOR_FOUNDATION_IMPLEMENTATION_PACKET.v1",
-        "SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1"
+        "SEM-GOV-001_UNIFIED_SPORTS_INTELLIGENCE_LIFECYCLE_CONTRACT.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
       ],
-      "related_files": [
-        "backend/services/lifecycleGovernor.js",
-        "tests/lifecycle-governor.test.js"
-      ],
+      "related_files": [],
       "related_tables": [],
       "known_issues": [],
       "required_decisions": [],
-      "completion_definition": "SEM-GOV-001B-I3 implements pure LifecycleGovernor foundation without DB, SQL, Supabase, pipeline hooks, or persistence adapter. Pure isolated service foundation; governed as a repository asset. No production runtime caller or pipeline reachability until separately authorized integration.",
+      "completion_definition": "SEM-GOV-001B-I3 implements pure LifecycleGovernor foundation with gate-before-flag evaluation, SAST admission window, legal transition matrix, deterministic idempotency, and rollover plan — without DB, SQL, Supabase, pipeline hooks, or persistence adapter. Pure isolated service foundation; governed as a repository asset. No production runtime caller or pipeline reachability until separately authorized integration.",
       "proof_required": [
-        "lifecycleGovernor.js exists and exports pure evaluators",
-        "All three gates remain BLOCKED",
-        "Focused lifecycle-governor test passes",
-        "Control Center registration complete"
+        "backend/services/lifecycleGovernor.js exists and exports pure evaluators",
+        "All three governance gates remain BLOCKED in ledger",
+        "No persistence adapter, pipeline hooks, or DB calls",
+        "SEM-GOV-001B-I3 registered in ledger and master project register",
+        "Focused proof: node --test tests/lifecycle-governor.test.js passes",
+        "SEM-GOV-001A and SEM-GOV-001B contract regression tests pass",
+        "npm run verify:rulebook passes"
       ],
       "risks_if_ignored": [
-        "Governor logic may embed in pipeline before persistence law is proven",
-        "Gate-before-flag ordering may be bypassed"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 25,
       "next_action": "SEM-GOV-001B-I3 pure LifecycleGovernor foundation sealed. SEM-GOV-001B-I4-CAP closed with HOLD. SEM-GOV-001B-I4-CAP2 closed with PASS FOR I4 CONTROL CENTER ACTIVATION. I4 implementation blocked pending separate implementation packet and supabase_storage_gate clearance.",
-      "owner_note": "Pure evaluators only. Gate before flag. No DB while blocked.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001B-I3",
       "current_evidence": [
-        "SEM-GOV-001B-I3 implemented backend/services/lifecycleGovernor.js",
+        "SEM-GOV-001B-I3 implemented backend/services/lifecycleGovernor.js as pure evaluator foundation",
         "Pure isolated service foundation; governed as a repository asset. No production runtime caller or pipeline reachability until separately authorized integration",
-        "Focused proof: node --test tests/lifecycle-governor.test.js passes",
+        "Gate-before-flag evaluation, SAST window, admission, transition, idempotency, and rollover plan proven",
         "All three gates remain BLOCKED",
-        "SEM-GOV-001B-I4-CAP capacity design sealed with HOLD activation decision"
+        "No persistence adapter, pipeline hooks, or DB calls",
+        "Focused proof: node --test tests/lifecycle-governor.test.js passes"
       ]
     },
     {
       "project_id": "SEM-GOV-001B-I4-CAP",
       "project_name": "Supabase Free-Tier Capacity and Retention Design",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Programme SEM-GOV-001: seal the I4 Supabase free-tier capacity and retention design with verified dashboard usage, per-table growth models, bounded purge law, and activation decision without implementation.",
-      "why_it_matters": "Without proven free-tier headroom and bounded retention, lifecycle persistence could breach the 500 MB Supabase Free Plan and endanger project availability.",
+      "description": "Programme SEM-GOV-001: seal the SEM-GOV-001B-I4 Supabase free-tier capacity and retention design — verified dashboard usage, per-table growth models, bounded retention and purge law, resource controls, Scout non-duplication proof, and activation decision — without SQL, migrations, tables, persistence adapter, or production runtime implementation.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "DONE",
       "priority": "critical",
       "blocked_by": [
@@ -1478,48 +1410,48 @@
         "SEM-GOV-001B-I4_SUPABASE_FREE_TIER_CAPACITY_AND_RETENTION_DESIGN.v1",
         "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
       ],
-      "related_files": [
-        "control-center/SEM-GOV-001B-I4_SUPABASE_FREE_TIER_CAPACITY_AND_RETENTION_DESIGN.v1.md"
-      ],
+      "related_files": [],
       "related_tables": [],
-      "known_issues": [
-        "Unconstrained conservative 80/day model projects 470.58 MB — exceeds activation ceiling"
-      ],
-      "required_decisions": [
-        "Separate I4 implementation packet before persistence DDL and supabase_storage_gate clearance"
-      ],
-      "completion_definition": "SEM-GOV-001B-I4-CAP seals capacity and retention design with HOLD activation decision; no SQL, migrations, tables, or persistence adapter.",
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001B-I4-CAP seals the Supabase free-tier capacity and retention design with verified dashboard baseline 167 MB, normal and conservative growth models, explicit retention and bounded purge design, resource controls, Scout non-duplication law, and HOLD activation decision until governed admission/retention caps are approved — without SQL, migrations, tables, persistence adapter, or gate clearance.",
       "proof_required": [
-        "Capacity design packet exists and validates",
-        "Normal model below 300 MB",
-        "Conservative model documented with HOLD",
-        "All gates remain BLOCKED",
-        "Control Center registration complete"
+        "control-center/SEM-GOV-001B-I4_SUPABASE_FREE_TIER_CAPACITY_AND_RETENTION_DESIGN.v1.md exists and validates",
+        "Normal projected total remains below 300 MB",
+        "Conservative 80/day model documented with HOLD and mitigated options",
+        "All three governance gates remain BLOCKED in ledger",
+        "SEM-GOV-001B-I4-CAP registered in ledger and master project register",
+        "npm run control:center passes",
+        "SEM-GOV contract regression tests pass",
+        "npm run verify:rulebook passes"
       ],
       "risks_if_ignored": [
-        "Unbounded lifecycle event growth could breach Free Plan",
-        "Missing purge design could cause database hard block"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 26,
       "next_action": "SEM-GOV-001B-I4-CAP closed with HOLD. SEM-GOV-001B-I4-CAP2 closed with PASS FOR I4 CONTROL CENTER ACTIVATION. I4 implementation blocked pending separate implementation packet and supabase_storage_gate clearance.",
-      "owner_note": "Closed HOLD. 50/day capacity proof and enforcement design sealed in CAP2 — not implemented.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001B-I4-CAP",
       "current_evidence": [
         "SEM-GOV-001B-I4-CAP sealed control-center/SEM-GOV-001B-I4_SUPABASE_FREE_TIER_CAPACITY_AND_RETENTION_DESIGN.v1.md",
-        "Verified dashboard baseline 167 MB",
-        "Normal projected total 186.10 MB; conservative 80/day 470.58 MB — HOLD closed",
-        "Stephen approved 50/day admission ceiling direction; Option B rejected; 180d retention unchanged",
-        "SEM-GOV-001B-I4-CAP2 50/day capacity proof TESTED",
-        "supabase_storage_gate remains BLOCKED; I4 implementation remains BLOCKED"
+        "Verified dashboard baseline 167 MB at 33% of 500 MB Free Plan",
+        "Normal projected total 186.10 MB below 300 MB preferred ceiling",
+        "Conservative 80/day projected total 470.58 MB exceeds 380 MB activation ceiling — HOLD closed",
+        "Stephen approved Option A direction: 50 admissions/day ceiling; Option B rejected; 180d retention unchanged",
+        "50/day enforcement requires separate governed mitigation packet — not proven here",
+        "Bounded retention and purge design documented",
+        "I4 owner authorization approved; supabase_storage_gate remains BLOCKED",
+        "I4 implementation remains BLOCKED"
       ]
     },
     {
       "project_id": "SEM-GOV-001B-I4-CAP2",
       "project_name": "50-Fixture Daily Admission Capacity and Enforcement Design",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Programme SEM-GOV-001: recalculate Supabase free-tier capacity at 50/day SAST admission ceiling from 167 MB baseline and define fail-closed admission-cap enforcement design without implementation.",
-      "why_it_matters": "Without proven 50/day capacity headroom and bypass-resistant enforcement design, lifecycle persistence could breach Free Plan limits despite owner mitigation direction.",
+      "description": "Programme SEM-GOV-001: recalculate Supabase free-tier capacity at the owner-selected 50/day SAST admission ceiling from the sealed 167 MB baseline, and define deterministic fail-closed admission-cap enforcement design — without SQL, migrations, tables, counter runtime, or gate clearance.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "DONE",
       "priority": "critical",
       "blocked_by": [
@@ -1544,50 +1476,57 @@
         "SEM-GOV-001B-I4_CAP2_DAILY_ADMISSION_LIMIT_DESIGN.v1",
         "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
       ],
-      "related_files": [
-        "control-center/SEM-GOV-001B-I4_CAP2_DAILY_ADMISSION_LIMIT_DESIGN.v1.md"
-      ],
+      "related_files": [],
       "related_tables": [],
       "known_issues": [],
-      "required_decisions": [
-        "Separate I4 implementation packet before persistence DDL and supabase_storage_gate clearance"
-      ],
-      "completion_definition": "SEM-GOV-001B-I4-CAP2 seals 50/day capacity proof TESTED, admission-cap enforcement design APPROVED DESIGN, and PASS FOR I4 CONTROL CENTER ACTIVATION — without SQL, migrations, tables, counter runtime, or gate clearance.",
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001B-I4-CAP2 seals the 50/day capacity recalculation from 167 MB baseline, SAST admission-cap law, counter persistence design, atomic transaction sequence, audit and monitoring design, and PASS FOR I4 CONTROL CENTER ACTIVATION decision — without SQL, migrations, tables, counter runtime, persistence adapter, or gate clearance.",
       "proof_required": [
-        "CAP2 design packet exists and validates",
+        "control-center/SEM-GOV-001B-I4_CAP2_DAILY_ADMISSION_LIMIT_DESIGN.v1.md exists and validates",
         "Conservative 50/day projected total below 380 MB with required headroom",
-        "Admission-cap enforcement design complete",
-        "All gates remain BLOCKED",
-        "Control Center registration complete"
+        "Admission-cap enforcement design APPROVED DESIGN",
+        "All three governance gates remain BLOCKED in ledger",
+        "SEM-GOV-001B-I4-CAP2 registered in ledger and master project register",
+        "npm run control:center passes",
+        "SEM-GOV contract regression tests pass",
+        "npm run verify:rulebook passes"
       ],
       "risks_if_ignored": [
-        "Unenforced admission ceiling could breach Free Plan despite capacity proof",
-        "Bypass via retries or concurrent instances could exceed 50/day"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 27,
-      "next_action": "SEM-GOV-001B-I4-CAP2 closed with PASS FOR I4 CONTROL CENTER ACTIVATION. I4 implementation blocked pending separate implementation packet and supabase_storage_gate clearance.",
-      "owner_note": "Capacity proof TESTED. Enforcement design APPROVED DESIGN only. No gate clearance.",
+      "next_action": "SEM-GOV-001B-I4-CAP2 closed with PASS FOR I4 CONTROL CENTER ACTIVATION. SEM-GOV-001B-I4 implementation foundation TESTED; migration authored NOT APPLIED; production activation BLOCKED.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001B-I4-CAP2",
       "current_evidence": [
         "SEM-GOV-001B-I4-CAP2 sealed control-center/SEM-GOV-001B-I4_CAP2_DAILY_ADMISSION_LIMIT_DESIGN.v1.md",
-        "Conservative 50/day projected total 357.10 MB with 22.90 MB headroom below 380 MB",
-        "SAST admission-cap law and lifecycle_daily_admission_counters design APPROVED DESIGN",
-        "supabase_storage_gate remains BLOCKED; I4 implementation foundation TESTED"
+        "50/day conservative projected total 357.10 MB — 22.90 MB headroom below 380 MB activation ceiling",
+        "42.90 MB headroom below 400 MB hard block",
+        "Transition-event growth bounded at 108,000 steady-state rows",
+        "SAST calendar-day admission-cap law and counter design APPROVED DESIGN",
+        "capacity proof TESTED",
+        "supabase_storage_gate remains BLOCKED",
+        "unified_lifecycle_governor remains BLOCKED",
+        "I4 implementation remains BLOCKED"
       ]
     },
     {
       "project_id": "SEM-GOV-001B-I4",
       "project_name": "Lifecycle Persistence Implementation",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Programme SEM-GOV-001: implement isolated lifecycle persistence foundation behind dependency injection with gate-before-DB admission, durable idempotency, 50/day SAST cap, and atomic transitions — migration authored NOT APPLIED, no production caller.",
-      "why_it_matters": "Without tested persistence foundation and six-table DDL, lifecycle governor cannot durably admit fixtures or record transitions while respecting Free-Tier capacity law.",
+      "description": "Programme SEM-GOV-001: implement isolated lifecycle persistence foundation behind dependency injection — gate-before-database admission orchestration, immutable fixture_uid, alias resolution, durable admission idempotency, atomic lifecycle admission, 50-new-fixtures-per-SAST-day enforcement, atomic transition-event and projection updates, rollover storage adapter methods only — without production caller or Supabase migration apply.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "TESTED",
       "priority": "critical",
       "blocked_by": [
         "SEM-GOV-001B-I4-CAP2"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI1",
+        "SEM-GOV-001D-UI3-I1"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -1606,66 +1545,56 @@
         "SEM-GOV-001B-I4_CAP2_DAILY_ADMISSION_LIMIT_DESIGN.v1",
         "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
       ],
-      "related_files": [
-        "control-center/SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md",
-        "backend/services/lifecyclePersistenceService.js",
-        "supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql",
-        "tests/lifecycle-persistence-service.test.js",
-        "tests/sem-gov-001b-i4-lifecycle-persistence-implementation-packet.test.js"
-      ],
-      "related_tables": [
-        "fixture_lifecycle_current",
-        "fixture_identity_aliases",
-        "fixture_lifecycle_transition_events",
-        "fixture_lifecycle_rollover_events",
-        "lifecycle_daily_admission_counters",
-        "lifecycle_admission_idempotency"
-      ],
-      "known_issues": [
-        "supabase_storage_gate BLOCKED — migration not applied",
-        "unified_lifecycle_governor BLOCKED — no production caller"
-      ],
-      "required_decisions": [
-        "supabase_storage_gate clearance before migration apply",
-        "Separate authorization before production caller wiring"
-      ],
-      "completion_definition": "SEM-GOV-001B-I4 seals isolated persistence foundation TESTED with six-table migration authored NOT APPLIED, mock-first proofs, and all gates BLOCKED.",
+      "related_files": [],
+      "related_tables": [],
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001B-I4 seals isolated lifecycle persistence implementation foundation TESTED with migration SQL authored NOT APPLIED, mock-first proofs for admission cap, idempotency, alias safety, atomic transitions, and rollover storage adapter only — without production caller, gate clearance, or Supabase mutation.",
       "proof_required": [
-        "Implementation packet sealed",
-        "lifecyclePersistenceService.js with gate-before-DB law",
-        "Six-table migration authored NOT APPLIED",
-        "test:lifecycle-persistence passes",
-        "All gates BLOCKED"
+        "control-center/SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md exists and validates",
+        "backend/services/lifecyclePersistenceService.js exists with gate-before-DB admission and transition orchestration",
+        "Migration defines exactly six lifecycle tables and is not applied",
+        "npm run test:lifecycle-persistence passes",
+        "All three governance gates remain BLOCKED in ledger",
+        "SEM-GOV-001B-I4 registered in ledger and master project register",
+        "npm run control:center passes",
+        "npm run verify:rulebook passes"
       ],
       "risks_if_ignored": [
-        "Premature migration apply could breach Free-Tier capacity without gate clearance",
-        "Production caller before governor gate clearance could bypass fail-closed ordering"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 28,
-      "next_action": "SEM-GOV-001B-I4 implementation foundation TESTED. Migration authored NOT APPLIED. Production activation BLOCKED pending supabase_storage_gate clearance.",
-      "owner_note": "Foundation only. No Supabase apply. No production caller.",
+      "next_action": "SEM-GOV-001B-I4 implementation foundation TESTED. Migration authored NOT APPLIED. Production activation BLOCKED pending supabase_storage_gate clearance and separate authorization.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001B-I4",
       "current_evidence": [
-        "SEM-GOV-001B-I4 sealed implementation packet and persistence service",
-        "Migration 20261008000001 authored — NOT APPLIED",
-        "Mock-first admission cap, idempotency, and transition proofs pass",
-        "supabase_storage_gate remains BLOCKED; unified_lifecycle_governor remains BLOCKED"
+        "SEM-GOV-001B-I4 sealed control-center/SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md",
+        "lifecyclePersistenceService.js implements admitFixture and applyTransition with DI and gate-before-DB law",
+        "Migration 20261008000001_sem_gov_001b_lifecycle_persistence.sql authored — NOT APPLIED",
+        "Mock-first tests prove admission 50/51, idempotency, alias reuse, atomic transitions, zero DB on gate rejection",
+        "supabase_storage_gate remains BLOCKED",
+        "unified_lifecycle_governor remains BLOCKED",
+        "scout_edge_marriage_gate remains BLOCKED",
+        "No production runtime caller introduced"
       ]
     },
     {
       "project_id": "SEM-GOV-001D-UI1",
       "project_name": "Sports Match Hub UI Information Architecture and Screen Contract",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Programme SEM-GOV-001: seal Sports Match Hub UI information architecture and screen contract — navigation, day funnel presentation, lifecycle language, fixture cards, filters, UI states, and future read-model API fields — without frontend or runtime implementation.",
-      "why_it_matters": "Without a fixed screen contract, UI2 implementation would invent layout, lifecycle terminology, API fields, and user states inconsistent with SEM-GOV-001 law.",
+      "description": "Programme SEM-GOV-001: seal the Sports Match Hub user-facing information architecture and screen contract — canonical navigation, day navigation, lifecycle language, fixture cards, filters, UI states, future API read-model fields, responsive and accessibility law — without HTML, CSS, JavaScript, API, migration, or runtime implementation.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "PROPOSED",
       "priority": "critical",
       "blocked_by": [
         "SEM-GOV-001A",
         "SEM-GOV-001B-I4"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI2"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -1681,54 +1610,53 @@
         "SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
         "SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1"
       ],
-      "related_files": [
-        "control-center/SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1.md",
-        "tests/sem-gov-001d-ui1-screen-contract.test.js"
-      ],
+      "related_files": [],
       "related_tables": [],
-      "known_issues": [
-        "Current index.html embeds prediction-centric Hub",
-        "No dedicated Hub route",
-        "Help and History pages missing"
-      ],
-      "required_decisions": [
-        "Separate UI2 authorization for static implementation",
-        "UI3 read-model API packet before live data"
-      ],
-      "completion_definition": "SEM-GOV-001D-UI1 seals UI information architecture and screen contract PROPOSED with packet guard test and Control Center registration — UI2/UI3/UI4 NOT STARTED.",
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001D-UI1 seals Sports Match Hub UI information architecture and screen contract PROPOSED with day-token reconciliation, lifecycle language, API read-model design only, and explicit UI2/UI3/UI4 boundaries — without frontend, API, migration, or gate clearance.",
       "proof_required": [
-        "Packet sections A–Y",
-        "test:sem-gov-001d-ui1 passes",
-        "All gates BLOCKED",
-        "No frontend code modified in UI1"
+        "control-center/SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1.md exists with sections A–Y",
+        "npm run test:sem-gov-001d-ui1 passes",
+        "All three governance gates remain BLOCKED",
+        "SEM-GOV-001D-UI1 registered in ledger and master project register",
+        "npm run control:center passes",
+        "npm run verify:rulebook passes"
       ],
       "risks_if_ignored": [
-        "UI2 could expose prediction-centric patterns as lifecycle truth",
-        "Inconsistent day labels could confuse users and break governor alignment"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 29,
-      "next_action": "SEM-GOV-001D-UI1 screen contract PROPOSED. UI2 NOT STARTED.",
-      "owner_note": "Design-only. No UI code in UI1.",
+      "next_action": "SEM-GOV-001D-UI1 screen contract PROPOSED. UI2 static implementation NOT STARTED pending separate authorization.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001D-UI1",
       "current_evidence": [
-        "SEM-GOV-001D-UI1 packet sealed with day-token reconciliation",
-        "Canonical navigation and lifecycle language fixed",
-        "Migration remains NOT APPLIED"
+        "SEM-GOV-001D-UI1 sealed control-center/SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1.md",
+        "Read-only UI1 inspection baseline recorded",
+        "Day tokens reconciled with lifecycleGovernor DAY_LABELS (no DAY_1)",
+        "UI2/UI3/UI4 NOT STARTED",
+        "supabase_storage_gate remains BLOCKED; migration NOT APPLIED",
+        "unified_lifecycle_governor remains BLOCKED",
+        "scout_edge_marriage_gate remains BLOCKED",
+        "No production UI mutation"
       ]
     },
     {
       "project_id": "SEM-GOV-001D-UI2",
       "project_name": "Static Sports Match Hub Implementation",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Programme SEM-GOV-001D: static Sports Match Hub HTML/CSS/JS with governed mock fixtures, lifecycle UI, filters, and accessibility acceptance — no live API.",
-      "why_it_matters": "Users need a fixture-first lifecycle Hub before UI3 read-model and UI4 live integration can ship.",
+      "description": "Programme SEM-GOV-001D: build the visible Sports Match Hub static frontend with governed mock fixtures, day navigation, lifecycle language, filters, fixture detail, responsive and accessibility acceptance — without live API, Supabase, backend, or gate clearance.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "TESTED",
       "priority": "critical",
       "blocked_by": [
         "SEM-GOV-001D-UI1"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-HOME1"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -1742,54 +1670,49 @@
         "SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1",
         "SEM-GOV-001D-UI2_STATIC_SPORTS_MATCH_HUB_IMPLEMENTATION_PACKET.v1"
       ],
-      "related_files": [
-        "public/sports-match-hub.html",
-        "public/css/sports-match-hub.css",
-        "public/js/sports-match-hub.js",
-        "public/js/sports-match-hub-mock-data.js",
-        "tests/sem-gov-001d-ui2-static-hub.test.js",
-        "tests/sem-gov-001d-ui2-visual-acceptance.test.js"
-      ],
+      "related_files": [],
       "related_tables": [],
-      "known_issues": [
-        "Mock data only — no production lifecycle API",
-        "Embedded prediction Hub remains on Home"
-      ],
-      "required_decisions": [
-        "UI3 read-model API packet before live data"
-      ],
-      "completion_definition": "SEM-GOV-001D-UI2 static Hub TESTED with UI2 tests and Control Center registration.",
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001D-UI2 seals static Sports Match Hub TESTED with mock fixtures, UI2 tests, Control Center registration — UI3/UI4 NOT STARTED, gates BLOCKED, migration NOT APPLIED.",
       "proof_required": [
-        "test:sem-gov-001d-ui2 passes",
-        "Gates BLOCKED",
-        "No fetch in UI2 JS"
+        "npm run test:sem-gov-001d-ui2 passes",
+        "npm run test:sem-gov-001d-ui1 passes",
+        "All gates BLOCKED",
+        "No fetch or /api/ in UI2 JavaScript"
       ],
       "risks_if_ignored": [
-        "Live integration could ship without visual and accessibility baseline"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 30,
-      "next_action": "SEM-GOV-001D-UI2 TESTED. UI3 NOT STARTED.",
-      "owner_note": "Static mock only.",
+      "next_action": "SEM-GOV-001D-UI2 static Hub TESTED. UI3 read-model API NOT STARTED pending separate authorization.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001D-UI2",
       "current_evidence": [
-        "sports-match-hub.html and isolated assets",
-        "UI2 tests pass",
-        "Migration NOT APPLIED"
+        "Dedicated sports-match-hub.html with isolated CSS/JS",
+        "Governed mock fixtures with public DTO fields only",
+        "index.html Hub nav and CTA only",
+        "UI3/UI4 NOT STARTED",
+        "Migration NOT APPLIED",
+        "All gates BLOCKED"
       ]
     },
     {
       "project_id": "SEM-GOV-001D-HOME1",
       "project_name": "Home Page Information Architecture and Visual Consolidation",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Rebuild public/index.html into a concise Hub-aligned dark landing page; remove legacy embedded Hub and sprawl from home rendering.",
-      "why_it_matters": "Users need a professional entry point that matches the governed Sports Match Hub before deeper lifecycle features ship.",
+      "description": "Programme SEM-GOV-001D: rebuild public/index.html into a concise Hub-aligned dark landing page; remove embedded legacy Hub, chatbot, and technical sprawl from home rendering.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "TESTED",
       "priority": "high",
       "blocked_by": [
         "SEM-GOV-001D-UI2"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI3-I1"
+      ],
       "affected_layers": [
         "governance",
         "control-center",
@@ -1799,53 +1722,51 @@
         "SEM-GOV-001D-HOME1"
       ],
       "related_contracts": [
-        "SEM-GOV-001D-HOME1_HOME_PAGE_INFORMATION_ARCHITECTURE_AND_VISUAL_CONSOLIDATION.v1"
+        "SEM-GOV-001D-HOME1_HOME_PAGE_INFORMATION_ARCHITECTURE_AND_VISUAL_CONSOLIDATION"
       ],
-      "related_files": [
-        "public/index.html",
-        "public/css/home-page.css",
-        "public/js/home-page.js",
-        "tests/sem-gov-001d-home1-static-home.test.js",
-        "tests/sem-gov-001d-home1-visual-acceptance.test.js"
-      ],
+      "related_files": [],
       "related_tables": [],
-      "known_issues": [
-        "Static landing only — no live lifecycle API on home"
-      ],
+      "known_issues": [],
       "required_decisions": [],
-      "completion_definition": "SEM-GOV-001D-HOME1 home landing TESTED with focused tests and Control Center registration.",
+      "completion_definition": "SEM-GOV-001D-HOME1 seals Hub-aligned home landing TESTED with focused tests and Control Center registration — Hub files unchanged, gates BLOCKED.",
       "proof_required": [
-        "test:sem-gov-001d-home1 passes",
+        "npm run test:sem-gov-001d-home1 passes",
+        "npm run test:sem-gov-001d-ui2 passes",
         "Hub files unchanged",
-        "Gates BLOCKED"
+        "No fetch or /api/ on home-page.js"
       ],
       "risks_if_ignored": [
-        "Home page could remain visually inconsistent with the governed Hub"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 31,
-      "next_action": "SEM-GOV-001D-HOME1 TESTED. UI3 NOT STARTED.",
-      "owner_note": "Home consolidation only.",
+      "next_action": "SEM-GOV-001D-HOME1 home landing TESTED. UI3/UI4 NOT STARTED.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001D-HOME1",
       "current_evidence": [
-        "Hub-aligned dark index.html",
+        "Dark Hub-aligned index.html landing",
+        "Isolated home-page.css and home-page.js",
+        "Legacy embedded Hub and chat removed from home",
         "HOME1 tests pass",
-        "Migration NOT APPLIED"
+        "All gates BLOCKED"
       ]
     },
     {
       "project_id": "SEM-GOV-001D-UI3-I1",
       "project_name": "Lifecycle Read-Model API Inspection and Contract",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Programme SEM-GOV-001D: read-only inspection closure and sealed lifecycle read-model API contract with two-source law and blocker registry — no routes or services.",
-      "why_it_matters": "UI4 live Hub integration must not invent API sources, fields, or fallbacks before a governed read-model contract exists.",
+      "description": "Programme SEM-GOV-001D: read-only inspection of lifecycle API readiness, blocker registry, and sealed public read-model contract — without routes, services, migration apply, or gate clearance.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "TESTED",
       "priority": "critical",
       "blocked_by": [
         "SEM-GOV-001D-HOME1",
         "SEM-GOV-001B-I4"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI3-I2"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -1858,56 +1779,50 @@
         "SEM-GOV-001D-UI1_SPORTS_MATCH_HUB_INFORMATION_ARCHITECTURE_AND_SCREEN_CONTRACT.v1",
         "SEM-GOV-001D-UI3-I1_LIFECYCLE_READ_MODEL_API_INSPECTION_AND_CONTRACT.v1"
       ],
-      "related_files": [
-        "control-center/SEM-GOV-001D-UI3-I1_LIFECYCLE_READ_MODEL_API_INSPECTION_AND_CONTRACT.v1.md",
-        "tests/sem-gov-001d-ui3-i1-contract.test.js"
-      ],
+      "related_files": [],
       "related_tables": [],
-      "known_issues": [
-        "No lifecycle route mounted",
-        "fixture_lifecycle_current lacks public fixture metadata columns",
-        "Canonical fixture_uid-to-metadata join not proven",
-        "public_fixture_id resolver BLOCKED"
-      ],
-      "required_decisions": [
-        "Canonical fixture metadata projection approval",
-        "Non-reversible public_fixture_id design",
-        "UI3 implementation authorization after blockers cleared"
-      ],
-      "completion_definition": "SEM-GOV-001D-UI3-I1 inspection PASS WITH BLOCKER with packet guard test and Control Center registration — UI3/UI4 NOT STARTED.",
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001D-UI3-I1 seals inspection PASS WITH BLOCKER and read-model API contract — UI3/UI4 implementation NOT STARTED, migration NOT APPLIED, gates BLOCKED.",
       "proof_required": [
-        "test:sem-gov-001d-ui3-i1 passes",
-        "Gates BLOCKED",
-        "Migration NOT APPLIED"
+        "npm run test:sem-gov-001d-ui3-i1 passes",
+        "npm run test:sem-gov-001d-ui1 passes",
+        "No /api/lifecycle route mounted",
+        "All gates BLOCKED"
       ],
       "risks_if_ignored": [
-        "Live API could expose persistence rows, Scout identifiers, or unsafe fallback sources"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 32,
-      "next_action": "SEM-GOV-001D-UI3-I1 PASS WITH BLOCKER. UI3 implementation BLOCKED.",
-      "owner_note": "Inspection and contract only.",
+      "next_action": "SEM-GOV-001D-UI3-I1 inspection PASS WITH BLOCKER. UI3 implementation BLOCKED pending metadata projection, identifier design, migration apply, and gate clearance.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I1",
       "current_evidence": [
-        "Inspection findings sealed",
-        "Two-source read-model law documented",
-        "No backend lifecycle route implemented",
-        "Migration NOT APPLIED"
+        "Read-only inspection findings recorded",
+        "Two-source read-model law sealed",
+        "No lifecycle route or read-model service implemented",
+        "Migration NOT APPLIED",
+        "UI3/UI4 NOT STARTED",
+        "All gates BLOCKED"
       ]
     },
     {
       "project_id": "SEM-GOV-001D-UI3-I2",
       "project_name": "Canonical Fixture Metadata Projection Inspection and Contract",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Programme SEM-GOV-001D: read-only inspection closure and sealed Source B bounded fixture-display metadata projection contract with Scout FIP authority and raw_fixtures rejection — no schema or persistence.",
-      "why_it_matters": "UI3 Source B must not inherit provider payloads or prediction tables; canonical metadata authority and bounded projection fields must be fixed before any persistence design.",
+      "description": "Programme SEM-GOV-001D: read-only inspection of Source B canonical fixture metadata authority, rejection of raw_fixtures and unsafe fallbacks, and sealed bounded projection field contract — without schema, persistence, or intake implementation.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "TESTED",
       "priority": "critical",
       "blocked_by": [
         "SEM-GOV-001D-UI3-I1",
         "EST-001"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI3-I3"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -1922,55 +1837,50 @@
         "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
         "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
       ],
-      "related_files": [
-        "control-center/SEM-GOV-001D-UI3-I2_CANONICAL_FIXTURE_METADATA_PROJECTION_INSPECTION_AND_CONTRACT.v1.md",
-        "tests/sem-gov-001d-ui3-i2-contract.test.js"
-      ],
+      "related_files": [],
       "related_tables": [],
-      "known_issues": [
-        "raw_fixtures rejected as Source B",
-        "No fixture_uid-to-metadata projection proven",
-        "EST-001 does not yet authorize bounded projection",
-        "EFI-001 intake not implemented"
-      ],
-      "required_decisions": [
-        "EST-001 explicit authorization for bounded metadata projection",
-        "Source B storage-policy mini-project",
-        "EFI-001 intake before projection population"
-      ],
-      "completion_definition": "SEM-GOV-001D-UI3-I2 inspection PASS WITH BLOCKER with packet guard test and Control Center registration — Source B persistence NOT AUTHORIZED.",
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001D-UI3-I2 seals inspection PASS WITH BLOCKER and Source B metadata projection contract — UI3/UI4 NOT STARTED, migration NOT APPLIED, EST-001 authorization pending, gates BLOCKED.",
       "proof_required": [
-        "test:sem-gov-001d-ui3-i2 passes",
-        "Gates BLOCKED",
-        "Migration NOT APPLIED"
+        "npm run test:sem-gov-001d-ui3-i2 passes",
+        "npm run test:sem-gov-001d-ui3-i1 passes",
+        "raw_fixtures rejected as Source B",
+        "All gates BLOCKED"
       ],
       "risks_if_ignored": [
-        "UI3 could use raw_fixtures or provider payloads as fixture metadata authority"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 33,
-      "next_action": "SEM-GOV-001D-UI3-I2 PASS WITH BLOCKER. Source B persistence NOT AUTHORIZED.",
-      "owner_note": "Inspection and contract only.",
+      "next_action": "SEM-GOV-001D-UI3-I2 inspection PASS WITH BLOCKER. Source B persistence NOT AUTHORIZED pending EST-001 and storage-policy mini-project.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I2",
       "current_evidence": [
-        "Scout FIP canonical authority sealed",
-        "Bounded projection fields documented",
-        "EST-001 blocker recorded",
-        "No runtime files added"
+        "raw_fixtures rejected as canonical Source B",
+        "Scout FIP-001 named metadata authority",
+        "Bounded projection fields sealed",
+        "EST-001 authorization blocker recorded",
+        "No schema or runtime implementation",
+        "Migration NOT APPLIED",
+        "All gates BLOCKED"
       ]
     },
     {
       "project_id": "SEM-GOV-001D-UI3-I3",
       "project_name": "Source B Storage Policy and Retention Contract",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Programme SEM-GOV-001D: seal D3 DERIVED FIXTURE DISPLAY STATE, retention and purge law, capacity proof, and EST-001 amendment for UI3 Source B — no migration or runtime.",
-      "why_it_matters": "Source B persistence must have explicit EST-001 authorization, bounded retention, and capacity proof before any fixture_display_metadata implementation.",
+      "description": "Programme SEM-GOV-001D: seal D3 DERIVED FIXTURE DISPLAY STATE storage class, retention law, capacity proof, and EST-001 amendment for UI3 Source B — without migration, purge, or runtime implementation.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "TESTED",
       "priority": "critical",
       "blocked_by": [
         "SEM-GOV-001D-UI3-I2"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI3-I4"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -1985,53 +1895,49 @@
         "SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1",
         "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
       ],
-      "related_files": [
-        "control-center/SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1.md",
-        "control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md",
-        "tests/sem-gov-001d-ui3-i3-contract.test.js"
-      ],
+      "related_files": [],
       "related_tables": [],
-      "known_issues": [
-        "fixture_display_metadata reserved not created",
-        "D3 purge runtime not authorized",
-        "supabase_storage_gate BLOCKED"
-      ],
-      "required_decisions": [
-        "D3 migration implementation packet",
-        "EFI-001 intake before D3 population"
-      ],
-      "completion_definition": "SEM-GOV-001D-UI3-I3 PASS WITH CORRECTION with D3 policy, EST-001 amendment, and packet guard test.",
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001D-UI3-I3 seals PASS WITH CORRECTION and D3 storage policy — EST-001 amended, UI3/UI4 NOT STARTED, migration NOT APPLIED, gates BLOCKED.",
       "proof_required": [
-        "test:sem-gov-001d-ui3-i3 passes",
-        "359.50 MB capacity proof",
-        "Gates BLOCKED"
+        "npm run test:sem-gov-001d-ui3-i3 passes",
+        "EST-001 recognizes D3",
+        "Capacity proof >= 20 MB headroom",
+        "All gates BLOCKED"
       ],
       "risks_if_ignored": [
-        "Source B could retain indefinite metadata or exceed free-tier capacity"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 34,
-      "next_action": "SEM-GOV-001D-UI3-I3 PASS WITH CORRECTION. D3 migration NOT AUTHORIZED.",
-      "owner_note": "Storage policy only.",
+      "next_action": "SEM-GOV-001D-UI3-I3 PASS WITH CORRECTION. D3 schema design packet SEM-GOV-001D-UI3-I4 authorized.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I3",
       "current_evidence": [
-        "D3 class sealed in EST-001",
-        "30-day post-closure retention law",
-        "20.50 MB headroom preserved"
+        "D3 storage class sealed",
+        "8-day active + 30-day post-closure retention",
+        "359.50 MB projected total with 20.50 MB headroom",
+        "fixture_display_metadata reserved not created",
+        "No migration or runtime implementation",
+        "All gates BLOCKED"
       ]
     },
     {
       "project_id": "SEM-GOV-001D-UI3-I4",
       "project_name": "Source B Schema and Persistence Implementation Design",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Programme SEM-GOV-001D: implementation-ready design for D3 fixture_display_metadata table and future persistence service — no migration apply or runtime implementation.",
-      "why_it_matters": "Source B persistence requires an exact schema, upsert law, and service interface aligned with lifecycle persistence before any migration or EFI-001 wiring.",
+      "description": "Programme SEM-GOV-001D: implementation-ready design for D3 public.fixture_display_metadata and future persistence service aligned with lifecycle persistence architecture — without migration, runtime, EFI-001, or gate clearance.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "TESTED",
       "priority": "critical",
       "blocked_by": [
         "SEM-GOV-001D-UI3-I3"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI3-I5"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -2042,51 +1948,49 @@
         "SEM-GOV-001D-UI3-I4"
       ],
       "related_contracts": [
+        "SEM-GOV-001D-UI3-I1_LIFECYCLE_READ_MODEL_API_INSPECTION_AND_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I2_CANONICAL_FIXTURE_METADATA_PROJECTION_INSPECTION_AND_CONTRACT.v1",
         "SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1",
         "SEM-GOV-001D-UI3-I4_SOURCE_B_SCHEMA_AND_PERSISTENCE_IMPLEMENTATION_DESIGN.v1",
         "SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
         "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1"
       ],
-      "related_files": [
-        "control-center/SEM-GOV-001D-UI3-I4_SOURCE_B_SCHEMA_AND_PERSISTENCE_IMPLEMENTATION_DESIGN.v1.md",
-        "tests/sem-gov-001d-ui3-i4-contract.test.js"
-      ],
+      "related_files": [],
       "related_tables": [],
-      "known_issues": [
-        "fixture_display_metadata reserved not created",
-        "Lifecycle migration NOT APPLIED",
-        "supabase_storage_gate BLOCKED"
-      ],
-      "required_decisions": [
-        "D3 migration implementation packet",
-        "Lifecycle migration apply before FK activation"
-      ],
-      "completion_definition": "SEM-GOV-001D-UI3-I4 PASS WITH CORRECTION with schema design, service interface, and packet guard test.",
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001D-UI3-I4 seals PASS WITH CORRECTION design for fixture_display_metadata and persistence service — migration NOT AUTHORIZED, gates BLOCKED.",
       "proof_required": [
-        "test:sem-gov-001d-ui3-i4 passes",
-        "FK CASCADE and RLS documented",
-        "Gates BLOCKED"
+        "npm run test:sem-gov-001d-ui3-i4 passes",
+        "Schema design documents FK CASCADE and RLS",
+        "No migration or runtime files created",
+        "All gates BLOCKED"
       ],
       "risks_if_ignored": [
-        "D3 implementation could diverge from lifecycle persistence patterns or retention law"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 35,
-      "next_action": "SEM-GOV-001D-UI3-I4 PASS WITH CORRECTION. D3 migration NOT AUTHORIZED.",
-      "owner_note": "Design only.",
+      "next_action": "SEM-GOV-001D-UI3-I4 PASS WITH CORRECTION. UI3-I5 implementation authorized.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I4",
       "current_evidence": [
-        "Schema design sealed",
+        "D3 schema design sealed",
         "Persistence service interface documented",
-        "Idempotency law documented"
+        "Idempotency and stale-update law documented",
+        "fixture_display_metadata reserved not created",
+        "Lifecycle migration NOT APPLIED",
+        "All gates BLOCKED"
       ]
     },
     {
       "project_id": "SEM-GOV-001D-UI3-I5",
       "project_name": "Source B Migration and Isolated Persistence Implementation",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Programme SEM-GOV-001D: D3 migration SQL and isolated fixtureDisplayMetadataPersistenceService — no migration apply or production caller.",
-      "why_it_matters": "Source B persistence foundation must exist as tested migration and service code before EFI-001 wiring or UI3 read-model work.",
+      "description": "Programme SEM-GOV-001D: author D3 fixture_display_metadata migration and isolated fixtureDisplayMetadataPersistenceService with mock-first tests — without migration apply, production caller, or gate clearance.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "TESTED",
       "priority": "critical",
       "blocked_by": [
@@ -2107,53 +2011,45 @@
       ],
       "related_contracts": [
         "SEM-GOV-001D-UI3-I4_SOURCE_B_SCHEMA_AND_PERSISTENCE_IMPLEMENTATION_DESIGN.v1",
-        "SEM-GOV-001D-UI3-I5_SOURCE_B_MIGRATION_AND_ISOLATED_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
-        "SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1"
+        "SEM-GOV-001D-UI3-I3_SOURCE_B_STORAGE_POLICY_AND_RETENTION_CONTRACT.v1",
+        "SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
       ],
-      "related_files": [
-        "supabase/migrations/20261010000001_sem_gov_001d_ui3_i4_fixture_display_metadata.sql",
-        "backend/services/fixtureDisplayMetadataPersistenceService.js",
-        "tests/fixture-display-metadata-persistence-service.test.js",
-        "tests/sem-gov-001d-ui3-i5-implementation-packet.test.js"
-      ],
-      "related_tables": [
-        "fixture_display_metadata"
-      ],
-      "known_issues": [
-        "Migration NOT APPLIED",
-        "Lifecycle migration NOT APPLIED",
-        "supabase_storage_gate BLOCKED"
-      ],
-      "required_decisions": [
-        "Migration apply authorization",
-        "EFI-001 intake before D3 population"
-      ],
-      "completion_definition": "SEM-GOV-001D-UI3-I5 PASS WITH CORRECTION with migration, service, and tests — not applied.",
+      "related_files": [],
+      "related_tables": [],
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001D-UI3-I5 PASS WITH CORRECTION — migration authored, persistence service implemented, migration NOT APPLIED, gates BLOCKED.",
       "proof_required": [
-        "test:sem-gov-001d-ui3-i5 passes",
-        "25 physical columns",
-        "Gates BLOCKED"
+        "npm run test:sem-gov-001d-ui3-i5 passes",
+        "25-column schema in migration SQL",
+        "No production caller",
+        "All gates BLOCKED"
       ],
       "risks_if_ignored": [
-        "UI3 read model could diverge from sealed D3 persistence law"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 36,
       "next_action": "SEM-GOV-001D-UI3-I5 PASS WITH CORRECTION. UI3-I6 adapter contract authorized.",
-      "owner_note": "Isolated implementation.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I5",
       "current_evidence": [
-        "Migration SQL authored",
-        "Persistence service implemented",
-        "Mock-first tests pass"
+        "D3 migration SQL authored",
+        "fixtureDisplayMetadataPersistenceService implemented",
+        "Mock-first tests pass",
+        "Migration NOT APPLIED",
+        "Lifecycle migration NOT APPLIED",
+        "All gates BLOCKED"
       ]
     },
     {
       "project_id": "SEM-GOV-001D-UI3-I6",
       "project_name": "EFI-001 Governed Intake Inspection and Adapter Contract",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Programme SEM-GOV-001D: inspect fipIntakeService and EFI-001; seal governed adapter contract for FIP-to-envelope and FIP-to-D3 DTO mapping — no runtime implementation.",
-      "why_it_matters": "EFI-001 intake boundary must be contractually sealed before adapter implementation, D3 population, or prediction pipeline wiring.",
+      "description": "Programme SEM-GOV-001D: inspect fipIntakeService and EFI-001 contracts; seal governed adapter contract for FIP-to-envelope and FIP-to-D3 DTO mapping — no runtime implementation.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "TESTED",
       "priority": "critical",
       "blocked_by": [
@@ -2175,53 +2071,45 @@
         "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
         "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
         "SEM-GOV-001D-UI3-I6_EFI_001_GOVERNED_INTAKE_INSPECTION_AND_ADAPTER_CONTRACT.v1",
-        "SEM-GOV-001D-UI3-I5_SOURCE_B_MIGRATION_AND_ISOLATED_PERSISTENCE_IMPLEMENTATION_PACKET.v1"
+        "SEM-GOV-001D-UI3-I5_SOURCE_B_MIGRATION_AND_ISOLATED_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001D-UI3-I4_SOURCE_B_SCHEMA_AND_PERSISTENCE_IMPLEMENTATION_DESIGN.v1",
+        "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1"
       ],
-      "related_files": [
-        "control-center/SEM-GOV-001D-UI3-I6_EFI_001_GOVERNED_INTAKE_INSPECTION_AND_ADAPTER_CONTRACT.v1.md",
-        "tests/sem-gov-001d-ui3-i6-contract.test.js"
-      ],
+      "related_files": [],
       "related_tables": [],
-      "known_issues": [
-        "fixture_uid resolution NOT IMPLEMENTED",
-        "FIP-001 shape drift in fipIntakeService",
-        "Intake evidence persistence NOT IMPLEMENTED",
-        "All gates BLOCKED"
-      ],
-      "required_decisions": [
-        "Adapter implementation authorization (I7)",
-        "Marriage gate clearance",
-        "Migration apply authorization"
-      ],
-      "completion_definition": "SEM-GOV-001D-UI3-I6 PASS WITH BLOCKER — intake inspected, adapter contract sealed, no runtime changes.",
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001D-UI3-I6 PASS WITH BLOCKER — intake inspected, adapter contract sealed, no runtime changes, gates BLOCKED.",
       "proof_required": [
-        "test:sem-gov-001d-ui3-i6 passes",
+        "npm run test:sem-gov-001d-ui3-i6 passes",
         "Hash law proven",
         "Lifecycle-before-D3 sealed",
-        "Gates BLOCKED"
+        "All gates BLOCKED"
       ],
       "risks_if_ignored": [
-        "D3 could be populated before lifecycle parent exists",
-        "scout.fixture_id could be misused as fixture_uid"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 37,
       "next_action": "SEM-GOV-001D-UI3-I6 PASS WITH BLOCKER. UI3-I7 adapter implementation authorized.",
-      "owner_note": "Inspection and contract only.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I6",
       "current_evidence": [
         "fipIntakeService classified PARTIAL proof-only",
         "Hash verification proven",
         "D3 DTO crosswalk sealed",
-        "fixture_uid resolution BLOCKER documented"
+        "fixture_uid resolution BLOCKER documented",
+        "No runtime changes",
+        "All gates BLOCKED"
       ]
     },
     {
       "project_id": "SEM-GOV-001D-UI3-I7",
       "project_name": "Governed FIP Intake Adapter Implementation",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Programme SEM-GOV-001D: implement isolated governed FIP intake adapter with identity resolution, D3 orchestration, and injected evidence — no route or production caller.",
-      "why_it_matters": "EFI-001 requires a governed adapter before HTTP boundary, durable evidence, or pipeline activation.",
+      "description": "Programme SEM-GOV-001D: implement isolated governed FIP intake adapter with identity resolution, D3 orchestration, envelope mapping, and injected evidence — no route, migration apply, or production caller.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "TESTED",
       "priority": "critical",
       "blocked_by": [
@@ -2241,54 +2129,46 @@
       ],
       "related_contracts": [
         "SEM-GOV-001D-UI3-I6_EFI_001_GOVERNED_INTAKE_INSPECTION_AND_ADAPTER_CONTRACT.v1",
-        "SEM-GOV-001D-UI3-I7_GOVERNED_FIP_INTAKE_ADAPTER_IMPLEMENTATION_PACKET.v1",
         "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
-        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1"
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I7_GOVERNED_FIP_INTAKE_ADAPTER_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001D-UI3-I5_SOURCE_B_MIGRATION_AND_ISOLATED_PERSISTENCE_IMPLEMENTATION_PACKET.v1"
       ],
-      "related_files": [
-        "backend/services/governedFipIntakeAdapter.js",
-        "backend/services/fixtureIdentityResolverService.js",
-        "backend/services/fipIntakeService.js",
-        "tests/governed-fip-intake-adapter.test.js",
-        "tests/fixture-identity-resolver-service.test.js"
-      ],
+      "related_files": [],
       "related_tables": [],
-      "known_issues": [
-        "No HTTP intake route",
-        "Migrations NOT APPLIED",
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001D-UI3-I7 PASS WITH CORRECTION — adapter implemented with mock-first tests, no route or production caller, gates BLOCKED.",
+      "proof_required": [
+        "npm run test:sem-gov-001d-ui3-i7 passes",
+        "FIP-001 canonical validation",
+        "Identity resolver isolated",
         "All gates BLOCKED"
       ],
-      "required_decisions": [
-        "HTTP boundary authorization",
-        "Marriage gate clearance"
-      ],
-      "completion_definition": "SEM-GOV-001D-UI3-I7 PASS WITH CORRECTION — adapter implemented with mock-first tests, no production caller.",
-      "proof_required": [
-        "test:sem-gov-001d-ui3-i7 passes",
-        "FIP-001 validation",
-        "Identity resolver isolated",
-        "Gates BLOCKED"
-      ],
       "risks_if_ignored": [
-        "Intake could be wired without durable evidence or HTTP auth"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 38,
       "next_action": "SEM-GOV-001D-UI3-I7 PASS WITH CORRECTION. Durable evidence storage authorized in UI3-I8.",
-      "owner_note": "Isolated adapter only.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I7",
       "current_evidence": [
-        "Adapter and resolver implemented",
+        "governedFipIntakeAdapter implemented",
+        "fixtureIdentityResolverService implemented",
+        "fipIntakeService FIP-001 aligned",
         "Mock-first tests pass",
-        "No production caller"
+        "No production caller",
+        "All gates BLOCKED"
       ]
     },
     {
       "project_id": "SEM-GOV-001D-UI3-I8",
       "project_name": "Durable Intake Evidence Storage and Isolated Implementation",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Programme SEM-GOV-001D: author bounded fip_intake_evidence migration and isolated intake evidence service — no migration apply, route, or production caller.",
-      "why_it_matters": "I7 adapter requires durable R2 intake evidence authority before production intake activation.",
+      "description": "Programme SEM-GOV-001D: author bounded fip_intake_evidence migration and isolated intake evidence service with mock-first tests — no migration apply, route, or production caller.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "TESTED",
       "priority": "critical",
       "blocked_by": [
@@ -2308,56 +2188,48 @@
         "SEM-GOV-001D-UI3-I8"
       ],
       "related_contracts": [
-        "SEM-GOV-001D-UI3-I8_DURABLE_INTAKE_EVIDENCE_STORAGE_IMPLEMENTATION_PACKET.v1",
         "SEM-GOV-001D-UI3-I7_GOVERNED_FIP_INTAKE_ADAPTER_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001D-UI3-I6_EFI_001_GOVERNED_INTAKE_INSPECTION_AND_ADAPTER_CONTRACT.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
         "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
-        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1"
+        "SEM-GOV-001D-UI3-I8_DURABLE_INTAKE_EVIDENCE_STORAGE_IMPLEMENTATION_PACKET.v1"
       ],
-      "related_files": [
-        "supabase/migrations/20261011000001_sem_gov_001d_ui3_i8_fip_intake_evidence.sql",
-        "backend/services/fipIntakeEvidenceService.js",
-        "backend/services/governedFipIntakeAdapter.js",
-        "tests/fip-intake-evidence-service.test.js"
-      ],
-      "related_tables": [
-        "fip_intake_evidence"
-      ],
-      "known_issues": [
-        "Migration NOT APPLIED",
-        "No HTTP intake route",
+      "related_files": [],
+      "related_tables": [],
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001D-UI3-I8 PASS WITH CORRECTION — migration authored, evidence service implemented, mock-first tests pass, migration NOT APPLIED, gates BLOCKED.",
+      "proof_required": [
+        "npm run test:sem-gov-001d-ui3-i8 passes",
+        "EST-001 R2 retention sealed",
+        "Gate-before-DB proof",
         "All gates BLOCKED"
       ],
-      "required_decisions": [
-        "Migration apply authorization",
-        "HTTP boundary authorization",
-        "Marriage gate clearance"
-      ],
-      "completion_definition": "SEM-GOV-001D-UI3-I8 PASS WITH CORRECTION — migration authored, evidence service implemented, mock-first tests pass.",
-      "proof_required": [
-        "test:sem-gov-001d-ui3-i8 passes",
-        "EST-001 R2 retention sealed",
-        "Gates BLOCKED"
-      ],
       "risks_if_ignored": [
-        "Intake evidence could be lost or duplicated without durable R2 authority"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 39,
       "next_action": "SEM-GOV-001D-UI3-I8 PASS WITH CORRECTION. Composition root authorized in UI3-I9.",
-      "owner_note": "Isolated evidence storage foundation only.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I8",
       "current_evidence": [
-        "Migration and service implemented",
+        "fip_intake_evidence migration authored",
+        "fipIntakeEvidenceService implemented",
         "Mock-first tests pass",
-        "Migration NOT APPLIED"
+        "I7 adapter envelope unwrap correction",
+        "Migration NOT APPLIED",
+        "All gates BLOCKED"
       ]
     },
     {
       "project_id": "SEM-GOV-001D-UI3-I9",
       "project_name": "Production Composition and M2M Auth Foundation",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Programme SEM-GOV-001D: wire isolated governed FIP intake composition root with HMAC M2M authenticator — no route or production activation.",
-      "why_it_matters": "Production intake requires a composition root and machine authentication before HTTP boundary authorization.",
+      "description": "Programme SEM-GOV-001D: wire isolated governed FIP intake composition root with HMAC M2M authenticator — no route, migration apply, or production activation.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "TESTED",
       "priority": "critical",
       "blocked_by": [
@@ -2376,47 +2248,38 @@
         "SEM-GOV-001D-UI3-I9"
       ],
       "related_contracts": [
-        "SEM-GOV-001D-UI3-I9_PRODUCTION_COMPOSITION_AND_M2M_AUTH_FOUNDATION_PACKET.v1",
         "SEM-GOV-001D-UI3-I8_DURABLE_INTAKE_EVIDENCE_STORAGE_IMPLEMENTATION_PACKET.v1",
         "SEM-GOV-001D-UI3-I7_GOVERNED_FIP_INTAKE_ADAPTER_IMPLEMENTATION_PACKET.v1",
-        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1"
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I9_PRODUCTION_COMPOSITION_AND_M2M_AUTH_FOUNDATION_PACKET.v1"
       ],
-      "related_files": [
-        "backend/services/governedFipIntakeComposition.js",
-        "backend/services/fipIntakeM2MAuthenticator.js",
-        "tests/governed-fip-intake-composition.test.js",
-        "tests/fip-intake-m2m-authenticator.test.js"
-      ],
+      "related_files": [],
       "related_tables": [],
-      "known_issues": [
-        "No HTTP intake route",
-        "Feature flag disabled by default",
-        "Migrations NOT APPLIED",
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001D-UI3-I9 PASS — composition and M2M auth implemented, feature flag disabled by default, no route or production caller, gates BLOCKED.",
+      "proof_required": [
+        "npm run test:sem-gov-001d-ui3-i9 passes",
+        "No secrets in source",
+        "Feature flag fail-closed",
         "All gates BLOCKED"
       ],
-      "required_decisions": [
-        "HTTP boundary authorization",
-        "Feature flag enablement",
-        "Marriage gate clearance"
-      ],
-      "completion_definition": "SEM-GOV-001D-UI3-I9 PASS — composition and M2M auth implemented with fail-closed defaults.",
-      "proof_required": [
-        "test:sem-gov-001d-ui3-i9 passes",
-        "No secrets in source",
-        "Gates BLOCKED"
-      ],
       "risks_if_ignored": [
-        "Intake could be wired without authenticated caller verification"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 40,
       "next_action": "SEM-GOV-001D-UI3-I9 PASS. Migration readiness authorized in UI3-I10.",
-      "owner_note": "Isolated composition foundation only.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-14",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I9",
       "current_evidence": [
-        "Composition and authenticator implemented",
+        "governedFipIntakeComposition implemented",
+        "fipIntakeM2MAuthenticator implemented",
         "Mock-first tests pass",
-        "No production caller"
+        "No HTTP route",
+        "No production caller",
+        "All gates BLOCKED"
       ]
     },
     {
@@ -2424,7 +2287,7 @@
       "project_name": "Migration Readiness and Controlled Apply",
       "category": "Unified Sports Intelligence Lifecycle",
       "description": "Programme SEM-GOV-001D: migration readiness checker, atomic controlled apply, eight-table schema proof — runtime gates remain BLOCKED.",
-      "why_it_matters": "Controlled migration apply requires proven static and live readiness before any DDL execution.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "TESTED",
       "priority": "critical",
       "blocked_by": [
@@ -2443,57 +2306,44 @@
         "SEM-GOV-001D-UI3-I10"
       ],
       "related_contracts": [
-        "SEM-GOV-001D-UI3-I10_MIGRATION_READINESS_AND_CONTROLLED_APPLY_PACKET.v1",
         "SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
         "SEM-GOV-001D-UI3-I5_SOURCE_B_MIGRATION_AND_ISOLATED_PERSISTENCE_IMPLEMENTATION_PACKET.v1",
-        "SEM-GOV-001D-UI3-I8_DURABLE_INTAKE_EVIDENCE_STORAGE_IMPLEMENTATION_PACKET.v1"
+        "SEM-GOV-001D-UI3-I8_DURABLE_INTAKE_EVIDENCE_STORAGE_IMPLEMENTATION_PACKET.v1",
+        "SEM-GOV-001D-UI3-I10_MIGRATION_READINESS_AND_CONTROLLED_APPLY_PACKET.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1"
       ],
-      "related_files": [
-        "scripts/check-ui3-i10-migration-readiness.js",
-        "scripts/apply-ui3-i10-controlled-migrations.js",
-        "reports/ui3-i10/migration-readiness.json",
-        "reports/ui3-i10/controlled-apply-result.json",
-        "reports/ui3-i10/migration-history-reconciliation.json",
-        "supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql"
-      ],
-      "related_tables": [
-        "fixture_lifecycle_current",
-        "fixture_display_metadata",
-        "fip_intake_evidence"
-      ],
-      "known_issues": [
-        "supabase_storage_gate BLOCKED",
-        "Runtime activation BLOCKED",
-        "All gates BLOCKED"
-      ],
-      "required_decisions": [
-        "supabase_storage_gate runtime clearance",
-        "HTTP route authorization",
-        "Production activation authorization"
-      ],
-      "completion_definition": "SEM-GOV-001D-UI3-I10 PASS WITH CORRECTION — Gate A readiness PASS, Gate B schema apply PASS WITH CORRECTION, Gate B-C1 reconciliation PASS, formal Gate B closure, runtime gates BLOCKED.",
+      "related_files": [],
+      "related_tables": [],
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "SEM-GOV-001D-UI3-I10 PASS WITH CORRECTION — Gate A readiness PASS, Gate B atomic schema apply PASS WITH CORRECTION, Gate B-C1 migration history reconciliation PASS, formal Gate B closure, eight tables with RLS and zero rows, runtime gates BLOCKED.",
       "proof_required": [
-        "test:sem-gov-001d-ui3-i10 passes",
-        "test:sem-gov-001d-ui3-i10-apply passes",
-        "controlled-apply-result.json PASS",
-        "migration-history-reconciliation.json PASS",
-        "Gates BLOCKED"
+        "npm run test:sem-gov-001d-ui3-i10 passes",
+        "npm run test:sem-gov-001d-ui3-i10-apply passes",
+        "controlled-apply-result.json result PASS",
+        "migration-history-reconciliation.json result PASS",
+        "Eight tables with RLS, zero policies, zero rows",
+        "All runtime gates BLOCKED"
       ],
       "risks_if_ignored": [
-        "Migrations could be applied without collision or capacity proof"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 41,
       "next_action": "SEM-GOV-001D-UI3-I10 formal Gate B closure PASS. I11 Gate A authorized.",
-      "owner_note": "Gate B schema apply and B-C1 history reconciliation complete.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-15",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I10",
       "current_evidence": [
         "Readiness checker PASS",
+        "Live read-only inspection PASS",
+        "Lifecycle RLS correction applied",
         "Gate B atomic apply PASS WITH CORRECTION",
         "Gate B-C1 migration history reconciliation PASS",
         "Formal Gate B closure PASS",
-        "Eight tables with RLS and zero rows",
-        "Lifecycle RLS correction"
+        "Eight tables created with RLS",
+        "Zero public policies and zero seeded rows",
+        "All runtime gates BLOCKED"
       ]
     },
     {
@@ -2501,7 +2351,7 @@
       "project_name": "Controlled End-to-End Marriage Proof",
       "category": "Unified Sports Intelligence Lifecycle",
       "description": "Gate A contract reconciliation, Gate B mock-only orchestration proof, and Gate B-C1 HMAC submitted-body hash binding correction complete; full live marriage proof remains HOLD and all runtime gates remain BLOCKED.",
-      "why_it_matters": "Marriage proof must not proceed to live execution until contract drift is reconciled and mock boundaries are sealed.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "TESTED",
       "priority": "critical",
       "blocked_by": [
@@ -2528,32 +2378,8 @@
         "SEM-GOV-001D-UI3-I11_GATE_B_C1_HMAC_BODY_HASH_BINDING_CORRECTION_PACKET.v1",
         "SEM-GOV-001D-UI3-I11_GATE_C_FORMAL_CLOSURE_AND_E2E_READINESS_PACKET.v1"
       ],
-      "related_files": [
-        "backend/services/fipIntakeM2MAuthenticator.js",
-        "backend/services/governedFipIntakeAdapter.js",
-        "reports/ui3-i11/marriage-proof-inspection.json",
-        "reports/ui3-i11/mock-orchestration-evidence.json",
-        "reports/ui3-i11/gate-b-c1-hmac-body-hash-binding-evidence.json",
-        "reports/ui3-i11/gate-c-formal-closure-evidence.json",
-        "control-center/SEM-GOV-001D-UI3-I11_CONTRACT_RECONCILIATION_AND_MOCK_PROOF_AUTHORIZATION_PACKET.v1.md",
-        "control-center/SEM-GOV-001D-UI3-I11_GATE_B_MOCK_ONLY_ORCHESTRATION_PROOF_PACKET.v1.md",
-        "control-center/SEM-GOV-001D-UI3-I11_GATE_B_C1_HMAC_BODY_HASH_BINDING_CORRECTION_PACKET.v1.md",
-        "control-center/SEM-GOV-001D-UI3-I11_GATE_C_FORMAL_CLOSURE_AND_E2E_READINESS_PACKET.v1.md",
-        "tests/helpers/ui3-i11-gate-b-harness.js",
-        "tests/helpers/ui3-i11-gate-b-hmac.js",
-        "tests/helpers/ui3-i11-in-memory-database.js",
-        "tests/sem-gov-001d-ui3-i11-inspection.test.js",
-        "tests/sem-gov-001d-ui3-i11-gate-b-security-preflight.test.js",
-        "tests/sem-gov-001d-ui3-i11-gate-b-mock-orchestration.test.js",
-        "tests/sem-gov-001d-ui3-i11-gate-b-governance.test.js",
-        "tests/sem-gov-001d-ui3-i11-gate-b-c1-body-hash-binding.test.js",
-        "tests/sem-gov-001d-ui3-i11-gate-b-c1-governance.test.js",
-        "tests/sem-gov-001d-ui3-i11-gate-c-closure.test.js",
-        "package.json"
-      ],
-      "related_tables": [
-        "fip_intake_evidence"
-      ],
+      "related_files": [],
+      "related_tables": [],
       "known_issues": [
         "Full live marriage proof HOLD",
         "E2E-001 execution remains BLOCKED",
@@ -2581,11 +2407,12 @@
         "All runtime gates BLOCKED"
       ],
       "risks_if_ignored": [
-        "Live marriage proof could be attempted before contract reconciliation"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 42,
       "next_action": "SEM-GOV-001D-UI3-I11 is closed as TESTED with Gate B PASS_MOCK_ONLY and Gate B-C1 PASS. Next perform a separate E2E-001 execution-readiness blocker reconciliation. Do not authorize live proof execution, runtime activation, I12, D1, R1, Scout transport, or governance-gate clearance in this closure.",
-      "owner_note": "I11 mock-only proof is formally closed. No live execution, runtime route, gate clearance, I12, D1, or R1 authorization.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-15",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I11",
       "current_evidence": [

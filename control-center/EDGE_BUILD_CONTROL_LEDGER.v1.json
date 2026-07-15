@@ -964,7 +964,7 @@
       "task_id": "E2E-001",
       "task_name": "Scout to Edge End-to-End Proof",
       "workstream": "Scout Handoff",
-      "description": "Prove one governed validated Scout FIP can cross the approved intake boundary, drive Edge analysis, and produce derived Edge output without direct external sports acquisition or unnecessary Scout-data retention in Supabase.",
+      "description": "Reconcile current execution readiness after the completed I11 mock-only proof, identify satisfied foundations and remaining live-proof blockers, and preserve fail-closed governance without executing the proof.",
       "status": "BLOCKED",
       "priority": "critical",
       "blocked_by": [
@@ -986,10 +986,23 @@
         "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1",
         "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
         "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
-        "E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1"
+        "EPI-001_PREDICTION_PIPELINE_INTEGRITY_CONTRACT.v1",
+        "EPRV-001_EXTERNAL_PROVIDER_REMOVAL_INSPECTION_CONTRACT.v1",
+        "E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1",
+        "SEM-GOV-001D-UI3-I11_GATE_C_FORMAL_CLOSURE_AND_E2E_READINESS_PACKET.v1",
+        "E2E-001_C2_EXECUTION_READINESS_BLOCKER_RECONCILIATION.v1"
       ],
       "affected_files": [
-        "control-center/E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1.md"
+        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
+        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
+        "control-center/EDGE_PROJECT_BACKLOG.md",
+        "control-center/E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1.md",
+        "control-center/E2E-001_C2_EXECUTION_READINESS_BLOCKER_RECONCILIATION.v1.md",
+        "reports/e2e-001/execution-readiness-reconciliation.json",
+        "reports/ui3-i10/controlled-apply-result.json",
+        "reports/ui3-i11/gate-c-formal-closure-evidence.json",
+        "tests/e2e-001-c2-execution-readiness.test.js",
+        "package.json"
       ],
       "affected_tables": [],
       "completion_definition": "A controlled end-to-end proof demonstrates Scout-to-Edge FIP intake, validation, idempotency, analysis, provenance linkage, minimal retention, and zero reachable direct external sports acquisition.",
@@ -1003,22 +1016,30 @@
         "Provider reachability proof"
       ],
       "current_evidence": [
-        "E2E-001-C1 sealed control-center/E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1.md",
-        "Proof route, FIP sample requirements, EFI-001 intake behavior, EST-001 audit/retention behavior, and EMG-001 pass/fail mapping defined",
-        "Execution remains BLOCKED; no actual E2E proof run performed"
+        "FIP-001 committed authority is registered and recognized by Edge",
+        "EFI-001 is TESTED and the fail-closed canonical FIP intake foundation exists",
+        "Governed intake adapter, fixture identity resolution, composition root, and HMAC M2M authentication foundations exist",
+        "Gate B mock-only orchestration proof PASS_MOCK_ONLY",
+        "Gate B-C1 submitted-body HMAC binding correction PASS",
+        "I10 controlled schema apply PASS with eight RLS-enabled zero-seed tables",
+        "public.fip_intake_evidence is the canonical bounded R2 intake evidence table",
+        "No production FIP route or controlled Scout transport is authorized",
+        "EPI-001 contract is TESTED but D1 prediction and R1 provenance runtime integration remain absent",
+        "ESEC-001 remains PROPOSED",
+        "EPRV-001 remains PARTIAL with direct external acquisition still reachable",
+        "Full marriage proof remains HOLD and all runtime governance gates remain BLOCKED"
       ],
       "open_gaps": [
-        "EFI-001 runtime intake boundary not implemented",
-        "EST-001 schema and storage enforcement not implemented",
-        "ESEC-001 security boundary not proven",
-        "EPI-001 pipeline integrity not proven",
-        "EPRV-001 provider removal incomplete (PARTIAL)",
-        "Controlled Scout FIP proof sample not yet authorized for execution",
-        "Marriage and storage gates remain BLOCKED"
+        "ESEC-001 subscriber, service-role, RLS, secrets, and Scout-integration credential boundary is not inspected or tested",
+        "D1 prediction output integration from the governed EdgeAnalysisEnvelope is not implemented",
+        "R1 provenance linkage from FIP identity and validation hash to derived prediction output is not implemented",
+        "EPRV-001 remains PARTIAL and direct external sports-truth acquisition remains reachable",
+        "Controlled canonical Scout FIP sample and governed Scout-to-Edge transport are not authorized",
+        "Live proof-mode route, feature flag, storage gate, lifecycle governor, rollback, and execution authorization remain blocked"
       ],
-      "next_action": "Planning complete (E2E-001-C1). FIP-001 authority registered. Remain BLOCKED until implementation prerequisites satisfied and separate proof execution authorization.",
-      "owner_note": "This is the final technical proof before the Scout-Edge marriage gate can be separately approved. Planning does not clear the gate.",
-      "last_updated": "2026-07-12"
+      "next_action": "E2E-001-C2 execution-readiness reconciliation PASS WITH BLOCKERS. Next separately approve ESEC-001-C1 subscriber, service-role, RLS, secrets, and Scout-integration credential boundary inspection. Do not execute the live proof, authorize Scout transport, implement D1 or R1, alter provider runtime, enable routes or feature flags, or clear any runtime governance gate in this reconciliation.",
+      "owner_note": "Readiness reconciliation only. E2E-001 remains BLOCKED; full marriage proof remains HOLD.",
+      "last_updated": "2026-07-15"
     },
     {
       "task_id": "ESA-RR-001",

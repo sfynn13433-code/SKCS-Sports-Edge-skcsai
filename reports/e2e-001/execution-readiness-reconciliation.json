@@ -1,0 +1,120 @@
+{
+  "task": "E2E-001",
+  "miniProject": "E2E-001-C2",
+  "operation": "EXECUTION_READINESS_BLOCKER_RECONCILIATION",
+  "startHead": "c14f839cb6482c7d58dd04bdac5705bbd94e57fb",
+  "generatedAt": "2026-07-15T00:00:00.000Z",
+  "result": "PASS_WITH_BLOCKERS",
+  "decision": "EXECUTION_READINESS_RECONCILED_LIVE_PROOF_BLOCKED",
+  "codeRequired": true,
+  "planningStatementsSuperseded": [
+    {
+      "statement": "EFI-001 runtime intake boundary not implemented",
+      "correctedState": "Intake foundation TESTED; production route and Scout transport remain absent."
+    },
+    {
+      "statement": "EST-001 schema not implemented",
+      "correctedState": "R2 evidence and lifecycle/display schemas applied; R1/D1 integration remains absent."
+    },
+    {
+      "statement": "public.fip_intake_events is canonical",
+      "correctedState": "public.fip_intake_evidence is canonical."
+    }
+  ],
+  "readinessMatrix": [
+    {
+      "id": "FIP-001",
+      "status": "SATISFIED_FOUNDATION",
+      "evidence": "Committed canonical FIP authority is registered."
+    },
+    {
+      "id": "EFI-001",
+      "status": "SATISFIED_MOCK_ONLY",
+      "evidence": "Fail-closed intake, adapter, composition and HMAC foundation are tested; no production receive route exists."
+    },
+    {
+      "id": "EST-001-R2",
+      "status": "SATISFIED_SCHEMA_ONLY",
+      "evidence": "public.fip_intake_evidence exists with RLS; runtime gates remain blocked."
+    },
+    {
+      "id": "ESEC-001",
+      "status": "BLOCKED",
+      "evidence": "Task remains PROPOSED with no canonical tested security-boundary proof."
+    },
+    {
+      "id": "EPI-001-D1-R1",
+      "status": "BLOCKED",
+      "evidence": "Pipeline contract is tested, but governed D1 prediction and R1 provenance integration are absent."
+    },
+    {
+      "id": "EPRV-001",
+      "status": "BLOCKED",
+      "evidence": "Task remains PARTIAL and external acquisition is still reachable."
+    },
+    {
+      "id": "SCOUT-TRANSPORT-SAMPLE",
+      "status": "BLOCKED",
+      "evidence": "No controlled Scout sample or governed transport is authorized."
+    },
+    {
+      "id": "LIVE-PROOF-AUTHORIZATION",
+      "status": "BLOCKED",
+      "evidence": "Proof-mode route, feature flag, storage/lifecycle authorization and rollback approval are absent."
+    }
+  ],
+  "remainingBlockerCount": 5,
+  "remainingBlockers": [
+    {
+      "id": "ESEC-001",
+      "status": "BLOCKED",
+      "evidence": "Task remains PROPOSED with no canonical tested security-boundary proof."
+    },
+    {
+      "id": "EPI-001-D1-R1",
+      "status": "BLOCKED",
+      "evidence": "Pipeline contract is tested, but governed D1 prediction and R1 provenance integration are absent."
+    },
+    {
+      "id": "EPRV-001",
+      "status": "BLOCKED",
+      "evidence": "Task remains PARTIAL and external acquisition is still reachable."
+    },
+    {
+      "id": "SCOUT-TRANSPORT-SAMPLE",
+      "status": "BLOCKED",
+      "evidence": "No controlled Scout sample or governed transport is authorized."
+    },
+    {
+      "id": "LIVE-PROOF-AUTHORIZATION",
+      "status": "BLOCKED",
+      "evidence": "Proof-mode route, feature flag, storage/lifecycle authorization and rollback approval are absent."
+    }
+  ],
+  "executionReady": false,
+  "e2e001Status": "BLOCKED",
+  "fullMarriageProofDecision": "HOLD",
+  "liveProofExecutionAuthorized": false,
+  "scoutTransportAuthorized": false,
+  "productionRouteAuthorized": false,
+  "runtimeActivationAuthorized": false,
+  "d1Implemented": false,
+  "r1Implemented": false,
+  "externalConnections": 0,
+  "nextAuthorizedMiniProject": {
+    "id": "ESEC-001-C1",
+    "mode": "SECURITY_BOUNDARY_INSPECTION_AND_CONTRACT",
+    "runtimeChangesAuthorized": false
+  },
+  "currentRuntimeGates": {
+    "scout_edge_marriage_gate": "BLOCKED",
+    "unified_lifecycle_governor": "BLOCKED",
+    "supabase_storage_gate": "BLOCKED"
+  },
+  "runtimeFilesChanged": [],
+  "preservedUntrackedDirectories": [
+    "evidence/",
+    "evidence-home1-scratch/"
+  ],
+  "nextAction": "E2E-001-C2 execution-readiness reconciliation PASS WITH BLOCKERS. Next separately approve ESEC-001-C1 subscriber, service-role, RLS, secrets, and Scout-integration credential boundary inspection. Do not execute the live proof, authorize Scout transport, implement D1 or R1, alter provider runtime, enable routes or feature flags, or clear any runtime governance gate in this reconciliation."
+}
