@@ -2423,7 +2423,7 @@
       "project_id": "SEM-GOV-001D-UI3-I10",
       "project_name": "Migration Readiness and Controlled Apply",
       "category": "Unified Sports Intelligence Lifecycle",
-      "description": "Programme SEM-GOV-001D: migration readiness checker, static tests, read-only live inspection — Gate B apply deferred.",
+      "description": "Programme SEM-GOV-001D: migration readiness checker, atomic controlled apply, eight-table schema proof — runtime gates remain BLOCKED.",
       "why_it_matters": "Controlled migration apply requires proven static and live readiness before any DDL execution.",
       "current_status": "TESTED",
       "priority": "critical",
@@ -2448,7 +2448,9 @@
       ],
       "related_files": [
         "scripts/check-ui3-i10-migration-readiness.js",
+        "scripts/apply-ui3-i10-controlled-migrations.js",
         "reports/ui3-i10/migration-readiness.json",
+        "reports/ui3-i10/controlled-apply-result.json",
         "supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql"
       ],
       "related_tables": [
@@ -2457,32 +2459,34 @@
         "fip_intake_evidence"
       ],
       "known_issues": [
-        "Gate B apply NOT EXECUTED",
         "supabase_storage_gate BLOCKED",
+        "Runtime activation BLOCKED",
         "All gates BLOCKED"
       ],
       "required_decisions": [
-        "Gate B controlled apply authorization",
-        "supabase_storage_gate clearance",
-        "Backup confirmation"
+        "supabase_storage_gate runtime clearance",
+        "HTTP route authorization",
+        "Production activation authorization"
       ],
-      "completion_definition": "SEM-GOV-001D-UI3-I10 PASS WITH CORRECTION — Gate A readiness PASS, Gate B apply deferred.",
+      "completion_definition": "SEM-GOV-001D-UI3-I10 PASS WITH CORRECTION — Gate A readiness PASS, Gate B schema apply PASS, runtime gates BLOCKED.",
       "proof_required": [
         "test:sem-gov-001d-ui3-i10 passes",
-        "migration-readiness.json PASS",
+        "test:sem-gov-001d-ui3-i10-apply passes",
+        "controlled-apply-result.json PASS",
         "Gates BLOCKED"
       ],
       "risks_if_ignored": [
         "Migrations could be applied without collision or capacity proof"
       ],
       "recommended_order": 41,
-      "next_action": "SEM-GOV-001D-UI3-I10 PASS WITH CORRECTION. Gate B apply NOT AUTHORIZED.",
-      "owner_note": "Readiness only.",
-      "last_updated": "2026-07-14",
+      "next_action": "SEM-GOV-001D-UI3-I10 PASS WITH CORRECTION. Schema applied; runtime activation BLOCKED.",
+      "owner_note": "Gate B schema-only apply complete.",
+      "last_updated": "2026-07-15",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I10",
       "current_evidence": [
         "Readiness checker PASS",
-        "Live inspection PASS",
+        "Gate B atomic apply PASS",
+        "Eight tables with RLS and zero rows",
         "Lifecycle RLS correction"
       ]
     }

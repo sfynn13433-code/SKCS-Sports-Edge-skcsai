@@ -3,12 +3,13 @@
 | Field | Value |
 |---|---|
 | Packet ID | SEM-GOV-001D-UI3-I10 |
-| Start HEAD | `bf12011b21dfd6172b8f64c64f3a01d7ac653f88` |
-| Mode | Readiness only — Gate A inspection; Gate B apply **NOT EXECUTED** |
+| Gate A start HEAD | `21e436da4ff16946519d8a6842b99bf7ae684328` |
+| Gate B start HEAD | `21e436da4ff16946519d8a6842b99bf7ae684328` |
+| Mode | Gate A readiness + Gate B controlled schema apply |
 | Gate A decision | **PASS** |
-| Gate B decision | **HOLD** (apply deferred — separate authorization required) |
+| Gate B decision | **PASS WITH CORRECTION** |
 | `scout_edge_marriage_gate` | **BLOCKED** (unchanged) |
-| `supabase_storage_gate` | **BLOCKED** (unchanged) |
+| `supabase_storage_gate` | **BLOCKED** (schema exists; runtime writes prohibited — no `CLEARED_FOR_SCHEMA_ONLY` enum) |
 | `unified_lifecycle_governor` | **BLOCKED** (unchanged) |
 
 ---
@@ -16,7 +17,8 @@
 ## A. Authority and start HEAD
 
 - **Controlling contracts:** `SEM-GOV-001B-I4_LIFECYCLE_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md`, `SEM-GOV-001D-UI3-I5_SOURCE_B_MIGRATION_AND_ISOLATED_PERSISTENCE_IMPLEMENTATION_PACKET.v1.md`, `SEM-GOV-001D-UI3-I8_DURABLE_INTAKE_EVIDENCE_STORAGE_IMPLEMENTATION_PACKET.v1.md`, `EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md`
-- **Start HEAD:** `bf12011b21dfd6172b8f64c64f3a01d7ac653f88`
+- **Gate A start HEAD:** `21e436da4ff16946519d8a6842b99bf7ae684328`
+- **Gate B start HEAD:** `21e436da4ff16946519d8a6842b99bf7ae684328`
 
 ---
 
@@ -25,26 +27,35 @@
 | Gate | Scope | Result |
 |---|---|---|
 | **Gate A** | Static migration inspection + read-only live Supabase snapshot | **PASS** |
-| **Gate B** | Controlled migration apply | **HOLD** — not executed in I10 closure |
+| **Gate B** | Atomic controlled migration apply (schema only) | **PASS WITH CORRECTION** |
 
-Gate B may proceed only after explicit human authorization, `supabase_storage_gate` clearance, and successful backup confirmation.
+Runtime activation remains prohibited. Gate B applied DDL only.
 
 ---
 
 ## C. Files implemented
 
-### Created
+### Created (Gate A)
 - `scripts/check-ui3-i10-migration-readiness.js`
 - `tests/sem-gov-001d-ui3-i10-migration-readiness.test.js`
 - `reports/ui3-i10/migration-readiness.json`
 - `control-center/SEM-GOV-001D-UI3-I10_MIGRATION_READINESS_AND_CONTROLLED_APPLY_PACKET.v1.md`
 - `tests/sem-gov-001d-ui3-i10-implementation-packet.test.js`
 
-### Modified (proven correction)
-- `supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql` — RLS enabled on all six lifecycle tables
+### Created (Gate B)
+- `scripts/apply-ui3-i10-controlled-migrations.js`
+- `tests/sem-gov-001d-ui3-i10-controlled-apply.test.js`
+- `reports/ui3-i10/pre-apply-schema-snapshot.json`
+- `reports/ui3-i10/post-apply-schema-snapshot.json`
+- `reports/ui3-i10/controlled-apply-result.json`
+
+### Modified (proven corrections)
+- `supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql` — RLS enabled on all six lifecycle tables (Gate A)
+- `scripts/apply-ui3-i10-controlled-migrations.js` — pooler session port normalization + pgcrypto strip at apply time (Gate B)
+- `package.json` — `test:sem-gov-001d-ui3-i10-apply`
 
 ### Unchanged boundary
-- No routes, no feature-flag enablement, no production caller, no Scout traffic, no migration apply
+- No HTTP route, no feature-flag enablement, no production caller, no Scout traffic, no lifecycle admission, no seeded rows
 
 ---
 
@@ -58,17 +69,15 @@ Gate B may proceed only after explicit human authorization, `supabase_storage_ga
 
 ---
 
-## E. Lifecycle RLS correction
+## E. Lifecycle RLS correction (Gate A)
 
 **Finding:** Initial static inspection reported `RLS_NOT_ENABLED_IN_MIGRATION` on all six lifecycle tables.
-
-**Authorization:** SEM-GOV-001B-I4 seals gate-before-database backend-only persistence via `lifecyclePersistenceService` with no production caller while gates remain BLOCKED — same security model as UI3-I5 D3 migration (RLS enabled, no anon/authenticated policies, service-role backend only).
 
 **Correction applied:** `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` on all six lifecycle tables. No `CREATE POLICY` statements added.
 
 ---
 
-## F. Static readiness result
+## F. Static readiness result (Gate A)
 
 | Check | Result |
 |---|---|
@@ -82,46 +91,81 @@ Static blockers after correction: **0**
 
 ---
 
-## G. Live read-only inspection result
+## G. Live read-only inspection result (Gate A)
 
 | Metric | Value |
 |---|---|
 | Inspected | **true** |
-| Database size | **152,095,891 bytes** (~145.0 MB) |
+| Pre-apply database size | **152,095,891 bytes** (~145.0 MB) |
 | `pgcrypto` installed | **true** |
 | `supabase_migrations.schema_migrations` exists | **true** |
 | Target migration versions already recorded | **none** |
 | Target table collisions | **none** (8 tables absent) |
 | Credentials in report | **redacted** (host/port/database only) |
 
-Live blockers: **0**
-
 Readiness report: `reports/ui3-i10/migration-readiness.json`
 
----
-
-## H. Capacity note
-
-Current database **~145 MB** against EST-001 / CAP2 **380 MB** activation ceiling leaves headroom for eight new governed tables. Full post-apply capacity proof requires apply + row growth monitoring (deferred).
+Gate B pre-apply recheck: **decision PASS** (immediately before apply)
 
 ---
 
-## I. Proposed migration-apply command (NOT EXECUTED)
+## H. Gate B controlled apply result
 
-```powershell
-node scripts/run-migration.js `
-  supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql `
-  supabase/migrations/20261010000001_sem_gov_001d_ui3_i4_fixture_display_metadata.sql `
-  supabase/migrations/20261011000001_sem_gov_001d_ui3_i8_fip_intake_evidence.sql
-```
+| Metric | Value |
+|---|---|
+| Operation | `GATE_B_CONTROLLED_APPLY` |
+| Confirmation | `UI3_I10_APPLY_CONFIRMED=YES` |
+| Transaction | **COMMIT** |
+| Final result | **PASS** |
+| First attempt | **ROLLED_BACK** (`cannot execute CREATE EXTENSION in a read-only transaction` on pooler port 6543) |
+| Rollback protection | **proven** — first failure left zero target tables; second attempt succeeded atomically |
+| Tables created | **8** |
+| Post-apply database size | **152,390,803 bytes** |
+| Size increase | **294,912 bytes** (~288 KB, bounded) |
+| Seeded rows | **0** (all eight tables) |
+| Public RLS policies | **0** |
+| Credentials in reports | **redacted** |
 
-**Pre-apply checklist (Gate B):**
-1. Confirm `supabase_storage_gate` clearance
-2. Confirm backup snapshot
-3. Re-run `node scripts/check-ui3-i10-migration-readiness.js` with `DATABASE_URL` set
-4. Verify decision remains `PASS`
-5. Apply in sealed order only
-6. Re-run readiness checker post-apply to confirm tables + migration history
+### Applied migration hashes
+
+| ID | SHA-256 |
+|---|---|
+| `20261008000001` | `90009b3614683ec371053dfa388638d044ea6c9b8ef6cfe9db7c80658db27965` |
+| `20261010000001` | `111cb9970125d1db894154e606c2c14a55d348b406f0ef3150822260bbfb0c44` |
+| `20261011000001` | `226b615dfd0ec7fd76e06ad937504b086cedd44a091626d098fa0cc0a761ec1b` |
+
+### Gate B apply corrections
+
+1. **Pooler session port:** Supabase transaction pooler port `6543` cannot execute DDL inside `BEGIN`; apply script normalizes to port `5432` for DDL.
+2. **pgcrypto strip at apply:** `CREATE EXTENSION IF NOT EXISTS pgcrypto` stripped from lifecycle migration at apply time (extension already installed per readiness). On-disk migration hash unchanged; verification uses full file content.
+
+### Eight-table verification
+
+| Table | RLS | Rows |
+|---|---|---|
+| `fixture_lifecycle_current` | enabled | 0 |
+| `fixture_identity_aliases` | enabled | 0 |
+| `fixture_lifecycle_transition_events` | enabled | 0 |
+| `fixture_lifecycle_rollover_events` | enabled | 0 |
+| `lifecycle_daily_admission_counters` | enabled | 0 |
+| `lifecycle_admission_idempotency` | enabled | 0 |
+| `fixture_display_metadata` | enabled | 0 |
+| `fip_intake_evidence` | enabled | 0 |
+
+### Constraint and index proof
+
+- Lifecycle FKs: `fixture_identity_aliases_fixture_fk`, `fixture_lifecycle_transition_events_fixture_fk`, `lifecycle_admission_idempotency_fixture_fk`
+- D3 FK: `fixture_display_metadata_fixture_fk`
+- D3 idempotency: `fixture_display_metadata_idempotency_unique`
+- Evidence accepted-only unique index: `idx_fip_intake_evidence_accepted_idempotency`
+
+Reports: `reports/ui3-i10/pre-apply-schema-snapshot.json`, `reports/ui3-i10/post-apply-schema-snapshot.json`, `reports/ui3-i10/controlled-apply-result.json`
+
+---
+
+## I. Capacity note
+
+Pre-apply **~145 MB** → post-apply **~145.3 MB** against EST-001 / CAP2 **380 MB** activation ceiling. Schema-only apply; row growth monitoring deferred until runtime activation is authorized.
 
 ---
 
@@ -129,7 +173,8 @@ node scripts/run-migration.js `
 
 | Suite | Result |
 |---|---|
-| `npm run test:sem-gov-001d-ui3-i10` | PASS (8 tests) |
+| `npm run test:sem-gov-001d-ui3-i10` | PASS |
+| `npm run test:sem-gov-001d-ui3-i10-apply` | PASS (6 tests) |
 | `npm run test:sem-gov-001d-ui3-i9` through `i1` | PASS |
 | `npm run control:center` | PASS |
 | `npm run control:projects` | PASS |
@@ -137,14 +182,15 @@ node scripts/run-migration.js `
 
 ---
 
-## K. Prohibited work (deferred)
+## K. Prohibited work (still deferred)
 
-- Migration apply (Gate B)
 - HTTP route
 - Scout FIP traffic
 - Production intake activation
 - Feature flag enablement
-- Gate clearance
+- Marriage gate clearance
+- Unified lifecycle governor activation
+- Runtime storage writes (`supabase_storage_gate` remains BLOCKED)
 
 ---
 
@@ -161,15 +207,20 @@ Five GitHub Dependabot dependency vulnerabilities remain recorded for future rem
 - [x] Read-only live inspection complete
 - [x] Lifecycle RLS correction applied
 - [x] Readiness report written
-- [x] No migration apply
-- [x] All gates remain BLOCKED
+- [x] Controlled apply script installed
+- [x] Gate B atomic apply PASS
+- [x] Eight tables created with RLS, zero policies, zero rows
+- [x] Post-apply reports written
+- [x] All runtime gates remain BLOCKED
 
 ---
 
 ## N. Inspection decision
 
-**PASS WITH CORRECTION** (Gate A readiness)
+**PASS WITH CORRECTION**
 
-Corrections: lifecycle migration RLS enabled to align with backend-only service-role security precedent.
+Corrections:
+- Gate A: lifecycle migration RLS enabled to align with backend-only service-role security precedent.
+- Gate B: pooler session port normalization and pgcrypto strip at apply time (first attempt rolled back; second attempt committed).
 
-Gate B controlled apply remains **HOLD** until separate authorization.
+Runtime gates remain **BLOCKED**. Schema exists; runtime writes and activation prohibited.

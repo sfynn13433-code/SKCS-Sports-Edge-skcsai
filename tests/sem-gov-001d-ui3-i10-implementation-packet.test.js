@@ -14,6 +14,10 @@ const REPORT_PATH = path.join(
   ROOT,
   'reports/ui3-i10/migration-readiness.json'
 );
+const APPLY_RESULT_PATH = path.join(
+  ROOT,
+  'reports/ui3-i10/controlled-apply-result.json'
+);
 const LIFECYCLE_MIGRATION_PATH = path.join(
   ROOT,
   'supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql'
@@ -24,13 +28,13 @@ const REQUIRED_SECTIONS = [
   'B. Two-gate law',
   'C. Files implemented',
   'D. Migration order (sealed)',
-  'E. Lifecycle RLS correction',
-  'F. Static readiness result',
-  'G. Live read-only inspection result',
-  'H. Capacity note',
-  'I. Proposed migration-apply command (NOT EXECUTED)',
+  'E. Lifecycle RLS correction (Gate A)',
+  'F. Static readiness result (Gate A)',
+  'G. Live read-only inspection result (Gate A)',
+  'H. Gate B controlled apply result',
+  'I. Capacity note',
   'J. Test matrix and results',
-  'K. Prohibited work (deferred)',
+  'K. Prohibited work (still deferred)',
   'L. FUTURE_SECURITY_NOTE',
   'M. Definition of Done',
   'N. Inspection decision'
@@ -43,10 +47,12 @@ function readJson(rel) {
 test('UI3-I10 packet records PASS WITH CORRECTION and blocked gates', () => {
   const packet = fs.readFileSync(PACKET_PATH, 'utf8');
   assert.match(packet, /SEM-GOV-001D-UI3-I10/);
-  assert.match(packet, /bf12011b21dfd6172b8f64c64f3a01d7ac653f88/);
+  assert.match(packet, /21e436da4ff16946519d8a6842b99bf7ae684328/);
   assert.match(packet, /Gate A decision.*\*\*PASS\*\*/);
-  assert.match(packet, /Gate B decision.*\*\*HOLD\*\*/);
+  assert.match(packet, /Gate B decision.*\*\*PASS WITH CORRECTION\*\*/);
   assert.match(packet, /scout_edge_marriage_gate.*\*\*BLOCKED\*\*/);
+  assert.match(packet, /unified_lifecycle_governor.*\*\*BLOCKED\*\*/);
+  assert.match(packet, /supabase_storage_gate.*\*\*BLOCKED\*\*/);
   for (const section of REQUIRED_SECTIONS) {
     assert.ok(packet.includes(section), `missing section ${section}`);
   }
@@ -63,8 +69,31 @@ test('readiness checker and report exist', () => {
   assert.equal(report.task, 'SEM-GOV-001D-UI3-I10');
   assert.equal(report.decision, 'PASS');
   assert.equal(report.live.inspected, true);
-  assert.equal(report.live.snapshot.targetTableInventory.length, 0);
-  assert.equal(report.live.snapshot.migrationHistory.length, 0);
+});
+
+test('controlled apply script, test, and Gate B reports exist', () => {
+  assert.ok(
+    fs.existsSync(
+      path.join(ROOT, 'scripts/apply-ui3-i10-controlled-migrations.js')
+    )
+  );
+  assert.ok(
+    fs.existsSync(
+      path.join(
+        ROOT,
+        'tests/sem-gov-001d-ui3-i10-controlled-apply.test.js'
+      )
+    )
+  );
+  assert.ok(fs.existsSync(APPLY_RESULT_PATH));
+
+  const result = JSON.parse(fs.readFileSync(APPLY_RESULT_PATH, 'utf8'));
+  assert.equal(result.task, 'SEM-GOV-001D-UI3-I10');
+  assert.equal(result.operation, 'GATE_B_CONTROLLED_APPLY');
+  assert.equal(result.result, 'PASS');
+  assert.equal(result.migrations.length, 3);
+  assert.equal(result.postApply.tables.length, 8);
+  assert.equal(result.postApply.policies.length, 0);
 });
 
 test('lifecycle migration includes RLS on all six tables', () => {
@@ -88,13 +117,18 @@ test('lifecycle migration includes RLS on all six tables', () => {
   assert.doesNotMatch(sql, /CREATE POLICY/i);
 });
 
-test('readiness report redacts credentials', () => {
-  const report = JSON.parse(fs.readFileSync(REPORT_PATH, 'utf8'));
-  const serialized = JSON.stringify(report);
+test('readiness and apply reports redact credentials', () => {
+  const readiness = JSON.parse(fs.readFileSync(REPORT_PATH, 'utf8'));
+  const apply = JSON.parse(fs.readFileSync(APPLY_RESULT_PATH, 'utf8'));
+  const serialized = JSON.stringify({ readiness, apply });
   assert.doesNotMatch(serialized, /secret-password|password@/i);
-  assert.ok(report.live.connectionTarget.host);
+  assert.ok(readiness.live.connectionTarget.host);
   assert.equal(
-    Object.hasOwn(report.live.connectionTarget, 'password'),
+    Object.hasOwn(readiness.live.connectionTarget, 'password'),
+    false
+  );
+  assert.equal(
+    Object.hasOwn(apply.connectionTarget, 'password'),
     false
   );
 });

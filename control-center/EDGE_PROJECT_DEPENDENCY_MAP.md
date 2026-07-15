@@ -301,4 +301,4 @@ Status: TESTED
 Governed by: SEM-GOV-001D-UI3-I10
 Blocked by: SEM-GOV-001D-UI3-I9
 Blocks: none
-Notes: PASS WITH CORRECTION. Gate A readiness PASS. Lifecycle RLS correction. Live read-only inspection PASS. Gate B apply NOT EXECUTED. All gates BLOCKED.
+Notes: PASS WITH CORRECTION. Gate A readiness PASS. Gate B atomic schema apply PASS. Eight tables with RLS, zero policies, zero rows. Pooler port + pgcrypto apply corrections. Runtime gates BLOCKED.

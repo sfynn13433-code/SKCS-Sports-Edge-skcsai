@@ -1,0 +1,836 @@
+{
+  "task": "SEM-GOV-001D-UI3-I10",
+  "operation": "GATE_B_CONTROLLED_APPLY",
+  "startedAt": "2026-07-15T00:57:48.883Z",
+  "connectionTarget": {
+    "protocol": "postgresql:",
+    "host": "aws-1-eu-central-1.pooler.supabase.com",
+    "port": "6543",
+    "database": "postgres"
+  },
+  "migrations": [
+    {
+      "id": "20261008000001",
+      "path": "supabase/migrations/20261008000001_sem_gov_001b_lifecycle_persistence.sql",
+      "sha256": "90009b3614683ec371053dfa388638d044ea6c9b8ef6cfe9db7c80658db27965",
+      "tables": [
+        "fixture_lifecycle_current",
+        "fixture_identity_aliases",
+        "fixture_lifecycle_transition_events",
+        "fixture_lifecycle_rollover_events",
+        "lifecycle_daily_admission_counters",
+        "lifecycle_admission_idempotency"
+      ]
+    },
+    {
+      "id": "20261010000001",
+      "path": "supabase/migrations/20261010000001_sem_gov_001d_ui3_i4_fixture_display_metadata.sql",
+      "sha256": "111cb9970125d1db894154e606c2c14a55d348b406f0ef3150822260bbfb0c44",
+      "tables": [
+        "fixture_display_metadata"
+      ]
+    },
+    {
+      "id": "20261011000001",
+      "path": "supabase/migrations/20261011000001_sem_gov_001d_ui3_i8_fip_intake_evidence.sql",
+      "sha256": "226b615dfd0ec7fd76e06ad937504b086cedd44a091626d098fa0cc0a761ec1b",
+      "tables": [
+        "fip_intake_evidence"
+      ]
+    }
+  ],
+  "preApply": {
+    "databaseBytes": 152095891,
+    "tables": [],
+    "indexes": [],
+    "constraints": [],
+    "policies": []
+  },
+  "postApply": {
+    "databaseBytes": 152390803,
+    "tables": [
+      {
+        "table_name": "fip_intake_evidence",
+        "rls_enabled": true,
+        "total_bytes": "40960"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "rls_enabled": true,
+        "total_bytes": "49152"
+      },
+      {
+        "table_name": "fixture_identity_aliases",
+        "rls_enabled": true,
+        "total_bytes": "32768"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "rls_enabled": true,
+        "total_bytes": "40960"
+      },
+      {
+        "table_name": "fixture_lifecycle_rollover_events",
+        "rls_enabled": true,
+        "total_bytes": "24576"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "rls_enabled": true,
+        "total_bytes": "40960"
+      },
+      {
+        "table_name": "lifecycle_admission_idempotency",
+        "rls_enabled": true,
+        "total_bytes": "16384"
+      },
+      {
+        "table_name": "lifecycle_daily_admission_counters",
+        "rls_enabled": true,
+        "total_bytes": "16384"
+      }
+    ],
+    "indexes": [
+      {
+        "table_name": "fip_intake_evidence",
+        "index_name": "fip_intake_evidence_pkey",
+        "index_definition": "CREATE UNIQUE INDEX fip_intake_evidence_pkey ON public.fip_intake_evidence USING btree (evidence_id)"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "index_name": "idx_fip_intake_evidence_accepted_idempotency",
+        "index_definition": "CREATE UNIQUE INDEX idx_fip_intake_evidence_accepted_idempotency ON public.fip_intake_evidence USING btree (idempotency_key) WHERE (outcome = 'ACCEPTED'::text)"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "index_name": "idx_fip_intake_evidence_purge",
+        "index_definition": "CREATE INDEX idx_fip_intake_evidence_purge ON public.fip_intake_evidence USING btree (purge_eligible_at)"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "index_name": "idx_fip_intake_evidence_received_at",
+        "index_definition": "CREATE INDEX idx_fip_intake_evidence_received_at ON public.fip_intake_evidence USING btree (received_at)"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "index_name": "fixture_display_metadata_idempotency_unique",
+        "index_definition": "CREATE UNIQUE INDEX fixture_display_metadata_idempotency_unique ON public.fixture_display_metadata USING btree (idempotency_key)"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "index_name": "fixture_display_metadata_pkey",
+        "index_definition": "CREATE UNIQUE INDEX fixture_display_metadata_pkey ON public.fixture_display_metadata USING btree (fixture_uid)"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "index_name": "idx_fixture_display_metadata_competition",
+        "index_definition": "CREATE INDEX idx_fixture_display_metadata_competition ON public.fixture_display_metadata USING btree (competition_id)"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "index_name": "idx_fixture_display_metadata_kickoff",
+        "index_definition": "CREATE INDEX idx_fixture_display_metadata_kickoff ON public.fixture_display_metadata USING btree (kickoff_at)"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "index_name": "idx_fixture_display_metadata_purge",
+        "index_definition": "CREATE INDEX idx_fixture_display_metadata_purge ON public.fixture_display_metadata USING btree (purge_eligible_at) WHERE (purge_eligible_at IS NOT NULL)"
+      },
+      {
+        "table_name": "fixture_identity_aliases",
+        "index_name": "fixture_identity_aliases_pkey",
+        "index_definition": "CREATE UNIQUE INDEX fixture_identity_aliases_pkey ON public.fixture_identity_aliases USING btree (alias_id)"
+      },
+      {
+        "table_name": "fixture_identity_aliases",
+        "index_name": "fixture_identity_aliases_unique_ns_value",
+        "index_definition": "CREATE UNIQUE INDEX fixture_identity_aliases_unique_ns_value ON public.fixture_identity_aliases USING btree (alias_namespace, alias_value)"
+      },
+      {
+        "table_name": "fixture_identity_aliases",
+        "index_name": "idx_fixture_identity_aliases_fixture_uid",
+        "index_definition": "CREATE INDEX idx_fixture_identity_aliases_fixture_uid ON public.fixture_identity_aliases USING btree (fixture_uid)"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "index_name": "fixture_lifecycle_current_pkey",
+        "index_definition": "CREATE UNIQUE INDEX fixture_lifecycle_current_pkey ON public.fixture_lifecycle_current USING btree (fixture_uid)"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "index_name": "idx_fixture_lifecycle_current_active_archive",
+        "index_definition": "CREATE INDEX idx_fixture_lifecycle_current_active_archive ON public.fixture_lifecycle_current USING btree (lifecycle_state, day_label) WHERE (lifecycle_state = ANY (ARRAY['VISIBLE'::text, 'UNDER_REVIEW'::text, 'HELD'::text]))"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "index_name": "idx_fixture_lifecycle_current_funnel",
+        "index_definition": "CREATE INDEX idx_fixture_lifecycle_current_funnel ON public.fixture_lifecycle_current USING btree (sport, day_label, lifecycle_state)"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "index_name": "idx_fixture_lifecycle_current_kickoff",
+        "index_definition": "CREATE INDEX idx_fixture_lifecycle_current_kickoff ON public.fixture_lifecycle_current USING btree (kickoff_at)"
+      },
+      {
+        "table_name": "fixture_lifecycle_rollover_events",
+        "index_name": "fixture_lifecycle_rollover_events_pkey",
+        "index_definition": "CREATE UNIQUE INDEX fixture_lifecycle_rollover_events_pkey ON public.fixture_lifecycle_rollover_events USING btree (rollover_id)"
+      },
+      {
+        "table_name": "fixture_lifecycle_rollover_events",
+        "index_name": "fixture_lifecycle_rollover_events_rollover_key_key",
+        "index_definition": "CREATE UNIQUE INDEX fixture_lifecycle_rollover_events_rollover_key_key ON public.fixture_lifecycle_rollover_events USING btree (rollover_key)"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "index_name": "fixture_lifecycle_transition_events_fixture_version_uniq",
+        "index_definition": "CREATE UNIQUE INDEX fixture_lifecycle_transition_events_fixture_version_uniq ON public.fixture_lifecycle_transition_events USING btree (fixture_uid, transition_version)"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "index_name": "fixture_lifecycle_transition_events_idempotency_uniq",
+        "index_definition": "CREATE UNIQUE INDEX fixture_lifecycle_transition_events_idempotency_uniq ON public.fixture_lifecycle_transition_events USING btree (fixture_uid, idempotency_key)"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "index_name": "fixture_lifecycle_transition_events_pkey",
+        "index_definition": "CREATE UNIQUE INDEX fixture_lifecycle_transition_events_pkey ON public.fixture_lifecycle_transition_events USING btree (event_id)"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "index_name": "idx_fixture_lifecycle_transition_events_archive_closed",
+        "index_definition": "CREATE INDEX idx_fixture_lifecycle_transition_events_archive_closed ON public.fixture_lifecycle_transition_events USING btree (archive_closed_at) WHERE (archive_closed_at IS NOT NULL)"
+      },
+      {
+        "table_name": "lifecycle_admission_idempotency",
+        "index_name": "lifecycle_admission_idempotency_pkey",
+        "index_definition": "CREATE UNIQUE INDEX lifecycle_admission_idempotency_pkey ON public.lifecycle_admission_idempotency USING btree (admission_idempotency_key)"
+      },
+      {
+        "table_name": "lifecycle_daily_admission_counters",
+        "index_name": "lifecycle_daily_admission_counters_pkey",
+        "index_definition": "CREATE UNIQUE INDEX lifecycle_daily_admission_counters_pkey ON public.lifecycle_daily_admission_counters USING btree (admission_date_sast)"
+      }
+    ],
+    "constraints": [
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "2200_319595_10_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "2200_319595_11_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "2200_319595_13_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "2200_319595_14_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "2200_319595_15_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "2200_319595_16_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "2200_319595_17_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "2200_319595_1_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "2200_319595_2_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "2200_319595_3_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "2200_319595_4_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "2200_319595_5_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "2200_319595_6_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "2200_319595_8_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "2200_319595_9_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "fip_intake_evidence_outcome_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "fip_intake_evidence_pkey",
+        "constraint_type": "PRIMARY KEY"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "fip_intake_evidence_purge_order_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "fip_intake_evidence_rejection_code_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "fip_intake_evidence_required_strings_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fip_intake_evidence",
+        "constraint_name": "fip_intake_evidence_validated_clock_skew_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_10_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_11_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_12_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_13_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_14_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_15_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_16_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_1_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_21_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_24_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_25_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_2_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_3_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_4_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_5_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_6_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_7_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_8_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "2200_319570_9_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "fixture_display_metadata_fixture_fk",
+        "constraint_type": "FOREIGN KEY"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "fixture_display_metadata_idempotency_unique",
+        "constraint_type": "UNIQUE"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "fixture_display_metadata_optional_trim_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "fixture_display_metadata_pkey",
+        "constraint_type": "PRIMARY KEY"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "fixture_display_metadata_purge_order_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "fixture_display_metadata_required_strings_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "fixture_display_metadata_sport_football_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_display_metadata",
+        "constraint_name": "fixture_display_metadata_timezone_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_identity_aliases",
+        "constraint_name": "2200_319483_1_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_identity_aliases",
+        "constraint_name": "2200_319483_2_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_identity_aliases",
+        "constraint_name": "2200_319483_3_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_identity_aliases",
+        "constraint_name": "2200_319483_4_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_identity_aliases",
+        "constraint_name": "2200_319483_5_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_identity_aliases",
+        "constraint_name": "2200_319483_6_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_identity_aliases",
+        "constraint_name": "2200_319483_7_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_identity_aliases",
+        "constraint_name": "fixture_identity_aliases_fixture_fk",
+        "constraint_type": "FOREIGN KEY"
+      },
+      {
+        "table_name": "fixture_identity_aliases",
+        "constraint_name": "fixture_identity_aliases_pkey",
+        "constraint_type": "PRIMARY KEY"
+      },
+      {
+        "table_name": "fixture_identity_aliases",
+        "constraint_name": "fixture_identity_aliases_seen_order_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_identity_aliases",
+        "constraint_name": "fixture_identity_aliases_unique_ns_value",
+        "constraint_type": "UNIQUE"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "constraint_name": "2200_319463_14_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "constraint_name": "2200_319463_16_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "constraint_name": "2200_319463_17_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "constraint_name": "2200_319463_1_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "constraint_name": "2200_319463_2_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "constraint_name": "2200_319463_3_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "constraint_name": "2200_319463_4_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "constraint_name": "2200_319463_5_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "constraint_name": "2200_319463_6_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "constraint_name": "2200_319463_8_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "constraint_name": "fixture_lifecycle_current_day_label_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "constraint_name": "fixture_lifecycle_current_engine_stage_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "constraint_name": "fixture_lifecycle_current_pkey",
+        "constraint_type": "PRIMARY KEY"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "constraint_name": "fixture_lifecycle_current_sport_football_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "constraint_name": "fixture_lifecycle_current_stage_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "constraint_name": "fixture_lifecycle_current_state_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_current",
+        "constraint_name": "fixture_lifecycle_current_transition_version_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_rollover_events",
+        "constraint_name": "2200_319524_1_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_rollover_events",
+        "constraint_name": "2200_319524_2_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_rollover_events",
+        "constraint_name": "2200_319524_3_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_rollover_events",
+        "constraint_name": "2200_319524_4_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_rollover_events",
+        "constraint_name": "2200_319524_5_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_rollover_events",
+        "constraint_name": "2200_319524_6_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_rollover_events",
+        "constraint_name": "2200_319524_7_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_rollover_events",
+        "constraint_name": "fixture_lifecycle_rollover_events_counts_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_rollover_events",
+        "constraint_name": "fixture_lifecycle_rollover_events_pkey",
+        "constraint_type": "PRIMARY KEY"
+      },
+      {
+        "table_name": "fixture_lifecycle_rollover_events",
+        "constraint_name": "fixture_lifecycle_rollover_events_rollover_key_key",
+        "constraint_type": "UNIQUE"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "constraint_name": "2200_319500_10_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "constraint_name": "2200_319500_14_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "constraint_name": "2200_319500_15_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "constraint_name": "2200_319500_16_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "constraint_name": "2200_319500_1_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "constraint_name": "2200_319500_2_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "constraint_name": "2200_319500_3_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "constraint_name": "2200_319500_5_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "constraint_name": "2200_319500_8_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "constraint_name": "fixture_lifecycle_transition_events_fixture_fk",
+        "constraint_type": "FOREIGN KEY"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "constraint_name": "fixture_lifecycle_transition_events_fixture_version_uniq",
+        "constraint_type": "UNIQUE"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "constraint_name": "fixture_lifecycle_transition_events_from_stage_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "constraint_name": "fixture_lifecycle_transition_events_from_state_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "constraint_name": "fixture_lifecycle_transition_events_idempotency_uniq",
+        "constraint_type": "UNIQUE"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "constraint_name": "fixture_lifecycle_transition_events_pkey",
+        "constraint_type": "PRIMARY KEY"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "constraint_name": "fixture_lifecycle_transition_events_to_stage_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "constraint_name": "fixture_lifecycle_transition_events_to_state_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "fixture_lifecycle_transition_events",
+        "constraint_name": "fixture_lifecycle_transition_events_version_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "lifecycle_admission_idempotency",
+        "constraint_name": "2200_319556_1_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "lifecycle_admission_idempotency",
+        "constraint_name": "2200_319556_2_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "lifecycle_admission_idempotency",
+        "constraint_name": "2200_319556_3_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "lifecycle_admission_idempotency",
+        "constraint_name": "2200_319556_4_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "lifecycle_admission_idempotency",
+        "constraint_name": "2200_319556_5_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "lifecycle_admission_idempotency",
+        "constraint_name": "lifecycle_admission_idempotency_fixture_fk",
+        "constraint_type": "FOREIGN KEY"
+      },
+      {
+        "table_name": "lifecycle_admission_idempotency",
+        "constraint_name": "lifecycle_admission_idempotency_outcome_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "lifecycle_admission_idempotency",
+        "constraint_name": "lifecycle_admission_idempotency_pkey",
+        "constraint_type": "PRIMARY KEY"
+      },
+      {
+        "table_name": "lifecycle_daily_admission_counters",
+        "constraint_name": "2200_319540_1_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "lifecycle_daily_admission_counters",
+        "constraint_name": "2200_319540_2_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "lifecycle_daily_admission_counters",
+        "constraint_name": "2200_319540_3_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "lifecycle_daily_admission_counters",
+        "constraint_name": "2200_319540_4_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "lifecycle_daily_admission_counters",
+        "constraint_name": "2200_319540_5_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "lifecycle_daily_admission_counters",
+        "constraint_name": "2200_319540_6_not_null",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "lifecycle_daily_admission_counters",
+        "constraint_name": "lifecycle_daily_admission_counters_admitted_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "lifecycle_daily_admission_counters",
+        "constraint_name": "lifecycle_daily_admission_counters_ceiling_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "lifecycle_daily_admission_counters",
+        "constraint_name": "lifecycle_daily_admission_counters_count_ceiling_chk",
+        "constraint_type": "CHECK"
+      },
+      {
+        "table_name": "lifecycle_daily_admission_counters",
+        "constraint_name": "lifecycle_daily_admission_counters_pkey",
+        "constraint_type": "PRIMARY KEY"
+      },
+      {
+        "table_name": "lifecycle_daily_admission_counters",
+        "constraint_name": "lifecycle_daily_admission_counters_version_chk",
+        "constraint_type": "CHECK"
+      }
+    ],
+    "policies": []
+  },
+  "result": "PASS",
+  "completedAt": "2026-07-15T00:57:54.435Z"
+}
