@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 41,
+  "project_count": 42,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -2430,7 +2430,9 @@
       "blocked_by": [
         "SEM-GOV-001D-UI3-I9"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI3-I11"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -2481,7 +2483,7 @@
         "Migrations could be applied without collision or capacity proof"
       ],
       "recommended_order": 41,
-      "next_action": "SEM-GOV-001D-UI3-I10 formal Gate B closure PASS. Gate B-C1 migration history reconciled. Schema applied; runtime activation BLOCKED.",
+      "next_action": "SEM-GOV-001D-UI3-I10 formal Gate B closure PASS. I11 Gate A authorized.",
       "owner_note": "Gate B schema apply and B-C1 history reconciliation complete.",
       "last_updated": "2026-07-15",
       "governed_by_control_task_id": "SEM-GOV-001D-UI3-I10",
@@ -2492,6 +2494,76 @@
         "Formal Gate B closure PASS",
         "Eight tables with RLS and zero rows",
         "Lifecycle RLS correction"
+      ]
+    },
+    {
+      "project_id": "SEM-GOV-001D-UI3-I11",
+      "project_name": "Controlled End-to-End Marriage Proof",
+      "category": "Unified Sports Intelligence Lifecycle",
+      "description": "Contract reconciliation and mock-only marriage proof orchestration — full live marriage proof HOLD; runtime gates remain BLOCKED.",
+      "why_it_matters": "Marriage proof must not proceed to live execution until contract drift is reconciled and mock boundaries are sealed.",
+      "current_status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I10"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "scout-handoff"
+      ],
+      "related_tasks": [
+        "SEM-GOV-001D-UI3-I11"
+      ],
+      "related_contracts": [
+        "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1",
+        "E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I11_CONTRACT_RECONCILIATION_AND_MOCK_PROOF_AUTHORIZATION_PACKET.v1"
+      ],
+      "related_files": [
+        "reports/ui3-i11/marriage-proof-inspection.json",
+        "control-center/SEM-GOV-001D-UI3-I11_CONTRACT_RECONCILIATION_AND_MOCK_PROOF_AUTHORIZATION_PACKET.v1.md",
+        "tests/sem-gov-001d-ui3-i11-inspection.test.js"
+      ],
+      "related_tables": [
+        "fip_intake_evidence"
+      ],
+      "known_issues": [
+        "Full marriage proof HOLD",
+        "scout_edge_marriage_gate BLOCKED",
+        "supabase_storage_gate BLOCKED",
+        "unified_lifecycle_governor BLOCKED"
+      ],
+      "required_decisions": [
+        "Gate B mock orchestration authorization",
+        "E2E-001 execution authorization",
+        "D1 and R1 implementation authorization"
+      ],
+      "completion_definition": "SEM-GOV-001D-UI3-I11 Gate A PASS WITH CORRECTION — contract reconciliation sealed, mock-only Gate B authorized, full marriage proof HOLD, all runtime gates BLOCKED.",
+      "proof_required": [
+        "test:sem-gov-001d-ui3-i11 passes",
+        "marriage-proof-inspection.json PASS_WITH_CORRECTION",
+        "Full marriage proof HOLD",
+        "Gates BLOCKED"
+      ],
+      "risks_if_ignored": [
+        "Live marriage proof could be attempted before contract reconciliation"
+      ],
+      "recommended_order": 42,
+      "next_action": "SEM-GOV-001D-UI3-I11 Gate A PASS WITH CORRECTION. Gate B mock-only orchestration authorized next.",
+      "owner_note": "Gate A governance only. No runtime changes.",
+      "last_updated": "2026-07-15",
+      "governed_by_control_task_id": "SEM-GOV-001D-UI3-I11",
+      "current_evidence": [
+        "Gate A contract reconciliation PASS WITH CORRECTION",
+        "Mock-only Gate B authorized",
+        "Full marriage proof HOLD",
+        "All runtime gates BLOCKED"
       ]
     }
   ]

@@ -302,3 +302,11 @@ Governed by: SEM-GOV-001D-UI3-I10
 Blocked by: SEM-GOV-001D-UI3-I9
 Blocks: none
 Notes: PASS WITH CORRECTION. Gate A readiness PASS. Gate B atomic schema apply PASS WITH CORRECTION. Gate B-C1 migration history reconciliation PASS. Formal Gate B closure PASS. Eight tables with RLS, zero policies, zero rows. Pooler port + pgcrypto apply corrections. Runtime gates BLOCKED.
+
+## SEM-GOV-001D-UI3-I11 — Controlled End-to-End Marriage Proof
+
+Status: TESTED
+Governed by: SEM-GOV-001D-UI3-I11
+Blocked by: SEM-GOV-001D-UI3-I10
+Blocks: none
+Notes: Gate A PASS WITH CORRECTION. Contract reconciliation sealed. Mock-only Gate B authorized. Full marriage proof HOLD. Proof kickoff 24-48h. public.fip_intake_evidence canonical. All runtime gates BLOCKED.

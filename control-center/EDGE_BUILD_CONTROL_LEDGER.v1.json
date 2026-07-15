@@ -2284,7 +2284,9 @@
       "blocked_by": [
         "SEM-GOV-001D-UI3-I9"
       ],
-      "blocks": [],
+      "blocks": [
+        "SEM-GOV-001D-UI3-I11"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -2350,8 +2352,71 @@
         "Scout FIP traffic",
         "Feature flag enablement"
       ],
-      "next_action": "SEM-GOV-001D-UI3-I10 formal Gate B closure PASS. Gate B-C1 migration history reconciled. Schema applied; runtime activation BLOCKED.",
+      "next_action": "SEM-GOV-001D-UI3-I10 formal Gate B closure PASS. I11 Gate A authorized.",
       "owner_note": "Gate B schema apply and B-C1 history reconciliation complete. No runtime activation.",
+      "last_updated": "2026-07-15"
+    },
+    {
+      "task_id": "SEM-GOV-001D-UI3-I11",
+      "task_name": "Controlled End-to-End Marriage Proof",
+      "workstream": "Unified Sports Intelligence Lifecycle",
+      "description": "Contract reconciliation and mock-only marriage proof orchestration — full live marriage proof HOLD; runtime gates remain BLOCKED.",
+      "status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I10"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "governance",
+        "lifecycle",
+        "control-center",
+        "scout-handoff"
+      ],
+      "related_contracts": [
+        "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1",
+        "E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1",
+        "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
+        "FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1",
+        "EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1",
+        "SEM-GOV-001D-UI3-I11_CONTRACT_RECONCILIATION_AND_MOCK_PROOF_AUTHORIZATION_PACKET.v1"
+      ],
+      "affected_files": [
+        "reports/ui3-i11/marriage-proof-inspection.json",
+        "control-center/SEM-GOV-001D-UI3-I11_CONTRACT_RECONCILIATION_AND_MOCK_PROOF_AUTHORIZATION_PACKET.v1.md",
+        "tests/sem-gov-001d-ui3-i11-inspection.test.js",
+        "package.json"
+      ],
+      "affected_tables": [
+        "fip_intake_evidence"
+      ],
+      "completion_definition": "SEM-GOV-001D-UI3-I11 Gate A PASS WITH CORRECTION — contract reconciliation sealed, mock-only Gate B authorized, full marriage proof HOLD, all runtime gates BLOCKED.",
+      "proof_required": [
+        "npm run test:sem-gov-001d-ui3-i11 passes",
+        "marriage-proof-inspection.json result PASS_WITH_CORRECTION",
+        "Full marriage proof decision HOLD",
+        "Mock-only proof authorized; live proof not authorized",
+        "All runtime gates BLOCKED"
+      ],
+      "current_evidence": [
+        "Gate A contract reconciliation PASS WITH CORRECTION",
+        "Proof kickoff window 24-48h intersection sealed",
+        "public.fip_intake_evidence canonical",
+        "I10 migrationsApplied true schemaOnly true",
+        "Mock-only Gate B authorized",
+        "Full marriage proof HOLD",
+        "All runtime gates BLOCKED"
+      ],
+      "open_gaps": [
+        "Gate B mock orchestration proof",
+        "E2E-001 execution authorization",
+        "D1 prediction integration",
+        "R1 provenance persistence",
+        "Live gate clearance",
+        "Scout transport"
+      ],
+      "next_action": "SEM-GOV-001D-UI3-I11 Gate A PASS WITH CORRECTION. Implement Gate B mock-only orchestration proof when separately authorized.",
+      "owner_note": "Gate A governance only. No runtime, SQL, routes, or live writes.",
       "last_updated": "2026-07-15"
     }
   ]

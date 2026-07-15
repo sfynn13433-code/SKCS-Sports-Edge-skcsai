@@ -1,0 +1,60 @@
+{
+  "task": "SEM-GOV-001D-UI3-I11",
+  "gate": "A",
+  "operation": "CONTRACT_RECONCILIATION_AND_MOCK_PROOF_AUTHORIZATION",
+  "startHead": "1d5b05fe3c5c0ae2384a4dba40ddd4f82bb84d4d",
+  "result": "PASS_WITH_CORRECTION",
+  "fullMarriageProofDecision": "HOLD",
+  "mockOnlyProofAuthorized": true,
+  "liveDatabaseProofAuthorized": false,
+  "scoutTransportAuthorized": false,
+  "productionRouteAuthorized": false,
+  "featureFlagEnablementAuthorized": false,
+  "gateClearanceAuthorized": false,
+  "runtimeWritesAuthorized": false,
+  "authoritativeContracts": {
+    "marriageGate": "control-center/EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1.md",
+    "proofPlanning": "control-center/E2E-001_SCOUT_EDGE_PROOF_PLANNING_PACKET.v1.md",
+    "intakeHandshake": "control-center/EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1.md",
+    "fipAuthority": "control-center/FIP-001_SCOUT_FIP_AUTHORITY_CONTRACT.v1.md",
+    "storageRetention": "control-center/EST-001_SUPABASE_STORAGE_AND_FIP_RETENTION_CONTRACT.v1.md"
+  },
+  "reconciliation": {
+    "proofKickoffWindowHours": {
+      "minimum": 24,
+      "maximum": 48,
+      "decision": "USE_INTERSECTION"
+    },
+    "canonicalEvidenceTable": "public.fip_intake_evidence",
+    "supersededEvidenceTableReference": "public.fip_intake_events",
+    "migrationsApplied": true,
+    "schemaOnly": true,
+    "runtimeActivated": false
+  },
+  "currentRuntimeGates": {
+    "scout_edge_marriage_gate": "BLOCKED",
+    "unified_lifecycle_governor": "BLOCKED",
+    "supabase_storage_gate": "BLOCKED"
+  },
+  "mockProofBoundary": {
+    "authentication": "REAL_HMAC_LOGIC_WITH_TEST_SECRET",
+    "gateReader": "INJECTED_TEST_DEPENDENCY",
+    "fixtureIdentity": "IN_MEMORY_OR_MOCK",
+    "displayMetadataPersistence": "IN_MEMORY_OR_MOCK",
+    "evidencePersistence": "IN_MEMORY_OR_MOCK",
+    "databaseResidue": false,
+    "productionCaller": false
+  },
+  "unresolvedForFullMarriageProof": [
+    "E2E-001 execution authorization",
+    "D1 prediction output integration",
+    "R1 provenance persistence",
+    "live storage gate clearance",
+    "live lifecycle governor clearance",
+    "controlled Scout transport",
+    "live cleanup and rollback authorization"
+  ],
+  "nextAuthorizedAction": "IMPLEMENT_GATE_B_MOCK_ONLY_ORCHESTRATION_PROOF",
+  "introducedRuntimeChanges": false,
+  "credentialsRecorded": false
+}
