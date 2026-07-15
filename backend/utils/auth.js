@@ -1,67 +1,105 @@
 'use strict';
 
-const LEGACY_PUBLIC_USER_KEY = 'skcs_user_12345';
+const crypto = require('node:crypto');
 
-function parseKeyList(value) {
-    return String(value || '')
-        .split(',')
-        .map((item) => item.trim())
-        .filter(Boolean);
+function normalizeCredential(value) {
+    return String(value || '').trim();
 }
 
-function getAllowedUserKeys() {
-    const keys = new Set();
-    parseKeyList(process.env.USER_API_KEY).forEach((key) => keys.add(key));
-    parseKeyList(process.env.USER_API_KEYS).forEach((key) => keys.add(key));
+function constantTimeEqual(left, right) {
+    const a = Buffer.from(normalizeCredential(left), 'utf8');
+    const b = Buffer.from(normalizeCredential(right), 'utf8');
 
-    const allowLegacy = String(process.env.ALLOW_LEGACY_USER_KEY || 'true').toLowerCase() !== 'false';
-    if (allowLegacy) {
-        keys.add(LEGACY_PUBLIC_USER_KEY);
+    if (a.length === 0 || b.length === 0 || a.length !== b.length) {
+        return false;
     }
 
-    return keys;
+    return crypto.timingSafeEqual(a, b);
 }
 
-// We pull from process.env INSIDE the function to ensure we get the latest Render values
-function requireRole(role) {
+function readCredentialHeader(req, headerNames) {
+    for (const name of headerNames) {
+        const value = normalizeCredential(req?.headers?.[name]);
+        if (value) return value;
+    }
+    return '';
+}
+
+function createSecretMiddleware({
+    environmentVariable,
+    headerNames,
+    credentialClass,
+    missingHeaderMessage
+}) {
     return (req, res, next) => {
-        const requestPath = req.originalUrl || req.path || '';
-        if (requestPath.startsWith('/api/cron/') || requestPath.startsWith('/cron/')) {
-            return next();
+        const expected = normalizeCredential(process.env[environmentVariable]);
+        if (!expected) {
+            console.error(
+                `[AUTH] ${credentialClass} rejected: ${environmentVariable} is not configured.`
+            );
+            return res.status(503).json({
+                error: `${credentialClass} authentication is not configured`
+            });
         }
 
-        const key = req.headers['x-api-key'];
-
-        // Get fresh values from environment
-        const adminKey = process.env.ADMIN_API_KEY;
-        const allowedUserKeys = getAllowedUserKeys();
-
-        if (!key) {
-            console.error(`[AUTH] Blocked: No x-api-key header provided.`);
-            return res.status(401).json({ error: 'Missing API key' });
+        const provided = readCredentialHeader(req, headerNames);
+        if (!provided) {
+            return res.status(401).json({
+                error: missingHeaderMessage
+            });
         }
 
-        if (role === 'admin') {
-            // Check if admin key exists in Env AND matches
-            if (!adminKey || key !== adminKey) {
-                console.error(`[AUTH] Admin Denied. Expected: ${adminKey ? 'Set' : 'MISSING IN RENDER'}`);
-                return res.status(403).json({ error: 'Admin access required' });
-            }
+        if (!constantTimeEqual(provided, expected)) {
+            return res.status(403).json({
+                error: `Invalid ${credentialClass.toLowerCase()} credential`
+            });
         }
 
-        if (role === 'user') {
-            // Users can be validated by user key OR admin key
-            const isValidUser = allowedUserKeys.has(key) || (key === adminKey);
-            if (!isValidUser) {
-                console.error(`[AUTH] User Denied.`);
-                return res.status(403).json({ error: 'User access required' });
-            }
-        }
+        req.authContext = Object.freeze({
+            credentialClass,
+            authenticated: true
+        });
 
-        next();
+        return next();
     };
 }
 
+const requireAdminKey = createSecretMiddleware({
+    environmentVariable: 'ADMIN_API_KEY',
+    headerNames: ['x-admin-key', 'x-api-key'],
+    credentialClass: 'Admin',
+    missingHeaderMessage: 'Missing admin credential'
+});
+
+const requireSchedulerSecret = createSecretMiddleware({
+    environmentVariable: 'CRON_SECRET',
+    headerNames: ['x-cron-secret'],
+    credentialClass: 'Scheduler',
+    missingHeaderMessage: 'Missing x-cron-secret header'
+});
+
+function requireRole(role) {
+    if (role === 'admin') {
+        return requireAdminKey;
+    }
+
+    if (role === 'user') {
+        return (req, res, next) => {
+            if (!req.user?.id) {
+                return res.status(401).json({
+                    error: 'Validated subscriber identity required'
+                });
+            }
+            return next();
+        };
+    }
+
+    throw new TypeError(`Unsupported role: ${role}`);
+}
+
 module.exports = {
-    requireRole
+    constantTimeEqual,
+    requireAdminKey,
+    requireRole,
+    requireSchedulerSecret
 };

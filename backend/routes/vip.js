@@ -2,7 +2,7 @@
 
 const express = require('express');
 const { query } = require('../db');
-const { requireRole } = require('../utils/auth');
+const { requireSupabaseUser, requireActiveSubscription } = require('../middleware/supabaseJwt');
 const {
     SUBSCRIPTION_MATRIX,
     calculateDailyAllocations,
@@ -280,7 +280,7 @@ function buildCoverageMatrix(day, masterCounts, referenceDate, sourceRows) {
     return coverage;
 }
 
-router.get('/stress-payload', requireRole('user'), async (req, res) => {
+router.get('/stress-payload', requireSupabaseUser, requireActiveSubscription, async (req, res) => {
     try {
         // Force fresh response — no caching
         res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');

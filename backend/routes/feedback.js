@@ -57,7 +57,7 @@ router.get('/public', async (_req, res) => {
     }
 });
 
-router.post('/', requireRole('user'), requireSupabaseUser, async (req, res) => {
+router.post('/', requireSupabaseUser, async (req, res) => {
     try {
         const rating = normalizeRating(req.body?.rating);
         const comment = sanitizeComment(req.body?.comment);

@@ -6,13 +6,13 @@ const router = express.Router();
 const db = require('../../db');
 const { selectSecondaryMarkets } = require('../../services/safeHavenSelector');
 const { filterMarketsByMainPick, validateSMBCLegs } = require('../../services/contradictionGovernance');
-const { requireSupabaseUser } = require('../../middleware/supabaseJwt');
+const { requireSupabaseUser, requireActiveSubscription } = require('../../middleware/supabaseJwt');
 
 /**
  * Get match predictions with main market and secondary insights
  * Implements Safe Haven fallback logic from Master Rulebook
  */
-router.get('/matches/:match_id/predictions', requireSupabaseUser, async (req, res) => {
+router.get('/matches/:match_id/predictions', requireSupabaseUser, requireActiveSubscription, async (req, res) => {
     try {
         const { match_id } = req.params;
         const userId = req.user?.id;

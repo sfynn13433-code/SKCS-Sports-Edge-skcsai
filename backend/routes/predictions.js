@@ -5,7 +5,7 @@ const { query } = require('../db');
 const { rebuildFinalOutputs } = require('../services/aiPipeline');
 const { requireRole } = require('../utils/auth');
 const { executeOperation } = require('../core/executionPipeline');
-const { requireSupabaseUser } = require('../middleware/supabaseJwt');
+const { requireSupabaseUser, requireActiveSubscription } = require('../middleware/supabaseJwt');
 const config = require('../config');
 const { createClient } = require('@supabase/supabase-js');
 const moment = require('moment-timezone');
@@ -2033,7 +2033,7 @@ function resolveRequestedPlanId(req) {
 
 function canUserAccessPlan(user, requestedPlanId) {
     if (!user || !requestedPlanId) return false;
-    if (user.is_admin === true || user.isAdmin === true || user.is_test_user === true) return true;
+    if (user.is_admin === true || user.isAdmin === true) return true;
 
     const requestedPlan = getPlan(requestedPlanId);
     if (!requestedPlan) return false;
@@ -2108,7 +2108,7 @@ function sendPredictionsError(res, statusCode, errorMessage, payload = {}) {
 
 // GET /api/predictions
 // Default tier = deep (elite pool); subscription limits use /api/user/predictions
-router.get('/', requireSupabaseUser, async (req, res) => {
+router.get('/', requireSupabaseUser, requireActiveSubscription, async (req, res) => {
     try {
         // DIAGNOSTIC: Log user info
         console.log('[DIAG] req.user:', JSON.stringify({
@@ -2118,20 +2118,15 @@ router.get('/', requireSupabaseUser, async (req, res) => {
             access_tiers: req.user?.access_tiers
         }));
 
-        // HARD-CODED ADMIN BYPASS
-        const isHardcodedAdmin = String(req.user?.email || '').toLowerCase().trim() === 'sfynn13433@gmail.com';
-        if (isHardcodedAdmin) {
-            console.log(`[API/PREDICTIONS] Admin request detected: granting full access for ${req.user.email}`);
-        }
+        const isAdminUser =
+            req.user?.is_admin === true
+            || req.user?.isAdmin === true;
 
         let planId = resolveRequestedPlanId(req);
         if (!planId) {
-            planId = isHardcodedAdmin ? 'elite_30day_deep_vip' : req.query.plan_id;
-        }
-        if (!planId) {
             return sendPredictionsError(res, 400, 'Invalid plan ID');
         }
-        if (!isHardcodedAdmin && !canUserAccessPlan(req.user, planId)) {
+        if (!canUserAccessPlan(req.user, planId)) {
             const fallbackPlanId = resolveBestKnownPlanId(req.user);
             if (!fallbackPlanId || !canUserAccessPlan(req.user, fallbackPlanId)) {
                 return sendPredictionsError(res, 403, 'Plan access denied for user');
@@ -2147,9 +2142,9 @@ router.get('/', requireSupabaseUser, async (req, res) => {
                 sport = normalizedSport;
             }
         }
-        const isAdminAudit = req.user?.is_admin === true || req.user?.isAdmin === true || isHardcodedAdmin;
+        const isAdminAudit = isAdminUser;
         const subscriptionViewTier = resolveRequestedSubscriptionViewTier(req, req.user);
-        if (!isHardcodedAdmin && !canAccessSubscriptionViewTier(req.user, subscriptionViewTier)) {
+        if (!canAccessSubscriptionViewTier(req.user, subscriptionViewTier)) {
             return sendPredictionsError(res, 403, 'Tier tab access denied for user');
         }
 

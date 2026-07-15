@@ -134,37 +134,11 @@ async function requireSupabaseUser(req, res, next) {
         return;
     }
 
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const authHeader = String(req.headers['authorization'] || '').trim();
+    const bearerMatch = authHeader.match(/^Bearer\s+(.+)$/i);
+    const token = bearerMatch?.[1]?.trim() || '';
 
     if (!token) {
-        const apiKey = req.headers['x-api-key'];
-        if (apiKey) {
-            const adminKey = process.env.ADMIN_API_KEY;
-            const allowLegacy = String(process.env.ALLOW_LEGACY_USER_KEY || 'false').toLowerCase() === 'true';
-            
-            let userKeys = [];
-            if (process.env.USER_API_KEY) userKeys.push(...process.env.USER_API_KEY.split(',').map(s=>s.trim()));
-            if (process.env.USER_API_KEYS) userKeys.push(...process.env.USER_API_KEYS.split(',').map(s=>s.trim()));
-            if (allowLegacy) userKeys.push('skcs_user_12345');
-
-            if (apiKey === adminKey || userKeys.includes(apiKey)) {
-                req.user = {
-                    id: 'api-key-user',
-                    email: 'api@skcs.test',
-                    first_name: 'API',
-                    is_admin: apiKey === adminKey,
-                    isAdmin: apiKey === adminKey,
-                    role: apiKey === adminKey ? 'admin' : 'user',
-                    subscription_status: 'active',
-                    subscription_tiers: ['core', 'elite', 'vip'],
-                    access_tiers: ['core', 'elite', 'vip'],
-                    subscription_plan_ids: ['VIP_30DAY', 'elite_30day_deep_vip'],
-                    is_test_user: true
-                };
-                return next();
-            }
-        }
         sendAuthError(req, res, 401, 'Access token required');
         return;
     }
@@ -178,91 +152,6 @@ async function requireSupabaseUser(req, res, next) {
         }
 
         const supaUser = data.user;
-
-        // ===== TESTING: Bypass all subscription checks for testing purposes =====
-        console.log('[TESTING] Bypassing subscription resolution for testing');
-        const requestedPlanId = normalizePlanId(req.query?.plan_id) || 'elite_30day_deep_vip';
-        const adminPlanIds = [
-            'core_4day_sprint',
-            'core_9day_run',
-            'core_14day_pro',
-            'core_30day_limitless',
-            'elite_4day_deep_dive',
-            'elite_9day_deep_strike',
-            'elite_14day_deep_pro',
-            'elite_30day_deep_vip',
-            'CORE_FREE',
-            'CORE_DAILY',
-            'CORE_WEEKLY',
-            'CORE_MONTHLY',
-            'ELITE_DAILY',
-            'ELITE_WEEKLY',
-            'ELITE_MONTHLY',
-            'VIP_30DAY'
-        ];
-        req.user = {
-            id: supaUser.id,
-            email: supaUser.email,
-            first_name: String(supaUser?.user_metadata?.first_name || 'Stephen').trim(),
-            is_admin: true,
-            isAdmin: true,
-            role: 'admin',
-            subscription_status: 'active',
-            subscription_tiers: ['core', 'elite', 'vip'],
-            access_tiers: ['core', 'elite', 'vip'],
-            subscription_plan_ids: adminPlanIds,
-            plan_id: requestedPlanId,
-            plan_tier: requestedPlanId.startsWith('core_') ? 'core' : 'elite',
-            plan_expires_at: '2099-12-31T23:59:59.000Z',
-            active_subscriptions: []
-        };
-        req.subscription = { plan_id: requestedPlanId, status: 'active' };
-        return next(); // INSTANTLY allow through
-        // ===== END TESTING BYPASS =====
-
-        // ===== GOD MODE BYPASS - IMMEDIATE EXIT BEFORE ANY DB QUERIES =====
-        const bypassEmail = String(process.env.ADMIN_BYPASS_EMAIL || '').toLowerCase().trim();
-        if (bypassEmail && String(supaUser?.email || '').toLowerCase().trim() === bypassEmail) {
-            console.log('[API-AUTH] God Mode Admin bypass triggered');
-            const requestedPlanId = normalizePlanId(req.query?.plan_id) || 'elite_30day_deep_vip';
-            const adminPlanIds = [
-                'core_4day_sprint',
-                'core_9day_run',
-                'core_14day_pro',
-                'core_30day_limitless',
-                'elite_4day_deep_dive',
-                'elite_9day_deep_strike',
-                'elite_14day_deep_pro',
-                'elite_30day_deep_vip',
-                'CORE_FREE',
-                'CORE_DAILY',
-                'CORE_WEEKLY',
-                'CORE_MONTHLY',
-                'ELITE_DAILY',
-                'ELITE_WEEKLY',
-                'ELITE_MONTHLY',
-                'VIP_30DAY'
-            ];
-            req.user = {
-                id: supaUser.id,
-                email: supaUser.email,
-                first_name: String(supaUser?.user_metadata?.first_name || 'Stephen').trim(),
-                is_admin: true,
-                isAdmin: true,
-                role: 'admin',
-                subscription_status: 'active',
-                subscription_tiers: ['core', 'elite', 'vip'],
-                access_tiers: ['core', 'elite', 'vip'],
-                subscription_plan_ids: adminPlanIds,
-                plan_id: requestedPlanId,
-                plan_tier: requestedPlanId.startsWith('core_') ? 'core' : 'elite',
-                plan_expires_at: '2099-12-31T23:59:59.000Z',
-                active_subscriptions: []
-            };
-            req.subscription = { plan_id: requestedPlanId, status: 'active' };
-            return next(); // INSTANTLY allow through
-        }
-        // ===== END GOD MODE BYPASS =====
 
         let profile = await getProfileById(supaUser.id);
         if (!profile) {
@@ -286,20 +175,10 @@ async function requireSupabaseUser(req, res, next) {
             ? supaUser.user_metadata
             : {};
         const profileRole = String(profile?.role || '').trim().toLowerCase();
-        const metadataRole = String(userMetadata?.role || '').trim().toLowerCase();
-        // ADMIN EMAIL BYPASS (configured via ADMIN_BYPASS_EMAIL env var)
-        const hardcodedAdminEmail = bypassEmail && String(supaUser?.email || '').toLowerCase().trim() === bypassEmail;
-        const metadataIsAdmin =
-            userMetadata?.is_admin === true
-            || userMetadata?.isAdmin === true
-            || metadataRole === 'admin'
-            || hardcodedAdminEmail;
-        const profileIsAdmin = profile?.is_admin === true || profileRole === 'admin' || metadataIsAdmin;
-        
-        // Log admin detection
-        if (hardcodedAdminEmail) {
-            console.log(`[SUPABASE_JWT] Admin email bypass triggered`);
-        }
+        const profileIsAdmin =
+            profile?.is_admin === true
+            || profileRole === 'admin';
+
         const accessContext = resolveAccessContext({
             activeSubscriptions,
             profilePlanId: subscriptionContext?.plan_id || profile?.plan_id || null,
@@ -322,7 +201,7 @@ async function requireSupabaseUser(req, res, next) {
             street: userMetadata?.street || null,
             town: userMetadata?.town || null,
             country: profile?.country || userMetadata?.country || null,
-            role: profileRole || metadataRole || 'user',
+            role: profileIsAdmin ? 'admin' : (profileRole || 'user'),
             is_admin: profileIsAdmin,
             isAdmin: profileIsAdmin,
             verification_status: verificationStatus,
@@ -333,7 +212,7 @@ async function requireSupabaseUser(req, res, next) {
             access_tiers: accessContext.access_tiers,
             subscription_plan_ids: accessContext.subscription_plan_ids,
             ...subscriptionContext,
-            is_test_user: profile?.is_test_user === true || userMetadata?.is_test_user === true
+            is_test_user: profile?.is_test_user === true
         };
 
         if (hasActiveSubscriptions && !ACTIVE_SUBSCRIPTION_STATUSES.has(req.user.subscription_status)) {
@@ -347,8 +226,15 @@ async function requireSupabaseUser(req, res, next) {
     }
 }
 
-// TESTING: Bypass subscription check for testing purposes
-// TODO: Revert this after testing
+function isTestUserSubscriptionBypassEnabled() {
+    const environment = String(process.env.NODE_ENV || '').trim().toLowerCase();
+    const enabled = String(
+        process.env.ALLOW_TEST_USER_SUBSCRIPTION_BYPASS || ''
+    ).trim().toLowerCase() === 'true';
+
+    return environment !== 'production' && enabled;
+}
+
 function requireActiveSubscription(req, res, next) {
     const user = req.user;
 
@@ -357,25 +243,31 @@ function requireActiveSubscription(req, res, next) {
         return;
     }
 
-    // TESTING: Always pass subscription check
-    console.log('[TESTING] Subscription check bypassed for testing');
-    next();
-
-    // Original logic (commented out for testing):
-    /*
-    if (
-        !ACTIVE_SUBSCRIPTION_STATUSES.has(user.subscription_status) &&
-        user.is_test_user !== true &&
-        user.is_admin !== true
-    ) {
-        res.status(403).json({ error: 'Subscription required' });
+    if (user.is_admin === true || user.isAdmin === true) {
+        next();
         return;
     }
+
+    if (
+        user.is_test_user === true
+        && isTestUserSubscriptionBypassEnabled()
+    ) {
+        next();
+        return;
+    }
+
+    if (!ACTIVE_SUBSCRIPTION_STATUSES.has(
+        String(user.subscription_status || '').trim().toLowerCase()
+    )) {
+        res.status(403).json({ error: 'Active subscription required' });
+        return;
+    }
+
     next();
-    */
 }
 
 module.exports = {
+    isTestUserSubscriptionBypassEnabled,
     requireSupabaseUser,
     requireActiveSubscription
 };
