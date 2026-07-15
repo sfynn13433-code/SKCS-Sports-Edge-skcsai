@@ -536,7 +536,7 @@
       "project_id": "ESEC-001",
       "project_name": "Subscriber and Security Boundary",
       "category": "Security and Commercial Boundary",
-      "description": "Inspect and govern Edge authentication, subscriber enforcement, API-key roles, service-role use, RLS, admin surfaces, secrets, and Scout M2M credential separation without changing runtime behavior.",
+      "description": "Govern Edge authentication, subscriber enforcement, scheduler authorization and credential-class separation through fail-closed source boundaries while RLS and production runtime proof remain separately gated.",
       "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
       "current_status": "PARTIAL",
       "priority": "critical",
@@ -562,84 +562,60 @@
         "EMG-001_SCOUT_EDGE_MARRIAGE_GATE_CONTRACT.v1",
         "EFI-001_FIP_INTAKE_HANDSHAKE_CONTRACT.v1",
         "E2E-001_C2_EXECUTION_READINESS_BLOCKER_RECONCILIATION.v1",
-        "ESEC-001_C1_SECURITY_BOUNDARY_INSPECTION_AND_CONTRACT.v1"
+        "ESEC-001_C1_SECURITY_BOUNDARY_INSPECTION_AND_CONTRACT.v1",
+        "ESEC-001_I1_FAIL_CLOSED_AUTHENTICATION_AND_CREDENTIAL_BOUNDARY_IMPLEMENTATION.v1"
       ],
-      "related_files": [
-        "backend/middleware/supabaseJwt.js",
-        "backend/utils/auth.js",
-        "backend/server-express.js",
-        "backend/services/governedFipIntakeComposition.js",
-        "public/js/config.js",
-        ".env.example",
-        "supabase/migrations/20260822000008_service_role_rls_policies.sql",
-        "supabase/migrations/20261011000001_sem_gov_001d_ui3_i8_fip_intake_evidence.sql",
-        "reports/ui3-i10/controlled-apply-result.json",
-        "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
-        "control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json",
-        "control-center/EDGE_PROJECT_BACKLOG.md",
-        "control-center/EDGE_PROJECT_DEPENDENCY_MAP.md",
-        "control-center/ESEC-001_C1_SECURITY_BOUNDARY_INSPECTION_AND_CONTRACT.v1.md",
-        "reports/esec-001/security-boundary-inspection.json",
-        "tests/esec-001-c1-security-boundary.test.js",
-        "package.json"
-      ],
-      "related_tables": [
-        "profiles",
-        "subscriptions",
-        "fip_intake_evidence"
-      ],
+      "related_files": [],
+      "related_tables": [],
       "known_issues": [
-        "Five CRITICAL security findings remain open",
-        "Three HIGH security findings remain open",
-        "ESEC-001 is not a satisfied marriage prerequisite",
-        "E2E-001 remains BLOCKED",
-        "Full marriage proof remains HOLD",
+        "RLS-001 remains open",
+        "Production credential configuration and rotation are unverified",
+        "Runtime and deployment proof remain blocked",
+        "ESEC-001 is not yet a satisfied marriage prerequisite",
         "All runtime gates remain BLOCKED"
       ],
       "required_decisions": [
-        "Authorize ESEC-001-I1 runtime security remediation",
-        "Approve replacement subscriber authentication model",
-        "Approve scheduler and cron credential model",
-        "Approve server-only service-role ownership boundary",
-        "Approve Scout M2M secret ownership, rotation, and nonce-store boundary",
-        "Approve RLS policy implementation packet"
+        "Separately authorize the RLS-001 policy and migration packet",
+        "Separately authorize production credential configuration and rotation verification",
+        "Separately authorize runtime and deployment verification",
+        "Explicitly approve any future ESEC or marriage-gate clearance"
       ],
-      "completion_definition": "ESEC-001-C1 PASS WITH CRITICAL BLOCKERS — the security boundary is inspected and contractually classified; eight open findings are recorded; no runtime, SQL, migration, environment, credential, route, deployment, E2E, or gate changes occur; ESEC-001 remains PARTIAL and E2E-001 remains BLOCKED.",
+      "completion_definition": "ESEC-001-I1 source-and-test remediation PASS - AUTH-001, SUB-001, KEY-001, CRON-001, ROUTE-001 and DB-001 are source-closed and tested; CRED-001 source credential separation is closed with production configuration and rotation proof still unverified; RLS-001 remains OPEN and excluded; ESEC-001 remains PARTIAL and every runtime gate remains BLOCKED.",
       "proof_required": [
-        "npm run test:esec-001-c1 passes",
-        "Authentication and subscriber surfaces inspected",
-        "Service-role use and credential aliases inspected without recording values",
-        "RLS state and missing-policy boundary recorded",
-        "Scout HMAC M2M credential boundary classified separately from subscriber and Supabase credentials",
-        "Eight security findings recorded",
-        "ESEC-001 remains PARTIAL",
-        "E2E-001 and all runtime gates remain BLOCKED",
-        "No runtime, SQL, migration, environment, credential, route, deployment, or external-system changes"
+        "npm run test:esec-001-i1 passes",
+        "npm run test:esec-001-c1 passes as read-only historical proof",
+        "Authentication and subscription middleware remain fail-closed",
+        "Browser protected calls use Supabase session bearer tokens",
+        "Scheduler routes and callers use the canonical scheduler-secret boundary",
+        "FORCE_BOOT_TEST startup writes are absent",
+        "Public direct-insight reads are anon-only",
+        "Privileged AI pipeline persistence is service-role-only",
+        "C1 historical artifacts remain preserved and non-mutating",
+        "ESEC-001 remains PARTIAL and all runtime gates remain BLOCKED"
       ],
       "risks_if_ignored": [
-        "Unauthorized admin and subscriber access",
-        "Public shared-key impersonation",
-        "Unauthenticated mutation execution",
-        "Service-role credential misuse",
-        "False E2E marriage readiness"
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
       ],
       "recommended_order": 10,
-      "next_action": "ESEC-001-C1 PASS WITH CRITICAL BLOCKERS. Next separately authorize ESEC-001-I1 fail-closed authentication and subscriber-boundary remediation: remove unconditional JWT admin/subscription bypasses, disable the public legacy user key, replace cron path bypasses with explicit authenticated scheduler credentials, protect mutation routes, remove startup test writes, and seal service-role/Scout M2M credential isolation. Do not execute E2E proof or clear any runtime gate.",
-      "owner_note": "Inspection and contract only. Security remediation requires ESEC-001-I1.",
+      "next_action": "ESEC-001-I1 source-and-test remediation PASS. AUTH-001, SUB-001, KEY-001, CRON-001, ROUTE-001 and DB-001 are source-closed and tested; CRED-001 source credential separation is closed but production configuration and rotation proof remain unverified. RLS-001 remains OPEN and separately excluded. Keep ESEC-001 PARTIAL and all runtime gates BLOCKED. Next separately authorize RLS-001 or production runtime/deployment verification; do not deploy, execute E2E proof, activate Scout transport, apply RLS migrations or clear any gate without explicit approval.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-15",
       "governed_by_control_task_id": "ESEC-001",
       "current_evidence": [
-        "Supabase JWT validation currently contains an unconditional testing branch that promotes authenticated users to admin with all tiers",
-        "Active-subscription middleware currently bypasses enforcement",
-        "Legacy shared user API key is enabled by backend default and embedded in public JavaScript",
-        "Role middleware bypasses authorization for cron path prefixes",
-        "Mutation-capable pipeline and internal fixture endpoints are mounted without explicit authentication",
-        "Server startup contains automatic FORCE_BOOT_TEST database writes using a privileged-key preference chain",
-        "I10 applied RLS-enabled tables with zero policies, including public.fip_intake_evidence",
-        "Service-role aliases and Scout HMAC M2M credentials do not yet have a sealed operational separation contract",
-        "Supabase anon key is classified as public client configuration, not a service secret",
-        "No secret values were copied into ESEC evidence",
-        "E2E-001 and all runtime gates remain BLOCKED"
+        "AUTH-001 source closure: validated Supabase JWTs no longer receive unconditional admin privilege",
+        "SUB-001 source closure: active-subscription enforcement is fail-closed",
+        "KEY-001 source closure: browser shared credential and backend legacy-key fallback were removed",
+        "CRON-001 source closure: scheduler routes and callers use dedicated canonical scheduler authentication",
+        "ROUTE-001 source closure: mutation-capable pipeline and internal routes use explicit middleware",
+        "DB-001 source closure: automatic FORCE_BOOT_TEST startup writes were removed",
+        "CRED-001 source boundary closure: public direct-insight reads use anon credentials and privileged pipeline writes use service-role credentials",
+        "Focused ESEC-001-I1 implementation suite is the active acceptance proof",
+        "ESEC-001-C1 is preserved as read-only historical inspection evidence",
+        "RLS-001 remains open and separately excluded",
+        "No deployment, E2E, Scout activation, RLS migration or production credential change occurred",
+        "E2E-001 and all runtime gates remain BLOCKED",
+        "Broad test:control-center result is HOLD because of repository-wide cleanup and asset-register drift; focused ESEC-I1 proof remains 32/32 PASS"
       ]
     },
     {
@@ -1076,7 +1052,9 @@
       ],
       "related_files": [],
       "related_tables": [],
-      "known_issues": [],
+      "known_issues": [
+        "ESEC-001 source remediation is tested but runtime security proof remains blocked"
+      ],
       "required_decisions": [],
       "completion_definition": "A controlled end-to-end proof demonstrates Scout-to-Edge FIP intake, validation, idempotency, analysis, provenance linkage, minimal retention, and zero reachable direct external sports acquisition.",
       "proof_required": [
@@ -1093,7 +1071,7 @@
         "Control Center sequencing bypass"
       ],
       "recommended_order": 19,
-      "next_action": "E2E-001-C2 readiness remains PASS WITH BLOCKERS after ESEC-001-C1. ESEC-001 is PARTIAL with eight open security findings. Next separately authorize ESEC-001-I1 fail-closed authentication and credential-boundary remediation. Do not execute the live proof, authorize Scout transport, implement D1 or R1, alter provider runtime, enable routes or feature flags, or clear any runtime governance gate.",
+      "next_action": "E2E-001 remains BLOCKED after ESEC-001-I1 source-and-test remediation. ESEC-001 is still PARTIAL because RLS-001, production credential verification and runtime/deployment proof remain open. Do not execute live E2E proof, authorize Scout transport, deploy functions, apply RLS migrations, alter provider runtime, enable routes or clear any runtime governance gate without separate explicit approval.",
       "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
       "last_updated": "2026-07-15",
       "governed_by_control_task_id": "E2E-001",
@@ -1110,7 +1088,7 @@
         "ESEC-001 remains PROPOSED",
         "EPRV-001 remains PARTIAL with direct external acquisition still reachable",
         "Full marriage proof remains HOLD and all runtime governance gates remain BLOCKED",
-        "ESEC-001-C1 inspection PASS WITH CRITICAL BLOCKERS; ESEC-001 is PARTIAL with five CRITICAL and three HIGH findings"
+        "ESEC-001-I1 source-and-test remediation passed; ESEC-001 remains PARTIAL because RLS-001 and production runtime/deployment proof remain open"
       ]
     },
     {

@@ -28,7 +28,7 @@ Blocks: none
 Status: TESTED
 Governed by: ESA-001
 Blocked by: EPR-001
-Blocks: EAC-001, EMG-001, EFI-001, EST-001, ESEC-001, EPI-001, EGR-001, EAI-001, EUI-001, EOPS-001, FIP-001
+Blocks: EAC-001, EMG-001, EFI-001, EST-001, ESEC-001, EPI-001, EGR-001, EAI-001, EUI-001, EOPS-001, FIP-001, SEM-GOV-001A
 
 ## EAC-001 — Edge Asset Classification and Repository Map
 
@@ -63,7 +63,7 @@ Blocks: EPRV-001, E2E-001
 Status: TESTED
 Governed by: EST-001
 Blocked by: ESA-001, EMG-001
-Blocks: EOPS-001, E2E-001
+Blocks: EOPS-001, E2E-001, SEM-GOV-001D-UI3-I2
 
 ## ESEC-001 — Subscriber and Security Boundary
 
@@ -77,7 +77,7 @@ Blocks: EUI-001, EOPS-001, E2E-001
 Status: TESTED
 Governed by: EPI-001
 Blocked by: ESA-001
-Blocks: EGR-001, EAI-001, EUI-001, E2E-001
+Blocks: EGR-001, EAI-001, EUI-001, E2E-001, SEM-GOV-001A
 
 ## EPRV-001 — External Sports Provider Removal
 
@@ -154,7 +154,7 @@ Blocks: none
 Status: APPROVED
 Governed by: SEM-GOV-001A
 Blocked by: ESA-001, EPI-001
-Blocks: none
+Blocks: SEM-GOV-001B, SEM-GOV-001D-UI1
 
 ## SEM-GOV-001B — Football Lifecycle Persistence Contract
 
@@ -196,64 +196,56 @@ Blocks: SEM-GOV-001B-I4
 Status: TESTED
 Governed by: SEM-GOV-001B-I4
 Blocked by: SEM-GOV-001B-I4-CAP2
-Blocks: none
-Notes: Implementation foundation TESTED. Migration authored NOT APPLIED. Production activation BLOCKED. All gates BLOCKED. I4-PURGE, I5, SEM-GOV-001C not started.
+Blocks: SEM-GOV-001D-UI1, SEM-GOV-001D-UI3-I1
 
 ## SEM-GOV-001D-UI1 — Sports Match Hub UI Information Architecture and Screen Contract
 
 Status: PROPOSED
 Governed by: SEM-GOV-001D-UI1
 Blocked by: SEM-GOV-001A, SEM-GOV-001B-I4
-Blocks: none
-Notes: Screen contract PROPOSED. UI2/UI3/UI4 NOT STARTED. No frontend code. Migration NOT APPLIED. All gates BLOCKED.
+Blocks: SEM-GOV-001D-UI2
 
 ## SEM-GOV-001D-UI2 — Static Sports Match Hub Implementation
 
 Status: TESTED
 Governed by: SEM-GOV-001D-UI2
 Blocked by: SEM-GOV-001D-UI1
-Blocks: none
-Notes: Static Hub TESTED with mock fixtures. UI3/UI4 NOT STARTED. No live API. Migration NOT APPLIED. All gates BLOCKED.
+Blocks: SEM-GOV-001D-HOME1
 
 ## SEM-GOV-001D-HOME1 — Home Page Information Architecture and Visual Consolidation
 
 Status: TESTED
 Governed by: SEM-GOV-001D-HOME1
 Blocked by: SEM-GOV-001D-UI2
-Blocks: none
-Notes: Hub-aligned dark home landing TESTED. Static preview only. Hub files unchanged. UI3/UI4 NOT STARTED. Migration NOT APPLIED. All gates BLOCKED.
+Blocks: SEM-GOV-001D-UI3-I1
 
 ## SEM-GOV-001D-UI3-I1 — Lifecycle Read-Model API Inspection and Contract
 
 Status: TESTED
 Governed by: SEM-GOV-001D-UI3-I1
 Blocked by: SEM-GOV-001D-HOME1, SEM-GOV-001B-I4
-Blocks: none
-Notes: Inspection PASS WITH BLOCKER. Two-source read-model contract sealed. No lifecycle route mounted. UI3/UI4 implementation NOT STARTED. Migration NOT APPLIED. public_fixture_id resolver BLOCKED. All gates BLOCKED.
+Blocks: SEM-GOV-001D-UI3-I2
 
 ## SEM-GOV-001D-UI3-I2 — Canonical Fixture Metadata Projection Inspection and Contract
 
 Status: TESTED
 Governed by: SEM-GOV-001D-UI3-I2
 Blocked by: SEM-GOV-001D-UI3-I1, EST-001
-Blocks: none
-Notes: Inspection PASS WITH BLOCKER — NEW GOVERNED METADATA PROJECTION REQUIRED. raw_fixtures rejected as Source B. Scout FIP-001 canonical authority. Bounded projection fields sealed. EST-001 authorization pending. Source B persistence NOT AUTHORIZED. UI3/UI4 NOT STARTED. Migration NOT APPLIED. All gates BLOCKED.
+Blocks: SEM-GOV-001D-UI3-I3
 
 ## SEM-GOV-001D-UI3-I3 — Source B Storage Policy and Retention Contract
 
 Status: TESTED
 Governed by: SEM-GOV-001D-UI3-I3
 Blocked by: SEM-GOV-001D-UI3-I2
-Blocks: none
-Notes: PASS WITH CORRECTION. D3 DERIVED FIXTURE DISPLAY STATE sealed. EST-001 amended. 8-day active + 30-day post-closure retention. 359.50 MB projected total with 20.50 MB headroom. fixture_display_metadata reserved not created. D3 migration NOT AUTHORIZED. UI3/UI4 NOT STARTED. Migration NOT APPLIED. All gates BLOCKED.
+Blocks: SEM-GOV-001D-UI3-I4
 
 ## SEM-GOV-001D-UI3-I4 — Source B Schema and Persistence Implementation Design
 
 Status: TESTED
 Governed by: SEM-GOV-001D-UI3-I4
 Blocked by: SEM-GOV-001D-UI3-I3
-Blocks: none
-Notes: PASS WITH CORRECTION. D3 fixture_display_metadata schema design sealed. FK CASCADE to fixture_lifecycle_current. Persistence service interface documented. Migration NOT AUTHORIZED. Lifecycle migration NOT APPLIED. EFI-001 NOT IMPLEMENTED. UI3/UI4 NOT STARTED. All gates BLOCKED.
+Blocks: SEM-GOV-001D-UI3-I5
 
 ## SEM-GOV-001D-UI3-I5 — Source B Migration and Isolated Persistence Implementation
 
@@ -261,7 +253,6 @@ Status: TESTED
 Governed by: SEM-GOV-001D-UI3-I5
 Blocked by: SEM-GOV-001D-UI3-I4
 Blocks: SEM-GOV-001D-UI3-I6
-Notes: PASS WITH CORRECTION. 25 physical columns in migration SQL. fixtureDisplayMetadataPersistenceService implemented. Mock-first tests pass. Migration NOT APPLIED. No production caller. Lifecycle migration NOT APPLIED. All gates BLOCKED.
 
 ## SEM-GOV-001D-UI3-I6 — EFI-001 Governed Intake Inspection and Adapter Contract
 
@@ -269,7 +260,6 @@ Status: TESTED
 Governed by: SEM-GOV-001D-UI3-I6
 Blocked by: SEM-GOV-001D-UI3-I5
 Blocks: SEM-GOV-001D-UI3-I7
-Notes: PASS WITH BLOCKER. fipIntakeService classified PARTIAL proof-only. Hash law proven. FIP-to-D3 DTO crosswalk sealed. Lifecycle-before-D3 sequence sealed. fixture_uid resolution BLOCKER. UI3-I7 implemented. All gates BLOCKED.
 
 ## SEM-GOV-001D-UI3-I7 — Governed FIP Intake Adapter Implementation
 
@@ -277,7 +267,6 @@ Status: TESTED
 Governed by: SEM-GOV-001D-UI3-I7
 Blocked by: SEM-GOV-001D-UI3-I6
 Blocks: SEM-GOV-001D-UI3-I8
-Notes: PASS WITH CORRECTION. governedFipIntakeAdapter and fixtureIdentityResolverService implemented. fipIntakeService FIP-001 aligned. Mock-first tests pass. No HTTP route. No production caller. Migrations NOT APPLIED. All gates BLOCKED.
 
 ## SEM-GOV-001D-UI3-I8 — Durable Intake Evidence Storage and Isolated Implementation
 
@@ -285,7 +274,6 @@ Status: TESTED
 Governed by: SEM-GOV-001D-UI3-I8
 Blocked by: SEM-GOV-001D-UI3-I7
 Blocks: SEM-GOV-001D-UI3-I9
-Notes: PASS WITH CORRECTION. fip_intake_evidence migration authored. fipIntakeEvidenceService implemented with EST-001 R2 retention. Migration NOT APPLIED. All gates BLOCKED.
 
 ## SEM-GOV-001D-UI3-I9 — Production Composition and M2M Auth Foundation
 
@@ -293,15 +281,13 @@ Status: TESTED
 Governed by: SEM-GOV-001D-UI3-I9
 Blocked by: SEM-GOV-001D-UI3-I8
 Blocks: SEM-GOV-001D-UI3-I10
-Notes: PASS. governedFipIntakeComposition and fipIntakeM2MAuthenticator implemented. Feature flag disabled by default. No HTTP route. No production caller. All gates BLOCKED.
 
 ## SEM-GOV-001D-UI3-I10 — Migration Readiness and Controlled Apply
 
 Status: TESTED
 Governed by: SEM-GOV-001D-UI3-I10
 Blocked by: SEM-GOV-001D-UI3-I9
-Blocks: none
-Notes: PASS WITH CORRECTION. Gate A readiness PASS. Gate B atomic schema apply PASS WITH CORRECTION. Gate B-C1 migration history reconciliation PASS. Formal Gate B closure PASS. Eight tables with RLS, zero policies, zero rows. Pooler port + pgcrypto apply corrections. Runtime gates BLOCKED.
+Blocks: SEM-GOV-001D-UI3-I11
 
 ## SEM-GOV-001D-UI3-I11 — Controlled End-to-End Marriage Proof
 
@@ -309,4 +295,3 @@ Status: TESTED
 Governed by: SEM-GOV-001D-UI3-I11
 Blocked by: SEM-GOV-001D-UI3-I10
 Blocks: none
-Notes: Gate A PASS WITH CORRECTION. Contract reconciliation sealed. Mock-only Gate B authorized. Full marriage proof HOLD. Proof kickoff 24-48h. public.fip_intake_evidence canonical. All runtime gates BLOCKED.

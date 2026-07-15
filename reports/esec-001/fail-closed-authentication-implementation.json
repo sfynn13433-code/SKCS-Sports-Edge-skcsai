@@ -1,0 +1,126 @@
+{
+  "task": "ESEC-001",
+  "miniProject": "ESEC-001-I1",
+  "operation": "FAIL_CLOSED_AUTHENTICATION_AND_CREDENTIAL_BOUNDARY_REMEDIATION",
+  "recordedOn": "2026-07-15",
+  "startHead": "ae2cee2e20c090b516d3d374ce5f3fd4425c8ffc",
+  "sourceImplementationCommits": [
+    "3048120c",
+    "a0c34d8a",
+    "b9700c3d",
+    "7a326b6e"
+  ],
+  "result": "PASS_SOURCE_AND_TEST_CLOSURE",
+  "decision": "SOURCE_REMEDIATION_COMPLETE_RUNTIME_AND_RLS_PROOF_BLOCKED",
+  "esec001Status": "PARTIAL",
+  "e2e001Status": "BLOCKED",
+  "fullMarriageProofDecision": "HOLD",
+  "findings": [
+    {
+      "id": "AUTH-001",
+      "state": "SOURCE_CLOSED_TESTED",
+      "outcome": "Supabase JWT authentication no longer promotes arbitrary authenticated users to admin."
+    },
+    {
+      "id": "SUB-001",
+      "state": "SOURCE_CLOSED_TESTED",
+      "outcome": "Subscription enforcement is fail-closed with bounded explicit test policy."
+    },
+    {
+      "id": "KEY-001",
+      "state": "SOURCE_CLOSED_TESTED",
+      "outcome": "The public shared application credential and backend legacy-key fallback were removed."
+    },
+    {
+      "id": "CRON-001",
+      "state": "SOURCE_CLOSED_TESTED",
+      "outcome": "Scheduler routes and callers use the dedicated canonical scheduler-secret boundary."
+    },
+    {
+      "id": "ROUTE-001",
+      "state": "SOURCE_CLOSED_TESTED",
+      "outcome": "Mutation-capable scheduler, pipeline and internal routes use explicit authorization middleware."
+    },
+    {
+      "id": "DB-001",
+      "state": "SOURCE_CLOSED_TESTED",
+      "outcome": "Automatic FORCE_BOOT_TEST startup database writes were removed."
+    },
+    {
+      "id": "CRED-001",
+      "state": "SOURCE_BOUNDARY_CLOSED_RUNTIME_UNVERIFIED",
+      "outcome": "Public direct-insight reads use the anon key; privileged pipeline writes use the server-only service-role key. Production configuration, rotation and revocation proof were not executed."
+    },
+    {
+      "id": "RLS-001",
+      "state": "OPEN_EXCLUDED",
+      "outcome": "RLS policy design and migration execution remain a separately authorized mini-project."
+    }
+  ],
+  "activeProof": {
+    "command": "npm run test:esec-001-i1",
+    "expectedTestCount": 32,
+    "expectedResult": "PASS"
+  },
+  "historicalEvidence": {
+    "miniProject": "ESEC-001-C1",
+    "report": "reports/esec-001/security-boundary-inspection.json",
+    "contract": "control-center/ESEC-001_C1_SECURITY_BOUNDARY_INSPECTION_AND_CONTRACT.v1.md",
+    "test": "tests/esec-001-c1-security-boundary.test.js",
+    "disposition": "PRESERVED_READ_ONLY_HISTORICAL_EVIDENCE"
+  },
+  "runtimeGates": {
+    "scout_edge_marriage_gate": "BLOCKED",
+    "unified_lifecycle_governor": "BLOCKED",
+    "supabase_storage_gate": "BLOCKED"
+  },
+  "exclusions": {
+    "rlsMigrationWork": true,
+    "runtimeE2EProof": true,
+    "deploymentProof": true,
+    "supabaseFunctionDeployment": true,
+    "scoutTransportActivation": true,
+    "productionCredentialConfiguration": true,
+    "gateClearance": true,
+    "controlAssetsExecution": true
+  },
+  "secretValuesRecorded": false,
+  "externalConnections": 0,
+  "nextAction": "ESEC-001-I1 source-and-test remediation PASS. AUTH-001, SUB-001, KEY-001, CRON-001, ROUTE-001 and DB-001 are source-closed and tested; CRED-001 source credential separation is closed but production configuration and rotation proof remain unverified. RLS-001 remains OPEN and separately excluded. Keep ESEC-001 PARTIAL and all runtime gates BLOCKED. Next separately authorize RLS-001 or production runtime/deployment verification; do not deploy, execute E2E proof, activate Scout transport, apply RLS migrations or clear any gate without explicit approval.",
+  "verification": {
+    "activeI1Proof": {
+      "result": "PASS",
+      "tests": 32,
+      "passed": 32,
+      "failed": 0
+    },
+    "historicalC1Proof": {
+      "result": "PASS",
+      "tests": 2,
+      "passed": 2,
+      "failed": 0
+    },
+    "projectRegisterBootstrap": {
+      "result": "PASS",
+      "projects": 42,
+      "ledgerTasks": 42
+    },
+    "broadControlCenterSuite": {
+      "result": "HOLD_REPOSITORY_WIDE_GOVERNANCE_DRIFT",
+      "tests": 331,
+      "passed": 319,
+      "failed": 12,
+      "closureCriterion": false,
+      "packetSpecificDeferredCandidates": [
+        "control-center/ESEC-001_I1_FAIL_CLOSED_AUTHENTICATION_AND_CREDENTIAL_BOUNDARY_IMPLEMENTATION.v1.md",
+        "reports/esec-001/fail-closed-authentication-implementation.json",
+        "tests/esec-001-i1-governance.test.js"
+      ],
+      "failureClasses": [
+        "Pre-existing cleanup-programme tracked-count expectation drift",
+        "Pre-existing asset-register enum, count and unregistered-path drift",
+        "Three Packet 4B governance assets deferred because control:assets and repository-wide asset repair were explicitly excluded"
+      ]
+    }
+  }
+}

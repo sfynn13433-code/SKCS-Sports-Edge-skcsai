@@ -60,7 +60,7 @@ The following technical prerequisites must be satisfied:
 | EMG-001 | Scout-Edge Marriage Gate Contract | APPROVED (contract sealed; gate remains BLOCKED) |
 | EFI-001 | FIP Intake Handshake | APPROVED (contract sealed; implementation forbidden) |
 | EST-001 | Supabase Storage and FIP Retention Contract | APPROVED (contract sealed; storage gate remains BLOCKED) |
-| ESEC-001 | Subscriber and Security Boundary | PROPOSED |
+| ESEC-001 | Subscriber and Security Boundary | PARTIAL (I1 source/test remediation passed; RLS and runtime proof open) |
 | EPI-001 | Prediction Pipeline Integrity | TESTED (contract sealed; runtime unchanged) |
 | EPRV-001 | External Sports Provider Removal | PARTIAL (inspection contract sealed; removal not implemented) |
 | E2E-001 | Scout to Edge End-to-End Proof | BLOCKED |
@@ -10394,3 +10394,19 @@ Evidence:
 - EPRV-001 remains PARTIAL.
 - `scout_edge_marriage_gate` remains BLOCKED.
 - `supabase_storage_gate` remains BLOCKED.
+---
+
+## ESEC-001-I1 source remediation closure - 2026-07-15
+
+**Decision:** PASS - SOURCE AND TEST CLOSURE
+
+- AUTH-001, SUB-001, KEY-001, CRON-001, ROUTE-001 and DB-001 are source-closed and tested.
+- CRED-001 source separation is implemented: public direct-insight reads are anon-only and privileged pipeline writes are service-role-only.
+- Production credential configuration, rotation and revocation proof were not executed.
+- RLS-001 remains OPEN and separately excluded.
+- ESEC-001 remains PARTIAL.
+- E2E-001 remains BLOCKED.
+- `scout_edge_marriage_gate`, `unified_lifecycle_governor` and `supabase_storage_gate` remain BLOCKED.
+- ESEC-001-C1 is preserved as read-only historical inspection evidence.
+- No deployment, E2E execution, Supabase function deployment, Scout activation, RLS migration, production credential change or `control:assets` execution occurred.
+- Broad `test:control-center` result: **HOLD** ? 319/331 tests passed; repository-wide cleanup/asset-register drift and three deferred Packet 4B asset registrations remain outside this packet.

@@ -119,6 +119,6 @@ test('AI pipeline persistence client is service-role-only', () => {
 test('package exposes the complete ESEC-001-I1 proof command', () => {
   assert.equal(
     packageJson.scripts['test:esec-001-i1'],
-    'node --test tests/esec-001-i1-auth-boundary.test.js tests/esec-001-i1-browser-auth-boundary.test.js tests/esec-001-i1-legacy-cron-boundary.test.js tests/esec-001-i1-scheduler-caller-boundary.test.js tests/esec-001-i1-scheduler-route-boundary.test.js tests/esec-001-i1-db-credential-boundary.test.js'
+    'node --test tests/esec-001-i1-auth-boundary.test.js tests/esec-001-i1-browser-auth-boundary.test.js tests/esec-001-i1-legacy-cron-boundary.test.js tests/esec-001-i1-scheduler-caller-boundary.test.js tests/esec-001-i1-scheduler-route-boundary.test.js tests/esec-001-i1-db-credential-boundary.test.js tests/esec-001-i1-governance.test.js'
   );
 });
