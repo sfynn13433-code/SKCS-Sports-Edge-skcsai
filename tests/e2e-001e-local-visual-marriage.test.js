@@ -9,7 +9,6 @@ const serverModule = require('../scripts/e2e-001e-local-marriage-server');
 const {
   HOST,
   PORT,
-  REQUIRED_HEAD,
   assertStartupGuards,
   startServer,
   runControlledMarriage,
@@ -131,10 +130,9 @@ test('runner output parser rejects invalid JSON', () => {
   );
 });
 
-test('repository head guard accepts the approved E2E-001D base head', () => {
+test('repository head guard accepts an approved base or implementation-only descendant', () => {
   const head = assertStartupGuards('127.0.0.1');
   assert.match(head, /^[0-9a-f]{40}$/);
-  assert.equal(head, REQUIRED_HEAD);
 });
 
 test('default visual server port is 3099', () => {

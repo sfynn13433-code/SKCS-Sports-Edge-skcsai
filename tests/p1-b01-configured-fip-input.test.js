@@ -3,6 +3,241 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
+
+/*
+ * E2E-001F TEST DATABASE ISOLATION
+ *
+ * Scout owns Neon.
+ * Edge owns Supabase.
+ * This test must not contact either live database.
+ */
+
+const http = require('node:http');
+const https = require('node:https');
+
+const isolationCounters = {
+  database_connection_attempts: 0,
+  database_query_attempts: 0,
+  network_attempts: 0
+};
+
+const originalEnvironment = {
+  NODE_ENV: process.env.NODE_ENV,
+  DATABASE_URL: process.env.DATABASE_URL,
+  SUPABASE_URL: process.env.SUPABASE_URL,
+  SUPABASE_SERVICE_ROLE_KEY:
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+  SUPABASE_KEY: process.env.SUPABASE_KEY,
+  SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY
+};
+
+const blockedEnvironment = {
+  NODE_ENV: 'test',
+
+  DATABASE_URL:
+    'postgresql://e2e001f-blocked:e2e001f-blocked@127.0.0.1:1/e2e001f',
+
+  SUPABASE_URL:
+    'http://127.0.0.1:1',
+
+  SUPABASE_SERVICE_ROLE_KEY:
+    'E2E001F_BLOCKED_SERVICE_ROLE_KEY',
+
+  SUPABASE_KEY:
+    'E2E001F_BLOCKED_SUPABASE_KEY',
+
+  SUPABASE_ANON_KEY:
+    'E2E001F_BLOCKED_ANON_KEY'
+};
+
+for (
+  const [name, value] of
+  Object.entries(blockedEnvironment)
+) {
+  process.env[name] = value;
+}
+
+function controlledIsolationError(
+  code,
+  message
+) {
+  const error = new Error(message);
+  error.code = code;
+  return error;
+}
+
+function blockDatabaseConnection() {
+  isolationCounters.database_connection_attempts += 1;
+
+  throw controlledIsolationError(
+    'E2E001F_DATABASE_CONNECTION_BLOCKED',
+    'A database connection was attempted during an isolated unit test.'
+  );
+}
+
+function blockDatabaseQuery() {
+  isolationCounters.database_query_attempts += 1;
+
+  throw controlledIsolationError(
+    'E2E001F_DATABASE_QUERY_BLOCKED',
+    'A database query was attempted during an isolated unit test.'
+  );
+}
+
+function blockNetworkOperation() {
+  isolationCounters.network_attempts += 1;
+
+  throw controlledIsolationError(
+    'E2E001F_NETWORK_OPERATION_BLOCKED',
+    'A network operation was attempted during an isolated unit test.'
+  );
+}
+
+const originalNetworkFunctions = {
+  httpRequest: http.request,
+  httpGet: http.get,
+  httpsRequest: https.request,
+  httpsGet: https.get,
+  fetch: global.fetch
+};
+
+http.request = blockNetworkOperation;
+http.get = blockNetworkOperation;
+https.request = blockNetworkOperation;
+https.get = blockNetworkOperation;
+
+global.fetch = async () => {
+  return blockNetworkOperation();
+};
+
+const blockedPool = {
+  connect: blockDatabaseConnection,
+  query: blockDatabaseQuery,
+
+  end() {
+    return undefined;
+  },
+
+  on() {
+    return undefined;
+  }
+};
+
+const blockedDatabaseExports = {
+  pool: blockedPool,
+  query: blockDatabaseQuery,
+  withTransaction: blockDatabaseQuery
+};
+
+function installRepositoryModuleStub(relativePath) {
+  const resolved =
+    require.resolve(relativePath);
+
+  require.cache[resolved] = {
+    id: resolved,
+    filename: resolved,
+    loaded: true,
+    exports: blockedDatabaseExports,
+    children: [],
+    paths: []
+  };
+}
+
+/*
+ * E2E-001F VERIFICATION CONTROLLER STUB
+ *
+ * aiPipeline imports this production controller, whose module startup
+ * hydrates a system-health snapshot from the Edge database.
+ *
+ * This unit test does not exercise verification-controller behaviour,
+ * so the controller is replaced before aiPipeline is loaded.
+ */
+function installPlainModuleStub(
+  relativePath,
+  exportsValue
+) {
+  const resolved =
+    require.resolve(relativePath);
+
+  require.cache[resolved] = {
+    id: resolved,
+    filename: resolved,
+    loaded: true,
+    exports: exportsValue,
+    children: [],
+    paths: []
+  };
+}
+
+installPlainModuleStub(
+  '../backend/core/verificationController.js',
+  Object.freeze({})
+);
+
+installRepositoryModuleStub('../backend/database.js');
+installRepositoryModuleStub('../backend/db.js');
+
+test.after(() => {
+  assert.equal(
+    isolationCounters.database_connection_attempts,
+    0,
+    'No database connection may be attempted'
+  );
+
+  assert.equal(
+    isolationCounters.database_query_attempts,
+    0,
+    'No database query may be attempted'
+  );
+
+  assert.equal(
+    isolationCounters.network_attempts,
+    0,
+    'No network operation may be attempted'
+  );
+
+  http.request =
+    originalNetworkFunctions.httpRequest;
+
+  http.get =
+    originalNetworkFunctions.httpGet;
+
+  https.request =
+    originalNetworkFunctions.httpsRequest;
+
+  https.get =
+    originalNetworkFunctions.httpsGet;
+
+  global.fetch =
+    originalNetworkFunctions.fetch;
+
+  for (
+    const [name, value] of
+    Object.entries(originalEnvironment)
+  ) {
+    if (value === undefined) {
+      delete process.env[name];
+    } else {
+      process.env[name] = value;
+    }
+  }
+
+  console.log(
+    'E2E-001F DATABASE CONNECTION ATTEMPTS: ' +
+    isolationCounters.database_connection_attempts
+  );
+
+  console.log(
+    'E2E-001F DATABASE QUERY ATTEMPTS: ' +
+    isolationCounters.database_query_attempts
+  );
+
+  console.log(
+    'E2E-001F NETWORK ATTEMPTS: ' +
+    isolationCounters.network_attempts
+  );
+});
+
 const aiPipeline = require('../backend/services/aiPipeline');
 
 const {
