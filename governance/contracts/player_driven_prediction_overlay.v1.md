@@ -124,3 +124,122 @@ This overlay does not:
 - alter Edge prediction formulas;
 - approve the Scout-Edge marriage gate;
 - start a prediction-engine project.
+
+## 10. Supplemental operating decision — revolving workload and progressive prediction
+
+**Supplemental decision date:** 2026-07-17
+**Decision status:** Recorded addition to the PDM-001 architecture; no runtime or implementation authority is granted.
+
+### 10.1 Nine-day revolving fixture horizon
+
+The shared Scout–Edge operating model shall be designed around a revolving nine-day horizon:
+
+- Days 1 through 8 are the active fixture-processing window.
+- Day 1 represents the most immediate fixture day and receives the highest prediction-refresh priority.
+- Day 8 represents the furthest active fixture day.
+- Day 9 is a lightweight background-preparation day that discovers, verifies and prepares fixtures before they enter Day 8.
+- At rollover, each active fixture day moves one position closer, the prepared Day 9 cohort becomes Day 8, and completed Day 1 fixtures move to post-fixture closure.
+
+The existence of a fixture in the window does not require full reprocessing. Scout and Edge must prefer delta-based work and skip unchanged fixtures.
+
+### 10.2 Three-hour workload ownership windows
+
+The twenty-four-hour operating day may be divided into eight three-hour ownership windows, one for each active fixture day.
+
+Each ownership window must:
+
+1. process the assigned fixture day first;
+2. enforce a bounded execution, request and retry budget;
+3. checkpoint and close its assigned work safely;
+4. release unused capacity to other approved work, such as another sporting code, Day 9 preparation, reconciliation, archiving or controlled retries.
+
+A three-hour ownership window is a capacity boundary, not an instruction to consume the full three hours. Football may receive a larger weighted allocation because of its fixture and evidence volume, but it must not monopolise the operating day or prevent the other governed sporting codes from progressing.
+
+### 10.3 Scout workload responsibility
+
+Scout progressively matures the evidence package across the active fixture horizon.
+
+Scout must:
+
+- discover and verify fixtures through the applicable identity and fixture gates;
+- collect, classify and archive governed evidence;
+- identify what changed since the previous successful package;
+- distinguish material changes from repeated or non-material evidence;
+- perform only objective and reproducible transformations;
+- issue versioned fixture evidence packages and deltas;
+- mark the affected evidence domains and package readiness;
+- avoid unnecessary archive and index writes when no material change exists.
+
+Distant fixture days may require broader evidence preparation, while later fixture days require increasingly current evidence. Scout must not execute prediction formulas, assign predictive weights or publish probabilities.
+
+### 10.4 Edge workload responsibility
+
+Edge progressively matures the prediction as Scout evidence matures.
+
+The intended Edge policy is:
+
+- establish an initial baseline for eligible distant fixtures;
+- perform only minor or incremental adjustments for Days 8 through 2 when material evidence changes;
+- assign the greatest formula and simulation capacity to Day 1;
+- perform a nominal scheduled refresh every three hours for eligible active fixtures;
+- skip fixtures whose consumed Scout package has not materially changed;
+- rerun only formulas and model components that depend on the changed evidence domains;
+- preserve formula, feature, model and consumed-package version references for every refresh.
+
+A small priority-event lane may refresh one affected fixture without waiting for the next scheduled cycle when Scout verifies a material late event such as a confirmed lineup, late withdrawal, cancellation, kickoff or venue change, or major weather disruption.
+
+### 10.5 Multi-sport and formula isolation
+
+The platform is intended to support sixteen governed sporting codes. Each code must therefore have isolated workload controls.
+
+Future implementation must provide:
+
+- sport-specific queues or equivalent partitions;
+- per-sport fixture, request, duration and retry budgets;
+- prioritisation that prevents one sport from starving another;
+- checkpoints and explicit overflow handling;
+- failure isolation so that one sport does not block the remaining sports;
+- sport-scoped formulas and features.
+
+Each Edge formula or model component must declare at minimum:
+
+- the sporting code to which it applies;
+- its required evidence domains;
+- its feature and formula dependencies;
+- its eligible fixture stage or refresh trigger;
+- its version;
+- the conditions under which recalculation may be skipped.
+
+No fixture may trigger formulas from another sporting code, and no evidence update may cause an uncontrolled full-history or full-portfolio recalculation.
+
+### 10.6 Governed Scout-to-Edge handoff
+
+The future versioned handoff should expose sufficient control metadata for incremental Edge processing, including where applicable:
+
+- fixture identity and sporting code;
+- fixture-window day;
+- evidence-package version;
+- evidence effective time;
+- changed evidence domains;
+- material-change state;
+- readiness state;
+- superseded package reference;
+- evidence quality and provenance references.
+
+Edge must record which Scout package version was consumed and which formula and model versions produced the resulting prediction state.
+
+### 10.7 Required proof before activation
+
+Before runtime implementation, separately approved mini-projects must:
+
+1. inventory the current Scout scheduler, tick, package and queue behaviour;
+2. inventory the current Edge refresh, formula and dependency behaviour;
+3. define capacity budgets and overflow rules;
+4. prove sport and fixture isolation;
+5. prove delta-based package and formula refresh behaviour;
+6. run the design in shadow mode;
+7. measure duration, throughput, retries, failures, storage growth and skipped unchanged work;
+8. demonstrate that football cannot consume the complete operating day;
+9. demonstrate that one sporting-code failure cannot stop the others.
+
+This addition does not approve scheduler implementation, formula implementation, production activation or expansion of any sporting code.

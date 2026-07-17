@@ -45,8 +45,40 @@ Before implementation, define and test a player-driven probabilistic baseline th
 
 ## Next action
 
-When current approved Edge work is closed and Scout evidence coverage is known, perform a read-only Edge prediction-input and baseline inspection. Do not change prediction rules during that inspection.
+When current approved Edge work is closed and Scout evidence coverage is known, perform a read-only joint PDM-001 prediction-input, formula-dependency and capacity inspection covering the nine-day revolving fixture horizon, three-hour refresh design, Day 1 prioritisation, incremental Days 2–8 refreshes, per-sport workload limits and consumed Scout package versions. Do not change prediction rules, formulas, schedulers or runtime behaviour during that inspection.
 
 ## Governance note
 
 This proposal file does not bypass `EDGE_MASTER_PROJECT_REGISTER.v1.json`. PDM-001 must be added through the canonical project-registration workflow before it becomes an executable mini-project.
+
+## Recorded operating-model addition — progressive prediction and Scout balance
+
+PDM-001 now also records the intended cross-project workload model:
+
+- Days 1 through 8 form the active revolving fixture horizon.
+- Day 9 is prepared in the background before entering Day 8.
+- The twenty-four-hour day may be divided into eight bounded three-hour fixture-day ownership windows.
+- Football may receive a larger weighted allocation but may not prevent other sporting codes from progressing.
+- Scout performs fixture verification, evidence acquisition, classification, archiving and objective package preparation.
+- Scout publishes versioned evidence packages and identifies material changes and affected evidence domains.
+- Edge consumes those package versions and owns all formulas, features, simulations, weights, probabilities and prediction publication decisions.
+- Day 1 receives the greatest Edge compute and refresh priority.
+- Days 8 through 2 receive baseline or incremental recalculation only when relevant evidence changes.
+- Edge may use a nominal three-hour scheduled refresh for eligible fixtures.
+- Confirmed lineups and other verified late material events may enter a narrow targeted-refresh lane.
+- Edge must rerun only the formulas and model components dependent on the changed evidence.
+- All sixteen sporting codes require isolated workload budgets, formula lanes, checkpoints and failure boundaries.
+
+This is a governance addition only. It does not authorise prediction-runtime, scheduler, formula, storage, UI or production changes.
+
+### Required future proof
+
+A separately approved joint inspection must determine:
+
+- the current Edge refresh and prediction execution paths;
+- current feature, formula and model dependency behaviour;
+- whether consumed Scout package versions are recorded;
+- whether unchanged fixtures can be skipped safely;
+- the required Day 1 versus Days 2–8 compute allocation;
+- per-sport capacity, checkpoint, overflow and failure-isolation requirements;
+- the shadow-mode and load proof required before activation.
