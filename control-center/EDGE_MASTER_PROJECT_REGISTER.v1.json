@@ -4,7 +4,7 @@
   "generated_at": "2026-07-05",
   "source_ledger": "control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json",
   "project_policy": "The Master Project Register owns project/workstream truth. Exact project_id to ledger.task_id overlaps must mirror canonical Control Center sequencing state. Files are assets, not automatically projects.",
-  "project_count": 42,
+  "project_count": 45,
   "projects": [
     {
       "project_id": "ECC-001",
@@ -2398,7 +2398,9 @@
       "blocked_by": [
         "SEM-GOV-001D-UI3-I10"
       ],
-      "blocks": [],
+      "blocks": [
+        "SXE-FIP-LAB-001"
+      ],
       "affected_layers": [
         "governance",
         "lifecycle",
@@ -2466,6 +2468,191 @@
         "Zero external connections during the mock proof",
         "Full live marriage proof HOLD",
         "All runtime gates BLOCKED"
+      ]
+    },
+    {
+      "project_id": "SXE-FIP-LAB-001",
+      "project_name": "Genuine Scout-to-Edge External FIP Controlled Proof",
+      "category": "Scout Handoff",
+      "description": "Consume one externally transferred canonical Scout FIP through Edge's existing governed intake and isolated local marriage laboratory, proving exact-byte integrity, fail-closed validation, provider bypass, in-memory-only processing, and zero production effects.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
+      "current_status": "IN_PROGRESS",
+      "priority": "critical",
+      "blocked_by": [
+        "SEM-GOV-001D-UI3-I11"
+      ],
+      "blocks": [],
+      "affected_layers": [
+        "Scout handoff",
+        "intake",
+        "prediction",
+        "local visual laboratory"
+      ],
+      "related_tasks": [
+        "SXE-FIP-LAB-001"
+      ],
+      "related_contracts": [
+        "FIP-001",
+        "EFI-001",
+        "EMG-001",
+        "E2E-001",
+        "EDGE-PACKAGE-SHAPE-001"
+      ],
+      "related_files": [],
+      "related_tables": [],
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "Local controlled proof consumes a verified external canonical Scout FIP when supplied, or returns HOLD with SXE_CANONICAL_SCOUT_FIP_MISSING for the current bundle; no fabricated Scout truth, provider fallback, network access, Scout/Neon access, production write, public route, deployment, or governance-gate clearance occurs.",
+      "proof_required": [
+        "Exact-byte manifest hash verification",
+        "Internal Scout FIP and consumer-safe DTO rejected as canonical Edge intake",
+        "Canonical Scout FIP role and EFI-001 wrapper enforced",
+        "Tamper, missing-file, path, URL, and fixture-mismatch rejection tests",
+        "External runner HOLD for the current handoff with zero prediction and zero fallback",
+        "Synthetic test-only canonical fixture reaches in-memory prediction and normal/deep filters",
+        "Loopback-only visual page rejects production mode",
+        "All three governance gates remain BLOCKED"
+      ],
+      "risks_if_ignored": [
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
+      ],
+      "recommended_order": 43,
+      "next_action": "Run the read-only Edge SXE publication preflight against the exact classified three-commit scope. Do not begin source acquisition, genuine FIP consumption, live prediction execution or deployment.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
+      "last_updated": "2026-07-24",
+      "governed_by_control_task_id": "SXE-FIP-LAB-001",
+      "current_evidence": [
+        "PREFLIGHT_REPAIR_PASS",
+        "Internal Scout FIP SHA-256 matches manifest 88A92C6A33745D1654AF91094E72217D7A888881D1762B1F696D4ECCA6860C48",
+        "Consumer-safe Edge DTO SHA-256 matches manifest 588D8CDC4AE183C2F52055AD71C8E84546AB84F0FB133FB93E1ED354476348C6",
+        "Current handoff declares INTERNAL_SCOUT_FIP, SCOUT_GENERATION_REPORT, and CONSUMER_SAFE_EDGE_DTO only",
+        "Current external run returns HOLD / SXE_CANONICAL_SCOUT_FIP_MISSING",
+        "Scout published tip 5a19ac88a436768a9356150e4c0cf7ec17f2405e",
+        "Scout canonical builder blob 6fc7ed22632cc97e24af664b8bd7e458f96a3a88",
+        "Scout canonical builder SHA-256 04F5F7F3FAB8AA80233F88E6F842D4BB6ECF8B58B8B91F2CAD4009C281847433",
+        "Scout post-publication identity result SXE_FIP_LAB_001_POST_PUBLICATION_IDENTITY_READY",
+        "No genuine canonical FIP has yet been consumed",
+        "No live prediction has been produced",
+        "No deployment has occurred",
+        "LPF remains a Scout-side UNKNOWN / AMBER / HOLD_REVIEW source and has no Edge activation",
+        "Edge intake audit found missing independent canonical-hash, size, sport, status and kickoff validation",
+        "SXE-FIP-LAB-001B repairs those local unpublished boundary gaps",
+        "SXE-FIP-LAB-001B completed at TESTED",
+        "The Edge boundary independently enforces the Scout canonical hash, schema, provenance, football isolation, fixture identity, status, kickoff window and size ceiling",
+        "The remaining Control Center test result was differentially compared with the untouched Edge published baseline",
+        "The edge-control-center-ledger cleanup-programme count failure is an unchanged published-baseline failure and is not caused by SXE-FIP-LAB-001B"
+      ]
+    },
+    {
+      "project_id": "SXE-FIP-LAB-001B",
+      "project_name": "Edge Canonical FIP Intake Boundary Hardening",
+      "category": "Scout Handoff",
+      "description": "Independently enforce the published Scout canonical FIP hash, schema, provenance, football eligibility, fixture identity, future kickoff and size constraints at the Edge external intake boundary before any isolated marriage execution.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
+      "current_status": "TESTED",
+      "priority": "critical",
+      "blocked_by": [],
+      "blocks": [],
+      "affected_layers": [
+        "external Scout FIP intake",
+        "canonical FIP validation",
+        "isolated marriage proof",
+        "loopback visual proof",
+        "Edge Control Center"
+      ],
+      "related_tasks": [
+        "SXE-FIP-LAB-001B"
+      ],
+      "related_contracts": [
+        "FIP-001",
+        "EFI-001",
+        "EMG-001",
+        "E2E-001",
+        "EDGE-PACKAGE-SHAPE-001"
+      ],
+      "related_files": [],
+      "related_tables": [],
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "The Edge loader rejects manifest-valid but canonically invalid payloads, enforces the published Scout FIP contract independently, uses portable synthetic tests, invokes marriage only after READY classification, reconciles Edge Control Center state with Scout tip 5a19ac8, and passes focused local verification without external or production effects.",
+      "proof_required": [
+        "Independent canonical validation-hash recomputation",
+        "256 KB intake ceiling enforcement",
+        "Football, status and 48-hour kickoff eligibility gates",
+        "Marriage runner invokes e2e path only after READY",
+        "Portable synthetic temporary-directory tests",
+        "Loopback-only visual verification",
+        "Edge Control Center registration for SXE-FIP-LAB-001B"
+      ],
+      "risks_if_ignored": [
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
+      ],
+      "recommended_order": 44,
+      "next_action": "SXE-FIP-LAB-001B is closed at TESTED. Run the read-only Edge SXE publication preflight. Do not execute a genuine FIP or live prediction.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
+      "last_updated": "2026-07-24",
+      "governed_by_control_task_id": "SXE-FIP-LAB-001B",
+      "current_evidence": [
+        "SXE_EDGE_INTAKE_BOUNDARY_HARDENING_PASS",
+        "Focused loader, validator, marriage and visual tests pass locally",
+        "No genuine FIP consumption",
+        "No live prediction",
+        "No deployment"
+      ]
+    },
+    {
+      "project_id": "SXE-FIP-LAB-001C",
+      "project_name": "Edge Hardening Closure Verification",
+      "category": "Scout Handoff",
+      "description": "Differentially verify whether the remaining Edge Control Center test failure predates SXE-FIP-LAB-001B, finalize post-TESTED next actions, and establish whether the hardened Edge intake is ready for publication preflight.",
+      "why_it_matters": "Governed Edge work must remain visible to Control Center sequencing.",
+      "current_status": "TESTED",
+      "priority": "high",
+      "blocked_by": [],
+      "blocks": [],
+      "affected_layers": [
+        "Edge Control Center",
+        "test attribution",
+        "publication readiness"
+      ],
+      "related_tasks": [
+        "SXE-FIP-LAB-001C"
+      ],
+      "related_contracts": [
+        "FIP-001",
+        "EFI-001",
+        "EMG-001",
+        "E2E-001"
+      ],
+      "related_files": [],
+      "related_tables": [],
+      "known_issues": [],
+      "required_decisions": [],
+      "completion_definition": "Baseline worktree at bd36c6e proves the edge-control-center-ledger cleanup-programme asset-count assertion failure predates SXE-FIP-LAB-001B; parent next action no longer references completing 001B; all 44 focused SXE tests pass; implementation file hashes unchanged.",
+      "proof_required": [
+        "Detached baseline worktree ledger test comparison",
+        "Identical 997 !== 927 failure signature on baseline and current",
+        "44/44 focused SXE tests pass",
+        "Parent next action points to read-only publication preflight only",
+        "Implementation SHA-256 manifest unchanged"
+      ],
+      "risks_if_ignored": [
+        "Hidden Edge work",
+        "Control Center sequencing bypass"
+      ],
+      "recommended_order": 45,
+      "next_action": "SXE-FIP-LAB-001C is closed at TESTED. Run the read-only Edge SXE publication preflight against the exact classified scope.",
+      "owner_note": "Bootstrapped from the canonical Edge Control Center ledger. Exact task-ID overlaps mirror ledger sequencing state.",
+      "last_updated": "2026-07-24",
+      "governed_by_control_task_id": "SXE-FIP-LAB-001C",
+      "current_evidence": [
+        "SXE_EDGE_HARDENING_CLOSURE_READY",
+        "PRE_EXISTING_UNRELATED_BASELINE_FAILURE for documents the active repository cleanup programme state",
+        "Baseline and current ledger tests 48/49 pass with identical single failure",
+        "Focused SXE tests 44/44 pass",
+        "No implementation file changes during closure pass"
       ]
     }
   ]

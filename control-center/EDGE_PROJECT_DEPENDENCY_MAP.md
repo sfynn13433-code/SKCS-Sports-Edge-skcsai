@@ -294,4 +294,25 @@ Blocks: SEM-GOV-001D-UI3-I11
 Status: TESTED
 Governed by: SEM-GOV-001D-UI3-I11
 Blocked by: SEM-GOV-001D-UI3-I10
+Blocks: SXE-FIP-LAB-001
+
+## SXE-FIP-LAB-001 — Genuine Scout-to-Edge External FIP Controlled Proof
+
+Status: IN_PROGRESS
+Governed by: SXE-FIP-LAB-001
+Blocked by: SEM-GOV-001D-UI3-I11
+Blocks: none
+
+## SXE-FIP-LAB-001B — Edge Canonical FIP Intake Boundary Hardening
+
+Status: TESTED
+Governed by: SXE-FIP-LAB-001B
+Blocked by: none
+Blocks: none
+
+## SXE-FIP-LAB-001C — Edge Hardening Closure Verification
+
+Status: TESTED
+Governed by: SXE-FIP-LAB-001C
+Blocked by: none
 Blocks: none
