@@ -557,14 +557,30 @@ function assertSafetyInvariants() {
   }
 }
 
-async function main() {
+async function main(options = {}) {
   const runId = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);
-  const { fip, receivedAt } = buildVisualFip(runId);
+  const { fip, receivedAt } = options.externalFip
+    ? {
+        fip: options.externalFip,
+        receivedAt: options.receivedAt || new Date().toISOString()
+      }
+    : buildVisualFip(runId);
+
+  const fixtureHome = typeof fip.fixture.home_team === 'string'
+    ? fip.fixture.home_team
+    : fip.fixture.home_team?.name;
+  const fixtureAway = typeof fip.fixture.away_team === 'string'
+    ? fip.fixture.away_team
+    : fip.fixture.away_team?.name;
+  const fixtureCompetition = fip.fixture.competition || fip.fixture.league;
+  const fixtureKickoff = fip.fixture.kickoff_time || fip.fixture.kickoff_utc;
 
   pushTimeline(
     'FIP_CREATED',
     'PASS',
-    `Scout FIP ${fip.fip_id} assembled with governed proof context.`
+    options.externalFip
+      ? `External Scout FIP ${fip.fip_id} loaded after verified handoff integrity.`
+      : `Scout FIP ${fip.fip_id} assembled with governed proof context.`
   );
 
   pushTimeline(
@@ -573,14 +589,14 @@ async function main() {
     `Validation hash ${fip.validation.hash.slice(0, 16)}… verified with ${HASH_ALGORITHM}.`
   );
 
-  const options = {
+  const pipelineOptions = {
     fip_envelopes: [fip],
     governed_mode: PROOF_FIXTURE_MODE,
     caller: 'E2E-001E-LOCAL-VISUAL-MARRIAGE',
     received_at: receivedAt
   };
 
-  const runtimeResult = await aiPipeline.runPipelineFromConfiguredDataMode(options);
+  const runtimeResult = await aiPipeline.runPipelineFromConfiguredDataMode(pipelineOptions);
 
   const intake = Array.isArray(runtimeResult?.intake_results)
     ? runtimeResult.intake_results[0]
@@ -658,11 +674,18 @@ async function main() {
       intake_id: intake.intake_id,
       idempotency_key: intake.evidence?.idempotency_key || null
     },
+    source_package: options.externalMetadata
+      ? {
+          selected_role: options.externalMetadata.selected_role,
+          manifest_path: options.externalMetadata.manifest_path,
+          verified_files: options.externalMetadata.files
+        }
+      : null,
     fixture: {
-      home_team: fip.fixture.home_team,
-      away_team: fip.fixture.away_team,
-      competition: fip.fixture.competition,
-      kickoff: fip.fixture.kickoff_time
+      home_team: fixtureHome,
+      away_team: fixtureAway,
+      competition: fixtureCompetition,
+      kickoff: fixtureKickoff
     },
     prediction: {
       market: rawRow.market,
@@ -707,7 +730,8 @@ async function main() {
   process.stdout.write(`${JSON.stringify(payload)}\n`);
 }
 
-main().catch((error) => {
+if (require.main === module) {
+  main().catch((error) => {
   const failure = {
     ok: false,
     code: error?.code || 'E2E001E_RUNNER_FAILURE',
@@ -730,4 +754,10 @@ main().catch((error) => {
 
   process.stdout.write(`${JSON.stringify(failure)}\n`);
   process.exitCode = 1;
-});
+  });
+}
+
+module.exports = {
+  buildVisualFip,
+  main
+};

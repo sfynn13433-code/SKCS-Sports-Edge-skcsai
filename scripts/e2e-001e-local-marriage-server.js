@@ -7,7 +7,7 @@ const { spawn, execSync } = require('node:child_process');
 
 const HOST = '127.0.0.1';
 const PORT = Number(process.env.E2E_001E_PORT || 3099);
-const REQUIRED_HEAD = '556e7707b280fadbf60d0cf60a20bc15399c074b';
+const REQUIRED_HEAD = 'bd36c6e1ce2a60a355d7cad66cf049106892c8f0';
 const RUN_TIMEOUT_MS = Number(process.env.E2E_001E_RUN_TIMEOUT_MS || 120000);
 const ROOT = path.resolve(__dirname, '..');
 const TOOL_DIR = path.join(ROOT, 'local-tools', 'e2e-001e');
@@ -16,10 +16,23 @@ const RUNNER_PATH = path.join(ROOT, 'scripts', 'e2e-001e-local-marriage-runner.j
 const ALLOWED_IMPLEMENTATION_PATHS = new Set([
   'scripts/e2e-001e-local-marriage-server.js',
   'scripts/e2e-001e-local-marriage-runner.js',
+  'scripts/sxe-fip-lab-001-external-fip-loader.js',
+  'scripts/sxe-fip-lab-001-external-marriage-runner.js',
+  'scripts/sxe-fip-lab-001-external-marriage-server.js',
   'local-tools/e2e-001e/index.html',
   'local-tools/e2e-001e/app.js',
   'local-tools/e2e-001e/styles.css',
+  'local-tools/sxe-fip-lab-001/index.html',
+  'local-tools/sxe-fip-lab-001/app.js',
+  'local-tools/sxe-fip-lab-001/styles.css',
   'tests/e2e-001e-local-visual-marriage.test.js',
+  'tests/sxe-fip-lab-001-external-fip-loader.test.js',
+  'tests/sxe-fip-lab-001-external-marriage.test.js',
+  'tests/sxe-fip-lab-001-visual.test.js',
+  'control-center/EDGE_BUILD_CONTROL_LEDGER.v1.json',
+  'control-center/EDGE_MASTER_PROJECT_REGISTER.v1.json',
+  'control-center/EDGE_PROJECT_BACKLOG.md',
+  'control-center/EDGE_PROJECT_DEPENDENCY_MAP.md',
   'package.json'
 ]);
 
@@ -93,7 +106,11 @@ function isAllowedWorktreeEntry(entry) {
     return true;
   }
 
-  if (entry === 'local-tools/' || entry.startsWith('local-tools/e2e-001e/')) {
+  if (
+    entry === 'local-tools/'
+    || entry.startsWith('local-tools/e2e-001e/')
+    || entry.startsWith('local-tools/sxe-fip-lab-001/')
+  ) {
     return true;
   }
 
